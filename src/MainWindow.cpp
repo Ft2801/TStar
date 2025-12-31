@@ -341,19 +341,12 @@ MainWindow::MainWindow(QWidget *parent)
                     if (m_headerDlg) {
                         m_headerDlg->setViewer(v);
                     }
-                    if (m_cropDlg) {
-                        m_cropDlg->setViewer(v);
-                    }
                     if (m_starAnalysisDlg) {
                         m_starAnalysisDlg->setViewer(v);
                     }
                     if (m_stretchDlg) {
                         m_stretchDlg->setViewer(v);
                     }
-                      CropRotateDialog* activeCrop = qobject_cast<CropRotateDialog*>(activeToolWidget);
-                      if (!activeCrop && m_lastActiveImageViewer) {
-                          m_lastActiveImageViewer->setCropMode(false);
-                      }
                 };
 
                 if (abe) {

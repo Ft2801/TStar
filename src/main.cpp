@@ -90,15 +90,31 @@ int main(int argc, char *argv[])
     };
 
     splash->setMessage(QCoreApplication::translate("main", "Initializing Core Systems..."));
+    splash->setProgress(10);
+    waitStep(100);
+    
+    splash->setMessage(QCoreApplication::translate("main", "Loading Configuration..."));
+    splash->setProgress(15);
+    waitStep(100);
+    
+    splash->setMessage(QCoreApplication::translate("main", "Initializing Memory Manager..."));
     splash->setProgress(20);
-    waitStep(200); 
+    waitStep(100);
     
     splash->setMessage(QCoreApplication::translate("main", "Loading Image Processing Algorithms..."));
+    splash->setProgress(30);
+    waitStep(100);
+    
+    splash->setMessage(QCoreApplication::translate("main", "Initializing OpenCV Backend..."));
+    splash->setProgress(35);
+    waitStep(100);
+    
+    splash->setMessage(QCoreApplication::translate("main", "Loading Color Management..."));
     splash->setProgress(40);
-    waitStep(200);
+    waitStep(100);
     
     splash->setMessage(QCoreApplication::translate("main", "Setting up Dark Theme..."));
-    splash->setProgress(60);
+    splash->setProgress(50);
     
     // Set Dark Theme
     QApplication::setStyle(QStyleFactory::create("Fusion"));
@@ -118,11 +134,15 @@ int main(int argc, char *argv[])
     p.setColor(QPalette::HighlightedText, Qt::black);
     qApp->setPalette(p);
     
-    waitStep(200);
+    waitStep(100);
+    
+    splash->setMessage(QCoreApplication::translate("main", "Configuring UI Colors..."));
+    splash->setProgress(55);
+    waitStep(100);
     
     splash->setMessage(QCoreApplication::translate("main", "Loading Stylesheets..."));
-    splash->setProgress(75);
-    waitStep(200);
+    splash->setProgress(60);
+    waitStep(100);
     
     // Tooltip style only (don't style QMdiSubWindow as it breaks native title bar)
     qApp->setStyleSheet(
@@ -143,9 +163,21 @@ int main(int argc, char *argv[])
         "QComboBox QAbstractItemView::item:selected { background-color: #4a7ba7; color: white; }"
     );
 
+    splash->setMessage(QCoreApplication::translate("main", "Applying Custom Widgets..."));
+    splash->setProgress(65);
+    waitStep(100);
+
+    splash->setMessage(QCoreApplication::translate("main", "Loading Icons & Resources..."));
+    splash->setProgress(70);
+    waitStep(100);
+
+    splash->setMessage(QCoreApplication::translate("main", "Initializing Tool Dialogs..."));
+    splash->setProgress(75);
+    waitStep(100);
+
     splash->setMessage(QCoreApplication::translate("main", "Constructing Main Window..."));
-    splash->setProgress(90); // Most of the way there
-    waitStep(200);
+    splash->setProgress(80);
+    waitStep(100);
 
     MainWindow* window = new MainWindow();
     window->setWindowTitle("TStar v" + QString(TSTAR_VERSION));
@@ -154,11 +186,19 @@ int main(int argc, char *argv[])
     // Set application icon for window and taskbar
     app.setWindowIcon(QIcon(logoPath));
     
+    splash->setMessage(QCoreApplication::translate("main", "Configuring Workspace..."));
+    splash->setProgress(90);
+    waitStep(100);
+    
+    splash->setMessage(QCoreApplication::translate("main", "Finalizing Setup..."));
+    splash->setProgress(95);
+    waitStep(100);
+    
     splash->setMessage(QCoreApplication::translate("main", "Ready!"));
     splash->setProgress(100);
     
     // Final wait to see 100%
-    waitStep(200);
+    waitStep(150);
     
     splash->startFadeOut();
     window->showMaximized(); 

@@ -587,8 +587,9 @@ void ImageViewer::undo() {
     m_redoStack.push_back(m_buffer);
     m_buffer = m_undoStack.back();
     m_undoStack.pop_back();
-    // Refresh with current display settings (Preserve View State)
-    setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), true); 
+    // Refresh and fit to window (useful after undoing crop)
+    setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), false);
+    fitToWindow();
     setModified(true); // Undo is a modification relative to disk
     emit bufferChanged();
     emit historyChanged();
