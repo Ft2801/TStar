@@ -1774,7 +1774,7 @@ void MainWindow::openPlateSolvingDialog() {
     
     auto dlg = new PlateSolvingDialog(nullptr);
     dlg->setAttribute(Qt::WA_DeleteOnClose, false);
-    dlg->setImageBuffer(viewer->getBuffer());
+    dlg->setViewer(viewer);  // Use setViewer instead of setImageBuffer to ensure WCS is applied to viewer
     
     log(tr("Opening Plate Solving..."), Log_Info, true);
     CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
