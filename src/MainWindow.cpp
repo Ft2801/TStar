@@ -29,6 +29,7 @@
 #include "dialogs/CropRotateDialog.h"
 #include "dialogs/CurvesDialog.h"
 #include "io/FitsLoader.h"
+#include "io/SimpleTiffReader.h"
 #include "dialogs/StretchDialog.h"
 #include "dialogs/ABEDialog.h"
 #include "dialogs/SCNRDialog.h"
@@ -983,6 +984,16 @@ void MainWindow::openFile() {
             success = FitsLoader::load(path, buf, &errorMsg);
         } else if (ext == "xisf") {
             success = buf.loadXISF(path, &errorMsg);
+        } else if (ext == "tiff" || ext == "tif") {
+             QString dbg;
+             success = buf.loadTiff32(path, &errorMsg, &dbg);
+             if (!success) {
+                 // Fallback
+                 if (buf.loadStandard(path)) {
+                     success = true;
+                     errorMsg.clear();
+                 }
+             }
         } else {
             success = buf.loadStandard(path);
             if (!success) errorMsg = "Failed to load standard image.";

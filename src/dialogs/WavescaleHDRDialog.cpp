@@ -396,6 +396,12 @@ void WavescaleHDRDialog::createUI() {
     rightLayout->addWidget(m_progressBar);
     
     QHBoxLayout* btnLayout = new QHBoxLayout();
+    
+    QLabel* copyLabel = new QLabel(tr("Copyright 2026 SetiAstro"));
+    copyLabel->setStyleSheet("color: #888; font-size: 10px;");
+    btnLayout->addWidget(copyLabel);
+    btnLayout->addStretch();
+    
     m_applyBtn = new QPushButton(tr("Apply"), this);
     connect(m_applyBtn, &QPushButton::clicked, this, &WavescaleHDRDialog::onApplyClicked);
     

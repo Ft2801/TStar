@@ -19,6 +19,7 @@
 #include <cmath> 
 #include "io/XISFReader.h" 
 #include "io/XISFWriter.h" 
+#include <opencv2/opencv.hpp>
 
 ImageBuffer::ImageBuffer() {}
 ImageBuffer::~ImageBuffer() {}
@@ -115,13 +116,70 @@ bool ImageBuffer::loadStandard(const QString& filePath) {
 }
 
 bool ImageBuffer::loadTiff32(const QString& filePath, QString* errorMsg, QString* debugInfo) {
-    int w, h, ch;
-    std::vector<float> data;
-    if (SimpleTiffReader::readFloat32(filePath, w, h, ch, data, errorMsg, debugInfo)) {
-        setData(w, h, ch, data);
-        return true;
+    // Use OpenCV for fast and reliable TIFF loading (uses libtiff internally)
+    std::string stdPath = filePath.toStdString();
+    
+    // IMREAD_UNCHANGED preserves bit depth and channel count
+    cv::Mat img = cv::imread(stdPath, cv::IMREAD_UNCHANGED);
+    
+    if (img.empty()) {
+        if (errorMsg) *errorMsg = QObject::tr("OpenCV failed to read TIFF file.");
+        return false;
     }
-    return false;
+    
+    int w = img.cols;
+    int h = img.rows;
+    int ch = img.channels();
+    
+    // Force to 3 channels if grayscale (for ImageBuffer compatibility)
+    if (ch == 1) {
+        cv::cvtColor(img, img, cv::COLOR_GRAY2BGR);
+        ch = 3;
+    } else if (ch == 4) {
+        // Drop alpha channel
+        cv::cvtColor(img, img, cv::COLOR_BGRA2BGR);
+        ch = 3;
+    }
+    
+    // Convert to float32 and normalize to [0,1]
+    cv::Mat floatMat;
+    double scale = 1.0;
+    
+    switch (img.depth()) {
+        case CV_8U:  scale = 1.0 / 255.0; break;
+        case CV_16U: scale = 1.0 / 65535.0; break;
+        case CV_32S: scale = 1.0 / 2147483647.0; break;
+        case CV_32F: scale = 1.0; break; // Already float
+        case CV_64F: scale = 1.0; break; // Will be converted
+        default:
+            if (errorMsg) *errorMsg = QObject::tr("Unsupported TIFF bit depth.");
+            return false;
+    }
+    
+    img.convertTo(floatMat, CV_32FC(ch), scale);
+    
+    // Copy to our data structure (BGR -> RGB and row-major interleaved)
+    std::vector<float> data(w * h * ch);
+    
+    for (int y = 0; y < h; ++y) {
+        const float* row = floatMat.ptr<float>(y);
+        for (int x = 0; x < w; ++x) {
+            int srcIdx = x * ch;
+            int dstIdx = (y * w + x) * ch;
+            // BGR to RGB swap
+            data[dstIdx + 0] = row[srcIdx + 2]; // R
+            data[dstIdx + 1] = row[srcIdx + 1]; // G
+            data[dstIdx + 2] = row[srcIdx + 0]; // B
+        }
+    }
+    
+    setData(w, h, ch, data);
+    
+    if (debugInfo) {
+        *debugInfo = QString("Loaded via OpenCV: %1x%2, %3ch, depth=%4").arg(w).arg(h).arg(ch).arg(img.depth());
+    }
+    
+    return true;
 }
 
 bool ImageBuffer::loadXISF(const QString& filePath, QString* errorMsg) {

@@ -1,0 +1,36 @@
+#include <windows.h>
+
+IDI_ICON1 ICON DISCARDABLE "images/Logo.ico"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     @TSTAR_VERSION_MAJOR@,@TSTAR_VERSION_MINOR@,@TSTAR_VERSION_PATCH@,0
+PRODUCTVERSION  @TSTAR_VERSION_MAJOR@,@TSTAR_VERSION_MINOR@,@TSTAR_VERSION_PATCH@,0
+FILEFLAGSMASK   0x3fL
+#ifdef _DEBUG
+FILEFLAGS       0x1L
+#else
+FILEFLAGS       0x0L
+#endif
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_APP
+FILESUBTYPE     VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName",      "FabioTempera"
+            VALUE "FileDescription",  "TStar Astrophotography Tool"
+            VALUE "FileVersion",      "@TSTAR_VERSION@"
+            VALUE "InternalName",     "TStar"
+            VALUE "LegalCopyright",   "Copyright (C) 2026 Fabio Tempera"
+            VALUE "OriginalFilename", "TStar.exe"
+            VALUE "ProductName",      "TStar"
+            VALUE "ProductVersion",   "@TSTAR_VERSION@"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END

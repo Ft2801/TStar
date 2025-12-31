@@ -1,6 +1,13 @@
 TStar Changelog
 ===============
 
+Version 1.0.2
+-------------
+- Added correct copyright in some tools
+- Fixed TIFFs not loading
+- Fixed repeating update messages
+- Fixed ABE not working for some specific image formats
+
 Version 1.0.1
 -------------
 - Fixed a bug that caused cosmic_bridge.py to self delete

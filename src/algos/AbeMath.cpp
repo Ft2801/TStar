@@ -68,6 +68,18 @@ namespace AbeMath {
         int N = samples.size();
         if (N < terms) return {}; 
 
+        // Find coordinate bounds for normalization (prevents overflow on large images)
+        float minX = samples[0].x, maxX = samples[0].x;
+        float minY = samples[0].y, maxY = samples[0].y;
+        for (const auto& s : samples) {
+            if (s.x < minX) minX = s.x;
+            if (s.x > maxX) maxX = s.x;
+            if (s.y < minY) minY = s.y;
+            if (s.y > maxY) maxY = s.y;
+        }
+        float rangeX = (maxX - minX) > 1e-6f ? (maxX - minX) : 1.0f;
+        float rangeY = (maxY - minY) > 1e-6f ? (maxY - minY) : 1.0f;
+
         // Normal Equations: (A^T A) x = A^T b
         // A is N x terms
         
@@ -75,7 +87,10 @@ namespace AbeMath {
         std::vector<double> ATb(terms, 0.0);
         
         for (const auto& s : samples) {
-            auto vars = getPolyTermValues(s.x, s.y, degree);
+            // Normalize to [0,1]
+            float nx = (s.x - minX) / rangeX;
+            float ny = (s.y - minY) / rangeY;
+            auto vars = getPolyTermValues(nx, ny, degree);
             for (int i = 0; i < terms; ++i) {
                 for (int j = 0; j < terms; ++j) {
                     ATA[i * terms + j] += (double)vars[i] * vars[j]; // Symmetric but full compute
@@ -85,7 +100,15 @@ namespace AbeMath {
         }
         
         std::vector<double> coeffsD;
-        if (!solveLinear(terms, ATA, coeffsD, ATb)) return {};
+        if (!solveLinear(terms, ATA, coeffsD, ATb)) {
+            // Fallback: return constant model (average Z)
+            float avgZ = 0.0f;
+            for (const auto& s : samples) avgZ += s.z;
+            avgZ /= N;
+            std::vector<float> fallback(terms, 0.0f);
+            fallback[0] = avgZ; // Constant term
+            return fallback;
+        }
         
         std::vector<float> coeffs(coeffsD.begin(), coeffsD.end());
         return coeffs;
@@ -153,7 +176,10 @@ namespace AbeMath {
         for(int y=cy-half; y<=cy+half; ++y) {
             for(int x=cx-half; x<=cx+half; ++x) {
                 if(x>=0 && x<w && y>=0 && y<h) {
-                    vals.push_back(data[y*w + x]);
+                    float v = data[y*w + x];
+                    if (!std::isnan(v)) {
+                        vals.push_back(v);
+                    }
                 }
             }
         }

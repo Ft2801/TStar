@@ -98,12 +98,18 @@ bool SimpleTiffReader::readFloat32(const QString& path, int& width, int& height,
         else if (tag == TAG_SampleFormat) t_sampleFormat = val; // 3 = Float
         else if (tag == TAG_PlanarConfiguration) t_planarConfig = val;
         else if (tag == TAG_BitsPerSample) {
-            // Can be array if samples > 1, checking count
-            if (count == 1) t_bitsPerSample = val;
-            else {
-                // If larger, value is offset. 
-                // We assume uniform bits per sample usually (32, 32, 32)
-                // Just checking first value for now or assume 32 if float
+            if (count == 1) {
+                t_bitsPerSample = val;
+            } else if (count == 2) {
+                t_bitsPerSample = val & 0xFFFF; 
+            } else {
+                qint64 savePos = file.pos();
+                if (file.seek(val)) {
+                    quint16 v; 
+                    stream >> v;
+                    t_bitsPerSample = v;
+                }
+                file.seek(savePos);
             }
         }
         else if (tag == TAG_StripOffsets) {

@@ -12,7 +12,33 @@ if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/changelog.txt")
 else()
     set(TSTAR_VERSION "1.0.0")
 endif()
+
+# Split Version for Windows Resource
+string(REPLACE "." ";" VERSION_LIST ${TSTAR_VERSION})
+list(GET VERSION_LIST 0 TSTAR_VERSION_MAJOR)
+list(GET VERSION_LIST 1 TSTAR_VERSION_MINOR)
+list(GET VERSION_LIST 2 TSTAR_VERSION_PATCH)
+
+# Ensure none are empty
+if(NOT TSTAR_VERSION_MAJOR) 
+    set(TSTAR_VERSION_MAJOR 1) 
+endif()
+if(NOT TSTAR_VERSION_MINOR) 
+    set(TSTAR_VERSION_MINOR 0) 
+endif()
+if(NOT TSTAR_VERSION_PATCH) 
+    set(TSTAR_VERSION_PATCH 0) 
+endif()
+
+# Configure version.rc
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/version.rc.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/TStar.rc"
+    @ONLY
+)
+
 add_definitions(-DTSTAR_VERSION="${TSTAR_VERSION}")
+
 
 project(TStar LANGUAGES CXX)
 
@@ -54,7 +80,7 @@ find_package(OpenCV REQUIRED PATHS "${CMAKE_CURRENT_SOURCE_DIR}/deps/opencv" NO_
 set(CMAKE_AUTOMOC_COMPILER_PREDEFS OFF)
 
 add_executable(TStar
-    src/TStar.rc
+    ${CMAKE_CURRENT_BINARY_DIR}/TStar.rc
     # ===========================
     # Root (src/)
     # ===========================

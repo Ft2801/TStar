@@ -331,6 +331,11 @@ void GHSDialog::setupUI() {
     applyBtn->setStyleSheet("QPushButton { background-color: #3a7d44; }");
     
     btnLayout->addWidget(resetBtn);
+    
+    QLabel* copyLabel = new QLabel(tr("Copyright 2026 Mike Cranfield"));
+    copyLabel->setStyleSheet("color: #888; font-size: 10px; margin-left: 10px;");
+    btnLayout->addWidget(copyLabel);
+    
     btnLayout->addStretch();
     btnLayout->addWidget(closeBtn);
     btnLayout->addWidget(applyBtn);
