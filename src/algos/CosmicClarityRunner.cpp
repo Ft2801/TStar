@@ -321,10 +321,6 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
     
     QFile::remove(rawInputFile);
     QFile::remove(savedTiff);
-    QFile::remove(bridgeScriptPath);
-    
-    // Final purge as requested by user
-    // Final purge as requested by user
     purge(inputDir);
     purge(outputDir);
 
