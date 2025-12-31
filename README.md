@@ -1,76 +1,111 @@
-
-# TStar
+<div align="center">
+  <img src="src/images/Logo.png" alt="TStar Logo" width="200"/>
+  <h1>TStar</h1>
+  <h3>Professional Astrophotography Processing Suite</h3>
+</div>
 
 **Author:** Fabio Tempera
 
-**TStar** is a comprehensive image processing application designed for astrophotography. Built on the Qt6 framework and C++17, it provides a suite of professional tools for signal processing, gradient reduction, and photometric analysis.
+**License:** MIT License
 
-## Overview
-
-TStar offers a streamlined workflow for processing high-dynamic-range astronomical data. It combines traditional mathematical transformations with modern AI-assisted tools to facilitate the production of scientific-grade images. The interface is designed to maximize screen real estate for data visualization while providing quick access to complex processing algorithms.
+TStar is a powerful, C++17/Qt6-based image processing platform explicitly designed for astrophotography. It combines high-performance signal processing algorithms with modern AI-based restoration tools to help astrophotographers produce scientific-grade images from their raw data.
 
 ## Key Features
 
-### Image Calibration and Stretching
-*   **Generalized Hyperbolic Stretch (GHS):** Advanced non-linear stretching algorithm allowing independent control over shadow protection, highlight preservation, and midtone contrast.
-*   **Histogram Transformation:** Standard levels adjustment with real-time preview and logarithmic visualization.
-*   **Curves Transformation:** Spline-based tonal manipulation for precise contrast adjustments.
+*   **Native FITS Support**: Full compatibility with 8, 16, 32-bit integer and floating-point FITS files.
+*   **MDI Workspace**: Flexible Multi-Document Interface allowing simultaneous editing of multiple images.
+*   **Project Management**: Sidebar with Console logging and FITS Header inspection.
+*   **Performance**: Optimized for 64-bit Windows systems.
 
-### Background Correction
-*   **Automatic Background Extraction (ABE):** Models and subtracts complex light pollution gradients using polynomial and RBF (Radial Basis Function) interpolation.
-*   **Background Neutralization:** Aligns color channels to a neutral background reference to remove chromatic casts.
-*   **GraXpert Integration:** Seamless support for AI-based gradient removal using external GraXpert models.
+## Tools & Functionalities
 
-### Noise Reduction and sharpening
-*   **SCNR (Subtractive Chromatic Noise Reduction):** Removes green or magenta color noise without affecting structural detail.
-*   **CosmicClarity Integration:** Deep learning-based denoising and sharpening.
-*   **Restoration Filters:** Deconvolution and wavelet-based sharpening tools.
+### 1. Stretching & Linear to Non-Linear
+Tools to transform raw linear data into viewable images.
+*   **Generalized Hyperbolic Stretch (GHS)**: State-of-the-art stretching with independent control over shadows, midtones, and highlights.
+*   **Histogram Transformation**: Classic levels adjustment with real-time logarithmic preview.
+*   **Curves Transformation**: Precision spline-based contrast / color adjustment.
+*   **ArcSinh Stretch**: Color-preserving stretch that boosts saturation while stretching.
+*   **Auto Stretch**: One-click screen transfer function for quick visualization.
+*   **Star Stretch**: Specialized tool for stretching stars independently (often used with star masks).
 
-### Star Processing
-*   **StarNet++ Integration:** Automated star removal to separate nebulae/galaxies from star fields for independent processing.
-*   **Plate Solving:** Astrometric calibration to identify celestial coordinates and objects within the field of view.
-*   **Photometric Color Calibration (PCC):** color balances images based on the photometric data of stars from the APASS and Gaia catalogs.
+### 2. Color Calibration & Correction
+*   **Photometric Color Calibration (PCC)**: Solves the image plate and calibrates colors based on Gaia/APASS photometric star catalogs.
+*   **PCC Distribution**: Visualizes the color distribution of stars after calibration.
+*   **Auto Background Extraction (ABE)**: Models and removes light pollution gradients using polynomial or RBF interpolation.
+*   **Background Neutralization**: Removes color casts by aligning background channels.
+*   **SCNR (Subtractive Chromatic Noise Reduction)**: Removes generic Green/Magenta color noise.
+*   **Saturation**: Adjust color intensity with luminance preservation options.
 
-### Utilities
-*   **PixelMath:** High-performance expression engine for arithmetic operations between images (e.g., channel combination, masking).
-*   **MDI Interface:** Multi-Document Interface allowing multiple images and processing versions to be open simultaneously.
-*   **Native FITS Support:** Full compatibility with the FITS standard (8, 16, 32-bit integer and floating point).
+### 3. AI & Restoration
+*   **Cosmic Clarity**: Deep-learning based noise reduction and sharpening.
+*   **GraXpert Integration**: Seamless bridge to run GraXpert for AI gradient removal.
+*   **StarNet++ Integration**: automated star removal to create starless images for separate processing.
+*   **Aberration Remover (RAR)**: Corrects chromatic aberration and star halos.
 
-### Masking Tools
-*   **Mask Creation:** Interactive dialog for drawing freehand polygons or ellipses to define mask regions.
-*   **Advanced Mask Generation:** Programmatic mask generation based on Lightness, Chrominance, Star Detection, or specific Color Hue ranges.
-*   **Mask Application:** Seamlessly apply masks to protect or isolate regions during image processing. Masks support inversion, opacity control, and "protect" modes.
+### 4. Channel Management
+*   **Channel Extraction/Combination**: Split RGB into Mono or combine Mono into RGB.
+*   **Star Recomposition**: Advanced tool to merge starless and stars images back together with blending modes.
+*   **Perfect Palette**: Tool for mapping narrowband data (SHO, HOO, etc.) to artistic color palettes.
+
+### 5. Masking
+*   **Mask Generation**: Create masks based on:
+    *   Luminance / Chrominance
+    *   Star Detection
+    *   Specific Color Hues
+    *   Linear data
+*   **Manual Masking**: Draw masks using polygons or shapes.
+*   **Mask Tools**: Invert, Blur, and Overlay visibility controls.
+
+### 6. Utilities & Effects
+*   **Plate Solving**: Native astrometric solver to determine image coordinates.
+*   **PixelMath**: Powerful expression engine for arithmetic operations between images.
+*   **Star Analysis**: Measure FWHM, eccentricity, and other star profile metrics.
+*   **Wavescale HDR**: Multiscale High Dynamic Range compression.
+*   **FITS Header Editor**: View and modify FITS metadata keywords.
+*   **AstroSpike**: Generates artificial diffraction spikes for aesthetic effect.
+
+## Translations
+TStar is available in multiple languages:
+*   🇬🇧 **English (en)** - Default
+*   🇩🇪 **German (de)**
+*   🇪🇸 **Spanish (es)**
+*   🇫🇷 **French (fr)**
+*   🇮🇹 **Italian (it)**
+
+*Translations are located in the `translations/` folder.*
 
 ## Installation
 
 ### Windows
-TStar is distributed as a standalone portable application for Windows x64 systems.
+TStar is distributed as a portable Windows x64 application.
+1. Download the latest release.
+2. Extract the archive.
+3. Run `TStar.exe`.
 
-1.  Download the latest distribution package from the **Releases** section.
-2.  Extract the archive to a preferred location.
-3.  Run `TStar.exe`.
-
-*Note: Python environments required for scripting and AI tools are now bundled with the application.*
+*Note: Python environments for AI tools (StarNet, etc.) are bundled internally.*
 
 ## Building from Source
 
-For developers or Linux users effectively building from source, please refer to the `BUILDING.md` file in the repository root for detailed dependencies and compilation instructions.
+### Prerequisites
+*   Windows 10/11 x64
+*   Visual Studio 2019/2022 (C++ Desktop Development)
+*   Qt 6.x (MSVC 2019 64-bit)
+*   CMake 3.20+
 
-### Quick Build (Windows PowerShell)
-The repository includes scripts to automate the build process on Windows:
-
+### Automatic Build (PowerShell)
 ```powershell
-.\setup_python_dist.ps1  # Sets up the local Python runtime
-.\build_all.bat          # Compiles the application
-.\package_dist.bat       # Creates the distribution package
+.\setup_python_dist.ps1  # Set up embedded Python
+.\build_all.bat          # Compile and build
+.\package_dist.bat       # Create release package
 ```
 
-## License and Copyright
+## License
+Copyright © 2026 Fabio Tempera.
 
-**Copyright © 2026 Fabio Tempera.**
-
-This software is provided "as is", without warranty of any kind. See the `LICENSE` file for full terms and conditions.
+This project is licensed under the MIT License - see the `LICENSE` file for details.
 
 ## Acknowledgments
-*   NASA's HEASARC for the CFITSIO library.
-*   The Qt Company for the Qt Application Framework.
+*   **Qt Framework** for the UI engine.
+*   **CFITSIO** for FITS file handling.
+*   **OpenCV** for image processing internals.
+*   **CCfits** for C++ FITS wrappers.
