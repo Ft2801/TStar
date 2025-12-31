@@ -9,6 +9,9 @@ echo ===========================================
 echo  TStar Deployment Script
 echo ===========================================
 
+REM Move to project root (parent directory of this script)
+pushd "%~dp0.."
+
 REM Detect build directory
 if exist "build_win\TStar.exe" (
     set "BUILD_DIR=build_win"

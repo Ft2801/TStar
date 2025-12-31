@@ -1,0 +1,12 @@
+__pycache__
+.pyc
+\python\share\
+\python\Scripts\
+\python\doc\
+\python\include\
+\python\libs\
+\python\tcl\
+\python\Tools\
+\python\Lib\test\
+\python\Lib\site-packages\numpy\tests\
+\python\Lib\site-packages\numpy\f2py\tests\

@@ -70,9 +70,12 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
     QStringList runArgs = args;
 
     QString bundledPython = QCoreApplication::applicationDirPath() + "/python/python.exe";
+    QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
+
     if (QFile::exists(bundledPython)) {
         program = bundledPython;
-        // Bundled python is standard python, not launcher
+    } else if (QFile::exists(devPython)) {
+        program = devPython;
     } else {
         #ifdef Q_OS_WIN
             // Force usage of Python 3.12 via launcher if no bundle

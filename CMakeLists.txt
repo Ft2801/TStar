@@ -54,6 +54,7 @@ find_package(OpenCV REQUIRED PATHS "${CMAKE_CURRENT_SOURCE_DIR}/deps/opencv" NO_
 set(CMAKE_AUTOMOC_COMPILER_PREDEFS OFF)
 
 add_executable(TStar
+    src/TStar.rc
     # ===========================
     # Root (src/)
     # ===========================
@@ -231,7 +232,7 @@ qt_add_translations(TStar
         "translations/tstar_fr.ts"
         "translations/tstar_de.ts"
     QM_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/translations"
-    RESOURCE "i18n.qrc"
+    RESOURCE "src/i18n.qrc"
 )
 
 target_include_directories(TStar PRIVATE 
@@ -276,3 +277,6 @@ target_link_libraries(TStar PRIVATE
 if(WIN32)
     # set_property(TARGET TStar PROPERTY WIN32_EXECUTABLE ON)
 endif()
+
+# Copy images to build directory
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/images" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")

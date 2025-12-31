@@ -121,7 +121,10 @@ The resulting folder in `dist/TStar` is completely standalone and can be moved t
 ### Python-related issues
 - If the AI tools fail, ensure `deps/python/python.exe` exists.
 - If you need to re-install the environment, simply delete `deps/python` and run `package_dist.bat` again.
-- C++ code looks for Python in `./python/python.exe` relative to the executable in production, and uses system python in debug/dev modes.
+- C++ code looks for Python in:
+  1. `./python/python.exe` (Distribution/Production)
+  2. `../deps/python/python.exe` (Development/Build environment)
+  3. System `python` (Fallback)
 
 ### Missing DLLs at runtime
 If you built manually with CMake, you MUST run `package_dist.bat` to collect the dependencies. The old `deploy.bat` is preserved for legacy use but `package_dist.bat` is now the preferred method as it handles Python bundling.

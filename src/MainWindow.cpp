@@ -89,7 +89,12 @@ MainWindow::MainWindow(QWidget *parent)
     // Icon Maker (handles SVG or File)
     auto makeIcon = [](const QString& source) -> QIcon {
         if (source.endsWith(".png") || source.endsWith(".jpg") || source.endsWith(".svg")) {
-             return QIcon(source); // Load from file
+             QString path = source;
+             // If relative and not resource, prepend app dir
+             if (!source.startsWith(":") && !QDir::isAbsolutePath(source)) {
+                 path = QCoreApplication::applicationDirPath() + "/" + source;
+             }
+             return QIcon(path); // Load from file
         } else {
             // Assume SVG string
             QPixmap pm(24, 24);
@@ -109,6 +114,7 @@ MainWindow::MainWindow(QWidget *parent)
     
     // 2. MDI Area (Right)
     m_mdiArea = new QMdiArea(this);
+    m_mdiArea->setActivationOrder(QMdiArea::ActivationHistoryOrder);
     m_mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     m_mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     m_mdiArea->setDocumentMode(true); // Tabbed view if we wanted, but we use subwindows
@@ -283,7 +289,14 @@ MainWindow::MainWindow(QWidget *parent)
                         m_displayLinked = v->isDisplayLinked();
                         // Update icon too? Yes, but usually linked/unlinked logic handles it. 
                         // Actually better to be explicit.
-                        m_linkChannelsBtn->setIcon(makeIcon(m_displayLinked ? "src/images/linked.svg" : "src/images/unlinked.svg"));
+    // Helper to get image path relative to executable
+    auto getImgPath = [](const QString& name) {
+        return QCoreApplication::applicationDirPath() + "/images/" + name;
+    };
+
+    m_linkChannelsBtn->setIcon(QIcon(
+        m_displayLinked ? getImgPath("linked.svg") : getImgPath("unlinked.svg")
+    ));
                     }
                     
                     // Ensure connections
@@ -497,13 +510,13 @@ MainWindow::MainWindow(QWidget *parent)
     m_linkChannelsBtn = new QToolButton(this);
     m_linkChannelsBtn->setCheckable(true);
     m_linkChannelsBtn->setChecked(true);
-    m_linkChannelsBtn->setIcon(makeIcon("src/images/linked.svg"));
+    m_linkChannelsBtn->setIcon(makeIcon("images/linked.svg"));
     m_linkChannelsBtn->setToolTip(tr("Toggle RGB Channel Linking for Stretch"));
     m_displayLinked = true;
     
     connect(m_linkChannelsBtn, &QToolButton::toggled, [this, makeIcon](bool checked){
         m_displayLinked = checked;
-        m_linkChannelsBtn->setIcon(makeIcon(checked ? "src/images/linked.svg" : "src/images/unlinked.svg"));
+        m_linkChannelsBtn->setIcon(makeIcon(checked ? "images/linked.svg" : "images/unlinked.svg"));
         if (auto v = currentViewer()) {
             v->setDisplayState(m_displayMode, m_displayLinked);
             log(tr("RGB Link: %1").arg(checked ? tr("Enabled") : tr("Disabled")));
@@ -518,8 +531,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_invertBtn = new QToolButton(this);
     m_invertBtn->setCheckable(true);
-    m_invertBtn->setIcon(makeIcon("src/images/invert.svg"));
-    m_invertBtn->setToolTip(tr("Invert Image Colors"));
+    m_invertBtn->setIcon(makeIcon("images/invert.svg"));
     m_invertBtn->setToolTip(tr("Invert Image Colors"));
     connect(m_invertBtn, &QToolButton::toggled, [this](bool checked){
         if (auto v = currentViewer()) {
@@ -536,7 +548,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_falseColorBtn = new QToolButton(this);
     m_falseColorBtn->setCheckable(true);
-    m_falseColorBtn->setIcon(makeIcon("src/images/false-color.svg"));
+    m_falseColorBtn->setIcon(makeIcon("images/false-color.svg"));
     m_falseColorBtn->setToolTip(tr("False Color Visualization"));
     m_falseColorBtn->setToolTip(tr("False Color Visualization"));
     connect(m_falseColorBtn, &QToolButton::toggled, [this](bool checked){
@@ -889,6 +901,8 @@ void MainWindow::createNewImageWindow(const ImageBuffer& buffer, const QString& 
     
     m_mdiArea->addSubWindow(sub);
     sub->show();
+    m_mdiArea->setActiveSubWindow(sub);
+    sub->raise();
     
     // Cascading Logic (Smart Center + Offset)
     // 1. Get viewport dimensions (actual usable space)
@@ -1458,11 +1472,21 @@ void MainWindow::showConsoleTemporarily(int durationMs) {
 
 void MainWindow::startLongProcess() {
     if (!m_sidebar) return;
+    
+    // Capture active subwindow to restore it after opening console (User Request: Keep image on top)
+    QMdiSubWindow* activeSub = m_mdiArea ? m_mdiArea->activeSubWindow() : nullptr;
+
     m_wasConsoleOpen = m_sidebar->isExpanded();
     m_sidebar->openPanel("Console");
+    
     // Disable auto-close timer if running
     if (m_tempConsoleTimer && m_tempConsoleTimer->isActive()) {
         m_tempConsoleTimer->stop();
+    }
+    
+    // Restore focus/z-order to the image
+    if (activeSub && m_mdiArea) {
+        m_mdiArea->setActiveSubWindow(activeSub);
     }
 }
 
@@ -2231,6 +2255,14 @@ void MainWindow::setupSidebarTools() {}
 void MainWindow::runCosmicClarity(const CosmicClarityParams& params) {
      ImageViewer* v = currentViewer();
      if (!v) return;
+
+     // Force activation of the target window before starting process
+     QWidget* p = v->parentWidget();
+     while (p && !qobject_cast<QMdiSubWindow*>(p)) p = p->parentWidget();
+     if (auto sub = qobject_cast<QMdiSubWindow*>(p)) {
+         m_mdiArea->setActiveSubWindow(sub);
+     }
+
      startLongProcess();
      
      QThread* thread = new QThread;
@@ -2275,6 +2307,13 @@ void MainWindow::runGraXpert(const GraXpertParams& params) {
      ImageViewer* v = currentViewer();
      if (!v) return;
      
+     // Force activation of the target window before starting process
+     QWidget* p = v->parentWidget();
+     while (p && !qobject_cast<QMdiSubWindow*>(p)) p = p->parentWidget();
+     if (auto sub = qobject_cast<QMdiSubWindow*>(p)) {
+         m_mdiArea->setActiveSubWindow(sub);
+     }
+
      startLongProcess();
      
      QThread* thread = new QThread;

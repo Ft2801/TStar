@@ -15,6 +15,8 @@
 AppId={{B5F8E3A4-2D91-4C67-9A5E-7F2B3C8D1E9A}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
+; Fix display name in Apps & Features
+AppVerName={#MyAppName}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -23,16 +25,18 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 PrivilegesRequired=admin
-LicenseFile=LICENSE
-OutputDir=installer_output
+LicenseFile=..\LICENSE
+SetupIconFile=images\Logo.ico
+UninstallDisplayIcon={app}\{#MyAppExeName}
+OutputDir=..\installer_output
 OutputBaseFilename=TStar_Setup_{#MyAppVersion}
 Compression=lzma2/normal
 SolidCompression=yes
-InfoBeforeFile=changelog.txt
+InfoBeforeFile=..\changelog.txt
 ; Modern Design Assets
 WizardStyle=modern
-WizardImageFile=src\images\Pillars.jpg
-WizardSmallImageFile=src\images\Logo.png
+WizardImageFile=images\WizardImage.bmp
+WizardSmallImageFile=images\WizardSmallImage.bmp
 ArchitecturesInstallIn64BitMode=x64compatible
 ArchitecturesAllowed=x64compatible
 ; Show version in installer title
@@ -52,7 +56,7 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 
 [Files]
 ; Main executable and all files from dist folder
-Source: "dist\TStar\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\dist\TStar\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

@@ -6,12 +6,20 @@ echo  TStar Installer Builder
 echo ===========================================
 echo.
 
+REM Move to project root (parent directory of this script)
+pushd "%~dp0.."
+
 REM --- Read version from changelog.txt ---
 set "VERSION=1.0.0"
 if exist "changelog.txt" (
-    for /f "tokens=2" %%v in ('findstr /R "^Version [0-9.]*" changelog.txt') do (
-        set "VERSION=%%v"
-        goto :VersionDone
+    REM Use type to handle potential encoding issues and pipe to findstr
+    for /f "tokens=2" %%v in ('type "changelog.txt" ^| findstr /R /C:"^Version [0-9][0-9.]*"') do (
+        set "TEMP_VER=%%v"
+        REM Simple check to ensure it starts with a number (basic validation)
+        echo !TEMP_VER!| findstr /R "^[0-9]" >nul && (
+            set "VERSION=!TEMP_VER!"
+            goto :VersionDone
+        )
     )
 ) else (
     echo [ERROR] changelog.txt not found!
@@ -45,9 +53,9 @@ if "!ISCC!"=="" (
 )
 echo   - Inno Setup: OK
 
-REM Check if installer.iss exists
-if not exist "installer.iss" (
-    echo [ERROR] installer.iss not found!
+REM Check if installer.iss exists (in src)
+if not exist "src\installer.iss" (
+    echo [ERROR] src\installer.iss not found!
     pause
     exit /b 1
 )
@@ -62,6 +70,23 @@ if not exist "LICENSE" (
 echo   - LICENSE: OK
 echo.
 
+REM --- STEP 0.5: Prepare Assets ---
+echo [STEP 0.5] Preparing assets...
+if exist "tools\convert_icon.py" (
+    python tools\convert_icon.py
+    if exist "src\images\Logo.ico" (
+        echo   - Icon converted: OK
+    ) else (
+        echo   [WARNING] Icon conversion failed, default icon might be used.
+    )
+    
+    if exist "tools\convert_wizard_images.py" (
+        python tools\convert_wizard_images.py
+        echo   - Wizard images converted to BMP
+    )
+)
+echo.
+
 REM --- STEP 1: Clean Previous Installer Output ---
 echo [STEP 1] Cleaning previous installer output...
 if exist "installer_output" (
@@ -74,7 +99,7 @@ echo.
 
 REM --- STEP 2: Build the Application ---
 echo [STEP 2] Building the application...
-call build_all.bat --silent
+call src\build_all.bat --silent
 if %errorlevel% neq 0 (
     echo [ERROR] Build failed!
     pause
@@ -85,7 +110,7 @@ echo.
 
 REM --- STEP 3: Create Distribution Package ---
 echo [STEP 3] Creating distribution package...
-call package_dist.bat --silent
+call src\package_dist.bat --silent
 if %errorlevel% neq 0 (
     echo [ERROR] Distribution packaging failed!
     pause
@@ -134,11 +159,11 @@ echo.
 REM --- STEP 5: Create Installer ---
 echo [STEP 5] Creating installer with Inno Setup...
 echo   - Compiler: !ISCC!
-echo   - Script: installer.iss
+echo   - Script: src\installer.iss
 echo   - Version: %VERSION%
 echo.
 
-"!ISCC!" /DMyAppVersion="%VERSION%" installer.iss
+"!ISCC!" /DMyAppVersion="%VERSION%" src\installer.iss
 if %errorlevel% neq 0 (
     echo.
     echo [ERROR] Installer creation failed!

@@ -166,8 +166,8 @@ void RARDialog::onDownloadModel() {
             return;
         }
         
-        // Use Application Directory (Workspace-like) instead of AppData
-        QString destDir = QCoreApplication::applicationDirPath() + "/models/rar";
+        // Use AppData/Local/TStar (Standardized user path)
+        QString destDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/TStar/models/rar";
         QDir().mkpath(destDir);
         QString destPath = destDir + "/" + fileName;
 

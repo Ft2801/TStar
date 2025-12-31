@@ -12,6 +12,9 @@ if %SILENT_MODE%==0 (
     echo.
 )
 
+REM Move to project root (parent directory of this script)
+pushd "%~dp0.."
+
 set "BUILD_DIR=build"
 set "DIST_DIR=dist\TStar"
 set "ERROR_COUNT=0"
@@ -71,7 +74,7 @@ if exist "%DIST_DIR%\TStar.exe" (
 
 echo.
 echo [STEP 3] Copying Qt DLLs...
-for %%f in (Qt6Core.dll Qt6Gui.dll Qt6Network.dll Qt6Svg.dll Qt6Widgets.dll) do (
+for %%f in (Qt6Core.dll Qt6Gui.dll Qt6Network.dll Qt6Svg.dll Qt6Widgets.dll Qt6Xml.dll) do (
     copy "%BUILD_DIR%\%%f" "%DIST_DIR%\" >nul 2>&1
     if exist "%DIST_DIR%\%%f" (
         set /a COPY_COUNT+=1
@@ -179,8 +182,21 @@ if exist "src\images" (
 )
 
 echo.
+echo [STEP 9.5] Copying translations...
+if exist "%BUILD_DIR%\translations" (
+    xcopy "%BUILD_DIR%\translations" "%DIST_DIR%\translations\" /E /I /Q >nul 2>&1
+    if exist "%DIST_DIR%\translations" (
+        echo   - translations folder: OK
+    ) else (
+        echo   [WARNING] translations folder: copy may have failed
+    )
+) else (
+    echo   [WARNING] translations folder not found in build directory
+)
+
+echo.
 echo [STEP 10] Copying Python Environment...
-xcopy "deps\python" "%DIST_DIR%\python\" /E /I /Q >nul 2>&1
+xcopy "deps\python" "%DIST_DIR%\python\" /E /I /Q /EXCLUDE:tools\xcopy_exclude.txt >nul 2>&1
 if exist "%DIST_DIR%\python\python.exe" (
     echo   - python folder: OK
 ) else (
@@ -191,7 +207,7 @@ if exist "%DIST_DIR%\python\python.exe" (
 echo.
 echo [STEP 11] Copying Scripts...
 if exist "src\scripts" (
-    xcopy "src\scripts" "%DIST_DIR%\scripts\" /E /I /Q >nul 2>&1
+    xcopy "src\scripts" "%DIST_DIR%\scripts\" /E /I /Q /EXCLUDE:tools\xcopy_exclude.txt >nul 2>&1
     if exist "%DIST_DIR%\scripts" (
         echo   - scripts folder: OK
     ) else (

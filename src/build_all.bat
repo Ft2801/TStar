@@ -9,6 +9,9 @@ echo ===========================================
 echo  TStar Build Script (MinGW + Qt6)
 echo ===========================================
 
+REM Move to project root (parent directory of this script)
+pushd "%~dp0.."
+
 REM --- CONFIGURATION ---
 REM Adjust these if your paths differ
 set MINGW_BIN=C:\Qt\Tools\mingw1310_64\bin
@@ -53,9 +56,9 @@ if %errorlevel% neq 0 goto :error
 echo.
 echo [STEP 3] Deployment (copying DLLs)...
 if !SILENT_MODE!==1 (
-    call deploy.bat --silent
+    call src\deploy.bat --silent
 ) else (
-    call deploy.bat
+    call src\deploy.bat
 )
 
 echo.

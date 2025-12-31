@@ -103,7 +103,7 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
              << rawInputFile;
         
         QProcess p;
-        p.start("python", args);
+        p.start(pythonExe, args);
         p.waitForFinished();
         if (p.exitCode() != 0) {
             if(errorMsg) *errorMsg = "Bridge failed to save TIFF: " + p.readAllStandardOutput() + p.readAllStandardError();
@@ -254,7 +254,7 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
             args << bridgeScriptPath << "load" << expectedOutput << rawResult;
             
             QProcess p;
-            p.start("python", args);
+            p.start(pythonExe, args);
             p.waitForFinished();
             if (p.exitCode() != 0) {
                 if(errorMsg) *errorMsg = "Bridge failed to load result.";
@@ -323,6 +323,7 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
     QFile::remove(savedTiff);
     QFile::remove(bridgeScriptPath);
     
+    // Final purge as requested by user
     // Final purge as requested by user
     purge(inputDir);
     purge(outputDir);
