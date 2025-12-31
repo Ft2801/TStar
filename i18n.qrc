@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RCC>
+    <qresource prefix="/translations">
+        <file>tstar_it.qm</file>
+    </qresource>
+</RCC>

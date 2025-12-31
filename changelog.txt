@@ -1,0 +1,11 @@
+TStar Changelog
+===============
+
+Version 1.0.0
+-------------
+- Initial release
+- Modern UI with Dark Theme
+- Standard and advanced astrophotography tools
+- AI Integration (GraXpert, CosmicClarity, StarNet++)
+- Centralized Python environment for standalone distribution
+- Unified script management

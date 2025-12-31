@@ -1,0 +1,66 @@
+# Build directories
+build/
+build_win/
+cmake-build-*/
+out/
+dist/
+installer_output/
+
+# Dependencies (users should download separately)
+deps/
+
+# IDE and editor files
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln
+*.vcxproj*
+CMakeSettings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Qt Creator files
+*.pro.user*
+*.qbs.user*
+CMakeLists.txt.user*
+
+# Compiled files
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+*.pdb
+*.ilk
+*.exp
+
+# CMake generated
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# Qt generated
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+*.qm
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and temporary files
+*.log
+build_log.txt
+*.tmp
+*.temp
