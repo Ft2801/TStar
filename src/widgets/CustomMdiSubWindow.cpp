@@ -1,6 +1,7 @@
 #include "CustomMdiSubWindow.h"
 #include "ImageViewer.h"
 #include "Icons.h"
+#include "core/DpiHelper.h"
 #include <QStyle>
 #include <QDebug>
 #include <QDrag>
@@ -24,11 +25,12 @@
 #include <QEasingCurve>
 #include <QGraphicsOpacityEffect>
 
-// Helper to create QIcon from SVG string
-static QIcon iconFromSvg(const QString& svg) {
+// Helper to create QIcon from SVG string (DPI-aware)
+static QIcon iconFromSvg(const QString& svg, QWidget* widget = nullptr) {
     QByteArray ba = svg.toUtf8();
     QSvgRenderer renderer(ba);
-    QPixmap pix(64, 64);
+    int size = DpiHelper::iconPixmapSize(widget);
+    QPixmap pix(size, size);
     pix.fill(Qt::transparent);
     QPainter painter(&pix);
     renderer.render(&painter);
@@ -37,7 +39,7 @@ static QIcon iconFromSvg(const QString& svg) {
 
 // --- NameStrip ---
 NameStrip::NameStrip(QWidget *parent) : QWidget(parent) {
-    setFixedWidth(24);
+    setFixedWidth(DpiHelper::sidebarWidth(this));
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
     setCursor(Qt::OpenHandCursor);
     setAcceptDrops(true);
@@ -128,7 +130,8 @@ void NameStrip::mouseMoveEvent(QMouseEvent *event) {
         mimeData->setData("application/x-tstar-duplicate", ptrData);
         drag->setMimeData(mimeData);
         
-        QPixmap pix(20, 20);
+        int dragSize = DpiHelper::dragPixmapSize(this);
+        QPixmap pix(dragSize, dragSize);
         pix.fill(Qt::cyan); // Cyan for duplicate
         drag->setPixmap(pix);
         drag->exec(Qt::CopyAction);
@@ -137,7 +140,7 @@ void NameStrip::mouseMoveEvent(QMouseEvent *event) {
 
 // --- LinkStrip ---
 LinkStrip::LinkStrip(QWidget *parent) : QWidget(parent) {
-    setFixedWidth(24);
+    setFixedWidth(DpiHelper::sidebarWidth(this));
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding); // Takes remaining space
     setCursor(Qt::OpenHandCursor);
     setAcceptDrops(true); // Can drop on link strip too
@@ -198,7 +201,8 @@ void LinkStrip::mouseMoveEvent(QMouseEvent *event) {
         QByteArray ptrData = QByteArray::number((quintptr)sourceWin, 16);
         mimeData->setData("application/x-tstar-link", ptrData);
         drag->setMimeData(mimeData);
-        QPixmap pix(20, 20);
+        int dragSize = DpiHelper::dragPixmapSize(this);
+        QPixmap pix(dragSize, dragSize);
         pix.fill(Qt::green);
         drag->setPixmap(pix);
         drag->exec(Qt::LinkAction);
@@ -232,7 +236,7 @@ void LinkStrip::dropEvent(QDropEvent *event) {
 
 // --- AdaptStrip ---
 AdaptStrip::AdaptStrip(QWidget *parent) : QWidget(parent) {
-    setFixedWidth(24);
+    setFixedWidth(DpiHelper::sidebarWidth(this));
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     setCursor(Qt::OpenHandCursor);
     setAcceptDrops(true);
@@ -280,7 +284,8 @@ void AdaptStrip::mouseMoveEvent(QMouseEvent *event) {
         mimeData->setData("application/x-tstar-adapt", ptrData);
         drag->setMimeData(mimeData);
         
-        QPixmap pix(20, 20);
+        int dragSize = DpiHelper::dragPixmapSize(this);
+        QPixmap pix(dragSize, dragSize);
         pix.fill(Qt::yellow);
         drag->setPixmap(pix);
         drag->exec(Qt::MoveAction);
@@ -313,21 +318,24 @@ void AdaptStrip::dropEvent(QDropEvent *event) {
 // --- Custom Title Bar ---
 
 CustomTitleBar::CustomTitleBar(QWidget *parent) : QWidget(parent) {
-    setFixedHeight(28);
+    setFixedHeight(DpiHelper::titleBarHeight(this));
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     m_active = false;
     
     QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(5, 0, 5, 4);
-    layout->setSpacing(4);
+    int margin = DpiHelper::scale(5, this);
+    layout->setContentsMargins(margin, 0, margin, DpiHelper::scale(4, this));
+    layout->setSpacing(DpiHelper::scale(4, this));
     
     m_titleLabel = new QLabel("", this);
     m_titleLabel->setStyleSheet("color: #ddd; font-weight: bold; font-family: 'Segoe UI'; font-size: 11px; background: transparent;");
     
+    int btnSize = DpiHelper::buttonSize(this);
+    int icnSize = DpiHelper::iconSize(this);
     auto configBtn = [&](QPushButton* btn, const QString& svg, const QString& hoverColor) {
-        btn->setFixedSize(22, 22);
-        btn->setIcon(iconFromSvg(svg));
-        btn->setIconSize(QSize(14, 14));
+        btn->setFixedSize(btnSize, btnSize);
+        btn->setIcon(iconFromSvg(svg, this));
+        btn->setIconSize(QSize(icnSize, icnSize));
         btn->setFlat(true);
         btn->setStyleSheet(QString(
             "QPushButton { border: none; background: transparent; padding: 2px; }"
@@ -343,10 +351,10 @@ CustomTitleBar::CustomTitleBar(QWidget *parent) : QWidget(parent) {
     configBtn(m_closeBtn, Icons::WIN_CLOSE, "#c00");
 
     // Balance layout for centering with dummy widget
-    int buttonsWidth = 3 * 22 + 2 * 4; 
+    int buttonsWidth = 3 * btnSize + 2 * DpiHelper::scale(4, this); 
     
     m_leftDummy = new QWidget(this);
-    m_leftDummy->setFixedSize(74, 1);
+    m_leftDummy->setFixedSize(DpiHelper::scale(74, this), 1);
     m_leftDummy->setStyleSheet("background: transparent;"); 
     m_leftDummy->setAttribute(Qt::WA_TransparentForMouseEvents);
 
@@ -460,7 +468,7 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
     
     // Left Strip Container
     QWidget* leftStrip = new QWidget(m_contentArea);
-    leftStrip->setFixedWidth(24);
+    leftStrip->setFixedWidth(DpiHelper::sidebarWidth(this));
     QVBoxLayout* leftLayout = new QVBoxLayout(leftStrip);
     leftLayout->setContentsMargins(0, 0, 0, 0);
     leftLayout->setSpacing(0);
@@ -548,14 +556,16 @@ void CustomMdiSubWindow::mouseMoveEvent(QMouseEvent *event) {
             newGeom.setBottom(m_dragStartGeometry.bottom() + delta.y());
         }
 
-        // Enforce minimum size
-        if (newGeom.width() < 100) {
-            if (m_activeEdges & Left) newGeom.setLeft(newGeom.right() - 100);
-            else newGeom.setRight(newGeom.left() + 100);
+        // Enforce minimum size (DPI-aware)
+        int minW = DpiHelper::minWindowWidth(this);
+        int minH = DpiHelper::minWindowHeight(this);
+        if (newGeom.width() < minW) {
+            if (m_activeEdges & Left) newGeom.setLeft(newGeom.right() - minW);
+            else newGeom.setRight(newGeom.left() + minW);
         }
-        if (newGeom.height() < 50) {
-            if (m_activeEdges & Top) newGeom.setTop(newGeom.bottom() - 50);
-            else newGeom.setBottom(newGeom.top() + 50);
+        if (newGeom.height() < minH) {
+            if (m_activeEdges & Top) newGeom.setTop(newGeom.bottom() - minH);
+            else newGeom.setBottom(newGeom.top() + minH);
         }
 
         setGeometry(newGeom);
@@ -584,7 +594,7 @@ void CustomMdiSubWindow::leaveEvent(QEvent *event) {
 
 int CustomMdiSubWindow::getResizeEdge(const QPoint& pos) {
     int edge = None;
-    int margin = 8;
+    int margin = DpiHelper::resizeMargin(this);
     if (pos.x() < margin) edge |= Left;
     if (pos.x() > width() - margin) edge |= Right;
     if (pos.y() < margin) edge |= Top;
@@ -620,13 +630,15 @@ void CustomMdiSubWindow::toggleShade() {
         m_originalWidth = width(); 
         
         m_contentArea->hide();
-        int newH = m_titleBar->height() + 2;
+        int newH = m_titleBar->height() + DpiHelper::borderWidth(this);
         
-        // Shrink width to title + buttons for ALL windows
+        // Shrink width to title + buttons for ALL windows (DPI-aware)
         QFontMetrics fm(m_titleBar->font());
         int textW = fm.horizontalAdvance(windowTitle());
-        int buttonsW = 3 * 26 + 20; 
-        int totalW = std::max(200, textW + buttonsW + 90); 
+        int btnSize = DpiHelper::buttonSize(this);
+        int buttonsW = 3 * btnSize + DpiHelper::scale(20, this); 
+        int minW = DpiHelper::minShadedWidth(this);
+        int totalW = std::max(minW, textW + buttonsW + DpiHelper::scale(90, this)); 
         
         // Center Collapse Implementation (Horizontal Center, Vertical Top)
         int newX = center.x() - totalW / 2;
@@ -702,13 +714,15 @@ bool CustomMdiSubWindow::eventFilter(QObject *obj, QEvent *event) {
             if (m_activeEdges & Top) newGeom.setTop(m_dragStartGeometry.top() + delta.y());
             else if (m_activeEdges & Bottom) newGeom.setBottom(m_dragStartGeometry.bottom() + delta.y());
 
-            if (newGeom.width() < 120) {
-                if (m_activeEdges & Left) newGeom.setLeft(newGeom.right() - 120);
-                else newGeom.setRight(newGeom.left() + 120);
+            int minW = DpiHelper::minWindowWidth(this);
+            int minH = DpiHelper::minWindowHeight(this);
+            if (newGeom.width() < minW) {
+                if (m_activeEdges & Left) newGeom.setLeft(newGeom.right() - minW);
+                else newGeom.setRight(newGeom.left() + minW);
             }
-            if (newGeom.height() < 60) {
-                if (m_activeEdges & Top) newGeom.setTop(newGeom.bottom() - 60);
-                else newGeom.setBottom(newGeom.top() + 60);
+            if (newGeom.height() < minH) {
+                if (m_activeEdges & Top) newGeom.setTop(newGeom.bottom() - minH);
+                else newGeom.setBottom(newGeom.top() + minH);
             }
 
             setGeometry(newGeom);
@@ -808,10 +822,16 @@ void CustomMdiSubWindow::adjustToImageSize() {
     if (!v) return;
     QImage img = v->getBuffer().getDisplayImage(ImageBuffer::Display_Linear);
     if (img.isNull()) return;
+    
+    int sidebar = DpiHelper::sidebarWidth(this);
+    int titleH = DpiHelper::titleBarHeight(this);
+    int border = DpiHelper::borderWidth(this);
+    
     int w = img.width();
     int h = img.height();
-    int totalW = w + 24 + 2;
-    int totalH = h + 26 + 2;
+    int totalW = w + sidebar + border;
+    int totalH = h + titleH + border;
+    
     if (parentWidget()) {
         QSize area = parentWidget()->size();
         if (totalW > area.width() * 0.9) totalW = area.width() * 0.9;

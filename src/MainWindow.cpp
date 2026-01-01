@@ -2170,6 +2170,19 @@ void MainWindow::showEvent(QShowEvent* event) {
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
+    if (m_isClosing) {
+        QMainWindow::closeEvent(event);
+        return;
+    }
+    
+    QMessageBox::StandardButton res = QMessageBox::question(this, tr("Exit TStar"), tr("Are you sure you want to exit?"), 
+                                                            QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+    
+    if (res != QMessageBox::Yes) {
+        event->ignore();
+        return;
+    }
+
     // Attempt to close all MDI windows first WITHOUT animation to allow quitting interaction
     if (m_mdiArea) {
         for (auto sub : m_mdiArea->subWindowList()) {

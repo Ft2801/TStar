@@ -955,6 +955,12 @@ void AstroSpikeDialog::setupUI() {
     contentLayout->addWidget(m_controlsScroll);
     
     root->addWidget(content);
+
+    // Copyright at the very bottom
+    QLabel* copyright = new QLabel(tr("© 2026 Fabio Tempera"), this);
+    copyright->setAlignment(Qt::AlignRight);
+    copyright->setStyleSheet("color: #888; font-size: 10px; padding: 3px 10px; background: #1e1e1e; border-top: 1px solid #333;");
+    root->addWidget(copyright);
 }
 
 void AstroSpikeDialog::setupControls(QVBoxLayout* layout) {

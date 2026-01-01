@@ -1,6 +1,11 @@
 TStar Changelog
 ===============
 
+Version 1.0.4
+-------------
+- DPI based window rescaling
+- App exit warning
+
 Version 1.0.3
 -------------
 - Fixed Tiffs saving typo
