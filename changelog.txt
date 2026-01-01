@@ -1,6 +1,11 @@
 TStar Changelog
 ===============
 
+Version 1.0.3
+-------------
+- Fixed Tiffs saving typo
+- Fallback for 32 bit integer Tiffs loading
+
 Version 1.0.2
 -------------
 - Added correct copyright in some tools
