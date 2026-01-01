@@ -1,6 +1,10 @@
 TStar Changelog
 ===============
 
+Version 1.0.5
+-------------
+- Fixed ABE, GHT and Saturation small bugs
+
 Version 1.0.4
 -------------
 - DPI based window rescaling

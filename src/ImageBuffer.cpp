@@ -1316,6 +1316,16 @@ void ImageBuffer::applyGHS(const GHSParams& params) {
         default: algoParams.type = GHSAlgo::STRETCH_PAYNE_NORMAL; break;
     }
 
+    if (algoParams.type != GHSAlgo::STRETCH_LINEAR && algoParams.BP > 0.0f) {
+        float den = 1.0f - algoParams.BP;
+        if (den > 1e-6f) { // Avoid div by zero
+            float invDen = 1.0f / den;
+            algoParams.SP = (algoParams.SP - algoParams.BP) * invDen;
+            algoParams.LP = (algoParams.LP - algoParams.BP) * invDen;
+            algoParams.HP = (algoParams.HP - algoParams.BP) * invDen;
+        }
+    }
+
     GHSAlgo::GHSComputeParams cp;
     GHSAlgo::setup(cp, algoParams.B, algoParams.D, algoParams.LP, algoParams.SP, algoParams.HP, algoParams.type);
 
@@ -1459,6 +1469,17 @@ std::vector<float> ImageBuffer::computeGHSLUT(const GHSParams& params, int size)
     else if (params.mode == GHS_ArcSinh) algoParams.type = GHSAlgo::STRETCH_ASINH;
     else if (params.mode == GHS_InverseArcSinh) algoParams.type = GHSAlgo::STRETCH_INVASINH;
     else algoParams.type = GHSAlgo::STRETCH_LINEAR;
+
+    // Fix for Siril Compatibility (LUT for Preview)
+    if (algoParams.type != GHSAlgo::STRETCH_LINEAR && algoParams.BP > 0.0f) {
+        float den = 1.0f - algoParams.BP;
+        if (den > 1e-6f) {
+            float invDen = 1.0f / den;
+            algoParams.SP = (algoParams.SP - algoParams.BP) * invDen;
+            algoParams.LP = (algoParams.LP - algoParams.BP) * invDen;
+            algoParams.HP = (algoParams.HP - algoParams.BP) * invDen;
+        }
+    }
 
     GHSAlgo::GHSComputeParams cp;
     GHSAlgo::setup(cp, algoParams.B, algoParams.D, algoParams.LP, algoParams.SP, algoParams.HP, algoParams.type);
@@ -2564,13 +2585,35 @@ void ImageBuffer::applySaturation(const SaturationParams& params) {
         float g = m_data[i * 3 + 1];
         float b = m_data[i * 3 + 2];
 
-        float h, s, l;
-        rgbToHsl(r, g, b, h, s, l);
+        // Cache original values for safe clamping (avoid race condition)
+        float origR = r, origG = g, origB = b;
+
+        // HDR-Safe Saturation: Work on chrominance directly
+        // Luminance (simple average for color-neutral weighting)
+        float lum = (r + g + b) / 3.0f;
+        
+        // Chrominance (deviation from gray)
+        float cr = r - lum;
+        float cg = g - lum;
+        float cb = b - lum;
+        
+        // Compute hue from chrominance for selective coloring
+        // Using atan2 on a/b style channels (simplified)
+        float hue = 0.0f;
+        float chroma = std::sqrt(cr*cr + cg*cg + cb*cb);
+        
+        if (chroma > 1e-7f) {
+            // Approximate hue from RGB deviation
+            // Red=0, Green=120, Blue=240
+            hue = std::atan2(std::sqrt(3.0f) * (cg - cb), 2.0f * cr - cg - cb);
+            hue = hue * 180.0f / 3.14159265f; // Convert to degrees
+            if (hue < 0.0f) hue += 360.0f;
+        }
 
         // Compute Hue Weighting
         float hueWeight = 1.0f;
         if (params.hueWidth < 359.0f) {
-            float d = std::abs(h - params.hueCenter);
+            float d = std::abs(hue - params.hueCenter);
             if (d > 180.0f) d = 360.0f - d;
             
             float halfWidth = params.hueWidth / 2.0f;
@@ -2579,15 +2622,34 @@ void ImageBuffer::applySaturation(const SaturationParams& params) {
             else hueWeight = 1.0f - (d - halfWidth) / params.hueSmooth;
         }
 
-        float mask = std::pow(l, params.bgFactor);
+        // Background masking: Reduce effect in dark areas
+        // Use luminance clamped to [0,1] for mask calculation
+        float lumClamped = std::max(0.0f, std::min(1.0f, lum));
+        float mask = std::pow(lumClamped, params.bgFactor);
         
+        // Compute effective boost
         float boost = 1.0f + (params.amount - 1.0f) * mask * hueWeight;
+        
+        // Clamp boost to prevent extreme inversion
+        boost = std::max(0.0f, boost);
 
-        s *= boost;
-        if (s > 1.0f) s = 1.0f;
-        if (s < 0.0f) s = 0.0f;
+        // Apply boost to chrominance
+        cr *= boost;
+        cg *= boost;
+        cb *= boost;
 
-        hslToRgb(h, s, l, r, g, b);
+        // Reconstruct RGB
+        r = lum + cr;
+        g = lum + cg;
+        b = lum + cb;
+        
+        // Clamp output to [0, max_original] to prevent runaway values
+        // but preserve HDR headroom (use cached originals, not m_data)
+        float maxOrig = std::max({origR, origG, origB, 1.0f});
+        r = std::max(0.0f, std::min(maxOrig, r));
+        g = std::max(0.0f, std::min(maxOrig, g));
+        b = std::max(0.0f, std::min(maxOrig, b));
+
         m_data[i * 3 + 0] = r;
         m_data[i * 3 + 1] = g;
         m_data[i * 3 + 2] = b;

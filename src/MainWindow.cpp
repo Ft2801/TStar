@@ -592,24 +592,47 @@ MainWindow::MainWindow(QWidget *parent)
 
     // --- A. Stretch ---
     QMenu* stretchMenu = processMenu->addMenu(tr("Stretch Tools"));
-    addMenuAction(stretchMenu, tr("Auto Stretch"), "", &MainWindow::openStretchDialog);
-    addMenuAction(stretchMenu, tr("ArcSinh Stretch"), "", &MainWindow::openArcsinhStretchDialog);
-    addMenuAction(stretchMenu, tr("Curves Transformation"), "", &MainWindow::openCurvesDialog);
-    addMenuAction(stretchMenu, tr("Histogram Transformation"), "", &MainWindow::openHistogramStretchDialog);
-    addMenuAction(stretchMenu, tr("GHS (Generalized Hyperbolic)"), "", &MainWindow::openGHSDialog);
+    addMenuAction(stretchMenu, tr("Auto Stretch"), "", [this](){
+        openStretchDialog();
+    });
+    addMenuAction(stretchMenu, tr("ArcSinh Stretch"), "", [this](){
+        openArcsinhStretchDialog();
+    });
+    addMenuAction(stretchMenu, tr("Curves Transformation"), "", [this](){
+        openCurvesDialog();
+    });
+    addMenuAction(stretchMenu, tr("Histogram Transformation"), "", [this](){
+        openHistogramStretchDialog();
+    });
+    addMenuAction(stretchMenu, tr("GHS (Generalized Hyperbolic)"), "", [this](){
+        openGHSDialog();
+    });
 
     // --- B. Color ---
     QMenu* colorMenu = processMenu->addMenu(tr("Color Management"));
-    addMenuAction(colorMenu, tr("Auto Background Extraction (ABE)"), "", &MainWindow::openAbeDialog);
-    addMenuAction(colorMenu, tr("Photometric Color Calibration"), "", &MainWindow::openPCCDialog);
-    addMenuAction(colorMenu, tr("Background Neutralization"), "", &MainWindow::openBackgroundNeutralizationDialog);
-    addMenuAction(colorMenu, tr("SCNR (Remove Green)"), "", &MainWindow::openSCNRDialog);
-    addMenuAction(colorMenu, tr("PCC Distribution"), "", &MainWindow::openPCCDistributionDialog);
-    addMenuAction(colorMenu, tr("Saturation"), "", &MainWindow::openSaturationDialog);
+    addMenuAction(colorMenu, tr("Auto Background Extraction (ABE)"), "", [this](){
+        openAbeDialog();
+    });
+    addMenuAction(colorMenu, tr("Photometric Color Calibration"), "", [this](){
+        openPCCDialog();
+    });
+    addMenuAction(colorMenu, tr("Background Neutralization"), "", [this](){
+        openBackgroundNeutralizationDialog();
+    });
+    addMenuAction(colorMenu, tr("SCNR (Remove Green)"), "", [this](){
+        openSCNRDialog(); 
+    });
+    addMenuAction(colorMenu, tr("PCC Distribution"), "", [this](){
+        openPCCDistributionDialog();
+    });
+    addMenuAction(colorMenu, tr("Saturation"), "", [this](){
+        openSaturationDialog();
+    });
 
     // --- C. AI ---
     QMenu* aiMenu = processMenu->addMenu(tr("AI Processing"));
     addMenuAction(aiMenu, tr("Cosmic Clarity"), "", [this](){
+        if (activateTool(tr("Cosmic Clarity"))) return;
         if (!currentViewer()) { QMessageBox::warning(this, tr("No Image"), tr("Select image.")); return; }
         auto dlg = new CosmicClarityDialog(this);
         dlg->setAttribute(Qt::WA_DeleteOnClose);
@@ -618,6 +641,7 @@ MainWindow::MainWindow(QWidget *parent)
         setupToolSubwindow(sub, dlg, tr("Cosmic Clarity"));
     });
     addMenuAction(aiMenu, tr("GraXpert"), "", [this](){
+        if (activateTool(tr("GraXpert"))) return;
         if (!currentViewer()) { QMessageBox::warning(this, tr("No Image"), tr("Select image.")); return; }
         auto dlg = new GraXpertDialog(this);
         dlg->setAttribute(Qt::WA_DeleteOnClose);
@@ -626,38 +650,54 @@ MainWindow::MainWindow(QWidget *parent)
         setupToolSubwindow(sub, dlg, tr("GraXpert"));
     });
     addMenuAction(aiMenu, tr("StarNet++"), "", [this](){
+        if (activateTool(tr("Remove Stars (StarNet)"))) return;
         if (!currentViewer()) { QMessageBox::warning(this, tr("No Image"), tr("Select image.")); return; }
         auto dlg = new StarNetDialog(this);
         dlg->setAttribute(Qt::WA_DeleteOnClose);
         CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
         setupToolSubwindow(sub, dlg, tr("Remove Stars (StarNet)"));
     });
-    addMenuAction(aiMenu, tr("Aberration Remover"), "", &MainWindow::openRARDialog);
+    addMenuAction(aiMenu, tr("Aberration Remover"), "", [this](){
+        openRARDialog();
+    });
 
     // --- D. Channels ---
     QMenu* chanMenu = processMenu->addMenu(tr("Channel Operations"));
     addMenuAction(chanMenu, tr("Extract Channels"), "", &MainWindow::extractChannels);
-    addMenuAction(chanMenu, tr("Combine Channels"), "", &MainWindow::combineChannels);
-    addMenuAction(chanMenu, tr("Star Recomposition"), "", &MainWindow::openStarRecompositionDialog);
-    addMenuAction(chanMenu, tr("Perfect Palette Picker"), "", &MainWindow::openPerfectPaletteDialog);
+    addMenuAction(chanMenu, tr("Combine Channels"), "", [this](){
+        if (activateTool(tr("Combine Channels"))) return;
+        combineChannels();
+    });
+    addMenuAction(chanMenu, tr("Star Recomposition"), "", [this](){
+        openStarRecompositionDialog();
+    });
+    addMenuAction(chanMenu, tr("Perfect Palette Picker"), "", [this](){
+        openPerfectPaletteDialog();
+    });
 
     // --- E. Utilities ---
     QMenu* utilMenu = processMenu->addMenu(tr("Utilities"));
-    addMenuAction(utilMenu, tr("Plate Solving"), "", &MainWindow::openPlateSolvingDialog);
-    addMenuAction(utilMenu, tr("Pixel Math"), "", &MainWindow::openPixelMathDialog);
-    addMenuAction(utilMenu, tr("Star Analysis"), "", [this](){
-        if (!currentViewer()) return;
-        auto dlg = new StarAnalysisDialog(this, currentViewer());
-        dlg->setAttribute(Qt::WA_DeleteOnClose);
-        CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-        setupToolSubwindow(sub, dlg, tr("Star Analysis"));
+    addMenuAction(utilMenu, tr("Plate Solving"), "", [this](){
+        openPlateSolvingDialog();
     });
-    addMenuAction(utilMenu, tr("Wavescale HDR"), "", &MainWindow::openWavescaleHDRDialog);
-    addMenuAction(utilMenu, tr("FITS Header Editor"), "", &MainWindow::openHeaderEditorDialog);
+    addMenuAction(utilMenu, tr("Pixel Math"), "", [this](){
+        openPixelMathDialog();
+    });
+    addMenuAction(utilMenu, tr("Star Analysis"), "", [this](){
+        openStarAnalysisDialog(); // Call handles checks
+    });
+    addMenuAction(utilMenu, tr("Wavescale HDR"), "", [this](){
+        openWavescaleHDRDialog();
+    });
+    addMenuAction(utilMenu, tr("FITS Header Editor"), "", [this](){
+         openHeaderEditorDialog();
+    });
 
     // --- F. Effects ---
     QMenu* effectMenu = processMenu->addMenu(tr("Effects"));
-    addMenuAction(effectMenu, tr("AstroSpike (Diffraction Spikes)"), "", &MainWindow::openAstroSpikeDialog);
+    addMenuAction(effectMenu, tr("AstroSpike (Diffraction Spikes)"), "", [this](){
+        openAstroSpikeDialog();
+    });
 
     processBtn->setMenu(processMenu);
     processBtn->setStyleSheet(
@@ -1559,6 +1599,22 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event) {
         }
     }
     return QMainWindow::eventFilter(obj, event);
+}
+
+bool MainWindow::activateTool(const QString& title) {
+    for (auto* sub : m_mdiArea->subWindowList()) {
+        if (auto* csw = qobject_cast<CustomMdiSubWindow*>(sub)) {
+             // Check matches. Note: subWindowTitle might be set, or windowTitle. 
+             // CustomMdiSubWindow::subWindowTitle() returns the title set on the bar.
+             if (csw->windowTitle() == title) {
+                 csw->showNormal();
+                 csw->raise();
+                 csw->activateWindow();
+                 return true;
+             }
+        }
+    }
+    return false;
 }
 
 QString MainWindow::generateUniqueTitle(const QString& baseTitle) {

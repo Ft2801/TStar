@@ -44,6 +44,7 @@ private:
     class QCheckBox* m_checkRBF;
     class QDoubleSpinBox* m_spinSmooth;
     class QCheckBox* m_checkShowBG;
+    class QCheckBox* m_checkNormalize; // New
 };
 
 #endif // ABEDIALOG_H

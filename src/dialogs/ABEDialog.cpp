@@ -43,6 +43,9 @@ ABEDialog::ABEDialog(QWidget* parent, ImageViewer* viewer, const ImageBuffer& bu
     m_spinSmooth->setSingleStep(0.1);
     
     m_checkShowBG = new QCheckBox(tr("Result = Background Model"));
+    m_checkNormalize = new QCheckBox(tr("Normalize Background (Undo Color Calib)"));
+    m_checkNormalize->setChecked(true); // Default behavior (destructive to PCC)
+    m_checkNormalize->setToolTip(tr("If checked, aligns channel backgrounds to the same level.\nUncheck if you have already performed Photometric Color Calibration (PCC)."));
     
     form->addRow(tr("Degree:"), m_spinDegree);
     form->addRow(tr("Samples:"), m_spinSamples);
@@ -50,6 +53,9 @@ ABEDialog::ABEDialog(QWidget* parent, ImageViewer* viewer, const ImageBuffer& bu
     form->addRow(tr("Patch Size:"), m_spinPatch);
     form->addRow(m_checkRBF);
     form->addRow(tr("RBF Smooth:"), m_spinSmooth);
+    form->addRow(m_checkRBF);
+    form->addRow(tr("RBF Smooth:"), m_spinSmooth);
+    form->addRow(m_checkNormalize);
     form->addRow(m_checkShowBG);
     
     mainLayout->addLayout(form);
@@ -422,7 +428,18 @@ void ABEDialog::generateModel(ImageBuffer& output) {
     
     // Apply Substraction (Correction)
     emit progressMsg(tr("Applying correction..."));
+    // Apply Substraction (Correction)
+    emit progressMsg(tr("Applying correction..."));
     bool showBg = m_checkShowBG->isChecked();
+    bool normalize = m_checkNormalize->isChecked();
+    
+    // Calculate Unified Median (Global Background Level) if preserving color
+    float globalMedian = 0.0f;
+    if (!normalize) {
+        for(float m : origMedians) globalMedian += m;
+        globalMedian /= (float)channels;
+    }
+    
     std::vector<float>& outData = output.data(); // Ref to modify
     
     for(size_t i=0; i<outData.size(); ++i) {
@@ -432,8 +449,12 @@ void ABEDialog::generateModel(ImageBuffer& output) {
         if (showBg) {
             outData[i] = totalBg[i];
         } else {
-            // Norm: Src - BG + OrigMedian
-            outData[i] = outData[i] - totalBg[i] + origMedians[c];
+            // Norm: 
+            // If Normalize (Destructive): Src - BG + OwnMedian
+            // If Preserve (PCC Safe):     Src - BG + GlobalMedian
+            float shift = normalize ? origMedians[c] : globalMedian;
+            
+            outData[i] = outData[i] - totalBg[i] + shift;
             
             // Clamp to valid range
             if(outData[i] < 0.0f) outData[i] = 0.0f;

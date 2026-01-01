@@ -256,8 +256,8 @@ void GHSDialog::setupUI() {
     // D: Stretch Factor - range: 0-10, default 0
     makeSliderRow(0, tr("Stretch (D):"), m_dSpin, m_dSlider, 0.0, 10.0, 0.0, 0.01, 2);
     
-    // B: Local Intensity - range: -5 to 15, default 0.5
-    makeSliderRow(1, tr("Intensity (B):"), m_bSpin, m_bSlider, -5.0, 15.0, 0.5, 0.01, 2);
+    // B: Local Intensity - range: -5 to 15, default 0.0 (was 0.5)
+    makeSliderRow(1, tr("Intensity (B):"), m_bSpin, m_bSlider, -5.0, 15.0, 0.0, 0.01, 2);
     
     // SP: Symmetry Point - range: 0-1, default 0
     QHBoxLayout* spRow = new QHBoxLayout();
@@ -396,6 +396,11 @@ void GHSDialog::connectSignals() {
     syncSliderSpin(m_lpSlider, m_lpSpin, 0.0, 1.0, 10000);
     syncSliderSpin(m_hpSlider, m_hpSpin, 0.0, 1.0, 10000);
     syncSliderSpin(m_bpSlider, m_bpSpin, 0.0, 0.2, 10000);
+    
+    // BP Special: Enforce real-time update during drag (it's fast and critical for visual feedback)
+    connect(m_bpSlider, &QSlider::valueChanged, this, [this](int){
+        if(m_previewCheck->isChecked()) onPreviewTrigger();
+    });
     
     // SP special (0-1 range)
     connect(m_spSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [this](double d){
@@ -723,7 +728,7 @@ void GHSDialog::onReset() {
     m_bpSpin->blockSignals(true);
     
     m_dSpin->setValue(0.0);
-    m_bSpin->setValue(0.5);
+    m_bSpin->setValue(0.0);
     m_spSpin->setValue(0.0);
     m_lpSpin->setValue(0.0);
     m_hpSpin->setValue(1.0);
@@ -741,7 +746,7 @@ void GHSDialog::onReset() {
     
     // Sync sliders
     m_dSlider->setValue(0);
-    m_bSlider->setValue(2750);
+    m_bSlider->setValue(2500); // 0.0 mapped to -5..15 range
     m_spSlider->setValue(0);
     m_lpSlider->setValue(0);
     m_hpSlider->setValue(10000);
@@ -751,18 +756,22 @@ void GHSDialog::onReset() {
 }
 
 void GHSDialog::resetIntensity() {
-    // Partial Reset: Clear D and B (Intensity) but keep SP, Mode, Color settings
+    // Partial Reset: Clear D, B (Intensity), and BP but keep SP, Mode, Color settings
     m_dSpin->blockSignals(true);
     m_bSpin->blockSignals(true);
+    m_bpSpin->blockSignals(true);
     
     m_dSpin->setValue(0.0);
-    m_bSpin->setValue(0.5); // Reset B to neutral for the next iteration
+    m_bSpin->setValue(0.0); // Reset B to neutral (0.0)
+    m_bpSpin->setValue(0.0); // Reset BP as requested
     
     m_dSpin->blockSignals(false);
     m_bSpin->blockSignals(false);
+    m_bpSpin->blockSignals(false);
     
     m_dSlider->setValue(0);
-    m_bSlider->setValue(2750); // Sync with B=0.5
+    m_bSlider->setValue(2500); // Sync with B=0.0
+    m_bpSlider->setValue(0);
     
     updateHistogram(); // Update curve visualization
 }
@@ -814,7 +823,10 @@ void GHSDialog::onPreviewTrigger() {
     
     if (m_activeViewer) {
         // Internal Apply Preview
-        bool isIdentity = (std::abs(params.D) < 1e-6 && params.mode == ImageBuffer::GHS_GeneralizedHyperbolic);
+        // Identity Check: Must account for BP if we allow BP in GHS mode
+        bool isIdentity = (std::abs(params.D) < 1e-6 && 
+                          std::abs(params.BP) < 1e-6 && 
+                          params.mode == ImageBuffer::GHS_GeneralizedHyperbolic);
         if (isIdentity) {
             m_selfUpdating = true;
             m_activeViewer->setBuffer(m_originalBuffer, m_activeViewer->windowTitle(), true);

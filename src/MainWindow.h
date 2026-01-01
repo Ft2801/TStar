@@ -53,6 +53,9 @@ public:
     void endLongProcess();
     void createNewImageWindow(const ImageBuffer& buffer, const QString& title, ImageBuffer::DisplayMode mode = ImageBuffer::Display_Linear);
     
+    // Helper to check if tool is already open and activate it
+    bool activateTool(const QString& title);
+    
     ImageBuffer::DisplayMode displayMode() const { return m_displayMode; }
     bool displayLinked() const { return m_displayLinked; }
 

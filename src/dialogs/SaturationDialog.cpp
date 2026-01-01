@@ -6,13 +6,13 @@
 #include <cmath>
 
 SaturationDialog::SaturationDialog(QWidget* parent, ImageViewer* viewer) 
-    : QDialog(parent), m_viewer(viewer), m_buffer(nullptr) {
+    : QDialog(parent), m_viewer(nullptr), m_buffer(nullptr) {
     setWindowTitle(tr("Color Saturation"));
     setMinimumWidth(350);
     setupUI();
     
-    if (m_viewer) {
-        setTarget(m_viewer);
+    if (viewer) {
+        setTarget(viewer);
     }
 }
 
@@ -40,7 +40,7 @@ void SaturationDialog::setupUI() {
         row++;
     };
 
-    addSlider(tr("Amount:"), m_sldAmount, m_valAmount, 0, 500, 150); // 0.0 to 5.0, default 1.5
+    addSlider(tr("Amount:"), m_sldAmount, m_valAmount, 0, 500, 100); // 0.0 to 5.0, default 1.0 (neutral)
     addSlider(tr("BG Factor:"), m_sldBgFactor, m_valBgFactor, 0, 500, 100); // 0.0 to 5.0, def 1.0
     
     // Hue Selection
@@ -139,11 +139,10 @@ void SaturationDialog::setTarget(ImageViewer* viewer) {
     if (m_viewer == viewer) return;
 
     // 1. Restore OLD viewer if we have an uncommitted preview
-    if (m_viewer && !m_applied) {
-        // If we modified the buffer, restore it
-        // We know we modified it if we have a valid backup and flags?
-        // Simpler: Always restore to m_originalBuffer if valid.
-        if (m_originalBuffer.isValid()) {
+    if (m_viewer) {
+        disconnect(m_viewer, &QObject::destroyed, this, nullptr); // Disconnect safety
+        
+        if (!m_applied && m_originalBuffer.isValid()) {
              m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true); // Preserve view
         }
     }
@@ -154,12 +153,21 @@ void SaturationDialog::setTarget(ImageViewer* viewer) {
     m_originalBuffer = ImageBuffer(); // Clear
 
     // 2. Setup NEW viewer
-    if (m_viewer && m_viewer->getBuffer().isValid()) {
-        m_buffer = &m_viewer->getBuffer();
-        m_originalBuffer = *m_buffer; // Deep copy backup
-        
-        // Trigger preview immediately for new target
-        triggerPreview();
+    if (m_viewer) {
+        // Safety: Handle viewer destruction
+        connect(m_viewer, &QObject::destroyed, this, [this](){
+            m_viewer = nullptr;
+            m_buffer = nullptr;
+            m_originalBuffer = ImageBuffer();
+        });
+
+        if (m_viewer->getBuffer().isValid()) {
+            m_buffer = &m_viewer->getBuffer();
+            m_originalBuffer = *m_buffer; // Deep copy backup
+            
+            // Trigger preview immediately for new target
+            triggerPreview();
+        }
     }
 }
 
