@@ -123,7 +123,13 @@ bool ImageBuffer::loadTiff32(const QString& filePath, QString* errorMsg, QString
     cv::Mat img = cv::imread(stdPath, cv::IMREAD_UNCHANGED);
     
     if (img.empty()) {
-        if (errorMsg) *errorMsg = QObject::tr("OpenCV failed to read TIFF file.");
+        // Fallback to SimpleTiffReader (handles 32-bit unsigned properly)
+        int w, h, c;
+        std::vector<float> data;
+        if (SimpleTiffReader::readFloat32(filePath, w, h, c, data, errorMsg, debugInfo)) {
+            setData(w, h, c, data);
+            return true;
+        }
         return false;
     }
     
@@ -148,7 +154,18 @@ bool ImageBuffer::loadTiff32(const QString& filePath, QString* errorMsg, QString
     switch (img.depth()) {
         case CV_8U:  scale = 1.0 / 255.0; break;
         case CV_16U: scale = 1.0 / 65535.0; break;
-        case CV_32S: scale = 1.0 / 2147483647.0; break;
+        case CV_32S: 
+            // 32-bit signed - but TIFF might actually be unsigned, try SimpleTiffReader
+            {
+                int tw, th, tc;
+                std::vector<float> tdata;
+                if (SimpleTiffReader::readFloat32(filePath, tw, th, tc, tdata, errorMsg, debugInfo)) {
+                    setData(tw, th, tc, tdata);
+                    return true;
+                }
+            }
+            scale = 1.0 / 2147483647.0; 
+            break;
         case CV_32F: scale = 1.0; break; // Already float
         case CV_64F: scale = 1.0; break; // Will be converted
         default:

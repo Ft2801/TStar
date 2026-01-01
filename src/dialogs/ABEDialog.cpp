@@ -1,4 +1,5 @@
 #include "ABEDialog.h"
+#include "../MainWindow.h"
 #include "algos/AbeMath.h"
 #include "ImageViewer.h" 
 #include <QVBoxLayout>
@@ -59,7 +60,7 @@ ABEDialog::ABEDialog(QWidget* parent, ImageViewer* viewer, const ImageBuffer& bu
     connect(btnClear, &QPushButton::clicked, this, &ABEDialog::clearPolys);
     bottomLayout->addWidget(btnClear);
 
-    QLabel* copyLabel = new QLabel(tr("Copyright 2026 SetiAstro"));
+    QLabel* copyLabel = new QLabel(tr("© 2026 SetiAstro"));
     copyLabel->setStyleSheet("color: #888; font-size: 10px; margin-left: 10px; margin-right: 10px;");
     bottomLayout->addWidget(copyLabel);
     bottomLayout->addStretch();
@@ -111,6 +112,7 @@ void ABEDialog::clearPolys() {
 }
 
 void ABEDialog::onApply() {
+    
     if (!m_originalBuffer.isValid()) {
         return;
     }

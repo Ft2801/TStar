@@ -1022,7 +1022,7 @@ void MainWindow::saveFile() {
     // 1. Get Filename first (Classic Windows Flow)
     QString selectedFilter;
     QString path = QFileDialog::getSaveFileName(this, tr("Save Image As"), "", 
-        tr("FITS (*.fits);;XISF (*.xisf);;TIFF (*.this *.tiff);;PNG (*.png);;JPG (*.jpg)"), &selectedFilter);
+        tr("FITS (*.fits);;XISF (*.xisf);;TIFF (*.tif *.tiff);;PNG (*.png);;JPG (*.jpg)"), &selectedFilter);
         
     if (path.isEmpty()) return;
     
@@ -1265,7 +1265,7 @@ void MainWindow::openAbeDialog() {
         v->pushUndo();
         // Updated: Preserve View!
         v->setBuffer(res, "ABE_Result", true); 
-        log(tr("ABE applied."), Log_Success);
+        log(tr("ABE applied."), Log_Success, true);
     });
     
     // Logging connection

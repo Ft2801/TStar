@@ -232,63 +232,49 @@ void RARDialog::onRun() {
     params.overlap = m_spinOverlap->value();
     params.provider = m_comboProvider->currentText();
     
-    m_mainWin->startLongProcess();
-    m_mainWin->log(tr("Starting Aberration Removal..."));
-    
-    QThread* thread = new QThread;
-    RARRunner* runner = new RARRunner;
-    runner->moveToThread(thread);
-    
-    connect(runner, &RARRunner::processOutput, m_mainWin, [this](const QString& msg){
-        m_mainWin->log(msg);
-    });
-
     ImageViewer* viewer = m_viewer; // Use tracked viewer
     if (!viewer) {
-        m_mainWin->endLongProcess();
-        runner->deleteLater();
-        thread->deleteLater();
         QMessageBox::warning(this, tr("No Target"), tr("No active image viewer found."));
         return;
     }
+    
+    m_mainWin->startLongProcess();
+    m_mainWin->log(tr("Starting Aberration Removal..."));
+    
+    // Run inline (like GraXpert/CosmicClarity) for real-time progress
+    RARRunner runner;
+    
+    // Direct connection for immediate logging in the event loop
+    connect(&runner, &RARRunner::processOutput, m_mainWin, [this](const QString& msg){
+        m_mainWin->log(msg);
+    }, Qt::DirectConnection);
     
     QProgressDialog* pd = new QProgressDialog(tr("Running Aberration Removal..."), tr("Cancel"), 0, 0, this);
     pd->setWindowModality(Qt::WindowModal);
     pd->setMinimumDuration(0);
     pd->show();
              
-    connect(pd, &QProgressDialog::canceled, runner, &RARRunner::cancel, Qt::DirectConnection);
+    connect(pd, &QProgressDialog::canceled, &runner, &RARRunner::cancel);
     
     ImageBuffer input = viewer->getBuffer();
+    ImageBuffer output;
+    QString err;
     
-    connect(thread, &QThread::started, runner, [runner, input, params, thread, pd, this]() mutable {
-        ImageBuffer output;
-        QString err;
-        bool success = runner->run(input, output, params, &err);
-        
-        QMetaObject::invokeMethod(this, [=]() {
-            pd->close();
-            pd->deleteLater();
-            
-            thread->quit();
-            thread->wait();
-            thread->deleteLater();
-            runner->deleteLater();
-            
-            m_mainWin->endLongProcess();
-            
-            if (success) {
-                m_mainWin->createNewImageWindow(output, tr("RAR Result"), m_mainWin->displayMode());
-                m_mainWin->log(tr("Aberration Removal Complete."));
-                accept();
-            } else if (!err.isEmpty() && err != tr("Aborted by user.")) {
-                 m_mainWin->log(tr("ERR: RAR Failed: %1").arg(err));
-                 QMessageBox::critical(this, tr("Error"), err);
-            } else if (err == tr("Aborted by user.")) {
-                 m_mainWin->log(tr("RAR cancelled."));
-            }
-        });
-    });
+    bool success = runner.run(input, output, params, &err);
     
-    thread->start();
+    pd->close();
+    pd->deleteLater();
+    m_mainWin->endLongProcess();
+    
+    if (success) {
+        m_mainWin->createNewImageWindow(output, tr("RAR Result"), m_mainWin->displayMode());
+        m_mainWin->log(tr("Aberration Removal Complete."));
+        accept();
+    } else if (!err.isEmpty() && err != tr("Aborted by user.")) {
+        m_mainWin->log(tr("ERR: RAR Failed: %1").arg(err));
+        QMessageBox::critical(this, tr("Error"), err);
+    } else if (err == tr("Aborted by user.")) {
+        m_mainWin->log(tr("RAR cancelled."));
+    }
 }
+

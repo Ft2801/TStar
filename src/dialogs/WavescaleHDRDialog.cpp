@@ -397,7 +397,7 @@ void WavescaleHDRDialog::createUI() {
     
     QHBoxLayout* btnLayout = new QHBoxLayout();
     
-    QLabel* copyLabel = new QLabel(tr("Copyright 2026 SetiAstro"));
+    QLabel* copyLabel = new QLabel(tr("© 2026 SetiAstro"));
     copyLabel->setStyleSheet("color: #888; font-size: 10px;");
     btnLayout->addWidget(copyLabel);
     btnLayout->addStretch();

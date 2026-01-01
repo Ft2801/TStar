@@ -332,7 +332,7 @@ void GHSDialog::setupUI() {
     
     btnLayout->addWidget(resetBtn);
     
-    QLabel* copyLabel = new QLabel(tr("Copyright 2026 Mike Cranfield"));
+    QLabel* copyLabel = new QLabel(tr("© 2026 Mike Cranfield"));
     copyLabel->setStyleSheet("color: #888; font-size: 10px; margin-left: 10px;");
     btnLayout->addWidget(copyLabel);
     
