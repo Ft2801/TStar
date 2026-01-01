@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # Read version from changelog.txt
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/changelog.txt")
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/changelog.txt")
     file(STRINGS "${CMAKE_CURRENT_LIST_DIR}/changelog.txt" VERSION_LINE REGEX "^Version [0-9.]+")
     if(VERSION_LINE)
