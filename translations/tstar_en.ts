@@ -67,7 +67,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>If checked, aligns channel backgrounds to the same level.\nUncheck if you have already performed Photometric Color Calibration (PCC).</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>No valid sample points. Using grid fallback...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Normalize Background (Undo Color Calib)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -123,6 +131,141 @@
         </message>
         <message>
             <source>Written by Fabio Tempera</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>AnnotationToolDialog</name>
+        <message>
+            <source>Add Text Label</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Annotation Tool</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Arrow</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Circle</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Clear All</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Click and drag to draw arrow</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Click and drag to draw circle</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Click and drag to draw rectangle</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Click on image to add text label</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Color:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cyan</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Draw Arrow</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Draw Circle</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Draw Rectangle</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Drawing Tools</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Enter text:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Green</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No image loaded</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Note: Keep this tool OPEN to burn annotations into the saved image (File &gt; Save).</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Ready</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Ready to draw</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Rect</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Red</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Redo</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select mode</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select/Pan (no drawing)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Text</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Text Label</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Text added. Click again to add more.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Undo</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>White</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Yellow</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -497,6 +640,97 @@
         </message>
     </context>
     <context>
+        <name>ContinuumSubtractionDialog</name>
+        <message>
+            <source>-- Use Green Channel --</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>-- Use Red Channel --</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Apply</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Continuum Subtraction</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Continuum:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Done.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Formula: Result = NB - Q × (Continuum - median)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image Selection</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image dimensions must match.\nNB: %1x%2, Cont: %3x%4</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Invalid continuum image.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Invalid narrowband image.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Narrowband image is empty.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Narrowband:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No images available.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Output Linear Only (skip stretch)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Parameters</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Processing (Q=%1)...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Processing failed.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Q-Factor:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Refresh</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>CosmicClarityDialog</name>
         <message>
             <source>Auto Detect PSF</source>
@@ -721,6 +955,89 @@
         </message>
         <message>
             <source>Unsaved Changes</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>DebayerDialog</name>
+        <message>
+            <source>Apply</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Auto (from header)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Auto-detecting pattern...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Bayer Pattern</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Bilinear</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Debayer</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Debayer failed.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Debayering (%1, %2)...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Detected: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Detected: (no image)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Detected: (none)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Detected: (unknown)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Done.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Edge-aware</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image already has 3 channels.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Interpolation Method</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No image selected.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Only single-channel mosaic images can be debayered.</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -1185,6 +1502,10 @@
     <context>
         <name>MainWindow</name>
         <message>
+            <source />
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source> (Rescaled)</source>
             <translation type="unfinished" />
         </message>
@@ -1246,6 +1567,10 @@
         </message>
         <message>
             <source>All Supported (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Annotation Tool</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1313,7 +1638,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Burn Annotations</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cannot burn annotations into raw data formats (FITS/XISF)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1334,6 +1667,10 @@
         </message>
         <message>
             <source>Console</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Continuum Subtraction</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1362,6 +1699,10 @@
         </message>
         <message>
             <source>Curves applied to %1.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Debayer</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1410,6 +1751,10 @@
         </message>
         <message>
             <source>Failed to load %1: %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to save image with annotations.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1478,6 +1823,14 @@
         </message>
         <message>
             <source>Histogram Transformation</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image Annotator</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image already has multiple channels.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1582,6 +1935,10 @@
         </message>
         <message>
             <source>Open</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Open Image Annotator first</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1822,6 +2179,10 @@
         </message>
         <message>
             <source>Save Options</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Saved with Annotations: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2162,6 +2523,10 @@
             <source>WCS Computation failed (Singular Matrix)</source>
             <translation type="unfinished" />
         </message>
+        <message>
+            <source>WCS computed: CRPIX=(%1, %2) CRVAL=(%3, %4)</source>
+            <translation type="unfinished" />
+        </message>
     </context>
     <context>
         <name>PCCDialog</name>
@@ -2390,7 +2755,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Auto-calculated</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>CRVAL: %1, %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Calculate</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Calculated pixel scale: %1 arcsec/px</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2406,11 +2783,35 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Error: Enter valid Focal Length and Pixel Size to calculate scale.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Focal Length (mm)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Focal Length (mm):</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Object Name (e.g. M31)</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Pixel Scale (arcsec/px):</source>
+            <source>Optical Settings</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Pixel Scale (″/px):</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Pixel Size (µm)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Pixel Size (µm):</source>
             <translation type="unfinished" />
         </message>
         <message>

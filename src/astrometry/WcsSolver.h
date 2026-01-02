@@ -5,65 +5,86 @@
 #include <cmath>
 #include <iostream>
 
-// Computes WCS parameters (CRVAL, CRPIX, CD) from an Affine/Generic Transformation
-// The transformation maps (x_img, y_img) -> (Xi, Eta) in Degrees.
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 class WcsSolver {
 public:
-    static bool computeWcs(const GenericTrans& trans, double raCenter, double decCenter,
+    // ARCSEC to DEGREES conversion
+    static constexpr double ARCSEC_TO_DEG = 1.0 / 3600.0;
+    
+    static bool computeWcs(const GenericTrans& trans, 
+                           double raHint, double decHint,
+                           int imageWidth, int imageHeight,
                            double& crpix1, double& crpix2,
+                           double& crval1, double& crval2,
                            double cd[2][2]) 
     {
-        // 1. CD Matrix
-        // The linear part of the transformation
-        // Xi  = x10*x + x01*y + x00
-        // Eta = y10*x + y01*y + y00
-        //
-        // WCS Standard (assuming CRPIX=0 initially):
-        // Xi  = CD1_1*x + CD1_2*y
-        // Eta = CD2_1*x + CD2_2*y
-        //
-        // So CD matrix is exactly the linear coefficients.
-        cd[0][0] = trans.x10;
-        cd[0][1] = trans.x01;
-        cd[1][0] = trans.y10;
-        cd[1][1] = trans.y01;
+        crpix1 = imageWidth * 0.5 + 0.5;
+        crpix2 = imageHeight * 0.5 + 0.5;
         
-        // 2. CRPIX
-        // Reference point is (raCenter, decCenter).
-        // At this reference point, Standard Coordinates (Xi, Eta) = (0, 0).
-        // We need to find pixel (x, y) such that transform maps it to (0, 0).
-        //
-        // 0 = x10*x + x01*y + x00
-        // 0 = y10*x + y01*y + y00
-        //
-        // Solve linear system A*x = B
-        // | x10 x01 | | x | = | -x00 |
-        // | y10 y01 | | y |   | -y00 |
+        // Initialize CD Matrix from affine transform
+        cd[0][0] = trans.x10 * ARCSEC_TO_DEG;  // CD1_1
+        cd[0][1] = trans.x01 * ARCSEC_TO_DEG;  // CD1_2
+        cd[1][0] = trans.y10 * ARCSEC_TO_DEG;  // CD2_1
+        cd[1][1] = trans.y01 * ARCSEC_TO_DEG;  // CD2_2
         
-        double det = trans.x10 * trans.y01 - trans.x01 * trans.y10;
-        if (std::abs(det) < 1e-12) {
-            return false; // Singular matrix, cannot invert
+        // Verify singular
+        double det = cd[0][0] * cd[1][1] - cd[0][1] * cd[1][0];
+        if (std::abs(det) < 1e-20) {
+            std::cerr << "WcsSolver: Singular CD matrix (det=" << det << ")" << std::endl;
+            return false;
         }
         
-        double invDet = 1.0 / det;
+        double crpix1_input = crpix1; // Center X
+        double crpix2_input = crpix2; // Center Y
         
-        // Cramer's or Inverse
-        // x = ( (-x00)*y01 - x01*(-y00) ) / det
-        // y = ( x10*(-y00) - (-x00)*y10 ) / det
+        // Calculate standard coords (in arcsec) at center pixel
+        double xi_sec = trans.x00 + trans.x10 * crpix1_input + trans.x01 * crpix2_input;
+        double eta_sec = trans.y00 + trans.y10 * crpix1_input + trans.y01 * crpix2_input;
         
-        double x00 = trans.x00;
-        double y00 = trans.y00;
+        // Convert to degrees (standard coordinates on the tangent plane)
+        double xi = xi_sec * ARCSEC_TO_DEG;
+        double eta = eta_sec * ARCSEC_TO_DEG;
         
-        double x_sol = (-x00 * trans.y01 - trans.x01 * (-y00)) * invDet;
-        double y_sol = (trans.x10 * (-y00) - (-x00) * trans.y10) * invDet;
+        // De-project from tangent plane to RA/DEC
+        double ra0 = raHint * (M_PI / 180.0);
+        double dec0 = decHint * (M_PI / 180.0);
         
-        crpix1 = x_sol;
-        crpix2 = y_sol;
+        double xi_rad = xi * (M_PI / 180.0);
+        double eta_rad = eta * (M_PI / 180.0);
         
-        // Adjust for 1-based indexing if FITS requires it (usually yes).
-        // But our internal image coordinates are 0-based.
-        // TStar/Standard usually keep internal 0-based.
-        // We deliver 0-based CRPIX here. The GUI/Output can shift it if writing to FITS.
+        double rho = std::sqrt(xi_rad * xi_rad + eta_rad * eta_rad);
+        double c = std::atan(rho);
+        double ra_new = raHint;
+        double dec_new = decHint;
+        
+        if (rho > 1e-10) {
+            c = std::atan(rho); // angular distance from center
+            double cos_c = std::cos(c);
+            double sin_c = std::sin(c);
+            
+            double sin_dec = std::cos(c) * std::sin(dec0) + (eta_rad * std::sin(c) * std::cos(dec0)) / rho;
+            double dec_rad_new = std::asin(sin_dec);
+            
+            double y_term = rho * std::cos(dec0) * cos_c - eta_rad * std::sin(dec0) * sin_c;
+            double x_term = xi_rad * sin_c;
+            
+            double ra_diff = std::atan2(x_term, y_term);
+            double ra_rad_new = ra0 + ra_diff;
+            
+            ra_new = ra_rad_new * (180.0 / M_PI);
+            dec_new = dec_rad_new * (180.0 / M_PI);
+            
+            // Normalize RA
+            while (ra_new < 0) ra_new += 360.0;
+            while (ra_new >= 360.0) ra_new -= 360.0;
+        }
+        
+        // Set new CRVAL
+        crval1 = ra_new;
+        crval2 = dec_new;
         
         return true;
     }

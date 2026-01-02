@@ -161,7 +161,6 @@ void ImageViewer::setCropMode(bool active) {
     m_cropMode = active;
     if (active) {
         setDragMode(QGraphicsView::NoDrag);
-        // Reset crop rect?
         m_cropItem->setRect(0, 0, 0, 0);
         m_cropItem->setRotation(0);
         m_cropAngle = 0;
@@ -341,8 +340,6 @@ void ImageViewer::mousePressEvent(QMouseEvent* event) {
         m_currentLassoItem->setZValue(20);
         return;
     } else if (m_abeMode && event->button() == Qt::RightButton) {
-        // Cancel / Clear?
-        // Cancel current draw
         if (m_lassoDrawing) {
             m_lassoDrawing = false;
             if(m_currentLassoItem) {
@@ -513,19 +510,11 @@ void ImageViewer::wheelEvent(QWheelEvent* event) {
 void ImageViewer::syncView(float scale, float hVal, float vVal) {
     QSignalBlocker blocker(this);
     
-    // Check for significant scale difference to avoid rounding loops
-    // Precision matters for linked views, so we use a smaller epsilon (0.0001)
     if (std::abs(m_scaleFactor - scale) > 0.0001f) {
-         // Apply absolute scale directly to ensure synchronization
-         // resetTransform defaults to identity, effectively clearing zoom
-         // We use setTransform with a fresh scaling matrix to ensure no drift
          setTransform(QTransform::fromScale(scale, scale));
          m_scaleFactor = scale;
     }
     
-    // Update scrollbars to sync Pan
-    // This assumes content scenes are identical size. If not, we might need relative sync.
-    // Given TStar allows duplicate View (New Image Window), they are likely same-size.
     horizontalScrollBar()->setValue(hVal);
     verticalScrollBar()->setValue(vVal);
     
@@ -561,14 +550,6 @@ void ImageViewer::setRectQueryMode(bool active) {
 
 void ImageViewer::scrollContentsBy(int dx, int dy) {
     QGraphicsView::scrollContentsBy(dx, dy);
-    // Emit only if not invoked programmatically within syncView?
-    // We can't easily distinguish. 
-    // We relies on MainWindow to manage the loop or "block signals".
-    // Or we check if sender is us?
-    // Actually, syncView sets scrollbar value which triggers scrollContentsBy?
-    // Wait, scrollContentsBy is called by the viewport update.
-    // Setting scrollbar value triggers valueChanged which might trigger this.
-    // We should emit. MainWindow will handle loop prevention (by blocking signals on others).
     emit viewChanged(m_scaleFactor, horizontalScrollBar()->value(), verticalScrollBar()->value());
 }
 
@@ -621,6 +602,15 @@ int ImageViewer::getHBarLoc() const {
 
 int ImageViewer::getVBarLoc() const {
     return verticalScrollBar()->value();
+}
+
+double ImageViewer::pixelScale() const {
+    // Return arcsec/pixel from WCS CD matrix
+    const auto& meta = m_buffer.metadata();
+    double cd11 = meta.cd1_1;
+    double cd21 = meta.cd2_1;
+    double scale = std::sqrt(cd11 * cd11 + cd21 * cd21);
+    return scale * 3600.0;  // Convert deg to arcsec
 }
 
 void ImageViewer::drawForeground(QPainter* painter, const QRectF& rect) {

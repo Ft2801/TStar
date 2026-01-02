@@ -450,6 +450,7 @@ bool StarNetRunner::run(const ImageBuffer& input, ImageBuffer& output, const Sta
 
     std::cerr << "Assigning to output/result..." << std::endl;
     output = starlessLocal;
+    output.setMetadata(input.metadata()); // Preserve WCS and other metadata
     std::cerr << "Run completed successfully." << std::endl;
 
     // Note: Star Mask generation is handled by the caller (StarNetDialog)

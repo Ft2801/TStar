@@ -67,8 +67,16 @@
             <translation type="finished">Encontrados %1 puntos de muestra válidos.</translation>
         </message>
         <message>
+            <source>If checked, aligns channel backgrounds to the same level.\nUncheck if you have already performed Photometric Color Calibration (PCC).</source>
+            <translation type="finished">Si se marca, alinea los fondos de canal al mismo nivel. Desmarcar si ya se realizó Calibración de Color Fotométrica (PCC).</translation>
+        </message>
+        <message>
             <source>No valid sample points. Using grid fallback...</source>
             <translation type="finished">No hay puntos de muestreo válidos. Usando rejilla alternativa...</translation>
+        </message>
+        <message>
+            <source>Normalize Background (Undo Color Calib)</source>
+            <translation type="finished">Normalizar Fondo (Deshacer Calib Color)</translation>
         </message>
         <message>
             <source>Patch Size:</source>
@@ -124,6 +132,141 @@
         <message>
             <source>Written by Fabio Tempera</source>
             <translation type="finished">Escrito por Fabio Tempera</translation>
+        </message>
+    </context>
+    <context>
+        <name>AnnotationToolDialog</name>
+        <message>
+            <source>Add Text Label</source>
+            <translation type="finished">Añadir Etiqueta Texto</translation>
+        </message>
+        <message>
+            <source>Annotation Tool</source>
+            <translation type="finished">Herramienta Anotación</translation>
+        </message>
+        <message>
+            <source>Arrow</source>
+            <translation type="finished">Flecha</translation>
+        </message>
+        <message>
+            <source>Circle</source>
+            <translation type="finished">Círculo</translation>
+        </message>
+        <message>
+            <source>Clear All</source>
+            <translation type="finished">Borrar Todo</translation>
+        </message>
+        <message>
+            <source>Click and drag to draw arrow</source>
+            <translation type="finished">Haz clic y arrastra para dibujar flecha</translation>
+        </message>
+        <message>
+            <source>Click and drag to draw circle</source>
+            <translation type="finished">Haz clic y arrastra para dibujar círculo</translation>
+        </message>
+        <message>
+            <source>Click and drag to draw rectangle</source>
+            <translation type="finished">Haz clic y arrastra para dibujar rectángulo</translation>
+        </message>
+        <message>
+            <source>Click on image to add text label</source>
+            <translation type="finished">Haz clic en la imagen para añadir texto</translation>
+        </message>
+        <message>
+            <source>Color:</source>
+            <translation type="finished">Color:</translation>
+        </message>
+        <message>
+            <source>Cyan</source>
+            <translation type="finished">Cian</translation>
+        </message>
+        <message>
+            <source>Draw Arrow</source>
+            <translation type="finished">Dibujar Flecha</translation>
+        </message>
+        <message>
+            <source>Draw Circle</source>
+            <translation type="finished">Dibujar Círculo</translation>
+        </message>
+        <message>
+            <source>Draw Rectangle</source>
+            <translation type="finished">Dibujar Rectángulo</translation>
+        </message>
+        <message>
+            <source>Drawing Tools</source>
+            <translation type="finished">Herramientas Dibujo</translation>
+        </message>
+        <message>
+            <source>Enter text:</source>
+            <translation type="finished">Introduce texto:</translation>
+        </message>
+        <message>
+            <source>Green</source>
+            <translation type="finished">Verde</translation>
+        </message>
+        <message>
+            <source>No image loaded</source>
+            <translation type="finished">Ninguna imagen cargada</translation>
+        </message>
+        <message>
+            <source>Note: Keep this tool OPEN to burn annotations into the saved image (File &gt; Save).</source>
+            <translation type="finished">Nota: Mantenga esta herramienta ABIERTA para grabar anotaciones en la imagen guardada (Archivo &gt; Guardar).</translation>
+        </message>
+        <message>
+            <source>Ready</source>
+            <translation type="finished">Listo</translation>
+        </message>
+        <message>
+            <source>Ready to draw</source>
+            <translation type="finished">Listo para dibujar</translation>
+        </message>
+        <message>
+            <source>Rect</source>
+            <translation type="finished">Rectángulo</translation>
+        </message>
+        <message>
+            <source>Red</source>
+            <translation type="finished">Rojo</translation>
+        </message>
+        <message>
+            <source>Redo</source>
+            <translation type="finished">Rehacer</translation>
+        </message>
+        <message>
+            <source>Select</source>
+            <translation type="finished">Seleccionar</translation>
+        </message>
+        <message>
+            <source>Select mode</source>
+            <translation type="finished">Modo selección</translation>
+        </message>
+        <message>
+            <source>Select/Pan (no drawing)</source>
+            <translation type="finished">Seleccionar/Pan (sin dibujo)</translation>
+        </message>
+        <message>
+            <source>Text</source>
+            <translation type="finished">Texto</translation>
+        </message>
+        <message>
+            <source>Text Label</source>
+            <translation type="finished">Etiqueta de texto</translation>
+        </message>
+        <message>
+            <source>Text added. Click again to add more.</source>
+            <translation type="finished">Texto añadido. Haz clic de nuevo para añadir más.</translation>
+        </message>
+        <message>
+            <source>Undo</source>
+            <translation type="finished">Deshacer</translation>
+        </message>
+        <message>
+            <source>White</source>
+            <translation type="finished">Blanco</translation>
+        </message>
+        <message>
+            <source>Yellow</source>
+            <translation type="finished">Amarillo</translation>
         </message>
     </context>
     <context>
@@ -497,6 +640,97 @@
         </message>
     </context>
     <context>
+        <name>ContinuumSubtractionDialog</name>
+        <message>
+            <source>-- Use Green Channel --</source>
+            <translation type="finished">-- Usar Canal Verde --</translation>
+        </message>
+        <message>
+            <source>-- Use Red Channel --</source>
+            <translation type="finished">-- Usar Canal Rojo --</translation>
+        </message>
+        <message>
+            <source>Apply</source>
+            <translation type="finished">Aplicar</translation>
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="finished">Cancelar</translation>
+        </message>
+        <message>
+            <source>Continuum Subtraction</source>
+            <translation type="finished">Sustracción de Continuo</translation>
+        </message>
+        <message>
+            <source>Continuum:</source>
+            <translation type="finished">Continuo:</translation>
+        </message>
+        <message>
+            <source>Done.</source>
+            <translation type="finished">Hecho.</translation>
+        </message>
+        <message>
+            <source>Failed.</source>
+            <translation type="finished">Fallido.</translation>
+        </message>
+        <message>
+            <source>Formula: Result = NB - Q × (Continuum - median)</source>
+            <translation type="finished">Fórmula: Resultado = NB - Q × (Continuo - mediana)</translation>
+        </message>
+        <message>
+            <source>Image Selection</source>
+            <translation type="finished">Selección de Imagen</translation>
+        </message>
+        <message>
+            <source>Image dimensions must match.\nNB: %1x%2, Cont: %3x%4</source>
+            <translation type="finished">Dimensiones no coinciden. NB: %1x%2, Cont: %3x%4</translation>
+        </message>
+        <message>
+            <source>Invalid continuum image.</source>
+            <translation type="finished">Imagen continuo inválida.</translation>
+        </message>
+        <message>
+            <source>Invalid narrowband image.</source>
+            <translation type="finished">Imagen banda estrecha inválida.</translation>
+        </message>
+        <message>
+            <source>Narrowband image is empty.</source>
+            <translation type="finished">Imagen banda estrecha vacía.</translation>
+        </message>
+        <message>
+            <source>Narrowband:</source>
+            <translation type="finished">Banda Estrecha:</translation>
+        </message>
+        <message>
+            <source>No images available.</source>
+            <translation type="finished">No hay imágenes disponibles.</translation>
+        </message>
+        <message>
+            <source>Output Linear Only (skip stretch)</source>
+            <translation type="finished">Salida Lineal (saltar stretch)</translation>
+        </message>
+        <message>
+            <source>Parameters</source>
+            <translation type="finished">Parámetros</translation>
+        </message>
+        <message>
+            <source>Processing (Q=%1)...</source>
+            <translation type="finished">Procesando (Q=%1)...</translation>
+        </message>
+        <message>
+            <source>Processing failed.</source>
+            <translation type="finished">Procesamiento fallido.</translation>
+        </message>
+        <message>
+            <source>Q-Factor:</source>
+            <translation type="finished">Factor Q:</translation>
+        </message>
+        <message>
+            <source>Refresh</source>
+            <translation type="finished">Actualizar</translation>
+        </message>
+    </context>
+    <context>
         <name>CosmicClarityDialog</name>
         <message>
             <source>Auto Detect PSF</source>
@@ -722,6 +956,89 @@
         <message>
             <source>Unsaved Changes</source>
             <translation type="finished">Cambios Sin Guardar</translation>
+        </message>
+    </context>
+    <context>
+        <name>DebayerDialog</name>
+        <message>
+            <source>Apply</source>
+            <translation type="finished">Aplicar</translation>
+        </message>
+        <message>
+            <source>Auto (from header)</source>
+            <translation type="finished">Auto (de cabecera)</translation>
+        </message>
+        <message>
+            <source>Auto-detecting pattern...</source>
+            <translation type="finished">Detectando patrón auto...</translation>
+        </message>
+        <message>
+            <source>Bayer Pattern</source>
+            <translation type="finished">Patrón Bayer</translation>
+        </message>
+        <message>
+            <source>Bilinear</source>
+            <translation type="finished">Bilineal</translation>
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="finished">Cancelar</translation>
+        </message>
+        <message>
+            <source>Debayer</source>
+            <translation type="finished">Debayer</translation>
+        </message>
+        <message>
+            <source>Debayer failed.</source>
+            <translation type="finished">Debayer fallido.</translation>
+        </message>
+        <message>
+            <source>Debayering (%1, %2)...</source>
+            <translation type="finished">Debayering (%1, %2)...</translation>
+        </message>
+        <message>
+            <source>Detected: %1</source>
+            <translation type="finished">Detectado: %1</translation>
+        </message>
+        <message>
+            <source>Detected: (no image)</source>
+            <translation type="finished">Detectado: (sin imagen)</translation>
+        </message>
+        <message>
+            <source>Detected: (none)</source>
+            <translation type="finished">Detectado: (ninguno)</translation>
+        </message>
+        <message>
+            <source>Detected: (unknown)</source>
+            <translation type="finished">Detectado: (desconocido)</translation>
+        </message>
+        <message>
+            <source>Done.</source>
+            <translation type="finished">Hecho.</translation>
+        </message>
+        <message>
+            <source>Edge-aware</source>
+            <translation type="finished">Edge-aware</translation>
+        </message>
+        <message>
+            <source>Failed.</source>
+            <translation type="finished">Fallido.</translation>
+        </message>
+        <message>
+            <source>Image already has 3 channels.</source>
+            <translation type="finished">La imagen ya tiene 3 canales.</translation>
+        </message>
+        <message>
+            <source>Interpolation Method</source>
+            <translation type="finished">Método Interpolación</translation>
+        </message>
+        <message>
+            <source>No image selected.</source>
+            <translation type="finished">Ninguna imagen seleccionada.</translation>
+        </message>
+        <message>
+            <source>Only single-channel mosaic images can be debayered.</source>
+            <translation type="finished">Solo imágenes de un canal pueden ser debayerizadas.</translation>
         </message>
     </context>
     <context>
@@ -1187,6 +1504,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
     <context>
         <name>MainWindow</name>
         <message>
+            <source />
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source> (Rescaled)</source>
             <translation type="finished"> (Reescalado)</translation>
         </message>
@@ -1249,6 +1570,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>All Supported (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;</source>
             <translation type="finished">Tutti i Supportati (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;</translation>
+        </message>
+        <message>
+            <source>Annotation Tool</source>
+            <translation type="finished">Herramienta Anotación</translation>
         </message>
         <message>
             <source>Application Ready.</source>
@@ -1315,8 +1640,16 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Profundidad de Bits:</translation>
         </message>
         <message>
+            <source>Burn Annotations</source>
+            <translation type="finished">Grabar Anotaciones</translation>
+        </message>
+        <message>
             <source>Cancel</source>
             <translation type="finished">Cancelar</translation>
+        </message>
+        <message>
+            <source>Cannot burn annotations into raw data formats (FITS/XISF)</source>
+            <translation type="finished">No se pueden grabar anotaciones en formatos raw (FITS/XISF)</translation>
         </message>
         <message>
             <source>Channel Operations</source>
@@ -1337,6 +1670,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Console</source>
             <translation type="finished">Consola</translation>
+        </message>
+        <message>
+            <source>Continuum Subtraction</source>
+            <translation type="finished">Sustracción de Continuo</translation>
         </message>
         <message>
             <source>Cosmic Clarity</source>
@@ -1365,6 +1702,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Curves applied to %1.</source>
             <translation type="finished">Curvas aplicadas a %1.</translation>
+        </message>
+        <message>
+            <source>Debayer</source>
+            <translation type="finished">Debayer</translation>
         </message>
         <message>
             <source>Disabled</source>
@@ -1413,6 +1754,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Failed to load %1: %2</source>
             <translation type="finished">Error al cargar %1: %2</translation>
+        </message>
+        <message>
+            <source>Failed to save image with annotations.</source>
+            <translation type="finished">Fallo al guardar imagen con anotaciones.</translation>
         </message>
         <message>
             <source>False Color Visualization</source>
@@ -1481,6 +1826,14 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Histogram Transformation</source>
             <translation type="finished">Transformación de Histograma</translation>
+        </message>
+        <message>
+            <source>Image Annotator</source>
+            <translation type="finished">Anotador de Imágenes</translation>
+        </message>
+        <message>
+            <source>Image already has multiple channels.</source>
+            <translation type="finished">La imagen ya tiene múltiples canales.</translation>
         </message>
         <message>
             <source>Images (*.png *.jpg *.jpeg)</source>
@@ -1585,6 +1938,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Open</source>
             <translation type="finished">Abrir</translation>
+        </message>
+        <message>
+            <source>Open Image Annotator first</source>
+            <translation type="finished">Abre primero el Anotador de Imágenes</translation>
         </message>
         <message>
             <source>Open Image(s)</source>
@@ -1826,6 +2183,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Save Options</source>
             <translation type="finished">Opciones de Guardado</translation>
+        </message>
+        <message>
+            <source>Saved with Annotations: %1</source>
+            <translation type="finished">Guardado con Anotaciones: %1</translation>
         </message>
         <message>
             <source>Saved: %1</source>
@@ -2165,6 +2526,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <source>WCS Computation failed (Singular Matrix)</source>
             <translation type="finished">Cálculo WCS fallido (Matriz Singular)</translation>
         </message>
+        <message>
+            <source>WCS computed: CRPIX=(%1, %2) CRVAL=(%3, %4)</source>
+            <translation type="finished">WCS calculado: CRPIX=(%1, %2) CRVAL=(%3, %4)</translation>
+        </message>
     </context>
     <context>
         <name>PCCDialog</name>
@@ -2393,8 +2758,20 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">&lt;b&gt;¡Resuelto!&lt;/b&gt;</translation>
         </message>
         <message>
+            <source>Auto-calculated</source>
+            <translation type="finished">Calculado automáticamente</translation>
+        </message>
+        <message>
             <source>CRVAL: %1, %2</source>
             <translation type="finished">CRVAL: %1, %2</translation>
+        </message>
+        <message>
+            <source>Calculate</source>
+            <translation type="finished">Calcular</translation>
+        </message>
+        <message>
+            <source>Calculated pixel scale: %1 arcsec/px</source>
+            <translation type="finished">Escala de píxeles calculada: %1 arcsec/px</translation>
         </message>
         <message>
             <source>Close</source>
@@ -2409,12 +2786,36 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Dec:</translation>
         </message>
         <message>
-            <source>Object Name (e.g. M31)</source>
-            <translation type="finished">Nombre Objeto (ej. M31)</translation>
+            <source>Error: Enter valid Focal Length and Pixel Size to calculate scale.</source>
+            <translation type="finished">Error: Introduzca Distancia Focal y Tamaño de Píxel válidos para calcular la escala.</translation>
         </message>
         <message>
-            <source>Pixel Scale (arcsec/px):</source>
-            <translation type="finished">Escala Pixel (arcsec/px):</translation>
+            <source>Focal Length (mm)</source>
+            <translation type="finished">Distancia Focal (mm)</translation>
+        </message>
+        <message>
+            <source>Focal Length (mm):</source>
+            <translation type="finished">Distancia Focal (mm):</translation>
+        </message>
+        <message>
+            <source>Object Name (e.g. M31)</source>
+            <translation type="finished">Nombre del Objeto (ej. M31)</translation>
+        </message>
+        <message>
+            <source>Optical Settings</source>
+            <translation type="finished">Configuración Óptica</translation>
+        </message>
+        <message>
+            <source>Pixel Scale (″/px):</source>
+            <translation type="finished">Escala Pixel (″/px):</translation>
+        </message>
+        <message>
+            <source>Pixel Size (µm)</source>
+            <translation type="finished">Tamaño Píxel (µm)</translation>
+        </message>
+        <message>
+            <source>Pixel Size (µm):</source>
+            <translation type="finished">Tamaño Píxel (µm):</translation>
         </message>
         <message>
             <source>Plate Solving</source>

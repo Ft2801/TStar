@@ -46,18 +46,37 @@ PlateSolvingDialog::PlateSolvingDialog(QWidget* parent) : QDialog(parent) {
     coordLayout->addWidget(m_decHint);
     mainLayout->addLayout(coordLayout);
     
-    // Solver Settings
-    QHBoxLayout* setBox = new QHBoxLayout();
+    // Solver Settings - FOV
+    QHBoxLayout* fovBox = new QHBoxLayout();
     m_fov = new QLineEdit("1.0", this); // Default 1 deg radius
-    setBox->addWidget(new QLabel(tr("Search Radius (deg):")));
-    setBox->addWidget(m_fov);
-
-    // Pixel Scale
-    m_pixelScale = new QLineEdit("1.0", this); // Default 1.0 arcsec/px
-    setBox->addWidget(new QLabel(tr("Pixel Scale (arcsec/px):")));
-    setBox->addWidget(m_pixelScale);
+    fovBox->addWidget(new QLabel(tr("Search Radius (deg):")));
+    fovBox->addWidget(m_fov);
+    mainLayout->addLayout(fovBox);
     
-    mainLayout->addLayout(setBox);
+    // Optical Settings
+    QGroupBox* grpOptics = new QGroupBox(tr("Optical Settings"), this);
+    QGridLayout* opticsLayout = new QGridLayout(grpOptics);
+    
+    m_focalLength = new QLineEdit(this);
+    m_focalLength->setPlaceholderText(tr("Focal Length (mm)"));
+    m_pixelSizeUm = new QLineEdit(this);
+    m_pixelSizeUm->setPlaceholderText(tr("Pixel Size (µm)"));
+    m_pixelScale = new QLineEdit(this);
+    m_pixelScale->setPlaceholderText(tr("Auto-calculated"));
+    m_pixelScale->setReadOnly(true);
+    
+    QPushButton* btnCalcScale = new QPushButton(tr("Calculate"), this);
+    connect(btnCalcScale, &QPushButton::clicked, this, &PlateSolvingDialog::calculatePixelScale);
+    
+    opticsLayout->addWidget(new QLabel(tr("Focal Length (mm):")), 0, 0);
+    opticsLayout->addWidget(m_focalLength, 0, 1);
+    opticsLayout->addWidget(new QLabel(tr("Pixel Size (µm):")), 1, 0);
+    opticsLayout->addWidget(m_pixelSizeUm, 1, 1);
+    opticsLayout->addWidget(new QLabel(tr("Pixel Scale (″/px):")), 2, 0);
+    opticsLayout->addWidget(m_pixelScale, 2, 1);
+    opticsLayout->addWidget(btnCalcScale, 2, 2);
+    
+    mainLayout->addWidget(grpOptics);
     
     // Log
     m_log = new QTextEdit(this);
@@ -108,6 +127,39 @@ void PlateSolvingDialog::setViewer(ImageViewer* v) {
     m_viewer = v;
     if (m_viewer) {
         setImageBuffer(m_viewer->getBuffer());
+        updateScaleFromMetadata(); // Auto-populate optical settings from FITS header
+    }
+}
+
+void PlateSolvingDialog::updateScaleFromMetadata() {
+    const auto& meta = m_image.metadata();
+    
+    // Populate from FITS header if available
+    if (meta.focalLength > 0) {
+        m_focalLength->setText(QString::number(meta.focalLength, 'f', 1));
+    }
+    if (meta.pixelSize > 0) {
+        m_pixelSizeUm->setText(QString::number(meta.pixelSize, 'f', 2));
+    }
+    
+    // Auto-calculate scale if both values are present
+    if (meta.focalLength > 0 && meta.pixelSize > 0) {
+        calculatePixelScale();
+    }
+}
+
+void PlateSolvingDialog::calculatePixelScale() {
+    double focalMm = m_focalLength->text().toDouble();
+    double pixelUm = m_pixelSizeUm->text().toDouble();
+    
+    if (focalMm > 0 && pixelUm > 0) {
+        // Formula: scale (arcsec/px) = (pixel_size_um * 206.265) / focal_mm
+        double scale = (pixelUm * 206.265) / focalMm;
+        m_pixelScale->setText(QString::number(scale, 'f', 3));
+        m_log->append(tr("Calculated pixel scale: %1 arcsec/px").arg(scale, 0, 'f', 3));
+    } else {
+        m_pixelScale->clear();
+        m_log->append(tr("Error: Enter valid Focal Length and Pixel Size to calculate scale."));
     }
 }
 
@@ -172,10 +224,12 @@ void PlateSolvingDialog::onSolverFinished(const NativeSolveResult& res) {
             if (m_jobTarget) {
                  ImageBuffer& liveBuf = m_jobTarget->getBuffer();
                  liveBuf.setMetadata(meta);
+                 liveBuf.syncWcsToHeaders();
                  mw->log(tr("WCS applied to %1.").arg(m_jobTarget->windowTitle()), MainWindow::Log_Success, true);
             } else if (m_viewer) {
                  // Fallback if job target closed but m_viewer replaced? Less likely but safe
                  m_viewer->getBuffer().setMetadata(meta);
+                 m_viewer->getBuffer().syncWcsToHeaders();
                  mw->log(tr("WCS applied to active image."), MainWindow::Log_Success, true);
             }
         }

@@ -183,6 +183,15 @@ bool XISFReader::parseHeader(const QByteArray& headerXml, XISFHeaderInfo& info, 
                             if(name == "DEC") info.meta.dec = val.toDouble();
                             if(name == "DATE-OBS") info.meta.dateObs = val;
                             if(name == "OBJECT") info.meta.objectName = val;
+                            // WCS Keywords (Critical for PCC and Image Annotator)
+                            if(name == "CRVAL1") info.meta.ra = val.toDouble();
+                            if(name == "CRVAL2") info.meta.dec = val.toDouble();
+                            if(name == "CRPIX1") info.meta.crpix1 = val.toDouble();
+                            if(name == "CRPIX2") info.meta.crpix2 = val.toDouble();
+                            if(name == "CD1_1") info.meta.cd1_1 = val.toDouble();
+                            if(name == "CD1_2") info.meta.cd1_2 = val.toDouble();
+                            if(name == "CD2_1") info.meta.cd2_1 = val.toDouble();
+                            if(name == "CD2_2") info.meta.cd2_2 = val.toDouble();
                         }
                     }
                 }

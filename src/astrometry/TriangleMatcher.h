@@ -51,9 +51,14 @@ public:
     void setMaxStars(int n) { m_maxStars = n; }
     
     // Strict solve method matching reference approach
+    // scaleMin/max: filter false matches by size
+    // centerX/Y, posTolerance: filter matches that imply a translation far from image center (hint)
+    // pass posTolerance < 0 to disable position check
     bool solve(const std::vector<MatchStar>& imgStars,
                const std::vector<MatchStar>& catStars,
-               GenericTrans& resultTrans);
+               GenericTrans& resultTrans,
+               double minScale = 0.9, double maxScale = 1.1,
+               double centerX = 0, double centerY = 0, double posTolerance = -1);
 
 private:
     int m_maxStars = 80; // Standard often uses ~40-100
@@ -61,9 +66,14 @@ private:
     std::vector<MatchTriangle> generateTriangles(const std::vector<MatchStar>& stars, int limit);
     
     // make_vote_matrix
+    // Requires star lists to compute centroids for position check
     std::vector<std::vector<int>> computeVotes(const std::vector<MatchTriangle>& triA,
                                                const std::vector<MatchTriangle>& triB,
-                                               int numStarsA, int numStarsB);
+                                               const std::vector<MatchStar>& starsA,
+                                               const std::vector<MatchStar>& starsB,
+                                               int numStarsA, int numStarsB,
+                                               double minScale, double maxScale,
+                                               double centerX, double centerY, double posTolerance);
                                                
     // iter_trans logic
     bool iterativeFit(const std::vector<MatchStar>& listA,

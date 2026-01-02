@@ -287,8 +287,6 @@ void ABEDialog::generateModel(ImageBuffer& output) {
 
     auto commonPoints = AbeMath::generateSamples(grayData, dw, dh, numSamples, patchSize, exMask);
 
-    
-    // Safety: If no samples found, use grid fallback (saspro-style)
     if (commonPoints.empty()) {
         emit progressMsg(tr("No valid sample points. Using grid fallback..."));
         int gridN = std::max(3, (int)std::sqrt(numSamples));

@@ -9,7 +9,7 @@
 #define RAD2DEG (180.0 / M_PI)
 
 NativePlateSolver::NativePlateSolver(QObject* parent) 
-    : QObject(parent), m_simbad(nullptr), m_nam(new QNetworkAccessManager(this))
+    : QObject(parent), m_nam(new QNetworkAccessManager(this))
 {
 }
 
@@ -102,10 +102,13 @@ void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars) {
 
     emit logMessage(tr("Matching Triangles..."));
     TriangleMatcher matcher;
-    matcher.setMaxStars(30); // Use top 30 brightest stars
+    matcher.setMaxStars(40); 
     GenericTrans trans;
+    double minScale = 1.0 / (m_pixelScale * 1.1); 
+    double maxScale = 1.0 / (m_pixelScale * 0.9);
     
-    bool solved = matcher.solve(imgMatchStars, projCatStars, trans);
+    bool solved = matcher.solve(imgMatchStars, projCatStars, trans, 
+                                minScale, maxScale);
     
     NativeSolveResult res;
     res.success = solved;
@@ -114,13 +117,13 @@ void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars) {
     if (solved) {
         emit logMessage(tr("Match Success!"));
         
-        // Calculate WCS
-        // Use transform coefficients to derive CRPIX and CD matrix.
-        // Transform maps (x_img, y_img) -> (Xi, Eta) relative to reference point.
-        
-        if (WcsSolver::computeWcs(trans, m_raHint, m_decHint, res.crpix1, res.crpix2, res.cd)) {
-             res.crval1 = m_raHint;
-             res.crval2 = m_decHint;
+        if (WcsSolver::computeWcs(trans, m_raHint, m_decHint, 
+                                  m_image.width(), m_image.height(),
+                                  res.crpix1, res.crpix2,
+                                  res.crval1, res.crval2, res.cd)) {
+            emit logMessage(tr("WCS computed: CRPIX=(%1, %2) CRVAL=(%3, %4)")
+                           .arg(res.crpix1).arg(res.crpix2)
+                           .arg(res.crval1).arg(res.crval2));
         } else {
              res.errorMsg = tr("WCS Computation failed (Singular Matrix)");
              res.success = false;
@@ -135,11 +138,10 @@ void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars) {
 
 
 std::vector<MatchStar> NativePlateSolver::projectCatalog(const std::vector<MatchStar>& catStars) const {
-    // Project RA/Dec to Standard Coords (Xi, Eta) in Degrees
-    // Gnomonic Projection (TAN)
-    
     double a0 = m_raHint * DEG2RAD;
     double d0 = m_decHint * DEG2RAD;
+    
+    const double RAD2ARCSEC = 206264.80624709636;
     
     std::vector<MatchStar> projected;
     projected.reserve(catStars.size());
@@ -157,9 +159,8 @@ std::vector<MatchStar> NativePlateSolver::projectCatalog(const std::vector<Match
         double eta_rad = (std::sin(d) * cos_d0 - std::cos(d) * sin_d0 * std::cos(a - a0)) / H;
         
         MatchStar p = s;
-        p.x = xi_rad * RAD2DEG;
-        p.y = eta_rad * RAD2DEG;
-        // p.mag unchanged
+        p.x = xi_rad * RAD2ARCSEC;
+        p.y = eta_rad * RAD2ARCSEC;
         
         projected.push_back(p);
     }

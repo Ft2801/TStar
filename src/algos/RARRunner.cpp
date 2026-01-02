@@ -138,5 +138,6 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
     emit processOutput(QString("Loaded RAW: %1 bytes").arg(blob.size()));
 
     output.setData(input.width(), input.height(), input.channels(), data);
+    output.setMetadata(input.metadata()); // Preserve WCS and other metadata
     return true;
 }

@@ -199,7 +199,6 @@ namespace AbeMath {
             int bestY = curY;
             float bestVal = curVal;
             
-            // Checks neighbors (step 5 pixels?)
             int step = 2; 
             int dx[] = {-step, 0, step, -step, step, -step, 0, step};
             int dy[] = {-step, -step, -step, 0, 0, step, step, step};

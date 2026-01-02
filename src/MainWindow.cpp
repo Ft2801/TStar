@@ -66,6 +66,9 @@
 #include <QDateTime>
 #include <QSplitter>
 #include "dialogs/AstroSpikeDialog.h"
+#include "dialogs/DebayerDialog.h"
+#include "dialogs/ContinuumSubtractionDialog.h"
+#include "dialogs/AnnotationToolDialog.h"
 #include "widgets/SidebarWidget.h"
 #include "widgets/HeaderPanel.h"
 #include <QResizeEvent>
@@ -274,6 +277,7 @@ MainWindow::MainWindow(QWidget *parent)
                     if (m_pccDlg) m_pccDlg->setViewer(v);
                     if (m_cropDlg) m_cropDlg->setViewer(v);
                     if (m_astroSpikeDlg) m_astroSpikeDlg->setViewer(v);
+                    if (m_annotatorDlg) m_annotatorDlg->setViewer(v);
 
                     if (m_headerPanel) m_headerPanel->setMetadata(v->getBuffer().metadata());
                     
@@ -288,9 +292,6 @@ MainWindow::MainWindow(QWidget *parent)
                         QSignalBlocker b(m_linkChannelsBtn);
                         m_linkChannelsBtn->setChecked(v->isDisplayLinked());
                         m_displayLinked = v->isDisplayLinked();
-                        // Update icon too? Yes, but usually linked/unlinked logic handles it. 
-                        // Actually better to be explicit.
-    // Helper to get image path relative to executable
     auto getImgPath = [](const QString& name) {
         return QCoreApplication::applicationDirPath() + "/images/" + name;
     };
@@ -674,6 +675,12 @@ MainWindow::MainWindow(QWidget *parent)
     addMenuAction(chanMenu, tr("Perfect Palette Picker"), "", [this](){
         openPerfectPaletteDialog();
     });
+    addMenuAction(chanMenu, tr("Debayer"), "", [this](){
+        openDebayerDialog();
+    });
+    addMenuAction(chanMenu, tr("Continuum Subtraction"), "", [this](){
+        openContinuumSubtractionDialog();
+    });
 
     // --- E. Utilities ---
     QMenu* utilMenu = processMenu->addMenu(tr("Utilities"));
@@ -691,6 +698,9 @@ MainWindow::MainWindow(QWidget *parent)
     });
     addMenuAction(utilMenu, tr("FITS Header Editor"), "", [this](){
          openHeaderEditorDialog();
+    });
+    addMenuAction(utilMenu, tr("Image Annotator"), "", [this](){
+        openImageAnnotatorDialog();
     });
 
     // --- F. Effects ---
@@ -736,7 +746,7 @@ MainWindow::MainWindow(QWidget *parent)
     
     QAction* toggleOverlayAct = maskMenu->addAction(tr("Show Overlay"));
     toggleOverlayAct->setCheckable(true);
-    toggleOverlayAct->setChecked(true); // Default on?
+    toggleOverlayAct->setChecked(true); 
     connect(toggleOverlayAct, &QAction::triggered, this, &MainWindow::toggleMaskOverlayAction);
     
     maskBtn->setMenu(maskMenu);
@@ -1085,9 +1095,27 @@ void MainWindow::saveFile() {
     QFormLayout* layout = new QFormLayout(&dlg);
     
     QComboBox* depthBox = new QComboBox(&dlg);
+    QCheckBox* burnBox = new QCheckBox(tr("Burn Annotations"), &dlg);
+    burnBox->setChecked(false);
+    
+    // Check if annotator is active
+    if (m_annotatorDlg && m_annotatorDlg->isVisible()) {
+        burnBox->setChecked(true); // Default to true if tool is open
+    } else {
+        burnBox->setEnabled(false);
+        burnBox->setChecked(false);
+        burnBox->setToolTip(tr("Open Image Annotator first"));
+    }
     
     if (format == "FITS" || format == "TIFF" || format == "XISF") {
         depthBox->addItems({tr("32-bit Float"), tr("32-bit Integer"), tr("16-bit Integer"), tr("8-bit Integer")});
+        
+        // Disable burning for raw formats (destructive)
+        if (format != "TIFF") { // TIFF is debatable (display or data?) let's allow TIFF burn if user wants (8/16bit)
+            burnBox->setChecked(false);
+            burnBox->setEnabled(false);
+            burnBox->setToolTip(tr("Cannot burn annotations into raw data formats (FITS/XISF)"));
+        }
     } else {
         depthBox->addItems({tr("8-bit Integer")});
         if (format == "PNG") depthBox->addItem(tr("16-bit Integer"));
@@ -1095,6 +1123,7 @@ void MainWindow::saveFile() {
     
     layout->addRow(tr("Format:"), new QLabel(format));
     layout->addRow(tr("Bit Depth:"), depthBox);
+    layout->addRow(tr(""), burnBox);
     
     QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel, &dlg);
     layout->addWidget(buttons);
@@ -1104,6 +1133,26 @@ void MainWindow::saveFile() {
     
     if (dlg.exec() != QDialog::Accepted) return;
     
+    // --- BURN ANNOTATIONS LOGIC ---
+    if (burnBox->isChecked() && m_annotatorDlg) {
+         // Render the display image (what user sees)
+         QImage displayImg = v->getBuffer().getDisplayImage(v->getDisplayMode(), v->isDisplayLinked());
+         
+         QPainter p(&displayImg);
+         m_annotatorDlg->renderAnnotations(p, QRectF(displayImg.rect()));
+         p.end(); 
+         
+         // Save QImage directly
+         if (!displayImg.save(path, format.toLatin1().constData())) {
+              QMessageBox::critical(this, tr("Error"), tr("Failed to save image with annotations."));
+         } else {
+              log(tr("Saved with Annotations: %1").arg(path), Log_Success, true);
+              showConsoleTemporarily(2000);
+         }
+         return; // Skip standard save
+    }
+    
+    // --- STANDARD SAVE ---
     QString dStr = depthBox->currentText();
     ImageBuffer::BitDepth d = ImageBuffer::Depth_8Int;
     
@@ -1936,8 +1985,6 @@ void MainWindow::openCurvesDialog() {
             if (viewer) m_curvesDlg->setViewer(viewer);
             return;
         }
-         // If no subwindow found but dlg exists, maybe it was closed but not deleted? 
-         // Or it's floating. Just show it.
         m_curvesDlg->show();
         m_curvesDlg->raise();
         m_curvesDlg->activateWindow();
@@ -2251,7 +2298,6 @@ void MainWindow::closeEvent(QCloseEvent* event) {
         // If canceled or still open windows (e.g. user said NO to unsaved changes)
         if (!m_mdiArea->subWindowList().isEmpty()) {
             event->ignore();
-            // Restore animation flag just in case? Or leave it as is since we are closing.
             for (auto sub : m_mdiArea->subWindowList()) {
                 if (auto customSub = qobject_cast<CustomMdiSubWindow*>(sub)) {
                     customSub->setSkipCloseAnimation(false);
@@ -2598,3 +2644,77 @@ void MainWindow::toggleMaskOverlayAction() {
         v->refresh();
     }
 }
+
+void MainWindow::openDebayerDialog() {
+    ImageViewer* v = currentViewer();
+    if (!v || !v->getBuffer().isValid()) {
+        QMessageBox::warning(this, tr("No Image"), tr("Please select an image first."));
+        return;
+    }
+    
+    if (v->getBuffer().channels() != 1) {
+        QMessageBox::information(this, tr("Debayer"), tr("Image already has multiple channels."));
+        return;
+    }
+    
+    if (m_debayerDlg) {
+        m_debayerDlg->raise();
+        m_debayerDlg->activateWindow();
+        m_debayerDlg->setViewer(v);
+        return;
+    }
+    
+    m_debayerDlg = new DebayerDialog(this);
+    m_debayerDlg->setAttribute(Qt::WA_DeleteOnClose);
+    m_debayerDlg->setViewer(v);
+    
+    connect(m_debayerDlg, &QDialog::destroyed, this, [this]() { m_debayerDlg = nullptr; });
+    
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, m_debayerDlg, tr("Debayer"));
+}
+
+void MainWindow::openContinuumSubtractionDialog() {
+    if (m_continuumDlg) {
+        m_continuumDlg->raise();
+        m_continuumDlg->activateWindow();
+        m_continuumDlg->refreshImageList();
+        return;
+    }
+    
+    m_continuumDlg = new ContinuumSubtractionDialog(this);
+    m_continuumDlg->setAttribute(Qt::WA_DeleteOnClose);
+    if (currentViewer()) {
+        m_continuumDlg->setViewer(currentViewer());
+    }
+    
+    connect(m_continuumDlg, &QDialog::destroyed, this, [this]() { m_continuumDlg = nullptr; });
+    
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, m_continuumDlg, tr("Continuum Subtraction"));
+}
+
+void MainWindow::openImageAnnotatorDialog() {
+    ImageViewer* v = currentViewer();
+    if (!v || !v->getBuffer().isValid()) {
+        QMessageBox::warning(this, tr("No Image"), tr("Please select an image first."));
+        return;
+    }
+    
+    if (m_annotatorDlg) {
+        m_annotatorDlg->raise();
+        m_annotatorDlg->activateWindow();
+        m_annotatorDlg->setViewer(v);
+        return;
+    }
+    
+    m_annotatorDlg = new AnnotationToolDialog(this);
+    m_annotatorDlg->setAttribute(Qt::WA_DeleteOnClose);
+    m_annotatorDlg->setViewer(v);
+    
+    connect(m_annotatorDlg, &QDialog::destroyed, this, [this]() { m_annotatorDlg = nullptr; });
+    
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, m_annotatorDlg, tr("Annotation Tool"));
+}
+

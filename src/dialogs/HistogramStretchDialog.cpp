@@ -330,6 +330,9 @@ void HistogramStretchDialog::onReset() {
 
 void HistogramStretchDialog::onApply() {
     if (m_viewer) {
+        // Clear preview LUT immediately to prevent double-application
+        m_viewer->clearPreviewLUT();
+
         // 1. Restore to backup (clean state)
         m_viewer->setBuffer(m_backup);
 
@@ -340,6 +343,8 @@ void HistogramStretchDialog::onApply() {
         ImageBuffer buf = m_backup;
         applyMTF(buf, m_shadows, m_midtones, m_highlights, m_doRed, m_doGreen, m_doBlue);
         m_viewer->setBuffer(buf);
+        // Reset display mode to linear to avoid double-stretching (applying AutoStretch on already stretched data)
+        m_viewer->setDisplayState(ImageBuffer::Display_Linear, true);
         m_applied = true;
     }
     accept();

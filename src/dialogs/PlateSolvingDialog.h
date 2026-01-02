@@ -36,7 +36,12 @@ private:
     QLineEdit* m_raHint;
     QLineEdit* m_decHint;
     QLineEdit* m_fov;
-    QLineEdit* m_pixelScale; // New field for scale
+    QLineEdit* m_focalLength;  // Focal length in mm
+    QLineEdit* m_pixelSizeUm;  // Pixel size in micrometers
+    QLineEdit* m_pixelScale;   // Calculated pixel scale arcsec/px
+    
+    void updateScaleFromMetadata(); // Auto-populate from metadata
+    void calculatePixelScale();     // Calculate from focal length and pixel size
     QTextEdit* m_log;
     QPushButton* m_solveBtn;
     

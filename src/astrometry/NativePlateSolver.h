@@ -6,7 +6,6 @@
 #include "../ImageBuffer.h"
 #include "../photometry/StarDetector.h"
 #include "TriangleMatcher.h"
-#include "SimbadSearcher.h"
 #include "WcsSolver.h"
 
 // Result structure
@@ -41,10 +40,6 @@ private slots:
     void onCatalogError(const QString& msg);
 
 private:
-    SimbadSearcher* m_simbad; // If we need to resolve name first (actually managed by dialog usually)
-    // We need a catalog client that fetches position and magnitude (Nomad, APASS, or similar)
-    // For now we can reuse CatalogClient but we need to verify if it returns what we need.
-    // CatalogClient (existing) is Vizier APASS.
     
     QNetworkAccessManager* m_nam;
     

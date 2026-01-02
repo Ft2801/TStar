@@ -150,6 +150,73 @@ bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* err
         }
     }
     status_meta = 0;
+    
+    // WCS Keywords (Critical for PCC and Image Annotator)
+    if (!fits_read_key(fptr, TDOUBLE, "CRVAL1", &dv, comment, &status_meta)) { meta.ra = dv; }
+    status_meta = 0;
+    if (!fits_read_key(fptr, TDOUBLE, "CRVAL2", &dv, comment, &status_meta)) { meta.dec = dv; }
+    status_meta = 0;
+    if (!fits_read_key(fptr, TDOUBLE, "CRPIX1", &dv, comment, &status_meta)) { meta.crpix1 = dv; }
+    status_meta = 0;
+    if (!fits_read_key(fptr, TDOUBLE, "CRPIX2", &dv, comment, &status_meta)) { meta.crpix2 = dv; }
+    status_meta = 0;
+    
+    // Read CD Matrix or CDELT/PC
+    double cd11=0, cd12=0, cd21=0, cd22=0;
+    bool hasCD = false;
+    if (!fits_read_key(fptr, TDOUBLE, "CD1_1", &dv, comment, &status_meta)) { cd11 = dv; hasCD = true; }
+    status_meta = 0;
+    if (!fits_read_key(fptr, TDOUBLE, "CD1_2", &dv, comment, &status_meta)) { cd12 = dv; hasCD = true; }
+    status_meta = 0;
+    if (!fits_read_key(fptr, TDOUBLE, "CD2_1", &dv, comment, &status_meta)) { cd21 = dv; hasCD = true; }
+    status_meta = 0;
+    if (!fits_read_key(fptr, TDOUBLE, "CD2_2", &dv, comment, &status_meta)) { cd22 = dv; hasCD = true; }
+    status_meta = 0;
+
+    if (!hasCD) {
+        // Try CDELT + PC or CDELT + CROTA
+        double cdelt1=1, cdelt2=1;
+        if (!fits_read_key(fptr, TDOUBLE, "CDELT1", &dv, comment, &status_meta)) cdelt1 = dv;
+        status_meta = 0;
+        if (!fits_read_key(fptr, TDOUBLE, "CDELT2", &dv, comment, &status_meta)) cdelt2 = dv;
+        status_meta = 0;
+        
+        double pc11=1, pc12=0, pc21=0, pc22=1;
+        bool hasPC = false;
+        if (!fits_read_key(fptr, TDOUBLE, "PC1_1", &dv, comment, &status_meta)) { pc11 = dv; hasPC = true; }
+        status_meta = 0;
+        if (!fits_read_key(fptr, TDOUBLE, "PC1_2", &dv, comment, &status_meta)) { pc12 = dv; hasPC = true; }
+        status_meta = 0;
+        if (!fits_read_key(fptr, TDOUBLE, "PC2_1", &dv, comment, &status_meta)) { pc21 = dv; hasPC = true; }
+        status_meta = 0;
+        if (!fits_read_key(fptr, TDOUBLE, "PC2_2", &dv, comment, &status_meta)) { pc22 = dv; hasPC = true; }
+        status_meta = 0;
+
+        if (hasPC) {
+            cd11 = pc11 * cdelt1;
+            cd12 = pc12 * cdelt1;
+            cd21 = pc21 * cdelt2;
+            cd22 = pc22 * cdelt2;
+        } else {
+            // Check for CROTA2
+            double crota2 = 0;
+            if (!fits_read_key(fptr, TDOUBLE, "CROTA2", &dv, comment, &status_meta)) {
+                crota2 = dv * M_PI / 180.0;
+                cd11 = cdelt1 * cos(crota2);
+                cd12 = -cdelt2 * sin(crota2);
+                cd21 = cdelt1 * sin(crota2);
+                cd22 = cdelt2 * cos(crota2);
+            } else {
+                // Just Scale
+                cd11 = cdelt1;
+                cd22 = cdelt2;
+            }
+            status_meta = 0;
+        }
+    }
+    
+    meta.cd1_1 = cd11; meta.cd1_2 = cd12;
+    meta.cd2_1 = cd21; meta.cd2_2 = cd22;
 
     char strVal[FLEN_VALUE];
     if (!fits_read_key(fptr, TSTRING, "OBJECT", strVal, comment, &status_meta)) meta.objectName = QString::fromUtf8(strVal);

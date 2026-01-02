@@ -213,5 +213,6 @@ bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const Gr
         }
     }
     
+    output.setMetadata(input.metadata()); // Preserve WCS and other metadata
     return true;
 }

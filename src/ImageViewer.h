@@ -24,6 +24,7 @@ public:
     // MDI / History Support
     ImageBuffer& getBuffer() { return m_buffer; }
     const ImageBuffer& getBuffer() const { return m_buffer; }
+    QString getHeaderValue(const QString &key) const { return m_buffer.getHeaderValue(key); }
     void setBuffer(const ImageBuffer& buffer, const QString& name = "Untitled", bool preserveView = false);
     void refreshDisplay(bool preserveView = true);
     void refresh() { refreshDisplay(true); } // Alias
@@ -101,8 +102,14 @@ public slots:
 public:
     // Accessors for Initial Sync
     float getScale() const { return (float)m_scaleFactor; }
-    int getHBarLoc() const; // Implemented in .cpp or here? Needed for QScrollBar
-    int getVBarLoc() const; 
+    int getHBarLoc() const;
+    int getVBarLoc() const;
+    
+    // Annotation Support
+    double zoomFactor() const { return m_scaleFactor; }
+    double pixelScale() const;  // arcsec/pixel from WCS
+    QPointF mapToScene(const QPoint& widgetPos) const { return QGraphicsView::mapToScene(widgetPos); }
+    QPointF mapFromScene(const QPointF& scenePos) const { return QGraphicsView::mapFromScene(scenePos).toPointF(); } 
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
@@ -133,13 +140,10 @@ private:
     std::vector<ImageBuffer> m_undoStack;
     std::vector<ImageBuffer> m_redoStack;
 
-    QImage m_displayImage; // Keep for data? Or just use pixmap? .cpp uses setImage(QImage).
-    // .cpp uses m_scaleFactor
+    QImage m_displayImage;
     double m_scaleFactor = 1.0;
     
-    float m_zoom = 1.0f; // Unused if m_scaleFactor is used? .cpp uses m_scaleFactor in zoomIn/Out.
-    // But .h had m_zoom. Let's keep both or check usage.
-    // .cpp zoomIn uses m_scaleFactor.
+    float m_zoom = 1.0f;
     
     float m_panX = 0.0f, m_panY = 0.0f;
     QPointF m_lastMousePos;

@@ -155,6 +155,7 @@ add_executable(TStar
     # ===========================
     src/network/UpdateChecker.cpp
     src/network/UpdateChecker.h
+
     
     # ===========================
     # Dialogs (src/dialogs/)
@@ -225,6 +226,14 @@ add_executable(TStar
     src/dialogs/LivePreviewDialog.h
     src/dialogs/ApplyMaskDialog.cpp
     src/dialogs/ApplyMaskDialog.h
+    src/dialogs/DebayerDialog.cpp
+    src/dialogs/DebayerDialog.h
+    src/dialogs/ContinuumSubtractionDialog.cpp
+    src/dialogs/ContinuumSubtractionDialog.h
+    src/dialogs/AnnotationToolDialog.cpp
+    src/dialogs/AnnotationToolDialog.h
+    src/widgets/AnnotationOverlay.cpp
+    src/widgets/AnnotationOverlay.h
     
     # ===========================
     # Astrometry (src/astrometry/)
@@ -307,3 +316,5 @@ endif()
 
 # Copy images to build directory
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/images" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+# Copy catalogs to build directory
+

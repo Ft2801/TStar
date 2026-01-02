@@ -324,5 +324,6 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
     purge(inputDir);
     purge(outputDir);
 
+    output.setMetadata(input.metadata()); // Preserve WCS and other metadata
     return true;
 }

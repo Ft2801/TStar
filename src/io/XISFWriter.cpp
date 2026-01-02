@@ -136,6 +136,11 @@ bool XISFWriter::write(const QString& filePath, const ImageBuffer& buffer, int d
                 writtenKeys.insert(k.toUpper());
             };
             
+            // CTYPE keywords are required for WCS validity
+            addKW("CTYPE1", "'RA---TAN'", "Coordinate type");
+            addKW("CTYPE2", "'DEC--TAN'", "Coordinate type");
+            addKW("EQUINOX", "2000.0", "Equinox of coordinates");
+            
             addKW("CRVAL1", QString::number(meta.ra, 'f', 9));
             addKW("CRVAL2", QString::number(meta.dec, 'f', 9));
             addKW("CRPIX1", QString::number(meta.crpix1, 'f', 3));

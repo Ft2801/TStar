@@ -40,6 +40,9 @@ class HeaderViewerDialog;
 class SidebarWidget;
 class HeaderPanel;
 class AstroSpikeDialog;
+class DebayerDialog;
+class ContinuumSubtractionDialog;
+class AnnotationToolDialog;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -93,6 +96,9 @@ private slots:
     void openSaturationDialog();
     void openAstroSpikeDialog();
     void openHeaderEditorDialog();
+    void openDebayerDialog();
+    void openContinuumSubtractionDialog();
+    void openImageAnnotatorDialog();
     
     // Mask Tool Actions
     void createMaskAction();
@@ -182,6 +188,9 @@ private:
     QPointer<class StarAnalysisDialog> m_starAnalysisDlg;
     QPointer<class HeaderViewerDialog> m_headerDlg;
     QPointer<class AstroSpikeDialog> m_astroSpikeDlg;
+    QPointer<class DebayerDialog> m_debayerDlg;
+    QPointer<class ContinuumSubtractionDialog> m_continuumDlg;
+    QPointer<class AnnotationToolDialog> m_annotatorDlg;
     
     void showConsoleTemporarily(int durationMs = 3000);
     // Move these to public above

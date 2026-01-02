@@ -8,6 +8,7 @@
 #include "photometry/PCCResult.h"
 #include "algos/CubicSpline.h"
 #include "core/MaskLayer.h"
+#include <QTransform>
 
 class ImageBuffer {
 public:
@@ -22,6 +23,10 @@ public:
     ImageBuffer(ImageBuffer&& other) noexcept = default;
     ImageBuffer& operator=(ImageBuffer&& other) noexcept = default;
 
+    // WCS Reframing Helper (Centralized logic for Geometry Ops)
+    // Updates CRPIX and CD Matrix based on a linear transform
+    void reframeWCS(const QTransform& trans, int oldWidth, int oldHeight);
+
     void setData(int width, int height, int channels, const std::vector<float>& data);
     void resize(int width, int height, int channels);
     
@@ -33,6 +38,10 @@ public:
 
     int width() const { return m_width; }
     int height() const { return m_height; }
+    
+    // Header Access
+    QString getHeaderValue(const QString& key) const;
+
     enum BitDepth { Depth_8Int, Depth_16Int, Depth_32Int, Depth_32Float };
     enum DisplayMode { Display_Linear, Display_AutoStretch, Display_ArcSinh, Display_Sqrt, Display_Log, Display_Histogram };
     int channels() const { return m_channels; }
@@ -200,6 +209,9 @@ public:
 
     bool isModified() const { return m_modified; }
     void setModified(bool modified) { m_modified = modified; }
+    
+    // Synchronize WCS struct values back to rawHeaders vector
+    void syncWcsToHeaders();
 
 private:
     int m_width = 0;

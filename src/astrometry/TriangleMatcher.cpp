@@ -121,16 +121,94 @@ std::vector<MatchTriangle> TriangleMatcher::generateTriangles(const std::vector<
     return triangles;
 }
 
+bool TriangleMatcher::solve(const std::vector<MatchStar>& imgStars,
+                            const std::vector<MatchStar>& catStars,
+                            GenericTrans& resultTrans,
+                            double minScale, double maxScale,
+                            double centerX, double centerY, double posTolerance) 
+{
+    // 1. Sort and Filter Brightest
+    int nA = std::min((int)imgStars.size(), m_maxStars);
+    int nB = std::min((int)catStars.size(), m_maxStars);
+    
+    if (nA < 5 || nB < 5) return false;
+    
+    std::vector<MatchStar> sA = imgStars;
+    std::vector<MatchStar> sB = catStars;
+    std::sort(sA.begin(), sA.end(), compareStarsMag);
+    std::sort(sB.begin(), sB.end(), compareStarsMag);
+    sA.resize(nA);
+    sB.resize(nB);
+    
+    // Update indices
+    for(int i=0; i<nA; ++i) sA[i].index = i;
+    for(int i=0; i<nB; ++i) sB[i].index = i;
+    
+    // 2. Generate Triangles
+    auto triA = generateTriangles(sA, nA);
+    auto triB = generateTriangles(sB, nB);
+    
+    // 3. Vote
+    auto votes = computeVotes(triA, triB, sA, sB, nA, nB, minScale, maxScale, centerX, centerY, posTolerance);
+    
+    // 4. Find Winners (Top vote getters)
+    // We need pairs (i, j) with high votes.
+    // Reference uses a loop to pick max vote in matrix, zero out row/col, repeat.
+    
+    std::vector<int> winnerA;
+    std::vector<int> winnerB;
+    
+    // Copy votes to temp to destructively find max
+    auto tempVotes = votes;
+    
+    int required_pairs = 10;
+    for(int k=0; k<std::min(nA, nB); ++k) {
+        int maxv = 0;
+        int max_i = -1, max_j = -1;
+        
+        for(int i=0; i<nA; ++i) {
+            for(int j=0; j<nB; ++j) {
+                if(tempVotes[i][j] > maxv) {
+                    maxv = tempVotes[i][j];
+                    max_i = i; 
+                    max_j = j;
+                }
+            }
+        }
+        
+        if (maxv < 1) break; // No more votes
+        
+        winnerA.push_back(max_i);
+        winnerB.push_back(max_j);
+        
+        // Zero out row/col to enforce 1-to-1 in this greedy step
+        for(int j=0; j<nB; ++j) tempVotes[max_i][j] = -1;
+        for(int i=0; i<nA; ++i) tempVotes[i][max_j] = -1;
+    }
+    
+    if (winnerA.size() < required_pairs) return false;
+    
+    // 5. Iterative Fit
+    return iterativeFit(sA, sB, winnerA, winnerB, resultTrans);
+}
+
+// ... (skipping generateTriangles, it is unchanged)
+
 std::vector<std::vector<int>> TriangleMatcher::computeVotes(const std::vector<MatchTriangle>& triA,
                                            const std::vector<MatchTriangle>& triB,
-                                           int numStarsA, int numStarsB) 
+                                           const std::vector<MatchStar>& starsA,
+                                           const std::vector<MatchStar>& starsB,
+                                           int numStarsA, int numStarsB,
+                                           double minScale, double maxScale,
+                                           double centerX, double centerY, double posTolerance) 
 {
     // Allocate vote matrix
     std::vector<std::vector<int>> votes(numStarsA, std::vector<int>(numStarsB, 0));
     
     double max_r = AT_MATCH_MAX_RADIUS;
     double max_r2 = max_r * max_r;
-    
+    double posTol2 = posTolerance * posTolerance;
+
     // Walk through B
     for (const auto& tb : triB) {
         double ba_min = tb.ba - max_r;
@@ -144,12 +222,48 @@ std::vector<std::vector<int>> TriangleMatcher::computeVotes(const std::vector<Ma
         for (auto it = it_start; it != triA.end(); ++it) {
             if (it->ba > ba_max) break;
             
+            // SCALE CHECK
+            double ratio = it->a_length / tb.a_length;
+            if (ratio < minScale || ratio > maxScale) {
+                continue; 
+            }
+            
+            // POSITION CHECK (Centroid)
+            if (posTolerance > 0) {
+                // Calculate geometric centers (approximate)
+                // Use star coordinates from starsA/starsB using indices in triangle
+                // Tri contains indices into the SORTED subset sA/sB passed to this function
+                
+                const auto& sA1 = starsA[it->a_index];
+                const auto& sA2 = starsA[it->b_index];
+                const auto& sA3 = starsA[it->c_index];
+                
+                const auto& sB1 = starsB[tb.a_index];
+                const auto& sB2 = starsB[tb.b_index];
+                const auto& sB3 = starsB[tb.c_index];
+                
+                double cxA = (sA1.x + sA2.x + sA3.x) / 3.0;
+                double cyA = (sA1.y + sA2.y + sA3.y) / 3.0;
+                
+                double cxB = (sB1.x + sB2.x + sB3.x) / 3.0;
+                double cyB = (sB1.y + sB2.y + sB3.y) / 3.0;
+                
+                // Estimated shift = Img - Cat (since Cat is near 0)
+                // Shift should be near centerX, centerY
+                double dx = cxA - cxB; 
+                double dy = cyA - cyB;
+                
+                double distSq = (dx - centerX)*(dx - centerX) + (dy - centerY)*(dy - centerY);
+                if (distSq > posTol2) {
+                    continue; // Reject match too far from expected position
+                }
+            }
+
             // Check distance in triangle space (ba, ca)
             double d_ba = it->ba - tb.ba;
             double d_ca = it->ca - tb.ca;
             if (d_ba*d_ba + d_ca*d_ca < max_r2) {
                 // Match! Vote for vertices.
-                // A indices maps to B indices
                 if (it->a_index < numStarsA && tb.a_index < numStarsB) votes[it->a_index][tb.a_index]++;
                 if (it->b_index < numStarsA && tb.b_index < numStarsB) votes[it->b_index][tb.b_index]++;
                 if (it->c_index < numStarsA && tb.c_index < numStarsB) votes[it->c_index][tb.c_index]++;
@@ -323,71 +437,4 @@ bool TriangleMatcher::iterativeFit(const std::vector<MatchStar>& listA,
     return (nr >= 6); 
 }
 
-bool TriangleMatcher::solve(const std::vector<MatchStar>& imgStars,
-                            const std::vector<MatchStar>& catStars,
-                            GenericTrans& resultTrans) 
-{
-    // 1. Sort and Filter Brightest
-    int nA = std::min((int)imgStars.size(), m_maxStars);
-    int nB = std::min((int)catStars.size(), m_maxStars);
-    
-    if (nA < 5 || nB < 5) return false;
-    
-    std::vector<MatchStar> sA = imgStars;
-    std::vector<MatchStar> sB = catStars;
-    std::sort(sA.begin(), sA.end(), compareStarsMag);
-    std::sort(sB.begin(), sB.end(), compareStarsMag);
-    sA.resize(nA);
-    sB.resize(nB);
-    
-    // Update indices
-    for(int i=0; i<nA; ++i) sA[i].index = i;
-    for(int i=0; i<nB; ++i) sB[i].index = i;
-    
-    // 2. Generate Triangles
-    auto triA = generateTriangles(sA, nA);
-    auto triB = generateTriangles(sB, nB);
-    
-    // 3. Vote
-    auto votes = computeVotes(triA, triB, nA, nB);
-    
-    // 4. Find Winners (Top vote getters)
-    // We need pairs (i, j) with high votes.
-    // Reference uses a loop to pick max vote in matrix, zero out row/col, repeat.
-    
-    std::vector<int> winnerA;
-    std::vector<int> winnerB;
-    
-    // Copy votes to temp to destructively find max
-    auto tempVotes = votes;
-    
-    int required_pairs = 10;
-    for(int k=0; k<std::min(nA, nB); ++k) {
-        int maxv = 0;
-        int max_i = -1, max_j = -1;
-        
-        for(int i=0; i<nA; ++i) {
-            for(int j=0; j<nB; ++j) {
-                if(tempVotes[i][j] > maxv) {
-                    maxv = tempVotes[i][j];
-                    max_i = i; 
-                    max_j = j;
-                }
-            }
-        }
-        
-        if (maxv < 1) break; // No more votes
-        
-        winnerA.push_back(max_i);
-        winnerB.push_back(max_j);
-        
-        // Zero out row/col to enforce 1-to-1 in this greedy step
-        for(int j=0; j<nB; ++j) tempVotes[max_i][j] = -1;
-        for(int i=0; i<nA; ++i) tempVotes[i][max_j] = -1;
-    }
-    
-    if (winnerA.size() < required_pairs) return false;
-    
-    // 5. Iterative Fit
-    return iterativeFit(sA, sB, winnerA, winnerB, resultTrans);
-}
+

@@ -1,6 +1,13 @@
 TStar Changelog
 ===============
 
+Version 1.1.0
+-------------
+- Debayer tool
+- Continuum subtraction tool
+- Image annotation tool
+- white image after histogram transformation fixed
+
 Version 1.0.5
 -------------
 - Fixed ABE, GHT and Saturation small bugs

@@ -51,6 +51,11 @@ copy "%MINGW_BIN%\libstdc++-6.dll" "!BUILD_DIR!\" >nul
 copy "%MINGW_BIN%\libwinpthread-1.dll" "!BUILD_DIR!\" >nul
 copy "%MINGW_BIN%\libgomp-1.dll" "!BUILD_DIR!\" >nul
 
+echo [STEP 2.1] Copying OpenSSL DLLs...
+set "OPENSSL_DIR=%MINGW_BIN%\..\opt\bin"
+copy "!OPENSSL_DIR!\libssl-1_1-x64.dll" "!BUILD_DIR!\" >nul
+copy "!OPENSSL_DIR!\libcrypto-1_1-x64.dll" "!BUILD_DIR!\" >nul
+
 echo [STEP 3] Copying local dependencies...
 
 REM Copy GSL DLLs

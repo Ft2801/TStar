@@ -24,6 +24,16 @@
 ImageBuffer::ImageBuffer() {}
 ImageBuffer::~ImageBuffer() {}
 
+QString ImageBuffer::getHeaderValue(const QString& key) const {
+    for (const auto& card : m_meta.rawHeaders) {
+        if (card.key == key) return card.value;
+    }
+    // Fallbacks for known metadata fields
+    if (key == "DATE-OBS") return m_meta.dateObs;
+    if (key == "OBJECT") return m_meta.objectName;
+    return QString();
+}
+
 // ...
 void ImageBuffer::setMask(const MaskLayer& mask) {
     if (mask.isValid() && mask.width == m_width && mask.height == m_height) {
@@ -429,35 +439,58 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
             float avgMed = (stats[0].median + stats[1].median + stats[2].median) / 3.0f;
             float avgMad = (stats[0].mad + stats[1].mad + stats[2].mad) / 3.0f;
             
-            float shadow = std::max(0.0f, avgMed + shadowClip * avgMad);
-            // If the image is uniform (mad=0) and bright (median=1), shadow becomes 1.0.
-            // We must ensure shadow < median to have a valid stretch.
-            if (shadow >= avgMed) shadow = std::max(0.0f, avgMed - 0.001f);
+            // Detect if image is already stretched (high median indicates stretched data)
+            // Stretched images typically have median > 0.05-0.1
+            bool alreadyStretched = (avgMed > 0.05f);
             
-            float mid = avgMed - shadow; 
-            if (mid <= 0) mid = 0.5f; 
-            
-            float m = mtf_func(targetBG, mid);
-            for (int c = 0; c < 3; ++c) {
-                for (int i = 0; i < LUT_SIZE; ++i) {
-                    float x = (float)i / (LUT_SIZE - 1);
-                    float normX = (x - shadow) / (1.0f - shadow + 1e-9f);
-                    luts[c][i] = mtf_func(m, normX);
+            if (alreadyStretched) {
+                // For already stretched data, use a mild linear LUT (near identity)
+                for (int c = 0; c < 3; ++c) {
+                    for (int i = 0; i < LUT_SIZE; ++i) {
+                        luts[c][i] = (float)i / (LUT_SIZE - 1);
+                    }
+                }
+            } else {
+                float shadow = std::max(0.0f, avgMed + shadowClip * avgMad);
+                // If the image is uniform (mad=0) and bright (median=1), shadow becomes 1.0.
+                // We must ensure shadow < median to have a valid stretch.
+                if (shadow >= avgMed) shadow = std::max(0.0f, avgMed - 0.001f);
+                
+                float mid = avgMed - shadow; 
+                if (mid <= 0) mid = 0.5f; 
+                
+                float m = mtf_func(targetBG, mid);
+                for (int c = 0; c < 3; ++c) {
+                    for (int i = 0; i < LUT_SIZE; ++i) {
+                        float x = (float)i / (LUT_SIZE - 1);
+                        float normX = (x - shadow) / (1.0f - shadow + 1e-9f);
+                        luts[c][i] = mtf_func(m, normX);
+                    }
                 }
             }
         } else {
             for (int c = 0; c < m_channels; ++c) {
-                float shadow = std::max(0.0f, stats[c].median + shadowClip * stats[c].mad);
-                if (shadow >= stats[c].median) shadow = std::max(0.0f, stats[c].median - 0.001f);
+                // Detect if this channel is already stretched
+                bool alreadyStretched = (stats[c].median > 0.05f);
                 
-                float mid = stats[c].median - shadow;
-                if (mid <= 0) mid = 0.5f;
+                if (alreadyStretched) {
+                    // For already stretched data, use linear LUT
+                    for (int i = 0; i < LUT_SIZE; ++i) {
+                        luts[c][i] = (float)i / (LUT_SIZE - 1);
+                    }
+                } else {
+                    float shadow = std::max(0.0f, stats[c].median + shadowClip * stats[c].mad);
+                    if (shadow >= stats[c].median) shadow = std::max(0.0f, stats[c].median - 0.001f);
+                    
+                    float mid = stats[c].median - shadow;
+                    if (mid <= 0) mid = 0.5f;
 
-                float m = mtf_func(targetBG, mid);
-                for (int i = 0; i < LUT_SIZE; ++i) {
-                    float x = (float)i / (LUT_SIZE - 1);
-                    float normX = (x - shadow) / (1.0f - shadow + 1e-9f);
-                    luts[c][i] = mtf_func(m, normX);
+                    float m = mtf_func(targetBG, mid);
+                    for (int i = 0; i < LUT_SIZE; ++i) {
+                        float x = (float)i / (LUT_SIZE - 1);
+                        float normX = (x - shadow) / (1.0f - shadow + 1e-9f);
+                        luts[c][i] = mtf_func(m, normX);
+                    }
                 }
             }
         }
@@ -704,21 +737,10 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
                      int g = (fmt == QImage::Format_Grayscale8) ? dest[x] : dest[x*3+1];
                      int b = (fmt == QImage::Format_Grayscale8) ? dest[x] : dest[x*3+2];
                      
-                     // If it was grayscale, we must convert this pixel area or use a better approach.
-                     // But for mask overlay, we usually want color.
-                     // The QImage format handles the storage.
-                     
                      if (fmt == QImage::Format_Grayscale8) {
-                         // We can't easily tint red in a grayscale image. 
-                         // For simplicity, just make it brighter? 
-                         // No, let's assume if showMask is on, we might want RGB.
-                         // However, getDisplayImage is called often. 
-                         // Let's just do a simple highlight for grayscale.
                          int val = dest[x];
                          dest[x] = std::clamp(static_cast<int>(val * (1.0f + overlayAlpha)), 0, 255);
                      } else {
-                         // Red tint: R + alpha, G/B reduced
-                         // Simple alpha blending with Red (255, 0, 0)
                          float r_f = r * (1.0f - overlayAlpha) + 255.0f * overlayAlpha;
                          float g_f = g * (1.0f - overlayAlpha);
                          float b_f = b * (1.0f - overlayAlpha);
@@ -781,10 +803,6 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
         long nelements = m_width * m_height * m_channels;
         
         if (depth == Depth_32Float) {
-             // Write standard float data interleaved?
-             // CFITSIO for 3D is usually planar [width, height, channels].
-             // Our m_data is interleaved [pixel, pixel...].
-             // WE must de-interleave for FITS writing if NAXIS3=3.
              
              std::vector<float> planarData(nelements);
              if (m_channels == 1) {
@@ -863,14 +881,6 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
                 continue;
             }
             
-            // Try to write as key/value/comment
-            // Note: CFITSIO handles quotes for strings if we use fits_write_key
-            // However, our 'value' is already a string representation.
-            // If it starts with quotes, it might be a literal string. 
-            // If it's a number, it's a number.
-            // Simple approach: fits_write_record with a reconstructed card?
-            // Or fits_write_key with TSTRING for now, CFITSIO is smart.
-            
             if (key == "HISTORY") {
                 fits_write_history(fptr, card.value.toUtf8().constData(), &status);
             } else if (key == "COMMENT") {
@@ -888,9 +898,6 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
                 } else if (isDouble) {
                      fits_write_key(fptr, TDOUBLE, key.toUtf8().constData(), &dVal, card.comment.toUtf8().constData(), &status);
                 } else {
-                     // String
-                     // Ensure we don't double-quote if the string already has quotes?
-                     // CFITSIO adds quotes for TSTRING.
                      fits_write_key(fptr, TSTRING, key.toUtf8().constData(), 
                                     (void*)card.value.toUtf8().constData(), 
                                     card.comment.toUtf8().constData(), &status);
@@ -902,6 +909,15 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
         
         // Write WCS explicitly to ensure it overrides any old/invalid WCS in rawHeaders
         if (m_meta.ra != 0 || m_meta.dec != 0) {
+            // CTYPE keywords are required for WCS validity
+            const char* ctype1 = "RA---TAN";
+            const char* ctype2 = "DEC--TAN";
+            fits_update_key(fptr, TSTRING, "CTYPE1", (void*)ctype1, "Coordinate type", &status);
+            fits_update_key(fptr, TSTRING, "CTYPE2", (void*)ctype2, "Coordinate type", &status);
+            
+            double equinox = 2000.0;
+            fits_update_key(fptr, TDOUBLE, "EQUINOX", &equinox, "Equinox of coordinates", &status);
+            
             fits_update_key(fptr, TDOUBLE, "CRVAL1", &m_meta.ra, "RA at reference pixel", &status);
             fits_update_key(fptr, TDOUBLE, "CRVAL2", &m_meta.dec, "Dec at reference pixel", &status);
             fits_update_key(fptr, TDOUBLE, "CRPIX1", &m_meta.crpix1, "Reference pixel x", &status);
@@ -917,13 +933,11 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
         return true;
 
     } else if (format.compare("tiff", Qt::CaseInsensitive) == 0 || format.compare("tif", Qt::CaseInsensitive) == 0) {
-        // Use SimpleTiffWriter for full bit depth support
         SimpleTiffWriter::Format fmt = SimpleTiffWriter::Format_uint8;
         if (depth == Depth_16Int) fmt = SimpleTiffWriter::Format_uint16;
         else if (depth == Depth_32Int) fmt = SimpleTiffWriter::Format_uint32;
         else if (depth == Depth_32Float) fmt = SimpleTiffWriter::Format_float32;
         
-        // Error msg?
         if (!SimpleTiffWriter::write(filePath, m_width, m_height, m_channels, fmt, m_data, errorMsg)) {
              return false;
         }
@@ -937,23 +951,14 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
     }
 }
 
-// ------ True Stretch Impl ------
-
-// Specific Python Formula port
-// num = (med - 1.0) * target_median * r
-// den = med * (target_median + r - 1.0) - target_median * r
 static float stretch_fn(float r, float med, float target) {
     if (r < 0) r = 0; // Clip input
-     // if (med == 1.0) avoid div zero? formula handles it?
     float num = (med - 1.0f) * target * r;
     float den = med * (target + r - 1.0f) - target * r;
     if (std::abs(den) < 1e-12f) den = 1e-12f;
     return num / den;
 }
 
-// Curves Interpolation (Linear for now, or simple S-curve?)
-// Python uses 6 points. 
-// For simplicity in C++, let's implement a look-up or direct linear interp.
 static float apply_curve(float val, const std::vector<float>& x, const std::vector<float>& y) {
     if (val <= 0) return 0;
     if (val >= 1) return 1;
@@ -1020,8 +1025,6 @@ void ImageBuffer::performTrueStretch(const StretchParams& params) {
     int stride = (m_width * m_height) / 100000 + 1;
     
     if (params.linked) {
-        // Compute combined stats (using Green channel as proxy or luminance? Python uses all pixels)
-        // Let's sample all channels interleaved
          TrueStretchStats s = getTrueStretchStats(m_data, stride, 2.7f, 0, 1); // Treat as 1 channel stream
          stats.push_back(s); // [0] = global
     } else {
@@ -1230,7 +1233,6 @@ static inline void rgbblend_func(float* r, float* g, float* b, float sf0, float 
     float candidate = (1.0f - tfmax) / safe_d;       // safe even when original d==0 due to safe_d
     float limited   = std::min(m_CB, candidate);
 
-    // final k = full_mask ? limited : m_CB  (blend)
     float k = full_mask * limited + (1.0f - full_mask) * m_CB;
 
     // precompute factor
@@ -1470,7 +1472,6 @@ std::vector<float> ImageBuffer::computeGHSLUT(const GHSParams& params, int size)
     else if (params.mode == GHS_InverseArcSinh) algoParams.type = GHSAlgo::STRETCH_INVASINH;
     else algoParams.type = GHSAlgo::STRETCH_LINEAR;
 
-    // Fix for Siril Compatibility (LUT for Preview)
     if (algoParams.type != GHSAlgo::STRETCH_LINEAR && algoParams.BP > 0.0f) {
         float den = 1.0f - algoParams.BP;
         if (den > 1e-6f) {
@@ -1518,6 +1519,41 @@ void ImageBuffer::blendResult(const ImageBuffer& original, bool inverseMask) {
     }
 }
 
+// WCS Reframing Helper
+void ImageBuffer::reframeWCS(const QTransform& trans, int oldWidth, int oldHeight) {
+    if (m_meta.ra == 0 && m_meta.dec == 0) return;
+    double crpix1_0 = m_meta.crpix1 - 1.0;
+    double crpix2_0 = m_meta.crpix2 - 1.0;
+    
+    QPointF pOld(crpix1_0, crpix2_0);
+    QPointF pNew = trans.map(pOld);
+    
+    m_meta.crpix1 = pNew.x() + 1.0;
+    m_meta.crpix2 = pNew.y() + 1.0;
+
+    // 2. Update CD Matrix
+    // CD_new = CD_old * T^-1
+    bool invertible = false;
+    QTransform inv = trans.inverted(&invertible);
+    if (!invertible) return;
+    
+    // Matrix multiplication:
+    // [ cd11 cd12 ]   [ m11 m12 ]
+    // [ cd21 cd22 ] * [ m21 m22 ]
+    
+    double old_cd11 = m_meta.cd1_1;
+    double old_cd12 = m_meta.cd1_2;
+    double old_cd21 = m_meta.cd2_1;
+    double old_cd22 = m_meta.cd2_2;
+    
+    m_meta.cd1_1 = old_cd11 * inv.m11() + old_cd12 * inv.m21();
+    m_meta.cd1_2 = old_cd11 * inv.m12() + old_cd12 * inv.m22();
+    m_meta.cd2_1 = old_cd21 * inv.m11() + old_cd22 * inv.m21();
+    m_meta.cd2_2 = old_cd21 * inv.m12() + old_cd22 * inv.m22();
+
+    syncWcsToHeaders();
+}
+
 // Geometric Ops
 void ImageBuffer::crop(int x, int y, int w, int h) {
     if (m_data.empty()) return;
@@ -1551,8 +1587,10 @@ void ImageBuffer::crop(int x, int y, int w, int h) {
     m_data = newData;
 
     // Update WCS
-    m_meta.crpix1 -= x;
-    m_meta.crpix2 -= y;
+    // Crop: translate(-x, -y)
+    QTransform t;
+    t.translate(-x, -y);
+    reframeWCS(t, oldW, oldH);
 
     if (hasMask()) {
         ImageBuffer maskBuf;
@@ -1567,6 +1605,9 @@ void ImageBuffer::crop(int x, int y, int w, int h) {
 void ImageBuffer::rotate(float angleDegrees) {
     if (m_data.empty()) return;
     if (std::abs(angleDegrees) < 0.1f) return;
+    
+    int oldW = m_width;
+    int oldH = m_height;
     
     // Convert to radians
     float theta = -angleDegrees * 3.14159265f / 180.0f; // Negative to match typical image coord rotation
@@ -1632,7 +1673,7 @@ void ImageBuffer::rotate(float angleDegrees) {
                 
                 for (int c = 0; c < m_channels; ++c) {
                     float v00 = m_data[idx00 + c];
-                    float v01 = m_data[idx01 + c]; // Bug: idx01 might be out of row if px=w-1? Handled by m_width-1 check
+                    float v01 = m_data[idx01 + c];
                     float v10 = m_data[idx10 + c];
                     float v11 = m_data[idx11 + c];
                     
@@ -1652,44 +1693,28 @@ void ImageBuffer::rotate(float angleDegrees) {
 
     // Apply geometry transform to MASK if present
     if (hasMask()) {
-        // We reuse the rotate logic but on the mask data.
-        // It's a single channel float image.
-        // Easiest way: create a temp ImageBuffer for mask, rotate it, put back.
         ImageBuffer maskBuf;
         maskBuf.setData(original.width(), original.height(), 1, m_mask.data);
         maskBuf.rotate(angleDegrees);
         m_mask.data = maskBuf.data();
         m_mask.width = maskBuf.width();
         m_mask.height = maskBuf.height();
-        // No blending for geometry! We just moved the pixels.
     }
 
-    // Update WCS for Rotation
-    // Transformation: P_dest = Rot(theta) * (P_src - C_src) + C_dest
-    // theta is POSITIVE form of angle (since theta in code was inverted)
-    // Wait, theta in code is -angleDegrees * rad.
-    // Let's use own theta for WCS to be clear.
-    float wcsTheta = -theta; // This is the rotation angle applied to image
-    float c = std::cos(wcsTheta);
-    float s = std::sin(wcsTheta);
+    // Update WCS
+    // Rotates around CENTER of image.
+    // T = T_newCenter * R * T_-oldCenter
+    QTransform t;
+    t.translate(centerX, centerY);    // Qt transform order: last applied is first in multiply? 
+    t.rotate(angleDegrees);           // No, QTransform API order: T' = T * thisOp
+    t.translate(-centerX, -centerY);  // We want: p_new = T_newCenter * R * T_-oldCenter * p_old
+    // Let's build explicitly:
+    QTransform wcsTrans;
+    wcsTrans.translate(newCenterX, newCenterY);
+    wcsTrans.rotate(angleDegrees);
+    wcsTrans.translate(-centerX, -centerY);
     
-    // CD_new = CD_old * Rot(-wcsTheta)
-    // Rot(-wcsTheta) = [[c, s], [-s, c]]
-    double ncd1_1 = m_meta.cd1_1 * c + m_meta.cd1_2 * -s;
-    double ncd1_2 = m_meta.cd1_1 * s + m_meta.cd1_2 * c;
-    double ncd2_1 = m_meta.cd2_1 * c + m_meta.cd2_2 * -s;
-    double ncd2_2 = m_meta.cd2_1 * s + m_meta.cd2_2 * c;
-    
-    m_meta.cd1_1 = ncd1_1; m_meta.cd1_2 = ncd1_2;
-    m_meta.cd2_1 = ncd2_1; m_meta.cd2_2 = ncd2_2;
-    
-    // CRPIX_new = Rot(wcsTheta) * (CRPIX_old - C_src) + C_dest
-    // Rot(wcsTheta) = [[c, -s], [s, c]]
-    double ox = m_meta.crpix1 - centerX;
-    double oy = m_meta.crpix2 - centerY;
-    
-    m_meta.crpix1 = (ox * c - oy * s) + newCenterX;
-    m_meta.crpix2 = (ox * s + oy * c) + newCenterY;
+    reframeWCS(wcsTrans, oldW, oldH);
 }
 
 void ImageBuffer::applySCNR(float amount, int method) {
@@ -1740,6 +1765,9 @@ void ImageBuffer::applySCNR(float amount, int method) {
 void ImageBuffer::cropRotated(float cx, float cy, float w, float h, float angleDegrees) {
     if (m_data.empty()) return;
     if (w <= 1 || h <= 1) return;
+
+    int oldW = m_width;
+    int oldH = m_height;
 
     // Output size is fixed to w, h
     int outW = static_cast<int>(w);
@@ -1812,37 +1840,16 @@ void ImageBuffer::cropRotated(float cx, float cy, float w, float h, float angleD
     m_height = outH;
     m_data = newData;
 
-    // Update WCS for CropRotated
-    // Code uses theta = angleDegrees * rad (positive)
-    // Mapping matches: P_dest corresponds to Rot(-theta) P_src ..
-    // Let's use Same Logic as Rotate:
-    // P_dest = Rot(theta) * (P_src - C_src) + C_dest ?? 
-    // In code: src = Rot(-theta) * dest + ...
-    // => dest = Rot(theta) * (src - ...)
-    // So Rotation is theta.
+    m_width = outW;
+    m_height = outH;
+    m_data = newData;
     
-    float c = std::cos(theta);
-    float s = std::sin(theta);
+    QTransform wcsTrans;
+    wcsTrans.translate(halfW, halfH);
+    wcsTrans.rotate(angleDegrees);
+    wcsTrans.translate(-cx, -cy);
     
-    // CD_new = CD_old * Rot(-theta)
-    // Rot(-theta) = [[c, s], [-s, c]]
-    double ncd1_1 = m_meta.cd1_1 * c + m_meta.cd1_2 * -s;
-    double ncd1_2 = m_meta.cd1_1 * s + m_meta.cd1_2 * c;
-    double ncd2_1 = m_meta.cd2_1 * c + m_meta.cd2_2 * -s;
-    double ncd2_2 = m_meta.cd2_1 * s + m_meta.cd2_2 * c;
-    
-    m_meta.cd1_1 = ncd1_1; m_meta.cd1_2 = ncd1_2;
-    m_meta.cd2_1 = ncd2_1; m_meta.cd2_2 = ncd2_2;
-    
-    // CRPIX_new = Rot(theta) * (CRPIX_old - C_src) + C_dest
-    // C_src = (cx, cy)
-    // C_dest = (w/2, h/2)
-    // Rot(theta) = [[c, -s], [s, c]]
-    double ox = m_meta.crpix1 - cx;
-    double oy = m_meta.crpix2 - cy;
-    
-    m_meta.crpix1 = (ox * c - oy * s) + halfW;
-    m_meta.crpix2 = (ox * s + oy * c) + halfH;
+    reframeWCS(wcsTrans, oldW, oldH);
     
     if (hasMask()) {
         ImageBuffer maskBuf;
@@ -1981,24 +1988,19 @@ void ImageBuffer::rotate90() {
     m_height = oldW;
     m_data = std::move(newData);
 
+    m_width = oldH;
+    m_height = oldW;
+    m_data = std::move(newData);
+
     // Update WCS for Rotate 90 CW
-    // x' = H - 1 - y  => y = H - 1 - x'
-    // y' = x          => x = y'
-    // Matrix M = [[0, 1], [-1, 0]]
-    // CD_new = CD_old * M
-    double ncd1_1 = m_meta.cd1_1 * 0.0 + m_meta.cd1_2 * -1.0;
-    double ncd1_2 = m_meta.cd1_1 * 1.0 + m_meta.cd1_2 * 0.0;
-    double ncd2_1 = m_meta.cd2_1 * 0.0 + m_meta.cd2_2 * -1.0;
-    double ncd2_2 = m_meta.cd2_1 * 1.0 + m_meta.cd2_2 * 0.0;
+    // T: (x,y) -> (H-1-y, x)
+    // T = Translate(H-1, 0) * Rotate(90)
     
-    m_meta.cd1_1 = ncd1_1; m_meta.cd1_2 = ncd1_2;
-    m_meta.cd2_1 = ncd2_1; m_meta.cd2_2 = ncd2_2;
+    QTransform t;
+    t.translate(oldH - 1, 0);
+    t.rotate(90);
     
-    // CRPIX Update: x' = H - 1 - y, y' = x
-    double nx = oldH - 1 - m_meta.crpix2;
-    double ny = m_meta.crpix1;
-    m_meta.crpix1 = nx;
-    m_meta.crpix2 = ny;
+    reframeWCS(t, oldW, oldH);
 
     if (hasMask()) {
         ImageBuffer maskBuf;
@@ -2043,13 +2045,13 @@ void ImageBuffer::rotate180() {
         }
     }
     
-    // Update WCS for Rotate 180
-    // Matrix M = [[-1, 0], [0, -1]]
-    m_meta.cd1_1 *= -1.0; m_meta.cd1_2 *= -1.0;
-    m_meta.cd2_1 *= -1.0; m_meta.cd2_2 *= -1.0;
-    
-    m_meta.crpix1 = w - 1 - m_meta.crpix1;
-    m_meta.crpix2 = h - 1 - m_meta.crpix2;
+    // Update WCS
+    // 180 Rotation: (x,y) -> (W-1-x, H-1-y)
+    // T = Translate(W-1, H-1) * Rotate(180)
+    QTransform t;
+    t.translate(w - 1, h - 1);
+    t.rotate(180);
+    reframeWCS(t, w, h);
 
     if (hasMask()) {
         ImageBuffer maskBuf;
@@ -2086,22 +2088,16 @@ void ImageBuffer::rotate270() {
     m_height = oldW;
     m_data = std::move(newData);
     
-    // Update WCS for Rotate 270 CW (90 CCW)
+    // Update WCS
+    // Rotate 270 CW (90 CCW)
     // x' = y
     // y' = W - 1 - x
-    // Matrix M = [[0, -1], [1, 0]]
-    double ncd1_1 = m_meta.cd1_1 * 0.0 + m_meta.cd1_2 * 1.0;
-    double ncd1_2 = m_meta.cd1_1 * -1.0 + m_meta.cd1_2 * 0.0;
-    double ncd2_1 = m_meta.cd2_1 * 0.0 + m_meta.cd2_2 * 1.0;
-    double ncd2_2 = m_meta.cd2_1 * -1.0 + m_meta.cd2_2 * 0.0;
+    // T = Translate(0, W-1) * Rotate(270)
+    QTransform t;
+    t.translate(0, oldW - 1);
+    t.rotate(270);
     
-    m_meta.cd1_1 = ncd1_1; m_meta.cd1_2 = ncd1_2;
-    m_meta.cd2_1 = ncd2_1; m_meta.cd2_2 = ncd2_2;
-    
-    double nx = m_meta.crpix2;
-    double ny = oldW - 1 - m_meta.crpix1;
-    m_meta.crpix1 = nx;
-    m_meta.crpix2 = ny;
+    reframeWCS(t, oldW, oldH);
 
     if (hasMask()) {
         ImageBuffer maskBuf;
@@ -2117,6 +2113,10 @@ void ImageBuffer::rotate270() {
 void ImageBuffer::mirrorX() {
     if (m_data.empty()) return;
     
+    // Capture old dimensions before mod (though mirror doesn't change W/H)
+    int w = m_width;
+    int h = m_height;
+    
     #pragma omp parallel for
     for (int y = 0; y < m_height; ++y) {
         for (int x = 0; x < m_width / 2; ++x) {
@@ -2131,19 +2131,47 @@ void ImageBuffer::mirrorX() {
         }
     }
     
-    // Update WCS for Mirror X
-    // Matrix M = [[-1, 0], [0, 1]]
-    m_meta.cd1_1 *= -1.0; 
-    m_meta.cd2_1 *= -1.0; 
-    
-    m_meta.crpix1 = m_width - 1 - m_meta.crpix1;
+    // Update WCS
+    // Mirror X (Horizontal): x' = W - 1 - x, y' = y
+    // T = Translate(W-1, 0) * Scale(-1, 1)
+    QTransform t;
+    t.translate(w - 1, 0);
+    t.scale(-1, 1);
+    reframeWCS(t, w, h);
 
     if (hasMask()) {
         ImageBuffer maskBuf;
-        maskBuf.setData(m_width, m_height, 1, m_mask.data);
+        maskBuf.setData(w, h, 1, m_mask.data);
         maskBuf.mirrorX();
         m_mask.data = maskBuf.data();
     }
+}
+
+void ImageBuffer::syncWcsToHeaders() {
+    // Helper lambda to set or add a key
+    auto setKey = [&](const QString& key, double val, const QString& comment) {
+        bool found = false;
+        QString valStr = QString::number(val, 'f', 9);
+        
+        for (auto& card : m_meta.rawHeaders) {
+            if (card.key == key) {
+                card.value = valStr;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            m_meta.rawHeaders.push_back({key, valStr, comment});
+        }
+    };
+    
+    setKey("CRPIX1", m_meta.crpix1, "Reference pixel axis 1");
+    setKey("CRPIX2", m_meta.crpix2, "Reference pixel axis 2");
+    
+    setKey("CD1_1", m_meta.cd1_1, "PC matrix 1_1");
+    setKey("CD1_2", m_meta.cd1_2, "PC matrix 1_2");
+    setKey("CD2_1", m_meta.cd2_1, "PC matrix 2_1");
+    setKey("CD2_2", m_meta.cd2_2, "PC matrix 2_2");
 }
 
 
@@ -2167,12 +2195,13 @@ void ImageBuffer::mirrorY() {
         }
     }
     
-    // Update WCS for Mirror Y
-    // Matrix M = [[1, 0], [0, -1]]
-    m_meta.cd1_2 *= -1.0;
-    m_meta.cd2_2 *= -1.0;
-    
-    m_meta.crpix2 = m_height - 1 - m_meta.crpix2;
+    // Update WCS
+    // Mirror Y (Vertical): x' = x, y' = H - 1 - y
+    // T = Translate(0, H-1) * Scale(1, -1)
+    QTransform t;
+    t.translate(0, h - 1);
+    t.scale(1, -1);
+    reframeWCS(t, w, h);
 
     if (hasMask()) {
         ImageBuffer maskBuf;
@@ -2677,7 +2706,6 @@ void ImageBuffer::applyArcSinh(float stretchFactor) {
         for (int c = 0; c < ch; ++c) {
              float v = m_data[idx + c];
              float out = std::asinh(v * stretchFactor) * norm;
-             // Clamp? usually not needed if v in [0,1], but good practice
              if (out < 0.0f) out = 0.0f;
              if (out > 1.0f) out = 1.0f;
              m_data[idx + c] = out;

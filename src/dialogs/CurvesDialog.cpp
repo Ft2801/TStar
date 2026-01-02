@@ -594,6 +594,7 @@ void CurvesDialog::resetState() {
 }
 
 void CurvesDialog::onApply() {
+    if (m_viewer) m_viewer->clearPreviewLUT();
     m_applied = true;
     SplineData spline = m_graph->getSpline();
     bool ch[3] = {m_redBtn->isChecked(), m_greenBtn->isChecked(), m_blueBtn->isChecked()};
