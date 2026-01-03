@@ -21,7 +21,6 @@ StarStretchDialog::StarStretchDialog(MainWindow* parent, ImageViewer* viewer)
     if (m_viewer) {
         m_originalBuffer = m_viewer->getBuffer();
     }
-    createUI();
 }
 
 void StarStretchDialog::setViewer(ImageViewer* v) {
@@ -123,7 +122,7 @@ void StarStretchDialog::onApply() {
     updatePreview();
     
     m_applied = true;
-    m_mainWin->log(tr("Star Stretch applied."));
+    m_mainWin->log(tr("Star Stretch applied."), MainWindow::Log_Success, true);
     accept();
 }
 

@@ -614,6 +614,9 @@ MainWindow::MainWindow(QWidget *parent)
     addMenuAction(stretchMenu, tr("GHS (Generalized Hyperbolic)"), "", [this](){
         openGHSDialog();
     });
+    addMenuAction(stretchMenu, tr("Star Stretch"), "", [this](){
+        openStarStretchDialog();
+    });
 
     // --- B. Color ---
     QMenu* colorMenu = processMenu->addMenu(tr("Color Management"));
@@ -641,6 +644,7 @@ MainWindow::MainWindow(QWidget *parent)
     addMenuAction(aiMenu, tr("Cosmic Clarity"), "", [this](){
         if (activateTool(tr("Cosmic Clarity"))) return;
         if (!currentViewer()) { QMessageBox::warning(this, tr("No Image"), tr("Select image.")); return; }
+        log(tr("Opening Cosmic Clarity..."), Log_Action, true);
         auto dlg = new CosmicClarityDialog(this);
         dlg->setAttribute(Qt::WA_DeleteOnClose);
         connect(dlg, &QDialog::accepted, [this, dlg](){ runCosmicClarity(dlg->getParams()); });
@@ -649,6 +653,7 @@ MainWindow::MainWindow(QWidget *parent)
     addMenuAction(aiMenu, tr("GraXpert"), "", [this](){
         if (activateTool(tr("GraXpert"))) return;
         if (!currentViewer()) { QMessageBox::warning(this, tr("No Image"), tr("Select image.")); return; }
+        log(tr("Opening GraXpert..."), Log_Action, true);
         auto dlg = new GraXpertDialog(this);
         dlg->setAttribute(Qt::WA_DeleteOnClose);
         connect(dlg, &QDialog::accepted, [this, dlg](){ runGraXpert(dlg->getParams()); });
@@ -657,9 +662,12 @@ MainWindow::MainWindow(QWidget *parent)
     addMenuAction(aiMenu, tr("StarNet++"), "", [this](){
         if (activateTool(tr("Remove Stars (StarNet)"))) return;
         if (!currentViewer()) { QMessageBox::warning(this, tr("No Image"), tr("Select image.")); return; }
+        log(tr("Opening StarNet++..."), Log_Action, true);
         auto dlg = new StarNetDialog(this);
         dlg->setAttribute(Qt::WA_DeleteOnClose);
-        setupToolSubwindow(nullptr, dlg, tr("Remove Stars (StarNet)"));
+        CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, dlg, tr("Remove Stars (StarNet)"));
+        sub->resize(sub->width() + 100, sub->height());
+        centerToolWindow(sub);
     });
     addMenuAction(aiMenu, tr("Aberration Remover"), "", [this](){
         openRARDialog();
@@ -1343,6 +1351,7 @@ void MainWindow::combineChannels() {
     log(tr("Opening Combine Channels Tool..."), Log_Info, true);
     CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
     setupToolSubwindow(sub, dlg, tr("Combine Channels"));
+    centerToolWindow(sub);
 }
 
 
@@ -1459,7 +1468,9 @@ void MainWindow::openAbeDialog() {
     auto dlg = new ABEDialog(this, v, v->getBuffer(), isStretched);
     m_abeDlg = dlg; // Track
     
-    setupToolSubwindow(nullptr, dlg, tr("ABE - ") + v->windowTitle());
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, dlg, tr("ABE - ") + v->windowTitle());
+    centerToolWindow(sub);
 
     // When ABE applies, it emits a result buffer
     connect(dlg, &ABEDialog::applyResult, [this, v](const ImageBuffer& res) {
@@ -1494,7 +1505,9 @@ void MainWindow::openWavescaleHDRDialog() {
     m_wavescaleDlg = dlg; 
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     
-    setupToolSubwindow(nullptr, dlg, tr("Wavescale HDR"));
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, dlg, tr("Wavescale HDR"));
+    centerToolWindow(sub);
 
     connect(dlg, &WavescaleHDRDialog::applyInternal, [this, dlg](const ImageBuffer& res) {
         ImageViewer* target = dlg->viewer();
@@ -1545,7 +1558,9 @@ void MainWindow::openSaturationDialog() {
     
     m_satTarget = viewer;
 
-    setupToolSubwindow(nullptr, m_satDlg, tr("Color Saturation"));
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, m_satDlg, tr("Color Saturation"));
+    centerToolWindow(sub);
 }
 
 void MainWindow::openAstroSpikeDialog() {
@@ -1577,7 +1592,8 @@ void MainWindow::openAstroSpikeDialog() {
     log(tr("Opening AstroSpike Tool..."), Log_Info, true);
     m_astroSpikeDlg = new AstroSpikeDialog(viewer, this); 
     
-    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, m_astroSpikeDlg, tr("AstroSpike"));
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, m_astroSpikeDlg, tr("AstroSpike"));
     
     // Requested size: 1000x600
     sub->resize(1000, 600);
@@ -1629,7 +1645,8 @@ void MainWindow::openSCNRDialog() {
     });
     
     log(tr("Opening SCNR Tool..."), Log_Info, true);
-    setupToolSubwindow(nullptr, dlg, tr("SCNR"));
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, dlg, tr("SCNR"));
 }
 
 // Replaces MainWindow::log
@@ -1959,7 +1976,8 @@ void MainWindow::openGHSDialog() {
     m_ghsDlg->setAttribute(Qt::WA_DeleteOnClose, false); // We manage lifecycle via wrapper
     
     log(tr("Opening GHS Tool..."), Log_Action, true);
-    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, m_ghsDlg, tr("Generalized Hyperbolic Stretch"));
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, m_ghsDlg, tr("Generalized Hyperbolic Stretch"));
     sub->resize(450, 650); // GHS specific size override
     centerToolWindow(sub); // Re-center after resize
 
@@ -2001,6 +2019,8 @@ void MainWindow::openPlateSolvingDialog() {
     
     log(tr("Opening Plate Solving..."), Log_Info, true);
     CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, dlg, tr("Plate Solving"));
+    sub->resize(sub->width(), sub->height() + 150);
+    centerToolWindow(sub);
     
     connect(dlg, &QDialog::accepted, [this, dlg, sub, viewer](){
         if (dlg->isSolved()) {
@@ -2021,7 +2041,7 @@ void MainWindow::openPlateSolvingDialog() {
                 
                 pushUndo(); // Save undo state before modifying metadata
                 viewer->getBuffer().setMetadata(meta);
-                log(tr("Plate Solved! Center: RA %1, Dec %2").arg(meta.ra).arg(meta.dec), Log_Success);
+                log(tr("Plate Solved! Center: RA %1, Dec %2").arg(meta.ra).arg(meta.dec), Log_Success, true);
             }
         }
         sub->close();
@@ -2058,7 +2078,7 @@ void MainWindow::openPCCDialog() {
              updateDisplay();
              log(tr("PCC Applied: R=%1 G=%2 B=%3 (BG: %4, %5, %6)")
                  .arg(res.R_factor).arg(res.G_factor).arg(res.B_factor)
-                 .arg(res.bg_r).arg(res.bg_g).arg(res.bg_b), Log_Success);
+                 .arg(res.bg_r).arg(res.bg_g).arg(res.bg_b), Log_Success, true);
          }
          sub->close();
     });
@@ -2198,7 +2218,7 @@ void MainWindow::openBackgroundNeutralizationDialog() {
         
         // Updated: Preserve View!
         v->setBuffer(buf, v->windowTitle(), true); 
-        log(tr("Background Neutralization applied."), Log_Success);
+        log(tr("Background Neutralization applied."), Log_Success, true);
     });
 }
     
@@ -2261,9 +2281,7 @@ void MainWindow::openPixelMathDialog() {
 CustomMdiSubWindow* MainWindow::setupToolSubwindow(CustomMdiSubWindow* sub, QWidget* dlg, const QString& title) {
     CustomMdiSubWindow* targetSub = sub;
     if (!targetSub) {
-        // Create as floating tool window instead of MDI subwindow
-        targetSub = new CustomMdiSubWindow(this);
-        targetSub->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
+        targetSub = new CustomMdiSubWindow(m_mdiArea);
         targetSub->setAttribute(Qt::WA_DeleteOnClose);
     }
 
@@ -2326,6 +2344,8 @@ CustomMdiSubWindow* MainWindow::setupToolSubwindow(CustomMdiSubWindow* sub, QWid
     targetSub->raise();
     targetSub->activateWindow();
     
+    centerToolWindow(targetSub); // Ensure every tool is centered by default
+    
     return targetSub;
 }
 
@@ -2353,7 +2373,9 @@ void MainWindow::centerToolWindow(CustomMdiSubWindow* sub) {
 void MainWindow::onSettingsAction() {
     auto dlg = new SettingsDialog(this);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
-    setupToolSubwindow(nullptr, dlg, tr("Settings"));
+    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, dlg, tr("Settings"));
+    sub->resize(sub->width() - 200, sub->height() - 100);
+    centerToolWindow(sub);
 }
 
 void MainWindow::updateActiveImage() {
@@ -2408,7 +2430,8 @@ void MainWindow::openHistogramStretchDialog() {
     m_histoDlg = dlg;
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     
-    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, dlg, tr("Histogram Stretch"));
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, dlg, tr("Histogram Stretch"));
     sub->resize(520, 600);
     centerToolWindow(sub); // Re-center after resize
 }
@@ -2810,6 +2833,7 @@ void MainWindow::openDebayerDialog() {
     }
     
     m_debayerDlg = new DebayerDialog(this);
+    log(tr("Opening Debayer..."), Log_Action, true);
     m_debayerDlg->setAttribute(Qt::WA_DeleteOnClose);
     m_debayerDlg->setViewer(v);
     
@@ -2827,6 +2851,7 @@ void MainWindow::openContinuumSubtractionDialog() {
     }
     
     m_continuumDlg = new ContinuumSubtractionDialog(this);
+    log(tr("Opening Continuum Subtraction..."), Log_Action, true);
     m_continuumDlg->setAttribute(Qt::WA_DeleteOnClose);
     if (currentViewer()) {
         m_continuumDlg->setViewer(currentViewer());
@@ -2834,7 +2859,8 @@ void MainWindow::openContinuumSubtractionDialog() {
     
     connect(m_continuumDlg, &QDialog::destroyed, this, [this]() { m_continuumDlg = nullptr; });
     
-    setupToolSubwindow(nullptr, m_continuumDlg, tr("Continuum Subtraction"));
+    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, m_continuumDlg, tr("Continuum Subtraction"));
+    centerToolWindow(sub);
 }
 
 void MainWindow::openImageAnnotatorDialog() {

@@ -640,6 +640,53 @@
         </message>
     </context>
     <context>
+        <name>CompressionUtils</name>
+        <message>
+            <source>LZ4 compress failed</source>
+            <translation type="finished">LZ4-Komprimierung fehlgeschlagen</translation>
+        </message>
+        <message>
+            <source>LZ4 decompress failed</source>
+            <translation type="finished">LZ4-Dekomprimierung fehlgeschlagen</translation>
+        </message>
+        <message>
+            <source>LZ4 support not compiled in</source>
+            <translation type="finished">LZ4-UnterstÃ¼tzung nicht kompiliert</translation>
+        </message>
+        <message>
+            <source>LZ4HC compress failed</source>
+            <translation type="finished">LZ4HC-Komprimierung fehlgeschlagen</translation>
+        </message>
+        <message>
+            <source>Unknown compression codec</source>
+            <translation type="finished">Unbekannter Kompressions-Codec</translation>
+        </message>
+        <message>
+            <source>Zlib compress failed: %1</source>
+            <translation type="finished">Zlib-Komprimierung fehlgeschlagen: %1</translation>
+        </message>
+        <message>
+            <source>Zlib inflate failed: %1</source>
+            <translation type="finished">Zlib inflate fehlgeschlagen: %1</translation>
+        </message>
+        <message>
+            <source>Zlib inflateInit failed: %1</source>
+            <translation type="finished">Zlib inflateInit fehlgeschlagen: %1</translation>
+        </message>
+        <message>
+            <source>Zstd compress failed: %1</source>
+            <translation type="finished">Zstd-Komprimierung fehlgeschlagen: %1</translation>
+        </message>
+        <message>
+            <source>Zstd decompress failed: %1</source>
+            <translation type="finished">Zstd-Dekomprimierung fehlgeschlagen: %1</translation>
+        </message>
+        <message>
+            <source>Zstd support not compiled in</source>
+            <translation type="finished">Zstd-UnterstÃ¼tzung nicht kompiliert</translation>
+        </message>
+    </context>
+    <context>
         <name>ContinuumSubtractionDialog</name>
         <message>
             <source>-- Use Green Channel --</source>
@@ -1048,16 +1095,48 @@
             <translation type="finished">CFITSIO Öffnungsfehler %1: %2\nPfad: %3</translation>
         </message>
         <message>
+            <source>CFITSIO Open Error: %1</source>
+            <translation type="finished">CFITSIO Ã–ffnungsfehler: %1</translation>
+        </message>
+        <message>
             <source>CFITSIO Param Error %1: %2</source>
             <translation type="finished">CFITSIO Param-Fehler %1: %2</translation>
+        </message>
+        <message>
+            <source>CFITSIO Param Error: %1</source>
+            <translation type="finished">CFITSIO Param Fehler: %1</translation>
         </message>
         <message>
             <source>CFITSIO Read Error (Plane %1) %2: %3</source>
             <translation type="finished">CFITSIO Lesefehler (Ebene %1) %2: %3</translation>
         </message>
         <message>
+            <source>CFITSIO Read Error: %1</source>
+            <translation type="finished">CFITSIO Lesefehler: %1</translation>
+        </message>
+        <message>
+            <source>Extension '%1' not found</source>
+            <translation type="finished">Erweiterung '%1' nicht gefunden</translation>
+        </message>
+        <message>
+            <source>Failed to move to HDU %1: %2</source>
+            <translation type="finished">Fehler beim Wechsel zu HDU %1: %2</translation>
+        </message>
+        <message>
+            <source>HDU %1 is not an image extension</source>
+            <translation type="finished">HDU %1 ist keine Bild-Erweiterung</translation>
+        </message>
+        <message>
+            <source>Image has &lt; 2 dimensions</source>
+            <translation type="finished">Bild hat &lt; 2 Dimensionen</translation>
+        </message>
+        <message>
             <source>Image has &lt; 2 dimensions (NAXIS=%1)</source>
             <translation type="finished">Bild hat &lt; 2 Dimensionen (NAXIS=%1)</translation>
+        </message>
+        <message>
+            <source>No image extensions found in file</source>
+            <translation type="finished">Keine Bild-Erweiterungen in Datei gefunden</translation>
         </message>
     </context>
     <context>
@@ -1516,6 +1595,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">16-bit Ganzzahl</translation>
         </message>
         <message>
+            <source>1:1</source>
+            <translation type="finished">1:1</translation>
+        </message>
+        <message>
             <source>32-bit Float</source>
             <translation type="finished">32-bit Float</translation>
         </message>
@@ -1562,6 +1645,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Activating PixelMath Tool...</source>
             <translation type="finished">Aktiviere PixelMath-Werkzeug...</translation>
+        </message>
+        <message>
+            <source>Activating Statistical Stretch Tool...</source>
+            <translation type="finished">Aktiviere Statistical Stretch Werkzeug...</translation>
         </message>
         <message>
             <source>Active View Changed: %1</source>
@@ -1752,8 +1839,20 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">FITS Header-Editor</translation>
         </message>
         <message>
+            <source>Failed to load %1</source>
+            <translation type="finished">Laden von %1 fehlgeschlagen</translation>
+        </message>
+        <message>
             <source>Failed to load %1: %2</source>
             <translation type="finished">Laden von %1 fehlgeschlagen: %2</translation>
+        </message>
+        <message>
+            <source>Failed to load XISF image %1: %2</source>
+            <translation type="finished">Laden von XISF-Bild %1 fehlgeschlagen: %2</translation>
+        </message>
+        <message>
+            <source>Failed to load extension %1: %2</source>
+            <translation type="finished">Laden der Erweiterung %1 fehlgeschlagen: %2</translation>
         </message>
         <message>
             <source>Failed to save image with annotations.</source>
@@ -1960,6 +2059,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Kurvenwerkzeug geöffnet.</translation>
         </message>
         <message>
+            <source>Opened FITS: %1 (%2 extensions)</source>
+            <translation type="finished">FITS geöffnet: %1 (%2 Erweiterungen)</translation>
+        </message>
+        <message>
             <source>Opened GHS Tool.</source>
             <translation type="finished">GHS Werkzeug geöffnet.</translation>
         </message>
@@ -1970,6 +2073,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Opened Wavescale HDR Tool.</source>
             <translation type="finished">Wavescale HDR-Werkzeug geöffnet.</translation>
+        </message>
+        <message>
+            <source>Opened XISF: %1 (%2 images)</source>
+            <translation type="finished">XISF geöffnet: %1 (%2 Bilder)</translation>
         </message>
         <message>
             <source>Opened: %1</source>
@@ -1996,8 +2103,24 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Öffne Kanalkombinations-Werkzeug...</translation>
         </message>
         <message>
+            <source>Opening Continuum Subtraction...</source>
+            <translation type="finished">Öffne Kontinuum-Subtraktion...</translation>
+        </message>
+        <message>
+            <source>Opening Cosmic Clarity...</source>
+            <translation type="finished">Öffne Cosmic Clarity...</translation>
+        </message>
+        <message>
+            <source>Opening Debayer...</source>
+            <translation type="finished">Öffne Debayer...</translation>
+        </message>
+        <message>
             <source>Opening GHS Tool...</source>
             <translation type="finished">Öffne GHS-Werkzeug...</translation>
+        </message>
+        <message>
+            <source>Opening GraXpert...</source>
+            <translation type="finished">Öffne GraXpert...</translation>
         </message>
         <message>
             <source>Opening Perfect Palette...</source>
@@ -2026,6 +2149,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Opening Star Stretch...</source>
             <translation type="finished">Öffne Star Stretch...</translation>
+        </message>
+        <message>
+            <source>Opening StarNet++...</source>
+            <translation type="finished">Öffne StarNet++...</translation>
         </message>
         <message>
             <source>Opening Statistical Stretch...</source>
@@ -2275,6 +2402,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>XISF Files (*.xisf);;</source>
             <translation type="finished">XISF-Dateien (*.xisf);;</translation>
+        </message>
+        <message>
+            <source>Zoom 100%</source>
+            <translation type="finished">Zoom 100%</translation>
         </message>
         <message>
             <source>Zoom In</source>
@@ -3624,40 +3755,124 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
     <context>
         <name>StretchDialog</name>
         <message>
+            <source>Amount:</source>
+            <translation type="finished">Menge:</translation>
+        </message>
+        <message>
             <source>Apply</source>
             <translation type="finished">Anwenden</translation>
         </message>
         <message>
-            <source>Apply S-Curves</source>
-            <translation type="finished">S-Kurven anwenden</translation>
+            <source>Apply S-Curve Boost</source>
+            <translation type="finished">S-Kurven-Verstärkung anwenden</translation>
+        </message>
+        <message>
+            <source>Black Point Sigma:</source>
+            <translation type="finished">Schwarzpunkt Sigma:</translation>
         </message>
         <message>
             <source>Cancel</source>
             <translation type="finished">Abbrechen</translation>
         </message>
         <message>
-            <source>Curves Boost:</source>
-            <translation type="finished">Kurvenverstärkung:</translation>
+            <source>Curve Strength:</source>
+            <translation type="finished">Kurvenstärke:</translation>
         </message>
         <message>
-            <source>Linked (RGB)</source>
-            <translation type="finished">Verknüpft (RGB)</translation>
+            <source>Curves &amp; HDR</source>
+            <translation type="finished">Kurven &amp; HDR</translation>
         </message>
         <message>
-            <source>Normalize Output</source>
-            <translation type="finished">Ausgabe normalisieren</translation>
+            <source>Formula:</source>
+            <translation type="finished">Formel:</translation>
+        </message>
+        <message>
+            <source>HDR Highlight Compression</source>
+            <translation type="finished">HDR-Lichterkomprimierung</translation>
+        </message>
+        <message>
+            <source>Hard Ceiling %:</source>
+            <translation type="finished">Harte Obergrenze %:</translation>
+        </message>
+        <message>
+            <source>High-Range Rescaling (VeraLux)</source>
+            <translation type="finished">Hochbereichsskalierung (VeraLux)</translation>
+        </message>
+        <message>
+            <source>Knee Point:</source>
+            <translation type="finished">Kniepunkt:</translation>
+        </message>
+        <message>
+            <source>Link Channels</source>
+            <translation type="finished">Kanäle verknüpfen</translation>
+        </message>
+        <message>
+            <source>Luminance-Only Mode</source>
+            <translation type="finished">Nur-Luminanz-Modus</translation>
+        </message>
+        <message>
+            <source>No Clipping</source>
+            <translation type="finished">Kein Clipping</translation>
+        </message>
+        <message>
+            <source>Normalize</source>
+            <translation type="finished">Normalisieren</translation>
+        </message>
+        <message>
+            <source>Pedestal:</source>
+            <translation type="finished">Sockel:</translation>
         </message>
         <message>
             <source>Preview</source>
             <translation type="finished">Vorschau</translation>
         </message>
         <message>
+            <source>Rec.2020 (HDR)</source>
+            <translation type="finished">Rec.2020 (HDR)</translation>
+        </message>
+        <message>
+            <source>Rec.601 (SD)</source>
+            <translation type="finished">Rec.601 (SD)</translation>
+        </message>
+        <message>
+            <source>Rec.709 (sRGB)</source>
+            <translation type="finished">Rec.709 (sRGB)</translation>
+        </message>
+        <message>
+            <source>Sigma multiplier for black point calculation (higher = darker backgrounds)</source>
+            <translation type="finished">Sigma-Multiplikator für Schwarzpunktberechnung (höher = dunklere Hintergründe)</translation>
+        </message>
+        <message>
+            <source>Soft Ceiling %:</source>
+            <translation type="finished">Weiche Obergrenze %:</translation>
+        </message>
+        <message>
+            <source>Softclip Start:</source>
+            <translation type="finished">Softclip Start:</translation>
+        </message>
+        <message>
+            <source>Statistical Parameters</source>
+            <translation type="finished">Statistische Parameter</translation>
+        </message>
+        <message>
+            <source>Statistical Stretch</source>
+            <translation type="finished">Statistisches Stretching</translation>
+        </message>
+        <message>
+            <source>Statistical Stretch applied (M=%1, BP=%2σ)</source>
+            <translation type="finished">Statistical Stretch angewendet (M=%1, BP=%2σ)</translation>
+        </message>
+        <message>
             <source>Target Median:</source>
             <translation type="finished">Zielmedian:</translation>
         </message>
         <message>
-            <source>True Stretch</source>
-            <translation type="finished">True Stretch</translation>
+            <source>Target median brightness after stretch (0.25 = typical astro)</source>
+            <translation type="finished">Ziel-Median-Helligkeit nach Stretch (0.25 = typisch Astro)</translation>
+        </message>
+        <message>
+            <source>© 2026 SetiAstro</source>
+            <translation type="finished">© 2026 SetiAstro</translation>
         </message>
     </context>
     <context>
@@ -3816,24 +4031,44 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Big-Endian XISF-Dateien werden nicht unterstützt.</translation>
         </message>
         <message>
-            <source>Compressed XISF files are not yet supported (detected: %1).</source>
-            <translation type="finished">Komprimierte XISF-Dateien noch nicht unterstützt (%1).</translation>
-        </message>
-        <message>
             <source>Could not open file: %1</source>
             <translation type="finished">Konnte Datei nicht öffnen: %1</translation>
+        </message>
+        <message>
+            <source>Could not parse embedded data element.</source>
+            <translation type="finished">Konnte eingebettetes Datenelement nicht parsen.</translation>
+        </message>
+        <message>
+            <source>Data block too small: expected %1 bytes, got %2</source>
+            <translation type="finished">Datenblock zu klein: erwartet %1 Bytes, erhalten %2</translation>
+        </message>
+        <message>
+            <source>Embedded XISF data not fully supported yet.</source>
+            <translation type="finished">Eingebettete XISF-Daten noch nicht vollständig unterstützt.</translation>
+        </message>
+        <message>
+            <source>Image index %1 out of range (file has %2 images)</source>
+            <translation type="finished">Bildindex %1 außerhalb des Bereichs (Datei hat %2 Bilder)</translation>
         </message>
         <message>
             <source>Incomplete XML Header.</source>
             <translation type="finished">Unvollständiger XML-Header.</translation>
         </message>
         <message>
-            <source>Inline XISF data not supported.</source>
-            <translation type="finished">Inline XISF-Daten nicht unterstützt.</translation>
+            <source>Incomplete data read: expected %1 bytes, got %2</source>
+            <translation type="finished">Unvollständige Datenlesung: erwartet %1 Bytes, erhalten %2</translation>
+        </message>
+        <message>
+            <source>Inline XISF data not fully supported yet.</source>
+            <translation type="finished">Inline XISF-Daten noch nicht vollständig unterstützt.</translation>
         </message>
         <message>
             <source>Invalid Header Length: %1</source>
             <translation type="finished">Ungültige Headerlänge: %1</translation>
+        </message>
+        <message>
+            <source>Invalid XISF Signature.</source>
+            <translation type="finished">Ungültige XISF-Signatur.</translation>
         </message>
         <message>
             <source>Invalid XISF Signature. File is not XISF 1.0.</source>
@@ -3848,23 +4083,23 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Suchfehler Datenblock bei %1</translation>
         </message>
         <message>
-            <source>Unexpected EOF reading Float32 data.</source>
-            <translation type="finished">Unerwartetes EOF beim Lesen von Float32.</translation>
-        </message>
-        <message>
-            <source>Unexpected EOF reading UInt16 data.</source>
-            <translation type="finished">Unerwartetes EOF beim Lesen von UInt16.</translation>
-        </message>
-        <message>
-            <source>Unexpected EOF reading UInt8 data.</source>
-            <translation type="finished">Unerwartetes EOF beim Lesen von UInt8.</translation>
-        </message>
-        <message>
             <source>Unexpected EOF reading header length.</source>
             <translation type="finished">Unerwartetes EOF beim Lesen der Headerlänge.</translation>
         </message>
         <message>
-            <source>Unsupported Sample Format: %1</source>
+            <source>Unexpected EOF.</source>
+            <translation type="finished">Unerwartetes EOF.</translation>
+        </message>
+        <message>
+            <source>Unknown data location type.</source>
+            <translation type="finished">Unbekannter Datenspeichertyp.</translation>
+        </message>
+        <message>
+            <source>Unknown inline encoding: %1</source>
+            <translation type="finished">Unbekannte Inline-Codierung: %1</translation>
+        </message>
+        <message>
+            <source>Unsupported sample format: %1</source>
             <translation type="finished">Nicht unterstütztes Probenformat: %1</translation>
         </message>
         <message>
@@ -3879,8 +4114,8 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Konnte Datei nicht öffnen: %1</translation>
         </message>
         <message>
-            <source>XISF Header Alignment Failed</source>
-            <translation type="finished">XISF Header-Ausrichtung fehlgeschlagen</translation>
+            <source>Failed to prepare image data.</source>
+            <translation type="finished">Fehler beim Vorbereiten der Bilddaten.</translation>
         </message>
     </context>
     <context>

@@ -640,6 +640,53 @@
         </message>
     </context>
     <context>
+        <name>CompressionUtils</name>
+        <message>
+            <source>LZ4 compress failed</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>LZ4 decompress failed</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>LZ4 support not compiled in</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>LZ4HC compress failed</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Unknown compression codec</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Zlib compress failed: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Zlib inflate failed: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Zlib inflateInit failed: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Zstd compress failed: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Zstd decompress failed: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Zstd support not compiled in</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>ContinuumSubtractionDialog</name>
         <message>
             <source>-- Use Green Channel --</source>
@@ -1048,7 +1095,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>CFITSIO Open Error: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>CFITSIO Param Error %1: %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>CFITSIO Param Error: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1056,7 +1111,31 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>CFITSIO Read Error: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Extension '%1' not found</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to move to HDU %1: %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>HDU %1 is not an image extension</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image has &lt; 2 dimensions</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Image has &lt; 2 dimensions (NAXIS=%1)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No image extensions found in file</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -1514,6 +1593,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>1:1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>32-bit Float</source>
             <translation type="unfinished" />
         </message>
@@ -1559,6 +1642,10 @@
         </message>
         <message>
             <source>Activating PixelMath Tool...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Activating Statistical Stretch Tool...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1750,7 +1837,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Failed to load %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Failed to load %1: %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to load XISF image %1: %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to load extension %1: %2</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1958,6 +2057,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Opened FITS: %1 (%2 extensions)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Opened GHS Tool.</source>
             <translation type="unfinished" />
         </message>
@@ -1967,6 +2070,10 @@
         </message>
         <message>
             <source>Opened Wavescale HDR Tool.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opened XISF: %1 (%2 images)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1994,7 +2101,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Opening Continuum Subtraction...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening Cosmic Clarity...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening Debayer...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Opening GHS Tool...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening GraXpert...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2023,6 +2146,10 @@
         </message>
         <message>
             <source>Opening Star Stretch...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening StarNet++...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2271,6 +2398,10 @@
         </message>
         <message>
             <source>XISF Files (*.xisf);;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Zoom 100%</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3621,11 +3752,19 @@
     <context>
         <name>StretchDialog</name>
         <message>
+            <source>Amount:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Apply</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Apply S-Curves</source>
+            <source>Apply S-Curve Boost</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Black Point Sigma:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3633,15 +3772,51 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Curves Boost:</source>
+            <source>Curve Strength:</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Linked (RGB)</source>
+            <source>Curves &amp; HDR</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Normalize Output</source>
+            <source>Formula:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>HDR Highlight Compression</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Hard Ceiling %:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>High-Range Rescaling (VeraLux)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Knee Point:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Link Channels</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Luminance-Only Mode</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No Clipping</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Normalize</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Pedestal:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3649,11 +3824,51 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Rec.2020 (HDR)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Rec.601 (SD)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Rec.709 (sRGB)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Sigma multiplier for black point calculation (higher = darker backgrounds)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Soft Ceiling %:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Softclip Start:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Statistical Parameters</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Statistical Stretch</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Statistical Stretch applied (M=%1, BP=%2σ)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Target Median:</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>True Stretch</source>
+            <source>Target median brightness after stretch (0.25 = typical astro)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>© 2026 SetiAstro</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -3813,11 +4028,23 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Compressed XISF files are not yet supported (detected: %1).</source>
+            <source>Could not open file: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Could not open file: %1</source>
+            <source>Could not parse embedded data element.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Data block too small: expected %1 bytes, got %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Embedded XISF data not fully supported yet.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image index %1 out of range (file has %2 images)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3825,11 +4052,19 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Inline XISF data not supported.</source>
+            <source>Incomplete data read: expected %1 bytes, got %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Inline XISF data not fully supported yet.</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Invalid Header Length: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Invalid XISF Signature.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3845,23 +4080,23 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Unexpected EOF reading Float32 data.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Unexpected EOF reading UInt16 data.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Unexpected EOF reading UInt8 data.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Unexpected EOF reading header length.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Unsupported Sample Format: %1</source>
+            <source>Unexpected EOF.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Unknown data location type.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Unknown inline encoding: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Unsupported sample format: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3876,7 +4111,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>XISF Header Alignment Failed</source>
+            <source>Failed to prepare image data.</source>
             <translation type="unfinished" />
         </message>
     </context>
