@@ -25,6 +25,7 @@
 #include <QEasingCurve>
 #include <QGraphicsOpacityEffect>
 #include <QTimer>
+#include <QElapsedTimer>
 
 
 // Helper to create QIcon from SVG string (DPI-aware)
@@ -452,16 +453,29 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
     connect(m_titleBar, &CustomTitleBar::closeClicked, this, &CustomMdiSubWindow::animateClose);
     connect(m_titleBar, &CustomTitleBar::minimizeClicked, this, &CustomMdiSubWindow::showMinimized);
     connect(m_titleBar, &CustomTitleBar::maximizeClicked, [this](){
-        if (isMaximized()) {
-            showNormal(); 
+        if (m_isMaximized) {
+            showNormal();
+            m_isMaximized = false;
             m_titleBar->setMaximized(false);
             // Auto-fit image to new window size
             if (ImageViewer* v = viewer()) {
                 QTimer::singleShot(50, v, &ImageViewer::fitToWindow);
             }
         } else {
-            if (m_shaded) toggleShade();
+            // If shaded, we need to unshade first (show content area)
+            if (m_shaded) {
+                m_shaded = false;
+                m_titleBar->setShaded(false);
+                setMinimumWidth(0);
+                setMaximumWidth(16777215);
+                setMaximumHeight(16777215);
+                setMinimumHeight(0);
+                m_titleBar->show();
+                m_contentArea->show();
+                // Don't restore geometry - we're about to maximize
+            }
             showMaximized();
+            m_isMaximized = true;
             m_titleBar->setMaximized(true);
             // Auto-fit image to new window size
             if (ImageViewer* v = viewer()) {
@@ -614,7 +628,7 @@ int CustomMdiSubWindow::getResizeEdge(const QPoint& pos) {
 }
 
 void CustomMdiSubWindow::updateCursor(const QPoint& pos) {
-    if (m_shaded || isMaximized()) {
+    if (m_shaded || m_isMaximized) {
         unsetCursor();
         return;
     }
@@ -630,15 +644,40 @@ void CustomMdiSubWindow::showMinimized() {
     toggleShade();
 }
 
+void CustomMdiSubWindow::showMaximized() {
+    m_isMaximized = true;
+    m_titleBar->setMaximized(true);
+    QMdiSubWindow::showMaximized();
+}
+
+void CustomMdiSubWindow::showNormal() {
+    m_isMaximized = false;
+    m_titleBar->setMaximized(false);
+    QMdiSubWindow::showNormal();
+}
+
 void CustomMdiSubWindow::toggleShade() {
+    // Guard against rapid successive calls (e.g., from double-click triggering twice)
+    static QElapsedTimer lastCallTimer;
+    if (lastCallTimer.isValid() && lastCallTimer.elapsed() < 200) {
+        qDebug() << "toggleShade: BLOCKED (too rapid, elapsed=" << lastCallTimer.elapsed() << "ms)";
+        return;
+    }
+    lastCallTimer.start();
+    
     m_shaded = !m_shaded;
     m_titleBar->setShaded(m_shaded);
+    
+    qDebug() << "toggleShade: m_shaded now =" << m_shaded << ", m_isMaximized =" << m_isMaximized << ", m_wasMaximized =" << m_wasMaximized;
     
     QPoint center = geometry().center();
     
     if (m_shaded) {
+        m_wasMaximized = m_isMaximized; // Use our manual flag, not isMaximized()
         m_originalHeight = height();
         m_originalWidth = width(); 
+        
+        qDebug() << "  SHADING: saving m_wasMaximized =" << m_wasMaximized << ", originalSize =" << m_originalWidth << "x" << m_originalHeight;
         
         m_contentArea->hide();
         int newH = m_titleBar->height() + DpiHelper::borderWidth(this);
@@ -667,11 +706,19 @@ void CustomMdiSubWindow::toggleShade() {
         m_titleBar->show();
         m_contentArea->show();
         
-        // Restore (Horizontal Center, Vertical Top)
-        int newX = center.x() - m_originalWidth / 2;
-        int newY = geometry().top(); // Preserve Top
+        qDebug() << "  UNSHADING: m_wasMaximized =" << m_wasMaximized;
         
-        setGeometry(newX, newY, m_originalWidth, m_originalHeight);
+        if (m_wasMaximized) {
+            qDebug() << "  -> Calling showMaximized()";
+            showMaximized();
+        } else {
+            // Restore (Horizontal Center, Vertical Top)
+            int newX = center.x() - m_originalWidth / 2;
+            int newY = geometry().top(); // Preserve Top
+            
+            qDebug() << "  -> Restoring to" << m_originalWidth << "x" << m_originalHeight;
+            setGeometry(newX, newY, m_originalWidth, m_originalHeight);
+        }
     }
 }
 

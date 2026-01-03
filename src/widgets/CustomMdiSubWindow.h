@@ -121,6 +121,8 @@ public:
     void setWidget(QWidget *widget);
     void setSubWindowTitle(const QString& title);
     void showMinimized(); // Shading instead of standard minimize
+    void showMaximized(); // Override to track m_isMaximized
+    void showNormal();    // Override to track m_isMaximized
     void animateClose(); // Public slot for fade-out close
     
     // Accessor for the embedded ImageViewer (if any)
@@ -196,6 +198,8 @@ private:
     bool m_shaded = false;
     int m_originalHeight = 0;
     int m_originalWidth = 0;
+    bool m_wasMaximized = false;
+    bool m_isMaximized = false; // Manual tracking since isMaximized() unreliable for frameless
     
     bool m_isToolWindow = false;
     

@@ -213,6 +213,7 @@ WavescaleHDRDialog::WavescaleHDRDialog(QWidget* parent, ImageViewer* targetViewe
     : QDialog(parent), m_targetViewer(targetViewer)
 {
     setWindowTitle(tr("Wavescale HDR"));
+    setMinimumSize(800, 600);
     resize(1000, 700);
     
     // Copy for preview

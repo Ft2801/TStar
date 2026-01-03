@@ -2179,16 +2179,35 @@ CustomMdiSubWindow* MainWindow::setupToolSubwindow(CustomMdiSubWindow* sub, QWid
     targetSub->setSubWindowTitle(title);
     targetSub->setToolWindow(true); // Enable tool mode
     
-    // Position logic - let dialog/widget size settle first
-    if (dlg) dlg->adjustSize();
-    targetSub->adjustSize(); 
-    
-    // Use actual size after adjustSize, not sizeHint
-    QSize subSize = targetSub->size();
-    if (subSize.width() < 100 || subSize.height() < 100) {
-        subSize = QSize(500, 400);
-        targetSub->resize(subSize);
+    // Get the dialog's preferred size BEFORE adjustSize modifies it
+    // If the dialog has explicitly called resize(), use that size
+    QSize preferredSize;
+    if (dlg) {
+        preferredSize = dlg->size();
+        // If dialog hasn't been explicitly sized, fall back to sizeHint
+        if (preferredSize.width() < 100 || preferredSize.height() < 100) {
+            preferredSize = dlg->sizeHint();
+        }
     }
+    
+    // Add space for CustomMdiSubWindow chrome (title bar, borders)
+    int titleBarH = 30; // Approximate title bar height
+    int borderW = 6;    // Approximate border width
+    
+    QSize subSize;
+    if (preferredSize.isValid() && preferredSize.width() >= 100 && preferredSize.height() >= 100) {
+        subSize = QSize(preferredSize.width() + borderW, preferredSize.height() + titleBarH + borderW);
+    } else {
+        // Fallback to adjustSize if dialog has no valid size
+        if (dlg) dlg->adjustSize();
+        targetSub->adjustSize();
+        subSize = targetSub->size();
+        if (subSize.width() < 100 || subSize.height() < 100) {
+            subSize = QSize(500, 400);
+        }
+    }
+    
+    targetSub->resize(subSize);
 
     // Center on main window geometry (more intuitive when image is maximized)
     const QRect mainGeom = this->geometry();
