@@ -1,6 +1,10 @@
 TStar Changelog
 ===============
 
+Version 1.1.3
+-------------
+- Subwindows maximize and minimize bugs fixed
+
 Version 1.1.2
 -------------
 - Small subwindows bugfixes

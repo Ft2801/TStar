@@ -199,7 +199,8 @@ private:
     int m_originalHeight = 0;
     int m_originalWidth = 0;
     bool m_wasMaximized = false;
-    bool m_isMaximized = false; // Manual tracking since isMaximized() unreliable for frameless
+    bool m_isMaximized = false; // Manual tracking
+    QRect m_validNormalGeometry; // Persistent normal geometry since isMaximized() unreliable for frameless
     
     bool m_isToolWindow = false;
     

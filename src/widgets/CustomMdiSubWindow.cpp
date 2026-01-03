@@ -454,15 +454,52 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
     connect(m_titleBar, &CustomTitleBar::minimizeClicked, this, &CustomMdiSubWindow::showMinimized);
     connect(m_titleBar, &CustomTitleBar::maximizeClicked, [this](){
         if (m_isMaximized) {
+            // If shaded, we MUST unshade first before restoring to normal
+            if (m_shaded) {
+                m_shaded = false;
+                m_titleBar->setShaded(false);
+                setMinimumWidth(0);
+                setMaximumWidth(16777215);
+                setMaximumHeight(16777215);
+                setMinimumHeight(0);
+                m_titleBar->show();
+                // Content area shown below/resized by setGeometry
+            }
+
             showNormal();
             m_isMaximized = false;
             m_titleBar->setMaximized(false);
+            
+            // Restore valid normal geometry if available
+            if (!m_validNormalGeometry.isNull()) {
+                qDebug() << "  -> Restoring valid normal geometry:" << m_validNormalGeometry;
+                setGeometry(m_validNormalGeometry);
+            } else {
+                qDebug() << "  -> WARNING: No valid normal geometry, using fallback";
+                resize(800, 600); // Reasonable fallback
+                // Center on screen
+                if (QMdiArea* area = mdiArea()) {
+                     setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), area->viewport()->rect()));
+                }
+            }
+            
+            if (m_contentArea) {
+                 m_contentArea->show();
+                 m_contentArea->resize(width(), height() - m_titleBar->height());
+            }
+            
             // Auto-fit image to new window size
             if (ImageViewer* v = viewer()) {
                 QTimer::singleShot(50, v, &ImageViewer::fitToWindow);
             }
         } else {
-            // If shaded, we need to unshade first (show content area)
+            // Save valid normal geometry before maximizing
+            if (!m_shaded) {
+                m_validNormalGeometry = geometry();
+                qDebug() << "  -> Saved Normal Geometry:" << m_validNormalGeometry;
+            }
+
+            // If shaded, we need to unshade first with robust logic
             if (m_shaded) {
                 m_shaded = false;
                 m_titleBar->setShaded(false);
@@ -472,8 +509,37 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
                 setMinimumHeight(0);
                 m_titleBar->show();
                 m_contentArea->show();
-                // Don't restore geometry - we're about to maximize
+                
+                 // Robust Unshade-to-Maximize:
+                 // DO NOT call showNormal() here as it might reset geometry to Shaded size
+                 
+                 // 2. Expand to full viewport to ensure maximize works visually
+                 if (QMdiArea* area = mdiArea()) {
+                     if (QWidget* vp = area->viewport()) setGeometry(vp->rect());
+                     else setGeometry(area->rect());
+                 } else {
+                     setGeometry(0, 0, 1920, 1080);
+                 }
+                 
+                 // 3. Defer maximize
+                 QTimer::singleShot(50, this, [this](){
+                     showMaximized();
+                     m_isMaximized = true;
+                     m_titleBar->setMaximized(true);
+                     if (m_contentArea) {
+                         m_contentArea->show();
+                         m_contentArea->resize(width(), height() - m_titleBar->height()); // Explicit resize help
+                     }
+                     
+                     if (ImageViewer* v = viewer()) {
+                         v->fitToWindow();
+                         // Double tap fit to window to handle layout latency
+                         QTimer::singleShot(10, v, &ImageViewer::fitToWindow);
+                     }
+                 });
+                 return; // Async completion
             }
+            
             showMaximized();
             m_isMaximized = true;
             m_titleBar->setMaximized(true);
@@ -673,6 +739,11 @@ void CustomMdiSubWindow::toggleShade() {
     QPoint center = geometry().center();
     
     if (m_shaded) {
+        // Save valid normal geometry if we are shading from a normal state
+        if (!m_isMaximized) {
+            m_validNormalGeometry = geometry();
+        }
+
         m_wasMaximized = m_isMaximized; // Use our manual flag, not isMaximized()
         m_originalHeight = height();
         m_originalWidth = width(); 
@@ -707,10 +778,47 @@ void CustomMdiSubWindow::toggleShade() {
         m_contentArea->show();
         
         qDebug() << "  UNSHADING: m_wasMaximized =" << m_wasMaximized;
+        bool restoreMax = m_wasMaximized;
         
-        if (m_wasMaximized) {
-            qDebug() << "  -> Calling showMaximized()";
-            showMaximized();
+        // Reset internal state to Normal first to avoid stuck flags
+        if (isMaximized()) QMdiSubWindow::showNormal();
+
+        if (restoreMax) {
+            qDebug() << "  -> Restoring geometry (FULL) before deferred showMaximized()";
+            
+            // Robustness: Use MDI viewport size to ensure we expand fully, 
+            // ignoring potentially corrupted m_originalWidth/Height
+            if (QMdiArea* area = mdiArea()) {
+                if (QWidget* vp = area->viewport()) {
+                    setGeometry(vp->rect());
+                } else {
+                    setGeometry(area->rect());
+                }
+            } else {
+                 // Fallback
+                 setGeometry(0, 0, 1920, 1080); 
+            }
+            
+            qDebug() << "  -> Deferring showMaximized()";
+            QTimer::singleShot(50, this, [this](){
+                qDebug() << "  -> Calling showMaximized() (deferred)";
+                showMaximized();
+                if (m_contentArea) {
+                    m_contentArea->show(); // Ensure visible
+                    m_contentArea->resize(width(), height() - m_titleBar->height());
+                }
+                
+                // Double check size
+                if (width() < 500) {
+                    qDebug() << "  -> WARNING: Window still small after max (" << width() << "x" << height() << "), forcing resize";
+                    if (QMdiArea* area = mdiArea()) setGeometry(area->viewport()->rect());
+                }
+                
+                if (ImageViewer* v = viewer()) {
+                    v->fitToWindow();
+                    QTimer::singleShot(10, v, &ImageViewer::fitToWindow);
+                }
+            });
         } else {
             // Restore (Horizontal Center, Vertical Top)
             int newX = center.x() - m_originalWidth / 2;
