@@ -82,6 +82,41 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
         return false;
     }
 
+    // Helper to run process with cancellation and timeout
+    auto runProcess = [&](QProcess& p, int timeoutMs = 600000) -> bool {
+        p.start();
+        if (!p.waitForStarted()) {
+             if (errorMsg) *errorMsg = "Failed to start process: " + p.program();
+             return false;
+        }
+        
+        // Wait loop
+        int elapsed = 0;
+        int interval = 100;
+        while (!p.waitForFinished(interval)) {
+             if (m_stop) {
+                 p.kill();
+                 p.waitForFinished();
+                 if (errorMsg) *errorMsg = "Process cancelled by user.";
+                 return false;
+             }
+             elapsed += interval;
+             if (elapsed > timeoutMs) {
+                 p.kill();
+                 if (errorMsg) *errorMsg = "Process timed out.";
+                 return false;
+             }
+        }
+        
+        if (p.exitCode() != 0) {
+            QString errOut = p.readAllStandardError();
+            if (errOut.isEmpty()) errOut = p.readAllStandardOutput();
+            if (errorMsg) *errorMsg = "Process failed: " + errOut;
+            return false;
+        }
+        return true;
+    };
+
     // 1. Write Input to Raw Float
     QString rawInputFile = inputDir.filePath("input.raw");
     {
@@ -103,11 +138,11 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
              << rawInputFile;
         
         QProcess p;
-        p.start(pythonExe, args);
-        p.waitForFinished();
-        if (p.exitCode() != 0) {
-            if(errorMsg) *errorMsg = "Bridge failed to save TIFF: " + p.readAllStandardOutput() + p.readAllStandardError();
-            return false;
+        p.setProgram(pythonExe);
+        p.setArguments(args);
+        
+        if (!runProcess(p, 60000)) { // 60s timeout for IO
+             return false;
         }
     }
     emit processOutput("Input staged via Python Bridge: " + savedTiff);
@@ -189,34 +224,7 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
             }
         });
 
-        process.start();
-        if (!process.waitForStarted()) {
-            if (errorMsg) *errorMsg = "Failed to start process: " + exeName;
-            return false;
-        }
-
-        int elapsed = 0;
-        // Blocking wait with cancellation (worker thread)
-        while (process.state() != QProcess::NotRunning) {
-            if (m_stop) {
-                process.kill();
-                process.waitForFinished();
-                if (errorMsg) *errorMsg = "Process cancelled by user.";
-                purge(inputDir); purge(outputDir);
-                return false;
-            }
-            QCoreApplication::processEvents();
-            QThread::msleep(50);
-            elapsed += 50;
-            if (elapsed > 600000) { // 10 min timeout
-                 process.kill();
-                 if (errorMsg) *errorMsg = "Process timed out.";
-                 return false;
-            }
-        }
-
-        if (process.exitCode() != 0) {
-            if (errorMsg) *errorMsg = QString("Process failed with exit code %1").arg(process.exitCode());
+        if (!runProcess(process, 600000)) { // 10 min timeout
             purge(inputDir); purge(outputDir);
             return false;
         }
@@ -254,10 +262,10 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
             args << bridgeScriptPath << "load" << expectedOutput << rawResult;
             
             QProcess p;
-            p.start(pythonExe, args);
-            p.waitForFinished();
-            if (p.exitCode() != 0) {
-                if(errorMsg) *errorMsg = "Bridge failed to load result.";
+            p.setProgram(pythonExe);
+            p.setArguments(args);
+            
+            if (!runProcess(p, 60000)) {
                 purge(inputDir); purge(outputDir);
                 return false;
             }
