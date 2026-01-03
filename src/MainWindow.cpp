@@ -638,8 +638,7 @@ MainWindow::MainWindow(QWidget *parent)
         auto dlg = new CosmicClarityDialog(this);
         dlg->setAttribute(Qt::WA_DeleteOnClose);
         connect(dlg, &QDialog::accepted, [this, dlg](){ runCosmicClarity(dlg->getParams()); });
-        CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-        setupToolSubwindow(sub, dlg, tr("Cosmic Clarity"));
+        setupToolSubwindow(nullptr, dlg, tr("Cosmic Clarity"));
     });
     addMenuAction(aiMenu, tr("GraXpert"), "", [this](){
         if (activateTool(tr("GraXpert"))) return;
@@ -647,16 +646,14 @@ MainWindow::MainWindow(QWidget *parent)
         auto dlg = new GraXpertDialog(this);
         dlg->setAttribute(Qt::WA_DeleteOnClose);
         connect(dlg, &QDialog::accepted, [this, dlg](){ runGraXpert(dlg->getParams()); });
-        CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-        setupToolSubwindow(sub, dlg, tr("GraXpert"));
+        setupToolSubwindow(nullptr, dlg, tr("GraXpert"));
     });
     addMenuAction(aiMenu, tr("StarNet++"), "", [this](){
         if (activateTool(tr("Remove Stars (StarNet)"))) return;
         if (!currentViewer()) { QMessageBox::warning(this, tr("No Image"), tr("Select image.")); return; }
         auto dlg = new StarNetDialog(this);
         dlg->setAttribute(Qt::WA_DeleteOnClose);
-        CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-        setupToolSubwindow(sub, dlg, tr("Remove Stars (StarNet)"));
+        setupToolSubwindow(nullptr, dlg, tr("Remove Stars (StarNet)"));
     });
     addMenuAction(aiMenu, tr("Aberration Remover"), "", [this](){
         openRARDialog();
@@ -1323,8 +1320,7 @@ void MainWindow::cropTool() {
     dlg->setViewer(v); // Sets initial viewer and enters crop mode
     
     log(tr("Opening Rotate / Crop Tool..."), Log_Info, true);
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, dlg, tr("Rotate / Crop"));
+    setupToolSubwindow(nullptr, dlg, tr("Rotate / Crop"));
 }
 
 void MainWindow::openAbeDialog() {
@@ -1432,8 +1428,7 @@ void MainWindow::openSaturationDialog() {
     
     m_satTarget = viewer;
 
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, m_satDlg, tr("Color Saturation"));
+    setupToolSubwindow(nullptr, m_satDlg, tr("Color Saturation"));
 }
 
 void MainWindow::openAstroSpikeDialog() {
@@ -1465,8 +1460,7 @@ void MainWindow::openAstroSpikeDialog() {
     log(tr("Opening AstroSpike Tool..."), Log_Info, true);
     m_astroSpikeDlg = new AstroSpikeDialog(viewer, this); 
     
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, m_astroSpikeDlg, tr("AstroSpike"));
+    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, m_astroSpikeDlg, tr("AstroSpike"));
     
     // Requested size: 1000x600
     sub->resize(1000, 600);
@@ -1518,8 +1512,7 @@ void MainWindow::openSCNRDialog() {
     });
     
     log(tr("Opening SCNR Tool..."), Log_Info, true);
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, dlg, tr("SCNR"));
+    setupToolSubwindow(nullptr, dlg, tr("SCNR"));
 }
 
 // Replaces MainWindow::log
@@ -1711,8 +1704,7 @@ void MainWindow::openRARDialog() {
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     dlg->setViewer(v);
 
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, dlg, tr("Aberration Remover"));
+    setupToolSubwindow(nullptr, dlg, tr("Aberration Remover"));
 }
 
 void MainWindow::openStarStretchDialog() {
@@ -1734,8 +1726,7 @@ void MainWindow::openStarStretchDialog() {
     m_starStretchDlg = dlg;
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, dlg, tr("Star Stretch"));
+    setupToolSubwindow(nullptr, dlg, tr("Star Stretch"));
 }
 
 void MainWindow::openStarRecompositionDialog() {
@@ -1757,8 +1748,7 @@ void MainWindow::openStarRecompositionDialog() {
     m_starRecompDlg = dlg;
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, dlg, tr("Star Recomposition"));
+    setupToolSubwindow(nullptr, dlg, tr("Star Recomposition"));
 }
 
 void MainWindow::openPerfectPaletteDialog() {
@@ -1776,8 +1766,7 @@ void MainWindow::openPerfectPaletteDialog() {
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     if(v) dlg->setViewer(v); // Set initial viewer
 
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, dlg, tr("Perfect Palette"));
+    setupToolSubwindow(nullptr, dlg, tr("Perfect Palette"));
 }
     // Re-adding applyGeometry here as it was likely not in previous view range or needs MDI
 void MainWindow::applyGeometry(const QString& op) {
@@ -1853,8 +1842,7 @@ void MainWindow::openGHSDialog() {
     m_ghsDlg->setAttribute(Qt::WA_DeleteOnClose, false); // We manage lifecycle via wrapper
     
     log(tr("Opening GHS Tool..."), Log_Action, true);
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, m_ghsDlg, tr("Generalized Hyperbolic Stretch"));
+    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, m_ghsDlg, tr("Generalized Hyperbolic Stretch"));
     sub->resize(450, 650); // GHS specific size override
      
     // Lifecycle: Delete on close to ensure clean reset on reopen.
@@ -1893,8 +1881,7 @@ void MainWindow::openPlateSolvingDialog() {
     dlg->setViewer(viewer);  // Use setViewer instead of setImageBuffer to ensure WCS is applied to viewer
     
     log(tr("Opening Plate Solving..."), Log_Info, true);
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, dlg, tr("Plate Solving"));
+    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, dlg, tr("Plate Solving"));
     
     connect(dlg, &QDialog::accepted, [this, dlg, sub, viewer](){
         if (dlg->isSolved()) {
@@ -1941,8 +1928,7 @@ void MainWindow::openPCCDialog() {
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     
     log(tr("Opening Photometric Color Calibration..."), Log_Info, true);
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, dlg, tr("Photometric Color Calibration"));
+    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, dlg, tr("Photometric Color Calibration"));
     // Let layout settle, then shrink to fit content
     QTimer::singleShot(50, sub, [sub](){ sub->adjustSize(); });
     
@@ -2014,8 +2000,7 @@ void MainWindow::openCurvesDialog() {
     connect(m_curvesDlg, &CurvesDialog::previewRequested, this, &MainWindow::applyCurvesPreview);
     connect(m_curvesDlg, &CurvesDialog::applyRequested, this, &MainWindow::applyCurves);
 
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, m_curvesDlg, tr("Curves Transformation"));
+    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, m_curvesDlg, tr("Curves Transformation"));
     sub->resize(650, 500);
     
     // Connect finished signal to clear preview and close subwindow
@@ -2149,64 +2134,59 @@ void MainWindow::openPixelMathDialog() {
          }
     });
 
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, m_pixelMathDialog, tr("Pixel Math"));
-    
+    setupToolSubwindow(nullptr, m_pixelMathDialog, tr("Pixel Math"));
     if (viewer) m_pixelMathDialog->setViewer(viewer);
 }
 
 
-void MainWindow::setupToolSubwindow(CustomMdiSubWindow* sub, QWidget* dlg, const QString& title) {
-    // If sub is nullptr, create a new one. Otherwise, use the provided one.
+CustomMdiSubWindow* MainWindow::setupToolSubwindow(CustomMdiSubWindow* sub, QWidget* dlg, const QString& title) {
     CustomMdiSubWindow* targetSub = sub;
     if (!targetSub) {
-        targetSub = new CustomMdiSubWindow(m_mdiArea);
-        targetSub->setAttribute(Qt::WA_DeleteOnClose); // Default for newly created tool subwindows
+        // Create as floating tool window instead of MDI subwindow
+        targetSub = new CustomMdiSubWindow(this);
+        targetSub->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
+        targetSub->setAttribute(Qt::WA_DeleteOnClose);
     }
 
     targetSub->setWidget(dlg);
     targetSub->setSubWindowTitle(title);
-    targetSub->setToolWindow(true); // Enable tool mode (no sidebar, horizontal shade)
+    targetSub->setToolWindow(true); // Enable tool mode
     
-    // Position logic: Strictly Center
+    // Position logic
     if (dlg) dlg->adjustSize();
     targetSub->adjustSize(); 
     
     QSize subSize = targetSub->sizeHint();
     if (subSize.width() < 100 || subSize.height() < 100) {
-        subSize = QSize(500, 400); // Reasonable default
+        subSize = QSize(500, 400);
         targetSub->resize(subSize);
     }
 
-    int viewW = m_mdiArea->viewport()->width();
-    int viewH = m_mdiArea->viewport()->height();
+    // Center on screen or main window
+    const QRect screen = this->screen()->availableGeometry();
+    const QPoint center = screen.center();
     
-    int x = (viewW - subSize.width()) / 2;
-    int y = (viewH - subSize.height()) / 2;
-    
-    x = std::max(0, x);
-    y = std::max(0, y);
+    int x = center.x() - subSize.width() / 2;
+    int y = center.y() - subSize.height() / 2;
     
     targetSub->move(x, y);
     
-    // Ensure if dialog has finished signal, we close the subwindow
     if (QDialog* qdlg = qobject_cast<QDialog*>(dlg)) {
         connect(qdlg, &QDialog::finished, [targetSub](int){ targetSub->close(); });
     }
     
+    targetSub->showNormal();
     targetSub->show();
-    
-    // Force position update after show to override any default MDI placement
-    targetSub->move(x, y);
     targetSub->raise();
     targetSub->activateWindow();
+    
+    return targetSub;
 }
 
 void MainWindow::onSettingsAction() {
     auto dlg = new SettingsDialog(this);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, dlg, tr("Settings"));
+    setupToolSubwindow(nullptr, dlg, tr("Settings"));
 }
 
 void MainWindow::updateActiveImage() {
@@ -2239,8 +2219,7 @@ void MainWindow::openArcsinhStretchDialog() {
         log(tr("Arcsinh Stretch Applied to %1").arg(viewer->windowTitle()), Log_Success, true);
     });
 
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, dlg, tr("Arcsinh Stretch"));
+    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, dlg, tr("Arcsinh Stretch"));
     sub->resize(420, 300);
 }
 
@@ -2262,8 +2241,7 @@ void MainWindow::openHistogramStretchDialog() {
     m_histoDlg = dlg;
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, dlg, tr("Histogram Stretch"));
+    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, dlg, tr("Histogram Stretch"));
     sub->resize(520, 600);
 }
 
@@ -2363,8 +2341,7 @@ void MainWindow::openPCCDistributionDialog() {
 
     auto dlg = new PCCDistributionDialog(res, this);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, dlg, tr("PCC Distribution"));
+    setupToolSubwindow(nullptr, dlg, tr("PCC Distribution"));
 
     log(tr("Opened PCC Distribution Tool"), Log_Action, true);
 }
@@ -2505,8 +2482,7 @@ void MainWindow::openStarAnalysisDialog() {
     m_starAnalysisDlg = dlg;
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, dlg, tr("Star Analysis"));
+    setupToolSubwindow(nullptr, dlg, tr("Star Analysis"));
 }
 
 // ...
@@ -2670,8 +2646,7 @@ void MainWindow::openDebayerDialog() {
     
     connect(m_debayerDlg, &QDialog::destroyed, this, [this]() { m_debayerDlg = nullptr; });
     
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, m_debayerDlg, tr("Debayer"));
+    setupToolSubwindow(nullptr, m_debayerDlg, tr("Debayer"));
 }
 
 void MainWindow::openContinuumSubtractionDialog() {
@@ -2690,8 +2665,7 @@ void MainWindow::openContinuumSubtractionDialog() {
     
     connect(m_continuumDlg, &QDialog::destroyed, this, [this]() { m_continuumDlg = nullptr; });
     
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, m_continuumDlg, tr("Continuum Subtraction"));
+    setupToolSubwindow(nullptr, m_continuumDlg, tr("Continuum Subtraction"));
 }
 
 void MainWindow::openImageAnnotatorDialog() {
@@ -2714,7 +2688,6 @@ void MainWindow::openImageAnnotatorDialog() {
     
     connect(m_annotatorDlg, &QDialog::destroyed, this, [this]() { m_annotatorDlg = nullptr; });
     
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, m_annotatorDlg, tr("Annotation Tool"));
+    setupToolSubwindow(nullptr, m_annotatorDlg, tr("Annotation Tool"));
 }
 

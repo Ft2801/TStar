@@ -1988,10 +1988,6 @@ void ImageBuffer::rotate90() {
     m_height = oldW;
     m_data = std::move(newData);
 
-    m_width = oldH;
-    m_height = oldW;
-    m_data = std::move(newData);
-
     // Update WCS for Rotate 90 CW
     // T: (x,y) -> (H-1-y, x)
     // T = Translate(H-1, 0) * Rotate(90)

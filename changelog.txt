@@ -1,6 +1,11 @@
 TStar Changelog
 ===============
 
+Version 1.1.1
+-------------
+- Rotation bug fixed
+- Tool windows auto maximizing when view is maximized fixed
+
 Version 1.1.0
 -------------
 - Debayer tool
@@ -11,7 +16,7 @@ Version 1.1.0
 Version 1.0.5
 -------------
 - Fixed ABE, GHT and Saturation small bugs
-
+- 
 Version 1.0.4
 -------------
 - DPI based window rescaling

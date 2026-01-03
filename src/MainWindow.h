@@ -204,7 +204,7 @@ private:
     class QToolButton* m_falseColorBtn;
     class QAction* m_linkViewsAction;
     
-    void setupToolSubwindow(CustomMdiSubWindow* sub, QWidget* dlg, const QString& title);
+    CustomMdiSubWindow* setupToolSubwindow(CustomMdiSubWindow* sub, QWidget* dlg, const QString& title);
     QPointer<ImageViewer> m_lastActiveImageViewer;
     QPointer<ImageViewer> m_curvesTarget;
     QPointer<ImageViewer> m_ghsTarget;
