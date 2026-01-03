@@ -516,3 +516,278 @@ void XISFReader::planarToInterleaved(const std::vector<float>& planar,
         }
     }
 }
+
+// ============================================================================
+// Multi-Image Support (SASPro compatible)
+// ============================================================================
+
+QList<XISFImageInfo> XISFReader::listImages(const QString& filePath, QString* errorMsg) {
+    QList<XISFImageInfo> result;
+    
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        if (errorMsg) *errorMsg = QCoreApplication::translate("XISFReader", "Could not open file: %1").arg(filePath);
+        return result;
+    }
+
+    // Read Signature
+    QByteArray sig = file.read(8);
+    if (sig != "XISF0100") {
+        if (errorMsg) *errorMsg = QCoreApplication::translate("XISFReader", "Invalid XISF Signature.");
+        return result;
+    }
+
+    // Read Header Length
+    uchar lenBytes[4];
+    if (file.read((char*)lenBytes, 4) != 4) {
+        if (errorMsg) *errorMsg = QCoreApplication::translate("XISFReader", "Unexpected EOF.");
+        return result;
+    }
+    quint32 headerLen = qFromLittleEndian<quint32>(lenBytes);
+
+    // Skip Reserved
+    file.read(4);
+
+    // Read XML Header
+    if (headerLen == 0 || headerLen > 100 * 1024 * 1024) {
+        if (errorMsg) *errorMsg = QCoreApplication::translate("XISFReader", "Invalid Header Length: %1").arg(headerLen);
+        return result;
+    }
+    
+    QByteArray xmlBytes = file.read(headerLen);
+    
+    // Parse all images from header
+    QList<XISFHeaderInfo> images;
+    if (!parseAllImages(xmlBytes, images, errorMsg)) {
+        return result;
+    }
+    
+    // Convert to public info structure
+    for (int i = 0; i < images.size(); ++i) {
+        const XISFHeaderInfo& info = images[i];
+        XISFImageInfo imgInfo;
+        imgInfo.index = i;
+        imgInfo.name = info.imageId.isEmpty() ? QString::number(i) : info.imageId;
+        imgInfo.width = info.width;
+        imgInfo.height = info.height;
+        imgInfo.channels = info.channels;
+        imgInfo.sampleFormat = info.sampleFormat;
+        imgInfo.colorSpace = info.colorSpace;
+        result.append(imgInfo);
+    }
+    
+    return result;
+}
+
+bool XISFReader::readImage(const QString& filePath, int imageIndex, 
+                           ImageBuffer& buffer, QString* errorMsg) {
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        if (errorMsg) *errorMsg = QCoreApplication::translate("XISFReader", "Could not open file: %1").arg(filePath);
+        return false;
+    }
+
+    // Read Signature
+    QByteArray sig = file.read(8);
+    if (sig != "XISF0100") {
+        if (errorMsg) *errorMsg = QCoreApplication::translate("XISFReader", "Invalid XISF Signature.");
+        return false;
+    }
+
+    // Read Header Length
+    uchar lenBytes[4];
+    if (file.read((char*)lenBytes, 4) != 4) {
+        if (errorMsg) *errorMsg = QCoreApplication::translate("XISFReader", "Unexpected EOF.");
+        return false;
+    }
+    quint32 headerLen = qFromLittleEndian<quint32>(lenBytes);
+
+    // Skip Reserved
+    file.read(4);
+
+    // Read XML Header
+    QByteArray xmlBytes = file.read(headerLen);
+    
+    // Parse all images
+    QList<XISFHeaderInfo> images;
+    if (!parseAllImages(xmlBytes, images, errorMsg)) {
+        return false;
+    }
+    
+    if (imageIndex < 0 || imageIndex >= images.size()) {
+        if (errorMsg) *errorMsg = QCoreApplication::translate("XISFReader", 
+            "Image index %1 out of range (file has %2 images)").arg(imageIndex).arg(images.size());
+        return false;
+    }
+    
+    XISFHeaderInfo& info = images[imageIndex];
+    info.meta.filePath = filePath;
+    
+    return loadImage(file, info, buffer, errorMsg);
+}
+
+bool XISFReader::parseAllImages(const QByteArray& headerXml, QList<XISFHeaderInfo>& images, QString* errorMsg) {
+    QXmlStreamReader xml(headerXml);
+    
+    int imageIndex = 0;
+    
+    while (!xml.atEnd()) {
+        xml.readNext();
+        
+        if (xml.isStartElement() && xml.name() == "Image") {
+            XISFHeaderInfo info;
+            
+            // Parse geometry
+            QString geom = xml.attributes().value("geometry").toString();
+            QStringList parts = geom.split(':');
+            if (parts.size() >= 2) {
+                info.width = parts[0].toInt();
+                info.height = parts[1].toInt();
+                info.channels = (parts.size() > 2) ? parts[2].toInt() : 1;
+            }
+            
+            // Skip invalid images
+            if (info.width <= 0 || info.height <= 0) {
+                continue;
+            }
+            
+            // Image ID
+            info.imageId = xml.attributes().value("id").toString();
+            if (info.imageId.isEmpty()) {
+                info.imageId = QString("Image_%1").arg(imageIndex);
+            }
+            
+            // Sample format
+            info.sampleFormat = xml.attributes().value("sampleFormat").toString();
+            if (info.sampleFormat.isEmpty()) info.sampleFormat = "Float32";
+            
+            // Color space
+            info.colorSpace = xml.attributes().value("colorSpace").toString();
+            
+            // Pixel storage
+            info.pixelStorage = xml.attributes().value("pixelStorage").toString();
+            
+            // Byte order
+            info.byteOrder = xml.attributes().value("byteOrder").toString();
+            
+            // Parse location
+            QString loc = xml.attributes().value("location").toString();
+            QStringList locParts = loc.split(':');
+            if (locParts.size() >= 1) {
+                QString locType = locParts[0].toLower();
+                if (locType == "attachment" && locParts.size() >= 3) {
+                    info.locationType = XISFHeaderInfo::Attachment;
+                    info.dataLocation = locParts[1].toLongLong();
+                    info.dataSize = locParts[2].toLongLong();
+                } else if (locType == "inline" && locParts.size() >= 2) {
+                    info.locationType = XISFHeaderInfo::Inline;
+                    info.inlineEncoding = locParts[1];
+                } else if (locType == "embedded") {
+                    info.locationType = XISFHeaderInfo::Embedded;
+                }
+            }
+            
+            // Parse compression
+            QString compression = xml.attributes().value("compression").toString();
+            if (!compression.isEmpty()) {
+                CompressionUtils::parseCompressionAttr(
+                    compression, info.compressionCodec, 
+                    info.uncompressedSize, info.shuffleItemSize);
+            }
+            
+            // Parse Image children (FITSKeywords, Properties)
+            while (!(xml.isEndElement() && xml.name() == "Image") && !xml.atEnd()) {
+                xml.readNext();
+                
+                if (xml.isStartElement()) {
+                    QString childName = xml.name().toString();
+                    
+                    if (childName == "FITSKeyword") {
+                        QString name = xml.attributes().value("name").toString();
+                        QString val = xml.attributes().value("value").toString();
+                        QString comment = xml.attributes().value("comment").toString();
+                        
+                        info.meta.rawHeaders.push_back({name, val, comment});
+                        
+                        if (name == "FOCALLEN") info.meta.focalLength = val.toDouble();
+                        else if (name == "XPIXSZ" || name == "PIXSIZE") info.meta.pixelSize = val.toDouble();
+                        else if (name == "RA") info.meta.ra = val.toDouble();
+                        else if (name == "DEC") info.meta.dec = val.toDouble();
+                        else if (name == "DATE-OBS") info.meta.dateObs = val;
+                        else if (name == "OBJECT") info.meta.objectName = val;
+                        else if (name == "CRVAL1") info.meta.ra = val.toDouble();
+                        else if (name == "CRVAL2") info.meta.dec = val.toDouble();
+                        else if (name == "CRPIX1") info.meta.crpix1 = val.toDouble();
+                        else if (name == "CRPIX2") info.meta.crpix2 = val.toDouble();
+                        else if (name == "CD1_1") info.meta.cd1_1 = val.toDouble();
+                        else if (name == "CD1_2") info.meta.cd1_2 = val.toDouble();
+                        else if (name == "CD2_1") info.meta.cd2_1 = val.toDouble();
+                        else if (name == "CD2_2") info.meta.cd2_2 = val.toDouble();
+                    }
+                    else if (childName == "Property") {
+                        XISFProperty prop = parseProperty(xml);
+                        info.properties[prop.id] = prop;
+                    }
+                }
+            }
+            
+            images.append(info);
+            imageIndex++;
+        }
+    }
+    
+    if (xml.hasError()) {
+        if (errorMsg) *errorMsg = QCoreApplication::translate("XISFReader", 
+            "XML Parse Error: %1").arg(xml.errorString());
+        return false;
+    }
+    
+    return true;
+}
+
+bool XISFReader::loadImage(QFile& file, const XISFHeaderInfo& info, ImageBuffer& buffer, QString* errorMsg) {
+    // Read Data Block
+    QByteArray rawData = readDataBlock(file, info, errorMsg);
+    if (rawData.isEmpty() && info.dataSize > 0) {
+        return false;
+    }
+    
+    // Handle Compression
+    if (info.compressionCodec != CompressionUtils::Codec_None) {
+        QByteArray decompressed = CompressionUtils::decompress(
+            rawData, info.compressionCodec, info.uncompressedSize, errorMsg);
+        if (decompressed.isEmpty()) {
+            return false;
+        }
+        
+        if (info.shuffleItemSize > 0) {
+            rawData = CompressionUtils::unshuffle(decompressed, info.shuffleItemSize);
+        } else {
+            rawData = decompressed;
+        }
+    }
+    
+    // Convert to float
+    std::vector<float> pixelData;
+    if (!convertToFloat(rawData, info, pixelData, errorMsg)) {
+        return false;
+    }
+    
+    // Convert planar to interleaved if needed
+    long long totalPixels = (long long)info.width * info.height * info.channels;
+    std::vector<float> finalData;
+    
+    if (info.channels > 1 && (info.pixelStorage.isEmpty() || info.pixelStorage.toLower() == "planar")) {
+        finalData.resize(totalPixels);
+        planarToInterleaved(pixelData, finalData, info.width, info.height, info.channels);
+    } else {
+        finalData = std::move(pixelData);
+    }
+    
+    // Set buffer data and metadata
+    buffer.setMetadata(info.meta);
+    buffer.setData(info.width, info.height, info.channels, finalData);
+    
+    return true;
+}
+

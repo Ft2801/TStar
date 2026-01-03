@@ -57,7 +57,14 @@ void NameStrip::dragMoveEvent(QDragMoveEvent *event) {
 }
 
 void NameStrip::setTitle(const QString& title) {
-    m_title = title;
+    // Truncate to max 15 chars with ellipsis to prevent layout issues
+    const int maxChars = 15;
+    if (title.length() > maxChars) {
+        m_title = title.left(maxChars - 1) + QChar(0x2026); // Unicode ellipsis
+    } else {
+        m_title = title;
+    }
+    
     QFontMetrics fm(QFont("Segoe UI", 9));
     int textLen = fm.horizontalAdvance(m_title);
     int desiredHeight = textLen + 40;

@@ -1035,6 +1035,8 @@ void MainWindow::propagateViewChange(float scale, float hVal, float vVal) {
 
 // ConsoleResizeHandle methods removed
 
+#include "io/XISFReader.h" // Added for multi-image XISF support
+
 void MainWindow::openFile() {
     QString filter = tr("All Supported (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;") +
                      tr("FITS Files (*.fits *.fit);;") +
@@ -1046,19 +1048,98 @@ void MainWindow::openFile() {
     if (paths.isEmpty()) return;
 
     for (const QString& path : paths) {
-        ImageBuffer buf;
-        QString errorMsg;
         QFileInfo fi(path);
         QString ext = fi.suffix().toLower();
-        bool success = false;
+        QString errorMsg;
         
+        // --- FITS / FIT ---
         if (ext == "fits" || ext == "fit") {
-            success = FitsLoader::load(path, buf, &errorMsg);
-        } else if (ext == "xisf") {
-            success = buf.loadXISF(path, &errorMsg);
-        } else if (ext == "tiff" || ext == "tif") {
+            // List extensions first
+            QMap<QString, FitsExtensionInfo> exts = FitsLoader::listExtensions(path, &errorMsg);
+            
+            // If failed to list or empty, try basic single load as fallback
+            if (exts.isEmpty()) {
+                 ImageBuffer buf;
+                 if (FitsLoader::load(path, buf, &errorMsg)) {
+                     createNewImageWindow(buf, fi.fileName());
+                     log(tr("Opened: %1").arg(fi.fileName()), Log_Success, true);
+                 } else {
+                     log(tr("Failed to load %1: %2").arg(fi.fileName()).arg(errorMsg), Log_Error);
+                 }
+                 continue;
+            }
+
+            // Load all extensions found
+            bool anyLoaded = false;
+            // Iterate in index order (0, 1, 2...)
+            // Map is sorted by key (Name), so we collect values and sort by index
+            QList<FitsExtensionInfo> sortedExts = exts.values();
+            std::sort(sortedExts.begin(), sortedExts.end(), [](const FitsExtensionInfo& a, const FitsExtensionInfo& b){
+                return a.index < b.index;
+            });
+
+            for (const auto& info : sortedExts) {
+                ImageBuffer buf;
+                QString extErr;
+                if (FitsLoader::loadExtension(path, info.index, buf, &extErr)) {
+                    QString name = fi.fileName();
+                    if (sortedExts.size() > 1) {
+                         name += QString(" [%1]").arg(info.name);
+                    }
+                    createNewImageWindow(buf, name);
+                    anyLoaded = true;
+                } else {
+                    log(tr("Failed to load extension %1: %2").arg(info.name).arg(extErr), Log_Error);
+                }
+            }
+            
+            if (anyLoaded) {
+                log(tr("Opened FITS: %1 (%2 extensions)").arg(fi.fileName()).arg(sortedExts.size()), Log_Success, true);
+            }
+        
+        } 
+        // --- XISF ---
+        else if (ext == "xisf") {
+             QList<XISFImageInfo> imgs = XISFReader::listImages(path, &errorMsg);
+             
+             if (imgs.isEmpty()) {
+                 // Fallback to single read
+                 ImageBuffer buf;
+                 if (XISFReader::read(path, buf, &errorMsg)) {
+                     createNewImageWindow(buf, fi.fileName());
+                     log(tr("Opened: %1").arg(fi.fileName()), Log_Success, true);
+                 } else {
+                     log(tr("Failed to load %1: %2").arg(fi.fileName()).arg(errorMsg), Log_Error);
+                 }
+                 continue;
+             }
+             
+             bool anyLoaded = false;
+             for (const auto& info : imgs) {
+                  ImageBuffer buf;
+                  QString imgErr;
+                  if (XISFReader::readImage(path, info.index, buf, &imgErr)) {
+                      QString name = fi.fileName();
+                      if (imgs.size() > 1) {
+                          // Make name look like "file.xisf [Image_0]" or "file.xisf [Ha]"
+                          name += QString(" [%1]").arg(info.name);
+                      }
+                      createNewImageWindow(buf, name);
+                      anyLoaded = true;
+                  } else {
+                      log(tr("Failed to load XISF image %1: %2").arg(info.name).arg(imgErr), Log_Error);
+                  }
+             }
+
+             if (anyLoaded) {
+                 log(tr("Opened XISF: %1 (%2 images)").arg(fi.fileName()).arg(imgs.size()), Log_Success, true);
+             }
+        }
+        // --- TIFF / Others ---
+        else if (ext == "tiff" || ext == "tif") {
+             ImageBuffer buf;
              QString dbg;
-             success = buf.loadTiff32(path, &errorMsg, &dbg);
+             bool success = buf.loadTiff32(path, &errorMsg, &dbg);
              if (!success) {
                  // Fallback
                  if (buf.loadStandard(path)) {
@@ -1066,20 +1147,24 @@ void MainWindow::openFile() {
                      errorMsg.clear();
                  }
              }
-        } else {
-            success = buf.loadStandard(path);
-            if (!success) errorMsg = "Failed to load standard image.";
+             if (success) {
+                 createNewImageWindow(buf, fi.fileName());
+                 log(tr("Opened: %1").arg(fi.fileName()), Log_Success, true);
+             } else {
+                 log(tr("Failed to load %1: %2").arg(fi.fileName()).arg(errorMsg), Log_Error);
+             }
+        } 
+        else {
+            ImageBuffer buf;
+            if (buf.loadStandard(path)) {
+                createNewImageWindow(buf, fi.fileName());
+                log(tr("Opened: %1").arg(fi.fileName()), Log_Success, true);
+            } else {
+                log(tr("Failed to load %1").arg(fi.fileName()), Log_Error);
+            }
         }
-
-        if (!success) {
-            log(tr("Failed to load %1: %2").arg(fi.fileName()).arg(errorMsg), Log_Error);
-            continue;
-        }
-
-        createNewImageWindow(buf, fi.fileName());
-        log(tr("Opened: %1").arg(fi.fileName()), Log_Success, true);
-        showConsoleTemporarily(2000);
         
+        showConsoleTemporarily(2000);
         QCoreApplication::processEvents(); 
     }
 }
@@ -1300,6 +1385,8 @@ void MainWindow::openStretchDialog() {
     log(tr("Opening Statistical Stretch..."), Log_Info, true);
     CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
     setupToolSubwindow(sub, m_stretchDlg, tr("Statistical Stretch"));
+    sub->resize(500, 550); // Appropriate size for the dialog
+    centerToolWindow(sub); // Center after setup like GHS does
     
     // Restoration of Z-Order on accept handled by the generic signal if needed,
     // but StretchDialog now closes on apply.

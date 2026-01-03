@@ -163,6 +163,9 @@ void StretchDialog::setupUI() {
     QPushButton* previewBtn = new QPushButton(tr("Preview"), this);
     previewBtn->setFixedWidth(100);
     
+    QLabel* copyLabel = new QLabel(tr("© 2026 SetiAstro"));
+    copyLabel->setStyleSheet("color: #888; font-size: 10px; margin-left: 10px;");
+    
     QPushButton* applyBtn = new QPushButton(tr("Apply"), this);
     applyBtn->setDefault(true);
     applyBtn->setFixedWidth(100);
@@ -172,6 +175,7 @@ void StretchDialog::setupUI() {
     cancelBtn->setFixedWidth(100);
     
     btnLayout->addWidget(previewBtn);
+    btnLayout->addWidget(copyLabel);
     btnLayout->addStretch();
     btnLayout->addWidget(applyBtn);
     btnLayout->addWidget(cancelBtn);
@@ -282,7 +286,9 @@ void StretchDialog::onApply() {
         
         m_applied = true;
         
-        QString msg = tr("Statistical Stretch applied (M=%.2f, BP=%.1fσ)").arg(p.targetMedian).arg(p.blackpointSigma);
+        QString msg = tr("Statistical Stretch applied (M=%1, BP=%2σ)")
+                        .arg(p.targetMedian, 0, 'f', 2)
+                        .arg(p.blackpointSigma, 0, 'f', 1);
         emit applied(msg);
     }
     accept();

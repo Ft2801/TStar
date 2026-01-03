@@ -11,10 +11,52 @@
 #include "CompressionUtils.h"
 
 
+/**
+ * @brief Information about a single XISF image block
+ */
+struct XISFImageInfo {
+    int index;            // Image index (0-based)
+    QString name;         // Image ID/name if present
+    int width;
+    int height;
+    int channels;
+    QString sampleFormat; // e.g. "Float32", "UInt16"
+    QString colorSpace;   // "Gray" or "RGB"
+};
+
 class XISFReader {
 public:
 
+    /**
+     * @brief Read first image from XISF file (for backward compatibility)
+     */
     static bool read(const QString& filePath, ImageBuffer& buffer, QString* errorMsg = nullptr);
+    
+    /**
+     * @brief List all images in an XISF file
+     * 
+     * Matches SASPro's XISF.get_images_metadata() behavior.
+     * Each Image element in the XISF header becomes an entry.
+     * 
+     * @param filePath Path to XISF file
+     * @param errorMsg Optional error message output
+     * @return List of XISFImageInfo for each image block
+     */
+    static QList<XISFImageInfo> listImages(const QString& filePath, QString* errorMsg = nullptr);
+    
+    /**
+     * @brief Read a specific image from XISF file by index
+     * 
+     * Matches SASPro's XISF.read_image(n) behavior.
+     * 
+     * @param filePath Path to XISF file
+     * @param imageIndex 0-based index of the image to read
+     * @param buffer Output image buffer
+     * @param errorMsg Optional error message output
+     * @return true on success
+     */
+    static bool readImage(const QString& filePath, int imageIndex, 
+                          ImageBuffer& buffer, QString* errorMsg = nullptr);
 
     struct XISFProperty {
         QString id;
@@ -36,6 +78,7 @@ private:
         QString colorSpace;       // "Gray", "RGB"
         QString pixelStorage;     // "planar" (default) or "normal"
         QString byteOrder;        // "little" (default) or "big"
+        QString imageId;          // Image ID for naming
         
         // Compression info
         CompressionUtils::Codec compressionCodec = CompressionUtils::Codec_None;
@@ -65,6 +108,9 @@ private:
     // Header parsing
     static bool parseHeader(const QByteArray& headerXml, XISFHeaderInfo& info, QString* errorMsg);
     
+    // Parse ALL image blocks from header (for multi-image support)
+    static bool parseAllImages(const QByteArray& headerXml, QList<XISFHeaderInfo>& images, QString* errorMsg);
+    
     // Data block reading
     static QByteArray readDataBlock(QFile& file, const XISFHeaderInfo& info, QString* errorMsg);
     static QByteArray readAttachedDataBlock(QFile& file, long long position, long long size, QString* errorMsg);
@@ -88,6 +134,9 @@ private:
     
     // Helper to get sample format item size
     static int getSampleSize(const QString& format);
+    
+    // Internal: load image from parsed header info
+    static bool loadImage(QFile& file, const XISFHeaderInfo& info, ImageBuffer& buffer, QString* errorMsg);
 };
 
 #endif // XISFREADER_H
