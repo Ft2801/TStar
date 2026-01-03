@@ -24,6 +24,8 @@
 #include <QPropertyAnimation>
 #include <QEasingCurve>
 #include <QGraphicsOpacityEffect>
+#include <QTimer>
+
 
 // Helper to create QIcon from SVG string (DPI-aware)
 static QIcon iconFromSvg(const QString& svg, QWidget* widget = nullptr) {
@@ -453,12 +455,21 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
         if (isMaximized()) {
             showNormal(); 
             m_titleBar->setMaximized(false);
+            // Auto-fit image to new window size
+            if (ImageViewer* v = viewer()) {
+                QTimer::singleShot(50, v, &ImageViewer::fitToWindow);
+            }
         } else {
             if (m_shaded) toggleShade();
             showMaximized();
             m_titleBar->setMaximized(true);
+            // Auto-fit image to new window size
+            if (ImageViewer* v = viewer()) {
+                QTimer::singleShot(50, v, &ImageViewer::fitToWindow);
+            }
         }
     });
+
     m_mainLayout->addWidget(m_titleBar);
     m_contentArea = new QWidget(m_container);
     m_contentArea->setStyleSheet("background: #202020;");

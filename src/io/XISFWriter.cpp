@@ -6,6 +6,8 @@
 #include <QSet>
 #include <QDebug>
 #include <QCoreApplication>
+#include <cmath>
+
 
 bool XISFWriter::write(const QString& filePath, const ImageBuffer& buffer, int depthInt, QString* errorMsg) {
     ImageBuffer::BitDepth depth = (ImageBuffer::BitDepth)depthInt;
@@ -125,8 +127,13 @@ bool XISFWriter::write(const QString& filePath, const ImageBuffer& buffer, int d
         // Track written keys to avoid duplicates
         QSet<QString> writtenKeys;
         
-        // 1. Add WCS Keywords explicitly if we have solving data
-        if (meta.ra != 0 || meta.dec != 0) {
+        // 1. Add WCS Keywords explicitly if we have valid solving data
+        // Check that we have valid RA/DEC AND a valid (non-singular) CD matrix
+        // A singular matrix has determinant = 0 and would cause errors in PixInsight
+        double cd_det = meta.cd1_1 * meta.cd2_2 - meta.cd1_2 * meta.cd2_1;
+        bool hasValidWCS = (meta.ra != 0 || meta.dec != 0) && std::abs(cd_det) > 1e-20;
+        
+        if (hasValidWCS) {
             auto addKW = [&](const QString& k, const QString& v, const QString& c = "") {
                 QDomElement kw = doc.createElement("FITSKeyword");
                 kw.setAttribute("name", k);
@@ -150,6 +157,7 @@ bool XISFWriter::write(const QString& filePath, const ImageBuffer& buffer, int d
             addKW("CD2_1", QString::number(meta.cd2_1, 'e', 10));
             addKW("CD2_2", QString::number(meta.cd2_2, 'e', 10));
         }
+
 
         // 2. Add all other Metadata from rawHeaders
         for(const auto& card : meta.rawHeaders) {

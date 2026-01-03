@@ -205,7 +205,9 @@ private:
     class QAction* m_linkViewsAction;
     
     CustomMdiSubWindow* setupToolSubwindow(CustomMdiSubWindow* sub, QWidget* dlg, const QString& title);
+    void centerToolWindow(CustomMdiSubWindow* sub);
     QPointer<ImageViewer> m_lastActiveImageViewer;
+
     QPointer<ImageViewer> m_curvesTarget;
     QPointer<ImageViewer> m_ghsTarget;
     QPointer<ImageViewer> m_satTarget; // Track Saturation Target

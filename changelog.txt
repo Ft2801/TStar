@@ -1,6 +1,10 @@
 TStar Changelog
 ===============
 
+Version 1.1.2
+-------------
+- Small subwindows bugfixes
+
 Version 1.1.1
 -------------
 - Rotation bug fixed

@@ -346,9 +346,47 @@ void HistogramStretchDialog::onApply() {
         // Reset display mode to linear to avoid double-stretching (applying AutoStretch on already stretched data)
         m_viewer->setDisplayState(ImageBuffer::Display_Linear, true);
         m_applied = true;
+        
+        // --- Persistence: Keep dialog open for continued adjustments ---
+        // Update backup to the newly applied result
+        m_backup = buf;
+        
+        // Reset sliders to neutral position
+        m_shadows = 0.0f;
+        m_midtones = 0.5f;
+        m_highlights = 1.0f;
+        
+        m_shadowsSpin->blockSignals(true);
+        m_midtonesSpin->blockSignals(true);
+        m_highlightsSpin->blockSignals(true);
+        m_shadowsSlider->blockSignals(true);
+        m_midtonesSlider->blockSignals(true);
+        m_highlightsSlider->blockSignals(true);
+        
+        m_shadowsSpin->setValue(0.0);
+        m_midtonesSpin->setValue(0.5);
+        m_highlightsSpin->setValue(1.0);
+        m_shadowsSlider->setValue(0);
+        m_midtonesSlider->setValue(5000);
+        m_highlightsSlider->setValue(10000);
+        
+        m_shadowsSpin->blockSignals(false);
+        m_midtonesSpin->blockSignals(false);
+        m_highlightsSpin->blockSignals(false);
+        m_shadowsSlider->blockSignals(false);
+        m_midtonesSlider->blockSignals(false);
+        m_highlightsSlider->blockSignals(false);
+        
+        // Recompute histogram for the new baseline
+        m_baseHist = m_backup.computeHistogram(65536);
+        if (m_histogram) {
+            m_histogram->setData(m_baseHist, m_backup.channels());
+        }
+        updateClippingStats(m_backup);
     }
-    accept();
+    // Don't call accept() - keep dialog open for continued adjustments
 }
+
 
 void HistogramStretchDialog::updatePreview() {
     if (!m_viewer || !m_previewCheck->isChecked()) return;

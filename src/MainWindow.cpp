@@ -22,6 +22,8 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <cmath> // for std::abs
+#include <QSet>
+
 #include <QFormLayout>
 #include <QDialogButtonBox>
 #include <QDialogButtonBox>
@@ -122,7 +124,10 @@ MainWindow::MainWindow(QWidget *parent)
     m_mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     m_mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     m_mdiArea->setDocumentMode(true); // Tabbed view if we wanted, but we use subwindows
+    // Prevent new windows from inheriting maximized state from active window
+    m_mdiArea->setOption(QMdiArea::DontMaximizeSubWindowOnActivation, true);
     mainLayout->addWidget(m_mdiArea);
+
     // Sidebar is now overlay, not in layout
     m_sidebar->setParent(this);
     m_sidebar->raise(); // Ensure on top
@@ -940,10 +945,30 @@ void MainWindow::createNewImageWindow(const ImageBuffer& buffer, const QString& 
     sub->setWidget(viewer); // This wraps it in our custom container
     sub->setSubWindowTitle(title); // Sets custom title bar text
     
+    // Save maximized state of existing windows before adding new one
+    // (Qt MDI area may unmaximize windows when activating a non-maximized window)
+    QList<QMdiSubWindow*> existingWindows = m_mdiArea->subWindowList();
+    QSet<QMdiSubWindow*> wasMaximized;
+    for (auto* w : existingWindows) {
+        if (w->isMaximized()) {
+            wasMaximized.insert(w);
+        }
+    }
+    
     m_mdiArea->addSubWindow(sub);
     sub->show();
+    sub->showNormal(); // Ensure new views always open non-maximized
     m_mdiArea->setActiveSubWindow(sub);
     sub->raise();
+    
+    // Restore maximized state of windows that were maximized before
+    for (auto* w : wasMaximized) {
+        if (w != sub && !w->isMaximized()) {
+            w->showMaximized();
+        }
+    }
+
+
     
     // Cascading Logic (Smart Center + Offset)
     // 1. Get viewport dimensions (actual usable space)
@@ -1844,6 +1869,8 @@ void MainWindow::openGHSDialog() {
     log(tr("Opening GHS Tool..."), Log_Action, true);
     CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, m_ghsDlg, tr("Generalized Hyperbolic Stretch"));
     sub->resize(450, 650); // GHS specific size override
+    centerToolWindow(sub); // Re-center after resize
+
      
     // Lifecycle: Delete on close to ensure clean reset on reopen.
     sub->setAttribute(Qt::WA_DeleteOnClose); 
@@ -2152,22 +2179,30 @@ CustomMdiSubWindow* MainWindow::setupToolSubwindow(CustomMdiSubWindow* sub, QWid
     targetSub->setSubWindowTitle(title);
     targetSub->setToolWindow(true); // Enable tool mode
     
-    // Position logic
+    // Position logic - let dialog/widget size settle first
     if (dlg) dlg->adjustSize();
     targetSub->adjustSize(); 
     
-    QSize subSize = targetSub->sizeHint();
+    // Use actual size after adjustSize, not sizeHint
+    QSize subSize = targetSub->size();
     if (subSize.width() < 100 || subSize.height() < 100) {
         subSize = QSize(500, 400);
         targetSub->resize(subSize);
     }
 
-    // Center on screen or main window
-    const QRect screen = this->screen()->availableGeometry();
-    const QPoint center = screen.center();
+    // Center on main window geometry (more intuitive when image is maximized)
+    const QRect mainGeom = this->geometry();
+    const QPoint center = mainGeom.center();
     
     int x = center.x() - subSize.width() / 2;
     int y = center.y() - subSize.height() / 2;
+    
+    // Ensure it stays on screen
+    const QRect screen = this->screen()->availableGeometry();
+    if (x < screen.left()) x = screen.left();
+    if (y < screen.top()) y = screen.top();
+    if (x + subSize.width() > screen.right()) x = screen.right() - subSize.width();
+    if (y + subSize.height() > screen.bottom()) y = screen.bottom() - subSize.height();
     
     targetSub->move(x, y);
     
@@ -2182,6 +2217,27 @@ CustomMdiSubWindow* MainWindow::setupToolSubwindow(CustomMdiSubWindow* sub, QWid
     
     return targetSub;
 }
+
+void MainWindow::centerToolWindow(CustomMdiSubWindow* sub) {
+    if (!sub) return;
+    
+    QSize subSize = sub->size();
+    const QRect mainGeom = this->geometry();
+    const QPoint center = mainGeom.center();
+    
+    int x = center.x() - subSize.width() / 2;
+    int y = center.y() - subSize.height() / 2;
+    
+    // Ensure it stays on screen
+    const QRect screen = this->screen()->availableGeometry();
+    if (x < screen.left()) x = screen.left();
+    if (y < screen.top()) y = screen.top();
+    if (x + subSize.width() > screen.right()) x = screen.right() - subSize.width();
+    if (y + subSize.height() > screen.bottom()) y = screen.bottom() - subSize.height();
+    
+    sub->move(x, y);
+}
+
 
 void MainWindow::onSettingsAction() {
     auto dlg = new SettingsDialog(this);
@@ -2243,7 +2299,9 @@ void MainWindow::openHistogramStretchDialog() {
     
     CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, dlg, tr("Histogram Stretch"));
     sub->resize(520, 600);
+    centerToolWindow(sub); // Re-center after resize
 }
+
 
 void MainWindow::showEvent(QShowEvent* event) {
     QMainWindow::showEvent(event);
