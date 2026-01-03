@@ -77,6 +77,62 @@ endif()
 set(OpenCV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/opencv")
 find_package(OpenCV REQUIRED PATHS "${CMAKE_CURRENT_SOURCE_DIR}/deps/opencv" NO_DEFAULT_PATH)
 
+# ===========================
+# Optional Compression Libraries (for XISF support)
+# ===========================
+
+# LZ4 - Check local deps first, then system
+set(LZ4_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/lz4")
+if(EXISTS "${LZ4_DIR}/include/lz4.h")
+    message(STATUS "Using local LZ4 from ${LZ4_DIR}")
+    set(LZ4_FOUND TRUE)
+    set(LZ4_INCLUDE_DIRS "${LZ4_DIR}/include")
+    if(EXISTS "${LZ4_DIR}/lib/liblz4.a")
+        set(LZ4_LIBRARIES "${LZ4_DIR}/lib/liblz4.a")
+    elseif(EXISTS "${LZ4_DIR}/lib/lz4.lib")
+        set(LZ4_LIBRARIES "${LZ4_DIR}/lib/lz4.lib")
+    else()
+        set(LZ4_LIBRARIES lz4)
+    endif()
+else()
+    # Try system LZ4
+    find_path(LZ4_INCLUDE_DIRS lz4.h)
+    find_library(LZ4_LIBRARIES NAMES lz4 liblz4)
+    if(LZ4_INCLUDE_DIRS AND LZ4_LIBRARIES)
+        set(LZ4_FOUND TRUE)
+        message(STATUS "Found system LZ4: ${LZ4_LIBRARIES}")
+    else()
+        set(LZ4_FOUND FALSE)
+        message(STATUS "LZ4 not found - XISF LZ4 compression will be disabled")
+    endif()
+endif()
+
+# Zstd - Check local deps first, then system
+set(ZSTD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/zstd")
+if(EXISTS "${ZSTD_DIR}/include/zstd.h")
+    message(STATUS "Using local Zstd from ${ZSTD_DIR}")
+    set(ZSTD_FOUND TRUE)
+    set(ZSTD_INCLUDE_DIRS "${ZSTD_DIR}/include")
+    if(EXISTS "${ZSTD_DIR}/lib/libzstd.a")
+        set(ZSTD_LIBRARIES "${ZSTD_DIR}/lib/libzstd.a")
+    elseif(EXISTS "${ZSTD_DIR}/lib/zstd.lib")
+        set(ZSTD_LIBRARIES "${ZSTD_DIR}/lib/zstd.lib")
+    else()
+        set(ZSTD_LIBRARIES zstd)
+    endif()
+else()
+    # Try system Zstd
+    find_path(ZSTD_INCLUDE_DIRS zstd.h)
+    find_library(ZSTD_LIBRARIES NAMES zstd libzstd)
+    if(ZSTD_INCLUDE_DIRS AND ZSTD_LIBRARIES)
+        set(ZSTD_FOUND TRUE)
+        message(STATUS "Found system Zstd: ${ZSTD_LIBRARIES}")
+    else()
+        set(ZSTD_FOUND FALSE)
+        message(STATUS "Zstd not found - XISF Zstd compression will be disabled")
+    endif()
+endif()
+
 # Force disable AutoMoc predefs (Normal variable shadows cache)
 set(CMAKE_AUTOMOC_COMPILER_PREDEFS OFF)
 
@@ -113,6 +169,10 @@ add_executable(TStar
     src/io/XISFReader.h
     src/io/XISFWriter.cpp
     src/io/XISFWriter.h
+    src/io/CompressionUtils.cpp
+    src/io/CompressionUtils.h
+    src/io/FitsHeaderUtils.cpp
+    src/io/FitsHeaderUtils.h
     
     # ===========================
     # Widgets (src/widgets/)
@@ -149,6 +209,8 @@ add_executable(TStar
     src/algos/StarRecompositionRunner.h
     src/algos/PerfectPaletteRunner.cpp
     src/algos/PerfectPaletteRunner.h
+    src/algos/StatisticalStretch.cpp
+    src/algos/StatisticalStretch.h
     
     # ===========================
     # Network (src/network/)
@@ -245,6 +307,8 @@ add_executable(TStar
     src/astrometry/NativePlateSolver.cpp
     src/astrometry/NativePlateSolver.h
     src/astrometry/WcsSolver.h
+    src/astrometry/WCSUtils.cpp
+    src/astrometry/WCSUtils.h
     
     # ===========================
     # Photometry (src/photometry/)
@@ -285,6 +349,16 @@ target_include_directories(TStar PRIVATE
     ${OpenCV_INCLUDE_DIRS}
 )
 
+# Add optional compression library includes
+if(LZ4_FOUND)
+    target_include_directories(TStar PRIVATE ${LZ4_INCLUDE_DIRS})
+    target_compile_definitions(TStar PRIVATE HAVE_LZ4)
+endif()
+if(ZSTD_FOUND)
+    target_include_directories(TStar PRIVATE ${ZSTD_INCLUDE_DIRS})
+    target_compile_definitions(TStar PRIVATE HAVE_ZSTD)
+endif()
+
 target_link_directories(TStar PRIVATE
     ${GSL_LIBRARY_DIRS}
 )
@@ -309,6 +383,16 @@ target_link_libraries(TStar PRIVATE
     ${GSL_LIBRARIES}
     ${OpenCV_LIBS}
 )
+
+# Link optional compression libraries
+if(LZ4_FOUND)
+    target_link_libraries(TStar PRIVATE ${LZ4_LIBRARIES})
+    message(STATUS "LZ4 compression enabled for XISF")
+endif()
+if(ZSTD_FOUND)
+    target_link_libraries(TStar PRIVATE ${ZSTD_LIBRARIES})
+    message(STATUS "Zstd compression enabled for XISF")
+endif()
 
 if(WIN32)
     # set_property(TARGET TStar PROPERTY WIN32_EXECUTABLE ON)

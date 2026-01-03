@@ -1269,13 +1269,14 @@ void MainWindow::openStretchDialog() {
     }
     
     if (m_stretchDlg) {
-        log("Activating Statistical Stretch...", Log_Action, true);
+        log(tr("Activating Statistical Stretch Tool..."), Log_Action, true);
         
         m_stretchDlg->setViewer(viewer);
         
         QWidget* p = m_stretchDlg->parentWidget();
         while (p && !qobject_cast<CustomMdiSubWindow*>(p)) p = p->parentWidget();
         if (auto sub = qobject_cast<CustomMdiSubWindow*>(p)) {
+            centerToolWindow(sub); // User requested precise centering
             sub->showNormal();
             sub->raise();
             sub->activateWindow();
@@ -1292,14 +1293,17 @@ void MainWindow::openStretchDialog() {
     m_stretchDlg->setViewer(viewer);
     m_stretchDlg->setAttribute(Qt::WA_DeleteOnClose, false);
     
+    connect(m_stretchDlg, &StretchDialog::applied, this, [this](const QString& msg){
+        log(msg, Log_Success, true);
+    });
+
     log(tr("Opening Statistical Stretch..."), Log_Info, true);
     CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
     setupToolSubwindow(sub, m_stretchDlg, tr("Statistical Stretch"));
     
-    // Logging and Z-Order Restoration
+    // Restoration of Z-Order on accept handled by the generic signal if needed,
+    // but StretchDialog now closes on apply.
     connect(m_stretchDlg, &QDialog::accepted, this, [this](){
-         log("Applied Statistical Stretch.", Log_Success, true);
-         
          // Restore Z-Order: Bring the viewer to front
          if (m_stretchDlg && m_stretchDlg->viewer()) {
              ImageViewer* v = m_stretchDlg->viewer();

@@ -1,6 +1,11 @@
 TStar Changelog
 ===============
 
+Version 1.1.4
+-------------
+- Updated statistical stretch
+- Completely rewritten fits/xisf management
+
 Version 1.1.3
 -------------
 - Subwindows maximize and minimize bugs fixed

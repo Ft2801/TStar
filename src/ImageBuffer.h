@@ -4,6 +4,8 @@
 #include <vector>
 #include <QImage>
 #include <QString>
+#include <QMap>
+#include <QVariant>
 #include "photometry/CatalogClient.h"
 #include "photometry/PCCResult.h"
 #include "algos/CubicSpline.h"
@@ -71,13 +73,33 @@ public:
     bool save(const QString& filePath, const QString& format, BitDepth depth, QString* errorMsg = nullptr);
     bool loadTiff32(const QString& filePath, QString* errorMsg = nullptr, QString* debugInfo = nullptr);
 
-    // Permanent Stretch Parameters
     struct StretchParams {
-        float targetMedian = 0.25f;
-        bool linked = true;
-        bool normalize = false;
-        bool applyCurves = false;
-        float curvesBoost = 0.0f;
+        float targetMedian = 0.25f;       // Target median brightness (0-1)
+        bool linked = true;               // Link channels (same stats for all)
+        bool normalize = false;           // Normalize to max after stretch
+        bool applyCurves = false;         // Apply S-curve boost
+        float curvesBoost = 0.0f;         // Curves strength (0-1)
+        
+        // Black Point Control
+        float blackpointSigma = 5.0f;     // Sigma for black point calculation
+        bool noBlackClip = false;         // Disable black clipping (use min instead)
+        
+        // HDR Highlight Compression
+        bool hdrCompress = false;         // Enable HDR highlight compression
+        float hdrAmount = 0.0f;           // HDR compression strength (0-1)
+        float hdrKnee = 0.75f;            // HDR knee point (where compression starts)
+        
+        // Luminance-Only Stretch
+        bool lumaOnly = false;            // Stretch luminance only (preserve colors)
+        int lumaMode = 0;                 // 0=Rec709, 1=Rec601, 2=Rec2020
+        
+        // High Dynamic Range Mode (VeraLux-style)
+        bool highRange = false;           // Enable high-range rescaling
+        float hrPedestal = 0.001f;        // Minimum output value
+        float hrSoftCeilPct = 99.0f;      // Soft ceiling percentile
+        float hrHardCeilPct = 99.99f;     // Hard ceiling percentile
+        float hrSoftclipThreshold = 0.98f; // Softclip start point
+        float hrSoftclipRolloff = 2.0f;   // Softclip rolloff strength
     };
     
     // XISF Support
@@ -100,6 +122,9 @@ public:
 
     // Apply permanent stretch to m_data
     void performTrueStretch(const StretchParams& params);
+    
+    // Luminance-only stretch (preserves colors)
+    void performLumaOnlyStretch(const StretchParams& params);
     
     // Compute LUT for TrueStretch (for Preview)
     std::vector<std::vector<float>> computeTrueStretchLUT(const StretchParams& params, int size = 65536) const;
@@ -174,12 +199,30 @@ public:
         double pixelSize = 0;
         double ra = 0;
         double dec = 0;
+        
         // WCS Matrix
         double crpix1 = 0, crpix2 = 0;
         double cd1_1 = 0, cd1_2 = 0, cd2_1 = 0, cd2_2 = 0;
         
+        // Additional WCS parameters
+        QString ctype1;   // e.g., "RA---TAN", "RA---TAN-SIP"
+        QString ctype2;   // e.g., "DEC--TAN", "DEC--TAN-SIP"
+        double equinox = 2000.0;
+        double lonpole = 180.0;
+        double latpole = 0.0;
+        
+        // SIP Distortion Coefficients
+        int sipOrderA = 0;   // A_ORDER
+        int sipOrderB = 0;   // B_ORDER
+        int sipOrderAP = 0;  // AP_ORDER (inverse)
+        int sipOrderBP = 0;  // BP_ORDER (inverse)
+        QMap<QString, double> sipCoeffs;  // "A_1_0" -> value, "B_2_1" -> value, etc.
+        
         QString objectName;
         QString dateObs;
+        QString filePath;      // Source file path for reference
+        QString bitDepth;      // Original bit depth info
+        bool isMono = false;   // True if originally mono image
 
         // Persisted Catalog Stars for PCC
         std::vector<CatalogStar> catalogStars;
@@ -192,6 +235,8 @@ public:
              QString comment;
         };
         std::vector<HeaderCard> rawHeaders;
+        
+        QVariantMap xisfProperties;
     };
 
     void setMetadata(const Metadata& meta) { m_meta = meta; }

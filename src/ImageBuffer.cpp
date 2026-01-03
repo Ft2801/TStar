@@ -19,6 +19,7 @@
 #include <cmath> 
 #include "io/XISFReader.h" 
 #include "io/XISFWriter.h" 
+#include "algos/StatisticalStretch.h"
 #include <opencv2/opencv.hpp>
 
 ImageBuffer::ImageBuffer() {}
@@ -1020,87 +1021,105 @@ void ImageBuffer::performTrueStretch(const StretchParams& params) {
     ImageBuffer original;
     if (hasMask()) original = *this;
 
-    // 1. Calculate Stats
-    std::vector<TrueStretchStats> stats;
+    // Use new StatisticalStretch for luminance-only mode on color images
+    if (params.lumaOnly && m_channels == 3) {
+        performLumaOnlyStretch(params);
+        if (hasMask()) blendResult(original);
+        return;
+    }
+
+    // 1. Calculate Stats using robust sigma estimation
+    std::vector<StatisticalStretch::ChannelStats> stats;
     int stride = (m_width * m_height) / 100000 + 1;
     
     if (params.linked) {
-         TrueStretchStats s = getTrueStretchStats(m_data, stride, 2.7f, 0, 1); // Treat as 1 channel stream
-         stats.push_back(s); // [0] = global
+        // Global stats across all channels
+        StatisticalStretch::ChannelStats s = StatisticalStretch::computeStats(
+            m_data, stride, 0, 1, params.blackpointSigma, params.noBlackClip);
+        stats.push_back(s);
     } else {
+        // Per-channel stats
         for (int c = 0; c < m_channels; ++c) {
-            stats.push_back(getTrueStretchStats(m_data, stride, 2.7f, c, m_channels));
+            StatisticalStretch::ChannelStats s = StatisticalStretch::computeStats(
+                m_data, stride, c, m_channels, params.blackpointSigma, params.noBlackClip);
+            stats.push_back(s);
         }
     }
     
-    // Curves Setup
-    std::vector<float> cx, cy;
-    bool useCurves = (params.applyCurves && params.curvesBoost > 0);
-    if (useCurves) {
-        float tm = params.targetMedian;
-        float cb = params.curvesBoost;
-        float p3x = 0.25f * (1.0f - tm) + tm;
-        float p4x = 0.75f * (1.0f - tm) + tm;
-        float p3y = std::pow(p3x, (1.0f - cb));
-        float p4y = std::pow(std::pow(p4x, (1.0f - cb)), (1.0f - cb));
-        
-        cx = {0.0f, 0.5f*tm, tm, p3x, p4x, 1.0f};
-        cy = {0.0f, 0.5f*tm, tm, p3y, p4y, 1.0f};
-    }
-
-    // Precompute MedRescaled
+    // Precompute rescaled medians
     std::vector<float> medRescaled;
     if (params.linked) {
-        float mr = (stats[0].median - stats[0].bp) / stats[0].den;
+        float mr = (stats[0].median - stats[0].blackpoint) / stats[0].denominator;
         medRescaled.push_back(mr);
     } else {
         for (int c = 0; c < m_channels; ++c) {
-             float mr = (stats[c].median - stats[c].bp) / stats[c].den;
-             medRescaled.push_back(mr);
+            float mr = (stats[c].median - stats[c].blackpoint) / stats[c].denominator;
+            medRescaled.push_back(mr);
         }
     }
     
-    // Main Loop
-    long total = m_data.size();
+    // 2. Main stretch loop
+    long total = static_cast<long>(m_data.size());
     int ch = m_channels;
     
     #pragma omp parallel for
     for (long i = 0; i < total; ++i) {
-        int c = i % ch;
-        // Linked uses index 0, Unlinked uses index c
+        int c = static_cast<int>(i % ch);
         int sIdx = params.linked ? 0 : c;
         
-        float bp = stats[sIdx].bp;
-        float den = stats[sIdx].den;
+        float bp = stats[sIdx].blackpoint;
+        float den = stats[sIdx].denominator;
         float mr = medRescaled[sIdx];
         
         float v = m_data[i];
         
         // Rescale
         float rescaled = (v - bp) / den;
+        if (rescaled < 0.0f) rescaled = 0.0f;
         
-        // Formula
-        float out = stretch_fn(rescaled, mr, params.targetMedian);
-        
-        // Curves
-        if (useCurves) {
-            out = apply_curve(out, cx, cy);
-        }
+        // Apply statistical stretch formula
+        float out = StatisticalStretch::stretchFormula(rescaled, mr, params.targetMedian);
         
         // Clip
-        if (out < 0.0f) out = 0.0f;
-        if (out > 1.0f) out = 1.0f;
-        
-        m_data[i] = out;
+        m_data[i] = std::clamp(out, 0.0f, 1.0f);
     }
     
-// Normalize
-    if (params.normalize) {
-        float mx = -1e30f;
-        for (float v : m_data) if (v > mx) mx = v;
-        if (mx > 1e-9f) {
-             for (long i = 0; i < total; ++i) m_data[i] /= mx;
+    // 3. Apply curves adjustment
+    if (params.applyCurves && params.curvesBoost > 0) {
+        StatisticalStretch::applyCurvesAdjustment(m_data, params.targetMedian, params.curvesBoost);
+    }
+    
+    // 4. HDR Highlight Compression
+    if (params.hdrCompress && params.hdrAmount > 0.0f) {
+        if (m_channels == 3) {
+            StatisticalStretch::hdrCompressColorLuminance(
+                m_data, m_width, m_height, params.hdrAmount, params.hdrKnee, params.lumaMode);
+        } else {
+            StatisticalStretch::hdrCompressHighlights(m_data, params.hdrAmount, params.hdrKnee);
         }
+    }
+    
+    // 5. Normalize
+    if (params.normalize) {
+        float mx = 0.0f;
+        for (float v : m_data) {
+            if (v > mx) mx = v;
+        }
+        if (mx > 1e-9f) {
+            #pragma omp parallel for
+            for (long i = 0; i < total; ++i) {
+                m_data[i] /= mx;
+            }
+        }
+    }
+    
+    // 6. High-Range Rescaling (VeraLux-style)
+    if (params.highRange) {
+        StatisticalStretch::highRangeRescale(
+            m_data, m_width, m_height, m_channels,
+            params.targetMedian,
+            params.hrPedestal, params.hrSoftCeilPct, params.hrHardCeilPct,
+            params.blackpointSigma, params.hrSoftclipThreshold);
     }
     
     // Blend back if masked
@@ -1109,20 +1128,115 @@ void ImageBuffer::performTrueStretch(const StretchParams& params) {
     }
 }
 
-// Compute LUT for TrueStretch
+void ImageBuffer::performLumaOnlyStretch(const StretchParams& params) {
+    if (m_data.empty() || m_channels != 3) return;
+    
+    long pixelCount = static_cast<long>(m_width) * m_height;
+    auto weights = StatisticalStretch::getLumaWeights(params.lumaMode);
+    
+    // 1. Extract luminance
+    std::vector<float> luminance(pixelCount);
+    
+    #pragma omp parallel for
+    for (long i = 0; i < pixelCount; ++i) {
+        size_t idx = i * 3;
+        luminance[i] = weights[0] * m_data[idx] + 
+                       weights[1] * m_data[idx + 1] + 
+                       weights[2] * m_data[idx + 2];
+    }
+    
+    // 2. Compute stats on luminance
+    int stride = pixelCount / 100000 + 1;
+    StatisticalStretch::ChannelStats stats = StatisticalStretch::computeStats(
+        luminance, stride, 0, 1, params.blackpointSigma, params.noBlackClip);
+    
+    float medRescaled = (stats.median - stats.blackpoint) / stats.denominator;
+    
+    // 3. Stretch luminance
+    std::vector<float> stretchedLuma(pixelCount);
+    
+    #pragma omp parallel for
+    for (long i = 0; i < pixelCount; ++i) {
+        float v = luminance[i];
+        float rescaled = (v - stats.blackpoint) / stats.denominator;
+        if (rescaled < 0.0f) rescaled = 0.0f;
+        
+        float out = StatisticalStretch::stretchFormula(rescaled, medRescaled, params.targetMedian);
+        stretchedLuma[i] = std::clamp(out, 0.0f, 1.0f);
+    }
+    
+    // 4. Apply curves to luminance if requested
+    if (params.applyCurves && params.curvesBoost > 0) {
+        StatisticalStretch::applyCurvesAdjustment(stretchedLuma, params.targetMedian, params.curvesBoost);
+    }
+    
+    // 5. Apply HDR compression to luminance if requested
+    if (params.hdrCompress && params.hdrAmount > 0.0f) {
+        StatisticalStretch::hdrCompressHighlights(stretchedLuma, params.hdrAmount, params.hdrKnee);
+    }
+    
+    // 6. Recombine via linear scaling (preserves color ratios)
+    #pragma omp parallel for
+    for (long i = 0; i < pixelCount; ++i) {
+        size_t idx = i * 3;
+        float oldL = luminance[i];
+        float newL = stretchedLuma[i];
+        
+        if (oldL > 1e-10f) {
+            float scale = newL / oldL;
+            m_data[idx] = std::clamp(m_data[idx] * scale, 0.0f, 1.0f);
+            m_data[idx + 1] = std::clamp(m_data[idx + 1] * scale, 0.0f, 1.0f);
+            m_data[idx + 2] = std::clamp(m_data[idx + 2] * scale, 0.0f, 1.0f);
+        } else {
+            // Near black, just set to new luminance (gray)
+            m_data[idx] = newL;
+            m_data[idx + 1] = newL;
+            m_data[idx + 2] = newL;
+        }
+    }
+    
+    // 7. High-Range Rescaling if requested
+    if (params.highRange) {
+        StatisticalStretch::highRangeRescale(
+            m_data, m_width, m_height, m_channels,
+            params.targetMedian,
+            params.hrPedestal, params.hrSoftCeilPct, params.hrHardCeilPct,
+            params.blackpointSigma, params.hrSoftclipThreshold);
+    }
+    
+    // 8. Normalize if requested
+    if (params.normalize) {
+        float mx = 0.0f;
+        for (float v : m_data) {
+            if (v > mx) mx = v;
+        }
+        if (mx > 1e-9f) {
+            long total = static_cast<long>(m_data.size());
+            #pragma omp parallel for
+            for (long i = 0; i < total; ++i) {
+                m_data[i] /= mx;
+            }
+        }
+    }
+}
+
+// Compute LUT for TrueStretch (for Preview)
 std::vector<std::vector<float>> ImageBuffer::computeTrueStretchLUT(const StretchParams& params, int size) const {
     if (m_data.empty()) return {};
 
-    // 1. Calculate Stats (Same as performTrueStretch)
-    std::vector<TrueStretchStats> stats;
+    // 1. Calculate Stats using StatisticalStretch
+    std::vector<StatisticalStretch::ChannelStats> stats;
     int stride = (m_width * m_height) / 100000 + 1;
     
     if (params.linked) {
-         TrueStretchStats s = getTrueStretchStats(m_data, stride, 2.7f, 0, 1); 
-         stats.push_back(s); 
+        StatisticalStretch::ChannelStats s = StatisticalStretch::computeStats(
+            m_data, stride, 0, 1, params.blackpointSigma, params.noBlackClip);
+        stats.push_back(s);
     } else {
         for (int c = 0; c < m_channels; ++c) {
-            stats.push_back(getTrueStretchStats(m_data, stride, 2.7f, c, m_channels));
+            StatisticalStretch::ChannelStats s = StatisticalStretch::computeStats(
+                m_data, stride, c, m_channels, params.blackpointSigma, params.noBlackClip);
+            stats.push_back(s);
         }
     }
     
@@ -1140,15 +1254,15 @@ std::vector<std::vector<float>> ImageBuffer::computeTrueStretchLUT(const Stretch
         cy = {0.0f, 0.5f*tm, tm, p3y, p4y, 1.0f};
     }
 
-    // Precompute MedRescaled
+    // Precompute rescaled medians
     std::vector<float> medRescaled;
     if (params.linked) {
-        float mr = (stats[0].median - stats[0].bp) / stats[0].den;
+        float mr = (stats[0].median - stats[0].blackpoint) / stats[0].denominator;
         medRescaled.push_back(mr);
     } else {
         for (int c = 0; c < m_channels; ++c) {
-             float mr = (stats[c].median - stats[c].bp) / stats[c].den;
-             medRescaled.push_back(mr);
+            float mr = (stats[c].median - stats[c].blackpoint) / stats[c].denominator;
+            medRescaled.push_back(mr);
         }
     }
 
@@ -1160,12 +1274,11 @@ std::vector<std::vector<float>> ImageBuffer::computeTrueStretchLUT(const Stretch
          float globalMax = 0.0f;
          for (int c = 0; c < m_channels; ++c) {
              int sIdx = params.linked ? 0 : c;
-             // Input 1.0 through formula
-             float bp = stats[sIdx].bp;
-             float den = stats[sIdx].den;
+             float bp = stats[sIdx].blackpoint;
+             float den = stats[sIdx].denominator;
              float mr = medRescaled[sIdx];
              float rescaled = (1.0f - bp) / den;
-             float out = stretch_fn(rescaled, mr, params.targetMedian);
+             float out = StatisticalStretch::stretchFormula(rescaled, mr, params.targetMedian);
              if (useCurves) out = apply_curve(out, cx, cy);
              if (out > globalMax) globalMax = out; 
          }
@@ -1176,16 +1289,18 @@ std::vector<std::vector<float>> ImageBuffer::computeTrueStretchLUT(const Stretch
 
     #pragma omp parallel for
     for (int i = 0; i < size; ++i) {
-        float inVal = (float)i / (size - 1);
+        float inVal = static_cast<float>(i) / (size - 1);
         
         for (int c = 0; c < m_channels; ++c) {
             int sIdx = params.linked ? 0 : c;
-            float bp = stats[sIdx].bp;
-            float den = stats[sIdx].den;
+            float bp = stats[sIdx].blackpoint;
+            float den = stats[sIdx].denominator;
             float mr = medRescaled[sIdx];
             
             float rescaled = (inVal - bp) / den;
-            float out = stretch_fn(rescaled, mr, params.targetMedian);
+            if (rescaled < 0.0f) rescaled = 0.0f;
+            
+            float out = StatisticalStretch::stretchFormula(rescaled, mr, params.targetMedian);
             
             if (useCurves) out = apply_curve(out, cx, cy);
             

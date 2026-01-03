@@ -652,7 +652,6 @@ TRANSLATIONS = {
     "Toggle Green channel": {'it': 'Attiva/Disattiva Canale Verde', 'es': 'Alternar canal Verde', 'fr': 'Basculer canal Vert', 'de': 'Grünkanal umschalten'},
     "Toggle RGB Channel Linking for Stretch": {'it': 'Attiva/Disattiva Collegamento Canali RGB per Stretching', 'es': 'Alternar Vinculación Canales RGB para Stretching', 'fr': 'Basculer le Lien des Canaux RGB pour Stretching', 'de': 'RGB-Kanalverknüpfung für Stretching umschalten'},
     "Toggle Red channel": {'it': 'Attiva/Disattiva Canale Rosso', 'es': 'Alternar canal Rojo', 'fr': 'Basculer canal Rouge', 'de': 'Rotkanal umschalten'},
-    "True Stretch": {'it': 'True Stretch', 'es': 'True Stretch', 'fr': 'True Stretch', 'de': 'True Stretch'},
     "Undo": {'it': 'Annulla', 'es': 'Deshacer', 'fr': 'Annuler', 'de': 'Rückgängig'},
     "Undo (Ctrl+Z)": {'it': 'Annulla (Ctrl+Z)', 'es': 'Deshacer (Ctrl+Z)', 'fr': 'Annuler (Ctrl+Z)', 'de': 'Rückgängig (Strg+Z)'},
     "Unexpected EOF reading Float32 data.": {'it': 'EOF inatteso leggendo dati Float32.', 'es': 'EOF inesperado leyendo Float32.', 'fr': 'EOF inattendu lecture données Float32.', 'de': 'Unerwartetes EOF beim Lesen von Float32.'},

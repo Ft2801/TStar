@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <QCoreApplication>
+#include <QRegularExpression>
 
 bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* errorMsg) {
     fitsfile* fptr;
@@ -218,10 +219,32 @@ bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* err
     meta.cd1_1 = cd11; meta.cd1_2 = cd12;
     meta.cd2_1 = cd21; meta.cd2_2 = cd22;
 
+    // Read CTYPE for WCS
     char strVal[FLEN_VALUE];
+    if (!fits_read_key(fptr, TSTRING, "CTYPE1", strVal, comment, &status_meta)) {
+        meta.ctype1 = QString::fromUtf8(strVal).trimmed().remove('\'');
+    }
+    status_meta = 0;
+    if (!fits_read_key(fptr, TSTRING, "CTYPE2", strVal, comment, &status_meta)) {
+        meta.ctype2 = QString::fromUtf8(strVal).trimmed().remove('\'');
+    }
+    status_meta = 0;
+    
+    // Equinox
+    if (!fits_read_key(fptr, TDOUBLE, "EQUINOX", &dv, comment, &status_meta)) {
+        meta.equinox = dv;
+    }
+    status_meta = 0;
+    
+    // Read SIP coefficients if present
+    readSIPCoefficients(fptr, meta);
+
     if (!fits_read_key(fptr, TSTRING, "OBJECT", strVal, comment, &status_meta)) meta.objectName = QString::fromUtf8(strVal);
     status_meta = 0;
     if (!fits_read_key(fptr, TSTRING, "DATE-OBS", strVal, comment, &status_meta)) meta.dateObs = QString::fromUtf8(strVal);
+    
+    // Store file path for reference
+    meta.filePath = filePath;
     
     // Read ALL Header Keys for Viewer
     int nkeys = 0;
@@ -256,3 +279,137 @@ bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* err
     buffer.setData(width, height, nChannels, allPixels);   
     return true;
 }
+
+// Parse RA string (HMS or decimal degrees)
+double FitsLoader::parseRAString(const QString& str, bool* ok) {
+    if (ok) *ok = false;
+    QString trimmed = str.trimmed();
+    
+    // Try decimal first
+    bool parseOk;
+    double val = trimmed.toDouble(&parseOk);
+    if (parseOk) {
+        if (ok) *ok = true;
+        return val;
+    }
+    
+    // Try HMS: "HH MM SS.ss" or "HH:MM:SS.ss"
+    QStringList parts = trimmed.split(QRegularExpression("[:\\s]+"));
+    if (parts.size() >= 3) {
+        double h = parts[0].toDouble();
+        double m = parts[1].toDouble();
+        double s = parts[2].toDouble();
+        if (ok) *ok = true;
+        return (h + m/60.0 + s/3600.0) * 15.0;  // Hours to degrees
+    }
+    
+    return 0.0;
+}
+
+// Parse Dec string (DMS or decimal degrees)
+double FitsLoader::parseDecString(const QString& str, bool* ok) {
+    if (ok) *ok = false;
+    QString trimmed = str.trimmed();
+    
+    // Try decimal first
+    bool parseOk;
+    double val = trimmed.toDouble(&parseOk);
+    if (parseOk) {
+        if (ok) *ok = true;
+        return val;
+    }
+    
+    // Try DMS: "DD MM SS.ss" or "DD:MM:SS.ss"
+    QStringList parts = trimmed.split(QRegularExpression("[:\\s]+"));
+    if (parts.size() >= 3) {
+        QString dStr = parts[0];
+        double d = std::abs(dStr.toDouble());
+        double m = parts[1].toDouble();
+        double s = parts[2].toDouble();
+        double sign = dStr.startsWith('-') ? -1.0 : 1.0;
+        if (ok) *ok = true;
+        return sign * (d + m/60.0 + s/3600.0);
+    }
+    
+    return 0.0;
+}
+
+// Read SIP distortion coefficients from FITS header
+void FitsLoader::readSIPCoefficients(void* fitsptr, ImageBuffer::Metadata& meta) {
+    fitsfile* fptr = static_cast<fitsfile*>(fitsptr);
+    int status = 0;
+    char comment[FLEN_COMMENT];
+    long lval;
+    double dv;
+    
+    // Read polynomial orders
+    if (!fits_read_key(fptr, TLONG, "A_ORDER", &lval, comment, &status)) {
+        meta.sipOrderA = static_cast<int>(lval);
+    }
+    status = 0;
+    if (!fits_read_key(fptr, TLONG, "B_ORDER", &lval, comment, &status)) {
+        meta.sipOrderB = static_cast<int>(lval);
+    }
+    status = 0;
+    if (!fits_read_key(fptr, TLONG, "AP_ORDER", &lval, comment, &status)) {
+        meta.sipOrderAP = static_cast<int>(lval);
+    }
+    status = 0;
+    if (!fits_read_key(fptr, TLONG, "BP_ORDER", &lval, comment, &status)) {
+        meta.sipOrderBP = static_cast<int>(lval);
+    }
+    status = 0;
+    
+    // Read forward coefficients (A_i_j, B_i_j)
+    int maxOrder = std::max(meta.sipOrderA, meta.sipOrderB);
+    for (int i = 0; i <= maxOrder; ++i) {
+        for (int j = 0; j <= maxOrder - i; ++j) {
+            if (i == 0 && j == 0) continue;
+            
+            // A coefficients
+            if (i + j <= meta.sipOrderA) {
+                QString key = QString("A_%1_%2").arg(i).arg(j);
+                if (!fits_read_key(fptr, TDOUBLE, key.toLatin1().constData(), &dv, comment, &status)) {
+                    meta.sipCoeffs[key] = dv;
+                }
+                status = 0;
+            }
+            
+            // B coefficients
+            if (i + j <= meta.sipOrderB) {
+                QString key = QString("B_%1_%2").arg(i).arg(j);
+                if (!fits_read_key(fptr, TDOUBLE, key.toLatin1().constData(), &dv, comment, &status)) {
+                    meta.sipCoeffs[key] = dv;
+                }
+                status = 0;
+            }
+        }
+    }
+    
+    // Read inverse coefficients (AP_i_j, BP_i_j) if present
+    maxOrder = std::max(meta.sipOrderAP, meta.sipOrderBP);
+    for (int i = 0; i <= maxOrder; ++i) {
+        for (int j = 0; j <= maxOrder - i; ++j) {
+            if (i == 0 && j == 0) continue;
+            
+            // AP coefficients
+            if (i + j <= meta.sipOrderAP) {
+                QString key = QString("AP_%1_%2").arg(i).arg(j);
+                if (!fits_read_key(fptr, TDOUBLE, key.toLatin1().constData(), &dv, comment, &status)) {
+                    meta.sipCoeffs[key] = dv;
+                }
+                status = 0;
+            }
+            
+            // BP coefficients
+            if (i + j <= meta.sipOrderBP) {
+                QString key = QString("BP_%1_%2").arg(i).arg(j);
+                if (!fits_read_key(fptr, TDOUBLE, key.toLatin1().constData(), &dv, comment, &status)) {
+                    meta.sipCoeffs[key] = dv;
+                }
+                status = 0;
+            }
+        }
+    }
+}
+
