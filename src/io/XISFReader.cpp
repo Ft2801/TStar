@@ -517,10 +517,6 @@ void XISFReader::planarToInterleaved(const std::vector<float>& planar,
     }
 }
 
-// ============================================================================
-// Multi-Image Support (SASPro compatible)
-// ============================================================================
-
 QList<XISFImageInfo> XISFReader::listImages(const QString& filePath, QString* errorMsg) {
     QList<XISFImageInfo> result;
     

@@ -27,34 +27,10 @@ struct XISFImageInfo {
 class XISFReader {
 public:
 
-    /**
-     * @brief Read first image from XISF file (for backward compatibility)
-     */
     static bool read(const QString& filePath, ImageBuffer& buffer, QString* errorMsg = nullptr);
     
-    /**
-     * @brief List all images in an XISF file
-     * 
-     * Matches SASPro's XISF.get_images_metadata() behavior.
-     * Each Image element in the XISF header becomes an entry.
-     * 
-     * @param filePath Path to XISF file
-     * @param errorMsg Optional error message output
-     * @return List of XISFImageInfo for each image block
-     */
     static QList<XISFImageInfo> listImages(const QString& filePath, QString* errorMsg = nullptr);
     
-    /**
-     * @brief Read a specific image from XISF file by index
-     * 
-     * Matches SASPro's XISF.read_image(n) behavior.
-     * 
-     * @param filePath Path to XISF file
-     * @param imageIndex 0-based index of the image to read
-     * @param buffer Output image buffer
-     * @param errorMsg Optional error message output
-     * @return true on success
-     */
     static bool readImage(const QString& filePath, int imageIndex, 
                           ImageBuffer& buffer, QString* errorMsg = nullptr);
 

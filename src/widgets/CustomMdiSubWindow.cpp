@@ -328,6 +328,7 @@ void AdaptStrip::dropEvent(QDropEvent *event) {
 // --- Custom Title Bar ---
 
 CustomTitleBar::CustomTitleBar(QWidget *parent) : QWidget(parent) {
+    setAttribute(Qt::WA_StyledBackground, true); // Ensure background is painted
     setFixedHeight(DpiHelper::titleBarHeight(this));
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     m_active = false;
@@ -339,6 +340,11 @@ CustomTitleBar::CustomTitleBar(QWidget *parent) : QWidget(parent) {
     
     m_titleLabel = new QLabel("", this);
     m_titleLabel->setStyleSheet("color: #ddd; font-weight: bold; font-family: 'Segoe UI'; font-size: 11px; background: transparent;");
+    
+    // Zoom Label (Left of title)
+    m_zoomLabel = new QLabel("", this);
+    m_zoomLabel->setStyleSheet("QLabel { color: #aaa; font-family: 'Segoe UI'; font-size: 10px; background-color: transparent; margin-right: 5px; border: none; }");
+    m_zoomLabel->setVisible(false); // Hide initially
     
     int btnSize = DpiHelper::buttonSize(this);
     int icnSize = DpiHelper::iconSize(this);
@@ -360,19 +366,16 @@ CustomTitleBar::CustomTitleBar(QWidget *parent) : QWidget(parent) {
     m_closeBtn = new QPushButton(this);
     configBtn(m_closeBtn, Icons::WIN_CLOSE, "#c00");
 
-    // Balance layout for centering with dummy widget
+    // Balance layout for centering
     int buttonsWidth = 3 * btnSize + 2 * DpiHelper::scale(4, this); 
     
-    m_leftDummy = new QWidget(this);
-    m_leftDummy->setFixedSize(DpiHelper::scale(74, this), 1);
-    m_leftDummy->setStyleSheet("background: transparent;"); 
-    m_leftDummy->setAttribute(Qt::WA_TransparentForMouseEvents);
-
     m_leftSpacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
     m_rightSpacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    layout->addWidget(m_leftDummy);
+    // Add fixed spacing to match buttons width on the right
+    layout->addSpacing(buttonsWidth); 
     layout->addSpacerItem(m_leftSpacer);
+    layout->addWidget(m_zoomLabel); 
     layout->addWidget(m_titleLabel);
     layout->addSpacerItem(m_rightSpacer);
     layout->addWidget(m_minBtn);
@@ -399,6 +402,15 @@ void CustomTitleBar::setActive(bool active) {
 void CustomTitleBar::setShaded(bool shaded) {
     m_shaded = shaded;
     m_minBtn->setIcon(iconFromSvg(m_shaded ? Icons::WIN_UNSHADE : Icons::WIN_SHADE));
+}
+
+void CustomTitleBar::setZoom(int percent) {
+    if (percent <= 0) {
+        m_zoomLabel->setVisible(false);
+    } else {
+        m_zoomLabel->setText(QString("%1%").arg(percent));
+        m_zoomLabel->setVisible(true);
+    }
 }
 
 void CustomTitleBar::setMaximized(bool maximized) {
@@ -981,6 +993,20 @@ void CustomMdiSubWindow::setWidget(QWidget *widget) {
                 }
             }
         });
+        
+        // Sync Zoom Label
+        connect(v, &ImageViewer::viewChanged, [this](float scale, float, float){
+            if (m_titleBar) {
+                int percent = static_cast<int>(scale * 100.0f + 0.5f);
+                m_titleBar->setZoom(percent);
+            }
+        });
+
+        // Initial update
+        if (m_titleBar) {
+             int percent = static_cast<int>(v->getScale() * 100.0f + 0.5f);
+             m_titleBar->setZoom(percent);
+        }
         
         // Also sync if viewer becomes linked...
     }

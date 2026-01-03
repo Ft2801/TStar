@@ -483,6 +483,7 @@ MainWindow::MainWindow(QWidget *parent)
     addBtn(tr("Zoom In"), Icons::ZOOM_IN, [this](){ if(currentViewer()) currentViewer()->zoomIn(); })->setShortcut(QKeySequence::ZoomIn);
     addBtn(tr("Zoom Out"), Icons::ZOOM_OUT, [this](){ if(currentViewer()) currentViewer()->zoomOut(); })->setShortcut(QKeySequence::ZoomOut);
     addBtn(tr("Fit to Screen"), Icons::FIT_SCREEN, [this](){ if(currentViewer()) currentViewer()->fitToWindow(); })->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_0));
+    addBtn(tr("1:1"), Icons::ZOOM_100, [this](){ if(currentViewer()) currentViewer()->zoom1to1(); })->setToolTip(tr("Zoom 100%"));
     
     mainToolbar->addSeparator();
 

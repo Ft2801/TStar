@@ -87,6 +87,7 @@ public:
     void setActive(bool active);
     void setShaded(bool shaded);
     void setMaximized(bool maximized);
+    void setZoom(int percent); // NEW: Update zoom display
     
 signals:
     void closeClicked();
@@ -101,11 +102,12 @@ protected:
 private:
     void updateStyle();
 
+
+    QLabel* m_zoomLabel; // NEW
     QLabel* m_titleLabel; 
     QPushButton* m_minBtn;
     QPushButton* m_maxBtn;
     QPushButton* m_closeBtn;
-    QWidget* m_leftDummy;
     QSpacerItem* m_leftSpacer;
     QSpacerItem* m_rightSpacer;
     QPoint m_dragPos;

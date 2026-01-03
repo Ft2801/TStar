@@ -494,7 +494,14 @@ void ImageViewer::fitToWindow() {
     if (!m_imageItem->pixmap().isNull()) {
         fitInView(m_imageItem, Qt::KeepAspectRatio);
         m_scaleFactor = transform().m11();
+        emit viewChanged(m_scaleFactor, horizontalScrollBar()->value(), verticalScrollBar()->value());
     }
+}
+
+void ImageViewer::zoom1to1() {
+    setTransform(QTransform()); // Reset to identity (scale 1.0)
+    m_scaleFactor = 1.0;
+    emit viewChanged(m_scaleFactor, horizontalScrollBar()->value(), verticalScrollBar()->value());
 }
 
 void ImageViewer::wheelEvent(QWheelEvent* event) {

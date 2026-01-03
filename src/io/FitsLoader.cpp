@@ -413,10 +413,6 @@ void FitsLoader::readSIPCoefficients(void* fitsptr, ImageBuffer::Metadata& meta)
     }
 }
 
-// ============================================================================
-// Multi-Extension Support (SASPro compatible)
-// ============================================================================
-
 QMap<QString, FitsExtensionInfo> FitsLoader::listExtensions(const QString& filePath, QString* errorMsg) {
     QMap<QString, FitsExtensionInfo> result;
     fitsfile* fptr;

@@ -19,6 +19,7 @@ public:
     void setImage(const QImage& image, bool preserveView = false);
     void zoomIn();
     void zoomOut();
+    void zoom1to1(); // New 1:1 Zoom
     void fitToWindow();
 
     // MDI / History Support
