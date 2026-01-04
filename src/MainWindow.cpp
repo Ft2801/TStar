@@ -792,6 +792,8 @@ MainWindow::MainWindow(QWidget *parent)
     
     mainToolbar->addWidget(settingsBtn);
 
+    mainToolbar->addSeparator();
+
     // Help Button
     QToolButton* helpBtn = new QToolButton(this);
     helpBtn->setText(tr("Help"));
