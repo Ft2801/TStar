@@ -72,7 +72,7 @@ echo "  - App bundle copied"
 echo ""
 echo "[STEP 4] Running macdeployqt..."
 
-QT_PREFIX=$(brew --prefix qt@6 2>/dev/null || echo "")
+QT_PREFIX=$(brew --prefix qt@6 2>/dev/null || brew --prefix qt 2>/dev/null || echo "")
 MACDEPLOYQT="$QT_PREFIX/bin/macdeployqt"
 
 if [ ! -f "$MACDEPLOYQT" ]; then
@@ -81,7 +81,13 @@ if [ ! -f "$MACDEPLOYQT" ]; then
 fi
 
 if [ -f "$MACDEPLOYQT" ]; then
-    "$MACDEPLOYQT" "$DIST_DIR" -verbose=1
+    # Run macdeployqt with Qt lib path and filter out rpath warnings
+    # The rpath warnings are non-fatal and occur because some plugins reference
+    # Qt frameworks that will be bundled. We filter them to keep output clean.
+    "$MACDEPLOYQT" "$DIST_DIR" \
+        -verbose=1 \
+        -libpath="$QT_PREFIX/lib" \
+        2>&1 | grep -v "Cannot resolve rpath" | grep -v "using QList" || true
     echo "  - Qt frameworks deployed"
 else
     echo "[WARNING] macdeployqt not found. Qt frameworks not bundled."
