@@ -102,12 +102,24 @@ jobs:
           QT_PREFIX=$(brew --prefix qt@6)
           echo "Qt6 found at: $QT_PREFIX"
           
-          # Configure with CMake
+          # Get libomp path for OpenMP support with Apple Clang
+          LIBOMP_PREFIX=$(brew --prefix libomp)
+          echo "libomp found at: $LIBOMP_PREFIX"
+          
+          # Use the macOS-specific CMakeLists
+          cp CMakeLists_macos.txt CMakeLists.txt
+          
+          # Configure with CMake - pass OpenMP paths explicitly
           cmake -S . -B build \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_PREFIX_PATH="$QT_PREFIX" \
-            -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0"
+            -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0" \
+            -DOpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I${LIBOMP_PREFIX}/include" \
+            -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I${LIBOMP_PREFIX}/include" \
+            -DOpenMP_C_LIB_NAMES="omp" \
+            -DOpenMP_CXX_LIB_NAMES="omp" \
+            -DOpenMP_omp_LIBRARY="${LIBOMP_PREFIX}/lib/libomp.dylib"
 
       # ===========================
       # 6. Build Application
