@@ -94,7 +94,7 @@ QString HelpDialog::buildHelpContent()
     // Navigation Controls
     html += "<h2>" + tr("Navigation Controls") + "</h2>";
     html += "<ul>";
-    html += "<li><b>" + tr("Zoom In/Out:") + "</b> " + tr("Mouse wheel or Ctrl++ and Ctrl+-") + "</li>";
+    html += "<li><b>" + tr("Zoom In/Out:") + "</b> " + tr("Mouse wheel or Ctrl + and Ctrl -") + "</li>";
     html += "<li><b>" + tr("Pan:") + "</b> " + tr("Click and drag to move around the image") + "</li>";
     html += "<li><b>" + tr("Fit to Window:") + "</b> " + tr("Press Ctrl+0") + "</li>";
     html += "<li><b>" + tr("1:1 Zoom:") + "</b> " + tr("Click the 1:1 button for 100% zoom") + "</li>";
@@ -137,6 +137,14 @@ QString HelpDialog::buildHelpContent()
     
     html += "<h3>" + tr("ArcSinh Stretch") + "</h3>";
     html += "<p>" + tr("Specialized stretch that preserves star colors while increasing contrast.") + "</p>";
+
+    html += "<h3>" + tr("Star Stretch") + "</h3>";
+    html += "<p>" + tr("Specialized tool to stretch stars while preserving their color and size:") + "</p>";
+    html += "<ul>";
+    html += "<li><b>" + tr("Stretch Amount:") + "</b> " + tr("Controls the non-linear expansion of stars.") + "</li>";
+    html += "<li><b>" + tr("Color Boost:") + "</b> " + tr("Increases color saturation specifically for stars.") + "</li>";
+    html += "<li><b>" + tr("SCNR:") + "</b> " + tr("Optional green noise removal during the stretch.") + "</li>";
+    html += "</ul>";
 
     // Color Management
     html += "<h2>" + tr("Color Management") + "</h2>";
@@ -264,8 +272,8 @@ QString HelpDialog::buildHelpContent()
     html += "<tr><td><span class=\"shortcut\">Ctrl+Z</span></td><td>" + tr("Undo") + "</td></tr>";
     html += "<tr><td><span class=\"shortcut\">Ctrl+Shift+Z</span></td><td>" + tr("Redo") + "</td></tr>";
     html += "<tr><td><span class=\"shortcut\">Ctrl+0</span></td><td>" + tr("Fit to window") + "</td></tr>";
-    html += "<tr><td><span class=\"shortcut\">Ctrl++</span></td><td>" + tr("Zoom in") + "</td></tr>";
-    html += "<tr><td><span class=\"shortcut\">Ctrl+-</span></td><td>" + tr("Zoom out") + "</td></tr>";
+    html += "<tr><td><span class=\"shortcut\">Ctrl +</span></td><td>" + tr("Zoom in") + "</td></tr>";
+    html += "<tr><td><span class=\"shortcut\">Ctrl -</span></td><td>" + tr("Zoom out") + "</td></tr>";
     html += "</table>";
 
     // Tips

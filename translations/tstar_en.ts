@@ -1653,6 +1653,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Color Boost:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Color Management</source>
             <translation type="unfinished" />
         </message>
@@ -1670,6 +1674,10 @@
         </message>
         <message>
             <source>Controls stretch intensity (0-10)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Controls the non-linear expansion of stars.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1785,6 +1793,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Increases color saturation specifically for stars.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Intensity</source>
             <translation type="unfinished" />
         </message>
@@ -1825,7 +1837,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Mouse wheel or Ctrl++ and Ctrl+-</source>
+            <source>Mouse wheel or Ctrl + and Ctrl -</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1846,6 +1858,10 @@
         </message>
         <message>
             <source>Open file</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Optional green noise removal during the stretch.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1929,6 +1945,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>SCNR:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Saturation</source>
             <translation type="unfinished" />
         </message>
@@ -1961,6 +1981,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Specialized tool to stretch stars while preserving their color and size:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Splits RGB image into separate R, G, B windows.</source>
             <translation type="unfinished" />
         </message>
@@ -1977,11 +2001,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Star Stretch</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>StarNet++</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Stretch</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stretch Amount:</source>
             <translation type="unfinished" />
         </message>
         <message>

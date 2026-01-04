@@ -1655,6 +1655,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Cerrar</translation>
         </message>
         <message>
+            <source>Color Boost:</source>
+            <translation type="finished">Potenciación de Color:</translation>
+        </message>
+        <message>
             <source>Color Management</source>
             <translation type="finished">Gestión Color</translation>
         </message>
@@ -1673,6 +1677,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Controls stretch intensity (0-10)</source>
             <translation type="finished">Controla la intensidad del estiramiento (0-10)</translation>
+        </message>
+        <message>
+            <source>Controls the non-linear expansion of stars.</source>
+            <translation type="finished">Controla la expansión no lineal de las estrellas.</translation>
         </message>
         <message>
             <source>Converts RAW Bayer pattern images to full color.</source>
@@ -1752,7 +1760,7 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         </message>
         <message>
             <source>GHS (Generalized Hyperbolic Stretch)</source>
-            <translation type="unfinished" />
+            <translation type="finished">GHS (Generalized Hyperbolic Stretch)</translation>
         </message>
         <message>
             <source>Generate mask from image luminosity</source>
@@ -1785,6 +1793,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Image Annotator</source>
             <translation type="finished">Anotador de Imágenes</translation>
+        </message>
+        <message>
+            <source>Increases color saturation specifically for stars.</source>
+            <translation type="finished">Aumenta la saturación de color específicamente para las estrellas.</translation>
         </message>
         <message>
             <source>Intensity</source>
@@ -1827,8 +1839,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Más potente que el ABE tradicional</translation>
         </message>
         <message>
-            <source>Mouse wheel or Ctrl++ and Ctrl+-</source>
-            <translation type="finished">Rueda del ratón o Ctrl++ y Ctrl+-</translation>
+            <source>Mouse wheel or Ctrl + and Ctrl -</source>
+            <translation type="finished">Rueda del ratón o Ctrl + y Ctrl -</translation>
         </message>
         <message>
             <source>Navigation Controls</source>
@@ -1849,6 +1861,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Open file</source>
             <translation type="finished">Abrir archivo</translation>
+        </message>
+        <message>
+            <source>Optional green noise removal during the stretch.</source>
+            <translation type="finished">Eliminación opcional del ruido verde durante el estiramiento.</translation>
         </message>
         <message>
             <source>Optionally creates a star-only mask</source>
@@ -1931,6 +1947,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">SCNR (Reducción Selectiva de Ruido de Color)</translation>
         </message>
         <message>
+            <source>SCNR:</source>
+            <translation type="finished">SCNR:</translation>
+        </message>
+        <message>
             <source>Saturation</source>
             <translation type="finished">Saturación</translation>
         </message>
@@ -1963,6 +1983,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Estiramiento especializado que preserva los colores de las estrellas mientras aumenta el contraste.</translation>
         </message>
         <message>
+            <source>Specialized tool to stretch stars while preserving their color and size:</source>
+            <translation type="finished">Herramienta especializada para estirar estrellas preservando su color y tamaño:</translation>
+        </message>
+        <message>
             <source>Splits RGB image into separate R, G, B windows.</source>
             <translation type="finished">Divide la imagen RGB en ventanas R, G, B separadas.</translation>
         </message>
@@ -1979,12 +2003,20 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Recomposición de Estrellas</translation>
         </message>
         <message>
+            <source>Star Stretch</source>
+            <translation type="finished">Star Stretch</translation>
+        </message>
+        <message>
             <source>StarNet++</source>
             <translation type="finished">StarNet++</translation>
         </message>
         <message>
             <source>Stretch</source>
             <translation type="finished">Estiramiento</translation>
+        </message>
+        <message>
+            <source>Stretch Amount:</source>
+            <translation type="finished">Cantidad de Estiramiento:</translation>
         </message>
         <message>
             <source>Stretch Tools</source>
@@ -2928,7 +2960,7 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         </message>
         <message>
             <source>Star Stretch</source>
-            <translation type="finished">Star Stretching</translation>
+            <translation type="finished">Star Stretch</translation>
         </message>
         <message>
             <source>StarNet++</source>
@@ -4320,7 +4352,7 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         </message>
         <message>
             <source>Star Stretch</source>
-            <translation type="finished">Star Stretching</translation>
+            <translation type="finished">Star Stretch</translation>
         </message>
         <message>
             <source>Star Stretch applied.</source>
