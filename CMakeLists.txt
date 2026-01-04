@@ -156,6 +156,8 @@ add_executable(TStar
     src/core/RobustStatistics.cpp
     src/core/RobustStatistics.h
     src/core/MaskManager.h
+    src/core/Logger.cpp
+    src/core/Logger.h
     
     # ===========================
     # IO (src/io/)
@@ -294,6 +296,8 @@ add_executable(TStar
     src/dialogs/ContinuumSubtractionDialog.h
     src/dialogs/AnnotationToolDialog.cpp
     src/dialogs/AnnotationToolDialog.h
+    src/dialogs/HelpDialog.cpp
+    src/dialogs/HelpDialog.h
     src/widgets/AnnotationOverlay.cpp
     src/widgets/AnnotationOverlay.h
     

@@ -65,10 +65,17 @@ bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const Gr
              << rawInputFile;
         
         QProcess p;
-        // Check for bundled python
+        // Check for bundled python - cross-platform
         QString pythonExe = "python";
+#if defined(Q_OS_MAC)
+        QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
+        QString devPython = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
+#else
         QString bundledPython = QCoreApplication::applicationDirPath() + "/python/python.exe";
+        QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
+#endif
         if (QFile::exists(bundledPython)) pythonExe = bundledPython;
+        else if (QFile::exists(devPython)) pythonExe = devPython;
         
         p.start(pythonExe, args);
         p.waitForFinished();
@@ -154,9 +161,17 @@ bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const Gr
         QStringList args;
         args << scriptPath << "load" << outputFile << rawResult;
         
+        // Check for bundled python - cross-platform
         QString pythonExe = "python";
+#if defined(Q_OS_MAC)
+        QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
+        QString devPython = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
+#else
         QString bundledPython = QCoreApplication::applicationDirPath() + "/python/python.exe";
+        QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
+#endif
         if (QFile::exists(bundledPython)) pythonExe = bundledPython;
+        else if (QFile::exists(devPython)) pythonExe = devPython;
 
         QProcess p;
         p.start(pythonExe, args);

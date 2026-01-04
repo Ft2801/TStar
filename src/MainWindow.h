@@ -156,6 +156,8 @@ public:
 protected:
     void resizeEvent(class QResizeEvent* event) override;
     bool eventFilter(QObject* obj, QEvent* event) override;
+    void dragEnterEvent(class QDragEnterEvent* event) override;
+    void dropEvent(class QDropEvent* event) override;
     
     QSettings m_settings;
 

@@ -1,6 +1,14 @@
 TStar Changelog
 ===============
 
+Version 1.2.0
+-------------
+- MACOS support!
+- drag and drop a file in the main window to open it
+- Help section
+- Logging system
+- 1:1 zoom and percentage zoom level indicator
+
 Version 1.1.4
 -------------
 - Updated statistical stretch
@@ -29,7 +37,7 @@ Version 1.1.0
 Version 1.0.5
 -------------
 - Fixed ABE, GHT and Saturation small bugs
-- 
+
 Version 1.0.4
 -------------
 - DPI based window rescaling

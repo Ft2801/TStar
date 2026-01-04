@@ -1493,6 +1493,585 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
     </context>
     <context>
+        <name>HelpDialog</name>
+        <message>
+            <source>1:1 Zoom:</source>
+            <translation type="finished">Zoom 1:1:</translation>
+        </message>
+        <message>
+            <source>AI Processing</source>
+            <translation type="finished">Elaborazione AI</translation>
+        </message>
+        <message>
+            <source>AI star removal for starless processing:</source>
+            <translation type="finished">Rimozione stelle AI per elaborazione senza stelle:</translation>
+        </message>
+        <message>
+            <source>AI-based gradient removal:</source>
+            <translation type="finished">Rimozione gradienti basata su AI:</translation>
+        </message>
+        <message>
+            <source>AI-powered deconvolution and noise reduction:</source>
+            <translation type="finished">Deconvoluzione e riduzione rumore basata su AI:</translation>
+        </message>
+        <message>
+            <source>Aberration Remover (RAR)</source>
+            <translation type="finished">Rimozione Aberrazioni (RAR)</translation>
+        </message>
+        <message>
+            <source>Add object labels and annotations using catalog data.</source>
+            <translation type="finished">Aggiungi etichette e annotazioni usando dati del catalogo.</translation>
+        </message>
+        <message>
+            <source>Adds WCS (World Coordinate System) metadata</source>
+            <translation type="finished">Aggiunge metadati WCS (World Coordinate System)</translation>
+        </message>
+        <message>
+            <source>Adds artificial diffraction spikes to bright stars for aesthetic effect.</source>
+            <translation type="finished">Aggiunge spikes di diffrazione artificiali alle stelle luminose per effetto estetico.</translation>
+        </message>
+        <message>
+            <source>Adjust color saturation with protection for highlights and shadows.</source>
+            <translation type="finished">Regola la saturazione del colore con protezione per luci e ombre.</translation>
+        </message>
+        <message>
+            <source>Adjust polynomial order for model complexity</source>
+            <translation type="finished">Regola l'ordine polinomiale per la complessità del modello</translation>
+        </message>
+        <message>
+            <source>Adjust tonal curves for each RGB channel independently or together.</source>
+            <translation type="finished">Regola le curve tonali per ogni canale RGB indipendentemente o insieme.</translation>
+        </message>
+        <message>
+            <source>Advanced stretch tool with full control:</source>
+            <translation type="finished">Strumento di stretching avanzato con controllo completo:</translation>
+        </message>
+        <message>
+            <source>Alternative stretches</source>
+            <translation type="finished">Stretching alternativi</translation>
+        </message>
+        <message>
+            <source>Always work on a copy of your original data</source>
+            <translation type="finished">Lavora sempre su una copia dei tuoi dati originali</translation>
+        </message>
+        <message>
+            <source>Analyzes star quality metrics (FWHM, roundness, etc.)</source>
+            <translation type="finished">Analizza metriche di qualità delle stelle (FWHM, rotondità, ecc.)</translation>
+        </message>
+        <message>
+            <source>Apply Mask:</source>
+            <translation type="finished">Applica Maschera:</translation>
+        </message>
+        <message>
+            <source>Apply mathematical expressions to images:</source>
+            <translation type="finished">Applica espressioni matematiche alle immagini:</translation>
+        </message>
+        <message>
+            <source>ArcSinh Stretch</source>
+            <translation type="finished">ArcSinh Stretching</translation>
+        </message>
+        <message>
+            <source>ArcSinh:</source>
+            <translation type="finished">ArcSinh:</translation>
+        </message>
+        <message>
+            <source>AstroSpike</source>
+            <translation type="finished">AstroSpike</translation>
+        </message>
+        <message>
+            <source>Auto Background Extraction (ABE)</source>
+            <translation type="finished">Estrazione Automatica Fondo (ABE)</translation>
+        </message>
+        <message>
+            <source>Auto Stretch (Statistical)</source>
+            <translation type="finished">Auto Stretch (Statistico)</translation>
+        </message>
+        <message>
+            <source>Auto Stretch:</source>
+            <translation type="finished">Auto-Stretch:</translation>
+        </message>
+        <message>
+            <source>Automatic histogram stretch for best visibility</source>
+            <translation type="finished">Stretching automatico dell'istogramma per la migliore visibilità</translation>
+        </message>
+        <message>
+            <source>Automatically detects and removes gradients</source>
+            <translation type="finished">Rileva e rimuove automaticamente i gradienti</translation>
+        </message>
+        <message>
+            <source>Automatically stretches the image based on statistical analysis. Ideal for quick previews.</source>
+            <translation type="finished">Allunga automaticamente l'immagine basandosi sull'analisi statistica. Ideale per anteprime veloci.</translation>
+        </message>
+        <message>
+            <source>Background Neutralization</source>
+            <translation type="finished">Neutralizzazione Fondo</translation>
+        </message>
+        <message>
+            <source>Black Point</source>
+            <translation type="finished">Punto Nero</translation>
+        </message>
+        <message>
+            <source>Blends starless and star-only images with adjustable parameters.</source>
+            <translation type="finished">Unisce immagini senza stelle e solo stelle con parametri regolabili.</translation>
+        </message>
+        <message>
+            <source>Calibrates colors using star catalog data:</source>
+            <translation type="finished">Calibra i colori usando dati del catalogo stellare:</translation>
+        </message>
+        <message>
+            <source>Channel Operations</source>
+            <translation type="finished">Operazioni Canale</translation>
+        </message>
+        <message>
+            <source>Check the Console panel for processing messages</source>
+            <translation type="finished">Controlla il pannello Console per i messaggi di elaborazione</translation>
+        </message>
+        <message>
+            <source>Choose Subtract or Divide mode</source>
+            <translation type="finished">Scegli la modalità Sottrai o Dividi</translation>
+        </message>
+        <message>
+            <source>Click Open or press Ctrl+O</source>
+            <translation type="finished">Clicca Apri o premi Ctrl+O</translation>
+        </message>
+        <message>
+            <source>Click Save or press Ctrl+S</source>
+            <translation type="finished">Clicca Salva o premi Ctrl+S</translation>
+        </message>
+        <message>
+            <source>Click and drag to move around the image</source>
+            <translation type="finished">Clicca e trascina per muoverti nell'immagine</translation>
+        </message>
+        <message>
+            <source>Click the 1:1 button for 100% zoom</source>
+            <translation type="finished">Clicca il pulsante 1:1 per lo zoom al 100%</translation>
+        </message>
+        <message>
+            <source>Click to add sample points on the background</source>
+            <translation type="finished">Clicca per aggiungere punti campione sullo sfondo</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Chiudi</translation>
+        </message>
+        <message>
+            <source>Color Management</source>
+            <translation type="finished">Gestione Colore</translation>
+        </message>
+        <message>
+            <source>Combine Channels</source>
+            <translation type="finished">Combina Canali</translation>
+        </message>
+        <message>
+            <source>Combine images with formulas</source>
+            <translation type="finished">Combina immagini con formule</translation>
+        </message>
+        <message>
+            <source>Combines separate channel images into one RGB image.</source>
+            <translation type="finished">Combina immagini di canali separati in un'unica immagine RGB.</translation>
+        </message>
+        <message>
+            <source>Controls stretch intensity (0-10)</source>
+            <translation type="finished">Controlla l'intensità dello stretching (0-10)</translation>
+        </message>
+        <message>
+            <source>Converts RAW Bayer pattern images to full color.</source>
+            <translation type="finished">Converte immagini pattern Bayer RAW a colori.</translation>
+        </message>
+        <message>
+            <source>Cosmic Clarity</source>
+            <translation type="finished">Cosmic Clarity</translation>
+        </message>
+        <message>
+            <source>Create Mask:</source>
+            <translation type="finished">Crea Maschera:</translation>
+        </message>
+        <message>
+            <source>Create and apply luminosity masks for selective processing:</source>
+            <translation type="finished">Crea e applica maschere di luminosità per elaborazione selettiva:</translation>
+        </message>
+        <message>
+            <source>Creates a starless version of your image</source>
+            <translation type="finished">Crea una versione senza stelle della tua immagine</translation>
+        </message>
+        <message>
+            <source>Ctrl+Z / Ctrl+Shift+Z</source>
+            <translation type="finished">Ctrl+Z / Ctrl+Shift+Z</translation>
+        </message>
+        <message>
+            <source>Curves Transformation</source>
+            <translation type="finished">Trasformazione Curve</translation>
+        </message>
+        <message>
+            <source>Debayer</source>
+            <translation type="finished">Debayer</translation>
+        </message>
+        <message>
+            <source>Display Modes</source>
+            <translation type="finished">Modalità di Visualizzazione</translation>
+        </message>
+        <message>
+            <source>Drag &amp; Drop:</source>
+            <translation type="finished">Trascina e Rilascia:</translation>
+        </message>
+        <message>
+            <source>Drag files directly onto the workspace</source>
+            <translation type="finished">Trascina i file direttamente nell'area di lavoro</translation>
+        </message>
+        <message>
+            <source>Effects</source>
+            <translation type="finished">Effetti</translation>
+        </message>
+        <message>
+            <source>Enable RGB Link for color images to maintain color balance</source>
+            <translation type="finished">Abilita Collega RGB per immagini a colori per mantenere il bilanciamento colore</translation>
+        </message>
+        <message>
+            <source>Extract Channels</source>
+            <translation type="finished">Estrai Canali</translation>
+        </message>
+        <message>
+            <source>FITS Header Editor</source>
+            <translation type="finished">Editor Header FITS</translation>
+        </message>
+        <message>
+            <source>Fit to Window:</source>
+            <translation type="finished">Adatta alla Finestra:</translation>
+        </message>
+        <message>
+            <source>Fit to window</source>
+            <translation type="finished">Adatta alla finestra</translation>
+        </message>
+        <message>
+            <source>Focus point for stretch (click on image to pick)</source>
+            <translation type="finished">Punto focale per lo stretching (clicca sull'immagine per selezionare)</translation>
+        </message>
+        <message>
+            <source>For best results, stretch AFTER background removal</source>
+            <translation type="finished">Per i migliori risultati, stira DOPO la rimozione dello sfondo</translation>
+        </message>
+        <message>
+            <source>GHS (Generalized Hyperbolic Stretch)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Generate mask from image luminosity</source>
+            <translation type="finished">Genera maschera dalla luminosità dell'immagine</translation>
+        </message>
+        <message>
+            <source>Getting Started</source>
+            <translation type="finished">Per Iniziare</translation>
+        </message>
+        <message>
+            <source>GraXpert</source>
+            <translation type="finished">GraXpert</translation>
+        </message>
+        <message>
+            <source>Histogram Transformation</source>
+            <translation type="finished">Trasformazione Istogramma</translation>
+        </message>
+        <message>
+            <source>Histogram equalization</source>
+            <translation type="finished">Equalizzazione dell'istogramma</translation>
+        </message>
+        <message>
+            <source>Histogram:</source>
+            <translation type="finished">Istogramma:</translation>
+        </message>
+        <message>
+            <source>Identifies the exact sky coordinates of your image:</source>
+            <translation type="finished">Identifica le coordinate esatte del cielo della tua immagine:</translation>
+        </message>
+        <message>
+            <source>Image Annotator</source>
+            <translation type="finished">Annotatore Immagini</translation>
+        </message>
+        <message>
+            <source>Intensity</source>
+            <translation type="finished">Intensità</translation>
+        </message>
+        <message>
+            <source>Invert Mask:</source>
+            <translation type="finished">Inverti Maschera:</translation>
+        </message>
+        <message>
+            <source>Invert mask selection</source>
+            <translation type="finished">Inverti selezione maschera</translation>
+        </message>
+        <message>
+            <source>Keyboard Shortcuts</source>
+            <translation type="finished">Scorciatoie da Tastiera</translation>
+        </message>
+        <message>
+            <source>Linear:</source>
+            <translation type="finished">Lineare:</translation>
+        </message>
+        <message>
+            <source>Load and apply existing mask</source>
+            <translation type="finished">Carica e applica maschera esistente</translation>
+        </message>
+        <message>
+            <source>Local intensity adjustment (-5 to 15)</source>
+            <translation type="finished">Regolazione intensità locale (-5 a 15)</translation>
+        </message>
+        <message>
+            <source>Manual histogram stretch with shadows, midtones, and highlights controls.</source>
+            <translation type="finished">Stretching manuale dell'istogramma con controlli per ombre, mezzi toni e luci.</translation>
+        </message>
+        <message>
+            <source>Masks</source>
+            <translation type="finished">Maschere</translation>
+        </message>
+        <message>
+            <source>More powerful than traditional ABE</source>
+            <translation type="finished">Più potente dell'ABE tradizionale</translation>
+        </message>
+        <message>
+            <source>Mouse wheel or Ctrl++ and Ctrl+-</source>
+            <translation type="finished">Rotella del mouse o Ctrl++ e Ctrl+-</translation>
+        </message>
+        <message>
+            <source>Navigation Controls</source>
+            <translation type="finished">Controlli di Navigazione</translation>
+        </message>
+        <message>
+            <source>Neutralizes color casts in the background sky:</source>
+            <translation type="finished">Neutralizza le dominanti di colore nel cielo di sfondo:</translation>
+        </message>
+        <message>
+            <source>Non-linear stretch preserving star colors</source>
+            <translation type="finished">Stretching non lineare che preserva i colori delle stelle</translation>
+        </message>
+        <message>
+            <source>Open Image:</source>
+            <translation type="finished">Apri Immagine:</translation>
+        </message>
+        <message>
+            <source>Open file</source>
+            <translation type="finished">Apri file</translation>
+        </message>
+        <message>
+            <source>Optionally creates a star-only mask</source>
+            <translation type="finished">Crea opzionalmente una maschera solo stelle</translation>
+        </message>
+        <message>
+            <source>Pan:</source>
+            <translation type="finished">Panoramica:</translation>
+        </message>
+        <message>
+            <source>Photometric Color Calibration (PCC)</source>
+            <translation type="finished">Calibrazione Colore Fotometrica (PCC)</translation>
+        </message>
+        <message>
+            <source>Pixel Math</source>
+            <translation type="finished">Pixel Math</translation>
+        </message>
+        <message>
+            <source>Plate Solving</source>
+            <translation type="finished">Plate Solving</translation>
+        </message>
+        <message>
+            <source>Press Ctrl+0</source>
+            <translation type="finished">Premi Ctrl+0</translation>
+        </message>
+        <message>
+            <source>Protect shadows/highlights from clipping</source>
+            <translation type="finished">Proteggi ombre/luci dal clipping</translation>
+        </message>
+        <message>
+            <source>Protection</source>
+            <translation type="finished">Protezione</translation>
+        </message>
+        <message>
+            <source>Raw pixel values without stretch</source>
+            <translation type="finished">Valori pixel grezzi senza stretching</translation>
+        </message>
+        <message>
+            <source>Redo</source>
+            <translation type="finished">Ripeti</translation>
+        </message>
+        <message>
+            <source>Reduces noise without losing detail</source>
+            <translation type="finished">Riduce il rumore senza perdere dettagli</translation>
+        </message>
+        <message>
+            <source>Removes chromatic aberration and optical artifacts.</source>
+            <translation type="finished">Rimuove aberrazioni cromatiche e artefatti ottici.</translation>
+        </message>
+        <message>
+            <source>Removes gradients and light pollution from your image:</source>
+            <translation type="finished">Rimuove gradienti e inquinamento luminoso dalla tua immagine:</translation>
+        </message>
+        <message>
+            <source>Removes green color cast common in OSC/DSLR images.</source>
+            <translation type="finished">Rimuove la dominante verde comune nelle immagini OSC/DSLR.</translation>
+        </message>
+        <message>
+            <source>Required for PCC and annotation tools</source>
+            <translation type="finished">Necessario per PCC e strumenti di annotazione</translation>
+        </message>
+        <message>
+            <source>Requires external Cosmic Clarity installation</source>
+            <translation type="finished">Richiede installazione esterna di Cosmic Clarity</translation>
+        </message>
+        <message>
+            <source>Requires external GraXpert installation</source>
+            <translation type="finished">Richiede installazione esterna di GraXpert</translation>
+        </message>
+        <message>
+            <source>Requires external StarNet installation</source>
+            <translation type="finished">Richiede installazione esterna di StarNet</translation>
+        </message>
+        <message>
+            <source>Requires plate-solved image (WCS data)</source>
+            <translation type="finished">Richiede immagine risolta astrometricamente (dati WCS)</translation>
+        </message>
+        <message>
+            <source>SCNR (Selective Color Noise Reduction)</source>
+            <translation type="finished">SCNR (Riduzione Selettiva Rumore Colore)</translation>
+        </message>
+        <message>
+            <source>Saturation</source>
+            <translation type="finished">Saturazione</translation>
+        </message>
+        <message>
+            <source>Save Image:</source>
+            <translation type="finished">Salva Immagine:</translation>
+        </message>
+        <message>
+            <source>Save file</source>
+            <translation type="finished">Salva file</translation>
+        </message>
+        <message>
+            <source>Select a region of pure background</source>
+            <translation type="finished">Seleziona una regione di sfondo puro</translation>
+        </message>
+        <message>
+            <source>Set black clipping level</source>
+            <translation type="finished">Imposta il livello di clipping nero</translation>
+        </message>
+        <message>
+            <source>Sharpens stars and details</source>
+            <translation type="finished">Affina stelle e dettagli</translation>
+        </message>
+        <message>
+            <source>Show Overlay:</source>
+            <translation type="finished">Mostra Sovrapposizione:</translation>
+        </message>
+        <message>
+            <source>Specialized stretch that preserves star colors while increasing contrast.</source>
+            <translation type="finished">Stretching specializzato che preserva i colori delle stelle aumentando il contrasto.</translation>
+        </message>
+        <message>
+            <source>Splits RGB image into separate R, G, B windows.</source>
+            <translation type="finished">Divide l'immagine RGB in finestre R, G, B separate.</translation>
+        </message>
+        <message>
+            <source>Square Root / Logarithmic:</source>
+            <translation type="finished">Radice Quadrata / Logaritmico:</translation>
+        </message>
+        <message>
+            <source>Star Analysis</source>
+            <translation type="finished">Analisi Stelle</translation>
+        </message>
+        <message>
+            <source>Star Recomposition</source>
+            <translation type="finished">Ricomposizione Stelle</translation>
+        </message>
+        <message>
+            <source>StarNet++</source>
+            <translation type="finished">StarNet++</translation>
+        </message>
+        <message>
+            <source>Stretch</source>
+            <translation type="finished">Stiramento</translation>
+        </message>
+        <message>
+            <source>Stretch Tools</source>
+            <translation type="finished">Strumenti di Stretching</translation>
+        </message>
+        <message>
+            <source>Symmetry Point</source>
+            <translation type="finished">Punto di Simmetria</translation>
+        </message>
+        <message>
+            <source>TStar - Astrophotography Processing</source>
+            <translation type="finished">TStar - Elaborazione Astrofotografia</translation>
+        </message>
+        <message>
+            <source>TStar Help &amp; Tutorial</source>
+            <translation type="finished">Aiuto e Tutorial TStar</translation>
+        </message>
+        <message>
+            <source>TStar supports FITS, XISF, TIFF, and PNG image formats commonly used in astrophotography.</source>
+            <translation type="finished">TStar supporta i formati FITS, XISF, TIFF e PNG comunemente usati in astrofotografia.</translation>
+        </message>
+        <message>
+            <source>The tool will balance RGB channels</source>
+            <translation type="finished">Lo strumento bilancerà i canali RGB</translation>
+        </message>
+        <message>
+            <source>Tip: Toggle RGB Link to stretch channels independently or together.</source>
+            <translation type="finished">Suggerimento: Attiva/disattiva Collega RGB per stirare i canali indipendentemente o insieme.</translation>
+        </message>
+        <message>
+            <source>Tips &amp; Best Practices</source>
+            <translation type="finished">Suggerimenti e Buone Pratiche</translation>
+        </message>
+        <message>
+            <source>Toggle mask visualization</source>
+            <translation type="finished">Attiva/disattiva visualizzazione maschera</translation>
+        </message>
+        <message>
+            <source>Undo</source>
+            <translation type="finished">Annulla</translation>
+        </message>
+        <message>
+            <source>Undo/Redo:</source>
+            <translation type="finished">Annulla/Ripeti:</translation>
+        </message>
+        <message>
+            <source>Use Undo frequently - every operation is reversible</source>
+            <translation type="finished">Usa Annulla frequentemente - ogni operazione è reversibile</translation>
+        </message>
+        <message>
+            <source>Use the dropdown menu in the toolbar to change visualization:</source>
+            <translation type="finished">Usa il menu a tendina nella barra degli strumenti per cambiare la visualizzazione:</translation>
+        </message>
+        <message>
+            <source>Use variables like $T (target), $R, $G, $B</source>
+            <translation type="finished">Usa variabili come $T (target), $R, $G, $B</translation>
+        </message>
+        <message>
+            <source>Uses reference stars for accurate color calibration</source>
+            <translation type="finished">Usa stelle di riferimento per una calibrazione colore accurata</translation>
+        </message>
+        <message>
+            <source>Utilities</source>
+            <translation type="finished">Utilità</translation>
+        </message>
+        <message>
+            <source>View and edit FITS header metadata.</source>
+            <translation type="finished">Visualizza e modifica i metadati dell'header FITS.</translation>
+        </message>
+        <message>
+            <source>Welcome to TStar! This guide covers all features and tools available in the application.</source>
+            <translation type="finished">Benvenuto in TStar! Questa guida copre tutte le funzionalità e gli strumenti disponibili nell'applicazione.</translation>
+        </message>
+        <message>
+            <source>Zoom In/Out:</source>
+            <translation type="finished">Zoom Avanti/Indietro:</translation>
+        </message>
+        <message>
+            <source>Zoom in</source>
+            <translation type="finished">Ingrandisci</translation>
+        </message>
+        <message>
+            <source>Zoom out</source>
+            <translation type="finished">Riduci</translation>
+        </message>
+    </context>
+    <context>
         <name>HistogramStretchDialog</name>
         <message>
             <source>Apply</source>
@@ -1915,6 +2494,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Header</translation>
         </message>
         <message>
+            <source>Help</source>
+            <translation type="finished">Aiuto</translation>
+        </message>
+        <message>
             <source>Histogram</source>
             <translation type="finished">Istogramma</translation>
         </message>
@@ -1928,7 +2511,7 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
         <message>
             <source>Image Annotator</source>
-            <translation type="finished">Annotatore Immagine</translation>
+            <translation type="finished">Annotatore Immagini</translation>
         </message>
         <message>
             <source>Image already has multiple channels.</source>
@@ -2180,7 +2763,7 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
         <message>
             <source>Pixel Math</source>
-            <translation type="finished">PixelMath</translation>
+            <translation type="finished">Pixel Math</translation>
         </message>
         <message>
             <source>PixelMath Applied</source>
@@ -2196,7 +2779,7 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
         <message>
             <source>Plate Solving</source>
-            <translation type="finished">Risoluzione Astrometrica</translation>
+            <translation type="finished">Plate Solving</translation>
         </message>
         <message>
             <source>Please open an image first.</source>
@@ -2341,7 +2924,7 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
         <message>
             <source>Star Recomposition</source>
-            <translation type="finished">Ricomposizione Stellare</translation>
+            <translation type="finished">Ricomposizione Stelle</translation>
         </message>
         <message>
             <source>Star Stretch</source>
@@ -2357,7 +2940,7 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
         <message>
             <source>Stretch Tools</source>
-            <translation type="finished">Strumenti Stretching</translation>
+            <translation type="finished">Strumenti di Stretching</translation>
         </message>
         <message>
             <source>TIFF Files (*.tiff *.tif);;</source>
@@ -2950,7 +3533,7 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
         <message>
             <source>Plate Solving</source>
-            <translation type="finished">Risoluzione Astrometrica</translation>
+            <translation type="finished">Plate Solving</translation>
         </message>
         <message>
             <source>Plate solving successful.\nSolution applied.</source>
@@ -3702,7 +4285,7 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
         <message>
             <source>Star Recomposition</source>
-            <translation type="finished">Ricomposizione Stellare</translation>
+            <translation type="finished">Ricomposizione Stelle</translation>
         </message>
         <message>
             <source>Starless View:</source>

@@ -334,8 +334,15 @@ bool StarNetRunner::run(const ImageBuffer& input, ImageBuffer& output, const Sta
     convArgs << converterScript << outputFile << rawOutput;
     
     QString pythonExe = "python";
+#if defined(Q_OS_MAC)
+    QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
+    QString devPython = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
+#else
     QString bundledPython = QCoreApplication::applicationDirPath() + "/python/python.exe";
+    QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
+#endif
     if (QFile::exists(bundledPython)) pythonExe = bundledPython;
+    else if (QFile::exists(devPython)) pythonExe = devPython;
 
     QProcess conv;
     conv.start(pythonExe, convArgs);

@@ -1,0 +1,195 @@
+# =============================================================================
+# TStar macOS Build Workflow
+# =============================================================================
+# Automatically builds TStar for macOS using GitHub's macOS runners.
+# This allows building macOS binaries from Windows by pushing to GitHub.
+#
+# How to use:
+#   1. Push this file to your GitHub repository
+#   2. Go to the "Actions" tab in your repository
+#   3. The build will start automatically
+#   4. Download the DMG from the "Artifacts" section when complete
+# =============================================================================
+
+name: macOS Build
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+
+jobs:
+  build-macos:
+    name: Build macOS App
+    runs-on: macos-14  # Apple Silicon runner (faster)
+    
+    env:
+      QT_VERSION: "6.6.2"
+    
+    steps:
+      # ===========================
+      # 1. Checkout Repository
+      # ===========================
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for version detection
+
+      # ===========================
+      # 2. Cache Homebrew packages
+      # ===========================
+      - name: Cache Homebrew packages
+        uses: actions/cache@v4
+        id: cache-brew
+        with:
+          path: |
+            ~/Library/Caches/Homebrew
+            /opt/homebrew/Cellar
+          key: ${{ runner.os }}-brew-${{ hashFiles('**/CMakeLists_macos.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-brew-
+
+      # ===========================
+      # 3. Install System Dependencies (Homebrew)
+      # ===========================
+      - name: Install Dependencies via Homebrew
+        run: |
+          echo ">>> Installing build tools..."
+          brew install cmake ninja pkg-config
+          
+          echo ">>> Installing Qt6..."
+          brew install qt@6
+          
+          echo ">>> Installing image/scientific libraries..."
+          brew install opencv
+          brew install gsl
+          brew install cfitsio
+          
+          echo ">>> Installing compression libraries..."
+          brew install lz4
+          brew install zstd
+          
+          echo ">>> Installing OpenMP..."
+          brew install libomp
+          
+          echo ">>> Installing DMG creation tool..."
+          brew install create-dmg
+          
+          echo ">>> Installing Python..."
+          brew install python@3.11
+          
+          echo ">>> All dependencies installed!"
+
+      # ===========================
+      # 4. Setup Python Environment
+      # ===========================
+      - name: Setup Python Virtual Environment
+        run: |
+          chmod +x setup_python_macos.sh
+          ./setup_python_macos.sh
+
+      # ===========================
+      # 5. Configure CMake
+      # ===========================
+      - name: Configure CMake
+        run: |
+          # Get Qt path
+          QT_PREFIX=$(brew --prefix qt@6)
+          echo "Qt6 found at: $QT_PREFIX"
+          
+          # Configure with CMake
+          cmake -S . -B build \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="$QT_PREFIX" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0"
+
+      # ===========================
+      # 6. Build Application
+      # ===========================
+      - name: Build TStar
+        run: |
+          cmake --build build --config Release --parallel $(sysctl -n hw.ncpu)
+
+      # ===========================
+      # 7. Verify Build
+      # ===========================
+      - name: Verify Build Output
+        run: |
+          if [ -d "build/TStar.app" ]; then
+            echo "✅ TStar.app bundle created successfully"
+            ls -la build/TStar.app/Contents/MacOS/
+          elif [ -f "build/TStar" ]; then
+            echo "✅ TStar binary created (non-bundle)"
+          else
+            echo "❌ Build output not found!"
+            exit 1
+          fi
+
+      # ===========================
+      # 8. Package Distribution
+      # ===========================
+      - name: Package App Bundle
+        run: |
+          chmod +x src/package_macos.sh
+          ./src/package_macos.sh --silent
+
+      # ===========================
+      # 9. Create DMG Installer
+      # ===========================
+      - name: Create DMG Installer
+        run: |
+          chmod +x src/build_installer_macos.sh
+          ./src/build_installer_macos.sh
+
+      # ===========================
+      # 10. Upload DMG Artifact
+      # ===========================
+      - name: Upload DMG Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TStar-macOS-Installer
+          path: installer_output/*.dmg
+          if-no-files-found: error
+          retention-days: 30
+
+      # ===========================
+      # 11. Upload App Bundle (alternative)
+      # ===========================
+      - name: Upload App Bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: TStar-macOS-App
+          path: dist/TStar.app
+          if-no-files-found: warn
+          retention-days: 30
+
+      # ===========================
+      # 12. Build Summary
+      # ===========================
+      - name: Build Summary
+        run: |
+          echo "## macOS Build Complete! 🎉" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Get version
+          VERSION=$(grep -E "^Version [0-9.]+" changelog.txt | head -1 | awk '{print $2}')
+          echo "**Version:** $VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # List artifacts
+          echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "- **DMG Installer:** \`installer_output/TStar_Setup_${VERSION}.dmg\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **App Bundle:** \`dist/TStar.app\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Notes
+          echo "### Notes" >> $GITHUB_STEP_SUMMARY
+          echo "- Built on macOS runner with Apple Silicon" >> $GITHUB_STEP_SUMMARY
+          echo "- Compatible with macOS 11.0 (Big Sur) and later" >> $GITHUB_STEP_SUMMARY
+          echo "- First launch: Right-click → Open to bypass Gatekeeper" >> $GITHUB_STEP_SUMMARY

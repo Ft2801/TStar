@@ -69,22 +69,22 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
     QString program = "python";
     QStringList runArgs = args;
 
+#if defined(Q_OS_MAC)
+    // macOS: Check for bundled virtualenv in app bundle Resources
+    QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
+    QString devPython = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
+#else
+    // Windows: Check for bundled embeddable Python
     QString bundledPython = QCoreApplication::applicationDirPath() + "/python/python.exe";
     QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
+#endif
 
     if (QFile::exists(bundledPython)) {
         program = bundledPython;
     } else if (QFile::exists(devPython)) {
         program = devPython;
-    } else {
-        #ifdef Q_OS_WIN
-            // Force usage of Python 3.12 via launcher if no bundle
-            // program = "py";
-            // runArgs.prepend("-3.12");
-            // NOTE: Changing this to just "python" fallback to avoid issues if py not installed
-             program = "python";
-        #endif
     }
+    // Fallback: use system "python" (already set)
 
     if (m_stop) return false; // Early exit check
 

@@ -54,6 +54,7 @@
 #include "dialogs/UpdateDialog.h" // [NEW] Auto-updater dialog
 #include "network/UpdateChecker.h" // [NEW] Auto-updater checker
 #include "dialogs/HeaderViewerDialog.h"
+#include "dialogs/HelpDialog.h"
 #include "dialogs/HeaderEditorDialog.h"
 #include "dialogs/AboutDialog.h"
 #include "dialogs/ArcsinhStretchDialog.h"
@@ -80,11 +81,15 @@
 #include <QEasingCurve>
 #include <QShowEvent>
 #include <QCloseEvent>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QMimeData>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent) {
     
     setWindowOpacity(0.0); // Start invisible for fade-in
+    setAcceptDrops(true);  // Enable drag and drop
     
     // === Setup UI ===
     QWidget* cwPtr = new QWidget(this);
@@ -786,6 +791,18 @@ MainWindow::MainWindow(QWidget *parent)
     connect(settingsBtn, &QToolButton::clicked, this, &MainWindow::onSettingsAction);
     
     mainToolbar->addWidget(settingsBtn);
+
+    // Help Button
+    QToolButton* helpBtn = new QToolButton(this);
+    helpBtn->setText(tr("Help"));
+    helpBtn->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    helpBtn->setStyleSheet(settingsBtn->styleSheet());
+    connect(helpBtn, &QToolButton::clicked, this, [this](){
+        HelpDialog dlg(this);
+        dlg.exec();
+    });
+    mainToolbar->addWidget(helpBtn);
+    
     mainToolbar->addSeparator();
 
     QToolButton* aboutBtn = new QToolButton(this);
@@ -2886,3 +2903,143 @@ void MainWindow::openImageAnnotatorDialog() {
     setupToolSubwindow(nullptr, m_annotatorDlg, tr("Annotation Tool"));
 }
 
+// Drag and Drop Support
+void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
+    const QMimeData* mimeData = event->mimeData();
+    if (mimeData->hasUrls()) {
+        // Accept if at least one URL is a supported image format
+        for (const QUrl& url : mimeData->urls()) {
+            QString path = url.toLocalFile().toLower();
+            if (path.endsWith(".fits") || path.endsWith(".fit") ||
+                path.endsWith(".xisf") ||
+                path.endsWith(".tiff") || path.endsWith(".tif") ||
+                path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".jpeg")) {
+                event->acceptProposedAction();
+                return;
+            }
+        }
+    }
+    event->ignore();
+}
+
+void MainWindow::dropEvent(QDropEvent* event) {
+    const QMimeData* mimeData = event->mimeData();
+    if (mimeData->hasUrls()) {
+        for (const QUrl& url : mimeData->urls()) {
+            QString path = url.toLocalFile();
+            QFileInfo fi(path);
+            QString ext = fi.suffix().toLower();
+            QString errorMsg;
+            
+            // FITS - Handle multi-extension files like openFile() does
+            if (ext == "fits" || ext == "fit") {
+                QMap<QString, FitsExtensionInfo> exts = FitsLoader::listExtensions(path, &errorMsg);
+                
+                if (exts.isEmpty()) {
+                    // Fallback to single load
+                    ImageBuffer buf;
+                    if (FitsLoader::load(path, buf, &errorMsg)) {
+                        createNewImageWindow(buf, fi.fileName());
+                        log(tr("Opened: %1").arg(fi.fileName()), Log_Success, true);
+                    } else {
+                        log(tr("Failed to load %1: %2").arg(fi.fileName()).arg(errorMsg), Log_Error, true);
+                    }
+                } else {
+                    // Load all extensions
+                    QList<FitsExtensionInfo> sortedExts = exts.values();
+                    std::sort(sortedExts.begin(), sortedExts.end(), [](const FitsExtensionInfo& a, const FitsExtensionInfo& b){
+                        return a.index < b.index;
+                    });
+                    
+                    bool anyLoaded = false;
+                    for (const auto& info : sortedExts) {
+                        ImageBuffer buf;
+                        QString extErr;
+                        if (FitsLoader::loadExtension(path, info.index, buf, &extErr)) {
+                            QString name = fi.fileName();
+                            if (sortedExts.size() > 1) {
+                                name += QString(" [%1]").arg(info.name);
+                            }
+                            createNewImageWindow(buf, name);
+                            anyLoaded = true;
+                        } else {
+                            log(tr("Failed to load extension %1: %2").arg(info.name).arg(extErr), Log_Error);
+                        }
+                    }
+                    
+                    if (anyLoaded) {
+                        log(tr("Opened FITS: %1 (%2 extensions)").arg(fi.fileName()).arg(sortedExts.size()), Log_Success, true);
+                    }
+                }
+            }
+            // XISF - Handle multi-image files like openFile() does
+            else if (ext == "xisf") {
+                QList<XISFImageInfo> imgs = XISFReader::listImages(path, &errorMsg);
+                
+                if (imgs.isEmpty()) {
+                    // Fallback to single read
+                    ImageBuffer buf;
+                    if (XISFReader::read(path, buf, &errorMsg)) {
+                        createNewImageWindow(buf, fi.fileName());
+                        log(tr("Opened: %1").arg(fi.fileName()), Log_Success, true);
+                    } else {
+                        log(tr("Failed to load %1: %2").arg(fi.fileName()).arg(errorMsg), Log_Error, true);
+                    }
+                } else {
+                    bool anyLoaded = false;
+                    for (const auto& info : imgs) {
+                        ImageBuffer buf;
+                        QString imgErr;
+                        if (XISFReader::readImage(path, info.index, buf, &imgErr)) {
+                            QString name = fi.fileName();
+                            if (imgs.size() > 1) {
+                                name += QString(" [%1]").arg(info.name);
+                            }
+                            createNewImageWindow(buf, name);
+                            anyLoaded = true;
+                        } else {
+                            log(tr("Failed to load XISF image %1: %2").arg(info.name).arg(imgErr), Log_Error);
+                        }
+                    }
+                    
+                    if (anyLoaded) {
+                        log(tr("Opened XISF: %1 (%2 images)").arg(fi.fileName()).arg(imgs.size()), Log_Success, true);
+                    }
+                }
+            }
+            // TIFF
+            else if (ext == "tiff" || ext == "tif") {
+                ImageBuffer buf;
+                QString dbg;
+                bool success = buf.loadTiff32(path, &errorMsg, &dbg);
+                if (!success) {
+                    // Fallback
+                    if (buf.loadStandard(path)) {
+                        success = true;
+                        errorMsg.clear();
+                    }
+                }
+                if (success) {
+                    createNewImageWindow(buf, fi.fileName());
+                    log(tr("Opened: %1").arg(fi.fileName()), Log_Success, true);
+                } else {
+                    log(tr("Failed to load %1: %2").arg(fi.fileName()).arg(errorMsg), Log_Error, true);
+                }
+            }
+            // PNG/JPG
+            else if (ext == "png" || ext == "jpg" || ext == "jpeg") {
+                ImageBuffer buf;
+                if (buf.loadStandard(path)) {
+                    createNewImageWindow(buf, fi.fileName());
+                    log(tr("Opened: %1").arg(fi.fileName()), Log_Success, true);
+                } else {
+                    log(tr("Failed to load %1").arg(fi.fileName()), Log_Error, true);
+                }
+            }
+            
+            showConsoleTemporarily(2000);
+            QCoreApplication::processEvents();
+        }
+        event->acceptProposedAction();
+    }
+}

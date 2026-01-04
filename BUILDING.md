@@ -144,3 +144,66 @@ From your MinGW `bin/` directory to the executable folder.
 |----|----------|------------|--------|
 | Windows 11 | MinGW 13.1 | Qt 6.7.0 | ✅ Tested |
 | Windows 10 | MinGW 11.2 | Qt 6.5.0 | ✅ Tested |
+| macOS 11+ (Big Sur) | Apple Clang | Qt 6.5+ | 🔧 Experimental |
+
+---
+
+## Building on macOS
+
+### Prerequisites
+
+| Software | Installation |
+|----------|-------------|
+| Xcode Command Line Tools | `xcode-select --install` |
+| Homebrew | See [brew.sh](https://brew.sh) |
+| Qt6 | `brew install qt@6` |
+| CMake | `brew install cmake` |
+| Ninja (optional) | `brew install ninja` |
+
+### Install Dependencies
+
+```bash
+# Required dependencies
+brew install qt@6 cmake ninja pkg-config
+brew install opencv gsl cfitsio libomp
+
+# Optional (for XISF compression)
+brew install lz4 zstd
+
+# Python for AI tools
+brew install python@3.11
+```
+
+### Build Steps
+
+```bash
+# 1. Setup Python environment
+chmod +x setup_python_macos.sh
+./setup_python_macos.sh
+
+# 2. Build the application
+chmod +x src/build_macos.sh
+./src/build_macos.sh
+
+# 3. Create distribution package
+chmod +x src/package_macos.sh
+./src/package_macos.sh
+
+# 4. Create DMG installer (optional)
+chmod +x src/build_installer_macos.sh
+./src/build_installer_macos.sh
+```
+
+### Output
+
+- **App Bundle**: `build/TStar.app`
+- **Distribution**: `dist/TStar.app`
+- **DMG Installer**: `installer_output/TStar_Setup_X.X.X.dmg`
+
+### Notes
+
+- **Apple Silicon (M1/M2/M3)**: Fully supported. Homebrew installs to `/opt/homebrew`
+- **Intel Macs**: Supported. Homebrew installs to `/usr/local`
+- **Gatekeeper**: On first run, right-click the app and select "Open" to bypass unsigned app warning
+- **Notarization**: For distribution, consider notarizing with `xcrun notarytool`
+

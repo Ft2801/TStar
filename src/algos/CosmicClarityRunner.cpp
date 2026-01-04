@@ -59,10 +59,24 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
     purge(inputDir);
     purge(outputDir);
 
-    // Verify Python availability
+    // Verify Python availability - cross-platform paths
     QString pythonExe = "python";
+    
+#if defined(Q_OS_MAC)
+    // macOS: Check for bundled virtualenv in app bundle Resources
+    QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
+    QString devPython = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
+#else
+    // Windows: Check for bundled embeddable Python
     QString bundledPython = QCoreApplication::applicationDirPath() + "/python/python.exe";
-    if (QFile::exists(bundledPython)) pythonExe = bundledPython;
+    QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
+#endif
+
+    if (QFile::exists(bundledPython)) {
+        pythonExe = bundledPython;
+    } else if (QFile::exists(devPython)) {
+        pythonExe = devPython;
+    }
 
     QProcess pythonCheck;
     pythonCheck.start(pythonExe, QStringList() << "--version");

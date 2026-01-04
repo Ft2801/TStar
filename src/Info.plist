@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Bundle Identification -->
+    <key>CFBundleIdentifier</key>
+    <string>com.fabiotempera.tstar</string>
+    
+    <key>CFBundleName</key>
+    <string>TStar</string>
+    
+    <key>CFBundleDisplayName</key>
+    <string>TStar</string>
+    
+    <key>CFBundleExecutable</key>
+    <string>TStar</string>
+    
+    <!-- Version Information -->
+    <key>CFBundleVersion</key>
+    <string>1.0.0</string>
+    
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    
+    <!-- Bundle Type -->
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    
+    <key>CFBundleSignature</key>
+    <string>????</string>
+    
+    <!-- Icon -->
+    <key>CFBundleIconFile</key>
+    <string>TStar.icns</string>
+    
+    <!-- macOS Specific -->
+    <key>LSMinimumSystemVersion</key>
+    <string>11.0</string>
+    
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    
+    <key>NSSupportsAutomaticGraphicsSwitching</key>
+    <true/>
+    
+    <!-- Category -->
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.photography</string>
+    
+    <!-- Copyright -->
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2026 Fabio Tempera. All rights reserved.</string>
+    
+    <!-- Document Types (FITS, XISF, TIFF) -->
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <!-- FITS Files -->
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>FITS Image</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Owner</string>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>fits</string>
+                <string>fit</string>
+                <string>fts</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>image/fits</string>
+            </array>
+        </dict>
+        
+        <!-- XISF Files -->
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>XISF Image</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Owner</string>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>xisf</string>
+            </array>
+        </dict>
+        
+        <!-- TIFF Files -->
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>TIFF Image</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>tiff</string>
+                <string>tif</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>image/tiff</string>
+            </array>
+        </dict>
+        
+        <!-- PNG Files -->
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>PNG Image</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>png</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>image/png</string>
+            </array>
+        </dict>
+    </array>
+    
+    <!-- Privacy Permissions (if needed for file access) -->
+    <key>NSDesktopFolderUsageDescription</key>
+    <string>TStar needs access to the Desktop to save processed images.</string>
+    
+    <key>NSDocumentsFolderUsageDescription</key>
+    <string>TStar needs access to Documents to open and save images.</string>
+    
+    <key>NSDownloadsFolderUsageDescription</key>
+    <string>TStar needs access to Downloads to open images.</string>
+</dict>
+</plist>

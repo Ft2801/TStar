@@ -1491,6 +1491,585 @@
         </message>
     </context>
     <context>
+        <name>HelpDialog</name>
+        <message>
+            <source>1:1 Zoom:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>AI Processing</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>AI star removal for starless processing:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>AI-based gradient removal:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>AI-powered deconvolution and noise reduction:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Aberration Remover (RAR)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Add object labels and annotations using catalog data.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Adds WCS (World Coordinate System) metadata</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Adds artificial diffraction spikes to bright stars for aesthetic effect.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Adjust color saturation with protection for highlights and shadows.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Adjust polynomial order for model complexity</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Adjust tonal curves for each RGB channel independently or together.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Advanced stretch tool with full control:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Alternative stretches</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Always work on a copy of your original data</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Analyzes star quality metrics (FWHM, roundness, etc.)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Apply Mask:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Apply mathematical expressions to images:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>ArcSinh Stretch</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>ArcSinh:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>AstroSpike</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Auto Background Extraction (ABE)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Auto Stretch (Statistical)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Auto Stretch:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Automatic histogram stretch for best visibility</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Automatically detects and removes gradients</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Automatically stretches the image based on statistical analysis. Ideal for quick previews.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Background Neutralization</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Black Point</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Blends starless and star-only images with adjustable parameters.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Calibrates colors using star catalog data:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Channel Operations</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Check the Console panel for processing messages</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Choose Subtract or Divide mode</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Click Open or press Ctrl+O</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Click Save or press Ctrl+S</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Click and drag to move around the image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Click the 1:1 button for 100% zoom</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Click to add sample points on the background</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Color Management</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Combine Channels</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Combine images with formulas</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Combines separate channel images into one RGB image.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Controls stretch intensity (0-10)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Converts RAW Bayer pattern images to full color.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cosmic Clarity</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Create Mask:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Create and apply luminosity masks for selective processing:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Creates a starless version of your image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Ctrl+Z / Ctrl+Shift+Z</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Curves Transformation</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Debayer</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Display Modes</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Drag &amp; Drop:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Drag files directly onto the workspace</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Effects</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Enable RGB Link for color images to maintain color balance</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Extract Channels</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>FITS Header Editor</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Fit to Window:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Fit to window</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Focus point for stretch (click on image to pick)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>For best results, stretch AFTER background removal</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>GHS (Generalized Hyperbolic Stretch)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Generate mask from image luminosity</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Getting Started</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>GraXpert</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Histogram Transformation</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Histogram equalization</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Histogram:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Identifies the exact sky coordinates of your image:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image Annotator</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Intensity</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Invert Mask:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Invert mask selection</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Keyboard Shortcuts</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Linear:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Load and apply existing mask</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Local intensity adjustment (-5 to 15)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Manual histogram stretch with shadows, midtones, and highlights controls.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Masks</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>More powerful than traditional ABE</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Mouse wheel or Ctrl++ and Ctrl+-</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Navigation Controls</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Neutralizes color casts in the background sky:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Non-linear stretch preserving star colors</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Open Image:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Open file</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Optionally creates a star-only mask</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Pan:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Photometric Color Calibration (PCC)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Pixel Math</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Plate Solving</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Press Ctrl+0</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Protect shadows/highlights from clipping</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Protection</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Raw pixel values without stretch</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Redo</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reduces noise without losing detail</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Removes chromatic aberration and optical artifacts.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Removes gradients and light pollution from your image:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Removes green color cast common in OSC/DSLR images.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Required for PCC and annotation tools</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Requires external Cosmic Clarity installation</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Requires external GraXpert installation</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Requires external StarNet installation</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Requires plate-solved image (WCS data)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>SCNR (Selective Color Noise Reduction)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Saturation</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Save Image:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Save file</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select a region of pure background</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Set black clipping level</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Sharpens stars and details</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Show Overlay:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Specialized stretch that preserves star colors while increasing contrast.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Splits RGB image into separate R, G, B windows.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Square Root / Logarithmic:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Star Analysis</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Star Recomposition</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>StarNet++</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stretch</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stretch Tools</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Symmetry Point</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>TStar - Astrophotography Processing</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>TStar Help &amp; Tutorial</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>TStar supports FITS, XISF, TIFF, and PNG image formats commonly used in astrophotography.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>The tool will balance RGB channels</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Tip: Toggle RGB Link to stretch channels independently or together.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Tips &amp; Best Practices</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Toggle mask visualization</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Undo</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Undo/Redo:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Use Undo frequently - every operation is reversible</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Use the dropdown menu in the toolbar to change visualization:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Use variables like $T (target), $R, $G, $B</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Uses reference stars for accurate color calibration</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Utilities</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>View and edit FITS header metadata.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Welcome to TStar! This guide covers all features and tools available in the application.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Zoom In/Out:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Zoom in</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Zoom out</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>HistogramStretchDialog</name>
         <message>
             <source>Apply</source>
@@ -1910,6 +2489,10 @@
         </message>
         <message>
             <source>Header</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Help</source>
             <translation type="unfinished" />
         </message>
         <message>

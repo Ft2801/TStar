@@ -13,11 +13,11 @@ static const QString UNDO = R"(
 )";
 
 static const QString ZOOM_100 = R"(
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-  <rect x="3" y="5" width="18" height="14" rx="2" stroke-width="2"></rect>
-  <circle cx="8" cy="12" r="1.5" fill="white" stroke="none"></circle>
-  <circle cx="16" cy="12" r="1.5" fill="white" stroke="none"></circle>
-  <path d="M12 9v6" stroke-width="2"></path>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M5 10l2-2v8" />
+  <circle cx="12" cy="10" r="0.8" fill="#ffffff" stroke="none"/>
+  <circle cx="12" cy="14" r="0.8" fill="#ffffff" stroke="none"/>
+  <path d="M17 10l2-2v8" />
 </svg>
 )";
 

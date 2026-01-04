@@ -11,12 +11,20 @@
 #include <QLocale>
 #include "MainWindow.h"
 #include "widgets/SplashScreen.h"
+#include "core/Logger.h"
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    // Initialize logging system BEFORE QApplication
+    // This ensures we capture any early errors
     QCoreApplication::setOrganizationName("FabioTempera");
     QCoreApplication::setApplicationName("TStar");
+    
+    QApplication app(argc, argv);
+    
+    // Now initialize logger with proper paths
+    Logger::init();
+    Logger::info("TStar starting up...", "Main");
     
     // --- Show Splash Screen Immediately ---
     QString appDir = QCoreApplication::applicationDirPath();
@@ -202,7 +210,14 @@ int main(int argc, char *argv[])
     
     splash->startFadeOut();
     window->showMaximized(); 
+    
+    Logger::info("Main window displayed", "Main");
+    Logger::info("Application startup complete", "Main");
 
-    return app.exec();
+    int result = app.exec();
+    
+    Logger::info(QString("Application exiting with code %1").arg(result), "Main");
+    Logger::shutdown();
+    
+    return result;
 }
-
