@@ -111,29 +111,28 @@ jobs:
       # ===========================
       - name: Configure CMake
         run: |
-          # Robust Qt6 Component Detection for Homebrew
-          echo ">>> Detecting Qt6 component paths..."
+          # Robust Qt6 Detection for Homebrew
+          echo ">>> Detecting Qt6 paths..."
           
-          # Initialize path list
-          QT_PREFIX_PATH=""
+          # Use brew --prefix to find the actual paths
+          # Prioritize 'qt' meta-package if available
+          QT_PATH=$(brew --prefix qt 2>/dev/null || brew --prefix qt@6 2>/dev/null)
           
-          # We need qtbase (Core/Widgets), qtsvg (Svg), and qttools (Linguist)
-          # These are often separate kegs in Homebrew
-          for pkg in qtbase qtsvg qttools; do
-            if brew --prefix $pkg &>/dev/null; then
-               PKG_PATH=$(brew --prefix $pkg)
-               echo "✅ Found $pkg at: $PKG_PATH"
-               QT_PREFIX_PATH="${QT_PREFIX_PATH};${PKG_PATH}"
-            else
-               echo "⚠️  Could not find path for $pkg (might be bundled in another package)"
-            fi
-          done
-          
-          # Also check 'qt' meta-package just in case
-          if brew --prefix qt &>/dev/null; then
-             QT_PATH=$(brew --prefix qt)
-             echo "ℹ️  'qt' meta-package at: $QT_PATH"
-             QT_PREFIX_PATH="${QT_PREFIX_PATH};${QT_PATH}"
+          if [ -n "$QT_PATH" ]; then
+            echo "✅ Found Qt6 prefix at: $QT_PATH"
+            QT_PREFIX_PATH="$QT_PATH"
+            
+            # Check for specific components (keg-only additions)
+            for pkg in qtbase qtsvg qttools; do
+               PKG_PATH=$(brew --prefix $pkg 2>/dev/null)
+               if [ -n "$PKG_PATH" ] && [ "$PKG_PATH" != "$QT_PATH" ]; then
+                 echo "ℹ️  Adding component path for $pkg: $PKG_PATH"
+                 QT_PREFIX_PATH="$QT_PREFIX_PATH;$PKG_PATH"
+               fi
+            done
+          else
+            echo "⚠️  Qt6 not found via brew --prefix qt, falling back to standard paths"
+            QT_PREFIX_PATH="/opt/homebrew/opt/qt;/usr/local/opt/qt"
           fi
           
           echo ">>> Final CMAKE_PREFIX_PATH: $QT_PREFIX_PATH"

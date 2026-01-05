@@ -81,10 +81,14 @@ if(APPLE)
     message(STATUS "Homebrew prefix: ${HOMEBREW_PREFIX}")
     
     # Add Homebrew paths to CMake search paths
-    # Include both qt and qt@6 for compatibility with different Homebrew versions
     list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_PREFIX}")
     list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_PREFIX}/opt/qt")
     list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_PREFIX}/opt/qt@6")
+    
+    # Specifically for Qt6 detection if find_package(Qt6) fails otherwise
+    if(EXISTS "${HOMEBREW_PREFIX}/opt/qt/lib/cmake/Qt6")
+        set(Qt6_DIR "${HOMEBREW_PREFIX}/opt/qt/lib/cmake/Qt6" CACHE PATH "Path to Qt6 cmake config")
+    endif()
 endif()
 
 # =============================================================================
