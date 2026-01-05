@@ -112,6 +112,21 @@
         </message>
     </context>
     <context>
+        <name>AberrationInspectorDialog</name>
+        <message>
+            <source>Aberration Inspector</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Panel Size:</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>AboutDialog</name>
         <message>
             <source>About TStar</source>
@@ -640,6 +655,41 @@
         </message>
     </context>
     <context>
+        <name>ClaheDialog</name>
+        <message>
+            <source>Apply</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>CLAHE (Contrast Limited Adaptive Histogram Equalization)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>CLAHE applied.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Clip Limit:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Grid Size:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Parameters</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reset</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>CompressionUtils</name>
         <message>
             <source>LZ4 compress failed</source>
@@ -774,6 +824,85 @@
         </message>
         <message>
             <source>Refresh</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>CorrectionBrushDialog</name>
+        <message>
+            <source>Apply to Document</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Auto-stretch preview</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Content-Aware (Slow, Best)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Controls</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Correction Brush</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Feather:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Fit</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Gaussian Blur</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Linked channels</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Median (Fast)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Method:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opacity:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Radius:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Redo</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Target Median:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Undo</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Zoom In</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Zoom Out</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -1085,6 +1214,85 @@
         </message>
         <message>
             <source>Only single-channel mosaic images can be debayered.</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>ExtractLuminanceDialog</name>
+        <message>
+            <source>Auto Estimate Noise</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Average (Equal)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Custom / Sensor</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Custom RGB Weights</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Extract</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Extract Luminance</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to compute luminance.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Max</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Median</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Method:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No Image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Please select an image first.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Rec. 2020</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Rec. 601</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Rec. 709 (Standard)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>SNR (Noise Weighted)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>SNR Settings</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -2232,6 +2440,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Aberration Inspector</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Aberration Inspector (9-Points)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Aberration Remover</source>
             <translation type="unfinished" />
         </message>
@@ -2340,6 +2556,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>CLAHE</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>CLAHE applied.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Cancel</source>
             <translation type="unfinished" />
         </message>
@@ -2369,6 +2593,14 @@
         </message>
         <message>
             <source>Continuum Subtraction</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Correction Brush</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Correction brush applied.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2433,6 +2665,10 @@
         </message>
         <message>
             <source>Extract Channels</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Extract Luminance</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2540,6 +2776,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Histogram Transformation applied.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Image Annotator</source>
             <translation type="unfinished" />
         </message>
@@ -2597,6 +2837,14 @@
         </message>
         <message>
             <source>Logarithmic</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Luminance extracted.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Luminance recombined.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2696,6 +2944,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Opening Aberration Inspector...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Opening Aberration Remover...</source>
             <translation type="unfinished" />
         </message>
@@ -2705,6 +2957,10 @@
         </message>
         <message>
             <source>Opening AstroSpike Tool...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening CLAHE...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2720,6 +2976,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Opening Correction Brush...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Opening Cosmic Clarity...</source>
             <translation type="unfinished" />
         </message>
@@ -2728,11 +2988,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Opening Extract Luminance...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Opening GHS Tool...</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Opening GraXpert...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening Histogram Transformation...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2748,11 +3016,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Opening Recombine Luminance...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Opening Rotate / Crop Tool...</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Opening SCNR Tool...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening Selective Color Correction...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2777,6 +3053,10 @@
         </message>
         <message>
             <source>PCC Distribution</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Pedestal removed.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2836,6 +3116,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Recombine Luminance</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Redo</source>
             <translation type="unfinished" />
         </message>
@@ -2845,6 +3129,10 @@
         </message>
         <message>
             <source>Remove Mask</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Remove Pedestal (Auto)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2936,7 +3224,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Selective Color Correction</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Selective Color Correction applied.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Settings</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Settings applied. Display refreshed.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3793,6 +4093,81 @@
         </message>
     </context>
     <context>
+        <name>RecombineLuminanceDialog</name>
+        <message>
+            <source>Apply</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Average</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Blend:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Custom / Sensor</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Custom RGB Weights</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Highlight Protection (Soft Knee):</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Luminance Source:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Method:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No Source</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Parameters</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Please select a source luminance image.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Rec. 2020</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Rec. 601</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Rec. 709 (Standard)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Recombination failed. Typically specific to size mismatch or invalid source image.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Recombine Luminance</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>SCNRDialog</name>
         <message>
             <source>Amount:</source>
@@ -3895,7 +4270,114 @@
         </message>
     </context>
     <context>
+        <name>SelectiveColorDialog</name>
+        <message>
+            <source>Apply</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Blue:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>CMY Adjustments</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Contrast:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cyan:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Green:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Hue End (°):</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Hue Selection</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Hue Start (°):</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Intensity:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Invert</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Luminance / Saturation / Contrast</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Luminance:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Magenta:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Min Chroma:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preset:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>RGB Adjustments</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Red:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reset</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Saturation:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Selective Color Correction</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Show Mask</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Smoothness (°):</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Yellow:</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>SettingsDialog</name>
+        <message>
+            <source>24-bit Autostretch (Smoother gradients)</source>
+            <translation type="unfinished" />
+        </message>
         <message>
             <source>Browse...</source>
             <translation type="unfinished" />
@@ -3906,6 +4388,10 @@
         </message>
         <message>
             <source>Cosmic Clarity Folder:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Display</source>
             <translation type="unfinished" />
         </message>
         <message>

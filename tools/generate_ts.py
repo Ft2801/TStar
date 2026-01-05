@@ -6,7 +6,7 @@ from datetime import datetime
 
 # Configuration
 SOURCE_DIR = "../src"
-OUTPUT_FILE = "../translations/tstar_en.ts"
+OUTPUT_FILE = "../translations/tstar_template.ts"
 
 # Regex for matching tr("string") and QCoreApplication::translate("context", "string")
 # Handles escaped quotes mostly

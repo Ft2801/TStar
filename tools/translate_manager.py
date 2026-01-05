@@ -86,14 +86,15 @@ def translate_file(input_file, lang_code, output_file):
         print(f"Failed to translate: {e}")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python translate_manager.py <input_ts>")
-        sys.exit(1)
-        
-    input_ts = sys.argv[1]
+    input_ts = "tstar_template.ts"
+    if len(sys.argv) > 1:
+        input_ts = sys.argv[1]
     
     LANGUAGES = ["it", "es", "fr", "de"]
     
     for lang in LANGUAGES:
-        output_ts = input_ts.replace("_en.ts", f"_{lang}.ts")
+        output_ts = input_ts.replace("_template.ts", f"_{lang}.ts")
+        if output_ts == input_ts:
+             output_ts = input_ts.replace(".ts", f"_{lang}.ts")
+             
         translate_file(input_ts, lang, output_ts)

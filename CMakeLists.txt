@@ -300,6 +300,18 @@ add_executable(TStar
     src/dialogs/HelpDialog.h
     src/widgets/AnnotationOverlay.cpp
     src/widgets/AnnotationOverlay.h
+    src/dialogs/ExtractLuminanceDialog.cpp
+    src/dialogs/ExtractLuminanceDialog.h
+    src/dialogs/RecombineLuminanceDialog.cpp
+    src/dialogs/RecombineLuminanceDialog.h
+    src/dialogs/CorrectionBrushDialog.cpp
+    src/dialogs/CorrectionBrushDialog.h
+    src/dialogs/ClaheDialog.cpp
+    src/dialogs/ClaheDialog.h
+    src/dialogs/AberrationInspectorDialog.cpp
+    src/dialogs/AberrationInspectorDialog.h
+    src/dialogs/SelectiveColorDialog.cpp
+    src/dialogs/SelectiveColorDialog.h
     
     # ===========================
     # Astrometry (src/astrometry/)
@@ -330,7 +342,6 @@ add_executable(TStar
 # Translations
 qt_add_translations(TStar
     TS_FILES 
-        "translations/tstar_en.ts"
         "translations/tstar_it.ts"
         "translations/tstar_es.ts"
         "translations/tstar_fr.ts"

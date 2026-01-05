@@ -28,16 +28,24 @@ HistogramStretchDialog::HistogramStretchDialog(ImageViewer* viewer, QWidget* par
     setViewer(viewer);
 }
 
+
 HistogramStretchDialog::~HistogramStretchDialog() {
-    if (!m_applied && m_viewer) {
+    // Always clean up preview and restore backup
+    if (m_viewer) {
         m_viewer->clearPreviewLUT();
+        if (m_backup.isValid()) {
+            m_viewer->setBuffer(m_backup, m_viewer->windowTitle(), true);
+        }
     }
 }
 
 void HistogramStretchDialog::reject() {
-    // Clear preview and stay with original state
-    if (!m_applied && m_viewer) {
+    // Always clean up preview and restore backup
+    if (m_viewer) {
         m_viewer->clearPreviewLUT();
+        if (m_backup.isValid()) {
+            m_viewer->setBuffer(m_backup, m_viewer->windowTitle(), true);
+        }
     }
     QDialog::reject();
 }
@@ -348,8 +356,11 @@ void HistogramStretchDialog::onApply() {
         m_applied = true;
         
         // --- Persistence: Keep dialog open for continued adjustments ---
-        // Update backup to the newly applied result
+        // Update backup to the newly applied result so subsequent cancels/closes revert to THIS state
         m_backup = buf;
+        // We do NOT set m_applied = true because we want destructor/reject to ALWAYS restore m_backup
+        // (which now holds the applied state). This handles cases where user applies, then changes sliders, then cancels.
+        // m_applied = true; 
         
         // Reset sliders to neutral position
         m_shadows = 0.0f;
@@ -383,6 +394,8 @@ void HistogramStretchDialog::onApply() {
             m_histogram->setData(m_baseHist, m_backup.channels());
         }
         updateClippingStats(m_backup);
+        
+        emit applied();
     }
     // Don't call accept() - keep dialog open for continued adjustments
 }

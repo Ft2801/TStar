@@ -17,12 +17,32 @@ public:
     enum class LumaMethod {
         REC709,
         REC601,
-        // REC2020, // Can add later
+        REC2020,
         AVERAGE,
-        MAX
+        MAX,
+        MEDIAN,
+        SNR,
+        CUSTOM
     };
 
-    static ImageBuffer computeLuminance(const ImageBuffer& src, LumaMethod method = LumaMethod::REC709);
+    // Extended computeLuminance with support for Custom weights and SNR
+    static ImageBuffer computeLuminance(const ImageBuffer& src, LumaMethod method = LumaMethod::REC709, 
+                                        const std::vector<float>& customWeights = {}, 
+                                        const std::vector<float>& customNoiseSigma = {});
+
+    // Recombine luminance into target image (L_new / L_old * RGB)
+    // target: RGB image to modify
+    // sourceL: New luminance (mono)
+    static bool recombineLuminance(ImageBuffer& target, const ImageBuffer& sourceL, 
+                                   LumaMethod method = LumaMethod::REC709, 
+                                   float blend = 1.0f, float softKnee = 0.0f,
+                                   const std::vector<float>& customWeights = {});
+
+    // Helper to estimate noise sigma per channel (for SNR weighting)
+    static std::vector<float> estimateNoiseSigma(const ImageBuffer& src);
+    
+    // Remove pedestal (subtract min per channel)
+    static void removePedestal(ImageBuffer& img);
 
     // Debayer (demosaic) a single-channel Bayer mosaic to RGB
     // pattern: "RGGB", "BGGR", "GRBG", or "GBRG"
@@ -36,9 +56,9 @@ public:
     static ImageBuffer continuumSubtract(const ImageBuffer& narrowband, const ImageBuffer& continuum, float qFactor = 0.8f);
 
 private:
-    static float getLumaWeightR(LumaMethod method);
-    static float getLumaWeightG(LumaMethod method);
-    static float getLumaWeightB(LumaMethod method);
+    static float getLumaWeightR(LumaMethod method, const std::vector<float>& customWeights = {});
+    static float getLumaWeightG(LumaMethod method, const std::vector<float>& customWeights = {});
+    static float getLumaWeightB(LumaMethod method, const std::vector<float>& customWeights = {});
 };
 
 #endif // CHANNEL_OPS_H

@@ -27,6 +27,9 @@ public:
 protected:
     void reject() override;  // Handle close/cancel
 
+signals:
+    void applied();
+
 private slots:
     void onShadowsChanged();
     void onMidtonesChanged();

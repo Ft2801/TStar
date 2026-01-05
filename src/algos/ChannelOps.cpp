@@ -61,7 +61,58 @@ ImageBuffer ChannelOps::combineChannels(const ImageBuffer& r, const ImageBuffer&
     return out;
 }
 
-ImageBuffer ChannelOps::computeLuminance(const ImageBuffer& src, LumaMethod method) {
+// Helper: Estimate Noise Sigma (MAD based)
+std::vector<float> ChannelOps::estimateNoiseSigma(const ImageBuffer& src) {
+    if (!src.isValid()) return {};
+    int w = src.width();
+    int h = src.height();
+    int c = src.channels();
+    std::vector<float> sigmas(c);
+    
+    // Subsample for speed (step 4 pixels)
+    int tempW = w;
+    int tempH = h;
+    int step = 4;
+    
+    if (tempW < 10 || tempH < 10) step = 1;
+
+    const float* s = src.data().data();
+    std::vector<float> sub;
+    sub.reserve((w/step + 1) * (h/step + 1));
+
+    for (int ch = 0; ch < c; ++ch) {
+        sub.clear();
+        for (int y = 0; y < h; y+=step) {
+             for (int x = 0; x < w; x+=step) {
+                 sub.push_back(s[(y * w + x) * c + ch]);
+             }
+        }
+        
+        if (sub.empty()) { sigmas[ch] = 1e-5f; continue; }
+        
+        // Median
+        size_t n = sub.size();
+        std::nth_element(sub.begin(), sub.begin() + n/2, sub.end());
+        float med = sub[n/2];
+        
+        // MAD
+        std::vector<float> absDevs(n);
+        for(size_t i=0; i<n; ++i) absDevs[i] = std::abs(sub[i] - med);
+        
+        std::nth_element(absDevs.begin(), absDevs.begin() + n/2, absDevs.end());
+        float mad = absDevs[n/2];
+        
+        float sigma = 1.4826f * mad;
+        if (sigma < 1e-12f) sigma = 1e-12f;
+        sigmas[ch] = sigma;
+    }
+    return sigmas;
+}
+
+ImageBuffer ChannelOps::computeLuminance(const ImageBuffer& src, LumaMethod method, 
+                                        const std::vector<float>& customWeights, 
+                                        const std::vector<float>& customNoiseSigma) 
+{
     if (!src.isValid()) return ImageBuffer();
     
     int w = src.width();
@@ -71,55 +122,167 @@ ImageBuffer ChannelOps::computeLuminance(const ImageBuffer& src, LumaMethod meth
     std::vector<float> dst(w * h);
     const float* s = src.data().data();
 
+    // Single Channel optimization
     if (c == 1) {
         std::copy(s, s + w * h, dst.begin());
         ImageBuffer out;
         out.setData(w, h, 1, dst);
-        out.setMetadata(src.metadata()); // Preserve WCS
+        out.setMetadata(src.metadata());
         return out;
     }
 
-    float wr = getLumaWeightR(method);
-    float wg = getLumaWeightG(method);
-    float wb = getLumaWeightB(method);
-
+    // Determine Weights
+    float wr = 0.333f, wg = 0.333f, wb = 0.333f;
+    bool useWeights = true;
+    
+    if (method == LumaMethod::MAX || method == LumaMethod::MEDIAN) {
+        useWeights = false;
+    } else if (method == LumaMethod::SNR) {
+        std::vector<float> sigmas = customNoiseSigma;
+        if (sigmas.size() != c) {
+            sigmas = estimateNoiseSigma(src);
+        }
+        // w = 1 / (sigma^2 + eps), normalized
+        float sumW = 0.0f;
+        std::vector<float> ws(c);
+        for(int i=0; i<c; ++i) {
+            ws[i] = 1.0f / (sigmas[i] * sigmas[i] + 1e-12f);
+            sumW += ws[i];
+        }
+        if (sumW > 0) {
+            if (c >= 3) {
+                wr = ws[0] / sumW; wg = ws[1] / sumW; wb = ws[2] / sumW;
+            } else {
+                // Should handle != 3 channels generically but for now TStar assumes RGB mainly
+                 wr=1.0f; wg=0; wb=0; // Fallback
+            }
+        }
+    } else {
+        wr = getLumaWeightR(method, customWeights);
+        wg = getLumaWeightG(method, customWeights);
+        wb = getLumaWeightB(method, customWeights);
+    }
+    
+    // Compute
     for (int i = 0; i < w * h; ++i) {
         float val = 0.0f;
         if (method == LumaMethod::MAX) {
-            float v1 = s[i*c+0];
-            float v2 = s[i*c+1];
-            float v3 = s[i*c+2];
-            val = (v1 > v2) ? ((v1 > v3) ? v1 : v3) : ((v2 > v3) ? v2 : v3);
-        } else if (method == LumaMethod::AVERAGE) {
-            val = (s[i*c+0] + s[i*c+1] + s[i*c+2]) / 3.0f;
+            float v1 = s[i*c+0], v2 = s[i*c+1], v3 = s[i*c+2];
+            val = std::max({v1, v2, v3});
+        } else if (method == LumaMethod::MEDIAN) {
+            float v[3] = {s[i*c+0], s[i*c+1], s[i*c+2]};
+            if (v[0] > v[1]) std::swap(v[0], v[1]);
+            if (v[1] > v[2]) std::swap(v[1], v[2]);
+            if (v[0] > v[1]) std::swap(v[0], v[1]);
+            val = v[1];
         } else {
+            // Weighted Sum
             val = s[i*c+0] * wr + s[i*c+1] * wg + s[i*c+2] * wb;
         }
-        dst[i] = val;
+        dst[i] = std::clamp(val, 0.0f, 1.0f);
     }
     
     ImageBuffer out;
     out.setData(w, h, 1, dst);
-    out.setMetadata(src.metadata()); // Preserve WCS
+    out.setMetadata(src.metadata());
     return out;
 }
 
+bool ChannelOps::recombineLuminance(ImageBuffer& target, const ImageBuffer& sourceL, 
+                                   LumaMethod method, 
+                                   float blend, float softKnee,
+                                   const std::vector<float>& customWeights)
+{
+    if (!target.isValid() || !sourceL.isValid()) return false;
+    if (sourceL.channels() != 1) return false;
+    
+    if (target.width() != sourceL.width() || target.height() != sourceL.height()) return false;
+    
+    int w = target.width();
+    int h = target.height();
+    int c = target.channels();
+    if (c < 3) return false;
+    
+    float wr, wg, wb;
+    if (method == LumaMethod::REC601 || method == LumaMethod::REC2020 || 
+        method == LumaMethod::REC709 || method == LumaMethod::CUSTOM || method == LumaMethod::AVERAGE) {
+        wr = getLumaWeightR(method, customWeights);
+        wg = getLumaWeightG(method, customWeights);
+        wb = getLumaWeightB(method, customWeights);
+    } else {
+        // Fallback for non-linear methods (Max/Median/SNR) - Use Rec709 as the "Linear Basis" for recombination scaling
+        wr = 0.2126f; wg = 0.7152f; wb = 0.0722f;
+    }
+    
+    float* rgb = target.data().data();
+    const float* L = sourceL.data().data();
+    const float eps = 1e-6f;
+    
+    for (int i = 0; i < w * h; ++i) {
+        float r = rgb[i*c+0];
+        float g = rgb[i*c+1];
+        float b = rgb[i*c+2];
+        
+        // Current Y (Linear Estimate)
+        float Y = r*wr + g*wg + b*wb; 
+        
+        // Target L
+        float newL = L[i];
+        
+        // Scale factor
+        float s = newL / (Y + eps);
+        
+        // Soft knee (compression of extreme highlights)
+        if (softKnee > 0.0f) {
+            float k = std::clamp(softKnee, 0.0f, 1.0f);
+            s = s / (1.0f + k * (s - 1.0f));
+        }
+        
+        // Apply
+        float nr = r * s;
+        float ng = g * s;
+        float nb = b * s;
+        
+        // Blend
+        if (blend < 1.0f && blend >= 0.0f) {
+            nr = r * (1.0f - blend) + nr * blend;
+            ng = g * (1.0f - blend) + ng * blend;
+            nb = b * (1.0f - blend) + nb * blend;
+        }
+        
+        rgb[i*c+0] = std::clamp(nr, 0.0f, 1.0f);
+        rgb[i*c+1] = std::clamp(ng, 0.0f, 1.0f);
+        rgb[i*c+2] = std::clamp(nb, 0.0f, 1.0f);
+    }
+    
+    target.setModified(true);
+    return true;
+}
 
-float ChannelOps::getLumaWeightR(LumaMethod method) {
+float ChannelOps::getLumaWeightR(LumaMethod method, const std::vector<float>& customWeights) {
+    if (method == LumaMethod::CUSTOM && customWeights.size() >= 3) return customWeights[0];
     switch (method) {
         case LumaMethod::REC601: return 0.299f;
+        case LumaMethod::REC2020: return 0.2627f;
+        case LumaMethod::AVERAGE: return 0.3333f;
         case LumaMethod::REC709: default: return 0.2126f;
     }
 }
-float ChannelOps::getLumaWeightG(LumaMethod method) {
+float ChannelOps::getLumaWeightG(LumaMethod method, const std::vector<float>& customWeights) {
+    if (method == LumaMethod::CUSTOM && customWeights.size() >= 3) return customWeights[1];
     switch (method) {
         case LumaMethod::REC601: return 0.587f;
+        case LumaMethod::REC2020: return 0.6780f;
+        case LumaMethod::AVERAGE: return 0.3333f;
         case LumaMethod::REC709: default: return 0.7152f;
     }
 }
-float ChannelOps::getLumaWeightB(LumaMethod method) {
+float ChannelOps::getLumaWeightB(LumaMethod method, const std::vector<float>& customWeights) {
+    if (method == LumaMethod::CUSTOM && customWeights.size() >= 3) return customWeights[2];
     switch (method) {
         case LumaMethod::REC601: return 0.114f;
+        case LumaMethod::REC2020: return 0.0593f;
+        case LumaMethod::AVERAGE: return 0.3333f;
         case LumaMethod::REC709: default: return 0.0722f;
     }
 }
@@ -339,5 +502,35 @@ ImageBuffer ChannelOps::continuumSubtract(const ImageBuffer& narrowband, const I
     out.setData(w, h, 1, result);
     out.setMetadata(narrowband.metadata()); // Preserve WCS and other metadata
     return out;
+}
+
+void ChannelOps::removePedestal(ImageBuffer& img) {
+    if (!img.isValid()) return;
+    int w = img.width();
+    int h = img.height();
+    int c = img.channels();
+    float* data = img.data().data();
+    size_t total = (size_t)w * h;
+    
+    if (total == 0) return;
+    
+    std::vector<float> mins(c, std::numeric_limits<float>::max());
+    
+    // 1. Find minimums
+    for (size_t i = 0; i < total; ++i) {
+        for (int ch = 0; ch < c; ++ch) {
+            float val = data[i * c + ch];
+            if (val < mins[ch]) mins[ch] = val;
+        }
+    }
+    
+    // 2. Subtract
+    #pragma omp parallel for
+    for (size_t i = 0; i < total; ++i) {
+        for (int ch = 0; ch < c; ++ch) {
+            float val = data[i * c + ch] - mins[ch];
+            data[i * c + ch] = std::max(0.0f, val);
+        }
+    }
 }
 

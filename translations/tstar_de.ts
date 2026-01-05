@@ -112,6 +112,21 @@
         </message>
     </context>
     <context>
+        <name>AberrationInspectorDialog</name>
+        <message>
+            <source>Aberration Inspector</source>
+            <translation type="finished">Aberrationsinspektor</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Schließen</translation>
+        </message>
+        <message>
+            <source>Panel Size:</source>
+            <translation type="finished">Panelgröße:</translation>
+        </message>
+    </context>
+    <context>
         <name>AboutDialog</name>
         <message>
             <source>About TStar</source>
@@ -178,7 +193,7 @@
         </message>
         <message>
             <source>Cyan</source>
-            <translation type="finished">Zyan</translation>
+            <translation type="finished">Cyan</translation>
         </message>
         <message>
             <source>Draw Arrow</source>
@@ -640,6 +655,41 @@
         </message>
     </context>
     <context>
+        <name>ClaheDialog</name>
+        <message>
+            <source>Apply</source>
+            <translation type="finished">Anwenden</translation>
+        </message>
+        <message>
+            <source>CLAHE (Contrast Limited Adaptive Histogram Equalization)</source>
+            <translation type="finished">CLAHE (Kontrastbegrenzte adaptive Histogramm-Entzerrung)</translation>
+        </message>
+        <message>
+            <source>CLAHE applied.</source>
+            <translation type="finished">CLAHE angewendet.</translation>
+        </message>
+        <message>
+            <source>Clip Limit:</source>
+            <translation type="finished">Clip-Limit:</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Schließen</translation>
+        </message>
+        <message>
+            <source>Grid Size:</source>
+            <translation type="finished">Rastergröße:</translation>
+        </message>
+        <message>
+            <source>Parameters</source>
+            <translation type="finished">Parameter</translation>
+        </message>
+        <message>
+            <source>Reset</source>
+            <translation type="finished">Zurücksetzen</translation>
+        </message>
+    </context>
+    <context>
         <name>CompressionUtils</name>
         <message>
             <source>LZ4 compress failed</source>
@@ -775,6 +825,85 @@
         <message>
             <source>Refresh</source>
             <translation type="finished">Aktualisieren</translation>
+        </message>
+    </context>
+    <context>
+        <name>CorrectionBrushDialog</name>
+        <message>
+            <source>Apply to Document</source>
+            <translation type="finished">Auf Dokument anwenden</translation>
+        </message>
+        <message>
+            <source>Auto-stretch preview</source>
+            <translation type="finished">Vorschau automatisch strecken</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Schließen</translation>
+        </message>
+        <message>
+            <source>Content-Aware (Slow, Best)</source>
+            <translation type="finished">Content-Aware (Langsam, Beste)</translation>
+        </message>
+        <message>
+            <source>Controls</source>
+            <translation type="finished">Steuerung</translation>
+        </message>
+        <message>
+            <source>Correction Brush</source>
+            <translation type="finished">Korrekturpinsel</translation>
+        </message>
+        <message>
+            <source>Feather:</source>
+            <translation type="finished">Weiche Kante:</translation>
+        </message>
+        <message>
+            <source>Fit</source>
+            <translation type="finished">Anpassen</translation>
+        </message>
+        <message>
+            <source>Gaussian Blur</source>
+            <translation type="finished">Gaußscher Weichzeichner</translation>
+        </message>
+        <message>
+            <source>Linked channels</source>
+            <translation type="finished">Verknüpfte Kanäle</translation>
+        </message>
+        <message>
+            <source>Median (Fast)</source>
+            <translation type="finished">Median (Schnell)</translation>
+        </message>
+        <message>
+            <source>Method:</source>
+            <translation type="finished">Methode:</translation>
+        </message>
+        <message>
+            <source>Opacity:</source>
+            <translation type="finished">Deckkraft:</translation>
+        </message>
+        <message>
+            <source>Radius:</source>
+            <translation type="finished">Radius:</translation>
+        </message>
+        <message>
+            <source>Redo</source>
+            <translation type="finished">Wiederholen</translation>
+        </message>
+        <message>
+            <source>Target Median:</source>
+            <translation type="finished">Zielmedian:</translation>
+        </message>
+        <message>
+            <source>Undo</source>
+            <translation type="finished">Rückgängig</translation>
+        </message>
+        <message>
+            <source>Zoom In</source>
+            <translation type="finished">Hereinzoomen</translation>
+        </message>
+        <message>
+            <source>Zoom Out</source>
+            <translation type="finished">Herauszoomen</translation>
         </message>
     </context>
     <context>
@@ -1086,6 +1215,85 @@
         <message>
             <source>Only single-channel mosaic images can be debayered.</source>
             <translation type="finished">Nur Einkanal-Mosaikbilder können debayered werden.</translation>
+        </message>
+    </context>
+    <context>
+        <name>ExtractLuminanceDialog</name>
+        <message>
+            <source>Auto Estimate Noise</source>
+            <translation type="finished">Rauschen automatisch schätzen</translation>
+        </message>
+        <message>
+            <source>Average (Equal)</source>
+            <translation type="finished">Durchschnitt (Gleich)</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Schließen</translation>
+        </message>
+        <message>
+            <source>Custom / Sensor</source>
+            <translation type="finished">Benutzerdefiniert / Sensor</translation>
+        </message>
+        <message>
+            <source>Custom RGB Weights</source>
+            <translation type="finished">Benutzerdefinierte RGB-Gewichte</translation>
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="finished">Fehler</translation>
+        </message>
+        <message>
+            <source>Extract</source>
+            <translation type="finished">Extrahieren</translation>
+        </message>
+        <message>
+            <source>Extract Luminance</source>
+            <translation type="finished">Luminanz extrahieren</translation>
+        </message>
+        <message>
+            <source>Failed to compute luminance.</source>
+            <translation type="finished">Berechnung der Luminanz fehlgeschlagen.</translation>
+        </message>
+        <message>
+            <source>Max</source>
+            <translation type="finished">Max</translation>
+        </message>
+        <message>
+            <source>Median</source>
+            <translation type="finished">Median</translation>
+        </message>
+        <message>
+            <source>Method:</source>
+            <translation type="finished">Methode:</translation>
+        </message>
+        <message>
+            <source>No Image</source>
+            <translation type="finished">Kein Bild</translation>
+        </message>
+        <message>
+            <source>Please select an image first.</source>
+            <translation type="finished">Bitten wählen Sie zuerst ein Bild aus.</translation>
+        </message>
+        <message>
+            <source>Rec. 2020</source>
+            <translation type="finished">Rec. 2020</translation>
+        </message>
+        <message>
+            <source>Rec. 601</source>
+            <translation type="finished">Rec. 601</translation>
+        </message>
+        <message>
+            <source>Rec. 709 (Standard)</source>
+            <translation type="finished">Rec. 709 (Standard)</translation>
+        </message>
+        <message>
+            <source>SNR (Noise Weighted)</source>
+            <translation type="finished">SNR (Rauschgewichtet)</translation>
+        </message>
+        <message>
+            <source>SNR Settings</source>
+            <translation type="finished">SNR-Einstellungen</translation>
         </message>
     </context>
     <context>
@@ -2234,6 +2442,14 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">KI-Verarbeitung</translation>
         </message>
         <message>
+            <source>Aberration Inspector</source>
+            <translation type="finished">Aberrationsinspektor</translation>
+        </message>
+        <message>
+            <source>Aberration Inspector (9-Points)</source>
+            <translation type="finished">Aberrationsinspektor (9 Punkte)</translation>
+        </message>
+        <message>
             <source>Aberration Remover</source>
             <translation type="finished">Aberrationsentferner</translation>
         </message>
@@ -2342,6 +2558,14 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Anmerkungen einbrennen</translation>
         </message>
         <message>
+            <source>CLAHE</source>
+            <translation type="finished">CLAHE</translation>
+        </message>
+        <message>
+            <source>CLAHE applied.</source>
+            <translation type="finished">CLAHE angewendet.</translation>
+        </message>
+        <message>
             <source>Cancel</source>
             <translation type="finished">Abbrechen</translation>
         </message>
@@ -2372,6 +2596,14 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Continuum Subtraction</source>
             <translation type="finished">Kontinuum-Subtraktion</translation>
+        </message>
+        <message>
+            <source>Correction Brush</source>
+            <translation type="finished">Korrekturpinsel</translation>
+        </message>
+        <message>
+            <source>Correction brush applied.</source>
+            <translation type="finished">Korrekturpinsel angewendet.</translation>
         </message>
         <message>
             <source>Cosmic Clarity</source>
@@ -2436,6 +2668,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Extract Channels</source>
             <translation type="finished">Kanäle extrahieren</translation>
+        </message>
+        <message>
+            <source>Extract Luminance</source>
+            <translation type="finished">Luminanz extrahieren</translation>
         </message>
         <message>
             <source>FITS (*.fits);;XISF (*.xisf);;TIFF (*.tif *.tiff);;PNG (*.png);;JPG (*.jpg)</source>
@@ -2542,6 +2778,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Histogramm-Transformation</translation>
         </message>
         <message>
+            <source>Histogram Transformation applied.</source>
+            <translation type="finished">Histogrammtransformation angewendet.</translation>
+        </message>
+        <message>
             <source>Image Annotator</source>
             <translation type="finished">Bild-Annotator</translation>
         </message>
@@ -2600,6 +2840,14 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Logarithmic</source>
             <translation type="finished">Logarithmisch</translation>
+        </message>
+        <message>
+            <source>Luminance extracted.</source>
+            <translation type="finished">Luminanz extrahiert.</translation>
+        </message>
+        <message>
+            <source>Luminance recombined.</source>
+            <translation type="finished">Luminanz rekombiniert.</translation>
         </message>
         <message>
             <source>Mask</source>
@@ -2698,6 +2946,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Geöffnet: %1</translation>
         </message>
         <message>
+            <source>Opening Aberration Inspector...</source>
+            <translation type="finished">Öffne Aberrationsinspektor...</translation>
+        </message>
+        <message>
             <source>Opening Aberration Remover...</source>
             <translation type="finished">Öffne Aberrationsentferner...</translation>
         </message>
@@ -2708,6 +2960,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Opening AstroSpike Tool...</source>
             <translation type="finished">Öffne AstroSpike-Werkzeug...</translation>
+        </message>
+        <message>
+            <source>Opening CLAHE...</source>
+            <translation type="finished">Öffne CLAHE...</translation>
         </message>
         <message>
             <source>Opening Color Saturation tool...</source>
@@ -2722,6 +2978,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Öffne Kontinuum-Subtraktion...</translation>
         </message>
         <message>
+            <source>Opening Correction Brush...</source>
+            <translation type="finished">Öffne Korrekturpinsel...</translation>
+        </message>
+        <message>
             <source>Opening Cosmic Clarity...</source>
             <translation type="finished">Öffne Cosmic Clarity...</translation>
         </message>
@@ -2730,12 +2990,20 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Öffne Debayer...</translation>
         </message>
         <message>
+            <source>Opening Extract Luminance...</source>
+            <translation type="finished">Öffne Luminanzextraktion...</translation>
+        </message>
+        <message>
             <source>Opening GHS Tool...</source>
             <translation type="finished">Öffne GHS-Werkzeug...</translation>
         </message>
         <message>
             <source>Opening GraXpert...</source>
             <translation type="finished">Öffne GraXpert...</translation>
+        </message>
+        <message>
+            <source>Opening Histogram Transformation...</source>
+            <translation type="finished">Öffne Histogrammtransformation...</translation>
         </message>
         <message>
             <source>Opening Perfect Palette...</source>
@@ -2750,12 +3018,20 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Öffne Plate Solving...</translation>
         </message>
         <message>
+            <source>Opening Recombine Luminance...</source>
+            <translation type="finished">Öffne Luminanzrekombination...</translation>
+        </message>
+        <message>
             <source>Opening Rotate / Crop Tool...</source>
             <translation type="finished">Öffne Dreh-/Schneidewerkzeug...</translation>
         </message>
         <message>
             <source>Opening SCNR Tool...</source>
             <translation type="finished">Öffne SCNR-Werkzeug...</translation>
+        </message>
+        <message>
+            <source>Opening Selective Color Correction...</source>
+            <translation type="finished">Öffne Selektive Farbkorrektur...</translation>
         </message>
         <message>
             <source>Opening Star Recomposition...</source>
@@ -2780,6 +3056,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>PCC Distribution</source>
             <translation type="finished">PCC Verteilung</translation>
+        </message>
+        <message>
+            <source>Pedestal removed.</source>
+            <translation type="finished">Sockel entfernt.</translation>
         </message>
         <message>
             <source>Perfect Palette</source>
@@ -2819,7 +3099,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>Please select an image first.</source>
-            <translation type="finished">Bitte wählen Sie zuerst ein Bild.</translation>
+            <translation type="finished">Bitten wählen Sie zuerst ein Bild aus.</translation>
         </message>
         <message>
             <source>Please select an image to crop.</source>
@@ -2838,6 +3118,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">RGB Erforderlich</translation>
         </message>
         <message>
+            <source>Recombine Luminance</source>
+            <translation type="finished">Luminanz rekombinieren</translation>
+        </message>
+        <message>
             <source>Redo</source>
             <translation type="finished">Wiederholen</translation>
         </message>
@@ -2848,6 +3132,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Remove Mask</source>
             <translation type="finished">Maske entfernen</translation>
+        </message>
+        <message>
+            <source>Remove Pedestal (Auto)</source>
+            <translation type="finished">Sockel entfernen (Auto)</translation>
         </message>
         <message>
             <source>Remove Stars (StarNet)</source>
@@ -2939,8 +3227,20 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Bild wählen.</translation>
         </message>
         <message>
+            <source>Selective Color Correction</source>
+            <translation type="finished">Selektive Farbkorrektur</translation>
+        </message>
+        <message>
+            <source>Selective Color Correction applied.</source>
+            <translation type="finished">Selektive Farbkorrektur angewendet.</translation>
+        </message>
+        <message>
             <source>Settings</source>
             <translation type="finished">Einstellungen</translation>
+        </message>
+        <message>
+            <source>Settings applied. Display refreshed.</source>
+            <translation type="finished">Einstellungen angewendet. Anzeige aktualisiert.</translation>
         </message>
         <message>
             <source>Show Overlay</source>
@@ -3427,7 +3727,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>Please select an image first.</source>
-            <translation type="finished">Bitte wählen Sie zuerst ein Bild.</translation>
+            <translation type="finished">Bitten wählen Sie zuerst ein Bild aus.</translation>
         </message>
         <message>
             <source>Select View</source>
@@ -3752,7 +4052,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>Please select an image first.</source>
-            <translation type="finished">Bitte wählen Sie zuerst ein Bild.</translation>
+            <translation type="finished">Bitten wählen Sie zuerst ein Bild aus.</translation>
         </message>
         <message>
             <source>Provider:</source>
@@ -3793,6 +4093,81 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>© 2026 Riccardo Alberghi</source>
             <translation type="finished">© 2026 Riccardo Alberghi</translation>
+        </message>
+    </context>
+    <context>
+        <name>RecombineLuminanceDialog</name>
+        <message>
+            <source>Apply</source>
+            <translation type="finished">Anwenden</translation>
+        </message>
+        <message>
+            <source>Average</source>
+            <translation type="finished">Durchschnitt</translation>
+        </message>
+        <message>
+            <source>Blend:</source>
+            <translation type="finished">Mischung:</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Schließen</translation>
+        </message>
+        <message>
+            <source>Custom / Sensor</source>
+            <translation type="finished">Benutzerdefiniert / Sensor</translation>
+        </message>
+        <message>
+            <source>Custom RGB Weights</source>
+            <translation type="finished">Benutzerdefinierte RGB-Gewichte</translation>
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="finished">Fehler</translation>
+        </message>
+        <message>
+            <source>Highlight Protection (Soft Knee):</source>
+            <translation type="finished">Lichter-Schutz (Soft Knee):</translation>
+        </message>
+        <message>
+            <source>Luminance Source:</source>
+            <translation type="finished">Luminanzquelle:</translation>
+        </message>
+        <message>
+            <source>Method:</source>
+            <translation type="finished">Methode:</translation>
+        </message>
+        <message>
+            <source>No Source</source>
+            <translation type="finished">Keine Quelle</translation>
+        </message>
+        <message>
+            <source>Parameters</source>
+            <translation type="finished">Parameter</translation>
+        </message>
+        <message>
+            <source>Please select a source luminance image.</source>
+            <translation type="finished">Bitte wähle ein Quell-Luminanzbild aus.</translation>
+        </message>
+        <message>
+            <source>Rec. 2020</source>
+            <translation type="finished">Rec. 2020</translation>
+        </message>
+        <message>
+            <source>Rec. 601</source>
+            <translation type="finished">Rec. 601</translation>
+        </message>
+        <message>
+            <source>Rec. 709 (Standard)</source>
+            <translation type="finished">Rec. 709 (Standard)</translation>
+        </message>
+        <message>
+            <source>Recombination failed. Typically specific to size mismatch or invalid source image.</source>
+            <translation type="finished">Rekombination fehlgeschlagen. Typischerweise aufgrund von Größenfehlanpassung oder ungültigem Quellbild.</translation>
+        </message>
+        <message>
+            <source>Recombine Luminance</source>
+            <translation type="finished">Luminanz rekombinieren</translation>
         </message>
     </context>
     <context>
@@ -3898,7 +4273,114 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
     </context>
     <context>
+        <name>SelectiveColorDialog</name>
+        <message>
+            <source>Apply</source>
+            <translation type="finished">Anwenden</translation>
+        </message>
+        <message>
+            <source>Blue:</source>
+            <translation type="finished">Blau:</translation>
+        </message>
+        <message>
+            <source>CMY Adjustments</source>
+            <translation type="finished">CMY-Anpassungen</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Schließen</translation>
+        </message>
+        <message>
+            <source>Contrast:</source>
+            <translation type="finished">Kontrast:</translation>
+        </message>
+        <message>
+            <source>Cyan:</source>
+            <translation type="finished">Cyan:</translation>
+        </message>
+        <message>
+            <source>Green:</source>
+            <translation type="finished">Grün:</translation>
+        </message>
+        <message>
+            <source>Hue End (°):</source>
+            <translation type="finished">Farbton Ende (°):</translation>
+        </message>
+        <message>
+            <source>Hue Selection</source>
+            <translation type="finished">Farbtonauswahl</translation>
+        </message>
+        <message>
+            <source>Hue Start (°):</source>
+            <translation type="finished">Farbton Start (°):</translation>
+        </message>
+        <message>
+            <source>Intensity:</source>
+            <translation type="finished">Intensität:</translation>
+        </message>
+        <message>
+            <source>Invert</source>
+            <translation type="finished">Invertieren</translation>
+        </message>
+        <message>
+            <source>Luminance / Saturation / Contrast</source>
+            <translation type="finished">Luminanz / Sättigung / Kontrast</translation>
+        </message>
+        <message>
+            <source>Luminance:</source>
+            <translation type="finished">Luminanz:</translation>
+        </message>
+        <message>
+            <source>Magenta:</source>
+            <translation type="finished">Magenta:</translation>
+        </message>
+        <message>
+            <source>Min Chroma:</source>
+            <translation type="finished">Min Chroma:</translation>
+        </message>
+        <message>
+            <source>Preset:</source>
+            <translation type="finished">Voreinstellung:</translation>
+        </message>
+        <message>
+            <source>RGB Adjustments</source>
+            <translation type="finished">RGB-Anpassungen</translation>
+        </message>
+        <message>
+            <source>Red:</source>
+            <translation type="finished">Rot:</translation>
+        </message>
+        <message>
+            <source>Reset</source>
+            <translation type="finished">Zurücksetzen</translation>
+        </message>
+        <message>
+            <source>Saturation:</source>
+            <translation type="finished">Sättigung:</translation>
+        </message>
+        <message>
+            <source>Selective Color Correction</source>
+            <translation type="finished">Selektive Farbkorrektur</translation>
+        </message>
+        <message>
+            <source>Show Mask</source>
+            <translation type="finished">Maske anzeigen</translation>
+        </message>
+        <message>
+            <source>Smoothness (°):</source>
+            <translation type="finished">Glätte (°):</translation>
+        </message>
+        <message>
+            <source>Yellow:</source>
+            <translation type="finished">Gelb:</translation>
+        </message>
+    </context>
+    <context>
         <name>SettingsDialog</name>
+        <message>
+            <source>24-bit Autostretch (Smoother gradients)</source>
+            <translation type="finished">24-Bit Autostretch (Glattere Verläufe)</translation>
+        </message>
         <message>
             <source>Browse...</source>
             <translation type="finished">Durchsuchen...</translation>
@@ -3910,6 +4392,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Cosmic Clarity Folder:</source>
             <translation type="finished">Cosmic Clarity Folder:</translation>
+        </message>
+        <message>
+            <source>Display</source>
+            <translation type="finished">Anzeige</translation>
         </message>
         <message>
             <source>Executables (*.exe);;All Files (*)</source>

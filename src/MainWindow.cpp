@@ -74,6 +74,12 @@
 #include "dialogs/AnnotationToolDialog.h"
 #include "widgets/SidebarWidget.h"
 #include "widgets/HeaderPanel.h"
+#include "dialogs/ExtractLuminanceDialog.h"
+#include "dialogs/RecombineLuminanceDialog.h"
+#include "dialogs/CorrectionBrushDialog.h"
+#include "dialogs/ClaheDialog.h"
+#include "dialogs/AberrationInspectorDialog.h"
+#include "dialogs/SelectiveColorDialog.h"
 #include <QResizeEvent>
 #include <QStatusBar>
 #include <QRegularExpression>
@@ -643,6 +649,9 @@ MainWindow::MainWindow(QWidget *parent)
     addMenuAction(colorMenu, tr("Saturation"), "", [this](){
         openSaturationDialog();
     });
+    addMenuAction(colorMenu, tr("Selective Color Correction"), "", [this](){
+        openSelectiveColorDialog();
+    });
 
     // --- C. AI ---
     QMenu* aiMenu = processMenu->addMenu(tr("AI Processing"));
@@ -681,6 +690,15 @@ MainWindow::MainWindow(QWidget *parent)
     // --- D. Channels ---
     QMenu* chanMenu = processMenu->addMenu(tr("Channel Operations"));
     addMenuAction(chanMenu, tr("Extract Channels"), "", &MainWindow::extractChannels);
+    addMenuAction(chanMenu, tr("Extract Luminance"), "", [this](){
+        openExtractLuminanceDialog();
+    });
+    addMenuAction(chanMenu, tr("Recombine Luminance"), "", [this](){
+        openRecombineLuminanceDialog();
+    });
+    addMenuAction(chanMenu, tr("Remove Pedestal (Auto)"), "", [this](){
+        removePedestal();
+    });
     addMenuAction(chanMenu, tr("Combine Channels"), "", [this](){
         if (activateTool(tr("Combine Channels"))) return;
         combineChannels();
@@ -717,6 +735,15 @@ MainWindow::MainWindow(QWidget *parent)
     });
     addMenuAction(utilMenu, tr("Image Annotator"), "", [this](){
         openImageAnnotatorDialog();
+    });
+    addMenuAction(utilMenu, tr("Correction Brush"), "", [this](){
+        openCorrectionBrushDialog();
+    });
+    addMenuAction(utilMenu, tr("CLAHE"), "", [this](){
+        openClaheDialog();
+    });
+    addMenuAction(utilMenu, tr("Aberration Inspector (9-Points)"), "", [this](){
+        openAberrationInspectorDialog();
     });
 
     // --- F. Effects ---
@@ -1999,6 +2026,7 @@ void MainWindow::openGHSDialog() {
     setupToolSubwindow(sub, m_ghsDlg, tr("Generalized Hyperbolic Stretch"));
     sub->resize(450, 650); // GHS specific size override
     centerToolWindow(sub); // Re-center after resize
+    sub->move(sub->x(), sub->y() - 50); // Adjust vertical centering
 
      
     // Lifecycle: Delete on close to ensure clean reset on reopen.
@@ -2392,6 +2420,20 @@ void MainWindow::centerToolWindow(CustomMdiSubWindow* sub) {
 void MainWindow::onSettingsAction() {
     auto dlg = new SettingsDialog(this);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
+    
+    connect(dlg, &SettingsDialog::settingsChanged, this, [this](){
+        updateActiveImage();
+        // Also update all other open viewers since this is a global setting
+        for (auto sub : m_mdiArea->subWindowList()) {
+            if (auto csw = qobject_cast<CustomMdiSubWindow*>(sub)) {
+                if (auto v = csw->viewer()) {
+                     v->refreshDisplay(true);
+                }
+            }
+        }
+        log(tr("Settings applied. Display refreshed."), Log_Success);
+    });
+
     CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, dlg, tr("Settings"));
     sub->resize(sub->width() - 200, sub->height() - 100);
     centerToolWindow(sub);
@@ -2445,14 +2487,27 @@ void MainWindow::openHistogramStretchDialog() {
          return;
     }
 
+    log(tr("Opening Histogram Transformation..."), Log_Action, true);
+    
     auto dlg = new HistogramStretchDialog(viewer, this);
     m_histoDlg = dlg;
     dlg->setAttribute(Qt::WA_DeleteOnClose);
+    
+    // Reset pointer when dialog is destroyed
+    connect(dlg, &QObject::destroyed, this, [this](){
+        m_histoDlg = nullptr;
+    });
+    
+    // Log when applied
+    connect(dlg, &HistogramStretchDialog::applied, this, [this](){
+        log(tr("Histogram Transformation applied."), Log_Success, true);
+    });
     
     CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
     setupToolSubwindow(sub, dlg, tr("Histogram Stretch"));
     sub->resize(520, 600);
     centerToolWindow(sub); // Re-center after resize
+    sub->move(sub->x(), sub->y() - 50); // Adjust vertical centering
 }
 
 
@@ -3044,4 +3099,167 @@ void MainWindow::dropEvent(QDropEvent* event) {
         }
         event->acceptProposedAction();
     }
+}
+
+void MainWindow::openExtractLuminanceDialog() {
+    if (!currentViewer()) {
+        QMessageBox::warning(this, tr("No Image"), tr("Please select an image first."));
+        return;
+    }
+    
+    log(tr("Opening Extract Luminance..."), Log_Action, true);
+    
+    auto* dlg = new ExtractLuminanceDialog(this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, dlg, tr("Extract Luminance"));
+    sub->resize(400, 350);
+    centerToolWindow(sub);
+    
+    connect(dlg, &QDialog::accepted, this, [this](){
+        log(tr("Luminance extracted."), Log_Success, true);
+    });
+}
+
+void MainWindow::openRecombineLuminanceDialog() {
+    if (!currentViewer()) {
+        QMessageBox::warning(this, tr("No Image"), tr("Please select an image first."));
+        return;
+    }
+    
+    log(tr("Opening Recombine Luminance..."), Log_Action, true);
+    
+    auto* dlg = new RecombineLuminanceDialog(this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, dlg, tr("Recombine Luminance"));
+    sub->resize(450, 400);
+    centerToolWindow(sub);
+    
+    connect(dlg, &QDialog::accepted, this, [this](){
+        log(tr("Luminance recombined."), Log_Success, true);
+    });
+}
+
+void MainWindow::openCorrectionBrushDialog() {
+    if (!currentViewer()) {
+        QMessageBox::warning(this, tr("No Image"), tr("Please select an image first."));
+        return;
+    }
+    
+    log(tr("Opening Correction Brush..."), Log_Action, true);
+    
+    auto* dlg = new CorrectionBrushDialog(this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, dlg, tr("Correction Brush"));
+    sub->resize(950, 700);
+    centerToolWindow(sub);
+    sub->move(sub->x(), sub->y() - 50); // Adjust vertical centering
+    
+    connect(dlg, &QDialog::accepted, this, [this](){
+        log(tr("Correction brush applied."), Log_Success, true);
+    });
+    
+    // Update when active image changes
+    connect(m_mdiArea, &QMdiArea::subWindowActivated, dlg, [this, dlg](QMdiSubWindow*){
+        if (currentViewer() && currentViewer()->getBuffer().isValid()) {
+            dlg->setSource(currentViewer()->getBuffer());
+        }
+    });
+}
+
+void MainWindow::removePedestal() {
+    ImageViewer* v = currentViewer();
+    if (!v || !v->getBuffer().isValid()) return;
+    
+    pushUndo();
+    ChannelOps::removePedestal(v->getBuffer());
+    v->refreshDisplay();
+    log(tr("Pedestal removed."), Log_Success, true);
+}
+
+void MainWindow::openClaheDialog() {
+    if (!currentViewer()) {
+        QMessageBox::warning(this, tr("No Image"), tr("Please select an image first."));
+        return;
+    }
+    
+    log(tr("Opening CLAHE..."), Log_Action, true);
+    
+    auto* dlg = new ClaheDialog(this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, dlg, tr("CLAHE"));
+    sub->resize(850, 650);
+    centerToolWindow(sub);
+    sub->move(sub->x(), sub->y() - 50); // Adjust vertical centering
+    
+    connect(dlg, &QDialog::accepted, this, [this](){
+        log(tr("CLAHE applied."), Log_Success, true);
+    });
+    
+    // Update when active image changes
+    connect(m_mdiArea, &QMdiArea::subWindowActivated, dlg, [this, dlg](QMdiSubWindow*){
+        if (currentViewer() && currentViewer()->getBuffer().isValid()) {
+            dlg->setSource(currentViewer()->getBuffer());
+        }
+    });
+}
+
+void MainWindow::openAberrationInspectorDialog() {
+    if (!currentViewer()) {
+        QMessageBox::warning(this, tr("No Image"), tr("Please select an image first."));
+        return;
+    }
+    
+    log(tr("Opening Aberration Inspector..."), Log_Action, true);
+    
+    auto* dlg = new AberrationInspectorDialog(currentViewer()->getBuffer(), this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, dlg, tr("Aberration Inspector"));
+    sub->resize(550, 550);
+    centerToolWindow(sub);
+    
+    // Update when active image changes
+    connect(m_mdiArea, &QMdiArea::subWindowActivated, dlg, [this, dlg](QMdiSubWindow*){
+        if (currentViewer() && currentViewer()->getBuffer().isValid()) {
+            dlg->setSource(currentViewer()->getBuffer());
+        }
+    });
+}
+
+void MainWindow::openSelectiveColorDialog() {
+    if (!currentViewer()) {
+        QMessageBox::warning(this, tr("No Image"), tr("Please select an image first."));
+        return;
+    }
+    
+    log(tr("Opening Selective Color Correction..."), Log_Action, true);
+    
+    auto* dlg = new SelectiveColorDialog(this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, dlg, tr("Selective Color Correction"));
+    sub->resize(950, 700);
+    centerToolWindow(sub);
+    sub->move(sub->x(), sub->y() - 50); // Adjust vertical centering
+    
+    connect(dlg, &QDialog::accepted, this, [this](){
+        log(tr("Selective Color Correction applied."), Log_Success, true);
+    });
+    
+    // Update when active image changes
+    connect(m_mdiArea, &QMdiArea::subWindowActivated, dlg, [this, dlg](QMdiSubWindow*){
+        if (currentViewer() && currentViewer()->getBuffer().isValid()) {
+            dlg->setSource(currentViewer()->getBuffer());
+        }
+    });
 }

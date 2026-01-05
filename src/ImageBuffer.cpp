@@ -237,7 +237,77 @@ static float mtf_func(float m, float x) {
 
 // Histogram-based Stats (O(N) instead of O(N log N))
 // Used for AutoStretch speed optimization (industry parity)
+#include <QSettings>
+
+// High Precision (24-bit/Float) Stats (No Histogram Binning)
+static ChStats computeStatsHighPrecision(const std::vector<float>& data, int width, int height, int channels, int channelIndex) {
+    const float MAD_NORM = 1.4826f;
+    
+    long totalPixels = static_cast<long>(width) * height;
+    if (totalPixels == 0) return {0.0f, 0.0f};
+    
+    // Subsampling strategy (Same as Histogram to match performance tier, but using exact float values)
+    int step = 1;
+    if (totalPixels > 4000000) { // > 4MP
+        step = static_cast<int>(std::sqrt(static_cast<double>(totalPixels) / 4000000.0));
+        if (step < 1) step = 1;
+    }
+
+    // Collect samples
+    // Estimate size for reservation
+    size_t estSize = (totalPixels / (step * step)) + 1000;
+    std::vector<float> samples;
+    samples.reserve(estSize);
+
+    for (int y = 0; y < height; y += step) {
+        for (int x = 0; x < width; x += step) {
+             size_t idx = (static_cast<size_t>(y) * width + x) * channels + channelIndex;
+             if (idx < data.size()) {
+                 float v = data[idx];
+                 // We don't necessarily clamp to 0-1 here, allowing HDR values if needed, 
+                 // but for STF we usually care about the main data range.
+                 // PixInsight STF typically handles 0-1 range.
+                 if (v >= 0.0f && v <= 1.0f) {
+                     samples.push_back(v);
+                 }
+             }
+        }
+    }
+    
+    if (samples.empty()) return {0.0f, 0.0f};
+
+    // 1. Find Median
+    size_t n = samples.size();
+    size_t mid = n / 2;
+    std::nth_element(samples.begin(), samples.begin() + mid, samples.end());
+    float median = samples[mid];
+
+    // 2. Find MAD
+    // Reuse samples vector for deviations to save memory
+    for (size_t i = 0; i < n; ++i) {
+        samples[i] = std::fabs(samples[i] - median);
+    }
+    
+    std::nth_element(samples.begin(), samples.begin() + mid, samples.end());
+    float mad = samples[mid] * MAD_NORM;
+
+    return {median, mad};
+}
+
 static ChStats computeStats(const std::vector<float>& data, int width, int height, int channels, int channelIndex) {
+    // Check Settings for 24-bit Override
+    // Note: Accessing QSettings in a tight loop/helper might be slightly inefficient if done repeatedly, 
+    // but this is called once per channel per display update, so it is negligible.
+    // We do it here to transparently upgrade the existing calls.
+    static bool use24Bit = false;
+    // We read it fresh every time or cache it? caching static might be tricky if user changes it.
+    // Ideally passed in, but signature change is larger.
+    // Let's read QSettings. It is usually fast enough (cached in memory by Qt).
+    QSettings settings;
+    if (settings.value("display/24bit_stf", true).toBool()) {
+        return computeStatsHighPrecision(data, width, height, channels, channelIndex);
+    }
+    
     const int HIST_SIZE = 65536;
     const float MAD_NORM = 1.4826f; // Standard Normalization Factor for MAD
     std::vector<int> hist(HIST_SIZE, 0);
@@ -424,6 +494,194 @@ static StandardSTFParams computeStandardSTF(const std::vector<float>& data, int 
 
 QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::vector<std::vector<float>>* overrideLUT, int maxWidth, int maxHeight, bool showMask, bool inverted, bool falseColor) const {
     if (m_data.empty()) return QImage();
+
+    // Check for 24-bit High Definition Stretch setting
+    QSettings settings;
+    bool use24Bit = settings.value("display/24bit_stf", true).toBool();
+
+    // --- DIRECT 24-BIT / HIGH DEFINITION MODE ---
+    // Bypasses LUT for direct float calculation to avoid banding
+    // Only active for AutoStretch and when no override LUT is present
+    if (use24Bit && mode == Display_AutoStretch && (!overrideLUT || overrideLUT->empty())) {
+        int outW = m_width;
+        int outH = m_height;
+        int stepX = 1;
+        int stepY = 1;
+
+        if (maxWidth > 0 && m_width > maxWidth) stepX = m_width / maxWidth;
+        if (maxHeight > 0 && m_height > maxHeight) stepY = m_height / maxHeight;
+
+        int step = std::max(stepX, stepY);
+        if (step < 1) step = 1;
+        stepX = stepY = step;
+
+        outW = m_width / stepX;
+        outH = m_height / stepY;
+
+        QImage::Format fmt = (m_channels == 1 && !falseColor) ? QImage::Format_Grayscale8 : QImage::Format_RGB888;
+        QImage result(outW, outH, fmt);
+
+        // False Color Helper
+        auto hsvToRgb = [](float h, float s, float v, uchar& r, uchar& g, uchar& b) {
+            if (s <= 0.0f) { r = g = b = static_cast<uchar>(v * 255.0f); return; }
+            float hh = h; if (hh >= 360.0f) hh = 0.0f; hh /= 60.0f;
+            int i = static_cast<int>(hh); float ff = hh - i;
+            float p = v * (1.0f - s); float q = v * (1.0f - (s * ff)); float t = v * (1.0f - (s * (1.0f - ff)));
+            float rr, gg, bb;
+            switch (i) {
+                case 0: rr = v; gg = t; bb = p; break;
+                case 1: rr = q; gg = v; bb = p; break;
+                case 2: rr = p; gg = v; bb = t; break;
+                case 3: rr = p; gg = q; bb = v; break;
+                case 4: rr = t; gg = p; bb = v; break;
+                default: rr = v; gg = p; bb = q; break;
+            }
+            r = static_cast<uchar>(rr * 255.0f); g = static_cast<uchar>(gg * 255.0f); b = static_cast<uchar>(bb * 255.0f);
+        };
+
+        // 1. Calculate Stretch Parameters
+        struct MtfParams { float shadow; float midtone; float norm; };
+        std::vector<MtfParams> params(3);
+        
+        std::vector<ChStats> stats(m_channels);
+        for (int c = 0; c < m_channels; ++c) stats[c] = computeStats(m_data, m_width, m_height, m_channels, c);
+        
+        const float targetBG = 0.25f;
+        const float shadowClip = -2.8f; 
+
+        if (linked && m_channels == 3) {
+            float avgMed = (stats[0].median + stats[1].median + stats[2].median) / 3.0f;
+            float avgMad = (stats[0].mad + stats[1].mad + stats[2].mad) / 3.0f;
+            bool alreadyStretched = (avgMed > 0.05f);
+            
+            float shadow = 0.0f; 
+            float mid = 0.5f;
+            
+            if (!alreadyStretched) {
+                shadow = std::max(0.0f, avgMed + shadowClip * avgMad);
+                if (shadow >= avgMed) shadow = std::max(0.0f, avgMed - 0.001f);
+                mid = avgMed - shadow;
+                if (mid <= 0) mid = 0.5f;
+            }
+            
+            float m = alreadyStretched ? 0.5f : mtf_func(targetBG, mid);
+            float norm = 1.0f / (1.0f - shadow + 1e-9f);
+            
+            for(int c=0; c<3; ++c) params[c] = {shadow, m, norm};
+            
+        } else {
+            for (int c = 0; c < m_channels; ++c) {
+                bool alreadyStretched = (stats[c].median > 0.05f);
+                float shadow = 0.0f; 
+                float mid = 0.5f;
+                
+                if (!alreadyStretched) {
+                    shadow = std::max(0.0f, stats[c].median + shadowClip * stats[c].mad);
+                    if (shadow >= stats[c].median) shadow = std::max(0.0f, stats[c].median - 0.001f);
+                    mid = stats[c].median - shadow;
+                    if (mid <= 0) mid = 0.5f;
+                }
+                
+                float m = alreadyStretched ? 0.5f : mtf_func(targetBG, mid);
+                float norm = 1.0f / (1.0f - shadow + 1e-9f);
+                params[c] = {shadow, m, norm};
+            }
+        }
+
+        // 2. Direct Application Loop
+        #pragma omp parallel for
+        for (int y = 0; y < outH; ++y) {
+            uchar* dest = result.scanLine(y);
+            int srcY = y * stepY;
+            if (srcY >= m_height) srcY = m_height - 1;
+            int srcIdxBase = srcY * m_width * m_channels;
+
+            for (int x = 0; x < outW; ++x) {
+                int srcX = x * stepX;
+                if (srcX >= m_width) srcX = m_width - 1;
+
+                float r_out, g_out, b_out;
+                
+                // Mask Logic (Basic Read for Overlay)
+                float maskAlpha = 0.0f;
+                if (m_hasMask && showMask) { 
+                     int maskX = x * stepX;
+                     int maskY = y * stepY;
+                     maskAlpha = m_mask.pixel(maskX, maskY);
+                     if (m_mask.inverted) maskAlpha = 1.0f - maskAlpha;
+                     if (m_mask.mode == "protect") maskAlpha = 1.0f - maskAlpha;
+                     maskAlpha *= m_mask.opacity;
+                }
+
+                if (m_channels == 1) {
+                    size_t idx = srcIdxBase + srcX;
+                    if (idx >= m_data.size()) continue;
+                    float v = m_data[idx];
+                    
+                    float normX = (v - params[0].shadow) * params[0].norm;
+                    float out = mtf_func(params[0].midtone, std::clamp(normX, 0.0f, 1.0f));
+                    out = std::clamp(out, 0.0f, 1.0f);
+                    
+                    if (inverted) out = 1.0f - out;
+                    r_out = g_out = b_out = out;
+                } else {
+                    int base = srcIdxBase + srcX * m_channels;
+                    if (base + 2 >= static_cast<int>(m_data.size())) continue;
+                    
+                    float r = m_data[base+0];
+                    float g = m_data[base+1];
+                    float b = m_data[base+2];
+                    
+                    float r_n = std::clamp((r - params[0].shadow) * params[0].norm, 0.0f, 1.0f);
+                    float g_n = std::clamp((g - params[1].shadow) * params[1].norm, 0.0f, 1.0f);
+                    float b_n = std::clamp((b - params[2].shadow) * params[2].norm, 0.0f, 1.0f);
+                    
+                    r_out = mtf_func(params[0].midtone, r_n);
+                    g_out = mtf_func(params[1].midtone, g_n);
+                    b_out = mtf_func(params[2].midtone, b_n);
+                    
+                    if (inverted) {
+                        r_out = 1.0f - r_out;
+                        g_out = 1.0f - g_out;
+                        b_out = 1.0f - b_out;
+                    }
+                }
+
+                if (falseColor) {
+                    float intensity = (m_channels == 3) ? (0.2989f * r_out + 0.5870f * g_out + 0.1140f * b_out) : r_out;
+                    intensity = std::clamp(intensity, 0.0f, 1.0f);
+                    float hue = (1.0f - intensity) * 300.0f;
+                    uchar r8, g8, b8;
+                    hsvToRgb(hue, 1.0f, 1.0f, r8, g8, b8);
+                    dest[x*3+0] = r8; dest[x*3+1] = g8; dest[x*3+2] = b8;
+                } else {
+                    if (m_channels == 1) {
+                        dest[x] = static_cast<uchar>(std::clamp(r_out * 255.0f, 0.0f, 255.0f));
+                    } else {
+                        dest[x*3+0] = static_cast<uchar>(std::clamp(r_out * 255.0f, 0.0f, 255.0f));
+                        dest[x*3+1] = static_cast<uchar>(std::clamp(g_out * 255.0f, 0.0f, 255.0f));
+                        dest[x*3+2] = static_cast<uchar>(std::clamp(b_out * 255.0f, 0.0f, 255.0f));
+                    }
+                }
+                
+                // Mask Overlay
+                if (showMask && m_hasMask && maskAlpha > 0) {
+                     float overlayAlpha = 0.5f * maskAlpha;
+                     if (fmt == QImage::Format_Grayscale8) {
+                         dest[x] = std::clamp(static_cast<int>(dest[x] * (1.0f + overlayAlpha)), 0, 255);
+                     } else {
+                         float r_f = dest[x*3+0] * (1.0f - overlayAlpha) + 255.0f * overlayAlpha;
+                         float g_f = dest[x*3+1] * (1.0f - overlayAlpha);
+                         float b_f = dest[x*3+2] * (1.0f - overlayAlpha);
+                         dest[x*3+0] = static_cast<uchar>(std::clamp(r_f, 0.0f, 255.0f));
+                         dest[x*3+1] = static_cast<uchar>(std::clamp(g_f, 0.0f, 255.0f));
+                         dest[x*3+2] = static_cast<uchar>(std::clamp(b_f, 0.0f, 255.0f));
+                     }
+                }
+            }
+        }
+        return result;
+    }
 
     // 1. Generate LUTs for each channel
     std::vector<std::vector<float>> luts(3, std::vector<float>(LUT_SIZE));

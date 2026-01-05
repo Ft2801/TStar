@@ -55,6 +55,7 @@ public:
     void startLongProcess();
     void endLongProcess();
     void createNewImageWindow(const ImageBuffer& buffer, const QString& title, ImageBuffer::DisplayMode mode = ImageBuffer::Display_Linear);
+    void pushUndo(); // Call before destructive actions
     
     // Helper to check if tool is already open and activate it
     bool activateTool(const QString& title);
@@ -65,8 +66,6 @@ public:
 private slots:
     void undo();
     void redo();
-    void pushUndo(); // Call before destructive actions
-
     // Existing slots...
     void openFile();
     void saveFile();
@@ -99,6 +98,14 @@ private slots:
     void openDebayerDialog();
     void openContinuumSubtractionDialog();
     void openImageAnnotatorDialog();
+    
+    void openExtractLuminanceDialog();
+    void openRecombineLuminanceDialog();
+    void openCorrectionBrushDialog();
+    void removePedestal();
+    void openClaheDialog();
+    void openAberrationInspectorDialog();
+    void openSelectiveColorDialog();
     
     // Mask Tool Actions
     void createMaskAction();

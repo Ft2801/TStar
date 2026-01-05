@@ -12,7 +12,7 @@
 
 SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
     setWindowTitle(tr("Preferences"));
-    resize(800, 400);
+    resize(600, 500);
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     
@@ -90,6 +90,19 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
     if (idx != -1) m_langCombo->setCurrentIndex(idx);
 
     m_checkUpdates->setChecked(m_settings.value("general/check_updates", true).toBool());
+
+    // --- Display Group ---
+    QGroupBox* displayGroup = new QGroupBox(tr("Display"), this);
+    QFormLayout* displayForm = new QFormLayout(displayGroup);
+
+    m_24bitStfCheck = new QCheckBox(tr("24-bit Autostretch (Smoother gradients)"));
+    // Default to true as requested
+    m_24bitStfCheck->setChecked(m_settings.value("display/24bit_stf", true).toBool());
+    
+    displayForm->addRow("", m_24bitStfCheck);
+
+    // Insert Display group after General group (index 1)
+    mainLayout->insertWidget(1, displayGroup);
 }
 
 void SettingsDialog::pickStarNetPath() {
@@ -116,6 +129,7 @@ void SettingsDialog::saveSettings() {
     QString newLang = m_langCombo->currentData().toString();
     m_settings.setValue("general/language", newLang);
     m_settings.setValue("general/check_updates", m_checkUpdates->isChecked());
+    m_settings.setValue("display/24bit_stf", m_24bitStfCheck->isChecked());
     
     if (oldLang != newLang) {
         QMessageBox::information(this, tr("Restart Required"), 

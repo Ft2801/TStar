@@ -29,7 +29,8 @@ private:
     QLineEdit* m_cosmicClarityPath;
     QLineEdit* m_starnetPath;
     QComboBox* m_langCombo;
-    class QCheckBox* m_checkUpdates; // Forward declaration or include
+    class QCheckBox* m_checkUpdates;
+    class QCheckBox* m_24bitStfCheck;
 };
 
 #endif // SETTINGSDIALOG_H
