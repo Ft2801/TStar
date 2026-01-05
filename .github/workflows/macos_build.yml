@@ -111,12 +111,17 @@ jobs:
       # ===========================
       - name: Configure CMake
         run: |
-          # Definitive Qt6 Detection for Homebrew (v6: Global Find)
-          echo ">>> Detecting Qt6 paths via global search..."
+          # Definitive Qt6 Detection for Homebrew (v7: Deep Cellar Search)
+          echo ">>> Detecting Qt6 paths via Deep Cellar Search..."
           
           # Initialize variables
           QT_PREFIXES=""
           QT6_DIR_DETECTED=""
+          
+          # 0. Attempt to repair symlinks first
+          echo ">>> Attempting to repair Qt symlinks..."
+          brew link --overwrite qt 2>/dev/null || true
+          brew link --overwrite qtbase 2>/dev/null || true
           
           # 1. Primary discovery via qmake (still best if it works)
           PRIMARY_QT_PREFIX=$( (brew --prefix qt 2>/dev/null || brew --prefix qt@6 2>/dev/null) | tr -d '[:space:]' )
@@ -135,21 +140,25 @@ jobs:
              fi
           fi
           
-          # 2. Global Search Fallback - The "Nuclear Option"
-          # If qmake failed or returned nothing, find the config file physically.
+          # 2. Deep Cellar Search Fallback
+          # If qmake failed, search the physical Cellar directory directly.
           if [ -z "$QT6_DIR_DETECTED" ]; then
-             echo ">>> Search for Qt6Config.cmake in /opt/homebrew/opt/..."
-             # Find first instance of Qt6Config.cmake in opt directory. Follow symlinks.
-             # We limit depth to avoid scanning too deeply into sub-packages.
-             FOUND_CONFIG=$(find -L /opt/homebrew/opt -maxdepth 6 -name "Qt6Config.cmake" -print -quit 2>/dev/null)
+             echo ">>> Searching for Qt6Config.cmake in /opt/homebrew/Cellar..."
+             # Find first instance of Qt6Config.cmake in Cellar. 
+             # No -L because we are looking at physical files now.
+             FOUND_CONFIG=$(find /opt/homebrew/Cellar -maxdepth 6 -name "Qt6Config.cmake" -print -quit 2>/dev/null)
              
              if [ -n "$FOUND_CONFIG" ]; then
                   QT6_DIR_DETECTED=$(dirname "$FOUND_CONFIG")
-                  echo "✅ Found Qt6Config.cmake globally at: '$QT6_DIR_DETECTED'"
+                  echo "✅ Found Qt6Config.cmake in Cellar at: '$QT6_DIR_DETECTED'"
              else
-                  echo "⚠️  Global search failed to find Qt6Config.cmake in /opt/homebrew/opt"
-                  echo ">>> Listing /opt/homebrew/opt/qt/lib/cmake (if it exists) to debug:"
-                  ls -la /opt/homebrew/opt/qt/lib/cmake 2>/dev/null || echo "Directory not found"
+                  echo "⚠️  Cellar search failed. Trying generic brew list..."
+                  # Last resort: ask brew where the files are
+                  BREW_FILES=$(brew list qt 2>/dev/null | grep "Qt6Config.cmake" | head -n 1 | tr -d '[:space:]')
+                  if [ -n "$BREW_FILES" ]; then
+                      QT6_DIR_DETECTED=$(dirname "$BREW_FILES")
+                      echo "✅ Found via brew list: '$QT6_DIR_DETECTED'"
+                  fi
              fi
           fi
           
