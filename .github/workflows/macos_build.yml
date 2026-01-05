@@ -114,28 +114,38 @@ jobs:
           # Robust Qt6 Detection for Homebrew
           echo ">>> Detecting Qt6 paths..."
           
-          # Use brew --prefix to find the actual paths
-          # Prioritize 'qt' meta-package if available
-          QT_PATH=$(brew --prefix qt 2>/dev/null || brew --prefix qt@6 2>/dev/null)
+          # Initialize prefix path
+          QT_PREFIXES=""
           
-          if [ -n "$QT_PATH" ]; then
-            echo "✅ Found Qt6 prefix at: $QT_PATH"
-            QT_PREFIX_PATH="$QT_PATH"
-            
-            # Check for specific components (keg-only additions)
-            for pkg in qtbase qtsvg qttools; do
-               PKG_PATH=$(brew --prefix $pkg 2>/dev/null)
-               if [ -n "$PKG_PATH" ] && [ "$PKG_PATH" != "$QT_PATH" ]; then
-                 echo "ℹ️  Adding component path for $pkg: $PKG_PATH"
-                 QT_PREFIX_PATH="$QT_PREFIX_PATH;$PKG_PATH"
-               fi
-            done
+          # 1. Try to find the exact directory containing Qt6Config.cmake
+          # We check qtbase first as it contains the main config
+          echo ">>> Searching for Qt6Config.cmake..."
+          QT6_CONFIG_PATH=$(find /opt/homebrew/opt /usr/local/opt -name Qt6Config.cmake -print -quit 2>/dev/null)
+          
+          if [ -n "$QT6_CONFIG_PATH" ]; then
+            QT6_DIR_DETECTED=$(dirname "$QT6_CONFIG_PATH")
+            echo "✅ Found Qt6Config.cmake at: $QT6_DIR_DETECTED"
+            export Qt6_DIR="$QT6_DIR_DETECTED"
           else
-            echo "⚠️  Qt6 not found via brew --prefix qt, falling back to standard paths"
-            QT_PREFIX_PATH="/opt/homebrew/opt/qt;/usr/local/opt/qt"
+            echo "⚠️  Could not find Qt6Config.cmake via find"
           fi
           
-          echo ">>> Final CMAKE_PREFIX_PATH: $QT_PREFIX_PATH"
+          # 2. Build CMAKE_PREFIX_PATH from Homebrew prefixes
+          for pkg in qt qt@6 qtbase qtsvg qttools; do
+            PKG_PATH=$(brew --prefix $pkg 2>/dev/null)
+            if [ -n "$PKG_PATH" ]; then
+              echo "ℹ️  Adding prefix for $pkg: $PKG_PATH"
+              if [ -z "$QT_PREFIXES" ]; then
+                QT_PREFIXES="$PKG_PATH"
+              else
+                QT_PREFIXES="$QT_PREFIXES;$PKG_PATH"
+              fi
+            fi
+          done
+          
+          export CMAKE_PREFIX_PATH="$QT_PREFIXES"
+          echo ">>> Final CMAKE_PREFIX_PATH: $CMAKE_PREFIX_PATH"
+          echo ">>> Final Qt6_DIR: $Qt6_DIR"
           
           # Get libomp path for OpenMP support with Apple Clang
           LIBOMP_PREFIX=$(brew --prefix libomp)

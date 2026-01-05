@@ -84,10 +84,22 @@ if(APPLE)
     list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_PREFIX}")
     list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_PREFIX}/opt/qt")
     list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_PREFIX}/opt/qt@6")
+    list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_PREFIX}/opt/qtbase")
+    
+    message(STATUS "Current CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
+    message(STATUS "Current Qt6_DIR from ENV: $ENV{Qt6_DIR}")
     
     # Specifically for Qt6 detection if find_package(Qt6) fails otherwise
-    if(EXISTS "${HOMEBREW_PREFIX}/opt/qt/lib/cmake/Qt6")
-        set(Qt6_DIR "${HOMEBREW_PREFIX}/opt/qt/lib/cmake/Qt6" CACHE PATH "Path to Qt6 cmake config")
+    if(NOT Qt6_DIR)
+        if(EXISTS "${HOMEBREW_PREFIX}/opt/qt/lib/cmake/Qt6/Qt6Config.cmake")
+            set(Qt6_DIR "${HOMEBREW_PREFIX}/opt/qt/lib/cmake/Qt6" CACHE PATH "Path to Qt6 cmake config")
+        elseif(EXISTS "${HOMEBREW_PREFIX}/opt/qtbase/lib/cmake/Qt6/Qt6Config.cmake")
+            set(Qt6_DIR "${HOMEBREW_PREFIX}/opt/qtbase/lib/cmake/Qt6" CACHE PATH "Path to Qt6 cmake config")
+        endif()
+    endif()
+    
+    if(Qt6_DIR)
+        message(STATUS "Using explicit Qt6_DIR: ${Qt6_DIR}")
     endif()
 endif()
 
