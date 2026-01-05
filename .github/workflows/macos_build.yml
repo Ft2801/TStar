@@ -66,6 +66,8 @@ jobs:
           echo ">>> Installing Qt6..."
           brew install qt
           brew link --overwrite qt || true
+          brew install qtsvg
+          brew link --overwrite qtsvg || true
           
           echo ">>> Installing image/scientific libraries..."
           brew install opencv
