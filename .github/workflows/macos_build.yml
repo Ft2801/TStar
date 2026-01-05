@@ -111,27 +111,32 @@ jobs:
       # ===========================
       - name: Configure CMake
         run: |
-          # Robust Qt6 Detection
-          echo ">>> Searching for Qt6Config.cmake..."
+          # Robust Qt6 Component Detection for Homebrew
+          echo ">>> Detecting Qt6 component paths..."
           
-          # Try standard Homebrew locations first
-          SEARCH_PATHS="/opt/homebrew /usr/local"
-          QT6_CONFIG_PATH=$(find $SEARCH_PATHS -name "Qt6Config.cmake" 2>/dev/null | head -n 1)
+          # Initialize path list
+          QT_PREFIX_PATH=""
           
-          if [ -z "$QT6_CONFIG_PATH" ]; then
-             echo "❌ Qt6Config.cmake not found in standard paths. Searching root (slow)..."
-             QT6_CONFIG_PATH=$(sudo find / -name "Qt6Config.cmake" 2>/dev/null | grep -v "Permission denied" | head -n 1)
+          # We need qtbase (Core/Widgets), qtsvg (Svg), and qttools (Linguist)
+          # These are often separate kegs in Homebrew
+          for pkg in qtbase qtsvg qttools; do
+            if brew --prefix $pkg &>/dev/null; then
+               PKG_PATH=$(brew --prefix $pkg)
+               echo "✅ Found $pkg at: $PKG_PATH"
+               QT_PREFIX_PATH="${QT_PREFIX_PATH};${PKG_PATH}"
+            else
+               echo "⚠️  Could not find path for $pkg (might be bundled in another package)"
+            fi
+          done
+          
+          # Also check 'qt' meta-package just in case
+          if brew --prefix qt &>/dev/null; then
+             QT_PATH=$(brew --prefix qt)
+             echo "ℹ️  'qt' meta-package at: $QT_PATH"
+             QT_PREFIX_PATH="${QT_PREFIX_PATH};${QT_PATH}"
           fi
           
-          if [ -z "$QT6_CONFIG_PATH" ]; then
-             echo "❌ CRITICAL: Qt6Config.cmake could not be found anywhere!"
-             exit 1
-          fi
-          
-          # Qt6_DIR must point to the directory containing Qt6Config.cmake
-          QT6_DIR=$(dirname "$QT6_CONFIG_PATH")
-          echo "✅ Found Qt6Config.cmake at: $QT6_CONFIG_PATH"
-          echo "✅ Setting Qt6_DIR to: $QT6_DIR"
+          echo ">>> Final CMAKE_PREFIX_PATH: $QT_PREFIX_PATH"
           
           # Get libomp path for OpenMP support with Apple Clang
           LIBOMP_PREFIX=$(brew --prefix libomp)
@@ -140,11 +145,11 @@ jobs:
           # Use the macOS-specific CMakeLists
           cp CMakeLists_macos.txt CMakeLists.txt
           
-          # Configure with CMake - pass explicit Qt6_DIR
+          # Configure with CMake
           cmake -S . -B build \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DQt6_DIR="$QT6_DIR" \
+            -DCMAKE_PREFIX_PATH="$QT_PREFIX_PATH" \
             -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0" \
             -DOpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I${LIBOMP_PREFIX}/include" \
             -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I${LIBOMP_PREFIX}/include" \
