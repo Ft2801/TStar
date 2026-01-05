@@ -111,69 +111,55 @@ jobs:
       # ===========================
       - name: Configure CMake
         run: |
-          # Definitive Qt6 Detection for Homebrew (v5: Sanitized)
-          echo ">>> Detecting Qt6 paths..."
+          # Definitive Qt6 Detection for Homebrew (v6: Global Find)
+          echo ">>> Detecting Qt6 paths via global search..."
           
           # Initialize variables
           QT_PREFIXES=""
           QT6_DIR_DETECTED=""
           
-          # 1. Get the primary prefix from brew (Sanitized)
-          # We use tr -d '[:space:]' to remove Any hidden newlines/CRs
+          # 1. Primary discovery via qmake (still best if it works)
           PRIMARY_QT_PREFIX=$( (brew --prefix qt 2>/dev/null || brew --prefix qt@6 2>/dev/null) | tr -d '[:space:]' )
-          
           if [ -n "$PRIMARY_QT_PREFIX" ]; then
-            echo "✅ Found primary Qt prefix at: '$PRIMARY_QT_PREFIX'"
-            
-            # 2. Try qmake or qmake6
-            QMAKE_BIN=""
-            if [ -x "$PRIMARY_QT_PREFIX/bin/qmake6" ]; then
-                QMAKE_BIN="$PRIMARY_QT_PREFIX/bin/qmake6"
-            elif [ -x "$PRIMARY_QT_PREFIX/bin/qmake" ]; then
-                QMAKE_BIN="$PRIMARY_QT_PREFIX/bin/qmake"
-            fi
-            
-            if [ -n "$QMAKE_BIN" ]; then
-              QT_INSTALL_LIBS=$("$QMAKE_BIN" -query QT_INSTALL_LIBS | tr -d '[:space:]')
-              echo "ℹ️  qmake reports libs at: '$QT_INSTALL_LIBS'"
-              
-              # Standard location in Homebrew: $QT_INSTALL_LIBS/cmake/Qt6
-              CANDIDATE="$QT_INSTALL_LIBS/cmake/Qt6"
-              if [ -d "$CANDIDATE" ]; then
-                QT6_DIR_DETECTED="$CANDIDATE"
-                echo "✅ Verified Qt6 CMake dir via qmake: '$QT6_DIR_DETECTED'"
-              fi
-            else
-               echo "⚠️  Could not find executable qmake or qmake6 in $PRIMARY_QT_PREFIX/bin"
-            fi
+             echo "ℹ️  Primary prefix: '$PRIMARY_QT_PREFIX'"
+             QMAKE_BIN=""
+             if [ -x "$PRIMARY_QT_PREFIX/bin/qmake6" ]; then QMAKE_BIN="$PRIMARY_QT_PREFIX/bin/qmake6";
+             elif [ -x "$PRIMARY_QT_PREFIX/bin/qmake" ]; then QMAKE_BIN="$PRIMARY_QT_PREFIX/bin/qmake"; fi
+             
+             if [ -n "$QMAKE_BIN" ]; then
+                 QT_INSTALL_LIBS=$("$QMAKE_BIN" -query QT_INSTALL_LIBS | tr -d '[:space:]')
+                 if [ -d "$QT_INSTALL_LIBS/cmake/Qt6" ]; then
+                     QT6_DIR_DETECTED="$QT_INSTALL_LIBS/cmake/Qt6"
+                     echo "✅ Verified Qt6 CMake dir via qmake: '$QT6_DIR_DETECTED'"
+                 fi
+             fi
           fi
           
-          # 3. Fallback: Aggregate prefixes & Try direct "Force" detection
+          # 2. Global Search Fallback - The "Nuclear Option"
+          # If qmake failed or returned nothing, find the config file physically.
+          if [ -z "$QT6_DIR_DETECTED" ]; then
+             echo ">>> Search for Qt6Config.cmake in /opt/homebrew/opt/..."
+             # Find first instance of Qt6Config.cmake in opt directory. Follow symlinks.
+             # We limit depth to avoid scanning too deeply into sub-packages.
+             FOUND_CONFIG=$(find -L /opt/homebrew/opt -maxdepth 6 -name "Qt6Config.cmake" -print -quit 2>/dev/null)
+             
+             if [ -n "$FOUND_CONFIG" ]; then
+                  QT6_DIR_DETECTED=$(dirname "$FOUND_CONFIG")
+                  echo "✅ Found Qt6Config.cmake globally at: '$QT6_DIR_DETECTED'"
+             else
+                  echo "⚠️  Global search failed to find Qt6Config.cmake in /opt/homebrew/opt"
+                  echo ">>> Listing /opt/homebrew/opt/qt/lib/cmake (if it exists) to debug:"
+                  ls -la /opt/homebrew/opt/qt/lib/cmake 2>/dev/null || echo "Directory not found"
+             fi
+          fi
+          
+          # 3. Construct CMAKE_PREFIX_PATH (Sanitized)
           for pkg in qt qt@6 qtbase qtsvg qttools; do
             PKG_PATH=$(brew --prefix $pkg 2>/dev/null | tr -d '[:space:]')
             if [ -n "$PKG_PATH" ]; then
-              # Sanitize path construction
               if [ -z "$QT_PREFIXES" ]; then QT_PREFIXES="$PKG_PATH"; else QT_PREFIXES="${QT_PREFIXES};${PKG_PATH}"; fi
-              
-              # If qmake failed, try to guess the path
-              if [ -z "$QT6_DIR_DETECTED" ]; then
-                 CANDIDATE="$PKG_PATH/lib/cmake/Qt6"
-                 if [ -d "$CANDIDATE" ]; then
-                    QT6_DIR_DETECTED="$CANDIDATE"
-                    echo "✅ Found valid fallback: '$QT6_DIR_DETECTED'"
-                 fi
-              fi
             fi
           done
-          
-          # 4. Final Failsafe: Hardcoded Apple Silicon Fallback
-          if [ -z "$QT6_DIR_DETECTED" ]; then
-             echo "⚠️  CRITICAL: Detection failed. Applying BLIND FALLBACK for Apple Silicon..."
-             # We assume standard paths here because detection logic is clearly failing on something subtle
-             QT6_DIR_DETECTED="/opt/homebrew/opt/qt/lib/cmake/Qt6"
-             echo ">>> FORCING Qt6_DIR to: '$QT6_DIR_DETECTED'"
-             ls -la "$QT6_DIR_DETECTED" || echo ">>> LS FAILED (Directory might not exist or perm issue)"
-          fi
           
           # Export for use in next commands
           export CMAKE_PREFIX_PATH="$QT_PREFIXES"
