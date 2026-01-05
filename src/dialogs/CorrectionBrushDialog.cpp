@@ -327,9 +327,8 @@ CorrectionBrushDialog::CorrectionBrushDialog(QWidget* parent) : QDialog(parent) 
     form->addRow(tr("Opacity:"), m_opacitySlider);
     
     m_methodCombo = new QComboBox();
-    m_methodCombo->addItem(tr("Content-Aware (Slow, Best)"), CorrectionMethod::ContentAware);
-    m_methodCombo->addItem(tr("Median (Fast)"), CorrectionMethod::Median);
-    m_methodCombo->addItem(tr("Gaussian Blur"), CorrectionMethod::Blur);
+    m_methodCombo->addItem(tr("Content-Aware (Slow, Best)"), (int)CorrectionMethod::ContentAware);
+    m_methodCombo->addItem(tr("Standard (Median)"), (int)CorrectionMethod::Standard);
     form->addRow(tr("Method:"), m_methodCombo);
     
     m_autoStretchCheck = new QCheckBox(tr("Auto-stretch preview"));

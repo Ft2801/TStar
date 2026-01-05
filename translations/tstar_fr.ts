@@ -862,16 +862,8 @@
             <translation type="finished">Ajuster</translation>
         </message>
         <message>
-            <source>Gaussian Blur</source>
-            <translation type="finished">Flou Gaussien</translation>
-        </message>
-        <message>
             <source>Linked channels</source>
             <translation type="finished">Canaux liés</translation>
-        </message>
-        <message>
-            <source>Median (Fast)</source>
-            <translation type="finished">Médiane (Rapide)</translation>
         </message>
         <message>
             <source>Method:</source>
@@ -888,6 +880,10 @@
         <message>
             <source>Redo</source>
             <translation type="finished">Refaire</translation>
+        </message>
+        <message>
+            <source>Standard (Median)</source>
+            <translation type="finished">Standard (Médiane)</translation>
         </message>
         <message>
             <source>Target Median:</source>

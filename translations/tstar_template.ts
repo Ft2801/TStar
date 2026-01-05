@@ -862,15 +862,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Gaussian Blur</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Linked channels</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Median (Fast)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -887,6 +879,10 @@
         </message>
         <message>
             <source>Redo</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Standard (Median)</source>
             <translation type="unfinished" />
         </message>
         <message>

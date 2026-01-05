@@ -862,16 +862,8 @@
             <translation type="finished">Anpassen</translation>
         </message>
         <message>
-            <source>Gaussian Blur</source>
-            <translation type="finished">Gaußscher Weichzeichner</translation>
-        </message>
-        <message>
             <source>Linked channels</source>
             <translation type="finished">Verknüpfte Kanäle</translation>
-        </message>
-        <message>
-            <source>Median (Fast)</source>
-            <translation type="finished">Median (Schnell)</translation>
         </message>
         <message>
             <source>Method:</source>
@@ -888,6 +880,10 @@
         <message>
             <source>Redo</source>
             <translation type="finished">Wiederholen</translation>
+        </message>
+        <message>
+            <source>Standard (Median)</source>
+            <translation type="finished">Standard (Median)</translation>
         </message>
         <message>
             <source>Target Median:</source>

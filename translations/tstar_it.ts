@@ -862,16 +862,8 @@
             <translation type="finished">Adatta</translation>
         </message>
         <message>
-            <source>Gaussian Blur</source>
-            <translation type="finished">Sfocatura Gaussiana</translation>
-        </message>
-        <message>
             <source>Linked channels</source>
             <translation type="finished">Canali collegati</translation>
-        </message>
-        <message>
-            <source>Median (Fast)</source>
-            <translation type="finished">Mediana (Veloce)</translation>
         </message>
         <message>
             <source>Method:</source>
@@ -888,6 +880,10 @@
         <message>
             <source>Redo</source>
             <translation type="finished">Ripeti</translation>
+        </message>
+        <message>
+            <source>Standard (Median)</source>
+            <translation type="finished">Standard (Mediana)</translation>
         </message>
         <message>
             <source>Target Median:</source>
