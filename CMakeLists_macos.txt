@@ -90,6 +90,7 @@ if(APPLE)
     message(STATUS "Current Qt6_DIR from ENV: $ENV{Qt6_DIR}")
     
     # Specifically for Qt6 detection if find_package(Qt6) fails otherwise
+    set(CMAKE_FIND_DEBUG_MODE TRUE) # Enable deep debugging for find_package
     if(NOT Qt6_DIR)
         if(EXISTS "${HOMEBREW_PREFIX}/opt/qt/lib/cmake/Qt6/Qt6Config.cmake")
             set(Qt6_DIR "${HOMEBREW_PREFIX}/opt/qt/lib/cmake/Qt6" CACHE PATH "Path to Qt6 cmake config")
