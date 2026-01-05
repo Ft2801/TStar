@@ -113,6 +113,9 @@ QString HelpDialog::buildHelpContent()
     html += "</ul>";
     html += "<p class=\"tip\">" + tr("Tip: Toggle RGB Link to stretch channels independently or together.") + "</p>";
 
+    html += "<h3>" + tr("24-bit Display Stretch") + "</h3>";
+    html += "<p>" + tr("Enable in Settings for smoother gradients and reduced banding in auto-stretched previews. Uses high-precision floating-point calculations instead of 16-bit histogram binning.") + "</p>";
+
     // Stretch Tools
     html += "<h2>" + tr("Stretch Tools") + "</h2>";
     
@@ -177,6 +180,14 @@ QString HelpDialog::buildHelpContent()
     html += "<h3>" + tr("Saturation") + "</h3>";
     html += "<p>" + tr("Adjust color saturation with protection for highlights and shadows.") + "</p>";
 
+    html += "<h3>" + tr("Selective Color Correction") + "</h3>";
+    html += "<p>" + tr("Adjust colors within a specific hue range without affecting other colors:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Select a color range using presets (Red, Green, Blue, etc.) or custom hue values") + "</li>";
+    html += "<li>" + tr("Adjust Cyan/Magenta/Yellow, RGB, Luminance, Saturation, and Contrast for the selected range") + "</li>";
+    html += "<li>" + tr("Use Smoothness to feather the selection edges") + "</li>";
+    html += "</ul>";
+
     // AI Processing
     html += "<h2>" + tr("AI Processing") + "</h2>";
     
@@ -222,6 +233,15 @@ QString HelpDialog::buildHelpContent()
     html += "<h3>" + tr("Debayer") + "</h3>";
     html += "<p>" + tr("Converts RAW Bayer pattern images to full color.") + "</p>";
 
+    html += "<h3>" + tr("Extract Luminance") + "</h3>";
+    html += "<p>" + tr("Extracts the luminance (brightness) channel from an RGB image into a separate grayscale window. Useful for processing the L channel independently before recombining.") + "</p>";
+
+    html += "<h3>" + tr("Recombine Luminance") + "</h3>";
+    html += "<p>" + tr("Replaces the luminance channel of an RGB image with a processed version. Select the source luminance and target color image, then blend with adjustable intensity.") + "</p>";
+
+    html += "<h3>" + tr("Remove Pedestal") + "</h3>";
+    html += "<p>" + tr("Automatically detects and subtracts the minimum pixel value (black floor) from the image. Essential before stretching to ensure true black levels.") + "</p>";
+
     // Utilities
     html += "<h2>" + tr("Utilities") + "</h2>";
     
@@ -247,6 +267,23 @@ QString HelpDialog::buildHelpContent()
     
     html += "<h3>" + tr("Image Annotator") + "</h3>";
     html += "<p>" + tr("Add object labels and annotations using catalog data.") + "</p>";
+
+    html += "<h3>" + tr("CLAHE") + "</h3>";
+    html += "<p>" + tr("Contrast Limited Adaptive Histogram Equalization. Enhances local contrast in different regions of the image:") + "</p>";
+    html += "<ul>";
+    html += "<li><b>" + tr("Clip Limit:") + "</b> " + tr("Controls contrast amplification. Higher values increase contrast but may introduce noise.") + "</li>";
+    html += "<li><b>" + tr("Grid Size:") + "</b> " + tr("Size of tiles for local processing. Smaller tiles increase local detail.") + "</li>";
+    html += "</ul>";
+
+    html += "<h3>" + tr("Aberration Inspector") + "</h3>";
+    html += "<p>" + tr("Displays a 3x3 grid of zoomed panels from the corners, edges, and center of your image. Useful for evaluating optical quality, coma, and field curvature across your frame.") + "</p>";
+
+    html += "<h3>" + tr("Correction Brush") + "</h3>";
+    html += "<p>" + tr("Interactive tool to remove artifacts and blemishes:") + "</p>";
+    html += "<ul>";
+    html += "<li><b>" + tr("Content-Aware:") + "</b> " + tr("Uses AI inpainting for seamless removal (slower but best quality)") + "</li>";
+    html += "<li><b>" + tr("Standard:") + "</b> " + tr("Uses median sampling from surrounding areas (faster)") + "</li>";
+    html += "</ul>";
 
     // Masks
     html += "<h2>" + tr("Masks") + "</h2>";

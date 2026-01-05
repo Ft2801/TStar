@@ -71,8 +71,14 @@ UpdateDialog::~UpdateDialog() {
 }
 
 void UpdateDialog::startDownload() {
-    // If the URL is just a webpage (no .exe found), open browser
+    // If the URL is just a webpage (no platform-specific installer), open browser
+#if defined(Q_OS_WIN)
     if (!m_downloadUrl.endsWith(".exe", Qt::CaseInsensitive)) {
+#elif defined(Q_OS_MAC)
+    if (!m_downloadUrl.endsWith(".dmg", Qt::CaseInsensitive)) {
+#else
+    if (true) { // Linux: always open in browser
+#endif
         QDesktopServices::openUrl(QUrl(m_downloadUrl));
         accept();
         return;
@@ -159,7 +165,12 @@ void UpdateDialog::onDownloadFinished() {
 
 void UpdateDialog::launchInstaller() {
     // Launch installer detached
+#if defined(Q_OS_MAC)
+    // On macOS, use 'open' to mount the DMG and show its contents
+    bool success = QProcess::startDetached("open", QStringList() << m_destinationPath);
+#else
     bool success = QProcess::startDetached(m_destinationPath, QStringList());
+#endif
     if (success) {
         QCoreApplication::quit();
     } else {

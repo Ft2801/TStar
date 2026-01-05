@@ -14,6 +14,8 @@ TRANSLATIONS = {
 
     "24-bit Autostretch (Smoother gradients)": {'it': 'Autostretch a 24-bit (Gradienti più fluidi)', 'es': 'Autostretch 24-bit (Gradientes más suaves)', 'fr': 'Autostretch 24-bit (Dégradés plus lisses)', 'de': '24-Bit Autostretch (Glattere Verläufe)'},
 
+    "24-bit Display Stretch": {'it': 'Stretch Display a 24-bit', 'es': 'Estiramiento de Pantalla 24-bit', 'fr': 'Étirement Affichage 24-bit', 'de': '24-Bit Anzeigestreckung'},
+
     "32-bit Float": {'it': '32-bit Float', 'es': '32-bit Float', 'fr': '32-bit Float', 'de': '32-bit Float'},
 
     "32-bit Integer": {'it': '32-bit Intero', 'es': '32-bit Entero', 'fr': '32-bit Entier', 'de': '32-bit Ganzzahl'},
@@ -45,6 +47,8 @@ TRANSLATIONS = {
     "Aberration Removal Complete.": {'it': 'Rimozione Aberrazioni Completa.', 'es': 'Eliminación de Aberraciones Completa.', 'fr': 'Suppression des Aberrations Terminée.', 'de': 'Aberrationsentfernung Abgeschlossen.'},
 
     "Aberration Remover": {'it': 'Rimozione Aberrazioni', 'es': 'Eliminador de Aberraciones', 'fr': "Correcteur d'Aberrations", 'de': 'Aberrationsentferner'},
+
+    "Aberration Inspector": {'it': 'Ispettore Aberrazioni', 'es': 'Inspector de Aberraciones', 'fr': "Inspecteur d'Aberrations", 'de': 'Aberrationsinspektor'},
 
     "Aborted by user.": {'it': "Annullato dall'utente.", 'es': 'Abortado por el usuario.', 'fr': "Annulé par l'utilisateur.", 'de': 'Vom Benutzer abgebrochen.'},
 
@@ -204,6 +208,12 @@ TRANSLATIONS = {
 
     "Clip Mode:": {'it': 'Modo Taglio:', 'es': 'Modo Recorte:', 'fr': 'Mode Ecrêtage :', 'de': 'Schnittmodus:'},
 
+    "Clip Limit:": {'it': 'Limite di Clip:', 'es': 'Límite de Recorte:', 'fr': 'Limite de Clip :', 'de': 'Clip-Limit:'},
+
+    "CLAHE": {'it': 'CLAHE', 'es': 'CLAHE', 'fr': 'CLAHE', 'de': 'CLAHE'},
+
+    "Click to add sample points on the background": {'it': "Fai clic per aggiungere punti di campionamento sullo sfondo", 'es': "Haga clic para agregar puntos de muestra en el fondo", 'fr': "Cliquez pour ajouter des points d'échantillonnage sur l'arrière-plan", 'de': "Klicken Sie, um Stichprobenpunkte auf dem Hintergrund hinzuzufügen"},
+
     "Close": {'it': 'Chiudi', 'es': 'Cerrar', 'fr': 'Fermer', 'de': 'Schließen'},
 
     "Color Boost: %1": {'it': 'Boost Colore: %1', 'es': 'Aumento Color: %1', 'fr': 'Boost Couleur : %1', 'de': 'Farbverstärkung: %1'},
@@ -255,6 +265,14 @@ TRANSLATIONS = {
     "Controllo Distribuzione Stelle (PSF Analysis)": {'it': 'Controllo Distribuzione Stelle (Analisi PSF)', 'es': 'Control Distribución Estrellas (Análisis PSF)', 'fr': 'Contrôle Distribution Étoiles (Analyse PSF)', 'de': 'Sternverteilungskontrolle (PSF Analyse)'},
 
     "Copyright © 2026": {'it': 'Copyright © 2026', 'es': 'Copyright © 2026', 'fr': 'Copyright © 2026', 'de': 'Copyright © 2026'},
+
+    "Content-Aware:": {'it': 'Consapevole del Contenuto:', 'es': 'Consciente del Contenido:', 'fr': 'Sensible au Contenu :', 'de': 'Inhaltsbewusst:'},
+
+    "Contrast Limited Adaptive Histogram Equalization. Enhances local contrast in different regions of the image:": {'it': "Equalizzazione Adattiva dell'Istogramma a Contrasto Limitato. Migliora il contrasto locale in diverse regioni dell'immagine:", 'es': 'Ecualización Adaptativa del Histograma con Contraste Limitado. Mejora el contraste local en diferentes regiones de la imagen:', 'fr': "Égalisation Adaptative d'Histogramme à Contraste Limité. Améliore le contraste local dans différentes régions de l'image :", 'de': 'Kontrastbegrenzte Adaptive Histogramm-Egalisierung. Verbessert den lokalen Kontrast in verschiedenen Bereichen des Bildes:'},
+
+    "Controls contrast amplification. Higher values increase contrast but may introduce noise.": {'it': "Controlla l'amplificazione del contrasto. Valori più alti aumentano il contrasto ma possono introdurre rumore.", 'es': 'Controla la amplificación del contraste. Valores más altos aumentan el contraste pero pueden introducir ruido.', 'fr': "Contrôle l'amplification du contraste. Des valeurs plus élevées augmentent le contraste mais peuvent introduire du bruit.", 'de': 'Steuert die Kontrastverstärkung. Höhere Werte erhöhen den Kontrast, können aber Rauschen verursachen.'},
+
+    "Correction Brush": {'it': 'Pennello di Correzione', 'es': 'Pincel de Corrección', 'fr': 'Pinceau de Correction', 'de': 'Korrekturpinsel'},
 
     "Cosmic Clarity": {'it': 'Cosmic Clarity', 'es': 'Cosmic Clarity', 'fr': 'Cosmic Clarity', 'de': 'Cosmic Clarity'},
 
@@ -388,6 +406,10 @@ TRANSLATIONS = {
 
     "Extract Channels": {'it': 'Estrai Canali', 'es': 'Extraer Canales', 'fr': 'Extraire Canaux', 'de': 'Kanäle extrahieren'},
 
+    "Extract Luminance": {'it': 'Estrai Luminanza', 'es': 'Extraer Luminancia', 'fr': 'Extraire Luminance', 'de': 'Luminanz extrahieren'},
+
+    "Extracts the luminance (brightness) channel from an RGB image into a separate grayscale window. Useful for processing the L channel independently before recombining.": {'it': "Estrae il canale di luminanza (luminosità) da un'immagine RGB in una finestra in scala di grigi separata. Utile per elaborare il canale L in modo indipendente prima di ricombinare.", 'es': 'Extrae el canal de luminancia (brillo) de una imagen RGB en una ventana de escala de grises separada. Útil para procesar el canal L de forma independiente antes de recombinar.', 'fr': "Extrait le canal de luminance (luminosité) d'une image RGB dans une fenêtre en niveaux de gris séparée. Utile pour traiter le canal L indépendamment avant la recombinaison.", 'de': 'Extrahiert den Luminanzkanal (Helligkeit) aus einem RGB-Bild in ein separates Graustufenfenster. Nützlich für unabhängige L-Kanal-Verarbeitung vor der Rekombination.'},
+
     "FITS (*.fits);;XISF (*.xisf);;TIFF (*.this *.tiff);;PNG (*.png);;JPG (*.jpg)": {'it': 'FITS (*.fits);;XISF (*.xisf);;TIFF (*.this *.tiff);;PNG (*.png);;JPG (*.jpg)', 'es': 'FITS (*.fits);;XISF (*.xisf);;TIFF (*.this *.tiff);;PNG (*.png);;JPG (*.jpg)', 'fr': 'FITS (*.fits);;XISF (*.xisf);;TIFF (*.this *.tiff);;PNG (*.png);;JPG (*.jpg)', 'de': 'FITS (*.fits);;XISF (*.xisf);;TIFF (*.this *.tiff);;PNG (*.png);;JPG (*.jpg)'},
 
     "FITS Files (*.fits *.fit);;": {'it': 'File FITS (*.fits *.fit);;', 'es': 'File FITS (*.fits *.fit);;', 'fr': 'Fichiers FITS (*.fits *.fit) ;;', 'de': 'FITS-Dateien (*.fits *.fit);;'},
@@ -497,6 +519,8 @@ TRANSLATIONS = {
     "Greens": {'it': 'Verdi', 'es': 'Verdes', 'fr': 'Verts', 'de': 'Grüntöne'},
 
     "Grid": {'it': 'Griglia', 'es': 'Cuadrícula', 'fr': 'Grille', 'de': 'Gitter'},
+
+    "Grid Size:": {'it': 'Dimensione Griglia:', 'es': 'Tamaño de Cuadrícula:', 'fr': 'Taille Grille :', 'de': 'Gittergröße:'},
 
     "HDR Controls": {'it': 'Controlli HDR', 'es': 'Controles HDR', 'fr': 'Contrôles HDR', 'de': 'HDR-Steuerung'},
 
@@ -990,6 +1014,10 @@ TRANSLATIONS = {
 
     "Remove Mask": {'it': 'Rimuovi Maschera', 'es': 'Eliminar Máscara', 'fr': 'Supprimer le Masque', 'de': 'Maske entfernen'},
 
+    "Recombine Luminance": {'it': 'Ricombina Luminanza', 'es': 'Recombinar Luminancia', 'fr': 'Recombiner Luminance', 'de': 'Luminanz rekombinieren'},
+
+    "Remove Pedestal": {'it': 'Rimuovi Piedistallo', 'es': 'Eliminar Pedestal', 'fr': 'Supprimer Piédestal', 'de': 'Sockel entfernen'},
+
     "Remove Stars (StarNet)": {'it': 'Rimuovi Stelle (StarNet)', 'es': 'Eliminar Estrellas (StarNet)', 'fr': 'Supprimer Étoiles (StarNet)', 'de': 'Sterne entfernen (StarNet)'},
 
     "Rename View": {'it': 'Rinomina Vista', 'es': 'Renombrar Vista', 'fr': 'Renommer Vue', 'de': 'Ansicht umbenennen'},
@@ -1117,6 +1145,8 @@ TRANSLATIONS = {
     "Selection": {'it': 'Selezione', 'es': 'Selección', 'fr': 'Sélection', 'de': 'Auswahl'},
 
     "Selection Error": {'it': 'Errore Selezione', 'es': 'Error Selección', 'fr': 'Erreur Sélection', 'de': 'Auswahlfehler'},
+
+    "Selective Color Correction": {'it': 'Correzione Colore Selettiva', 'es': 'Corrección de Color Selectiva', 'fr': 'Correction de Couleur Sélective', 'de': 'Selektive Farbkorrektur'},
 
     "Selection too small.": {'it': 'Selezione troppo piccola.', 'es': 'Selección muy pequeña.', 'fr': 'Sélection trop petite.', 'de': 'Auswahl zu klein.'},
 
@@ -1922,10 +1952,6 @@ TRANSLATIONS = {
     "Increases color saturation specifically for stars.": {'it': "Aumenta la saturazione del colore specificamente per le stelle.", 'es': "Aumenta la saturación de color específicamente para las estrellas.", 'fr': "Augmente la saturation des couleurs spécifiquement pour les étoiles.", 'de': "Erhöht die Farbsättigung speziell für Sterne."},
     "SCNR:": {'it': "SCNR:", 'es': "SCNR:", 'fr': "SCNR :", 'de': "SCNR:"},
     "Optional green noise removal during the stretch.": {'it': "Rimozione opzionale del rumore verde durante lo stretch.", 'es': "Eliminación opcional del ruido verde durante el estiramiento.", 'fr': "Suppression facultative du bruit vert pendant l'étirement.", 'de': "Optionale Grünrauschentfernung während der Streckung."},
-
-    # New Translations for Step 952
-    
-    # Extract/Recombine Luminance
     "Rec. 709 (Standard)": {'it': 'Rec. 709 (Standard)', 'es': 'Rec. 709 (Estándar)', 'fr': 'Rec. 709 (Standard)', 'de': 'Rec. 709 (Standard)'},
     "Rec. 601": {'it': 'Rec. 601', 'es': 'Rec. 601', 'fr': 'Rec. 601', 'de': 'Rec. 601'},
     "Rec. 2020": {'it': 'Rec. 2020', 'es': 'Rec. 2020', 'fr': 'Rec. 2020', 'de': 'Rec. 2020'},
@@ -2006,5 +2032,31 @@ TRANSLATIONS = {
     "Selective Color Correction applied.": {'it': "Correzione Colore Selettiva applicata.", 'es': "Corrección Selectiva de Color aplicada.", 'fr': "Correction Sélective des Couleurs appliquée.", 'de': "Selektive Farbkorrektur angewendet."},
     "Average": {'it': "Media", 'es': "Promedio", 'fr': "Moyenne", 'de': "Durchschnitt"},
     "Recombination failed. Typically specific to size mismatch or invalid source image.": {'it': "Ricombinazione fallita. Solitamente dovuto a discrepanza di dimensioni o immagine sorgente non valida.", 'es': "La recombinación falló. Típicamente específico de desajuste de tamaño o imagen de origen no válida.", 'fr': "La recombinaison a échoué. Généralement spécifique à une incompatibilité de taille ou une image source invalide.", 'de': "Rekombination fehlgeschlagen. Typischerweise aufgrund von Größenfehlanpassung oder ungültigem Quellbild."},
-    "Standard (Median)": {'it': "Standard (Mediana)", 'es': "Estándar (Mediana)", 'fr': "Standard (Médiane)", 'de': "Standard (Median)"}
+    "Standard (Median)": {'it': "Standard (Mediana)", 'es': "Estándar (Mediana)", 'fr': "Standard (Médiane)", 'de': "Standard (Median)"},
+
+    "Adjust colors within a specific hue range without affecting other colors:": {'it': "Regola i colori all'interno di un intervallo di tonalità specifico senza influire sugli altri colori:", 'es': "Ajusta los colores dentro de un rango de tono específico sin afectar a otros colores:", 'fr': "Ajuster les couleurs dans une plage de teintes spécifique sans affecter les autres couleurs :", 'de': "Passen Sie Farben innerhalb eines bestimmten Farbbereichs an, ohne andere Farben zu beeinflussen:"},
+
+    "Select a color range using presets (Red, Green, Blue, etc.) or custom hue values": {'it': "Seleziona un intervallo di colori utilizzando predefiniti (Rosso, Verde, Blu, ecc.) o valori di tonalità personalizzati", 'es': "Seleccione un rango de color utilizando ajustes preestablecidos (rojo, verde, azul, etc.) o valores de tono personalizados", 'fr': "Sélectionner une plage de couleurs à l'aide de préréglages (rouge, vert, bleu, etc.) ou de valeurs de teinte personnalisées", 'de': "Wählen Sie einen Farbbereich mit Voreinstellungen (Rot, Grün, Blau usw.) oder benutzerdefinierten Farbtonwerten aus"},
+
+    "Adjust Cyan/Magenta/Yellow, RGB, Luminance, Saturation, and Contrast for the selected range": {'it': "Regola Ciano/Magenta/Giallo, RGB, Luminanza, Saturazione e Contrasto per l'intervallo selezionato", 'es': "Ajuste cian/magenta/amarillo, RGB, luminancia, saturación y contraste para el rango seleccionado", 'fr': "Ajuster Cyan/Magenta/Jaune, RGB, Luminance, Saturation et Contraste pour la plage sélectionnée", 'de': "Anpassen von Cyan/Magenta/Gelb, RGB, Luminanz, Sättigung und Kontrast für den ausgewählten Bereich"},
+
+    "Use Smoothness to feather the selection edges": {'it': "Usa Sfumatura per ammorbidire i bordi della selezione", 'es': "Utilice la suavidad para desvanecer los bordes de la selección", 'fr': "Utiliser la fluidité pour adoucir les bords de la sélection", 'de': "Verwenden Sie Glättung, um die Auswahlkanten weichzuzeichnen"},
+
+    "Enable in Settings for smoother gradients and reduced banding in auto-stretched previews. Uses high-precision floating-point calculations instead of 16-bit histogram binning.": {'it': "Abilita nelle impostazioni per gradienti più fluidi e banding ridotto nelle anteprime auto-stretch. Utilizza calcoli a virgola mobile ad alta precisione invece del binning dell'istogramma a 16 bit.", 'es': "Habilitar en los ajustes para gradientes más suaves y banding reducido en las previsualizaciones de auto-stretch. Utiliza cálculos de punto flotante de alta precisión en lugar de binning de histograma de 16 bits.", 'fr': "Activer dans les paramètres pour des dégradés plus lisses et un banding réduit dans les aperçus auto-stretch. Utilise des calculs en virgule flottante haute précision au lieu du binning d'histogramme 16 bits.", 'de': "In den Einstellungen aktivieren für glattere Verläufe und reduziertes Banding in Auto-Stretch-Vorschauen. Verwendet hochpräzise Fließkommaberechnungen anstelle von 16-Bit-Histogramm-Binning."},
+
+    "Replaces the luminance channel of an RGB image with a processed version. Select the source luminance and target color image, then blend with adjustable intensity.": {'it': "Sostituisce il canale di luminanza di un'immagine RGB con una versione elaborata. Seleziona la luminanza sorgente e l'immagine a colori di destinazione, quindi miscela con intensità regolabile.", 'es': "Reemplaza el canal de luminancia de una imagen RGB con una versión procesada. Seleccione la luminancia de origen y la imagen de color de destino, luego mezcle con intensidad ajustable.", 'fr': "Remplace le canal de luminance d'une image RGB par une version traitée. Sélectionnez la luminance source et l'image couleur cible, puis mélangez avec une intensité réglable.", 'de': "Ersetzt den Luminanzkanal eines RGB-Bildes durch eine verarbeitete Version. Wählen Sie die Quell-Luminanz und das Ziel-Farbbild aus und mischen Sie sie dann mit einstellbarer Intensität."},
+
+    "Automatically detects and subtracts the minimum pixel value (black floor) from the image. Essential before stretching to ensure true black levels.": {'it': "Rileva e sottrae automaticamente il valore minimo del pixel (pavimento nero) dall'immagine. Essenziale prima dello stretching per garantire livelli di nero reali.", 'es': "Detecta y resta automáticamente el valor mínimo de píxel (suelo negro) de la imagen. Esencial antes del estiramiento para garantizar niveles de negro reales.", 'fr': "Détecte et soustrait auotmatiquement la valeur minimale des pixels (fond noir) de l'image. Essentiel avant l'étirement pour garantir des niveaux de noir réels.", 'de': "Erkennt und subtrahiert automatisch den minimalen Pixelwert (Schwarzboden) vom Bild. Unverzichtbar vor dem Strecken, um echte Schwarzwerte zu gewährleisten."},
+
+    "Size of tiles for local processing. Smaller tiles increase local detail.": {'it': "Dimensione dei riquadri per l'elaborazione locale. Riquadri più piccoli aumentano i dettagli locali.", 'es': "Tamaño de los azulejos para procesamiento local. Azulejos más pequeños aumentan el detalle local.", 'fr': "Taille des tuiles pour le traitement local. Des tuiles plus petites augmentent les détails locaux.", 'de': "Größe der Kacheln für die lokale Verarbeitung. Kleinere Kacheln erhöhen die lokale Detailgenauigkeit."},
+
+    "Displays a 3x3 grid of zoomed panels from the corners, edges, and center of your image. Useful for evaluating optical quality, coma, and field curvature across your frame.": {'it': "Visualizza una griglia 3x3 di pannelli ingranditi dagli angoli, dai bordi e dal centro dell'immagine. Utile per valutare la qualità ottica, il coma e la curvatura di campo su tutto il fotogramma.", 'es': "Muestra una cuadrícula de 3x3 de paneles ampliados desde las esquinas, los bordes y el centro de la imagen. Útil para evaluar la calidad óptica, el coma y la curvatura de campo en todo el fotograma.", 'fr': "Affiche une grille 3x3 de panneaux zoomés depuis les coins, les bords et le centre de votre image. Utile pour évaluer la qualité optique, le coma et la courbure de champ sur votre cadre.", 'de': "Zeigt ein 3x3-Gitter mit gezoomten Panels aus den Ecken, Kanten und der Mitte Ihres Bildes an. Nützlich zur Bewertung der optischen Qualität, Koma und Bildfeldwölbung über Ihren Rahmen hinweg."},
+
+    "Interactive tool to remove artifacts and blemishes:": {'it': "Strumento interattivo per rimuovere artefatti e imperfezioni:", 'es': "Herramienta interactiva para eliminar artefactos e imperfecciones:", 'fr': "Outil interactif pour supprimer les artefacts et les imperfections :", 'de': "Interaktives Werkzeug zum Entfernen von Artefakten und Fehlern:"},
+
+    "Uses AI inpainting for seamless removal (slower but best quality)": {'it': "Utilizza l'inpainting AI per una rimozione senza soluzione di continuità (più lenta ma con la migliore qualità)", 'es': "Utiliza inpainting de IA para una eliminación perfecta (más lenta pero de mejor calidad)", 'fr': "Utilise l'inpainting IA pour une suppression transparente (plus lente mais meilleure qualité)", 'de': "Verwendet KI-Inpainting für nahtloses Entfernen (langsamer, aber beste Qualität)"},
+
+    "Standard:": {'it': "Standard:", 'es': "Estándar:", 'fr': "Standard :", 'de': "Standard:"},
+
+    "Uses median sampling from surrounding areas (faster)": {'it': "Utilizza il campionamento mediano dalle aree circostanti (più veloce)", 'es': "Utiliza el muestreo mediano de las áreas circundantes (más rápido)", 'fr': "Utilise l'échantillonnage médian des zones environnantes (plus rapide)", 'de': "Verwendet Median-Sampling aus umliegenden Bereichen (schneller)"},
 }

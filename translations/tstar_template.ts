@@ -1,5282 +1,6921 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
 <TS version="2.1" language="en">
-    <context>
-        <name>ABEDialog</name>
-        <message>
-            <source>ABE Error: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>ABE Error: Unknown exception occurred.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Applying correction...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Auto Background Extraction</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Clear Selections</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Degree:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Downsample:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Downsampling image (Factor: %1)...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Enable RBF</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Error: Image data appears to be empty or invalid.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Evaluating Model (Channel %1)...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Fitting Polynomial degree %1 (Channel %2)...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Fitting RBF (Smooth: %1) (Channel %2)...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Found %1 valid sample points.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>If checked, aligns channel backgrounds to the same level.\nUncheck if you have already performed Photometric Color Calibration (PCC).</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No valid sample points. Using grid fallback...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Normalize Background (Undo Color Calib)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Patch Size:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>RBF Smooth:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Result = Background Model</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Running ABE...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Samples:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Sampling points...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Starting ABE Model generation...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>© 2026 SetiAstro</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>AberrationInspectorDialog</name>
-        <message>
-            <source>Aberration Inspector</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Panel Size:</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>AboutDialog</name>
-        <message>
-            <source>About TStar</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Build:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Copyright © 2026</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>TStar is a professional astrophotography image processing application designed to provide advanced tools for enhancing and analyzing astronomical images.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Written by Fabio Tempera</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>AnnotationToolDialog</name>
-        <message>
-            <source>Add Text Label</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Annotation Tool</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Arrow</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Circle</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Clear All</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Click and drag to draw arrow</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Click and drag to draw circle</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Click and drag to draw rectangle</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Click on image to add text label</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cyan</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Draw Arrow</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Draw Circle</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Draw Rectangle</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Drawing Tools</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Enter text:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Green</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No image loaded</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Note: Keep this tool OPEN to burn annotations into the saved image (File &gt; Save).</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Ready</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Ready to draw</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rect</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Red</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Redo</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Select</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Select mode</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Select/Pan (no drawing)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Text</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Text Label</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Text added. Click again to add more.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Undo</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>White</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Yellow</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>ApplyMaskDialog</name>
-        <message>
-            <source>Apply Mask</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Available Masks:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invalid Mask Data</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Preview</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Select a mask to see preview</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>[Saved] %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>[View] %1</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>ArcsinhStretchDialog</name>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Arcsinh Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Black Point:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Constant value subtracted from the image.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>For colour images, use human eye luminous efficiency weights to compute the luminance.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>High: %1%</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>High: 0.00%</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Human-weighted luminance</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Low: %1%</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Low: 0.00%</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Preview</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Reset</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Stretch factor:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>The stretch factor adjusts the non-linearity.</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>AstroSpikeDialog</name>
-        <message>
-            <source>Add Star</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Amount %</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Angle</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Appearance</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>AstroSpike</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Blur</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Detecting stars...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Detection</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Enable Halo</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Enable Rainbow</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Erase:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Eraser</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Flare</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Found %1 stars</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Frequency</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Global Scale</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Halo</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Hue Shift</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Intensity</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Length</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Max Size</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Min Size</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No valid image.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Offset</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>PNG Images (*.png);;JPEG Images (*.jpg);;TIFF Images (*.tif)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Points</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rainbow</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Ready</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Redo</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Saturation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Save Image</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Saved to %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Scale</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Secondary Spikes</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Sharpness</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Size</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Size:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Spikes</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Thickness</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Threshold</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Undo</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Width</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>© 2026 Fabio Tempera</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>BackgroundNeutralizationDialog</name>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Background Neutralization</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Ready - Please select a background region in the viewer.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Select a background reference on the image by drawing a rectangle.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Selection too small.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Selection: %1x%2 at %3,%4</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>CatalogClient</name>
-        <message>
-            <source>No stars found in region.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Parser failed to find RA column.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>XML Parse Error: %1</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>ChannelCombinationDialog</name>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Blue:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Channel Combination</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Failed to combine channels.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Green:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Incomplete</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>None</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Please select a source for all R, G, B channels.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Red:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Selected images must have the same dimensions.</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>ClaheDialog</name>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>CLAHE (Contrast Limited Adaptive Histogram Equalization)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>CLAHE applied.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Clip Limit:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Grid Size:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Parameters</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Reset</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>CompressionUtils</name>
-        <message>
-            <source>LZ4 compress failed</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>LZ4 decompress failed</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>LZ4 support not compiled in</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>LZ4HC compress failed</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Unknown compression codec</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zlib compress failed: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zlib inflate failed: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zlib inflateInit failed: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zstd compress failed: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zstd decompress failed: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zstd support not compiled in</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>ContinuumSubtractionDialog</name>
-        <message>
-            <source>-- Use Green Channel --</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>-- Use Red Channel --</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Continuum Subtraction</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Continuum:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Done.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Failed.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Formula: Result = NB - Q × (Continuum - median)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image Selection</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image dimensions must match.\nNB: %1x%2, Cont: %3x%4</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invalid continuum image.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invalid narrowband image.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Narrowband image is empty.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Narrowband:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No images available.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Output Linear Only (skip stretch)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Parameters</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Processing (Q=%1)...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Processing failed.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Q-Factor:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Refresh</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>CorrectionBrushDialog</name>
-        <message>
-            <source>Apply to Document</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Auto-stretch preview</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Content-Aware (Slow, Best)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Controls</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Correction Brush</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Feather:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Fit</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Linked channels</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Method:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opacity:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Radius:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Redo</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Standard (Median)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Target Median:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Undo</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zoom In</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zoom Out</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>CosmicClarityDialog</name>
-        <message>
-            <source>Auto Detect PSF</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Both</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color Denoise: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color Denoise: 0.50</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cosmic Clarity</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Denoise</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Denoise Mode:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Luminance Denoise: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Luminance Denoise: 0.50</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Mode:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Non-Stellar Amount: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Non-Stellar Amount: 0.50</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Non-Stellar Only</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Non-Stellar PSF: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Non-Stellar PSF: 3.0</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Parameters</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Process RGB Separately</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Scale:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Sharpen</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Sharpen Channels Separately</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Sharpening Mode:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Stellar Amount: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Stellar Amount: 0.50</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Stellar Only</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Super Resolution</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Use GPU:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Yes</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>full</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>luminance</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>CropRotateDialog</name>
-        <message>
-            <source>1:1 (Square)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Aspect Ratio:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Free</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Please draw a crop rectangle first.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rotate &amp; Crop Tool</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rotation (deg):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Warning</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>CurvesDialog</name>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Curves Transformation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Grid</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Log</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Point: x=0.000, y=0.000</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Preview</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Reset</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>CustomMdiSubWindow</name>
-        <message>
-            <source>ADAPT</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>LINK</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>LINKED</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>New Name:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rename View</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>The image '%1' has unsaved changes. Do you want to close it?</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Unsaved Changes</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>DebayerDialog</name>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Auto (from header)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Auto-detecting pattern...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Bayer Pattern</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Bilinear</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Debayer</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Debayer failed.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Debayering (%1, %2)...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Detected: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Detected: (no image)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Detected: (none)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Detected: (unknown)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Done.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Edge-aware</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Failed.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image already has 3 channels.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Interpolation Method</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No image selected.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Only single-channel mosaic images can be debayered.</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>ExtractLuminanceDialog</name>
-        <message>
-            <source>Auto Estimate Noise</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Average (Equal)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Custom / Sensor</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Custom RGB Weights</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Extract</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Extract Luminance</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Failed to compute luminance.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Max</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Median</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Method:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No Image</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Please select an image first.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rec. 2020</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rec. 601</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rec. 709 (Standard)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>SNR (Noise Weighted)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>SNR Settings</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>FitsLoader</name>
-        <message>
-            <source>CFITSIO Open Error %1: %2\nPath: %3</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>CFITSIO Open Error: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>CFITSIO Param Error %1: %2</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>CFITSIO Param Error: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>CFITSIO Read Error (Plane %1) %2: %3</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>CFITSIO Read Error: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Extension '%1' not found</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Failed to move to HDU %1: %2</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>HDU %1 is not an image extension</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image has &lt; 2 dimensions</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image has &lt; 2 dimensions (NAXIS=%1)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No image extensions found in file</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>GHSDialog</name>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>ArcSinh Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Black Point (BP):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Clip</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Clip Mode:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Curve</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Enable live preview</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Even Weighted Luminance</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>GHS Transformation applied to %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Generalized Hyperbolic Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Generalized Hyperbolic Stretch (GHT)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Global rescale</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Grid</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>High: %1%</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>High: 0.00%</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Highlight (HP):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>How to handle values outside 0-1 range</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Human Weighted Luminance</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Intensity (B):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Inverse ArcSinh</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Inverse GHS</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Logarithmic</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Logarithmic histogram scale</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Low: %1%</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Low: 0.00%</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Parameters</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Preview</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>RGB (Independent)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>RGB Blend</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rescale</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Reset</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Reset zoom to 1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Saturation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Shadow (LP):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Show grid overlay</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Show transfer curve</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Stretch (D):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Stretch Mode</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Symmetry (SP):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Toggle Blue channel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Toggle Green channel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Toggle Red channel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zoom In</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zoom Out</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zoom:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>© 2026 Mike Cranfield</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>GraXpertDialog</name>
-        <message>
-            <source>AI Model:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Background Extraction</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Denoise</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>GraXpert</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Latest (auto)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Operation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Smoothing/Strength:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Use GPU Acceleration</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>HeaderEditorDialog</name>
-        <message>
-            <source>Add/Update Key</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Apply changes and save file?\nWarning: This overwrites the existing file if you choose Yes.\nChoose No to only apply to memory (you can Save As later).</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Comment</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Delete Selected</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>FITS Header Editor</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>FITS Header Editor - %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Failed to save: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>File saved.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>KEYWORD</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Key</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Save Changes</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Save FITS</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Save File</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Set</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Success</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Value</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>HeaderPanel</name>
-        <message>
-            <source>Comment</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Filter FITS keys...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Key</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Value</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>HeaderViewerDialog</name>
-        <message>
-            <source>Comment</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>FITS/XISF Header Explorer</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>FITS/XISF Header: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Filter keys...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Key</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Value</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>HelpDialog</name>
-        <message>
-            <source>1:1 Zoom:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>AI Processing</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>AI star removal for starless processing:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>AI-based gradient removal:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>AI-powered deconvolution and noise reduction:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Aberration Remover (RAR)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Add object labels and annotations using catalog data.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Adds WCS (World Coordinate System) metadata</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Adds artificial diffraction spikes to bright stars for aesthetic effect.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Adjust color saturation with protection for highlights and shadows.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Adjust polynomial order for model complexity</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Adjust tonal curves for each RGB channel independently or together.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Advanced stretch tool with full control:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Alternative stretches</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Always work on a copy of your original data</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Analyzes star quality metrics (FWHM, roundness, etc.)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Apply Mask:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Apply mathematical expressions to images:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>ArcSinh Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>ArcSinh:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>AstroSpike</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Auto Background Extraction (ABE)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Auto Stretch (Statistical)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Auto Stretch:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Automatic histogram stretch for best visibility</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Automatically detects and removes gradients</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Automatically stretches the image based on statistical analysis. Ideal for quick previews.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Background Neutralization</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Black Point</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Blends starless and star-only images with adjustable parameters.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Calibrates colors using star catalog data:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Channel Operations</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Check the Console panel for processing messages</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Choose Subtract or Divide mode</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Click Open or press Ctrl+O</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Click Save or press Ctrl+S</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Click and drag to move around the image</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Click the 1:1 button for 100% zoom</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Click to add sample points on the background</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color Boost:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color Management</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Combine Channels</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Combine images with formulas</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Combines separate channel images into one RGB image.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Controls stretch intensity (0-10)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Controls the non-linear expansion of stars.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Converts RAW Bayer pattern images to full color.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cosmic Clarity</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Create Mask:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Create and apply luminosity masks for selective processing:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Creates a starless version of your image</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Ctrl+Z / Ctrl+Shift+Z</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Curves Transformation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Debayer</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Display Modes</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Drag &amp; Drop:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Drag files directly onto the workspace</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Effects</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Enable RGB Link for color images to maintain color balance</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Extract Channels</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>FITS Header Editor</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Fit to Window:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Fit to window</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Focus point for stretch (click on image to pick)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>For best results, stretch AFTER background removal</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>GHS (Generalized Hyperbolic Stretch)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Generate mask from image luminosity</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Getting Started</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>GraXpert</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Histogram Transformation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Histogram equalization</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Histogram:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Identifies the exact sky coordinates of your image:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image Annotator</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Increases color saturation specifically for stars.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Intensity</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invert Mask:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invert mask selection</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Keyboard Shortcuts</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Linear:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Load and apply existing mask</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Local intensity adjustment (-5 to 15)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Manual histogram stretch with shadows, midtones, and highlights controls.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Masks</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>More powerful than traditional ABE</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Mouse wheel or Ctrl + and Ctrl -</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Navigation Controls</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Neutralizes color casts in the background sky:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Non-linear stretch preserving star colors</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Open Image:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Open file</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Optional green noise removal during the stretch.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Optionally creates a star-only mask</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Pan:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Photometric Color Calibration (PCC)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Pixel Math</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Plate Solving</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Press Ctrl+0</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Protect shadows/highlights from clipping</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Protection</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Raw pixel values without stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Redo</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Reduces noise without losing detail</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Removes chromatic aberration and optical artifacts.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Removes gradients and light pollution from your image:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Removes green color cast common in OSC/DSLR images.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Required for PCC and annotation tools</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Requires external Cosmic Clarity installation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Requires external GraXpert installation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Requires external StarNet installation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Requires plate-solved image (WCS data)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>SCNR (Selective Color Noise Reduction)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>SCNR:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Saturation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Save Image:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Save file</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Select a region of pure background</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Set black clipping level</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Sharpens stars and details</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Show Overlay:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Specialized stretch that preserves star colors while increasing contrast.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Specialized tool to stretch stars while preserving their color and size:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Splits RGB image into separate R, G, B windows.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Square Root / Logarithmic:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Star Analysis</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Star Recomposition</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Star Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>StarNet++</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Stretch Amount:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Stretch Tools</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Symmetry Point</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>TStar - Astrophotography Processing</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>TStar Help &amp; Tutorial</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>TStar supports FITS, XISF, TIFF, and PNG image formats commonly used in astrophotography.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>The tool will balance RGB channels</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Tip: Toggle RGB Link to stretch channels independently or together.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Tips &amp; Best Practices</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Toggle mask visualization</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Undo</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Undo/Redo:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Use Undo frequently - every operation is reversible</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Use the dropdown menu in the toolbar to change visualization:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Use variables like $T (target), $R, $G, $B</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Uses reference stars for accurate color calibration</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Utilities</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>View and edit FITS header metadata.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Welcome to TStar! This guide covers all features and tools available in the application.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zoom In/Out:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zoom in</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zoom out</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>HistogramStretchDialog</name>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Auto Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Compute optimal stretch parameters from image statistics</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>High: %1%</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>High: 0.00%</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Highlights:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Histogram Transformation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Low: %1%</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Low: 0.00%</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Midtones:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Parameters</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Preview</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Reset</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Shadows:</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>ImageBuffer</name>
-        <message>
-            <source>Unsupported TIFF bit depth.</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>ImageViewer</name>
-        <message>
-            <source>Selection</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>LivePreviewDialog</name>
-        <message>
-            <source>Live Mask Preview</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No mask data</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>MainWindow</name>
-        <message>
-            <source />
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source> (Rescaled)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>16-bit Integer</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>1:1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>32-bit Float</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>32-bit Integer</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>8-bit Integer</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>ABE - </source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>ABE applied.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>AI Processing</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Aberration Inspector</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Aberration Inspector (9-Points)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Aberration Remover</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>About</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Activating AstroSpike Tool...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Activating Curves Tool...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Activating GHS Tool...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Activating PixelMath Tool...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Activating Statistical Stretch Tool...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Active View Changed: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>All Supported (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Annotation Tool</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Application Ready.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Applied mask resized to match image.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Apply Mask...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>ArcSinh</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>ArcSinh Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Arcsinh Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Arcsinh Stretch Applied to %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Are you sure you want to exit?</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>AstroSpike</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>AstroSpike (Diffraction Spikes)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Auto Background Extraction (ABE)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Auto Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Background Neutralization</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Background Neutralization applied.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Background Neutralization requires an RGB image.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Bit Depth:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Burn Annotations</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>CLAHE</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>CLAHE applied.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cannot burn annotations into raw data formats (FITS/XISF)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Channel Operations</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color Management</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color Saturation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Combine Channels</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Console</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Continuum Subtraction</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Correction Brush</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Correction brush applied.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cosmic Clarity</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cosmic Clarity Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cosmic Clarity cancelled.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Create Mask...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Crop / Rotate</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Curves Transformation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Curves applied to %1.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Debayer</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Disabled</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Display Mode changed to: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Effects</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Enabled</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Enter a name to save this mask:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Exit TStar</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Extract Channels</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Extract Luminance</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>FITS (*.fits);;XISF (*.xisf);;TIFF (*.tif *.tiff);;PNG (*.png);;JPG (*.jpg)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>FITS Files (*.fits *.fit);;</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>FITS Header Editor</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Failed to load %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Failed to load %1: %2</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Failed to load XISF image %1: %2</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Failed to load extension %1: %2</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Failed to save image with annotations.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>False Color Visualization</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>False Color: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Fit to Screen</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Fit to Window</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Flip Horiz</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Flip Vert</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Format:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>GHS (Generalized Hyperbolic)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Generalized Hyperbolic Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Geometry applied: </source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>GraXpert</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>GraXpert Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>GraXpert cancelled.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Header</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Help</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Histogram</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Histogram Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Histogram Transformation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Histogram Transformation applied.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image Annotator</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image already has multiple channels.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Images (*.png *.jpg *.jpeg)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Info</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Interactive Mode: Auto Background Extraction</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Interactive Mode: Background Neutralization</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Interactive Mode: Crop</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Interactive Mode: GHS Point Picking</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invert Image Colors</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invert Mask</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invert: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Linear</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Link Views</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Link Zoom and Pan across all windows</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Logarithmic</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Luminance extracted.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Luminance recombined.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Mask</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Mask Applied: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Mask Created and Applied.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Mask Inverted.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Mask Removed.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Mirror H</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Mirror V</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>New version found: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No Image</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No mask to remove.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No open images to combine.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No valid PCC result found for this image.\nPlease run Photometric Color Calibration first.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Open</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Open Image Annotator first</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Open Image(s)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Open an image first.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opened ABE Tool.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opened Curves Tool.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opened FITS: %1 (%2 extensions)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opened GHS Tool.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opened PCC Distribution Tool</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opened Wavescale HDR Tool.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opened XISF: %1 (%2 images)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opened: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Aberration Inspector...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Aberration Remover...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Arcsinh Stretch Tool...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening AstroSpike Tool...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening CLAHE...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Color Saturation tool...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Combine Channels Tool...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Continuum Subtraction...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Correction Brush...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Cosmic Clarity...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Debayer...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Extract Luminance...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening GHS Tool...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening GraXpert...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Histogram Transformation...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Perfect Palette...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Photometric Color Calibration...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Plate Solving...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Recombine Luminance...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Rotate / Crop Tool...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening SCNR Tool...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Selective Color Correction...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Star Recomposition...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Star Stretch...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening StarNet++...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Opening Statistical Stretch...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>PCC Applied: R=%1 G=%2 B=%3 (BG: %4, %5, %6)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>PCC Distribution</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Pedestal removed.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Perfect Palette</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Perfect Palette Picker</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Photometric Color Calibration</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Pixel Math</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>PixelMath Applied</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>PixelMath Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Plate Solved! Center: RA %1, Dec %2</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Plate Solving</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Please open an image first.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Please select an image first.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Please select an image to crop.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Process</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>RGB Link: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>RGB Required</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Recombine Luminance</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Redo</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Redo (Ctrl+Shift+Z)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Remove Mask</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Remove Pedestal (Auto)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Remove Stars (StarNet)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rotate / Crop</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rotate CCW</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rotate CW</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rotate Left</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rotate Right</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Running Cosmic Clarity...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Running GraXpert...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>SCNR</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>SCNR (Remove Green)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>SCNR applied.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>SCNR requires color image.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Saturation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Saturation applied permanently</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Save</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Save Failed:\n</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Save Image As</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Save Mask</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Save Options</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Saved with Annotations: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Saved: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Select image.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Selective Color Correction</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Selective Color Correction applied.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Settings</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Settings applied. Display refreshed.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Show Overlay</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Square Root</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Star Analysis</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Star Recomposition</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Star Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>StarNet++</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Statistical Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Stretch Tools</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>TIFF Files (*.tiff *.tif);;</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>TStar is up to date.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Toggle RGB Channel Linking for Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Undo</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Undo (Ctrl+Z)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Update check failed: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Utilities</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>View Duplicated: </source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Wavescale HDR</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Wavescale HDR applied.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>XISF Files (*.xisf);;</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zoom 100%</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zoom In</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zoom Out</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>MaskGenerationDialog</name>
-        <message>
-            <source>ArcSinh</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Auto Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Binary</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Chrominance</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Clear Shapes</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color: Blue</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color: Cyan</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color: Green</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color: Magenta</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color: Orange</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color: Red</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color: Yellow</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Edge Blur (px):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Ellipse</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>False Color</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Fit</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Freehand</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Full</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Fuzziness</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Histogram</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Internal Blur:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invert</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invert Range</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Lightness</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Linear</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Link Limits</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Log</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Lower Limit</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Mask Creation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Mask Type:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Move/Select</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No mask data generated. Please draw shapes or select a mask type.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Preview</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Preview Mask</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Preview Visualization</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Range Selection</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Screening</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Select Entire Image</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Size:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Sqrt</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Star Mask</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Stretch:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Upper Limit</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Use Lightness</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zoom In</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Zoom Out</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>NativePlateSolver</name>
-        <message>
-            <source>Catalog Error: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Catalog received. Found %1 stars.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Detected %1 stars in image.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Detecting Image Stars...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Match Success!</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Matching Triangles...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Matching failed. Pattern not found.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Not enough catalog stars found.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Not enough image stars detected.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Projecting Catalog Stars...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Querying Catalog (VizieR)...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Starting Native Solver. Center: %1, %2 Radius: %3 deg</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>WCS Computation failed (Singular Matrix)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>WCS computed: CRPIX=(%1, %2) CRVAL=(%3, %4)</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>PCCDialog</name>
-        <message>
-            <source>Background Neutralization</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Calibration Failed.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Catalog Error: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Catalog loaded (%1 stars). Running Calibration (Async)...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Could not match enough stars. Check WCS and Image Quality.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Downloading Gaia DR3 Catalog...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Error: Image closed.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Error: No valid image.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Factors (K):\nR: %1\nG: %2\nB: %3\n\nBackground Ref (Detected):\nR: %4\nG: %5\nB: %6\n\nComputed Offsets:\nR: %7\nG: %8\nB: %9</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image must be plate solved first.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>PCC Failed</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>PCC Result</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Photometric Color Calibration</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Ready (Catalog stars cached).</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Ready (RA: %1, Dec: %2)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Ready. Cached stars: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Ready. Image must be plate solved.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Run PCC</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Starting PCC with %1 catalog stars...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Success. Applying correction...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Warning: No WCS coordinates found!</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>PCCDistributionDialog</name>
-        <message>
-            <source>B/G Distribution</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Expected (Catalog)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Measured (Image)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>R/G Distribution</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Star Distribution (PCC Analysis)</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>PerfectPaletteDialog</name>
-        <message>
-            <source>&lt;b&gt;Intensities&lt;/b&gt;</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>&lt;b&gt;Narrowband Channels&lt;/b&gt;</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Apply to New View</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Load %1...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No Image</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Not loaded</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Perfect Palette Picker</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Please select an image first.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Select View</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Source for %1:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>© 2026 SetiAstro</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>PixelMathDialog</name>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Channel Expressions</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Empty Expression</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Parse error: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Pixel Math (Pro)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Pixel Math requires RGB image.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Please enter an expression.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>R = r; G = g; B = b;</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Ready</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rescale result (maps min-max to 0-1)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Unknown function or wrong arg count: %1</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>PlateSolvingDialog</name>
-        <message>
-            <source>&lt;b&gt;Failed:&lt;/b&gt; %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>&lt;b&gt;Solved!&lt;/b&gt;</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Auto-calculated</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>CRVAL: %1, %2</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Calculate</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Calculated pixel scale: %1 arcsec/px</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Dec (deg)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Dec:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Error: Enter valid Focal Length and Pixel Size to calculate scale.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Focal Length (mm)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Focal Length (mm):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Object Name (e.g. M31)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Optical Settings</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Pixel Scale (″/px):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Pixel Size (µm)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Pixel Size (µm):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Plate Solving</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Plate solving successful.\nSolution applied.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>RA (deg)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>RA:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Search Radius (deg):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Search Simbad</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Searching Simbad...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Simbad Error: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Simbad found: RA %1, Dec %2</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Solve</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Solving Failed: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Starting Plate Solving...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Starting Solver...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Success</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Target Coordinates</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>WCS applied to %1.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>WCS applied to active image.</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>RARDialog</name>
-        <message>
-            <source>Aberration Removal Complete.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Aberration Remover</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Aborted by user.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Browse...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Checking GitHub...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Could not save model file.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Download Complete.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Download Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Download Latest Model (GitHub)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Downloading %1...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Downloading: %1%</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>ERR: RAR Failed: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>File Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>GitHub Check Failed: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Model</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Model Found</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Model downloaded to:\n%1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Model found locally.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No Image</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No ONNX model found in latest release.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No Target</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No active image viewer found.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>ONNX Models (*.onnx)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Overlap:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Parameters</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Patch Size:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Please select an image first.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Provider:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>RAR Result</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>RAR cancelled.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Run</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Running Aberration Removal...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Select ONNX Model</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Starting Aberration Removal...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Success</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>The model is already downloaded:\n%1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>© 2026 Riccardo Alberghi</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>RecombineLuminanceDialog</name>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Average</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Blend:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Custom / Sensor</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Custom RGB Weights</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Highlight Protection (Soft Knee):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Luminance Source:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Method:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No Source</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Parameters</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Please select a source luminance image.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rec. 2020</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rec. 601</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rec. 709 (Standard)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Recombination failed. Typically specific to size mismatch or invalid source image.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Recombine Luminance</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>SCNRDialog</name>
-        <message>
-            <source>Amount:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Average Neutral</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Maximum Neutral</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Minimum Neutral</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Protection Method:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>SCNR (Remove Green Noise)</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>SaturationDialog</name>
-        <message>
-            <source>All Colors</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Amount:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>BG Factor:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Blues</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color Saturation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cyans</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Greens</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Hue Center:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Hue Presets:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Hue Smooth:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Hue Width:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Magentas</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Reds</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Yellows</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>SelectiveColorDialog</name>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Blue:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>CMY Adjustments</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Contrast:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cyan:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Green:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Hue End (°):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Hue Selection</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Hue Start (°):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Intensity:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invert</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Luminance / Saturation / Contrast</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Luminance:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Magenta:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Min Chroma:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Preset:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>RGB Adjustments</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Red:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Reset</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Saturation:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Selective Color Correction</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Show Mask</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Smoothness (°):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Yellow:</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>SettingsDialog</name>
-        <message>
-            <source>24-bit Autostretch (Smoother gradients)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Browse...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Check for updates on startup</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cosmic Clarity Folder:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Display</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Executables (*.exe);;All Files (*)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>General</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>GraXpert Executable:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Language:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Paths and Integrations</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Please restart the application for the language changes to take effect.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Preferences</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Restart Required</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Select Cosmic Clarity Folder</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Select GraXpert Executable</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Select StarNet++ Executable</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>StarNet Executable:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>System Default</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>SidebarWidget</name>
-        <message>
-            <source>Auto-open console on log</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Console</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>SimbadSearcher</name>
-        <message>
-            <source>Network Error: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Object not found in Simbad/Sesame.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>XML Parse Error</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>SimpleTiffReader</name>
-        <message>
-            <source>Compressed TIFFs not supported (only Uncompressed).</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Could not seek to IFD.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invalid TIFF byte order marker.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invalid TIFF version (not 42).</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Strip offset/count mismatch.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Tile offset/count mismatch.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Use File open failed: %1</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>SimpleTiffWriter</name>
-        <message>
-            <source>Could not open file for writing.</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>SplashScreen</name>
-        <message>
-            <source>Professional astro editing app</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Starting...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>TStar v</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>StarAnalysisDialog</name>
-        <message>
-            <source> (Median HFR: %1 px)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>5</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Controllo Distribuzione Stelle (PSF Analysis)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Eccentricity</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Flux</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Flux Distribution</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>HFR</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Half Flux Radius Distribution</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Log Scale</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Max</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Median</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Min</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No Data</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No Image</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No Image or Image Closed</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Processing...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Ready</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Show Flux Distribution</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Show HFR Distribution</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Star Analysis: Found %1 stars</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>StdDev</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Target: %1. Processing...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Threshold (Sigma):</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>a</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>b</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>theta</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>StarNetDialog</name>
-        <message>
-            <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Could not generate mask due to size mismatch.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>ERR: Dimension mismatch for mask.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>ERR: StarNet failed: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>ERR: StarNet result is empty!</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Generate Star Mask</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Generating Star Mask...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Highly recommended if compatible hardware is detected.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>If checked, applies an auto-stretch before StarNet and inverts it afterwards.\nEssential for linear images.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Linear Data (Pre-stretch)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No image loaded (StarNet).</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Parameters</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Run</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Running StarNet++...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Star Mask</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>StarNet Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>StarNet cancelled.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>StarNet completed successfully. Validating result...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>StarNet process cancelled by user.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>StarNet produced an empty image.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>StarNet++ Star Removal</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Starless</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Starting StarNet++...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Stride:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Use GPU</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Warning</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>StarRecompositionDialog</name>
-        <message>
-            <source>Add</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Blend Mode:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Fit</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No Image</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Please select both Starless and Stars-Only views.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Preview:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Processing Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Ratio:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Screen</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Star Recomposition</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Starless View:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Stars-Only View:</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>StarStretchDialog</name>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color Boost: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color Boost: 1.00</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Remove Green via SCNR (Optional)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Star Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Star Stretch applied.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Stretch Amount: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Stretch Amount: 5.00</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>StretchDialog</name>
-        <message>
-            <source>Amount:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Apply S-Curve Boost</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Black Point Sigma:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Curve Strength:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Curves &amp; HDR</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Formula:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>HDR Highlight Compression</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Hard Ceiling %:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>High-Range Rescaling (VeraLux)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Knee Point:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Link Channels</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Luminance-Only Mode</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No Clipping</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Normalize</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Pedestal:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Preview</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rec.2020 (HDR)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rec.601 (SD)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rec.709 (sRGB)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Sigma multiplier for black point calculation (higher = darker backgrounds)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Soft Ceiling %:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Softclip Start:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Statistical Parameters</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Statistical Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Statistical Stretch applied (M=%1, BP=%2σ)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Target Median:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Target median brightness after stretch (0.25 = typical astro)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>© 2026 SetiAstro</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>UpdateChecker</name>
-        <message>
-            <source>Invalid JSON response from GitHub.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Network error: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No detailed changelog available.</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>UpdateDialog</name>
-        <message>
-            <source>&lt;h3&gt;A new version of TStar is available!&lt;/h3&gt;</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Could not save update file: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Download complete. Close TStar and start the installer?</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Download complete. Verifying...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Download failed: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Downloading update...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Downloading... %1%</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Downloading... (%1 bytes)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Failed to launch installer. Please run it manually:\n%1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Not Now</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Ready to Install</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Update Available: v%1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Update Failed</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Update Now</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Update downloaded. Run installer manually from temp if desired.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>What's New:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Would you like to update now?</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>WavescaleHDRDialog</name>
-        <message>
-            <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Compare (Show Original)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Compression:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Dimming Gamma:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>HDR Controls</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Mask Gamma:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Mask Preview</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Original</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Preview</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Scales:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Update Preview</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Wavescale HDR</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>© 2026 SetiAstro</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>XISFReader</name>
-        <message>
-            <source>Big-endian XISF files are not supported.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Could not open file: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Could not parse embedded data element.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Data block too small: expected %1 bytes, got %2</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Embedded XISF data not fully supported yet.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image index %1 out of range (file has %2 images)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Incomplete XML Header.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Incomplete data read: expected %1 bytes, got %2</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Inline XISF data not fully supported yet.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invalid Header Length: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invalid XISF Signature.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invalid XISF Signature. File is not XISF 1.0.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No valid image found in XISF header.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Seek error to data block at %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Unexpected EOF reading header length.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Unexpected EOF.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Unknown data location type.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Unknown inline encoding: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Unsupported sample format: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>XML Parse Error: %1</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>XISFWriter</name>
-        <message>
-            <source>Could not open file for writing: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Failed to prepare image data.</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
-        <name>main</name>
-        <message>
-            <source>Applying Custom Widgets...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Configuring UI Colors...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Configuring Workspace...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Constructing Main Window...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Finalizing Setup...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Initializing Core Systems...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Initializing Memory Manager...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Initializing OpenCV Backend...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Initializing Tool Dialogs...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Loading Color Management...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Loading Configuration...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Loading Icons &amp; Resources...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Loading Image Processing Algorithms...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Loading Stylesheets...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Ready!</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Setting up Dark Theme...</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
+<context>
+    <name>ABEDialog</name>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="164"/>
+        <source>ABE Error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="166"/>
+        <source>ABE Error: Unknown exception occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="74"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="428"/>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="430"/>
+        <source>Applying correction...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="24"/>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="143"/>
+        <source>Auto Background Extraction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="48"/>
+        <source>If checked, aligns channel backgrounds to the same level.
+Uncheck if you have already performed Photometric Color Calibration (PCC).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="65"/>
+        <source>Clear Selections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="78"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="50"/>
+        <source>Degree:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="52"/>
+        <source>Downsample:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="208"/>
+        <source>Downsampling image (Factor: %1)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="41"/>
+        <source>Enable RBF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="137"/>
+        <source>Error: Image data appears to be empty or invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="356"/>
+        <source>Evaluating Model (Channel %1)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="328"/>
+        <source>Fitting Polynomial degree %1 (Channel %2)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="349"/>
+        <source>Fitting RBF (Smooth: %1) (Channel %2)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="306"/>
+        <source>Found %1 valid sample points.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="291"/>
+        <source>No valid sample points. Using grid fallback...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="46"/>
+        <source>Normalize Background (Undo Color Calib)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="53"/>
+        <source>Patch Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="55"/>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="57"/>
+        <source>RBF Smooth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="45"/>
+        <source>Result = Background Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="142"/>
+        <source>Running ABE...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="51"/>
+        <source>Samples:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="286"/>
+        <source>Sampling points...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="174"/>
+        <source>Starting ABE Model generation...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ABEDialog.cpp" line="69"/>
+        <source>© 2026 SetiAstro</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AberrationInspectorDialog</name>
+    <message>
+        <location filename="../src/dialogs/AberrationInspectorDialog.cpp" line="16"/>
+        <source>Aberration Inspector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AberrationInspectorDialog.cpp" line="68"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AberrationInspectorDialog.cpp" line="34"/>
+        <source>Panel Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AboutDialog</name>
+    <message>
+        <location filename="../src/dialogs/AboutDialog.cpp" line="7"/>
+        <source>About TStar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AboutDialog.cpp" line="25"/>
+        <source>Build:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AboutDialog.cpp" line="22"/>
+        <source>Copyright © 2026</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AboutDialog.cpp" line="37"/>
+        <source>TStar is a professional astrophotography image processing application designed to provide advanced tools for enhancing and analyzing astronomical images.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AboutDialog.cpp" line="21"/>
+        <source>Written by Fabio Tempera</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AdaptStrip</name>
+    <message>
+        <location filename="../src/widgets/CustomMdiSubWindow.cpp" line="266"/>
+        <source>ADAPT</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AnnotationToolDialog</name>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="86"/>
+        <source>Add Text Label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="30"/>
+        <source>Annotation Tool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="78"/>
+        <source>Arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="64"/>
+        <source>Circle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="129"/>
+        <source>Clear All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="211"/>
+        <source>Click and drag to draw arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="203"/>
+        <source>Click and drag to draw circle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="207"/>
+        <source>Click and drag to draw rectangle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="216"/>
+        <source>Click on image to add text label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="105"/>
+        <source>Color:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="110"/>
+        <source>Cyan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="79"/>
+        <source>Draw Arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="65"/>
+        <source>Draw Circle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="72"/>
+        <source>Draw Rectangle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="48"/>
+        <source>Drawing Tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="225"/>
+        <source>Enter text:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="109"/>
+        <source>Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="168"/>
+        <source>No image loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="142"/>
+        <source>Note: Keep this tool OPEN to burn annotations into the saved image (File &gt; Save).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="138"/>
+        <source>Ready</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="188"/>
+        <source>Ready to draw</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="71"/>
+        <source>Rect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="108"/>
+        <source>Red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="122"/>
+        <source>Redo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="56"/>
+        <source>Select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="199"/>
+        <source>Select mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="57"/>
+        <source>Select/Pan (no drawing)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="85"/>
+        <source>Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="224"/>
+        <source>Text Label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="235"/>
+        <source>Text added. Click again to add more.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="117"/>
+        <source>Undo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="111"/>
+        <source>White</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AnnotationToolDialog.cpp" line="107"/>
+        <source>Yellow</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ApplyMaskDialog</name>
+    <message>
+        <location filename="../src/dialogs/ApplyMaskDialog.cpp" line="11"/>
+        <source>Apply Mask</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ApplyMaskDialog.cpp" line="18"/>
+        <source>Available Masks:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ApplyMaskDialog.cpp" line="66"/>
+        <source>Invalid Mask Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ApplyMaskDialog.cpp" line="26"/>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ApplyMaskDialog.cpp" line="28"/>
+        <source>Select a mask to see preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ApplyMaskDialog.cpp" line="44"/>
+        <source>[Saved] %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ApplyMaskDialog.cpp" line="44"/>
+        <source>[View] %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ArcsinhStretchDialog</name>
+    <message>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="124"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="16"/>
+        <source>Arcsinh Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="81"/>
+        <source>Black Point:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="123"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="95"/>
+        <source>Constant value subtracted from the image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="112"/>
+        <source>For colour images, use human eye luminous efficiency weights to compute the luminance.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="268"/>
+        <source>High: %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="101"/>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="206"/>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="225"/>
+        <source>High: 0.00%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="110"/>
+        <source>Human-weighted luminance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="267"/>
+        <source>Low: %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="100"/>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="205"/>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="224"/>
+        <source>Low: 0.00%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="116"/>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="122"/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="62"/>
+        <source>Stretch factor:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ArcsinhStretchDialog.cpp" line="76"/>
+        <source>The stretch factor adjusts the non-linearity.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AstroSpikeDialog</name>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="871"/>
+        <source>Add Star</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="977"/>
+        <source>Amount %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="988"/>
+        <source>Angle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="996"/>
+        <source>Appearance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="860"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="739"/>
+        <source>AstroSpike</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1020"/>
+        <source>Blur</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="797"/>
+        <source>Detecting stars...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="968"/>
+        <source>Detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1013"/>
+        <source>Enable Halo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1027"/>
+        <source>Enable Rainbow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="910"/>
+        <source>Erase:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="872"/>
+        <source>Eraser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1037"/>
+        <source>Flare</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="806"/>
+        <source>Found %1 stars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1032"/>
+        <source>Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="990"/>
+        <source>Global Scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1011"/>
+        <source>Halo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="999"/>
+        <source>Hue Shift</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="992"/>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1005"/>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1017"/>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1031"/>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1039"/>
+        <source>Intensity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="987"/>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1006"/>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1033"/>
+        <source>Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="979"/>
+        <source>Max Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="978"/>
+        <source>Min Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="324"/>
+        <source>No valid image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1007"/>
+        <source>Offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1146"/>
+        <source>PNG Images (*.png);;JPEG Images (*.jpg);;TIFF Images (*.tif)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="985"/>
+        <source>Points</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1025"/>
+        <source>Rainbow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="877"/>
+        <source>Ready</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="867"/>
+        <source>Redo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="998"/>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1021"/>
+        <source>Saturation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1145"/>
+        <source>Save Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1159"/>
+        <source>Saved to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1018"/>
+        <source>Scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1003"/>
+        <source>Secondary Spikes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="991"/>
+        <source>Sharpness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1040"/>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="890"/>
+        <source>Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="983"/>
+        <source>Spikes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="989"/>
+        <source>Thickness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="971"/>
+        <source>Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="863"/>
+        <source>Undo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="1019"/>
+        <source>Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/AstroSpikeDialog.cpp" line="960"/>
+        <source>© 2026 Fabio Tempera</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BackgroundNeutralizationDialog</name>
+    <message>
+        <location filename="../src/dialogs/BackgroundNeutralizationDialog.cpp" line="54"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/BackgroundNeutralizationDialog.cpp" line="15"/>
+        <source>Background Neutralization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/BackgroundNeutralizationDialog.cpp" line="56"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/BackgroundNeutralizationDialog.cpp" line="47"/>
+        <source>Ready - Please select a background region in the viewer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/BackgroundNeutralizationDialog.cpp" line="43"/>
+        <source>Select a background reference on the image by drawing a rectangle.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/BackgroundNeutralizationDialog.cpp" line="101"/>
+        <source>Selection too small.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/BackgroundNeutralizationDialog.cpp" line="95"/>
+        <source>Selection: %1x%2 at %3,%4</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CatalogClient</name>
+    <message>
+        <location filename="../src/photometry/CatalogClient.cpp" line="169"/>
+        <source>No stars found in region.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/photometry/CatalogClient.cpp" line="168"/>
+        <source>Parser failed to find RA column.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/photometry/CatalogClient.cpp" line="163"/>
+        <source>XML Parse Error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ChannelCombinationDialog</name>
+    <message>
+        <location filename="../src/dialogs/ChannelCombinationDialog.cpp" line="44"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ChannelCombinationDialog.cpp" line="31"/>
+        <source>Blue:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ChannelCombinationDialog.cpp" line="45"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ChannelCombinationDialog.cpp" line="11"/>
+        <source>Channel Combination</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ChannelCombinationDialog.cpp" line="72"/>
+        <location filename="../src/dialogs/ChannelCombinationDialog.cpp" line="78"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ChannelCombinationDialog.cpp" line="78"/>
+        <source>Failed to combine channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ChannelCombinationDialog.cpp" line="30"/>
+        <source>Green:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ChannelCombinationDialog.cpp" line="61"/>
+        <source>Incomplete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ChannelCombinationDialog.cpp" line="21"/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ChannelCombinationDialog.cpp" line="61"/>
+        <source>Please select a source for all R, G, B channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ChannelCombinationDialog.cpp" line="29"/>
+        <source>Red:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ChannelCombinationDialog.cpp" line="72"/>
+        <source>Selected images must have the same dimensions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ClaheDialog</name>
+    <message>
+        <location filename="../src/dialogs/ClaheDialog.cpp" line="90"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ClaheDialog.cpp" line="21"/>
+        <source>CLAHE (Contrast Limited Adaptive Histogram Equalization)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ClaheDialog.cpp" line="219"/>
+        <source>CLAHE applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ClaheDialog.cpp" line="58"/>
+        <source>Clip Limit:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ClaheDialog.cpp" line="91"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ClaheDialog.cpp" line="73"/>
+        <source>Grid Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ClaheDialog.cpp" line="44"/>
+        <source>Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ClaheDialog.cpp" line="89"/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CompressionUtils</name>
+    <message>
+        <location filename="../src/io/CompressionUtils.cpp" line="296"/>
+        <source>LZ4 compress failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/CompressionUtils.cpp" line="267"/>
+        <source>LZ4 decompress failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/CompressionUtils.cpp" line="274"/>
+        <location filename="../src/io/CompressionUtils.cpp" line="303"/>
+        <location filename="../src/io/CompressionUtils.cpp" line="332"/>
+        <source>LZ4 support not compiled in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/CompressionUtils.cpp" line="325"/>
+        <source>LZ4HC compress failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/CompressionUtils.cpp" line="168"/>
+        <location filename="../src/io/CompressionUtils.cpp" line="188"/>
+        <source>Unknown compression codec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/CompressionUtils.cpp" line="241"/>
+        <source>Zlib compress failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/CompressionUtils.cpp" line="220"/>
+        <source>Zlib inflate failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/CompressionUtils.cpp" line="212"/>
+        <source>Zlib inflateInit failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/CompressionUtils.cpp" line="388"/>
+        <source>Zstd compress failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/CompressionUtils.cpp" line="357"/>
+        <source>Zstd decompress failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/CompressionUtils.cpp" line="365"/>
+        <location filename="../src/io/CompressionUtils.cpp" line="396"/>
+        <source>Zstd support not compiled in</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ContinuumSubtractionDialog</name>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="133"/>
+        <source>-- Use Green Channel --</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="132"/>
+        <source>-- Use Red Channel --</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="85"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="86"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="18"/>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="138"/>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="146"/>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="152"/>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="185"/>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="191"/>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="213"/>
+        <source>Continuum Subtraction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="31"/>
+        <source>Continuum:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="225"/>
+        <source>Done.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="214"/>
+        <source>Failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="68"/>
+        <source>Formula: Result = NB - Q × (Continuum - median)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="24"/>
+        <source>Image Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="185"/>
+        <source>Invalid continuum image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="146"/>
+        <source>Invalid narrowband image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="152"/>
+        <source>Narrowband image is empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="30"/>
+        <source>Narrowband:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="138"/>
+        <source>No images available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="61"/>
+        <source>Output Linear Only (skip stretch)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="35"/>
+        <source>Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="192"/>
+        <source>Image dimensions must match.
+NB: %1x%2, Cont: %3x%4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="200"/>
+        <source>Processing (Q=%1)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="213"/>
+        <source>Processing failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="39"/>
+        <source>Q-Factor:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ContinuumSubtractionDialog.cpp" line="84"/>
+        <source>Refresh</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CorrectionBrushDialog</name>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="351"/>
+        <source>Apply to Document</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="334"/>
+        <source>Auto-stretch preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="352"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="330"/>
+        <source>Content-Aware (Slow, Best)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="318"/>
+        <source>Controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="266"/>
+        <source>Correction Brush</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="326"/>
+        <source>Feather:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="306"/>
+        <source>Fit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="336"/>
+        <source>Linked channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="332"/>
+        <source>Method:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="327"/>
+        <source>Opacity:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="325"/>
+        <source>Radius:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="350"/>
+        <source>Redo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="331"/>
+        <source>Standard (Median)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="342"/>
+        <source>Target Median:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="349"/>
+        <source>Undo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="305"/>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CorrectionBrushDialog.cpp" line="304"/>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CosmicClarityDialog</name>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="62"/>
+        <source>Auto Detect PSF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="34"/>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="54"/>
+        <source>Both</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="88"/>
+        <source>Color Denoise: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="86"/>
+        <source>Color Denoise: 0.50</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="21"/>
+        <source>Cosmic Clarity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="33"/>
+        <source>Denoise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="91"/>
+        <source>Denoise Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="83"/>
+        <source>Luminance Denoise: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="81"/>
+        <source>Luminance Denoise: 0.50</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="30"/>
+        <source>Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="43"/>
+        <source>No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="77"/>
+        <source>Non-Stellar Amount: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="75"/>
+        <source>Non-Stellar Amount: 0.50</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="56"/>
+        <source>Non-Stellar Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="67"/>
+        <source>Non-Stellar PSF: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="65"/>
+        <source>Non-Stellar PSF: 3.0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="26"/>
+        <source>Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="97"/>
+        <source>Process RGB Separately</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="101"/>
+        <source>Scale:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="32"/>
+        <source>Sharpen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="60"/>
+        <source>Sharpen Channels Separately</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="52"/>
+        <source>Sharpening Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="72"/>
+        <source>Stellar Amount: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="70"/>
+        <source>Stellar Amount: 0.50</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="55"/>
+        <source>Stellar Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="35"/>
+        <source>Super Resolution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="40"/>
+        <source>Use GPU:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="42"/>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="93"/>
+        <source>full</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CosmicClarityDialog.cpp" line="94"/>
+        <source>luminance</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CropRotateDialog</name>
+    <message>
+        <location filename="../src/dialogs/CropRotateDialog.cpp" line="36"/>
+        <source>1:1 (Square)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CropRotateDialog.cpp" line="48"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CropRotateDialog.cpp" line="33"/>
+        <source>Aspect Ratio:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CropRotateDialog.cpp" line="49"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CropRotateDialog.cpp" line="35"/>
+        <source>Free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CropRotateDialog.cpp" line="124"/>
+        <source>Please draw a crop rectangle first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CropRotateDialog.cpp" line="11"/>
+        <source>Rotate &amp; Crop Tool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CropRotateDialog.cpp" line="18"/>
+        <source>Rotation (deg):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CropRotateDialog.cpp" line="124"/>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CurvesDialog</name>
+    <message>
+        <location filename="../src/dialogs/CurvesDialog.cpp" line="460"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CurvesDialog.cpp" line="461"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CurvesDialog.cpp" line="376"/>
+        <source>Curves Transformation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CurvesDialog.cpp" line="392"/>
+        <source>Grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CurvesDialog.cpp" line="385"/>
+        <source>Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CurvesDialog.cpp" line="440"/>
+        <source>Point: x=0.000, y=0.000</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CurvesDialog.cpp" line="453"/>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/CurvesDialog.cpp" line="449"/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CustomMdiSubWindow</name>
+    <message>
+        <location filename="../src/widgets/CustomMdiSubWindow.cpp" line="1045"/>
+        <source>New Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/widgets/CustomMdiSubWindow.cpp" line="1044"/>
+        <source>Rename View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/widgets/CustomMdiSubWindow.cpp" line="1182"/>
+        <source>The image &apos;%1&apos; has unsaved changes. Do you want to close it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/widgets/CustomMdiSubWindow.cpp" line="1181"/>
+        <source>Unsaved Changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DebayerDialog</name>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="63"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="24"/>
+        <source>Auto (from header)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="173"/>
+        <source>Auto-detecting pattern...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="20"/>
+        <source>Bayer Pattern</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="45"/>
+        <source>Bilinear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="64"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="14"/>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="151"/>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="159"/>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="164"/>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="198"/>
+        <source>Debayer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="198"/>
+        <source>Debayer failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="185"/>
+        <source>Debayering (%1, %2)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="94"/>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="179"/>
+        <source>Detected: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="86"/>
+        <source>Detected: (no image)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="32"/>
+        <source>Detected: (none)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="92"/>
+        <source>Detected: (unknown)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="210"/>
+        <source>Done.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="44"/>
+        <source>Edge-aware</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="199"/>
+        <source>Failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="159"/>
+        <source>Image already has 3 channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="40"/>
+        <source>Interpolation Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="151"/>
+        <source>No image selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/DebayerDialog.cpp" line="164"/>
+        <source>Only single-channel mosaic images can be debayered.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ExtractLuminanceDialog</name>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="58"/>
+        <source>Auto Estimate Noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="27"/>
+        <source>Average (Equal)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="82"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="31"/>
+        <source>Custom / Sensor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="36"/>
+        <source>Custom RGB Weights</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="142"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="81"/>
+        <source>Extract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="15"/>
+        <source>Extract Luminance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="142"/>
+        <source>Failed to compute luminance.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="28"/>
+        <source>Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="29"/>
+        <source>Median</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="22"/>
+        <source>Method:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="128"/>
+        <source>No Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="128"/>
+        <source>Please select an image first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="26"/>
+        <source>Rec. 2020</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="25"/>
+        <source>Rec. 601</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="24"/>
+        <source>Rec. 709 (Standard)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="30"/>
+        <source>SNR (Noise Weighted)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ExtractLuminanceDialog.cpp" line="56"/>
+        <source>SNR Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FitsLoader</name>
+    <message>
+        <location filename="../src/io/FitsLoader.cpp" line="425"/>
+        <location filename="../src/io/FitsLoader.cpp" line="534"/>
+        <source>CFITSIO Open Error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/FitsLoader.cpp" line="32"/>
+        <source>CFITSIO Param Error %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/FitsLoader.cpp" line="578"/>
+        <source>CFITSIO Param Error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/FitsLoader.cpp" line="71"/>
+        <source>CFITSIO Read Error (Plane %1) %2: %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/FitsLoader.cpp" line="605"/>
+        <source>CFITSIO Read Error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/FitsLoader.cpp" line="520"/>
+        <source>Extension &apos;%1&apos; not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/FitsLoader.cpp" line="18"/>
+        <source>CFITSIO Open Error %1: %2
+Path: %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/FitsLoader.cpp" line="545"/>
+        <source>Failed to move to HDU %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/FitsLoader.cpp" line="553"/>
+        <source>HDU %1 is not an image extension</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/FitsLoader.cpp" line="584"/>
+        <source>Image has &lt; 2 dimensions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/FitsLoader.cpp" line="41"/>
+        <source>Image has &lt; 2 dimensions (NAXIS=%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/FitsLoader.cpp" line="501"/>
+        <source>No image extensions found in file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GHSDialog</name>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="328"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="187"/>
+        <source>ArcSinh Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="292"/>
+        <source>Black Point (BP):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="300"/>
+        <source>Clip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="298"/>
+        <source>Clip Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="329"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="170"/>
+        <source>Curve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="320"/>
+        <source>Enable live preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="204"/>
+        <source>Even Weighted Luminance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="634"/>
+        <source>GHS Transformation applied to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="185"/>
+        <source>Generalized Hyperbolic Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="28"/>
+        <source>Generalized Hyperbolic Stretch (GHT)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="303"/>
+        <source>Global rescale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="163"/>
+        <source>Grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="484"/>
+        <source>High: %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="221"/>
+        <source>High: 0.00%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="288"/>
+        <source>Highlight (HP):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="304"/>
+        <source>How to handle values outside 0-1 range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="203"/>
+        <source>Human Weighted Luminance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="260"/>
+        <source>Intensity (B):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="188"/>
+        <source>Inverse ArcSinh</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="186"/>
+        <source>Inverse GHS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="102"/>
+        <source>Logarithmic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="104"/>
+        <source>Logarithmic histogram scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="483"/>
+        <source>Low: %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="220"/>
+        <source>Low: 0.00%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="232"/>
+        <source>Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="318"/>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="202"/>
+        <source>RGB (Independent)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="302"/>
+        <source>RGB Blend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="301"/>
+        <source>Rescale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="327"/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="96"/>
+        <source>Reset zoom to 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="205"/>
+        <source>Saturation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="285"/>
+        <source>Shadow (LP):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="166"/>
+        <source>Show grid overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="173"/>
+        <source>Show transfer curve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="257"/>
+        <source>Stretch (D):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="181"/>
+        <source>Stretch Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="264"/>
+        <source>Symmetry (SP):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="154"/>
+        <source>Toggle Blue channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="153"/>
+        <source>Toggle Green channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="152"/>
+        <source>Toggle Red channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="90"/>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="79"/>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="74"/>
+        <source>Zoom:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GHSDialog.cpp" line="335"/>
+        <source>© 2026 Mike Cranfield</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GraXpertDialog</name>
+    <message>
+        <location filename="../src/dialogs/GraXpertDialog.cpp" line="67"/>
+        <source>AI Model:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GraXpertDialog.cpp" line="30"/>
+        <source>Background Extraction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GraXpertDialog.cpp" line="31"/>
+        <source>Denoise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GraXpertDialog.cpp" line="22"/>
+        <source>GraXpert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GraXpertDialog.cpp" line="46"/>
+        <source>Latest (auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GraXpertDialog.cpp" line="27"/>
+        <source>Operation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GraXpertDialog.cpp" line="66"/>
+        <source>Smoothing/Strength:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/GraXpertDialog.cpp" line="63"/>
+        <source>Use GPU Acceleration</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HeaderEditorDialog</name>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="27"/>
+        <source>Add/Update Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="83"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="38"/>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="53"/>
+        <source>Comment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="77"/>
+        <source>Delete Selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="167"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="16"/>
+        <source>FITS Header Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="14"/>
+        <source>FITS Header Editor - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="156"/>
+        <source>Apply changes and save file?
+Warning: This overwrites the existing file if you choose Yes.
+Choose No to only apply to memory (you can Save As later).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="167"/>
+        <source>Failed to save: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="169"/>
+        <source>File saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="31"/>
+        <source>KEYWORD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="53"/>
+        <source>Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="80"/>
+        <source>Save Changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="162"/>
+        <source>Save FITS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="155"/>
+        <source>Save File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="40"/>
+        <source>Set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="169"/>
+        <source>Success</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="35"/>
+        <location filename="../src/dialogs/HeaderEditorDialog.cpp" line="53"/>
+        <source>Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HeaderPanel</name>
+    <message>
+        <location filename="../src/widgets/HeaderPanel.cpp" line="23"/>
+        <source>Comment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/widgets/HeaderPanel.cpp" line="15"/>
+        <source>Filter FITS keys...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/widgets/HeaderPanel.cpp" line="23"/>
+        <source>Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/widgets/HeaderPanel.cpp" line="23"/>
+        <source>Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HeaderViewerDialog</name>
+    <message>
+        <location filename="../src/dialogs/HeaderViewerDialog.cpp" line="79"/>
+        <source>Comment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderViewerDialog.cpp" line="59"/>
+        <source>FITS/XISF Header Explorer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderViewerDialog.cpp" line="168"/>
+        <source>FITS/XISF Header: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderViewerDialog.cpp" line="71"/>
+        <source>Filter keys...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderViewerDialog.cpp" line="167"/>
+        <source>Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderViewerDialog.cpp" line="79"/>
+        <source>Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HeaderViewerDialog.cpp" line="79"/>
+        <source>Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HelpDialog</name>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="100"/>
+        <source>1:1 Zoom:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="192"/>
+        <source>AI Processing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="211"/>
+        <source>AI star removal for starless processing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="203"/>
+        <source>AI-based gradient removal:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="195"/>
+        <source>AI-powered deconvolution and noise reduction:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="218"/>
+        <source>Aberration Remover (RAR)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="269"/>
+        <source>Add object labels and annotations using catalog data.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="251"/>
+        <source>Adds WCS (World Coordinate System) metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="302"/>
+        <source>Adds artificial diffraction spikes to bright stars for aesthetic effect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="181"/>
+        <source>Adjust color saturation with protection for highlights and shadows.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="159"/>
+        <source>Adjust polynomial order for model complexity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="136"/>
+        <source>Adjust tonal curves for each RGB channel independently or together.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="126"/>
+        <source>Advanced stretch tool with full control:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="112"/>
+        <source>Alternative stretches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="319"/>
+        <source>Always work on a copy of your original data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="263"/>
+        <source>Analyzes star quality metrics (FWHM, roundness, etc.)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="293"/>
+        <source>Apply Mask:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="256"/>
+        <source>Apply mathematical expressions to images:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="141"/>
+        <source>ArcSinh Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="111"/>
+        <source>ArcSinh:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="301"/>
+        <source>AstroSpike</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="155"/>
+        <source>Auto Background Extraction (ABE)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="122"/>
+        <source>Auto Stretch (Statistical)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="109"/>
+        <source>Auto Stretch:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="109"/>
+        <source>Automatic histogram stretch for best visibility</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="205"/>
+        <source>Automatically detects and removes gradients</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="123"/>
+        <source>Automatically stretches the image based on statistical analysis. Ideal for quick previews.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="170"/>
+        <source>Background Neutralization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="132"/>
+        <source>Black Point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="231"/>
+        <source>Blends starless and star-only images with adjustable parameters.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="164"/>
+        <source>Calibrates colors using star catalog data:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="222"/>
+        <source>Channel Operations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="323"/>
+        <source>Check the Console panel for processing messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="160"/>
+        <source>Choose Subtract or Divide mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="89"/>
+        <source>Click Open or press Ctrl+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="90"/>
+        <source>Click Save or press Ctrl+S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="98"/>
+        <source>Click and drag to move around the image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="100"/>
+        <source>Click the 1:1 button for 100% zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="116"/>
+        <source>24-bit Display Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="117"/>
+        <source>Enable in Settings for smoother gradients and reduced banding in auto-stretched previews. Uses high-precision floating-point calculations instead of 16-bit histogram binning.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="158"/>
+        <source>Click to add sample points on the background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="48"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="148"/>
+        <source>Color Boost:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="153"/>
+        <source>Color Management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="183"/>
+        <source>Selective Color Correction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="184"/>
+        <source>Adjust colors within a specific hue range without affecting other colors:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="186"/>
+        <source>Select a color range using presets (Red, Green, Blue, etc.) or custom hue values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="187"/>
+        <source>Adjust Cyan/Magenta/Yellow, RGB, Luminance, Saturation, and Contrast for the selected range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="188"/>
+        <source>Use Smoothness to feather the selection edges</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="227"/>
+        <source>Combine Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="236"/>
+        <source>Extract Luminance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="237"/>
+        <source>Extracts the luminance (brightness) channel from an RGB image into a separate grayscale window. Useful for processing the L channel independently before recombining.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="239"/>
+        <source>Recombine Luminance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="240"/>
+        <source>Replaces the luminance channel of an RGB image with a processed version. Select the source luminance and target color image, then blend with adjustable intensity.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="242"/>
+        <source>Remove Pedestal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="243"/>
+        <source>Automatically detects and subtracts the minimum pixel value (black floor) from the image. Essential before stretching to ensure true black levels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="258"/>
+        <source>Combine images with formulas</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="228"/>
+        <source>Combines separate channel images into one RGB image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="128"/>
+        <source>Controls stretch intensity (0-10)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="147"/>
+        <source>Controls the non-linear expansion of stars.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="234"/>
+        <source>Converts RAW Bayer pattern images to full color.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="194"/>
+        <source>Cosmic Clarity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="292"/>
+        <source>Create Mask:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="290"/>
+        <source>Create and apply luminosity masks for selective processing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="213"/>
+        <source>Creates a starless version of your image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="101"/>
+        <source>Ctrl+Z / Ctrl+Shift+Z</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="135"/>
+        <source>Curves Transformation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="233"/>
+        <source>Debayer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="105"/>
+        <source>Display Modes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="91"/>
+        <source>Drag &amp; Drop:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="91"/>
+        <source>Drag files directly onto the workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="271"/>
+        <source>CLAHE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="272"/>
+        <source>Contrast Limited Adaptive Histogram Equalization. Enhances local contrast in different regions of the image:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="274"/>
+        <source>Clip Limit:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="274"/>
+        <source>Controls contrast amplification. Higher values increase contrast but may introduce noise.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="275"/>
+        <source>Grid Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="275"/>
+        <source>Size of tiles for local processing. Smaller tiles increase local detail.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="278"/>
+        <source>Aberration Inspector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="279"/>
+        <source>Displays a 3x3 grid of zoomed panels from the corners, edges, and center of your image. Useful for evaluating optical quality, coma, and field curvature across your frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="281"/>
+        <source>Correction Brush</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="282"/>
+        <source>Interactive tool to remove artifacts and blemishes:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="284"/>
+        <source>Content-Aware:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="284"/>
+        <source>Uses AI inpainting for seamless removal (slower but best quality)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="285"/>
+        <source>Standard:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="285"/>
+        <source>Uses median sampling from surrounding areas (faster)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="299"/>
+        <source>Effects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="322"/>
+        <source>Enable RGB Link for color images to maintain color balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="224"/>
+        <source>Extract Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="265"/>
+        <source>FITS Header Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="99"/>
+        <source>Fit to Window:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="311"/>
+        <source>Fit to window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="130"/>
+        <source>Focus point for stretch (click on image to pick)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="321"/>
+        <source>For best results, stretch AFTER background removal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="125"/>
+        <source>GHS (Generalized Hyperbolic Stretch)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="292"/>
+        <source>Generate mask from image luminosity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="86"/>
+        <source>Getting Started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="202"/>
+        <source>GraXpert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="138"/>
+        <source>Histogram Transformation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="110"/>
+        <source>Histogram equalization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="110"/>
+        <source>Histogram:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="249"/>
+        <source>Identifies the exact sky coordinates of your image:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="268"/>
+        <source>Image Annotator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="148"/>
+        <source>Increases color saturation specifically for stars.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="129"/>
+        <source>Intensity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="294"/>
+        <source>Invert Mask:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="294"/>
+        <source>Invert mask selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="305"/>
+        <source>Keyboard Shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="108"/>
+        <source>Linear:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="293"/>
+        <source>Load and apply existing mask</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="129"/>
+        <source>Local intensity adjustment (-5 to 15)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="139"/>
+        <source>Manual histogram stretch with shadows, midtones, and highlights controls.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="289"/>
+        <source>Masks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="206"/>
+        <source>More powerful than traditional ABE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="97"/>
+        <source>Mouse wheel or Ctrl + and Ctrl -</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="95"/>
+        <source>Navigation Controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="171"/>
+        <source>Neutralizes color casts in the background sky:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="111"/>
+        <source>Non-linear stretch preserving star colors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="89"/>
+        <source>Open Image:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="307"/>
+        <source>Open file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="149"/>
+        <source>Optional green noise removal during the stretch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="214"/>
+        <source>Optionally creates a star-only mask</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="98"/>
+        <source>Pan:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="163"/>
+        <source>Photometric Color Calibration (PCC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="255"/>
+        <source>Pixel Math</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="248"/>
+        <source>Plate Solving</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="99"/>
+        <source>Press Ctrl+0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="131"/>
+        <source>Protect shadows/highlights from clipping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="131"/>
+        <source>Protection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="108"/>
+        <source>Raw pixel values without stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="310"/>
+        <source>Redo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="198"/>
+        <source>Reduces noise without losing detail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="219"/>
+        <source>Removes chromatic aberration and optical artifacts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="156"/>
+        <source>Removes gradients and light pollution from your image:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="178"/>
+        <source>Removes green color cast common in OSC/DSLR images.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="252"/>
+        <source>Required for PCC and annotation tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="199"/>
+        <source>Requires external Cosmic Clarity installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="207"/>
+        <source>Requires external GraXpert installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="215"/>
+        <source>Requires external StarNet installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="166"/>
+        <source>Requires plate-solved image (WCS data)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="177"/>
+        <source>SCNR (Selective Color Noise Reduction)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="149"/>
+        <source>SCNR:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="180"/>
+        <source>Saturation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="90"/>
+        <source>Save Image:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="308"/>
+        <source>Save file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="173"/>
+        <source>Select a region of pure background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="132"/>
+        <source>Set black clipping level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="197"/>
+        <source>Sharpens stars and details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="295"/>
+        <source>Show Overlay:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="142"/>
+        <source>Specialized stretch that preserves star colors while increasing contrast.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="145"/>
+        <source>Specialized tool to stretch stars while preserving their color and size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="225"/>
+        <source>Splits RGB image into separate R, G, B windows.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="112"/>
+        <source>Square Root / Logarithmic:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="262"/>
+        <source>Star Analysis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="230"/>
+        <source>Star Recomposition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="144"/>
+        <source>Star Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="210"/>
+        <source>StarNet++</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="128"/>
+        <source>Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="147"/>
+        <source>Stretch Amount:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="120"/>
+        <source>Stretch Tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="130"/>
+        <source>Symmetry Point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="82"/>
+        <source>TStar - Astrophotography Processing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="10"/>
+        <source>TStar Help &amp; Tutorial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="87"/>
+        <source>TStar supports FITS, XISF, TIFF, and PNG image formats commonly used in astrophotography.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="174"/>
+        <source>The tool will balance RGB channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="114"/>
+        <source>Tip: Toggle RGB Link to stretch channels independently or together.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="317"/>
+        <source>Tips &amp; Best Practices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="295"/>
+        <source>Toggle mask visualization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="309"/>
+        <source>Undo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="101"/>
+        <source>Undo/Redo:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="320"/>
+        <source>Use Undo frequently - every operation is reversible</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="106"/>
+        <source>Use the dropdown menu in the toolbar to change visualization:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="259"/>
+        <source>Use variables like $T (target), $R, $G, $B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="167"/>
+        <source>Uses reference stars for accurate color calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="246"/>
+        <source>Utilities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="266"/>
+        <source>View and edit FITS header metadata.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="83"/>
+        <source>Welcome to TStar! This guide covers all features and tools available in the application.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="97"/>
+        <source>Zoom In/Out:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="312"/>
+        <source>Zoom in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HelpDialog.cpp" line="313"/>
+        <source>Zoom out</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HistogramStretchDialog</name>
+    <message>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="169"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="112"/>
+        <source>Auto Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="168"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="113"/>
+        <source>Compute optimal stretch parameters from image statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="487"/>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="500"/>
+        <source>High: %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="279"/>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="336"/>
+        <source>High: 0.00%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="156"/>
+        <source>Highlights:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="23"/>
+        <source>Histogram Transformation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="486"/>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="499"/>
+        <source>Low: %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="278"/>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="335"/>
+        <source>Low: 0.00%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="155"/>
+        <source>Midtones:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="129"/>
+        <source>Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="161"/>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="167"/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/HistogramStretchDialog.cpp" line="154"/>
+        <source>Shadows:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ImageViewer</name>
+    <message>
+        <location filename="../src/ImageViewer.cpp" line="431"/>
+        <source>Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LinkStrip</name>
+    <message>
+        <location filename="../src/widgets/CustomMdiSubWindow.cpp" line="178"/>
+        <source>LINKED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/widgets/CustomMdiSubWindow.cpp" line="178"/>
+        <source>LINK</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LivePreviewDialog</name>
+    <message>
+        <location filename="../src/dialogs/LivePreviewDialog.cpp" line="10"/>
+        <source>Live Mask Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/LivePreviewDialog.cpp" line="40"/>
+        <source>No mask data</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MainWindow</name>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1288"/>
+        <source></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2315"/>
+        <source> (Rescaled)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1273"/>
+        <location filename="../src/MainWindow.cpp" line="1283"/>
+        <source>16-bit Integer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="497"/>
+        <source>1:1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1273"/>
+        <source>32-bit Float</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1273"/>
+        <source>32-bit Integer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1273"/>
+        <location filename="../src/MainWindow.cpp" line="1282"/>
+        <source>8-bit Integer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1328"/>
+        <source>Save Failed:
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1518"/>
+        <source>ABE - </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1527"/>
+        <source>ABE applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="657"/>
+        <source>AI Processing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="3226"/>
+        <source>Aberration Inspector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="745"/>
+        <source>Aberration Inspector (9-Points)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="686"/>
+        <location filename="../src/MainWindow.cpp" line="1887"/>
+        <source>Aberration Remover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="838"/>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1620"/>
+        <source>Activating AstroSpike Tool...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2144"/>
+        <source>Activating Curves Tool...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1985"/>
+        <source>Activating GHS Tool...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2285"/>
+        <source>Activating PixelMath Tool...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1413"/>
+        <source>Activating Statistical Stretch Tool...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="250"/>
+        <source>Active View Changed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1096"/>
+        <source>All Supported (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2960"/>
+        <source>Annotation Tool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="870"/>
+        <source>Application Ready.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2842"/>
+        <source>Applied mask resized to match image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="784"/>
+        <source>Apply Mask...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="416"/>
+        <source>ArcSinh</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="616"/>
+        <source>ArcSinh Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2472"/>
+        <source>Arcsinh Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2469"/>
+        <source>Arcsinh Stretch Applied to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2525"/>
+        <source>Are you sure you want to exit?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1642"/>
+        <source>AstroSpike</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="751"/>
+        <source>AstroSpike (Diffraction Spikes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="634"/>
+        <source>Auto Background Extraction (ABE)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="414"/>
+        <location filename="../src/MainWindow.cpp" line="613"/>
+        <source>Auto Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="640"/>
+        <location filename="../src/MainWindow.cpp" line="2253"/>
+        <source>Background Neutralization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2268"/>
+        <source>Background Neutralization applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2240"/>
+        <source>Background Neutralization requires an RGB image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1287"/>
+        <source>Bit Depth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1260"/>
+        <source>Burn Annotations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="742"/>
+        <location filename="../src/MainWindow.cpp" line="3197"/>
+        <source>CLAHE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="3203"/>
+        <source>CLAHE applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2636"/>
+        <location filename="../src/MainWindow.cpp" line="2687"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1279"/>
+        <source>Cannot burn annotations into raw data formats (FITS/XISF)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="691"/>
+        <source>Channel Operations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="633"/>
+        <source>Color Management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1608"/>
+        <source>Color Saturation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="702"/>
+        <location filename="../src/MainWindow.cpp" line="703"/>
+        <location filename="../src/MainWindow.cpp" line="1399"/>
+        <source>Combine Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="158"/>
+        <source>Console</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="715"/>
+        <location filename="../src/MainWindow.cpp" line="2936"/>
+        <source>Continuum Subtraction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="739"/>
+        <location filename="../src/MainWindow.cpp" line="3158"/>
+        <source>Correction Brush</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2604"/>
+        <source>No valid PCC result found for this image.
+Please run Photometric Color Calibration first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="3164"/>
+        <source>Correction brush applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="658"/>
+        <location filename="../src/MainWindow.cpp" line="659"/>
+        <location filename="../src/MainWindow.cpp" line="665"/>
+        <source>Cosmic Clarity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2661"/>
+        <source>Cosmic Clarity Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2662"/>
+        <source>Cosmic Clarity cancelled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="783"/>
+        <source>Create Mask...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="506"/>
+        <source>Crop / Rotate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="619"/>
+        <location filename="../src/MainWindow.cpp" line="2189"/>
+        <source>Curves Transformation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2225"/>
+        <source>Curves applied to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="712"/>
+        <location filename="../src/MainWindow.cpp" line="2898"/>
+        <location filename="../src/MainWindow.cpp" line="2916"/>
+        <source>Debayer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="534"/>
+        <location filename="../src/MainWindow.cpp" line="551"/>
+        <location filename="../src/MainWindow.cpp" line="569"/>
+        <source>Disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="449"/>
+        <source>Display Mode changed to: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="750"/>
+        <source>Effects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="534"/>
+        <location filename="../src/MainWindow.cpp" line="551"/>
+        <location filename="../src/MainWindow.cpp" line="569"/>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2772"/>
+        <source>Enter a name to save this mask:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1309"/>
+        <location filename="../src/MainWindow.cpp" line="1328"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2525"/>
+        <source>Exit TStar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="692"/>
+        <source>Extract Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="693"/>
+        <location filename="../src/MainWindow.cpp" line="3116"/>
+        <source>Extract Luminance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1237"/>
+        <source>FITS (*.fits);;XISF (*.xisf);;TIFF (*.tif *.tiff);;PNG (*.png);;JPG (*.jpg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1097"/>
+        <source>FITS Files (*.fits *.fit);;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="733"/>
+        <source>FITS Header Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1218"/>
+        <location filename="../src/MainWindow.cpp" line="3093"/>
+        <source>Failed to load %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1122"/>
+        <location filename="../src/MainWindow.cpp" line="1167"/>
+        <location filename="../src/MainWindow.cpp" line="1209"/>
+        <location filename="../src/MainWindow.cpp" line="3002"/>
+        <location filename="../src/MainWindow.cpp" line="3043"/>
+        <location filename="../src/MainWindow.cpp" line="3083"/>
+        <source>Failed to load %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1185"/>
+        <location filename="../src/MainWindow.cpp" line="3058"/>
+        <source>Failed to load XISF image %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1147"/>
+        <location filename="../src/MainWindow.cpp" line="3023"/>
+        <source>Failed to load extension %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1309"/>
+        <source>Failed to save image with annotations.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="564"/>
+        <location filename="../src/MainWindow.cpp" line="565"/>
+        <source>False Color Visualization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="569"/>
+        <source>False Color: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="496"/>
+        <source>Fit to Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="407"/>
+        <source>Fit to Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="504"/>
+        <source>Flip Horiz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="505"/>
+        <source>Flip Vert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1286"/>
+        <source>Format:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="625"/>
+        <source>GHS (Generalized Hyperbolic)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2026"/>
+        <source>Generalized Hyperbolic Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1964"/>
+        <location filename="../src/MainWindow.cpp" line="1973"/>
+        <source>Geometry applied: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="667"/>
+        <location filename="../src/MainWindow.cpp" line="668"/>
+        <location filename="../src/MainWindow.cpp" line="674"/>
+        <source>GraXpert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2713"/>
+        <source>GraXpert Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2714"/>
+        <source>GraXpert cancelled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="162"/>
+        <source>Header</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="826"/>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="415"/>
+        <source>Histogram</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2507"/>
+        <source>Histogram Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="622"/>
+        <source>Histogram Transformation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2503"/>
+        <source>Histogram Transformation applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="736"/>
+        <source>Image Annotator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2898"/>
+        <source>Image already has multiple channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1100"/>
+        <source>Images (*.png *.jpg *.jpeg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1384"/>
+        <source>Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="374"/>
+        <source>Interactive Mode: Auto Background Extraction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="380"/>
+        <source>Interactive Mode: Background Neutralization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="392"/>
+        <source>Interactive Mode: Crop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="386"/>
+        <source>Interactive Mode: GHS Point Picking</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="547"/>
+        <source>Invert Image Colors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="787"/>
+        <source>Invert Mask</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="551"/>
+        <source>Invert: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="413"/>
+        <source>Linear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="453"/>
+        <source>Link Views</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="456"/>
+        <source>Link Zoom and Pan across all windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="418"/>
+        <source>Logarithmic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="3121"/>
+        <source>Luminance extracted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="3142"/>
+        <source>Luminance recombined.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="775"/>
+        <source>Mask</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2847"/>
+        <source>Mask Applied: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2782"/>
+        <source>Mask Created and Applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2872"/>
+        <source>Mask Inverted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2860"/>
+        <source>Mask Removed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="504"/>
+        <source>Mirror H</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="505"/>
+        <source>Mirror V</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="856"/>
+        <source>New version found: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="660"/>
+        <location filename="../src/MainWindow.cpp" line="669"/>
+        <location filename="../src/MainWindow.cpp" line="678"/>
+        <location filename="../src/MainWindow.cpp" line="1230"/>
+        <location filename="../src/MainWindow.cpp" line="1408"/>
+        <location filename="../src/MainWindow.cpp" line="1478"/>
+        <location filename="../src/MainWindow.cpp" line="1501"/>
+        <location filename="../src/MainWindow.cpp" line="1539"/>
+        <location filename="../src/MainWindow.cpp" line="1574"/>
+        <location filename="../src/MainWindow.cpp" line="1615"/>
+        <location filename="../src/MainWindow.cpp" line="1660"/>
+        <location filename="../src/MainWindow.cpp" line="1785"/>
+        <location filename="../src/MainWindow.cpp" line="1870"/>
+        <location filename="../src/MainWindow.cpp" line="1893"/>
+        <location filename="../src/MainWindow.cpp" line="1915"/>
+        <location filename="../src/MainWindow.cpp" line="1980"/>
+        <location filename="../src/MainWindow.cpp" line="2059"/>
+        <location filename="../src/MainWindow.cpp" line="2101"/>
+        <location filename="../src/MainWindow.cpp" line="2139"/>
+        <location filename="../src/MainWindow.cpp" line="2235"/>
+        <location filename="../src/MainWindow.cpp" line="2279"/>
+        <location filename="../src/MainWindow.cpp" line="2451"/>
+        <location filename="../src/MainWindow.cpp" line="2479"/>
+        <location filename="../src/MainWindow.cpp" line="2598"/>
+        <location filename="../src/MainWindow.cpp" line="2724"/>
+        <location filename="../src/MainWindow.cpp" line="2785"/>
+        <location filename="../src/MainWindow.cpp" line="2851"/>
+        <location filename="../src/MainWindow.cpp" line="2893"/>
+        <location filename="../src/MainWindow.cpp" line="2943"/>
+        <location filename="../src/MainWindow.cpp" line="3106"/>
+        <location filename="../src/MainWindow.cpp" line="3127"/>
+        <location filename="../src/MainWindow.cpp" line="3148"/>
+        <location filename="../src/MainWindow.cpp" line="3187"/>
+        <location filename="../src/MainWindow.cpp" line="3216"/>
+        <location filename="../src/MainWindow.cpp" line="3240"/>
+        <source>No Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2862"/>
+        <source>No mask to remove.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1384"/>
+        <source>No open images to combine.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="473"/>
+        <source>Open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1269"/>
+        <source>Open Image Annotator first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1101"/>
+        <source>Open Image(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2785"/>
+        <location filename="../src/MainWindow.cpp" line="2851"/>
+        <source>Open an image first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1533"/>
+        <source>Opened ABE Tool.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2202"/>
+        <source>Opened Curves Tool.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1152"/>
+        <location filename="../src/MainWindow.cpp" line="3028"/>
+        <source>Opened FITS: %1 (%2 extensions)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2053"/>
+        <source>Opened GHS Tool.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2612"/>
+        <source>Opened PCC Distribution Tool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1566"/>
+        <source>Opened Wavescale HDR Tool.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1190"/>
+        <location filename="../src/MainWindow.cpp" line="3063"/>
+        <source>Opened XISF: %1 (%2 images)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1120"/>
+        <location filename="../src/MainWindow.cpp" line="1165"/>
+        <location filename="../src/MainWindow.cpp" line="1207"/>
+        <location filename="../src/MainWindow.cpp" line="1216"/>
+        <location filename="../src/MainWindow.cpp" line="3000"/>
+        <location filename="../src/MainWindow.cpp" line="3041"/>
+        <location filename="../src/MainWindow.cpp" line="3081"/>
+        <location filename="../src/MainWindow.cpp" line="3091"/>
+        <source>Opened: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="3220"/>
+        <source>Opening Aberration Inspector...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1881"/>
+        <source>Opening Aberration Remover...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2462"/>
+        <source>Opening Arcsinh Stretch Tool...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1638"/>
+        <source>Opening AstroSpike Tool...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="3191"/>
+        <source>Opening CLAHE...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1585"/>
+        <source>Opening Color Saturation tool...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1397"/>
+        <source>Opening Combine Channels Tool...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2928"/>
+        <source>Opening Continuum Subtraction...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="3152"/>
+        <source>Opening Correction Brush...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="661"/>
+        <source>Opening Cosmic Clarity...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2910"/>
+        <source>Opening Debayer...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="3110"/>
+        <source>Opening Extract Luminance...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2024"/>
+        <source>Opening GHS Tool...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="670"/>
+        <source>Opening GraXpert...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2490"/>
+        <source>Opening Histogram Transformation...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1943"/>
+        <source>Opening Perfect Palette...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2116"/>
+        <source>Opening Photometric Color Calibration...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2067"/>
+        <source>Opening Plate Solving...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="3131"/>
+        <source>Opening Recombine Luminance...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1494"/>
+        <source>Opening Rotate / Crop Tool...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1693"/>
+        <source>Opening SCNR Tool...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="3244"/>
+        <source>Opening Selective Color Correction...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1926"/>
+        <source>Opening Star Recomposition...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1904"/>
+        <source>Opening Star Stretch...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="679"/>
+        <source>Opening StarNet++...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1441"/>
+        <source>Opening Statistical Stretch...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2126"/>
+        <source>PCC Applied: R=%1 G=%2 B=%3 (BG: %4, %5, %6)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="646"/>
+        <location filename="../src/MainWindow.cpp" line="2604"/>
+        <location filename="../src/MainWindow.cpp" line="2610"/>
+        <source>PCC Distribution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="3182"/>
+        <source>Pedestal removed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1949"/>
+        <source>Perfect Palette</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="709"/>
+        <source>Perfect Palette Picker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="637"/>
+        <location filename="../src/MainWindow.cpp" line="2117"/>
+        <source>Photometric Color Calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="724"/>
+        <location filename="../src/MainWindow.cpp" line="2323"/>
+        <source>Pixel Math</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2315"/>
+        <source>PixelMath Applied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2317"/>
+        <source>PixelMath Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2091"/>
+        <source>Plate Solved! Center: RA %1, Dec %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="721"/>
+        <location filename="../src/MainWindow.cpp" line="2068"/>
+        <source>Plate Solving</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1408"/>
+        <location filename="../src/MainWindow.cpp" line="1615"/>
+        <location filename="../src/MainWindow.cpp" line="2235"/>
+        <location filename="../src/MainWindow.cpp" line="2279"/>
+        <source>Please open an image first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1230"/>
+        <location filename="../src/MainWindow.cpp" line="1501"/>
+        <location filename="../src/MainWindow.cpp" line="1539"/>
+        <location filename="../src/MainWindow.cpp" line="1574"/>
+        <location filename="../src/MainWindow.cpp" line="1660"/>
+        <location filename="../src/MainWindow.cpp" line="1785"/>
+        <location filename="../src/MainWindow.cpp" line="1870"/>
+        <location filename="../src/MainWindow.cpp" line="1893"/>
+        <location filename="../src/MainWindow.cpp" line="1915"/>
+        <location filename="../src/MainWindow.cpp" line="1980"/>
+        <location filename="../src/MainWindow.cpp" line="2059"/>
+        <location filename="../src/MainWindow.cpp" line="2101"/>
+        <location filename="../src/MainWindow.cpp" line="2139"/>
+        <location filename="../src/MainWindow.cpp" line="2451"/>
+        <location filename="../src/MainWindow.cpp" line="2479"/>
+        <location filename="../src/MainWindow.cpp" line="2598"/>
+        <location filename="../src/MainWindow.cpp" line="2724"/>
+        <location filename="../src/MainWindow.cpp" line="2893"/>
+        <location filename="../src/MainWindow.cpp" line="2943"/>
+        <location filename="../src/MainWindow.cpp" line="3106"/>
+        <location filename="../src/MainWindow.cpp" line="3127"/>
+        <location filename="../src/MainWindow.cpp" line="3148"/>
+        <location filename="../src/MainWindow.cpp" line="3187"/>
+        <location filename="../src/MainWindow.cpp" line="3216"/>
+        <location filename="../src/MainWindow.cpp" line="3240"/>
+        <source>Please select an image first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1478"/>
+        <source>Please select an image to crop.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="581"/>
+        <source>Process</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="534"/>
+        <source>RGB Link: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2240"/>
+        <source>RGB Required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="696"/>
+        <location filename="../src/MainWindow.cpp" line="3137"/>
+        <source>Recombine Luminance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="485"/>
+        <source>Redo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="486"/>
+        <source>Redo (Ctrl+Shift+Z)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="786"/>
+        <source>Remove Mask</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="699"/>
+        <source>Remove Pedestal (Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="677"/>
+        <location filename="../src/MainWindow.cpp" line="682"/>
+        <source>Remove Stars (StarNet)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1495"/>
+        <source>Rotate / Crop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="502"/>
+        <source>Rotate CCW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="503"/>
+        <source>Rotate CW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="502"/>
+        <source>Rotate Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="503"/>
+        <source>Rotate Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2636"/>
+        <source>Running Cosmic Clarity...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2687"/>
+        <source>Running GraXpert...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1695"/>
+        <source>SCNR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="643"/>
+        <source>SCNR (Remove Green)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1690"/>
+        <source>SCNR applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1665"/>
+        <source>SCNR requires color image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="649"/>
+        <source>Saturation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1594"/>
+        <source>Saturation applied permanently</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="474"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1236"/>
+        <source>Save Image As</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2771"/>
+        <source>Save Mask</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1256"/>
+        <source>Save Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1311"/>
+        <source>Saved with Annotations: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1331"/>
+        <source>Saved: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="660"/>
+        <location filename="../src/MainWindow.cpp" line="669"/>
+        <location filename="../src/MainWindow.cpp" line="678"/>
+        <source>Select image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="652"/>
+        <location filename="../src/MainWindow.cpp" line="3250"/>
+        <source>Selective Color Correction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="3256"/>
+        <source>Selective Color Correction applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="800"/>
+        <location filename="../src/MainWindow.cpp" line="2437"/>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="2434"/>
+        <source>Settings applied. Display refreshed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="790"/>
+        <source>Show Overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="417"/>
+        <source>Square Root</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="727"/>
+        <location filename="../src/MainWindow.cpp" line="2751"/>
+        <source>Star Analysis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="706"/>
+        <location filename="../src/MainWindow.cpp" line="1931"/>
+        <source>Star Recomposition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="628"/>
+        <location filename="../src/MainWindow.cpp" line="1909"/>
+        <source>Star Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="676"/>
+        <source>StarNet++</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1443"/>
+        <source>Statistical Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="612"/>
+        <source>Stretch Tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1099"/>
+        <source>TIFF Files (*.tiff *.tif);;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="526"/>
+        <source>Toggle RGB Channel Linking for Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="479"/>
+        <source>Undo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="480"/>
+        <source>Undo (Ctrl+Z)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="864"/>
+        <source>Update check failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="720"/>
+        <source>Utilities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1814"/>
+        <source>View Duplicated: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="730"/>
+        <location filename="../src/MainWindow.cpp" line="1555"/>
+        <source>Wavescale HDR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1563"/>
+        <source>Wavescale HDR applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="1098"/>
+        <source>XISF Files (*.xisf);;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="497"/>
+        <source>Zoom 100%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="408"/>
+        <location filename="../src/MainWindow.cpp" line="494"/>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="409"/>
+        <location filename="../src/MainWindow.cpp" line="495"/>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MaskGenerationDialog</name>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="215"/>
+        <source>ArcSinh</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="213"/>
+        <source>Auto Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="104"/>
+        <source>Binary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="107"/>
+        <source>Chrominance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="299"/>
+        <source>Clear Shapes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="114"/>
+        <source>Color: Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="113"/>
+        <source>Color: Cyan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="112"/>
+        <source>Color: Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="115"/>
+        <source>Color: Magenta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="110"/>
+        <source>Color: Orange</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="109"/>
+        <source>Color: Red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="111"/>
+        <source>Color: Yellow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="128"/>
+        <source>Edge Blur (px):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="42"/>
+        <source>Ellipse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="290"/>
+        <source>False Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="80"/>
+        <source>Fit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="38"/>
+        <source>Freehand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="258"/>
+        <source>Full</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="163"/>
+        <source>Fuzziness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="214"/>
+        <source>Histogram</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="166"/>
+        <source>Internal Blur:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="286"/>
+        <source>Invert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="196"/>
+        <source>Invert Range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="106"/>
+        <source>Lightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="212"/>
+        <source>Linear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="178"/>
+        <source>Link Limits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="217"/>
+        <source>Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="161"/>
+        <source>Lower Limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="24"/>
+        <source>Mask Creation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="101"/>
+        <source>Mask Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="48"/>
+        <source>Move/Select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="677"/>
+        <source>No mask data generated. Please draw shapes or select a mask type.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="677"/>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="298"/>
+        <source>Preview Mask</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="207"/>
+        <source>Preview Visualization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="105"/>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="144"/>
+        <source>Range Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="187"/>
+        <source>Screening</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="45"/>
+        <source>Select Entire Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="254"/>
+        <source>Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="216"/>
+        <source>Sqrt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="108"/>
+        <source>Star Mask</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="210"/>
+        <source>Stretch:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="162"/>
+        <source>Upper Limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="191"/>
+        <source>Use Lightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="79"/>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/MaskGenerationDialog.cpp" line="78"/>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NativePlateSolver</name>
+    <message>
+        <location filename="../src/astrometry/NativePlateSolver.cpp" line="55"/>
+        <source>Catalog Error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/astrometry/NativePlateSolver.cpp" line="172"/>
+        <source>Catalog received. Found %1 stars.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/astrometry/NativePlateSolver.cpp" line="76"/>
+        <source>Detected %1 stars in image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/astrometry/NativePlateSolver.cpp" line="72"/>
+        <source>Detecting Image Stars...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/astrometry/NativePlateSolver.cpp" line="118"/>
+        <source>Match Success!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/astrometry/NativePlateSolver.cpp" line="103"/>
+        <source>Matching Triangles...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/astrometry/NativePlateSolver.cpp" line="132"/>
+        <source>Matching failed. Pattern not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/astrometry/NativePlateSolver.cpp" line="67"/>
+        <source>Not enough catalog stars found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/astrometry/NativePlateSolver.cpp" line="81"/>
+        <source>Not enough image stars detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/astrometry/NativePlateSolver.cpp" line="98"/>
+        <source>Projecting Catalog Stars...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/astrometry/NativePlateSolver.cpp" line="30"/>
+        <source>Querying Catalog (VizieR)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/astrometry/NativePlateSolver.cpp" line="24"/>
+        <source>Starting Native Solver. Center: %1, %2 Radius: %3 deg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/astrometry/NativePlateSolver.cpp" line="128"/>
+        <source>WCS Computation failed (Singular Matrix)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/astrometry/NativePlateSolver.cpp" line="124"/>
+        <source>WCS computed: CRPIX=(%1, %2) CRVAL=(%3, %4)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PCCDialog</name>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="33"/>
+        <source>Background Neutralization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="200"/>
+        <source>Calibration Failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="227"/>
+        <source>Factors (K):
+R: %1
+G: %2
+B: %3
+
+Background Ref (Detected):
+R: %4
+G: %5
+B: %6
+
+Computed Offsets:
+R: %7
+G: %8
+B: %9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="249"/>
+        <source>Catalog Error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="122"/>
+        <source>Catalog loaded (%1 stars). Running Calibration (Async)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="201"/>
+        <source>Could not match enough stars. Check WCS and Image Quality.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="109"/>
+        <source>Downloading Gaia DR3 Catalog...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="105"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="90"/>
+        <source>Error: Image closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="54"/>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="83"/>
+        <source>Error: No valid image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="105"/>
+        <source>Image must be plate solved first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="201"/>
+        <source>PCC Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="240"/>
+        <source>PCC Result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="19"/>
+        <source>Photometric Color Calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="51"/>
+        <source>Ready (Catalog stars cached).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="79"/>
+        <source>Ready (RA: %1, Dec: %2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="45"/>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="75"/>
+        <source>Ready. Cached stars: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="28"/>
+        <source>Ready. Image must be plate solved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="38"/>
+        <source>Run PCC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="128"/>
+        <source>Starting PCC with %1 catalog stars...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="203"/>
+        <source>Success. Applying correction...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="49"/>
+        <location filename="../src/dialogs/PCCDialog.cpp" line="77"/>
+        <source>Warning: No WCS coordinates found!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PCCDistributionDialog</name>
+    <message>
+        <location filename="../src/dialogs/PCCDistributionDialog.cpp" line="27"/>
+        <source>B/G Distribution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDistributionDialog.cpp" line="81"/>
+        <source>Expected (Catalog)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDistributionDialog.cpp" line="85"/>
+        <source>Measured (Image)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDistributionDialog.cpp" line="26"/>
+        <source>R/G Distribution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PCCDistributionDialog.cpp" line="10"/>
+        <source>Star Distribution (PCC Analysis)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PerfectPaletteDialog</name>
+    <message>
+        <location filename="../src/dialogs/PerfectPaletteDialog.cpp" line="50"/>
+        <source>&lt;b&gt;Intensities&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PerfectPaletteDialog.cpp" line="34"/>
+        <source>&lt;b&gt;Narrowband Channels&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PerfectPaletteDialog.cpp" line="71"/>
+        <source>Apply to New View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PerfectPaletteDialog.cpp" line="293"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PerfectPaletteDialog.cpp" line="37"/>
+        <source>Load %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PerfectPaletteDialog.cpp" line="134"/>
+        <source>No Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PerfectPaletteDialog.cpp" line="38"/>
+        <source>Not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PerfectPaletteDialog.cpp" line="17"/>
+        <source>Perfect Palette Picker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PerfectPaletteDialog.cpp" line="134"/>
+        <source>Please select an image first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PerfectPaletteDialog.cpp" line="145"/>
+        <source>Select View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PerfectPaletteDialog.cpp" line="145"/>
+        <source>Source for %1:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PerfectPaletteDialog.cpp" line="77"/>
+        <source>© 2026 SetiAstro</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PixelMathDialog</name>
+    <message>
+        <location filename="../src/dialogs/PixelMathDialog.cpp" line="280"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PixelMathDialog.cpp" line="281"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PixelMathDialog.cpp" line="262"/>
+        <source>Channel Expressions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PixelMathDialog.cpp" line="390"/>
+        <source>Empty Expression</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PixelMathDialog.cpp" line="319"/>
+        <source>Parse error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PixelMathDialog.cpp" line="231"/>
+        <source>Pixel Math (Pro)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PixelMathDialog.cpp" line="251"/>
+        <source>&lt;b&gt;Variables:&lt;/b&gt; r, g, b&lt;br&gt;&lt;b&gt;Targets:&lt;/b&gt; R = ...; G = ...; B = ...;&lt;br&gt;&lt;b&gt;Operators:&lt;/b&gt; +, -, *, /, ^, ( ), ~ (invert)&lt;br&gt;&lt;b&gt;Functions:&lt;/b&gt; mtf(x, mid), gamma(x, g), clamp(x, lo, hi), iff(cond, t, f), min(a, b), max(a, b), sqrt, abs, log, sin, cos&lt;br&gt;&lt;b&gt;Example:&lt;/b&gt; R = ~r; G = (g * 1.5) - 0.1; B = mtf(b, 0.5);</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PixelMathDialog.cpp" line="295"/>
+        <source>Pixel Math requires RGB image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PixelMathDialog.cpp" line="390"/>
+        <source>Please enter an expression.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PixelMathDialog.cpp" line="265"/>
+        <source>R = r; G = g; B = b;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PixelMathDialog.cpp" line="275"/>
+        <source>Ready</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PixelMathDialog.cpp" line="271"/>
+        <source>Rescale result (maps min-max to 0-1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PixelMathDialog.cpp" line="206"/>
+        <source>Unknown function or wrong arg count: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PlateSolvingDialog</name>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="239"/>
+        <source>&lt;b&gt;Failed:&lt;/b&gt; %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="206"/>
+        <source>&lt;b&gt;Solved!&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="65"/>
+        <source>Auto-calculated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="207"/>
+        <source>CRVAL: %1, %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="68"/>
+        <source>Calculate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="159"/>
+        <source>Calculated pixel scale: %1 arcsec/px</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="92"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="42"/>
+        <source>Dec (deg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="45"/>
+        <source>Dec:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="162"/>
+        <source>Error: Enter valid Focal Length and Pixel Size to calculate scale.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="61"/>
+        <source>Focal Length (mm)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="71"/>
+        <source>Focal Length (mm):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="31"/>
+        <source>Object Name (e.g. M31)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="57"/>
+        <source>Optical Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="75"/>
+        <source>Pixel Scale (″/px):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="63"/>
+        <source>Pixel Size (µm)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="73"/>
+        <source>Pixel Size (µm):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="20"/>
+        <source>Plate Solving</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="40"/>
+        <source>RA (deg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="43"/>
+        <source>RA:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="52"/>
+        <source>Search Radius (deg):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="32"/>
+        <source>Search Simbad</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="168"/>
+        <source>Searching Simbad...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="114"/>
+        <source>Simbad Error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="111"/>
+        <source>Simbad found: RA %1, Dec %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="90"/>
+        <source>Solve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="237"/>
+        <source>Plate solving successful.
+Solution applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="240"/>
+        <source>Solving Failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="184"/>
+        <source>Starting Plate Solving...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="180"/>
+        <source>Starting Solver...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="237"/>
+        <source>Success</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="28"/>
+        <source>Target Coordinates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="228"/>
+        <source>WCS applied to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/PlateSolvingDialog.cpp" line="233"/>
+        <source>WCS applied to active image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="../src/ImageBuffer.cpp" line="183"/>
+        <source>Unsupported TIFF bit depth.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RARDialog</name>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="271"/>
+        <source>Aberration Removal Complete.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="41"/>
+        <source>Aberration Remover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="273"/>
+        <location filename="../src/dialogs/RARDialog.cpp" line="276"/>
+        <source>Aborted by user.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="56"/>
+        <source>Browse...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="252"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="134"/>
+        <source>Checking GitHub...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="117"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="209"/>
+        <source>Could not save model file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="206"/>
+        <source>Download Complete.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="196"/>
+        <source>Download Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="61"/>
+        <source>Download Latest Model (GitHub)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="178"/>
+        <source>The model is already downloaded:
+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="183"/>
+        <source>Downloading %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="188"/>
+        <source>Downloading: %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="207"/>
+        <source>Model downloaded to:
+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="274"/>
+        <source>ERR: RAR Failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="144"/>
+        <location filename="../src/dialogs/RARDialog.cpp" line="164"/>
+        <location filename="../src/dialogs/RARDialog.cpp" line="275"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="209"/>
+        <source>File Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="144"/>
+        <source>GitHub Check Failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="50"/>
+        <source>Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="178"/>
+        <source>Model Found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="177"/>
+        <source>Model found locally.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="221"/>
+        <source>No Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="164"/>
+        <source>No ONNX model found in latest release.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="237"/>
+        <source>No Target</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="237"/>
+        <source>No active image viewer found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="129"/>
+        <source>ONNX Models (*.onnx)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="78"/>
+        <source>Overlap:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="69"/>
+        <source>Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="72"/>
+        <source>Patch Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="221"/>
+        <source>Please select an image first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="84"/>
+        <source>Provider:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="270"/>
+        <source>RAR Result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="277"/>
+        <source>RAR cancelled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="116"/>
+        <source>Run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="252"/>
+        <source>Running Aberration Removal...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="129"/>
+        <source>Select ONNX Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="242"/>
+        <source>Starting Aberration Removal...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="207"/>
+        <source>Success</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RARDialog.cpp" line="112"/>
+        <source>© 2026 Riccardo Alberghi</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RecombineLuminanceDialog</name>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="81"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="39"/>
+        <source>Average</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="49"/>
+        <source>Blend:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="82"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="37"/>
+        <source>Custom / Sensor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="69"/>
+        <source>Custom RGB Weights</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="149"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="60"/>
+        <source>Highlight Protection (Soft Knee):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="25"/>
+        <source>Luminance Source:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="32"/>
+        <source>Method:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="130"/>
+        <source>No Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="44"/>
+        <source>Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="130"/>
+        <source>Please select a source luminance image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="36"/>
+        <source>Rec. 2020</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="35"/>
+        <source>Rec. 601</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="34"/>
+        <source>Rec. 709 (Standard)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="149"/>
+        <source>Recombination failed. Typically specific to size mismatch or invalid source image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/RecombineLuminanceDialog.cpp" line="18"/>
+        <source>Recombine Luminance</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SCNRDialog</name>
+    <message>
+        <location filename="../src/dialogs/SCNRDialog.cpp" line="41"/>
+        <source>Amount:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SCNRDialog.cpp" line="66"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SCNRDialog.cpp" line="23"/>
+        <source>Average Neutral</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SCNRDialog.cpp" line="67"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SCNRDialog.cpp" line="24"/>
+        <source>Maximum Neutral</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SCNRDialog.cpp" line="25"/>
+        <source>Minimum Neutral</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SCNRDialog.cpp" line="21"/>
+        <source>Protection Method:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SCNRDialog.cpp" line="11"/>
+        <source>SCNR (Remove Green Noise)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SaturationDialog</name>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="49"/>
+        <source>All Colors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="43"/>
+        <source>Amount:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="93"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="44"/>
+        <source>BG Factor:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="54"/>
+        <source>Blues</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="95"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="10"/>
+        <source>Color Saturation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="53"/>
+        <source>Cyans</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="52"/>
+        <source>Greens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="85"/>
+        <source>Hue Center:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="47"/>
+        <source>Hue Presets:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="87"/>
+        <source>Hue Smooth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="86"/>
+        <source>Hue Width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="55"/>
+        <source>Magentas</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="50"/>
+        <source>Reds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SaturationDialog.cpp" line="51"/>
+        <source>Yellows</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SelectiveColorDialog</name>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="199"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="169"/>
+        <source>Blue:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="131"/>
+        <source>CMY Adjustments</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="203"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="187"/>
+        <source>Contrast:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="143"/>
+        <source>Cyan:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="165"/>
+        <source>Green:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="87"/>
+        <source>Hue End (°):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="66"/>
+        <source>Hue Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="79"/>
+        <source>Hue Start (°):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="112"/>
+        <source>Intensity:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="120"/>
+        <source>Invert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="174"/>
+        <source>Luminance / Saturation / Contrast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="179"/>
+        <source>Luminance:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="147"/>
+        <source>Magenta:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="103"/>
+        <source>Min Chroma:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="70"/>
+        <source>Preset:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="156"/>
+        <source>RGB Adjustments</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="161"/>
+        <source>Red:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="193"/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="183"/>
+        <source>Saturation:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="27"/>
+        <source>Selective Color Correction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="124"/>
+        <source>Show Mask</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="96"/>
+        <source>Smoothness (°):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SelectiveColorDialog.cpp" line="151"/>
+        <source>Yellow:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsDialog</name>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="98"/>
+        <source>24-bit Autostretch (Smoother gradients)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="45"/>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="55"/>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="65"/>
+        <source>Browse...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="33"/>
+        <source>Check for updates on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="61"/>
+        <source>Cosmic Clarity Folder:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="95"/>
+        <source>Display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="109"/>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="114"/>
+        <source>Executables (*.exe);;All Files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="20"/>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="51"/>
+        <source>GraXpert Executable:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="31"/>
+        <source>Language:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="39"/>
+        <source>Paths and Integrations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="136"/>
+        <source>Please restart the application for the language changes to take effect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="14"/>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="135"/>
+        <source>Restart Required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="119"/>
+        <source>Select Cosmic Clarity Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="114"/>
+        <source>Select GraXpert Executable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="109"/>
+        <source>Select StarNet++ Executable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="71"/>
+        <source>StarNet Executable:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/SettingsDialog.cpp" line="24"/>
+        <source>System Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SidebarWidget</name>
+    <message>
+        <location filename="../src/widgets/SidebarWidget.cpp" line="106"/>
+        <source>Auto-open console on log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/widgets/SidebarWidget.cpp" line="85"/>
+        <source>Console</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SimbadSearcher</name>
+    <message>
+        <location filename="../src/astrometry/SimbadSearcher.cpp" line="27"/>
+        <source>Network Error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/astrometry/SimbadSearcher.cpp" line="64"/>
+        <source>Object not found in Simbad/Sesame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/astrometry/SimbadSearcher.cpp" line="57"/>
+        <source>XML Parse Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SimpleTiffReader</name>
+    <message>
+        <location filename="../src/io/SimpleTiffReader.cpp" line="164"/>
+        <source>Compressed TIFFs not supported (only Uncompressed).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/SimpleTiffReader.cpp" line="67"/>
+        <source>Could not seek to IFD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/SimpleTiffReader.cpp" line="51"/>
+        <source>Invalid TIFF byte order marker.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/SimpleTiffReader.cpp" line="58"/>
+        <source>Invalid TIFF version (not 42).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/SimpleTiffReader.cpp" line="289"/>
+        <source>Strip offset/count mismatch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/SimpleTiffReader.cpp" line="192"/>
+        <source>Tile offset/count mismatch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/SimpleTiffReader.cpp" line="35"/>
+        <source>Use File open failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SimpleTiffWriter</name>
+    <message>
+        <location filename="../src/io/SimpleTiffWriter.cpp" line="38"/>
+        <source>Could not open file for writing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SplashScreen</name>
+    <message>
+        <location filename="../src/widgets/SplashScreen.cpp" line="143"/>
+        <source>Professional astro editing app</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/widgets/SplashScreen.cpp" line="62"/>
+        <source>Starting...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/widgets/SplashScreen.cpp" line="137"/>
+        <source>TStar v</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StarAnalysisDialog</name>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="320"/>
+        <source> (Median HFR: %1 px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="247"/>
+        <source>5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="272"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="184"/>
+        <source>Controllo Distribuzione Stelle (PSF Analysis)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="235"/>
+        <source>Eccentricity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="235"/>
+        <source>Flux</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="358"/>
+        <source>Flux Distribution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="235"/>
+        <source>HFR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="358"/>
+        <source>Half Flux Radius Distribution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="261"/>
+        <source>Log Scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="236"/>
+        <source>Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="236"/>
+        <source>Median</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="236"/>
+        <source>Min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="345"/>
+        <source>No Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="217"/>
+        <source>No Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="285"/>
+        <source>No Image or Image Closed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="289"/>
+        <source>Processing...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="267"/>
+        <source>Ready</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="257"/>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="338"/>
+        <source>Show Flux Distribution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="335"/>
+        <source>Show HFR Distribution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="312"/>
+        <source>Star Analysis: Found %1 stars</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="236"/>
+        <source>StdDev</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="214"/>
+        <source>Target: %1. Processing...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="243"/>
+        <source>Threshold (Sigma):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="235"/>
+        <source>a</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="235"/>
+        <source>b</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="235"/>
+        <source>theta</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StarAnalysisWorker</name>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="151"/>
+        <source>No Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StarHistogramWidget</name>
+    <message>
+        <location filename="../src/dialogs/StarAnalysisDialog.cpp" line="45"/>
+        <source>No Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StarNetDialog</name>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="107"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="62"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="145"/>
+        <source>Could not generate mask due to size mismatch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="144"/>
+        <source>ERR: Dimension mismatch for mask.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="163"/>
+        <source>ERR: StarNet failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="137"/>
+        <source>ERR: StarNet result is empty!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="76"/>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="138"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="38"/>
+        <source>Generate Star Mask</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="142"/>
+        <source>Generating Star Mask...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="43"/>
+        <source>Highly recommended if compatible hardware is detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="34"/>
+        <source>Linear Data (Pre-stretch)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="76"/>
+        <source>No image loaded (StarNet).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="31"/>
+        <source>Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="36"/>
+        <source>If checked, applies an auto-stretch before StarNet and inverts it afterwards.
+Essential for linear images.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="61"/>
+        <source>Run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="107"/>
+        <source>Running StarNet++...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="157"/>
+        <source>Star Mask</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="164"/>
+        <source>StarNet Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="166"/>
+        <source>StarNet cancelled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="135"/>
+        <source>StarNet completed successfully. Validating result...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="162"/>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="165"/>
+        <source>StarNet process cancelled by user.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="138"/>
+        <source>StarNet produced an empty image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="25"/>
+        <source>StarNet++ Star Removal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="140"/>
+        <source>Starless</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="89"/>
+        <source>Starting StarNet++...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="46"/>
+        <source>Stride:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="41"/>
+        <source>Use GPU</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarNetDialog.cpp" line="145"/>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StarRecompositionDialog</name>
+    <message>
+        <location filename="../src/dialogs/StarRecompositionDialog.cpp" line="77"/>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarRecompositionDialog.cpp" line="106"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarRecompositionDialog.cpp" line="74"/>
+        <source>Blend Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarRecompositionDialog.cpp" line="107"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarRecompositionDialog.cpp" line="122"/>
+        <source>Fit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarRecompositionDialog.cpp" line="241"/>
+        <source>No Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarRecompositionDialog.cpp" line="241"/>
+        <source>Please select both Starless and Stars-Only views.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarRecompositionDialog.cpp" line="121"/>
+        <source>Preview:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarRecompositionDialog.cpp" line="255"/>
+        <source>Processing Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarRecompositionDialog.cpp" line="94"/>
+        <source>Ratio:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarRecompositionDialog.cpp" line="76"/>
+        <source>Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarRecompositionDialog.cpp" line="16"/>
+        <source>Star Recomposition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarRecompositionDialog.cpp" line="44"/>
+        <source>Starless View:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarRecompositionDialog.cpp" line="59"/>
+        <source>Stars-Only View:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StarStretchDialog</name>
+    <message>
+        <location filename="../src/dialogs/StarStretchDialog.cpp" line="79"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarStretchDialog.cpp" line="80"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarStretchDialog.cpp" line="65"/>
+        <source>Color Boost: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarStretchDialog.cpp" line="60"/>
+        <source>Color Boost: 1.00</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarStretchDialog.cpp" line="73"/>
+        <source>Remove Green via SCNR (Optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarStretchDialog.cpp" line="15"/>
+        <source>Star Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarStretchDialog.cpp" line="125"/>
+        <source>Star Stretch applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarStretchDialog.cpp" line="52"/>
+        <source>Stretch Amount: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StarStretchDialog.cpp" line="47"/>
+        <source>Stretch Amount: 5.00</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StretchDialog</name>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="95"/>
+        <source>Amount:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="169"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="74"/>
+        <source>Apply S-Curve Boost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="49"/>
+        <source>Black Point Sigma:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="174"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="82"/>
+        <source>Curve Strength:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="71"/>
+        <source>Curves &amp; HDR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="118"/>
+        <source>Formula:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="86"/>
+        <source>HDR Highlight Compression</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="145"/>
+        <source>Hard Ceiling %:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="122"/>
+        <source>High-Range Rescaling (VeraLux)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="101"/>
+        <source>Knee Point:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="52"/>
+        <source>Link Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="109"/>
+        <source>Luminance-Only Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="55"/>
+        <source>No Clipping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="58"/>
+        <source>Normalize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="132"/>
+        <source>Pedestal:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="163"/>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="117"/>
+        <source>Rec.2020 (HDR)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="116"/>
+        <source>Rec.601 (SD)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="115"/>
+        <source>Rec.709 (sRGB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="48"/>
+        <source>Sigma multiplier for black point calculation (higher = darker backgrounds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="138"/>
+        <source>Soft Ceiling %:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="152"/>
+        <source>Softclip Start:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="34"/>
+        <source>Statistical Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="11"/>
+        <source>Statistical Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="289"/>
+        <source>Statistical Stretch applied (M=%1, BP=%2σ)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="42"/>
+        <source>Target Median:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="41"/>
+        <source>Target median brightness after stretch (0.25 = typical astro)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/StretchDialog.cpp" line="166"/>
+        <source>© 2026 SetiAstro</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UpdateChecker</name>
+    <message>
+        <location filename="../src/network/UpdateChecker.cpp" line="38"/>
+        <source>Invalid JSON response from GitHub.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/network/UpdateChecker.cpp" line="28"/>
+        <source>Network error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/network/UpdateChecker.cpp" line="87"/>
+        <source>No detailed changelog available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UpdateDialog</name>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="28"/>
+        <source>&lt;h3&gt;A new version of TStar is available!&lt;/h3&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="94"/>
+        <source>Could not save update file: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="154"/>
+        <source>Download complete. Close TStar and start the installer?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="177"/>
+        <source>Failed to launch installer. Please run it manually:
+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="148"/>
+        <source>Download complete. Verifying...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="139"/>
+        <source>Download failed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="103"/>
+        <source>Downloading update...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="120"/>
+        <source>Downloading... %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="123"/>
+        <source>Downloading... (%1 bytes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="94"/>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="177"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="51"/>
+        <source>Not Now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="153"/>
+        <source>Ready to Install</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="21"/>
+        <source>Update Available: v%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="139"/>
+        <source>Update Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="48"/>
+        <source>Update Now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="160"/>
+        <source>Update downloaded. Run installer manually from temp if desired.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="32"/>
+        <source>What&apos;s New:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/UpdateDialog.cpp" line="39"/>
+        <source>Would you like to update now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WavescaleHDRDialog</name>
+    <message>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="406"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="409"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="386"/>
+        <source>Compare (Show Original)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="358"/>
+        <source>Compression:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="369"/>
+        <source>Dimming Gamma:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="333"/>
+        <source>HDR Controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="360"/>
+        <source>Mask Gamma:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="375"/>
+        <source>Mask Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="265"/>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="499"/>
+        <source>Original</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="489"/>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="501"/>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="356"/>
+        <source>Scales:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="390"/>
+        <source>Update Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="215"/>
+        <source>Wavescale HDR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/WavescaleHDRDialog.cpp" line="401"/>
+        <source>© 2026 SetiAstro</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>XISFReader</name>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="147"/>
+        <source>Big-endian XISF files are not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="17"/>
+        <location filename="../src/io/XISFReader.cpp" line="525"/>
+        <location filename="../src/io/XISFReader.cpp" line="582"/>
+        <source>Could not open file: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="441"/>
+        <source>Could not parse embedded data element.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="461"/>
+        <source>Data block too small: expected %1 bytes, got %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="387"/>
+        <source>Embedded XISF data not fully supported yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="614"/>
+        <source>Image index %1 out of range (file has %2 images)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="47"/>
+        <source>Incomplete XML Header.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="407"/>
+        <source>Incomplete data read: expected %1 bytes, got %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="382"/>
+        <source>Inline XISF data not fully supported yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="41"/>
+        <location filename="../src/io/XISFReader.cpp" line="549"/>
+        <source>Invalid Header Length: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="532"/>
+        <location filename="../src/io/XISFReader.cpp" line="589"/>
+        <source>Invalid XISF Signature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="24"/>
+        <source>Invalid XISF Signature. File is not XISF 1.0.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="58"/>
+        <source>No valid image found in XISF header.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="400"/>
+        <source>Seek error to data block at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="31"/>
+        <source>Unexpected EOF reading header length.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="539"/>
+        <location filename="../src/io/XISFReader.cpp" line="596"/>
+        <source>Unexpected EOF.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="392"/>
+        <source>Unknown data location type.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="423"/>
+        <source>Unknown inline encoding: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="500"/>
+        <source>Unsupported sample format: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFReader.cpp" line="291"/>
+        <location filename="../src/io/XISFReader.cpp" line="736"/>
+        <source>XML Parse Error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>XISFWriter</name>
+    <message>
+        <location filename="../src/io/XISFWriter.cpp" line="24"/>
+        <source>Could not open file for writing: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/io/XISFWriter.cpp" line="36"/>
+        <source>Failed to prepare image data.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>main</name>
+    <message>
+        <location filename="../src/main.cpp" line="174"/>
+        <source>Applying Custom Widgets...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="147"/>
+        <source>Configuring UI Colors...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="197"/>
+        <source>Configuring Workspace...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="186"/>
+        <source>Constructing Main Window...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="201"/>
+        <source>Finalizing Setup...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="100"/>
+        <source>Initializing Core Systems...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="108"/>
+        <source>Initializing Memory Manager...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="116"/>
+        <source>Initializing OpenCV Backend...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="182"/>
+        <source>Initializing Tool Dialogs...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="120"/>
+        <source>Loading Color Management...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="104"/>
+        <source>Loading Configuration...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="178"/>
+        <source>Loading Icons &amp; Resources...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="112"/>
+        <source>Loading Image Processing Algorithms...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="151"/>
+        <source>Loading Stylesheets...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="205"/>
+        <source>Ready!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="124"/>
+        <source>Setting up Dark Theme...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

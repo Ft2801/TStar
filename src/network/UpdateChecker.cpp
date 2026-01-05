@@ -51,19 +51,25 @@ void UpdateChecker::onReplyFinished(QNetworkReply* reply) {
         if (isNewer(m_currentVersion, remoteVersion)) {
             m_pendingVersion = remoteVersion;
             
-            // Find asset URL (looking for .exe)
+            // Find asset URL based on platform
             m_pendingDownloadUrl.clear();
             QJsonArray assets = obj["assets"].toArray();
             for (const auto& assetVal : assets) {
                 QJsonObject asset = assetVal.toObject();
                 QString name = asset["name"].toString();
+#if defined(Q_OS_WIN)
                 if (name.endsWith(".exe", Qt::CaseInsensitive)) {
+#elif defined(Q_OS_MAC)
+                if (name.endsWith(".dmg", Qt::CaseInsensitive)) {
+#else
+                if (false) { // Linux: fallback to html_url
+#endif
                     m_pendingDownloadUrl = asset["browser_download_url"].toString();
                     break; 
                 }
             }
             
-            // If no exe found, fallback to html_url of the release page
+            // If no platform-specific installer found, fallback to html_url of the release page
             if (m_pendingDownloadUrl.isEmpty()) {
                 m_pendingDownloadUrl = obj["html_url"].toString();
             }
