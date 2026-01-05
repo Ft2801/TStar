@@ -60,28 +60,28 @@ jobs:
       - name: Install Dependencies via Homebrew
         run: |
           echo ">>> Installing build tools..."
-          brew install cmake ninja pkg-config
+          brew install cmake ninja pkg-config || brew link --overwrite cmake ninja pkg-config
           
           echo ">>> Installing Qt6..."
-          brew install qt@6
+          brew install qt@6 || brew link --overwrite qt@6
           
           echo ">>> Installing image/scientific libraries..."
-          brew install opencv
-          brew install gsl
-          brew install cfitsio
+          brew install opencv || brew link --overwrite opencv
+          brew install gsl || brew link --overwrite gsl
+          brew install cfitsio || brew link --overwrite cfitsio
           
           echo ">>> Installing compression libraries..."
-          brew install lz4
-          brew install zstd
+          brew install lz4 || brew link --overwrite lz4
+          brew install zstd || brew link --overwrite zstd
           
           echo ">>> Installing OpenMP..."
-          brew install libomp
+          brew install libomp || brew link --overwrite libomp
           
           echo ">>> Installing DMG creation tool..."
-          brew install create-dmg
+          brew install create-dmg || brew link --overwrite create-dmg
           
           echo ">>> Installing Python..."
-          brew install python@3.11
+          brew install python@3.11 || brew link --overwrite python@3.11
           
           echo ">>> All dependencies installed!"
 
