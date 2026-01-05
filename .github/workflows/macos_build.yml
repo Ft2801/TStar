@@ -131,14 +131,23 @@ jobs:
           done
           
           # 2. Try to find the exact directory containing Qt6Config.cmake within detected prefixes
-          echo ">>> Searching for Qt6Config.cmake in prefixes..."
+          echo ">>> Searching for Qt6Config.cmake in prefixes (following symlinks)..."
           QT6_DIR_DETECTED=""
           for prefix in $(echo "$QT_PREFIXES" | tr ';' '\n'); do
             if [ -d "$prefix" ]; then
-              FOUND=$(find "$prefix" -name Qt6Config.cmake -print | head -n 1 2>/dev/null)
+              # First try direct probing of standard Homebrew location
+              if [ -d "$prefix/lib/cmake/Qt6" ] && [ -f "$prefix/lib/cmake/Qt6/Qt6Config.cmake" ]; then
+                QT6_DIR_DETECTED="$prefix/lib/cmake/Qt6"
+                echo "✅ Found Qt6Config.cmake at: $QT6_DIR_DETECTED (direct probe)"
+                export Qt6_DIR="$QT6_DIR_DETECTED"
+                break
+              fi
+              
+              # Fallback to find -L (follow symlinks)
+              FOUND=$(find -L "$prefix" -name Qt6Config.cmake -print | head -n 1 2>/dev/null)
               if [ -n "$FOUND" ]; then
                 QT6_DIR_DETECTED=$(dirname "$FOUND")
-                echo "✅ Found Qt6Config.cmake at: $QT6_DIR_DETECTED"
+                echo "✅ Found Qt6Config.cmake at: $QT6_DIR_DETECTED (find -L)"
                 export Qt6_DIR="$QT6_DIR_DETECTED"
                 break
               fi
@@ -146,7 +155,14 @@ jobs:
           done
           
           if [ -z "$QT6_DIR_DETECTED" ]; then
-             echo "⚠️  Could not find Qt6Config.cmake directory"
+             echo "⚠️  Could not find Qt6Config.cmake directory!"
+             echo ">>> Listing prefixes for manual debug..."
+             for prefix in $(echo "$QT_PREFIXES" | tr ';' '\n'); do
+               if [ -d "$prefix" ]; then
+                 echo "Structure of $prefix:"
+                 find -L "$prefix" -maxdepth 4 -name "*Config.cmake" 2>/dev/null || true
+               fi
+             done
           fi
           
           export CMAKE_PREFIX_PATH="$QT_PREFIXES"
@@ -165,6 +181,7 @@ jobs:
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH" \
+            -DQt6_DIR="$Qt6_DIR" \
             -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0" \
             -DOpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I${LIBOMP_PREFIX}/include" \
             -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I${LIBOMP_PREFIX}/include" \
