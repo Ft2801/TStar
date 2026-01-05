@@ -60,28 +60,38 @@ jobs:
       - name: Install Dependencies via Homebrew
         run: |
           echo ">>> Installing build tools..."
-          brew install cmake ninja pkg-config || brew link --overwrite cmake ninja pkg-config
+          brew install cmake ninja pkg-config
+          brew link --overwrite cmake ninja pkg-config || true
           
           echo ">>> Installing Qt6..."
-          brew install qt@6 || brew link --overwrite qt@6
+          brew install qt@6
+          brew link --overwrite qt@6 || true
           
           echo ">>> Installing image/scientific libraries..."
-          brew install opencv || brew link --overwrite opencv
-          brew install gsl || brew link --overwrite gsl
-          brew install cfitsio || brew link --overwrite cfitsio
+          brew install opencv
+          brew link --overwrite opencv || true
+          brew install gsl
+          brew link --overwrite gsl || true
+          brew install cfitsio
+          brew link --overwrite cfitsio || true
           
           echo ">>> Installing compression libraries..."
-          brew install lz4 || brew link --overwrite lz4
-          brew install zstd || brew link --overwrite zstd
+          brew install lz4
+          brew link --overwrite lz4 || true
+          brew install zstd
+          brew link --overwrite zstd || true
           
           echo ">>> Installing OpenMP..."
-          brew install libomp || brew link --overwrite libomp
+          brew install libomp
+          brew link --overwrite libomp || true
           
           echo ">>> Installing DMG creation tool..."
-          brew install create-dmg || brew link --overwrite create-dmg
+          brew install create-dmg
+          brew link --overwrite create-dmg || true
           
           echo ">>> Installing Python..."
-          brew install python@3.11 || brew link --overwrite python@3.11
+          brew install python@3.11
+          brew link --overwrite python@3.11 || true
           
           echo ">>> All dependencies installed!"
 
@@ -100,7 +110,9 @@ jobs:
         run: |
           # Get Qt path
           QT_PREFIX=$(brew --prefix qt@6)
+          QT6_DIR="${QT_PREFIX}/lib/cmake/Qt6"
           echo "Qt6 found at: $QT_PREFIX"
+          echo "Qt6_DIR set to: $QT6_DIR"
           
           # Get libomp path for OpenMP support with Apple Clang
           LIBOMP_PREFIX=$(brew --prefix libomp)
@@ -113,6 +125,7 @@ jobs:
           cmake -S . -B build \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
+            -DQt6_DIR="$QT6_DIR" \
             -DCMAKE_PREFIX_PATH="$QT_PREFIX" \
             -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0" \
             -DOpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I${LIBOMP_PREFIX}/include" \
