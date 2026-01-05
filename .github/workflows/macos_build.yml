@@ -64,7 +64,7 @@ jobs:
           brew link --overwrite cmake ninja pkg-config || true
           
           echo ">>> Installing Qt6..."
-          brew install qt || true
+          brew install qt
           brew link --overwrite qt || true
           
           echo ">>> Installing image/scientific libraries..."
@@ -106,17 +106,32 @@ jobs:
       # ===========================
       # 5. Configure CMake
       # ===========================
+      # ===========================
+      # 5. Configure CMake
+      # ===========================
       - name: Configure CMake
         run: |
-          # Get Qt path - try qt first, then qt@6 for older systems
-          if brew --prefix qt &>/dev/null; then
-            QT_PREFIX=$(brew --prefix qt)
-          else
-            QT_PREFIX=$(brew --prefix qt@6)
+          # Robust Qt6 Detection
+          echo ">>> Searching for Qt6Config.cmake..."
+          
+          # Try standard Homebrew locations first
+          SEARCH_PATHS="/opt/homebrew /usr/local"
+          QT6_CONFIG_PATH=$(find $SEARCH_PATHS -name "Qt6Config.cmake" 2>/dev/null | head -n 1)
+          
+          if [ -z "$QT6_CONFIG_PATH" ]; then
+             echo "❌ Qt6Config.cmake not found in standard paths. Searching root (slow)..."
+             QT6_CONFIG_PATH=$(sudo find / -name "Qt6Config.cmake" 2>/dev/null | grep -v "Permission denied" | head -n 1)
           fi
-          QT6_DIR="${QT_PREFIX}/lib/cmake/Qt6"
-          echo "Qt6 found at: $QT_PREFIX"
-          echo "Qt6_DIR set to: $QT6_DIR"
+          
+          if [ -z "$QT6_CONFIG_PATH" ]; then
+             echo "❌ CRITICAL: Qt6Config.cmake could not be found anywhere!"
+             exit 1
+          fi
+          
+          # Qt6_DIR must point to the directory containing Qt6Config.cmake
+          QT6_DIR=$(dirname "$QT6_CONFIG_PATH")
+          echo "✅ Found Qt6Config.cmake at: $QT6_CONFIG_PATH"
+          echo "✅ Setting Qt6_DIR to: $QT6_DIR"
           
           # Get libomp path for OpenMP support with Apple Clang
           LIBOMP_PREFIX=$(brew --prefix libomp)
@@ -125,12 +140,11 @@ jobs:
           # Use the macOS-specific CMakeLists
           cp CMakeLists_macos.txt CMakeLists.txt
           
-          # Configure with CMake - pass OpenMP paths explicitly
+          # Configure with CMake - pass explicit Qt6_DIR
           cmake -S . -B build \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DQt6_DIR="$QT6_DIR" \
-            -DCMAKE_PREFIX_PATH="$QT_PREFIX" \
             -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0" \
             -DOpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I${LIBOMP_PREFIX}/include" \
             -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I${LIBOMP_PREFIX}/include" \
