@@ -164,7 +164,33 @@ jobs:
              fi
           fi
           
-          # 3. Construct CMAKE_PREFIX_PATH (Sanitized)
+          # 3. Detect Components (Svg, LinguistTools)
+          # These live in separate kegs (qtsvg, qttools) and need their own DIR helpers
+          # because the main Qt link is incomplete.
+          
+          echo ">>> Searching for component configs..."
+          QT6_SVG_DIR=""
+          QT6_LINGUIST_DIR=""
+          
+          # Find Qt6Svg
+          FOUND_SVG=$(find /opt/homebrew/Cellar/qtsvg -maxdepth 6 -name "Qt6SvgConfig.cmake" -print -quit 2>/dev/null)
+          if [ -n "$FOUND_SVG" ]; then
+             QT6_SVG_DIR=$(dirname "$FOUND_SVG")
+             echo "✅ Found Qt6Svg: $QT6_SVG_DIR"
+          else
+             echo "⚠️  Qt6SvgConfig.cmake not found in Cellar/qtsvg"
+          fi
+          
+          # Find Qt6LinguistTools
+          FOUND_LINGUIST=$(find /opt/homebrew/Cellar/qttools -maxdepth 6 -name "Qt6LinguistToolsConfig.cmake" -print -quit 2>/dev/null)
+          if [ -n "$FOUND_LINGUIST" ]; then
+             QT6_LINGUIST_DIR=$(dirname "$FOUND_LINGUIST")
+             echo "✅ Found Qt6LinguistTools: $QT6_LINGUIST_DIR"
+          else
+             echo "⚠️  Qt6LinguistToolsConfig.cmake not found in Cellar/qttools"
+          fi
+          
+          # 4. Construct CMAKE_PREFIX_PATH (Sanitized)
           for pkg in qt qt@6 qtbase qtsvg qttools; do
             PKG_PATH=$(brew --prefix $pkg 2>/dev/null | tr -d '[:space:]')
             if [ -n "$PKG_PATH" ]; then
@@ -175,9 +201,12 @@ jobs:
           # Export for use in next commands
           export CMAKE_PREFIX_PATH="$QT_PREFIXES"
           export Qt6_DIR="$QT6_DIR_DETECTED"
+          export Qt6Svg_DIR="$QT6_SVG_DIR"
+          export Qt6LinguistTools_DIR="$QT6_LINGUIST_DIR"
           
           echo ">>> Final CMAKE_PREFIX_PATH: $CMAKE_PREFIX_PATH"
           echo ">>> Final Qt6_DIR: $Qt6_DIR"
+          echo ">>> Final Qt6Svg_DIR: $Qt6Svg_DIR"
           
           # Get libomp path for OpenMP support with Apple Clang
           LIBOMP_PREFIX=$(brew --prefix libomp)
@@ -188,9 +217,9 @@ jobs:
           
           # Configure with CMake (Surgical pass of Qt6_DIR)
           CMAKE_EXTRA_ARGS=""
-          if [ -n "$Qt6_DIR" ]; then
-            CMAKE_EXTRA_ARGS="-DQt6_DIR=$Qt6_DIR"
-          fi
+          if [ -n "$Qt6_DIR" ]; then CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DQt6_DIR=$Qt6_DIR"; fi
+          if [ -n "$Qt6Svg_DIR" ]; then CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DQt6Svg_DIR=$Qt6Svg_DIR"; fi
+          if [ -n "$Qt6LinguistTools_DIR" ]; then CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DQt6LinguistTools_DIR=$Qt6LinguistTools_DIR"; fi
           
           cmake -S . -B build \
             -G Ninja \
