@@ -69,6 +69,11 @@ jobs:
           brew install qtsvg
           brew link --overwrite qtsvg || true
           
+          echo ">>> Installing Qt runtime dependencies (fix for uic crash)..."
+          brew install double-conversion brotli
+          brew link --overwrite double-conversion || true
+          brew link --overwrite brotli || true
+          
           echo ">>> Installing image/scientific libraries..."
           brew install opencv
           brew link --overwrite opencv || true
