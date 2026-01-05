@@ -73,6 +73,16 @@ echo ""
 echo "[STEP 4] Running macdeployqt..."
 
 QT_PREFIX=$(brew --prefix qt@6 2>/dev/null || brew --prefix qt 2>/dev/null || echo "")
+
+# Fallback to Cellar if opt symlink is broken (Dependency Harvester logic)
+if [ ! -d "$QT_PREFIX/bin" ]; then
+    POTENTIAL_QT=$(find /opt/homebrew/Cellar/qtbase -maxdepth 2 -name "bin" -type d 2>/dev/null | head -1)
+    if [ -n "$POTENTIAL_QT" ]; then
+        QT_PREFIX=$(dirname "$POTENTIAL_QT")
+        echo "[INFO] Using physical Qt prefix: $QT_PREFIX"
+    fi
+fi
+
 MACDEPLOYQT="$QT_PREFIX/bin/macdeployqt"
 
 if [ ! -f "$MACDEPLOYQT" ]; then
@@ -107,6 +117,20 @@ copy_dylib() {
     local brew_pkg="$2"
     
     local prefix=$(brew --prefix "$brew_pkg" 2>/dev/null || echo "")
+    
+    # Fallback to Cellar if opt symlink is broken
+    if [ ! -d "$prefix/lib" ]; then
+        CELLAR_PATH="/opt/homebrew/Cellar/$brew_pkg"
+        if [ -d "$CELLAR_PATH" ]; then
+             # Pick the first version found
+             VERSION_PATH=$(find "$CELLAR_PATH" -maxdepth 1 -mindepth 1 -type d | head -1)
+             if [ -n "$VERSION_PATH" ]; then
+                 prefix="$VERSION_PATH"
+                 echo "    (Using Cellar path for $lib_name)"
+             fi
+        fi
+    fi
+
     if [ -n "$prefix" ] && [ -d "$prefix/lib" ]; then
         local dylib=$(find "$prefix/lib" -name "${lib_name}*.dylib" -type f | head -1)
         if [ -f "$dylib" ]; then
@@ -129,6 +153,12 @@ copy_dylib "libomp" "libomp" || true
 
 # OpenCV (multiple libs)
 OPENCV_PREFIX=$(brew --prefix opencv 2>/dev/null || echo "")
+if [ ! -d "$OPENCV_PREFIX/lib" ]; then
+    # OpenCV Fallback
+    OPENCV_PREFIX=$(find /opt/homebrew/Cellar/opencv -maxdepth 2 -name "lib" -type d 2>/dev/null | head -1)
+    if [ -n "$OPENCV_PREFIX" ]; then OPENCV_PREFIX=$(dirname "$OPENCV_PREFIX"); fi
+fi
+
 if [ -n "$OPENCV_PREFIX" ] && [ -d "$OPENCV_PREFIX/lib" ]; then
     for dylib in "$OPENCV_PREFIX/lib"/libopencv_*.dylib; do
         if [ -f "$dylib" ]; then
