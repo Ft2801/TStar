@@ -94,10 +94,12 @@ if [ -f "$MACDEPLOYQT" ]; then
     # Run macdeployqt with Qt lib path and filter out rpath warnings
     # The rpath warnings are non-fatal and occur because some plugins reference
     # Qt frameworks that will be bundled. We filter them to keep output clean.
+    # We also filter "no file at /opt/homebrew/opt" because macdeployqt is confused by
+    # the broken symlinks, but we manually fix these dependencies in Step 5.
     "$MACDEPLOYQT" "$DIST_DIR" \
         -verbose=1 \
         -libpath="$QT_PREFIX/lib" \
-        2>&1 | grep -v "Cannot resolve rpath" | grep -v "using QList" || true
+        2>&1 | grep -v "Cannot resolve rpath" | grep -v "using QList" | grep -v "ERROR: no file at \"/opt/homebrew/opt" || true
     echo "  - Qt frameworks deployed"
 else
     echo "[WARNING] macdeployqt not found. Qt frameworks not bundled."
