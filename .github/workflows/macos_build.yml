@@ -217,9 +217,46 @@ jobs:
           echo ">>> Final Qt6_DIR: $Qt6_DIR"
           echo ">>> Final Qt6Svg_DIR: $Qt6Svg_DIR"
           
-          # Get libomp path for OpenMP support with Apple Clang
-          LIBOMP_PREFIX=$(brew --prefix libomp)
-          echo "libomp found at: $LIBOMP_PREFIX"
+          # 4. Dependency Harvester (Runtime & Link Time)
+          # "Scavenge" physical paths for broken symlinks (libomp, libb2, double-conversion, etc.)
+          echo ">>> Harvesting physical dependency paths..."
+          FIXED_DYLD_PATH=""
+          FOUND_LIBOMP=""
+          
+          # List of known fragile dependencies
+          DEP_LIST="libomp libb2 double-conversion brotli pcre2 harfbuzz freetype"
+          
+          for dep in $DEP_LIST; do
+             # Search Cellar for the lib directory (heuristic: /opt/homebrew/Cellar/<dep>/<version>/lib)
+             FOUND_LIB_DIR=$(find /opt/homebrew/Cellar/$dep -maxdepth 3 -name "lib" -type d -print -quit 2>/dev/null)
+             
+             if [ -n "$FOUND_LIB_DIR" ]; then
+                echo "✅ Found $dep lib: $FOUND_LIB_DIR"
+                if [ -z "$FIXED_DYLD_PATH" ]; then FIXED_DYLD_PATH="$FOUND_LIB_DIR"; else FIXED_DYLD_PATH="$FIXED_DYLD_PATH:$FOUND_LIB_DIR"; fi
+                
+                # Capture libomp prefix specifically for CMake
+                if [ "$dep" == "libomp" ]; then
+                   FOUND_LIBOMP=$(dirname "$FOUND_LIB_DIR")
+                fi
+             else
+                echo "⚠️  Could not find physical lib for $dep"
+             fi
+          done
+          
+          # Add standard paths as fallback
+          FIXED_DYLD_PATH="$FIXED_DYLD_PATH:/usr/lib:/usr/local/lib"
+          
+          echo ">>> Setting DYLD_FALLBACK_LIBRARY_PATH=$FIXED_DYLD_PATH"
+          # Export to GITHUB_ENV so it persists for the Build step (where uic runs)
+          echo "DYLD_FALLBACK_LIBRARY_PATH=$FIXED_DYLD_PATH" >> $GITHUB_ENV
+          
+          # Define LIBOMP_PREFIX for this step
+          LIBOMP_PREFIX="$FOUND_LIBOMP"
+          if [ -z "$LIBOMP_PREFIX" ]; then
+             echo "⚠️  Physical libomp not found, falling back to brew --prefix"
+             LIBOMP_PREFIX=$(brew --prefix libomp)
+          fi
+          echo ">>> Using LIBOMP_PREFIX: $LIBOMP_PREFIX"
           
           # Use the macOS-specific CMakeLists
           cp CMakeLists_macos.txt CMakeLists.txt
@@ -230,10 +267,10 @@ jobs:
           if [ -n "$Qt6Svg_DIR" ]; then CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DQt6Svg_DIR=$Qt6Svg_DIR"; fi
           if [ -n "$Qt6LinguistTools_DIR" ]; then CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DQt6LinguistTools_DIR=$Qt6LinguistTools_DIR"; fi
           
+          # Note: CMAKE_PREFIX_PATH is exported above
           cmake -S . -B build \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH" \
             $CMAKE_EXTRA_ARGS \
             -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0" \
             -DOpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I${LIBOMP_PREFIX}/include" \
