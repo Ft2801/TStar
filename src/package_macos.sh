@@ -196,6 +196,17 @@ if [ -f "$EXECUTABLE" ]; then
     echo "  - Updated rpath"
 fi
 
+# --- Ad-hoc Code Signing ---
+echo ""
+echo "[STEP 9.5] Applying ad-hoc code signing..."
+# Required for Apple Silicon and helps with "damaged app" errors
+if command -v codesign &> /dev/null; then
+    codesign --force --deep -s - "$DIST_DIR"
+    echo "  - Ad-hoc signed: OK"
+else
+    echo "  - codesign not found (skip)"
+fi
+
 # --- Create README ---
 echo ""
 echo "[STEP 10] Creating README..."

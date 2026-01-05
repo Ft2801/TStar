@@ -64,8 +64,8 @@ jobs:
           brew link --overwrite cmake ninja pkg-config || true
           
           echo ">>> Installing Qt6..."
-          brew install qt@6
-          brew link --overwrite qt@6 || true
+          brew install qt || true
+          brew link --overwrite qt || true
           
           echo ">>> Installing image/scientific libraries..."
           brew install opencv
@@ -108,8 +108,12 @@ jobs:
       # ===========================
       - name: Configure CMake
         run: |
-          # Get Qt path
-          QT_PREFIX=$(brew --prefix qt@6)
+          # Get Qt path - try qt first, then qt@6 for older systems
+          if brew --prefix qt &>/dev/null; then
+            QT_PREFIX=$(brew --prefix qt)
+          else
+            QT_PREFIX=$(brew --prefix qt@6)
+          fi
           QT6_DIR="${QT_PREFIX}/lib/cmake/Qt6"
           echo "Qt6 found at: $QT_PREFIX"
           echo "Qt6_DIR set to: $QT6_DIR"
