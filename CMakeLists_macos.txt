@@ -431,6 +431,18 @@ set(TSTAR_SOURCES
     src/dialogs/AnnotationToolDialog.h
     src/dialogs/HelpDialog.cpp
     src/dialogs/HelpDialog.h
+    src/dialogs/ClaheDialog.cpp
+    src/dialogs/ClaheDialog.h
+    src/dialogs/SelectiveColorDialog.cpp
+    src/dialogs/SelectiveColorDialog.h
+    src/dialogs/CorrectionBrushDialog.cpp
+    src/dialogs/CorrectionBrushDialog.h
+    src/dialogs/ExtractLuminanceDialog.cpp
+    src/dialogs/ExtractLuminanceDialog.h
+    src/dialogs/RecombineLuminanceDialog.cpp
+    src/dialogs/RecombineLuminanceDialog.h
+    src/dialogs/AberrationInspectorDialog.cpp
+    src/dialogs/AberrationInspectorDialog.h
     src/widgets/AnnotationOverlay.cpp
     src/widgets/AnnotationOverlay.h
     
