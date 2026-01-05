@@ -1175,6 +1175,11 @@ void CustomMdiSubWindow::handleDrop(QDropEvent* event) {
 }
 
 bool CustomMdiSubWindow::canClose() {
+    // Skip unsaved changes check for tool windows - their internal viewers are just for preview
+    if (m_isToolWindow) {
+        return true;
+    }
+    
     // Check for unsaved changes if this window contains an ImageViewer
     ImageViewer* v = viewer();
     if (v && v->isModified()) {

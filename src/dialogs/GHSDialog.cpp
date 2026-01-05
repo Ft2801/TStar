@@ -38,6 +38,11 @@ GHSDialog::~GHSDialog() {
     if (m_activeViewer && !m_applied) {
         m_activeViewer->setBuffer(m_originalBuffer, m_activeViewer->windowTitle(), true);
     }
+    // Always reset interaction mode to prevent lingering selection cursor
+    if (m_activeViewer) {
+        m_activeViewer->setInteractionMode(ImageViewer::Mode_PanZoom);
+        m_activeViewer->setCursor(Qt::ArrowCursor);
+    }
 }
 
 void GHSDialog::reject() {

@@ -231,6 +231,10 @@ void StretchDialog::showEvent(QShowEvent* event) {
 void StretchDialog::reject() {
     if (!m_applied && m_viewer) {
         m_viewer->clearPreviewLUT();
+        // Also restore original buffer for advanced modes that modify buffer directly
+        if (m_originalBuffer.isValid()) {
+            m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
+        }
     }
     QDialog::reject();
 }

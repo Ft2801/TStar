@@ -1555,11 +1555,8 @@ void MainWindow::openWavescaleHDRDialog() {
     setupToolSubwindow(sub, dlg, tr("Wavescale HDR"));
     centerToolWindow(sub);
 
-    connect(dlg, &WavescaleHDRDialog::applyInternal, [this, dlg](const ImageBuffer& res) {
-        ImageViewer* target = dlg->viewer();
-        if (!target) return;
-        target->pushUndo();
-        target->setBuffer(res, "Wavescale_Result", true); 
+    connect(dlg, &WavescaleHDRDialog::applyInternal, [this](const ImageBuffer& res) {
+        Q_UNUSED(res);
         log(tr("Wavescale HDR applied."), Log_Success);
     });
     

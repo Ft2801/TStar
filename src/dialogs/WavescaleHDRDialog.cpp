@@ -263,6 +263,7 @@ WavescaleHDRDialog::WavescaleHDRDialog(QWidget* parent, ImageViewer* targetViewe
     
     // Set initial buffer so view is not empty and can be fitted
     m_viewer->setBuffer(m_originalBuffer, tr("Original"), false);
+    m_viewer->setModified(false);  // Prevent "unsaved changes" dialog
     
     // Deferred initial mask update (after dialog is fully constructed and shown)
     QTimer::singleShot(50, this, &WavescaleHDRDialog::updateQuickMask);
@@ -324,6 +325,7 @@ void WavescaleHDRDialog::createUI() {
     
     // Left: ImageViewer
     m_viewer = new ImageViewer(this);
+    m_viewer->setProperty("isPreview", true);  // Prevent MainWindow activation handler from treating this as target
     m_viewer->setMinimumWidth(600);
     contentLayout->addWidget(m_viewer, 1);
     
@@ -470,7 +472,19 @@ void WavescaleHDRDialog::onPreviewClicked() {
 }
 
 void WavescaleHDRDialog::onApplyClicked() {
-    if (m_targetViewer) {
+    if (m_targetViewer && m_previewBuffer.isValid()) {
+        // Push undo before making changes
+        m_targetViewer->pushUndo();
+        
+        // Apply the processed buffer to the target viewer
+        m_targetViewer->setBuffer(m_previewBuffer, m_targetViewer->windowTitle(), true);
+        m_targetViewer->refreshDisplay();
+        
+        // Mark internal viewer as not modified to prevent "unsaved changes" prompt
+        if (m_viewer) {
+            m_viewer->setModified(false);
+        }
+        
         emit applyInternal(m_previewBuffer);
         accept();
     }
@@ -486,7 +500,8 @@ void WavescaleHDRDialog::onWorkerFinished(ImageBuffer result, ImageBuffer mask) 
     
     if (!m_showOriginalCheck->isChecked()) {
         // After first process, we want to preserve view if user zooms in
-        m_viewer->setBuffer(m_previewBuffer, tr("Preview"), true); 
+        m_viewer->setBuffer(m_previewBuffer, tr("Preview"), true);
+        m_viewer->setModified(false);  // Prevent "unsaved changes" dialog
     }
     
     // NOTE: We do NOT update the mask preview here anymore.
@@ -500,6 +515,7 @@ void WavescaleHDRDialog::toggleOriginal(bool showOriginal) {
     } else {
         m_viewer->setBuffer(m_previewBuffer, tr("Preview"), true);
     }
+    m_viewer->setModified(false);  // Prevent "unsaved changes" dialog
 }
 
 void WavescaleHDRDialog::updateMaskPreview(const ImageBuffer& mask) {

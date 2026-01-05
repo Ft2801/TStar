@@ -4,6 +4,7 @@
 #include <vector>
 #include <array>
 #include <cmath>
+#include <algorithm>
 
 
 class StatisticalStretch {
@@ -32,10 +33,27 @@ public:
     }
     
     static inline float stretchFormula(float x, float medRescaled, float targetMedian) {
+        // Clamp inputs to prevent edge cases that produce white images
+        x = std::max(0.0f, x);
+        medRescaled = std::clamp(medRescaled, 1e-6f, 1.0f - 1e-6f);
+        
         float num = (medRescaled - 1.0f) * targetMedian * x;
         float den = medRescaled * (targetMedian + x - 1.0f) - targetMedian * x;
-        if (std::abs(den) < 1e-12f) den = 1e-12f;
-        return num / den;
+        
+        // Protect against division by zero or very small values
+        if (std::abs(den) < 1e-6f) {
+            // When denominator is too small, return a safe value
+            return std::clamp(x, 0.0f, 1.0f);
+        }
+        
+        float result = num / den;
+        
+        // Protect against NaN or infinity
+        if (!std::isfinite(result)) {
+            return std::clamp(x, 0.0f, 1.0f);
+        }
+        
+        return std::clamp(result, 0.0f, 1.0f);
     }
     
     static float computeMTFParameter(float currentMedian, float targetMedian);

@@ -1308,10 +1308,12 @@ void ImageBuffer::performTrueStretch(const StretchParams& params) {
     std::vector<float> medRescaled;
     if (params.linked) {
         float mr = (stats[0].median - stats[0].blackpoint) / stats[0].denominator;
+        mr = std::clamp(mr, 1e-6f, 1.0f - 1e-6f);  // Prevent edge cases
         medRescaled.push_back(mr);
     } else {
         for (int c = 0; c < m_channels; ++c) {
             float mr = (stats[c].median - stats[c].blackpoint) / stats[c].denominator;
+            mr = std::clamp(mr, 1e-6f, 1.0f - 1e-6f);  // Prevent edge cases
             medRescaled.push_back(mr);
         }
     }
@@ -1516,10 +1518,12 @@ std::vector<std::vector<float>> ImageBuffer::computeTrueStretchLUT(const Stretch
     std::vector<float> medRescaled;
     if (params.linked) {
         float mr = (stats[0].median - stats[0].blackpoint) / stats[0].denominator;
+        mr = std::clamp(mr, 1e-6f, 1.0f - 1e-6f);  // Prevent edge cases
         medRescaled.push_back(mr);
     } else {
         for (int c = 0; c < m_channels; ++c) {
             float mr = (stats[c].median - stats[c].blackpoint) / stats[c].denominator;
+            mr = std::clamp(mr, 1e-6f, 1.0f - 1e-6f);  // Prevent edge cases
             medRescaled.push_back(mr);
         }
     }
