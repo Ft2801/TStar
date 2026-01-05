@@ -124,44 +124,55 @@ jobs:
           if [ -n "$PRIMARY_QT_PREFIX" ]; then
             echo "✅ Found primary Qt prefix at: $PRIMARY_QT_PREFIX"
             
-            # 2. Use qmake to query installation details (most reliable)
-            QMAKE_BIN="$PRIMARY_QT_PREFIX/bin/qmake"
-            if [ -x "$QMAKE_BIN" ]; then
-              QT_INSTALL_LIBS=$("$QMAKE_BIN" -query QT_INSTALL_LIBS)
+            # 2. Try qmake or qmake6
+            QMAKE_BIN=""
+            if [ -x "$PRIMARY_QT_PREFIX/bin/qmake6" ]; then
+                QMAKE_BIN="$PRIMARY_QT_PREFIX/bin/qmake6"
+            elif [ -x "$PRIMARY_QT_PREFIX/bin/qmake" ]; then
+                QMAKE_BIN="$PRIMARY_QT_PREFIX/bin/qmake"
+            fi
+            
+            if [ -n "$QMAKE_BIN" ]; then
+              QT_INSTALL_LIBS=$("$QMAKE_BIN" -query QT_INSTALL_LIBS | tr -d '\r\n')
               echo "ℹ️  qmake reports libs at: $QT_INSTALL_LIBS"
               
               # Standard location in Homebrew: $QT_INSTALL_LIBS/cmake/Qt6
-              if [ -d "$QT_INSTALL_LIBS/cmake/Qt6" ] && [ -f "$QT_INSTALL_LIBS/cmake/Qt6/Qt6Config.cmake" ]; then
-                QT6_DIR_DETECTED="$QT_INSTALL_LIBS/cmake/Qt6"
-                echo "✅ Verified Qt6Config.cmake via qmake: $QT6_DIR_DETECTED"
+              CANDIDATE="$QT_INSTALL_LIBS/cmake/Qt6"
+              if [ -d "$CANDIDATE" ]; then
+                # List contents to confirm existence of config files
+                echo ">>> Listing contents of $CANDIDATE:"
+                ls -la "$CANDIDATE"
+                
+                QT6_DIR_DETECTED="$CANDIDATE"
+                echo "✅ Verified Qt6 CMake dir via qmake: $QT6_DIR_DETECTED"
               fi
+            else
+               echo "⚠️  Could not find executable qmake or qmake6 in $PRIMARY_QT_PREFIX/bin"
             fi
           fi
           
-          # 3. Fallback: Aggregate all related Homebrew prefixes
+          # 3. Fallback: Aggregate prefixes & Try direct "Force" detection
           for pkg in qt qt@6 qtbase qtsvg qttools; do
             PKG_PATH=$(brew --prefix $pkg 2>/dev/null)
             if [ -n "$PKG_PATH" ]; then
               echo "ℹ️  Found $pkg: $PKG_PATH"
               if [ -z "$QT_PREFIXES" ]; then QT_PREFIXES="$PKG_PATH"; else QT_PREFIXES="$QT_PREFIXES;$PKG_PATH"; fi
               
-              # Try direct probing if qmake failed
+              # If qmake failed, try to guess the path
               if [ -z "$QT6_DIR_DETECTED" ]; then
-                if [ -f "$PKG_PATH/lib/cmake/Qt6/Qt6Config.cmake" ]; then
-                  QT6_DIR_DETECTED="$PKG_PATH/lib/cmake/Qt6"
-                elif [ -f "$PKG_PATH/share/cmake/Qt6/Qt6Config.cmake" ]; then
-                  QT6_DIR_DETECTED="$PKG_PATH/share/cmake/Qt6"
-                fi
+                 if [ -d "$PKG_PATH/lib/cmake/Qt6" ]; then
+                    echo ">>> Found directory $PKG_PATH/lib/cmake/Qt6 (Optimistic Fallback)"
+                    echo ">>> Contents:"
+                    ls -la "$PKG_PATH/lib/cmake/Qt6"
+                    QT6_DIR_DETECTED="$PKG_PATH/lib/cmake/Qt6"
+                 fi
               fi
             fi
           done
           
-          # 4. Final Failsafe Diagnostic: If still not found, list the tree
+          # 4. Final Failsafe Diagnostic
           if [ -z "$QT6_DIR_DETECTED" ]; then
-             echo "⚠️  CRITICAL: Could not find Qt6Config.cmake! Dumping directory tree for debug..."
-             if [ -n "$PRIMARY_QT_PREFIX" ]; then
-               find -L "$PRIMARY_QT_PREFIX" -maxdepth 4 2>/dev/null || true
-             fi
+             echo "⚠️  CRITICAL: Could not find any lib/cmake/Qt6 directory!"
           fi
           
           # Export for use in next commands
