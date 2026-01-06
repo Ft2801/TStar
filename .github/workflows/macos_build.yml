@@ -50,7 +50,7 @@ jobs:
           path: |
             ~/Library/Caches/Homebrew
             /opt/homebrew/Cellar
-          key: ${{ runner.os }}-brew-${{ hashFiles('**/CMakeLists_macos.txt') }}
+          key: ${{ runner.os }}-brew-${{ hashFiles('**/CMakeLists.txt') }}
           restore-keys: |
             ${{ runner.os }}-brew-
 
@@ -258,8 +258,8 @@ jobs:
           fi
           echo ">>> Using LIBOMP_PREFIX: $LIBOMP_PREFIX"
           
-          # Use the macOS-specific CMakeLists
-          cp CMakeLists_macos.txt CMakeLists.txt
+          # CMakeLists.txt is now unified for Windows and macOS
+          # No need to copy CMakeLists_macos.txt anymore
           
           # Configure with CMake (Surgical pass of Qt6_DIR)
           CMAKE_EXTRA_ARGS=""

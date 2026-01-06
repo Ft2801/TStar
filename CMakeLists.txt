@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 3.16)
 
+# =============================================================================
+# TStar Cross-Platform CMakeLists.txt
+# =============================================================================
+# Supports both Windows (MinGW) and macOS (Homebrew)
+# Auto-detects platform and uses appropriate dependency paths
+# =============================================================================
+
 # Read version from changelog.txt
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/changelog.txt")
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/changelog.txt")
@@ -14,13 +21,12 @@ else()
     set(TSTAR_VERSION "1.0.0")
 endif()
 
-# Split Version for Windows Resource
+# Split Version
 string(REPLACE "." ";" VERSION_LIST ${TSTAR_VERSION})
 list(GET VERSION_LIST 0 TSTAR_VERSION_MAJOR)
 list(GET VERSION_LIST 1 TSTAR_VERSION_MINOR)
 list(GET VERSION_LIST 2 TSTAR_VERSION_PATCH)
 
-# Ensure none are empty
 if(NOT TSTAR_VERSION_MAJOR) 
     set(TSTAR_VERSION_MAJOR 1) 
 endif()
@@ -31,128 +37,295 @@ if(NOT TSTAR_VERSION_PATCH)
     set(TSTAR_VERSION_PATCH 0) 
 endif()
 
-# Configure version.rc
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/version.rc.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/TStar.rc"
-    @ONLY
-)
+# Configure version.rc for Windows
+if(WIN32)
+    configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/version.rc.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/TStar.rc"
+        @ONLY
+    )
+endif()
 
 add_definitions(-DTSTAR_VERSION="${TSTAR_VERSION}")
-
 
 project(TStar LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Disable AutoMoc predefs generation (Fixes pre-processing failures on Windows/MinGW)
-set(CMAKE_AUTOMOC_COMPILER_PREDEFS OFF CACHE BOOL "" FORCE)
+# =============================================================================
+# Platform-Specific Settings
+# =============================================================================
+if(APPLE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum macOS version")
+    set(CMAKE_MACOSX_BUNDLE ON)
+    message(STATUS "Building for macOS")
+elseif(WIN32)
+    # Disable AutoMoc predefs generation (Fixes pre-processing failures on Windows/MinGW)
+    set(CMAKE_AUTOMOC_COMPILER_PREDEFS OFF CACHE BOOL "" FORCE)
+    message(STATUS "Building for Windows")
+endif()
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-# Prioritize User's Qt Location (Removed non-existent Program Files path)
-# find_package will use standard locations or Qt6_DIR if provided.
+# =============================================================================
+# Homebrew Detection (macOS)
+# =============================================================================
+if(APPLE)
+    execute_process(
+        COMMAND brew --prefix
+        OUTPUT_VARIABLE HOMEBREW_PREFIX
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    
+    if(NOT HOMEBREW_PREFIX)
+        if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
+            set(HOMEBREW_PREFIX "/opt/homebrew")
+        else()
+            set(HOMEBREW_PREFIX "/usr/local")
+        endif()
+    endif()
+    
+    message(STATUS "Homebrew prefix: ${HOMEBREW_PREFIX}")
+    
+    list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_PREFIX}")
+    list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_PREFIX}/opt/qt")
+    list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_PREFIX}/opt/qt@6")
+    
+    if(NOT Qt6_DIR)
+        if(EXISTS "${HOMEBREW_PREFIX}/opt/qt/lib/cmake/Qt6/Qt6Config.cmake")
+            set(Qt6_DIR "${HOMEBREW_PREFIX}/opt/qt/lib/cmake/Qt6" CACHE PATH "Path to Qt6")
+        elseif(EXISTS "${HOMEBREW_PREFIX}/opt/qtbase/lib/cmake/Qt6/Qt6Config.cmake")
+            set(Qt6_DIR "${HOMEBREW_PREFIX}/opt/qtbase/lib/cmake/Qt6" CACHE PATH "Path to Qt6")
+        endif()
+    endif()
+endif()
 
+# =============================================================================
+# Find Qt6
+# =============================================================================
 find_package(Qt6 REQUIRED COMPONENTS Widgets Network Svg Concurrent Xml LinguistTools)
-find_package(OpenMP REQUIRED)
-# GSL
-# Directories setup
-set(GSL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/gsl")
-set(CFITSIO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/cfitsio")
 
-# Ensure we use the local libs if present
-if(EXISTS "${GSL_DIR}")
-    set(GSL_INCLUDE_DIRS "${GSL_DIR}/include")
-    set(GSL_LIBRARY_DIRS "${GSL_DIR}/lib")
-    set(GSL_LIBRARIES gsl gslcblas)
+# =============================================================================
+# OpenMP
+# =============================================================================
+if(APPLE)
+    execute_process(
+        COMMAND brew --prefix libomp
+        OUTPUT_VARIABLE LIBOMP_PREFIX
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    
+    if(LIBOMP_PREFIX AND EXISTS "${LIBOMP_PREFIX}")
+        message(STATUS "Using Homebrew libomp from: ${LIBOMP_PREFIX}")
+        add_library(OpenMP::OpenMP_CXX INTERFACE IMPORTED)
+        set_target_properties(OpenMP::OpenMP_CXX PROPERTIES
+            INTERFACE_COMPILE_OPTIONS "-Xpreprocessor;-fopenmp"
+            INTERFACE_INCLUDE_DIRECTORIES "${LIBOMP_PREFIX}/include"
+            INTERFACE_LINK_LIBRARIES "${LIBOMP_PREFIX}/lib/libomp.dylib"
+        )
+    else()
+        find_package(OpenMP)
+        if(NOT OpenMP_FOUND)
+            message(WARNING "OpenMP not found. Install with: brew install libomp")
+        endif()
+    endif()
 else()
-    find_package(GSL REQUIRED)
-    set(GSL_LIBRARIES GSL::gsl GSL::gslcblas)
+    find_package(OpenMP REQUIRED)
 endif()
 
+# =============================================================================
+# GSL (GNU Scientific Library)
+# =============================================================================
+if(APPLE)
+    execute_process(
+        COMMAND brew --prefix gsl
+        OUTPUT_VARIABLE GSL_PREFIX
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    
+    if(GSL_PREFIX AND EXISTS "${GSL_PREFIX}")
+        set(GSL_INCLUDE_DIRS "${GSL_PREFIX}/include")
+        set(GSL_LIBRARY_DIRS "${GSL_PREFIX}/lib")
+        set(GSL_LIBRARIES "${GSL_PREFIX}/lib/libgsl.dylib" "${GSL_PREFIX}/lib/libgslcblas.dylib")
+        message(STATUS "Using Homebrew GSL from: ${GSL_PREFIX}")
+    else()
+        find_package(GSL REQUIRED)
+        set(GSL_LIBRARIES GSL::gsl GSL::gslcblas)
+    endif()
+else()
+    # Windows: local deps
+    set(GSL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/gsl")
+    if(EXISTS "${GSL_DIR}")
+        set(GSL_INCLUDE_DIRS "${GSL_DIR}/include")
+        set(GSL_LIBRARY_DIRS "${GSL_DIR}/lib")
+        set(GSL_LIBRARIES gsl gslcblas)
+    else()
+        find_package(GSL REQUIRED)
+        set(GSL_LIBRARIES GSL::gsl GSL::gslcblas)
+    endif()
+endif()
+
+# =============================================================================
+# CFITSIO
+# =============================================================================
+if(APPLE)
+    execute_process(
+        COMMAND brew --prefix cfitsio
+        OUTPUT_VARIABLE CFITSIO_PREFIX
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    
+    if(CFITSIO_PREFIX AND EXISTS "${CFITSIO_PREFIX}")
+        set(CFITSIO_INCLUDE_DIR "${CFITSIO_PREFIX}/include")
+        set(CFITSIO_LIBRARY "${CFITSIO_PREFIX}/lib/libcfitsio.dylib")
+        message(STATUS "Using Homebrew CFITSIO from: ${CFITSIO_PREFIX}")
+    else()
+        message(FATAL_ERROR "CFITSIO not found. Install with: brew install cfitsio")
+    endif()
+else()
+    # Windows: local deps
+    set(CFITSIO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/cfitsio")
+    set(CFITSIO_INCLUDE_DIR "${CFITSIO_DIR}/include")
+    set(CFITSIO_LIBRARY "${CFITSIO_DIR}/lib/libcfitsio.a")
+endif()
+
+# =============================================================================
 # OpenCV
-set(OpenCV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/opencv")
-find_package(OpenCV REQUIRED PATHS "${CMAKE_CURRENT_SOURCE_DIR}/deps/opencv" NO_DEFAULT_PATH)
-
-# ===========================
-# Optional Compression Libraries (for XISF support)
-# ===========================
-
-# LZ4 - Check local deps first, then system
-set(LZ4_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/lz4")
-# Support MSYS2 package structure (mingw64 subfolder)
-if(EXISTS "${LZ4_DIR}/mingw64/include/lz4.h")
-    message(STATUS "Using local LZ4 from ${LZ4_DIR}/mingw64")
-    set(LZ4_FOUND TRUE)
-    set(LZ4_INCLUDE_DIRS "${LZ4_DIR}/mingw64/include")
-    set(LZ4_LIBRARIES "${LZ4_DIR}/mingw64/lib/liblz4.a")
-elseif(EXISTS "${LZ4_DIR}/include/lz4.h")
-    message(STATUS "Using local LZ4 from ${LZ4_DIR}")
-    set(LZ4_FOUND TRUE)
-    set(LZ4_INCLUDE_DIRS "${LZ4_DIR}/include")
-    if(EXISTS "${LZ4_DIR}/lib/liblz4.a")
-        set(LZ4_LIBRARIES "${LZ4_DIR}/lib/liblz4.a")
-    elseif(EXISTS "${LZ4_DIR}/lib/lz4.lib")
-        set(LZ4_LIBRARIES "${LZ4_DIR}/lib/lz4.lib")
-    else()
-        set(LZ4_LIBRARIES lz4)
+# =============================================================================
+if(APPLE)
+    execute_process(
+        COMMAND brew --prefix opencv
+        OUTPUT_VARIABLE OPENCV_PREFIX
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    
+    if(OPENCV_PREFIX AND EXISTS "${OPENCV_PREFIX}")
+        set(OpenCV_DIR "${OPENCV_PREFIX}/lib/cmake/opencv4")
     endif()
+    find_package(OpenCV REQUIRED)
 else()
-    # Try system LZ4
-    find_path(LZ4_INCLUDE_DIRS lz4.h)
-    find_library(LZ4_LIBRARIES NAMES lz4 liblz4)
-    if(LZ4_INCLUDE_DIRS AND LZ4_LIBRARIES)
+    # Windows: local deps
+    set(OpenCV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/opencv")
+    find_package(OpenCV REQUIRED PATHS "${CMAKE_CURRENT_SOURCE_DIR}/deps/opencv" NO_DEFAULT_PATH)
+endif()
+
+# =============================================================================
+# Optional Compression Libraries (LZ4, Zstd)
+# =============================================================================
+
+# LZ4
+if(APPLE)
+    execute_process(
+        COMMAND brew --prefix lz4
+        OUTPUT_VARIABLE LZ4_PREFIX
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    
+    if(LZ4_PREFIX AND EXISTS "${LZ4_PREFIX}/include/lz4.h")
         set(LZ4_FOUND TRUE)
-        message(STATUS "Found system LZ4: ${LZ4_LIBRARIES}")
-    else()
-        set(LZ4_FOUND FALSE)
-        message(STATUS "LZ4 not found - XISF LZ4 compression will be disabled")
-    endif()
-endif()
-
-# Zstd - Check local deps first, then system
-set(ZSTD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/zstd")
-# Support MSYS2 package structure (mingw64 subfolder)
-if(EXISTS "${ZSTD_DIR}/mingw64/include/zstd.h")
-    message(STATUS "Using local Zstd from ${ZSTD_DIR}/mingw64")
-    set(ZSTD_FOUND TRUE)
-    set(ZSTD_INCLUDE_DIRS "${ZSTD_DIR}/mingw64/include")
-    set(ZSTD_LIBRARIES "${ZSTD_DIR}/mingw64/lib/libzstd.a")
-elseif(EXISTS "${ZSTD_DIR}/include/zstd.h")
-    message(STATUS "Using local Zstd from ${ZSTD_DIR}")
-    set(ZSTD_FOUND TRUE)
-    set(ZSTD_INCLUDE_DIRS "${ZSTD_DIR}/include")
-    if(EXISTS "${ZSTD_DIR}/lib/libzstd.a")
-        set(ZSTD_LIBRARIES "${ZSTD_DIR}/lib/libzstd.a")
-    elseif(EXISTS "${ZSTD_DIR}/lib/zstd.lib")
-        set(ZSTD_LIBRARIES "${ZSTD_DIR}/lib/zstd.lib")
-    else()
-        set(ZSTD_LIBRARIES zstd)
+        set(LZ4_INCLUDE_DIRS "${LZ4_PREFIX}/include")
+        set(LZ4_LIBRARIES "${LZ4_PREFIX}/lib/liblz4.dylib")
+        message(STATUS "Using Homebrew LZ4 from: ${LZ4_PREFIX}")
     endif()
 else()
-    # Try system Zstd
-    find_path(ZSTD_INCLUDE_DIRS zstd.h)
-    find_library(ZSTD_LIBRARIES NAMES zstd libzstd)
-    if(ZSTD_INCLUDE_DIRS AND ZSTD_LIBRARIES)
-        set(ZSTD_FOUND TRUE)
-        message(STATUS "Found system Zstd: ${ZSTD_LIBRARIES}")
+    # Windows: local deps (support MSYS2 mingw64 structure)
+    set(LZ4_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/lz4")
+    if(EXISTS "${LZ4_DIR}/mingw64/include/lz4.h")
+        message(STATUS "Using local LZ4 from ${LZ4_DIR}/mingw64")
+        set(LZ4_FOUND TRUE)
+        set(LZ4_INCLUDE_DIRS "${LZ4_DIR}/mingw64/include")
+        set(LZ4_LIBRARIES "${LZ4_DIR}/mingw64/lib/liblz4.a")
+    elseif(EXISTS "${LZ4_DIR}/include/lz4.h")
+        message(STATUS "Using local LZ4 from ${LZ4_DIR}")
+        set(LZ4_FOUND TRUE)
+        set(LZ4_INCLUDE_DIRS "${LZ4_DIR}/include")
+        if(EXISTS "${LZ4_DIR}/lib/liblz4.a")
+            set(LZ4_LIBRARIES "${LZ4_DIR}/lib/liblz4.a")
+        else()
+            set(LZ4_LIBRARIES lz4)
+        endif()
     else()
-        set(ZSTD_FOUND FALSE)
-        message(STATUS "Zstd not found - XISF Zstd compression will be disabled")
+        find_path(LZ4_INCLUDE_DIRS lz4.h)
+        find_library(LZ4_LIBRARIES NAMES lz4 liblz4)
+        if(LZ4_INCLUDE_DIRS AND LZ4_LIBRARIES)
+            set(LZ4_FOUND TRUE)
+            message(STATUS "Found system LZ4: ${LZ4_LIBRARIES}")
+        else()
+            set(LZ4_FOUND FALSE)
+        endif()
     endif()
 endif()
 
-# Force disable AutoMoc predefs (Normal variable shadows cache)
-set(CMAKE_AUTOMOC_COMPILER_PREDEFS OFF)
+if(NOT LZ4_FOUND)
+    message(STATUS "LZ4 not found - XISF LZ4 compression will be disabled")
+endif()
 
-add_executable(TStar
-    ${CMAKE_CURRENT_BINARY_DIR}/TStar.rc
-    # ===========================
-    # Root (src/)
-    # ===========================
+# Zstd
+if(APPLE)
+    execute_process(
+        COMMAND brew --prefix zstd
+        OUTPUT_VARIABLE ZSTD_PREFIX
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    
+    if(ZSTD_PREFIX AND EXISTS "${ZSTD_PREFIX}/include/zstd.h")
+        set(ZSTD_FOUND TRUE)
+        set(ZSTD_INCLUDE_DIRS "${ZSTD_PREFIX}/include")
+        set(ZSTD_LIBRARIES "${ZSTD_PREFIX}/lib/libzstd.dylib")
+        message(STATUS "Using Homebrew Zstd from: ${ZSTD_PREFIX}")
+    endif()
+else()
+    # Windows: local deps (support MSYS2 mingw64 structure)
+    set(ZSTD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/zstd")
+    if(EXISTS "${ZSTD_DIR}/mingw64/include/zstd.h")
+        message(STATUS "Using local Zstd from ${ZSTD_DIR}/mingw64")
+        set(ZSTD_FOUND TRUE)
+        set(ZSTD_INCLUDE_DIRS "${ZSTD_DIR}/mingw64/include")
+        set(ZSTD_LIBRARIES "${ZSTD_DIR}/mingw64/lib/libzstd.a")
+    elseif(EXISTS "${ZSTD_DIR}/include/zstd.h")
+        message(STATUS "Using local Zstd from ${ZSTD_DIR}")
+        set(ZSTD_FOUND TRUE)
+        set(ZSTD_INCLUDE_DIRS "${ZSTD_DIR}/include")
+        if(EXISTS "${ZSTD_DIR}/lib/libzstd.a")
+            set(ZSTD_LIBRARIES "${ZSTD_DIR}/lib/libzstd.a")
+        else()
+            set(ZSTD_LIBRARIES zstd)
+        endif()
+    else()
+        find_path(ZSTD_INCLUDE_DIRS zstd.h)
+        find_library(ZSTD_LIBRARIES NAMES zstd libzstd)
+        if(ZSTD_INCLUDE_DIRS AND ZSTD_LIBRARIES)
+            set(ZSTD_FOUND TRUE)
+            message(STATUS "Found system Zstd: ${ZSTD_LIBRARIES}")
+        else()
+            set(ZSTD_FOUND FALSE)
+        endif()
+    endif()
+endif()
+
+if(NOT ZSTD_FOUND)
+    message(STATUS "Zstd not found - XISF Zstd compression will be disabled")
+endif()
+
+# Force disable AutoMoc predefs on Windows
+if(WIN32)
+    set(CMAKE_AUTOMOC_COMPILER_PREDEFS OFF)
+endif()
+
+# =============================================================================
+# Source Files
+# =============================================================================
+set(TSTAR_SOURCES
     src/main.cpp
     src/MainWindow.cpp
     src/MainWindow.h
@@ -162,18 +335,14 @@ add_executable(TStar
     src/ImageBuffer.h
     src/resources.qrc
     
-    # ===========================
-    # Core (src/core/)
-    # ===========================
+    # Core
     src/core/RobustStatistics.cpp
     src/core/RobustStatistics.h
     src/core/MaskManager.h
     src/core/Logger.cpp
     src/core/Logger.h
     
-    # ===========================
-    # IO (src/io/)
-    # ===========================
+    # IO
     src/io/FitsLoader.cpp
     src/io/FitsLoader.h
     src/io/SimpleTiffWriter.cpp
@@ -188,9 +357,7 @@ add_executable(TStar
     src/io/FitsHeaderUtils.cpp
     src/io/FitsHeaderUtils.h
     
-    # ===========================
-    # Widgets (src/widgets/)
-    # ===========================
+    # Widgets
     src/widgets/HistogramWidget.cpp
     src/widgets/HistogramWidget.h
     src/widgets/CustomMdiSubWindow.cpp
@@ -201,10 +368,10 @@ add_executable(TStar
     src/widgets/SidebarWidget.h
     src/widgets/HeaderPanel.cpp
     src/widgets/HeaderPanel.h
+    src/widgets/AnnotationOverlay.cpp
+    src/widgets/AnnotationOverlay.h
     
-    # ===========================
-    # Algorithms (src/algos/)
-    # ===========================
+    # Algorithms
     src/algos/AbeMath.cpp
     src/algos/GHSAlgo.cpp
     src/algos/GHSAlgo.h
@@ -226,16 +393,11 @@ add_executable(TStar
     src/algos/StatisticalStretch.cpp
     src/algos/StatisticalStretch.h
     
-    # ===========================
-    # Network (src/network/)
-    # ===========================
+    # Network
     src/network/UpdateChecker.cpp
     src/network/UpdateChecker.h
-
     
-    # ===========================
-    # Dialogs (src/dialogs/)
-    # ===========================
+    # Dialogs
     src/dialogs/UpdateDialog.cpp
     src/dialogs/UpdateDialog.h
     src/dialogs/StretchDialog.cpp
@@ -293,7 +455,6 @@ add_executable(TStar
     src/dialogs/HeaderEditorDialog.cpp
     src/dialogs/HeaderEditorDialog.h
     src/dialogs/AboutDialog.cpp
-    src/dialogs/AboutDialog.cpp
     src/dialogs/MaskCanvas.cpp
     src/dialogs/MaskCanvas.h
     src/dialogs/MaskGenerationDialog.cpp
@@ -310,24 +471,20 @@ add_executable(TStar
     src/dialogs/AnnotationToolDialog.h
     src/dialogs/HelpDialog.cpp
     src/dialogs/HelpDialog.h
-    src/widgets/AnnotationOverlay.cpp
-    src/widgets/AnnotationOverlay.h
+    src/dialogs/ClaheDialog.cpp
+    src/dialogs/ClaheDialog.h
+    src/dialogs/SelectiveColorDialog.cpp
+    src/dialogs/SelectiveColorDialog.h
+    src/dialogs/CorrectionBrushDialog.cpp
+    src/dialogs/CorrectionBrushDialog.h
     src/dialogs/ExtractLuminanceDialog.cpp
     src/dialogs/ExtractLuminanceDialog.h
     src/dialogs/RecombineLuminanceDialog.cpp
     src/dialogs/RecombineLuminanceDialog.h
-    src/dialogs/CorrectionBrushDialog.cpp
-    src/dialogs/CorrectionBrushDialog.h
-    src/dialogs/ClaheDialog.cpp
-    src/dialogs/ClaheDialog.h
     src/dialogs/AberrationInspectorDialog.cpp
     src/dialogs/AberrationInspectorDialog.h
-    src/dialogs/SelectiveColorDialog.cpp
-    src/dialogs/SelectiveColorDialog.h
     
-    # ===========================
-    # Astrometry (src/astrometry/)
-    # ===========================
+    # Astrometry
     src/astrometry/SimbadSearcher.cpp
     src/astrometry/SimbadSearcher.h
     src/astrometry/TriangleMatcher.cpp
@@ -338,9 +495,7 @@ add_executable(TStar
     src/astrometry/WCSUtils.cpp
     src/astrometry/WCSUtils.h
     
-    # ===========================
-    # Photometry (src/photometry/)
-    # ===========================
+    # Photometry
     src/photometry/StarDetector.cpp
     src/photometry/StarDetector.h
     src/photometry/CatalogClient.cpp
@@ -351,7 +506,44 @@ add_executable(TStar
     src/photometry/AperturePhotometry.h
 )
 
+# =============================================================================
+# Create Executable
+# =============================================================================
+if(APPLE)
+    # macOS App Bundle
+    set(MACOSX_BUNDLE_ICON_FILE TStar.icns)
+    set(APP_ICON_MACOS "${CMAKE_CURRENT_SOURCE_DIR}/src/images/TStar.icns")
+    
+    if(EXISTS "${APP_ICON_MACOS}")
+        set_source_files_properties(${APP_ICON_MACOS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+        add_executable(TStar MACOSX_BUNDLE ${TSTAR_SOURCES} ${APP_ICON_MACOS})
+    else()
+        add_executable(TStar MACOSX_BUNDLE ${TSTAR_SOURCES})
+    endif()
+    
+    set_target_properties(TStar PROPERTIES
+        MACOSX_BUNDLE_BUNDLE_NAME "TStar"
+        MACOSX_BUNDLE_BUNDLE_VERSION "${TSTAR_VERSION}"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${TSTAR_VERSION}"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "com.fabiotempera.tstar"
+    )
+    
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/Info.plist")
+        set_target_properties(TStar PROPERTIES
+            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/src/Info.plist"
+        )
+    endif()
+else()
+    # Windows with resource file
+    add_executable(TStar
+        ${CMAKE_CURRENT_BINARY_DIR}/TStar.rc
+        ${TSTAR_SOURCES}
+    )
+endif()
+
+# =============================================================================
 # Translations
+# =============================================================================
 qt_add_translations(TStar
     TS_FILES 
         "translations/tstar_it.ts"
@@ -362,6 +554,9 @@ qt_add_translations(TStar
     RESOURCE "src/i18n.qrc"
 )
 
+# =============================================================================
+# Include Directories
+# =============================================================================
 target_include_directories(TStar PRIVATE 
     src
     src/astrometry
@@ -372,11 +567,10 @@ target_include_directories(TStar PRIVATE
     src/io
     src/algos
     ${GSL_INCLUDE_DIRS}
-    "${CFITSIO_DIR}/include"
+    ${CFITSIO_INCLUDE_DIR}
     ${OpenCV_INCLUDE_DIRS}
 )
 
-# Add optional compression library includes
 if(LZ4_FOUND)
     target_include_directories(TStar PRIVATE ${LZ4_INCLUDE_DIRS})
     target_compile_definitions(TStar PRIVATE HAVE_LZ4)
@@ -386,32 +580,46 @@ if(ZSTD_FOUND)
     target_compile_definitions(TStar PRIVATE HAVE_ZSTD)
 endif()
 
+# =============================================================================
+# Link Directories
+# =============================================================================
 target_link_directories(TStar PRIVATE
     ${GSL_LIBRARY_DIRS}
 )
 
-# Definitive fix for AutoMoc predefs failure on Windows/MinGW
-set_property(TARGET TStar PROPERTY AUTOMOC_COMPILER_PREDEFS OFF)
-# libraries need to be linked explicitly if they are static or simpler
-# CFITSIO
+# =============================================================================
+# Link Libraries
+# =============================================================================
+if(WIN32)
+    set_property(TARGET TStar PROPERTY AUTOMOC_COMPILER_PREDEFS OFF)
+endif()
+
 target_link_libraries(TStar PRIVATE 
     Qt6::Widgets 
     Qt6::Svg
     Qt6::Network
-    Qt6::Network
     Qt6::Concurrent
     Qt6::Xml
-    OpenMP::OpenMP_CXX
-    "${CFITSIO_DIR}/lib/libcfitsio.a" 
-    z
-    ws2_32
-    z
-    ws2_32
+    ${CFITSIO_LIBRARY}
     ${GSL_LIBRARIES}
     ${OpenCV_LIBS}
 )
 
-# Link optional compression libraries
+# OpenMP
+if(TARGET OpenMP::OpenMP_CXX)
+    target_link_libraries(TStar PRIVATE OpenMP::OpenMP_CXX)
+endif()
+
+# Platform-specific libs
+if(APPLE)
+    find_package(ZLIB REQUIRED)
+    target_link_libraries(TStar PRIVATE ZLIB::ZLIB)
+else()
+    # Windows: zlib and winsock
+    target_link_libraries(TStar PRIVATE z ws2_32)
+endif()
+
+# Optional compression libraries
 if(LZ4_FOUND)
     target_link_libraries(TStar PRIVATE ${LZ4_LIBRARIES})
     message(STATUS "LZ4 compression enabled for XISF")
@@ -421,11 +629,19 @@ if(ZSTD_FOUND)
     message(STATUS "Zstd compression enabled for XISF")
 endif()
 
-if(WIN32)
-    # set_property(TARGET TStar PROPERTY WIN32_EXECUTABLE ON)
-endif()
-
-# Copy images to build directory
+# =============================================================================
+# Post-build: Copy resources
+# =============================================================================
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/images" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-# Copy catalogs to build directory
 
+if(APPLE)
+    add_custom_command(TARGET TStar POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/images"
+            "$<TARGET_BUNDLE_DIR:TStar>/Contents/Resources/images"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_BINARY_DIR}/translations"
+            "$<TARGET_BUNDLE_DIR:TStar>/Contents/Resources/translations"
+        COMMENT "Copying resources to app bundle"
+    )
+endif()

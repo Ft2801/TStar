@@ -273,11 +273,14 @@ bool StarNetRunner::run(const ImageBuffer& input, ImageBuffer& output, const Sta
 
     emit processOutput("Running StarNet++...");
     QStringList args;
-    if (exe.contains("starnet2", Qt::CaseInsensitive)) {
-        args << inputFile << outputFile << QString::number(params.stride);
-    } else {
-        args << inputFile << outputFile << QString::number(params.stride);
-    }
+#if defined(Q_OS_MAC)
+    // macOS StarNet2 uses flag-style arguments
+    args << "-i" << inputFile << "-o" << outputFile << "-s" << QString::number(params.stride);
+#else
+    // Windows uses positional arguments
+    args << inputFile << outputFile << QString::number(params.stride);
+#endif
+
 
     QProcess p;
     p.setProcessChannelMode(QProcess::MergedChannels); 

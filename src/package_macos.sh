@@ -153,7 +153,7 @@ copy_dylib "liblz4" "lz4" || true
 copy_dylib "libzstd" "zstd" || true
 copy_dylib "libomp" "libomp" || true
 
-# OpenCV (multiple libs)
+# OpenCV (only required modules - dnn excluded to avoid libprotobuf conflict)
 OPENCV_PREFIX=$(brew --prefix opencv 2>/dev/null || echo "")
 if [ ! -d "$OPENCV_PREFIX/lib" ]; then
     # OpenCV Fallback
@@ -162,15 +162,24 @@ if [ ! -d "$OPENCV_PREFIX/lib" ]; then
 fi
 
 if [ -n "$OPENCV_PREFIX" ] && [ -d "$OPENCV_PREFIX/lib" ]; then
-    for dylib in "$OPENCV_PREFIX/lib"/libopencv_*.dylib; do
-        if [ -f "$dylib" ]; then
-            cp "$dylib" "$FRAMEWORKS_DIR/" 2>/dev/null || true
-        fi
+    # Only copy the modules TStar actually uses to avoid protobuf conflicts
+    # TStar uses: core, imgproc, imgcodecs, photo
+    # Excluded: dnn (links protobuf), video, videoio, objdetect, ml, highgui
+    OPENCV_MODULES="core imgproc imgcodecs photo"
+    
+    for module in $OPENCV_MODULES; do
+        for dylib in "$OPENCV_PREFIX/lib"/libopencv_${module}*.dylib; do
+            if [ -f "$dylib" ]; then
+                cp "$dylib" "$FRAMEWORKS_DIR/" 2>/dev/null || true
+            fi
+        done
     done
-    echo "  - OpenCV: OK"
+    echo "  - OpenCV (core, imgproc, imgcodecs, photo): OK"
+    echo "    (dnn and video modules excluded to avoid protobuf conflict)"
 else
     echo "  - OpenCV: NOT FOUND"
 fi
+
 
 # --- Copy Python environment ---
 echo ""
