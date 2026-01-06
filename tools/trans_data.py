@@ -2059,4 +2059,13 @@ TRANSLATIONS = {
     "Standard:": {'it': "Standard:", 'es': "Estándar:", 'fr': "Standard :", 'de': "Standard:"},
 
     "Uses median sampling from surrounding areas (faster)": {'it': "Utilizza il campionamento mediano dalle aree circostanti (più veloce)", 'es': "Utiliza el muestreo mediano de las áreas circundantes (más rápido)", 'fr': "Utilise l'échantillonnage médian des zones environnantes (plus rapide)", 'de': "Verwendet Median-Sampling aus umliegenden Bereichen (schneller)"},
+    "View": {'it': 'Vista', 'es': 'Vista', 'fr': 'Vue', 'de': 'Ansicht'},
+
+    "Tile Images": {'it': 'Affianca Immagini', 'es': 'Mosaico de Imágenes', 'fr': 'Mosaïque d\'Images', 'de': 'Bilder anordnen'},
+
+    "Need at least 2 images to tile.": {'it': 'Necessarie almeno 2 immagini per affiancare.', 'es': 'Se necesitan al menos 2 imágenes para el mosaico.', 'fr': 'Nécessite au moins 2 images pour la mosaïque.', 'de': 'Mindestens 2 Bilder zum Anordnen erforderlich.'},
+
+    "Tiled %1 images in %2x%3 layout.": {'it': 'Affiancate %1 immagini in un layout %2x%3.', 'es': 'Mosaico de %1 imágenes en diseño %2x%3.', 'fr': 'Mosaïque de %1 images en disposition %2x%3.', 'de': '%1 Bilder in %2x%3 Layout angeordnet.'},
 }
+
+
