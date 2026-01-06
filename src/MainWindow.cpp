@@ -143,6 +143,12 @@ MainWindow::MainWindow(QWidget *parent)
     m_sidebar->setParent(this);
     m_sidebar->raise(); // Ensure on top
     
+    // Create left margin to prevent windows from going under sidebar tab strip
+    // The tab strip is 32px wide, add small padding
+    int sidebarTabWidth = 34; // 32px tab + 2px buffer
+    mainLayout->setContentsMargins(sidebarTabWidth, 0, 0, 0);
+
+    
     // Immediate initial sync for overlay positioning
     if (this->centralWidget()) {
         m_sidebar->move(this->centralWidget()->x(), this->centralWidget()->y());
@@ -796,7 +802,26 @@ MainWindow::MainWindow(QWidget *parent)
     mainToolbar->addWidget(maskBtn);
     mainToolbar->addSeparator();
 
+    // --- View Menu ---
+    QToolButton* viewBtn = new QToolButton(this);
+    viewBtn->setText(tr("View"));
+    viewBtn->setPopupMode(QToolButton::InstantPopup);
+    viewBtn->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    viewBtn->setStyleSheet(processBtn->styleSheet()); // Re-use style
+
+    QMenu* viewMenu = new QMenu(this);
+    viewMenu->setStyleSheet(processMenu->styleSheet()); // Re-use style
+    
+    addMenuAction(viewMenu, tr("Tile Images"), "", [this](){
+        tileImageViews();
+    });
+    
+    viewBtn->setMenu(viewMenu);
+    mainToolbar->addWidget(viewBtn);
+    mainToolbar->addSeparator();
+
     QToolButton* settingsBtn = new QToolButton(this);
+
     settingsBtn->setText(tr("Settings"));
     settingsBtn->setToolButtonStyle(Qt::ToolButtonTextOnly);
     // Remove arrow styling adjustments as we have no menu
@@ -870,7 +895,59 @@ MainWindow::MainWindow(QWidget *parent)
     log(tr("Application Ready."));
 }
 
+void MainWindow::tileImageViews() {
+    // Collect only image views (not tool windows)
+    QList<CustomMdiSubWindow*> imageWindows;
+    for (auto* sub : m_mdiArea->subWindowList()) {
+        auto* csw = qobject_cast<CustomMdiSubWindow*>(sub);
+        if (csw && !csw->isToolWindow() && csw->viewer()) {
+            imageWindows.append(csw);
+        }
+    }
+    
+    int count = imageWindows.size();
+    if (count < 2) {
+        log(tr("Need at least 2 images to tile."), Log_Warning, true);
+        return;
+    }
+    
+    // Calculate layout grid
+    QRect area = m_mdiArea->viewport()->rect();
+    int cols, rows;
+    
+    if (count == 2) {
+        cols = 2; rows = 1;  // Side by side (left/right)
+    } else if (count <= 4) {
+        cols = 2; rows = 2;  // 2x2 grid
+    } else {
+        // For more than 4, use a square-ish grid
+        cols = std::ceil(std::sqrt((double)count));
+        rows = std::ceil((double)count / cols);
+    }
+    
+    int cellW = area.width() / cols;
+    int cellH = area.height() / rows;
+    
+    // Position each window in its cell
+    int idx = 0;
+    for (int r = 0; r < rows && idx < count; ++r) {
+        for (int c = 0; c < cols && idx < count; ++c) {
+            auto* win = imageWindows[idx++];
+            win->showNormal();  // De-maximize if needed
+            win->setGeometry(c * cellW, r * cellH, cellW, cellH);
+            
+            // Fit image to new window size
+            if (auto* v = win->viewer()) {
+                QTimer::singleShot(50, v, &ImageViewer::fitToWindow);
+            }
+        }
+    }
+    
+    log(tr("Tiled %1 images in %2x%3 layout.").arg(count).arg(cols).arg(rows), Log_Success, true);
+}
+
 void MainWindow::pushUndo() {
+
     if (auto v = currentViewer()) {
         log("Pushing Undo State...", Log_Info); 
         v->pushUndo();

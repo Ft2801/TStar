@@ -118,6 +118,7 @@ private slots:
     void setupSidebarTools();
     void runCosmicClarity(const struct CosmicClarityParams& params);
     void runGraXpert(const struct GraXpertParams& params);
+    void tileImageViews();
     // Settings
     void onSettingsAction();
 
