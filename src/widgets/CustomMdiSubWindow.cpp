@@ -1105,6 +1105,8 @@ void CustomMdiSubWindow::handleDrop(QDropEvent* event) {
                 ImageViewer* targetPtr = this->findChild<ImageViewer*>(); 
                 
                 if (sourcePtr && targetPtr) {
+                    // Connect bidirectional view synchronization
+                    // These will auto-disconnect when either receiver is destroyed
                     connect(sourcePtr, &ImageViewer::viewChanged, targetPtr, &ImageViewer::syncView, Qt::UniqueConnection);
                     connect(targetPtr, &ImageViewer::viewChanged, sourcePtr, &ImageViewer::syncView, Qt::UniqueConnection);
                     
@@ -1114,40 +1116,65 @@ void CustomMdiSubWindow::handleDrop(QDropEvent* event) {
                     
                     // Update LinkStrip Status
                     if (sourceWin->m_linkStrip) sourceWin->m_linkStrip->setLinked(true);
-                    if (m_linkStrip) m_linkStrip->setLinked(true); // this window
+                    if (m_linkStrip) m_linkStrip->setLinked(true);
                     
-                    // Use QPointers for safety in lambdas
-                    QPointer<ImageViewer> sSafe = sourcePtr;
-                    QPointer<ImageViewer> tSafe = targetPtr;
-
-                    connect(sourcePtr, &ImageViewer::unlinked, [=](){
-                        if (sSafe && tSafe) {
-                            sSafe->disconnect(tSafe);
-                            tSafe->disconnect(sSafe);
-                            tSafe->setLinked(false);
-                            // Update strip if possible (need pointer to parent window, tricky in lambda without capture)
-                            // Viewer unlinked -> Update Strip connection needed
-                        } else if (tSafe) {
-                             tSafe->setLinked(false);
+                    // When one viewer is destroyed, update the other's linked state
+                    // Only set linked=false if there are no other linked viewers remaining
+                    QPointer<ImageViewer> targetSafe = targetPtr;
+                    QPointer<CustomMdiSubWindow> targetWin = this;
+                    QPointer<ImageViewer> sourceSafe = sourcePtr;
+                    
+                    connect(sourcePtr, &QObject::destroyed, [targetSafe, targetWin, sourceSafe](){
+                        if (targetSafe) {
+                            // Check if target still has other linked viewers
+                            bool hasOtherLinks = false;
+                            if (targetWin) {
+                                QMdiArea* mdiArea = targetWin->mdiArea();
+                                if (mdiArea) {
+                                    for (QMdiSubWindow* sub : mdiArea->subWindowList()) {
+                                        ImageViewer* otherViewer = sub->findChild<ImageViewer*>();
+                                        if (otherViewer && otherViewer != targetSafe && otherViewer != sourceSafe && otherViewer->isLinked()) {
+                                            hasOtherLinks = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if (!hasOtherLinks) {
+                                targetSafe->setLinked(false);
+                                if (targetWin && targetWin->m_linkStrip) {
+                                    targetWin->m_linkStrip->setLinked(false);
+                                }
+                            }
                         }
                     });
                     
-                    connect(targetPtr, &ImageViewer::unlinked, [=](){
-                         if (sSafe && tSafe) {
-                            sSafe->disconnect(tSafe);
-                            tSafe->disconnect(sSafe);
-                            sSafe->setLinked(false);
-                         } else if (sSafe) {
-                             sSafe->setLinked(false);
-                         }
-                    });
-
-                    // Break link if one viewer is destroyed (window closed)
-                    connect(sourcePtr, &QObject::destroyed, targetPtr, [=](){
-                        if (tSafe) tSafe->setLinked(false);
-                    });
-                    connect(targetPtr, &QObject::destroyed, sourcePtr, [=](){
-                        if (sSafe) sSafe->setLinked(false);
+                    QPointer<CustomMdiSubWindow> sourceWinSafe = sourceWin;
+                    connect(targetPtr, &QObject::destroyed, [sourceSafe, sourceWinSafe, targetSafe](){
+                        if (sourceSafe) {
+                            // Check if source still has other linked viewers
+                            bool hasOtherLinks = false;
+                            if (sourceWinSafe) {
+                                QMdiArea* mdiArea = sourceWinSafe->mdiArea();
+                                if (mdiArea) {
+                                    for (QMdiSubWindow* sub : mdiArea->subWindowList()) {
+                                        ImageViewer* otherViewer = sub->findChild<ImageViewer*>();
+                                        if (otherViewer && otherViewer != sourceSafe && otherViewer != targetSafe && otherViewer->isLinked()) {
+                                            hasOtherLinks = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if (!hasOtherLinks) {
+                                sourceSafe->setLinked(false);
+                                if (sourceWinSafe && sourceWinSafe->m_linkStrip) {
+                                    sourceWinSafe->m_linkStrip->setLinked(false);
+                                }
+                            }
+                        }
                     });
                 }
             }
