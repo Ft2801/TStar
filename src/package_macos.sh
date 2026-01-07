@@ -153,6 +153,10 @@ copy_dylib "liblz4" "lz4" || true
 copy_dylib "libzstd" "zstd" || true
 copy_dylib "libomp" "libomp" || true
 
+# Brotli: must copy both common and dec (decompression)
+copy_dylib "libbrotlicommon" "brotli" || true
+copy_dylib "libbrotlidec" "brotli" || true
+
 # OpenCV (only required modules - dnn and video excluded to avoid external dependencies)
 OPENCV_PREFIX=$(brew --prefix opencv 2>/dev/null || echo "")
 if [ ! -d "$OPENCV_PREFIX/lib" ]; then
@@ -250,6 +254,45 @@ if [ -f "$EXECUTABLE" ]; then
     # Update rpath to look in Frameworks
     install_name_tool -add_rpath "@executable_path/../Frameworks" "$EXECUTABLE" 2>/dev/null || true
     echo "  - Updated rpath"
+fi
+
+# --- Verify bundled dylibs dependencies ---
+echo ""
+echo "[STEP 9.1] Verifying bundled dylib dependencies..."
+
+MISSING_DEPS=0
+for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
+    if [ -f "$dylib" ]; then
+        # Get all dependencies with @rpath reference
+        DEPS=$(otool -L "$dylib" 2>/dev/null | grep "@rpath" || true)
+        if [ -n "$DEPS" ]; then
+            while IFS= read -r dep_line; do
+                # Extract just the library name from @rpath/libXXX.dylib
+                DEP_NAME=$(echo "$dep_line" | awk '{print $1}' | sed 's|@rpath/||')
+                if [ -n "$DEP_NAME" ] && [ "$DEP_NAME" != "@rpath" ]; then
+                    # Check if the dependency is bundled
+                    if [ ! -f "$FRAMEWORKS_DIR/$DEP_NAME" ]; then
+                        echo "  [WARNING] $dylib depends on $DEP_NAME (not bundled)"
+                        # Try to find and copy the missing library
+                        for brew_path in /opt/homebrew /usr/local; do
+                            if [ -f "$brew_path/lib/$DEP_NAME" ]; then
+                                echo "    -> Found at $brew_path/lib, copying..."
+                                cp "$brew_path/lib/$DEP_NAME" "$FRAMEWORKS_DIR/" 2>/dev/null && echo "    -> Copied successfully" || true
+                                break
+                            fi
+                        done
+                        MISSING_DEPS=$((MISSING_DEPS + 1))
+                    fi
+                fi
+            done <<< "$DEPS"
+        fi
+    fi
+done
+
+if [ $MISSING_DEPS -gt 0 ]; then
+    echo "  [WARNING] Found $MISSING_DEPS unresolved dependencies - attempting fixes"
+else
+    echo "  - All bundled dylib dependencies verified"
 fi
 
 # --- Ad-hoc Code Signing ---

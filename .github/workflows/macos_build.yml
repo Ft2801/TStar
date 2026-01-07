@@ -353,20 +353,20 @@ jobs:
           echo "## macOS Build Complete! 🎉" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # Get version
+          # Get version from changelog
           VERSION=$(grep -E "^Version [0-9.]+" changelog.txt | head -1 | awk '{print $2}')
-          echo "**Version:** $VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** $VERSION (Apple Silicon ARM64)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # List artifacts
+          # List artifacts with correct naming (matches DMG rename in step 11)
           echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
-          echo "- **DMG Installer:** \`installer_output/TStar_Setup_${VERSION}.dmg\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **DMG Installer:** \`installer_output/TStar_Setup_${VERSION}-AppleSilicon-ARM64.dmg\`" >> $GITHUB_STEP_SUMMARY
           echo "- **App Bundle:** \`dist/TStar.app\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # Notes
           echo "### Notes" >> $GITHUB_STEP_SUMMARY
-          echo "- Built on macOS runner with Apple Silicon" >> $GITHUB_STEP_SUMMARY
+          echo "- Built on macOS runner with Apple Silicon (ARM64)" >> $GITHUB_STEP_SUMMARY
           echo "- Compatible with macOS 11.0 (Big Sur) and later" >> $GITHUB_STEP_SUMMARY
           echo "- First launch: Right-click → Open to bypass Gatekeeper" >> $GITHUB_STEP_SUMMARY
   # ============================================================================
@@ -588,15 +588,18 @@ jobs:
           echo "## macOS Intel Build Complete! 🎉" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
+          # Get version from changelog - matches ARM64 build
           VERSION=$(grep -E "^Version [0-9.]+" changelog.txt | head -1 | awk '{print $2}')
           echo "**Version:** $VERSION (Intel x86_64)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
+          # List artifacts with correct naming (matches DMG rename in step 11)
           echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
-          echo "- **DMG Installer:** \`installer_output/TStar_Setup_${VERSION}.dmg\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **DMG Installer:** \`installer_output/TStar_Setup_${VERSION}-Intel-x86_64.dmg\`" >> $GITHUB_STEP_SUMMARY
           echo "- **App Bundle:** \`dist/TStar.app\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
+          # Notes
           echo "### Notes" >> $GITHUB_STEP_SUMMARY
           echo "- Built on Intel macOS runner (macos-15)" >> $GITHUB_STEP_SUMMARY
           echo "- Native Intel x86_64 build" >> $GITHUB_STEP_SUMMARY
