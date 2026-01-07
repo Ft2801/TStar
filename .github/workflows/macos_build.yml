@@ -409,7 +409,7 @@ jobs:
           
           # Clean up any conflicting Python symlinks from system Python
           echo ">>> Cleaning up conflicting system Python symlinks..."
-          rm -f /usr/local/bin/python3 /usr/local/bin/python3.* /usr/local/bin/pip3* /usr/local/bin/idle3* /usr/local/bin/pydoc3* /usr/local/bin/python3*-config 2>/dev/null || true
+          rm -f /usr/local/bin/python3 /usr/local/bin/python3.* /usr/local/bin/pip3* /usr/local/bin/idle3* /usr/local/bin/pydoc3* /usr/local/bin/python3*-config /usr/local/bin/2to3* 2>/dev/null || true
           
           # Use x86_64 Homebrew explicitly
           export HOMEBREW_PREFIX="/usr/local"
