@@ -9,7 +9,7 @@
 **License:** MIT License
 
 **Contributors:**
-* [Tim dicke](https://github.com/dickett): testing and building of MacOS versions
+* [Tim Dicke](https://github.com/dickett): testing and building of MacOS versions
 
 ## Overview
 
