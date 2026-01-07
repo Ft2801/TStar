@@ -159,6 +159,10 @@ void AnnotationToolDialog::setupUI() {
     
     setMinimumWidth(400);
     adjustSize();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void AnnotationToolDialog::setViewer(ImageViewer* viewer) {

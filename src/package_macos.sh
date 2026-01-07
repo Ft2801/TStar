@@ -34,7 +34,7 @@ ERROR_COUNT=0
 # --- Read version from changelog.txt ---
 VERSION="1.0.0"
 if [ -f "changelog.txt" ]; then
-    VERSION=$(grep -E "^Version [0-9.]+" changelog.txt | head -1 | awk '{print $2}')
+    VERSION=$(grep -E "^Version [0-9.]+" changelog.txt | head -1 | awk '{print $2}' | tr -d '\r')
     if [ -z "$VERSION" ]; then
         VERSION="1.0.0"
     fi

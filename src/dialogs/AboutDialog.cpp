@@ -45,4 +45,8 @@ AboutDialog::AboutDialog(QWidget* parent, const QString& version, const QString&
     // Set a reasonable minimum width and let the layout determine height
     setMinimumWidth(400);
     adjustSize();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }

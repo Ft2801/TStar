@@ -28,6 +28,10 @@ ClaheDialog::ClaheDialog(MainWindow* parent)
     
     setupUi();
     onReset(); // Default values
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 ClaheDialog::~ClaheDialog() {}

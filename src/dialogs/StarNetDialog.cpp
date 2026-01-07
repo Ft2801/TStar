@@ -26,6 +26,10 @@ StarNetDialog::StarNetDialog(MainWindow* parent) : QDialog(parent), m_mainWin(pa
     setWindowIcon(QIcon(":/images/Logo.png"));
     resize(300, 200);
 
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
+
     QVBoxLayout* layout = new QVBoxLayout(this);
 
     QGroupBox* grp = new QGroupBox(tr("Parameters"), this);

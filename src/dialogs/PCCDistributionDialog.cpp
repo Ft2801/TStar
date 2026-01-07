@@ -9,6 +9,10 @@ PCCDistributionDialog::PCCDistributionDialog(const PCCResult& result, QWidget* p
 {
     setWindowTitle(tr("Star Distribution (PCC Analysis)"));
     resize(800, 400);
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void PCCDistributionDialog::paintEvent(QPaintEvent* event) {

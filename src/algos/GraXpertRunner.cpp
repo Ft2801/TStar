@@ -141,7 +141,9 @@ bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const Gr
     }
 
     if (process.exitCode() != 0) {
-        if (errorMsg) *errorMsg = "GraXpert failed (Exit Code " + QString::number(process.exitCode()) + ")";
+        if (errorMsg) *errorMsg = QString("GraXpert failed (Exit Code %1): %2")
+                                    .arg(process.exitCode())
+                                    .arg(process.errorString().isEmpty() ? "Unknown error" : process.errorString());
         return false;
     }
 

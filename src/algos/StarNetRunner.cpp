@@ -307,7 +307,9 @@ bool StarNetRunner::run(const ImageBuffer& input, ImageBuffer& output, const Sta
     }
     
     if (p.exitCode() != 0) {
-        if (errorMsg) *errorMsg = "StarNet process failed.";
+        if (errorMsg) *errorMsg = QString("StarNet process failed (Code %1): %2")
+                                    .arg(p.exitCode())
+                                    .arg(p.errorString().isEmpty() ? "Unknown error" : p.errorString());
         return false;
     }
     

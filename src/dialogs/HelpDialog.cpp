@@ -10,6 +10,10 @@ HelpDialog::HelpDialog(QWidget *parent) : QDialog(parent)
     setWindowTitle(tr("TStar Help & Tutorial"));
     setWindowIcon(QIcon(":/images/Logo.png"));
     setupUI();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void HelpDialog::setupUI()

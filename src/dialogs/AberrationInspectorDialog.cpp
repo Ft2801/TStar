@@ -17,6 +17,10 @@ AberrationInspectorDialog::AberrationInspectorDialog(const ImageBuffer& img, QWi
     resize(800, 800);
     setupUi();
     updatePanels();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 AberrationInspectorDialog::~AberrationInspectorDialog() {}

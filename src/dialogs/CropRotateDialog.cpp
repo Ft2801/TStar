@@ -73,6 +73,11 @@ CropRotateDialog::CropRotateDialog(QWidget* parent) : QDialog(parent) {
     connect(m_aspectCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CropRotateDialog::onRatioChanged);
     
     resize(300, 200);
+
+    // Ensure dialog is on screen (fix for macOS off-screen issue)
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 CropRotateDialog::~CropRotateDialog() {

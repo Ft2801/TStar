@@ -21,6 +21,10 @@ StarStretchDialog::StarStretchDialog(MainWindow* parent, ImageViewer* viewer)
     if (m_viewer) {
         m_originalBuffer = m_viewer->getBuffer();
     }
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void StarStretchDialog::setViewer(ImageViewer* v) {

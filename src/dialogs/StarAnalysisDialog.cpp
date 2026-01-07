@@ -197,6 +197,10 @@ StarAnalysisDialog::StarAnalysisDialog(QWidget* parent, ImageViewer* viewer)
     
     // Initial run
     QTimer::singleShot(100, this, &StarAnalysisDialog::onRunClicked);
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 StarAnalysisDialog::~StarAnalysisDialog() {

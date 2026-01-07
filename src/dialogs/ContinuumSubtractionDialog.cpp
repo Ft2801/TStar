@@ -96,6 +96,10 @@ ContinuumSubtractionDialog::ContinuumSubtractionDialog(MainWindow* parent)
     mainLayout->addLayout(btnLayout);
     
     refreshImageList();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void ContinuumSubtractionDialog::setViewer(ImageViewer* v) {

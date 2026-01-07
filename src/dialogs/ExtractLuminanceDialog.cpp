@@ -96,6 +96,10 @@ ExtractLuminanceDialog::ExtractLuminanceDialog(QWidget* parent) : QDialog(parent
     
     // Initial State Trigger
     onMethodChanged(0);
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void ExtractLuminanceDialog::onMethodChanged(int index) {

@@ -62,6 +62,10 @@ PCCDialog::PCCDialog(ImageViewer* viewer, QWidget* parent) : QDialog(parent), m_
     connect(m_catalog, &CatalogClient::errorOccurred, this, &PCCDialog::onCatalogError);
     
     m_calibrator = new PCCCalibrator();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void PCCDialog::setViewer(ImageViewer* v) {

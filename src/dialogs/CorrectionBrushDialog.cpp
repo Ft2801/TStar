@@ -372,6 +372,10 @@ CorrectionBrushDialog::CorrectionBrushDialog(QWidget* parent) : QDialog(parent) 
     
     updateDisplay();
     onFit();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 CorrectionBrushDialog::~CorrectionBrushDialog() {

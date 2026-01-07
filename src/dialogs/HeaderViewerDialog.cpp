@@ -59,6 +59,10 @@ HeaderViewerDialog::HeaderViewerDialog(const ImageBuffer::Metadata& meta, QWidge
     setWindowTitle(tr("FITS/XISF Header Explorer"));
     resize(600, 500);
     setupUI();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void HeaderViewerDialog::setupUI() {

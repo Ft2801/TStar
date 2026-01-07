@@ -234,6 +234,10 @@ PixelMathDialog::PixelMathDialog(MainWindow* parent, ImageViewer* viewer)
     setWindowFlags(windowFlags() | Qt::WindowMinMaxButtonsHint);
     
     setupUI();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 PixelMathDialog::~PixelMathDialog() {}

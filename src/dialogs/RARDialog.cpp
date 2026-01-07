@@ -41,6 +41,10 @@ RARDialog::RARDialog(MainWindow* parent) : QDialog(parent), m_mainWin(parent) {
     setWindowTitle(tr("Aberration Remover"));
     setWindowIcon(QIcon(":/images/Logo.png"));
     resize(400, 300);
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
     
     QSettings s;
 

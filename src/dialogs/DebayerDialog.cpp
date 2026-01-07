@@ -70,6 +70,10 @@ DebayerDialog::DebayerDialog(QWidget* parent)
     btnLayout->addWidget(m_applyBtn);
     btnLayout->addWidget(cancelBtn);
     mainLayout->addLayout(btnLayout);
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void DebayerDialog::setViewer(ImageViewer* v) {

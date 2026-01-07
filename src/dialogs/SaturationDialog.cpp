@@ -14,6 +14,10 @@ SaturationDialog::SaturationDialog(QWidget* parent, ImageViewer* viewer)
     if (viewer) {
         setTarget(viewer);
     }
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void SaturationDialog::setupUI() {

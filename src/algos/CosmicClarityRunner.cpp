@@ -81,7 +81,12 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
     QProcess pythonCheck;
     pythonCheck.start(pythonExe, QStringList() << "--version");
     if (!pythonCheck.waitForFinished(5000)) {
-        if(errorMsg) *errorMsg = "Python not found! Please check PATH or TStar installation.";
+        if(errorMsg) *errorMsg = "Python version check timed out.";
+        return false;
+    }
+    
+    if (pythonCheck.exitCode() != 0) {
+        if(errorMsg) *errorMsg = "Python interpreter failed to run (bundled python might be broken).";
         return false;
     }
 

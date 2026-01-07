@@ -21,6 +21,10 @@ BackgroundNeutralizationDialog::BackgroundNeutralizationDialog(MainWindow* paren
     m_interactionEnabled = false;
     
     setupUI();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void BackgroundNeutralizationDialog::setInteractionEnabled(bool enabled) {

@@ -23,6 +23,10 @@ GraXpertDialog::GraXpertDialog(QWidget* parent) : QDialog(parent) {
     setWindowIcon(QIcon(":/images/Logo.png"));
     resize(350, 250);
 
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
+
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     QGroupBox* grp = new QGroupBox(tr("Operation"), this);
     QVBoxLayout* grpLayout = new QVBoxLayout(grp);

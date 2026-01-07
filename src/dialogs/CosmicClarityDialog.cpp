@@ -22,6 +22,10 @@ CosmicClarityDialog::CosmicClarityDialog(QWidget* parent) : QDialog(parent) {
     setWindowIcon(QIcon(":/images/Logo.png"));
     resize(500, 500);
 
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
+
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     QGroupBox* grp = new QGroupBox(tr("Parameters"), this);
     QGridLayout* grid = new QGridLayout(grp);

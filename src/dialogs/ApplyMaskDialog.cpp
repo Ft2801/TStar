@@ -38,6 +38,10 @@ ApplyMaskDialog::ApplyMaskDialog(int targetWidth, int targetHeight, QWidget* par
     previewLayout->addWidget(bbox);
 
     mainLayout->addLayout(previewLayout, 1);
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void ApplyMaskDialog::addAvailableMask(const QString& name, const MaskLayer& mask, bool isView) {

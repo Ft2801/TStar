@@ -467,6 +467,10 @@ CurvesDialog::CurvesDialog(ImageViewer* viewer, QWidget* parent)
     botLayout->addWidget(cancelBtn);
     
     mainLayout->addLayout(botLayout);
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 CurvesDialog::~CurvesDialog() {}

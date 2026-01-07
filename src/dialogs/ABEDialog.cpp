@@ -82,6 +82,10 @@ ABEDialog::ABEDialog(QWidget* parent, ImageViewer* viewer, const ImageBuffer& bu
     mainLayout->addLayout(bottomLayout);
     
     mainLayout->setSizeConstraint(QLayout::SetFixedSize); // Shrink to fit content
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 ABEDialog::~ABEDialog() {

@@ -50,6 +50,10 @@ ChannelCombinationDialog::ChannelCombinationDialog(const std::vector<ChannelSour
 
     connect(btnOk, &QPushButton::clicked, this, &ChannelCombinationDialog::onApply);
     connect(btnCancel, &QPushButton::clicked, this, &ChannelCombinationDialog::onCancel);
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void ChannelCombinationDialog::onApply() {

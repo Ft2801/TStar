@@ -269,6 +269,10 @@ WavescaleHDRDialog::WavescaleHDRDialog(QWidget* parent, ImageViewer* targetViewe
     QTimer::singleShot(50, this, &WavescaleHDRDialog::updateQuickMask);
     
     startPreview();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void WavescaleHDRDialog::setViewer(ImageViewer* v) {

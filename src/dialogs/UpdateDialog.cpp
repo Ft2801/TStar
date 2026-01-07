@@ -57,6 +57,10 @@ UpdateDialog::UpdateDialog(QWidget* parent, const QString& version, const QStrin
 
     connect(m_updateBtn, &QPushButton::clicked, this, &UpdateDialog::startDownload);
     connect(m_cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 UpdateDialog::~UpdateDialog() {

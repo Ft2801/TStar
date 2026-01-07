@@ -31,6 +31,10 @@ LivePreviewDialog::LivePreviewDialog(int width, int height, QWidget* parent)
     layout->setContentsMargins(0, 0, 0, 0);
     
     resize(m_targetWidth + 20, m_targetHeight + 20);
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void LivePreviewDialog::updateMask(const std::vector<float>& maskData, int width, int height, 

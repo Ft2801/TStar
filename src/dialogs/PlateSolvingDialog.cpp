@@ -19,6 +19,11 @@ static MainWindow* getMainWindow(QWidget* w) {
 PlateSolvingDialog::PlateSolvingDialog(QWidget* parent) : QDialog(parent) {
     setWindowTitle(tr("Plate Solving"));
     resize(420, 320); // More compact window
+
+    // Ensure dialog is on screen
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
     
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(10, 10, 10, 10);

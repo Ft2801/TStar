@@ -83,16 +83,19 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
     QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
 #endif
 
-    if (QFile::exists(bundledPython)) {
-        program = bundledPython;
-    } else if (QFile::exists(devPython)) {
-        program = devPython;
+    // Verify python interpreter exists
+    if (!QFile::exists(program)) {
+        if(errorMsg) *errorMsg = "Python interpreter not found at: " + program;
+        return false;
     }
-    // Fallback: use system "python" (already set)
-
-    if (m_stop) return false; // Early exit check
 
     p.start(program, runArgs);
+    
+    // Check if it started successfully
+    if (!p.waitForStarted(3000)) {
+        if(errorMsg) *errorMsg = "Failed to start AI worker: " + p.errorString();
+        return false;
+    }
     
     // Blocking loop with cancellation
     while(p.state() != QProcess::NotRunning) {
@@ -107,7 +110,9 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
     }
 
     if (p.exitCode() != 0) {
-        if(errorMsg) *errorMsg = "Worker process failed.";
+        if(errorMsg) *errorMsg = QString("Worker process failed (Code %1): %2")
+                                    .arg(p.exitCode())
+                                    .arg(p.errorString().isEmpty() ? "Unknown error" : p.errorString());
         return false;
     }
     

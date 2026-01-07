@@ -46,6 +46,10 @@ SelectiveColorDialog::SelectiveColorDialog(MainWindow* parent)
     
     setupUi();
     onReset();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 SelectiveColorDialog::~SelectiveColorDialog() {}

@@ -72,6 +72,10 @@ SCNRDialog::SCNRDialog(QWidget* parent) : QDialog(parent) {
 
     connect(applyBtn, &QPushButton::clicked, this, &SCNRDialog::apply);
     connect(closeBtn, &QPushButton::clicked, this, &QDialog::close);
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 SCNRDialog::~SCNRDialog() {}

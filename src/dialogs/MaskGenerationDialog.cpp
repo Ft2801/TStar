@@ -28,6 +28,10 @@ MaskGenerationDialog::MaskGenerationDialog(const ImageBuffer& image, QWidget* pa
     m_livePreview = nullptr; // Create only when Preview Mask is clicked
     
     setupUI();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void MaskGenerationDialog::setupUI() {

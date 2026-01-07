@@ -25,6 +25,12 @@ StarRecompositionDialog::StarRecompositionDialog(MainWindow* mainWin, QWidget* p
     // Trigger initial update if possible
     m_initializing = false;
     // Trigger initial update if possible
+    m_initializing = false;
+    // Trigger initial update if possible
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void StarRecompositionDialog::setViewer(ImageViewer* v) {

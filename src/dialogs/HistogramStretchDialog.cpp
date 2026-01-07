@@ -26,6 +26,10 @@ HistogramStretchDialog::HistogramStretchDialog(ImageViewer* viewer, QWidget* par
     
     setupUI();
     setViewer(viewer);
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 

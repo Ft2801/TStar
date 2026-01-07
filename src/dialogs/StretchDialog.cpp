@@ -14,6 +14,10 @@ StretchDialog::StretchDialog(QWidget* parent) : QDialog(parent) {
     
     setupUI();
     setupConnections();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void StretchDialog::setupUI() {

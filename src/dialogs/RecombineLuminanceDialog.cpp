@@ -92,6 +92,10 @@ RecombineLuminanceDialog::RecombineLuminanceDialog(QWidget* parent) : QDialog(pa
     
     onMethodChanged(0);
     refreshSourceList();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void RecombineLuminanceDialog::refreshSourceList() {

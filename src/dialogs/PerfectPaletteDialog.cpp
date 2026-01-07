@@ -18,6 +18,10 @@ PerfectPaletteDialog::PerfectPaletteDialog(MainWindow* mainWin, QWidget* parent)
     setWindowIcon(QIcon(":/images/Logo.png"));
     createUI();
     resize(1000, 700);
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void PerfectPaletteDialog::setViewer(ImageViewer* v) {

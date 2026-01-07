@@ -103,6 +103,10 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
 
     // Insert Display group after General group (index 1)
     mainLayout->insertWidget(1, displayGroup);
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void SettingsDialog::pickStarNetPath() {

@@ -18,6 +18,10 @@ ArcsinhStretchDialog::ArcsinhStretchDialog(ImageViewer* viewer, QWidget* parent)
     
     setupUI();
     setViewer(viewer); // Use centralized logic
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void ArcsinhStretchDialog::setViewer(ImageViewer* v) {

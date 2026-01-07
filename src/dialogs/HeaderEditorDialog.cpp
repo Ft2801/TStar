@@ -18,6 +18,10 @@ HeaderEditorDialog::HeaderEditorDialog(ImageViewer* viewer, QWidget* parent)
     resize(700, 600);
     setupUI();
     loadMetadata();
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void HeaderEditorDialog::setupUI() {

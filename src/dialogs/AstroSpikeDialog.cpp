@@ -754,6 +754,10 @@ AstroSpikeDialog::AstroSpikeDialog(ImageViewer* viewer, QWidget* parent)
         m_canvas->setImage(m_viewer->getBuffer().getDisplayImage(ImageBuffer::Display_Linear));
         m_detectTimer.start(200, this); // Trigger detection
     }
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 // Event Filter to block scroll on sliders

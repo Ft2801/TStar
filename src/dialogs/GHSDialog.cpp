@@ -361,6 +361,10 @@ void GHSDialog::setupUI() {
             onPreviewTrigger(); 
         }
     });
+
+    if (parentWidget()) {
+        move(parentWidget()->window()->geometry().center() - rect().center());
+    }
 }
 
 void GHSDialog::connectSignals() {
