@@ -8,6 +8,11 @@
 
 **License:** MIT License
 
+**Contributors:**
+* [Tim dicke](https://github.com/dickett): Testing and building of MacOS versions
+
+## Overview
+
 TStar is a powerful, C++17/Qt6-based image processing platform explicitly designed for astrophotography. It combines high-performance signal processing algorithms with modern AI-based restoration tools to help astrophotographers produce scientific-grade images from their raw data.
 
 ## Key Features
@@ -15,7 +20,7 @@ TStar is a powerful, C++17/Qt6-based image processing platform explicitly design
 *   **Native FITS Support**: Full compatibility with 8, 16, 32-bit integer and floating-point FITS files.
 *   **MDI Workspace**: Flexible Multi-Document Interface allowing simultaneous editing of multiple images.
 *   **Project Management**: Sidebar with Console logging and FITS Header inspection.
-*   **Performance**: Optimized for 64-bit Windows systems.
+*   **Cross-Platform**: Fully supported on Windows, macOS (Intel & Apple Silicon), with optimized performance.
 
 ## Tools & Functionalities
 
@@ -86,17 +91,16 @@ TStar is distributed as a portable Windows x64 application.
 
 ## Building from Source
 
-### Prerequisites
-*   Windows 10/11 x64
-*   Visual Studio 2019/2022 (C++ Desktop Development)
-*   Qt 6.x (MSVC 2019 64-bit)
-*   CMake 3.20+
+### Windows
+See [BUILDING.md](BUILDING.md) for detailed Windows build instructions using MinGW.
 
-### Automatic Build (PowerShell)
-```powershell
-.\setup_python_dist.ps1  # Set up embedded Python
-.\build_all.bat          # Compile and build
-.\package_dist.bat       # Create release package
+### macOS
+See [BUILDING.md](BUILDING.md) for detailed macOS build instructions. Both Intel and Apple Silicon architectures are fully supported.
+
+For quick start:
+```bash
+chmod +x src/build_macos.sh
+./src/build_macos.sh
 ```
 
 ## License

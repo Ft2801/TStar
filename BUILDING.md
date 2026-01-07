@@ -71,15 +71,23 @@ make && make install
 - Pre-built MinGW binaries available from [MSYS2](https://www.msys2.org/)
 - Or build from source following [GSL documentation](https://www.gnu.org/software/gsl/)
 
-### Python Environment (New!)
-TStar now requires a local Python environment for AI tools and specialized processing scripts.
+### Python Environment Discovery
 
-```powershell
-# Run the automated setup script
-powershell -ExecutionPolicy Bypass -File setup_python_dist.ps1
-```
+TStar uses an intelligent fallback chain to locate Python for AI tools and bridge scripts:
 
-This will download an embeddable Python 3.11 and install necessary libraries (`numpy`, `astropy`, `onnxruntime`, etc.) to the `deps/python` folder.
+**macOS & Linux:**
+1. Bundled Python in app bundle: `$APP_DIR/../Resources/python_venv/bin/python3`
+2. Development Python: `$APP_DIR/../../deps/python_venv/bin/python3`
+3. System Python in PATH: `python3` (found via `QStandardPaths::findExecutable()`)
+4. Fallback: `python3` (direct invocation)
+
+**Windows:**
+1. Bundled embeddable Python: `$APP_DIR/python/python.exe`
+2. Development Python: `$APP_DIR/../deps/python/python.exe`
+3. System Python in PATH: `python3` (found via `QStandardPaths::findExecutable()`)
+4. Fallback: `python3` (direct invocation)
+
+This approach ensures compatibility across development, distribution, and heterogeneous system configurations.
 
 ## Building
 
@@ -184,6 +192,9 @@ chmod +x setup_python_macos.sh
 # 2. Build the application
 chmod +x src/build_macos.sh
 ./src/build_macos.sh
+
+# Note: STEP 6 of build_macos.sh creates a symlink from src/scripts to the app bundle
+# This allows development changes to scripts without rebuilding
 
 # 3. Create distribution package
 chmod +x src/package_macos.sh

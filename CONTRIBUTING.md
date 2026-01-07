@@ -47,9 +47,10 @@ Thank you for your interest in contributing to TStar! This document provides gui
 
 - **Usage**: Only for bridge/worker scripts or AI integrations.
 - **Portability**: Must be compatible with Python 3.11.
-- **Dependencies**: New dependencies must be added to `setup_python_dist.ps1` and approved.
+- **Dependencies**: New dependencies must be added to `setup_python_dist.ps1` (Windows) or `setup_python_macos.sh` (macOS) and approved.
 - **Location**: All scripts must reside in `src/scripts`.
 - **Style**: Follow PEP 8 where possible.
+- **Python Discovery**: C++ code searches for Python in bundled → development → system PATH locations. Ensure scripts work with bundled virtualenv paths.
 
 ### Translations
 
