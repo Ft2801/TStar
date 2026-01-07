@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QEventLoop>
 #include <QRegularExpression>
+#include <QStandardPaths>
 
 #include <QThread>
 
@@ -70,7 +71,7 @@ bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const Gr
         
         QProcess p;
         // Check for bundled python - cross-platform
-        QString pythonExe = "python";
+        QString pythonExe;
 #if defined(Q_OS_MAC)
         QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
         QString devPython = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
@@ -78,8 +79,11 @@ bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const Gr
         QString bundledPython = QCoreApplication::applicationDirPath() + "/python/python.exe";
         QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
 #endif
+        QString foundPython = QStandardPaths::findExecutable("python3");
         if (QFile::exists(bundledPython)) pythonExe = bundledPython;
         else if (QFile::exists(devPython)) pythonExe = devPython;
+        else if (!foundPython.isEmpty()) pythonExe = foundPython;
+        else pythonExe = "python3";
         
         p.start(pythonExe, args);
         p.waitForFinished();

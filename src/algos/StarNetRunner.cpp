@@ -9,6 +9,7 @@
 #include <QThread>
 #include <QSettings>
 #include <QDebug>
+#include <QStandardPaths>
 #include <cmath>
 #include <algorithm>
 #include <iostream>
@@ -343,7 +344,7 @@ bool StarNetRunner::run(const ImageBuffer& input, ImageBuffer& output, const Sta
     QStringList convArgs;
     convArgs << converterScript << outputFile << rawOutput;
     
-    QString pythonExe = "python";
+    QString pythonExe;
 #if defined(Q_OS_MAC)
     QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
     QString devPython = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
@@ -351,8 +352,11 @@ bool StarNetRunner::run(const ImageBuffer& input, ImageBuffer& output, const Sta
     QString bundledPython = QCoreApplication::applicationDirPath() + "/python/python.exe";
     QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
 #endif
+    QString foundPython = QStandardPaths::findExecutable("python3");
     if (QFile::exists(bundledPython)) pythonExe = bundledPython;
     else if (QFile::exists(devPython)) pythonExe = devPython;
+    else if (!foundPython.isEmpty()) pythonExe = foundPython;
+    else pythonExe = "python3";
 
     QProcess conv;
     conv.start(pythonExe, convArgs);

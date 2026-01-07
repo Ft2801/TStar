@@ -8,6 +8,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QDebug>
+#include <QStandardPaths>
 
 RARRunner::RARRunner(QObject* parent) : QObject(parent) {}
 
@@ -70,9 +71,7 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
         }
     });
 
-    QString program = "python";
-    QStringList runArgs = args;
-
+    QString pythonExe;
 #if defined(Q_OS_MAC)
     // macOS: Check for bundled virtualenv in app bundle Resources
     QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
@@ -82,14 +81,13 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
     QString bundledPython = QCoreApplication::applicationDirPath() + "/python/python.exe";
     QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
 #endif
+    QString foundPython = QStandardPaths::findExecutable("python3");
+    if (QFile::exists(bundledPython)) pythonExe = bundledPython;
+    else if (QFile::exists(devPython)) pythonExe = devPython;
+    else if (!foundPython.isEmpty()) pythonExe = foundPython;
+    else pythonExe = "python3";
 
-    // Verify python interpreter exists
-    if (!QFile::exists(program)) {
-        if(errorMsg) *errorMsg = "Python interpreter not found at: " + program;
-        return false;
-    }
-
-    p.start(program, runArgs);
+    p.start(pythonExe, args);
     
     // Check if it started successfully
     if (!p.waitForStarted(3000)) {

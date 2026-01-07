@@ -149,6 +149,19 @@ else
 fi
 
 echo ""
+
+
+# --- 6. SYMLINK SCRIPTS FOLDER FOR DEVELOPMENT ---
+echo ""
+echo "[STEP 6] Linking scripts folder for development..."
+SCRIPTS_DIR="$APP_BUNDLE/Contents/Resources/scripts"
+SRC_SCRIPTS_DIR="$PROJECT_ROOT/src/scripts"
+if [ -L "$SCRIPTS_DIR" ] || [ -d "$SCRIPTS_DIR" ]; then
+    rm -rf "$SCRIPTS_DIR"
+fi
+ln -s "$SRC_SCRIPTS_DIR" "$SCRIPTS_DIR"
+echo "  - Linked $SRC_SCRIPTS_DIR to $SCRIPTS_DIR"
+
 echo "==========================================="
 echo " SUCCESS!"
 echo " Executable: $EXECUTABLE"

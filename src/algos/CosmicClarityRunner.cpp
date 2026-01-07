@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QRegularExpression>
 #include <QEventLoop>
+#include <QStandardPaths>
 
 CosmicClarityRunner::CosmicClarityRunner(QObject* parent) : QObject(parent) {}
 
@@ -26,7 +27,10 @@ QString CosmicClarityRunner::getExecutableName(CosmicClarityParams::Mode mode) {
 #endif
     }
     
-    bool isWin = true;
+    bool isWin = false;
+#ifdef Q_OS_WIN
+    isWin = true;
+#endif
 
     if (mode == CosmicClarityParams::Mode_Denoise) {
         return isWin ? "SetiAstroCosmicClarity_denoise.exe" : "SetiAstroCosmicClarity_denoise";
@@ -60,22 +64,24 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
     purge(outputDir);
 
     // Verify Python availability - cross-platform paths
-    QString pythonExe = "python";
+    QString pythonExe;
     
 #if defined(Q_OS_MAC)
-    // macOS: Check for bundled virtualenv in app bundle Resources
     QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
     QString devPython = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
 #else
-    // Windows: Check for bundled embeddable Python
     QString bundledPython = QCoreApplication::applicationDirPath() + "/python/python.exe";
     QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
 #endif
-
+    QString foundPython = QStandardPaths::findExecutable("python3");
     if (QFile::exists(bundledPython)) {
         pythonExe = bundledPython;
     } else if (QFile::exists(devPython)) {
         pythonExe = devPython;
+    } else if (!foundPython.isEmpty()) {
+        pythonExe = foundPython;
+    } else {
+        pythonExe = "python3";
     }
 
     QProcess pythonCheck;
