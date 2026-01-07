@@ -368,7 +368,7 @@ jobs:
   # ============================================================================
   build-macos-intel:
     name: Build macOS App (Intel x86_64)
-    runs-on: macos-13  # Intel runner (Ventura, native Intel support)
+    runs-on: macos-15  # Intel runner
     
     env:
       QT_VERSION: "6.6.2"
@@ -582,6 +582,6 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           
           echo "### Notes" >> $GITHUB_STEP_SUMMARY
-          echo "- Built on Intel macOS runner (macos-13)" >> $GITHUB_STEP_SUMMARY
+          echo "- Built on Intel macOS runner (macos-15)" >> $GITHUB_STEP_SUMMARY
           echo "- Native Intel x86_64 build" >> $GITHUB_STEP_SUMMARY
           echo "- Compatible with Intel Mac systems on macOS 11.0+" >> $GITHUB_STEP_SUMMARY
