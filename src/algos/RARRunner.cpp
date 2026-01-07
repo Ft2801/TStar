@@ -27,12 +27,16 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
     QString inputFile = tempDir.filePath("rar_input.tif");
     // Use .raw for output to avoid TIFF parsing issues in C++ (float32 exchange)
     QString outputFile = tempDir.filePath("rar_output.raw");
-    QString scriptPath = QCoreApplication::applicationDirPath() + "/../src/scripts/rar_worker.py"; 
+    QString scriptPath = QCoreApplication::applicationDirPath() + "/scripts/rar_worker.py";
 
     // Adjust script path if running from build dir or installed
     if (!QFile::exists(scriptPath)) {
-        // Fallback for dev environment - try scripts folder in current dir
-        scriptPath = QCoreApplication::applicationDirPath() + "/scripts/rar_worker.py";
+        // Try Resources folder (macOS DMG bundle)
+        scriptPath = QCoreApplication::applicationDirPath() + "/../Resources/scripts/rar_worker.py";
+    }
+    if (!QFile::exists(scriptPath)) {
+        // Fallback for dev environment
+        scriptPath = QCoreApplication::applicationDirPath() + "/../src/scripts/rar_worker.py";
     }
 
     // Save Input (Float32 for precision)

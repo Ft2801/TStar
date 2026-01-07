@@ -35,6 +35,10 @@ bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const Gr
     // 1. Ensure bridge script path
     QString scriptPath = QCoreApplication::applicationDirPath() + "/scripts/graxpert_bridge.py";
     if (!QFile::exists(scriptPath)) {
+        // Try Resources folder (macOS DMG bundle)
+        scriptPath = QCoreApplication::applicationDirPath() + "/../Resources/scripts/graxpert_bridge.py";
+    }
+    if (!QFile::exists(scriptPath)) {
         // Fallback for dev environment
         scriptPath = QCoreApplication::applicationDirPath() + "/../src/scripts/graxpert_bridge.py";
     }

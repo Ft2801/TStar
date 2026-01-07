@@ -110,6 +110,10 @@ MainWindow::MainWindow(QWidget *parent)
              // If relative and not resource, prepend app dir
              if (!source.startsWith(":") && !QDir::isAbsolutePath(source)) {
                  path = QCoreApplication::applicationDirPath() + "/" + source;
+                 // If not found, try Resources folder (macOS DMG bundle)
+                 if (!QFile::exists(path)) {
+                     path = QCoreApplication::applicationDirPath() + "/../Resources/" + source;
+                 }
              }
              return QIcon(path); // Load from file
         } else {
@@ -142,6 +146,12 @@ MainWindow::MainWindow(QWidget *parent)
     // Sidebar is now overlay, not in layout
     m_sidebar->setParent(this);
     m_sidebar->raise(); // Ensure on top
+    
+    // Create left margin to prevent windows from going under sidebar tab strip
+    // The tab strip is 32px wide, add small padding
+    int sidebarTabWidth = 34; // 32px tab + 2px buffer
+    mainLayout->setContentsMargins(sidebarTabWidth, 0, 0, 0);
+
     
     // Immediate initial sync for overlay positioning
     if (this->centralWidget()) {
@@ -309,7 +319,12 @@ MainWindow::MainWindow(QWidget *parent)
                         m_linkChannelsBtn->setChecked(v->isDisplayLinked());
                         m_displayLinked = v->isDisplayLinked();
     auto getImgPath = [](const QString& name) {
-        return QCoreApplication::applicationDirPath() + "/images/" + name;
+        QString path = QCoreApplication::applicationDirPath() + "/images/" + name;
+        // If not found, try Resources folder (macOS DMG bundle)
+        if (!QFile::exists(path)) {
+            path = QCoreApplication::applicationDirPath() + "/../Resources/images/" + name;
+        }
+        return path;
     };
 
     m_linkChannelsBtn->setIcon(QIcon(
@@ -796,7 +811,26 @@ MainWindow::MainWindow(QWidget *parent)
     mainToolbar->addWidget(maskBtn);
     mainToolbar->addSeparator();
 
+    // --- View Menu ---
+    QToolButton* viewBtn = new QToolButton(this);
+    viewBtn->setText(tr("View"));
+    viewBtn->setPopupMode(QToolButton::InstantPopup);
+    viewBtn->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    viewBtn->setStyleSheet(processBtn->styleSheet()); // Re-use style
+
+    QMenu* viewMenu = new QMenu(this);
+    viewMenu->setStyleSheet(processMenu->styleSheet()); // Re-use style
+    
+    addMenuAction(viewMenu, tr("Tile Images"), "", [this](){
+        tileImageViews();
+    });
+    
+    viewBtn->setMenu(viewMenu);
+    mainToolbar->addWidget(viewBtn);
+    mainToolbar->addSeparator();
+
     QToolButton* settingsBtn = new QToolButton(this);
+
     settingsBtn->setText(tr("Settings"));
     settingsBtn->setToolButtonStyle(Qt::ToolButtonTextOnly);
     // Remove arrow styling adjustments as we have no menu
@@ -870,7 +904,59 @@ MainWindow::MainWindow(QWidget *parent)
     log(tr("Application Ready."));
 }
 
+void MainWindow::tileImageViews() {
+    // Collect only image views (not tool windows)
+    QList<CustomMdiSubWindow*> imageWindows;
+    for (auto* sub : m_mdiArea->subWindowList()) {
+        auto* csw = qobject_cast<CustomMdiSubWindow*>(sub);
+        if (csw && !csw->isToolWindow() && csw->viewer()) {
+            imageWindows.append(csw);
+        }
+    }
+    
+    int count = imageWindows.size();
+    if (count < 2) {
+        log(tr("Need at least 2 images to tile."), Log_Warning, true);
+        return;
+    }
+    
+    // Calculate layout grid
+    QRect area = m_mdiArea->viewport()->rect();
+    int cols, rows;
+    
+    if (count == 2) {
+        cols = 2; rows = 1;  // Side by side (left/right)
+    } else if (count <= 4) {
+        cols = 2; rows = 2;  // 2x2 grid
+    } else {
+        // For more than 4, use a square-ish grid
+        cols = std::ceil(std::sqrt((double)count));
+        rows = std::ceil((double)count / cols);
+    }
+    
+    int cellW = area.width() / cols;
+    int cellH = area.height() / rows;
+    
+    // Position each window in its cell
+    int idx = 0;
+    for (int r = 0; r < rows && idx < count; ++r) {
+        for (int c = 0; c < cols && idx < count; ++c) {
+            auto* win = imageWindows[idx++];
+            win->showNormal();  // De-maximize if needed
+            win->setGeometry(c * cellW, r * cellH, cellW, cellH);
+            
+            // Fit image to new window size
+            if (auto* v = win->viewer()) {
+                QTimer::singleShot(50, v, &ImageViewer::fitToWindow);
+            }
+        }
+    }
+    
+    log(tr("Tiled %1 images in %2x%3 layout.").arg(count).arg(cols).arg(rows), Log_Success, true);
+}
+
 void MainWindow::pushUndo() {
+
     if (auto v = currentViewer()) {
         log("Pushing Undo State...", Log_Info); 
         v->pushUndo();
@@ -1430,39 +1516,53 @@ void MainWindow::openStretchDialog() {
     }
     
     // Create new
-    m_stretchDlg = new StretchDialog(nullptr); // No parent
-    m_stretchDlg->setViewer(viewer);
-    m_stretchDlg->setAttribute(Qt::WA_DeleteOnClose, false);
-    
-    connect(m_stretchDlg, &StretchDialog::applied, this, [this](const QString& msg){
-        log(msg, Log_Success, true);
-    });
+    try {
+        m_stretchDlg = new StretchDialog(nullptr); // No parent
+        m_stretchDlg->setViewer(viewer);
+        m_stretchDlg->setAttribute(Qt::WA_DeleteOnClose, false);
+        
+        connect(m_stretchDlg, &StretchDialog::applied, this, [this](const QString& msg){
+            log(msg, Log_Success, true);
+        });
 
-    log(tr("Opening Statistical Stretch..."), Log_Info, true);
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, m_stretchDlg, tr("Statistical Stretch"));
-    sub->resize(500, 550); // Appropriate size for the dialog
-    centerToolWindow(sub); // Center after setup like GHS does
-    
-    // Restoration of Z-Order on accept handled by the generic signal if needed,
-    // but StretchDialog now closes on apply.
-    connect(m_stretchDlg, &QDialog::accepted, this, [this](){
-         // Restore Z-Order: Bring the viewer to front
-         if (m_stretchDlg && m_stretchDlg->viewer()) {
-             ImageViewer* v = m_stretchDlg->viewer();
-             QWidget* p = v->parentWidget(); 
-             while (p && !qobject_cast<CustomMdiSubWindow*>(p) && !qobject_cast<QMdiSubWindow*>(p)) {
-                 p = p->parentWidget();
+        log(tr("Opening Statistical Stretch..."), Log_Info, true);
+        CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+        setupToolSubwindow(sub, m_stretchDlg, tr("Statistical Stretch"));
+        sub->resize(500, 550); // Appropriate size for the dialog
+        centerToolWindow(sub); // Center after setup like GHS does
+        
+        // Restoration of Z-Order on accept handled by the generic signal if needed,
+        // but StretchDialog now closes on apply.
+        connect(m_stretchDlg, &QDialog::accepted, this, [this](){
+             // Restore Z-Order: Bring the viewer to front
+             if (m_stretchDlg && m_stretchDlg->viewer()) {
+                 ImageViewer* v = m_stretchDlg->viewer();
+                 QWidget* p = v->parentWidget(); 
+                 while (p && !qobject_cast<CustomMdiSubWindow*>(p) && !qobject_cast<QMdiSubWindow*>(p)) {
+                     p = p->parentWidget();
+                 }
+                 
+                 if (auto sub = qobject_cast<QMdiSubWindow*>(p)) {
+                     sub->raise();
+                     sub->activateWindow();
+                 }
              }
-             
-             if (auto sub = qobject_cast<QMdiSubWindow*>(p)) {
-                 sub->raise();
-                 sub->activateWindow();
-             }
-         }
-    });
+        });
 
-    // Removed duplicate setupToolSubwindow call
+        // Removed duplicate setupToolSubwindow call
+    } catch (const std::exception& e) {
+        QMessageBox::critical(this, tr("Error"), tr("Failed to open Statistical Stretch dialog: %1").arg(e.what()));
+        if (m_stretchDlg) {
+            delete m_stretchDlg;
+            m_stretchDlg = nullptr;
+        }
+    } catch (...) {
+        QMessageBox::critical(this, tr("Error"), tr("Failed to open Statistical Stretch dialog: Unknown error"));
+        if (m_stretchDlg) {
+            delete m_stretchDlg;
+            m_stretchDlg = nullptr;
+        }
+    }
 }
 
 void MainWindow::updateDisplay() {

@@ -73,6 +73,16 @@ echo ""
 echo "[STEP 4] Running macdeployqt..."
 
 QT_PREFIX=$(brew --prefix qt@6 2>/dev/null || brew --prefix qt 2>/dev/null || echo "")
+
+# Fallback to Cellar if opt symlink is broken (Dependency Harvester logic)
+if [ ! -d "$QT_PREFIX/bin" ]; then
+    POTENTIAL_QT=$(find /opt/homebrew/Cellar/qtbase -maxdepth 2 -name "bin" -type d 2>/dev/null | head -1)
+    if [ -n "$POTENTIAL_QT" ]; then
+        QT_PREFIX=$(dirname "$POTENTIAL_QT")
+        echo "[INFO] Using physical Qt prefix: $QT_PREFIX"
+    fi
+fi
+
 MACDEPLOYQT="$QT_PREFIX/bin/macdeployqt"
 
 if [ ! -f "$MACDEPLOYQT" ]; then
@@ -84,10 +94,12 @@ if [ -f "$MACDEPLOYQT" ]; then
     # Run macdeployqt with Qt lib path and filter out rpath warnings
     # The rpath warnings are non-fatal and occur because some plugins reference
     # Qt frameworks that will be bundled. We filter them to keep output clean.
+    # We also filter "no file at /opt/homebrew/opt" because macdeployqt is confused by
+    # the broken symlinks, but we manually fix these dependencies in Step 5.
     "$MACDEPLOYQT" "$DIST_DIR" \
         -verbose=1 \
         -libpath="$QT_PREFIX/lib" \
-        2>&1 | grep -v "Cannot resolve rpath" | grep -v "using QList" || true
+        2>&1 | grep -v "Cannot resolve rpath" | grep -v "using QList" | grep -v "ERROR: no file at \"/opt/homebrew/opt" || true
     echo "  - Qt frameworks deployed"
 else
     echo "[WARNING] macdeployqt not found. Qt frameworks not bundled."
@@ -107,6 +119,20 @@ copy_dylib() {
     local brew_pkg="$2"
     
     local prefix=$(brew --prefix "$brew_pkg" 2>/dev/null || echo "")
+    
+    # Fallback to Cellar if opt symlink is broken
+    if [ ! -d "$prefix/lib" ]; then
+        CELLAR_PATH="/opt/homebrew/Cellar/$brew_pkg"
+        if [ -d "$CELLAR_PATH" ]; then
+             # Pick the first version found
+             VERSION_PATH=$(find "$CELLAR_PATH" -maxdepth 1 -mindepth 1 -type d | head -1)
+             if [ -n "$VERSION_PATH" ]; then
+                 prefix="$VERSION_PATH"
+                 echo "    (Using Cellar path for $lib_name)"
+             fi
+        fi
+    fi
+
     if [ -n "$prefix" ] && [ -d "$prefix/lib" ]; then
         local dylib=$(find "$prefix/lib" -name "${lib_name}*.dylib" -type f | head -1)
         if [ -f "$dylib" ]; then
@@ -127,18 +153,33 @@ copy_dylib "liblz4" "lz4" || true
 copy_dylib "libzstd" "zstd" || true
 copy_dylib "libomp" "libomp" || true
 
-# OpenCV (multiple libs)
+# OpenCV (only required modules - dnn excluded to avoid libprotobuf conflict)
 OPENCV_PREFIX=$(brew --prefix opencv 2>/dev/null || echo "")
+if [ ! -d "$OPENCV_PREFIX/lib" ]; then
+    # OpenCV Fallback
+    OPENCV_PREFIX=$(find /opt/homebrew/Cellar/opencv -maxdepth 2 -name "lib" -type d 2>/dev/null | head -1)
+    if [ -n "$OPENCV_PREFIX" ]; then OPENCV_PREFIX=$(dirname "$OPENCV_PREFIX"); fi
+fi
+
 if [ -n "$OPENCV_PREFIX" ] && [ -d "$OPENCV_PREFIX/lib" ]; then
-    for dylib in "$OPENCV_PREFIX/lib"/libopencv_*.dylib; do
-        if [ -f "$dylib" ]; then
-            cp "$dylib" "$FRAMEWORKS_DIR/" 2>/dev/null || true
-        fi
+    # Only copy the modules TStar actually uses to avoid protobuf conflicts
+    # TStar uses: core, imgproc, imgcodecs, photo
+    # Excluded: dnn (links protobuf), video, videoio, objdetect, ml, highgui
+    OPENCV_MODULES="core imgproc imgcodecs photo"
+    
+    for module in $OPENCV_MODULES; do
+        for dylib in "$OPENCV_PREFIX/lib"/libopencv_${module}*.dylib; do
+            if [ -f "$dylib" ]; then
+                cp "$dylib" "$FRAMEWORKS_DIR/" 2>/dev/null || true
+            fi
+        done
     done
-    echo "  - OpenCV: OK"
+    echo "  - OpenCV (core, imgproc, imgcodecs, photo): OK"
+    echo "    (dnn and video modules excluded to avoid protobuf conflict)"
 else
     echo "  - OpenCV: NOT FOUND"
 fi
+
 
 # --- Copy Python environment ---
 echo ""

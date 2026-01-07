@@ -88,6 +88,10 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
     // Embed cosmic_bridge.py
     QString bridgeScriptPath = QCoreApplication::applicationDirPath() + "/scripts/cosmic_bridge.py";
     if (!QFile::exists(bridgeScriptPath)) {
+        // Try Resources folder (macOS DMG bundle)
+        bridgeScriptPath = QCoreApplication::applicationDirPath() + "/../Resources/scripts/cosmic_bridge.py";
+    }
+    if (!QFile::exists(bridgeScriptPath)) {
         bridgeScriptPath = QCoreApplication::applicationDirPath() + "/../src/scripts/cosmic_bridge.py";
     }
     

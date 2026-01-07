@@ -25,22 +25,50 @@ echo "Target Directory: $PYTHON_VENV"
 echo ""
 echo "[STEP 1] Finding Python..."
 
-# Try Homebrew Python first
+# Priority list of compatible Python versions
+COMPAT_VERSIONS=("3.13" "3.12" "3.11")
 PYTHON_CMD=""
-if command -v python3.11 &> /dev/null; then
-    PYTHON_CMD="python3.11"
-elif [ -f "$(brew --prefix python@3.11 2>/dev/null)/bin/python3.11" ]; then
-    PYTHON_CMD="$(brew --prefix python@3.11)/bin/python3.11"
-elif command -v python3 &> /dev/null; then
-    PYTHON_CMD="python3"
-else
-    echo "[ERROR] Python 3 not found!"
-    echo "Install with: brew install python@3.11"
+
+# 1. Try specific versioned commands in PATH
+for ver in "${COMPAT_VERSIONS[@]}"; do
+    if command -v "python$ver" &> /dev/null; then
+        PYTHON_CMD="python$ver"
+        break
+    fi
+done
+
+# 2. Try Homebrew paths directly (ARM and Intel)
+if [ -z "$PYTHON_CMD" ]; then
+    HOMEBREW_PREFIX=$(brew --prefix 2>/dev/null || echo "/opt/homebrew")
+    for ver in "${COMPAT_VERSIONS[@]}"; do
+        BREW_PYTHON="$HOMEBREW_PREFIX/opt/python@$ver/bin/python$ver"
+        if [ -x "$BREW_PYTHON" ]; then
+            PYTHON_CMD="$BREW_PYTHON"
+            break
+        fi
+    done
+fi
+
+# 3. Fallback to generic python3 if it's compatible (< 3.14)
+if [ -z "$PYTHON_CMD" ] && command -v python3 &> /dev/null; then
+    P3_VER=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+    P3_MAJOR=$(echo "$P3_VER" | cut -d. -f1)
+    P3_MINOR=$(echo "$P3_VER" | cut -d. -f2)
+    
+    # If python3 is 3.11-3.13, we use it. If it's newer (3.14+), we avoid it.
+    if [ "$P3_MAJOR" -eq 3 ] && [ "$P3_MINOR" -ge 11 ] && [ "$P3_MINOR" -le 13 ]; then
+        PYTHON_CMD="python3"
+    fi
+fi
+
+if [ -z "$PYTHON_CMD" ]; then
+    echo "[ERROR] Compatible Python 3 (3.11, 3.12, or 3.13) not found!"
+    echo "Install with: brew install python@3.12"
     exit 1
 fi
 
-PYTHON_VERSION=$("$PYTHON_CMD" --version)
-echo "  - Using: $PYTHON_CMD ($PYTHON_VERSION)"
+PYTHON_DISPLAY_VERSION=$("$PYTHON_CMD" --version)
+echo "  - Using: $PYTHON_CMD ($PYTHON_DISPLAY_VERSION)"
 
 # --- 2. Prepare Directory ---
 echo ""
