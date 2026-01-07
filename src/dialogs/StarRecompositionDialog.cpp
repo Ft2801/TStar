@@ -22,11 +22,6 @@ StarRecompositionDialog::StarRecompositionDialog(MainWindow* mainWin, QWidget* p
     setMinimumWidth(400);
     
     m_initializing = false;
-    // Trigger initial update if possible
-    m_initializing = false;
-    // Trigger initial update if possible
-    m_initializing = false;
-    // Trigger initial update if possible
 
     if (parentWidget()) {
         move(parentWidget()->window()->geometry().center() - rect().center());
@@ -183,14 +178,19 @@ void StarRecompositionDialog::onUpdatePreview() {
     
     if (!starlessViewer || !starsViewer) return;
     
+    // Validate buffers first
+    if (starlessViewer->getBuffer().width() == 0 || starsViewer->getBuffer().width() == 0) return;
+    
     QImage qSll = starlessViewer->getCurrentDisplayImage();
     QImage qStr = starsViewer->getCurrentDisplayImage();
     
     if (qSll.isNull() || qStr.isNull()) return;
+    if (qSll.width() <= 0 || qSll.height() <= 0 || qStr.width() <= 0 || qStr.height() <= 0) return;
 
     // Ensure sizes match logic (resize stars to starless)
     if (qStr.size() != qSll.size()) {
-       qStr = qStr.scaled(qSll.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+       qStr = qStr.scaled(qSll.size(), Qt::IgnoreAspectRatio, Qt::FastTransformation);
+       if (qStr.isNull()) return;  // Check after scaling
     }
     
     int qw = qSll.width();
@@ -245,6 +245,12 @@ void StarRecompositionDialog::onApply() {
     
     if (!starlessViewer || !starsViewer) {
         QMessageBox::warning(this, tr("No Image"), tr("Please select both Starless and Stars-Only views."));
+        return;
+    }
+    
+    // Validate buffers
+    if (starlessViewer->getBuffer().width() == 0 || starsViewer->getBuffer().width() == 0) {
+        QMessageBox::warning(this, tr("Invalid Images"), tr("Selected views contain invalid image data."));
         return;
     }
     

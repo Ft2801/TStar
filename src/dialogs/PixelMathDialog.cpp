@@ -153,7 +153,12 @@ private:
             m_pos++;
             ASTNode* node = parseExpression();
             skipWS();
-            if (m_pos < m_str.length() && m_str[m_pos] == ')') m_pos++;
+            if (m_pos >= m_str.length()) {
+                m_error = QCoreApplication::translate("PixelMathDialog", "Missing closing parenthesis");
+                return node;
+            }
+            if (m_str[m_pos] == ')') m_pos++;
+            else m_error = QCoreApplication::translate("PixelMathDialog", "Expected ')' but found '%1'").arg(m_str[m_pos]);
             return node;
         }
 
@@ -180,10 +185,17 @@ private:
                 while (m_pos < m_str.length() && m_str[m_pos] != ')') {
                     args.push_back(parseExpression());
                     skipWS();
-                    if (m_pos < m_str.length() && m_str[m_pos] == ',') m_pos++;
-                    skipWS();
+                    if (m_pos < m_str.length() && m_str[m_pos] == ',') {
+                        m_pos++;
+                        skipWS();
+                    }
                 }
-                if (m_pos < m_str.length()) m_pos++;
+                if (m_pos >= m_str.length()) {
+                    m_error = QCoreApplication::translate("PixelMathDialog", "Unclosed function call: %1").arg(name);
+                    for (auto a : args) delete a;
+                    return new ASTNode(0.0f);
+                }
+                m_pos++;  // Skip ')'
 
                 ASTNode* func = nullptr;
                 if (name == "mtf" && args.size() == 2) func = new ASTNode(ASTNode::FUNC_MTF);
@@ -197,6 +209,16 @@ private:
                 else if (name == "log" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_LOG);
                 else if (name == "sin" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_SIN);
                 else if (name == "cos" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_COS);
+                else {
+                    // Check if this is an unknown function or a typo
+                    for (auto a : args) delete a;
+                    if (args.size() > 0) {
+                        m_error = QCoreApplication::translate("PixelMathDialog", "Unknown function '%1' with %2 arguments").arg(name).arg(args.size());
+                    } else {
+                        m_error = QCoreApplication::translate("PixelMathDialog", "Unknown variable or function: '%1' (only r, g, b are allowed)").arg(name);
+                    }
+                    return new ASTNode(0.0f);
+                }
 
                 if (func) {
                     func->children = args;
@@ -357,10 +379,11 @@ bool PixelMathDialog::evaluateExpression(const QString& expr, ImageBuffer& buf, 
                 if (rescale) {
                     if (res < localMin) localMin = res;
                     if (res > localMax) localMax = res;
+                    data[idx + c] = res;  // Keep original for rescale pass
                 } else {
-                    res = std::clamp(res, 0.0f, 1.0f);
+                    // Always clamp to [0, 1] when not rescaling
+                    data[idx + c] = std::clamp(res, 0.0f, 1.0f);
                 }
-                data[idx + c] = res;
             }
         }
         

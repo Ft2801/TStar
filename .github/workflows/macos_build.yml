@@ -508,7 +508,10 @@ jobs:
       # ===========================
       - name: Build TStar (Intel x86_64)
         run: |
-          arch -x86_64 cmake --build build --config Release --parallel $(sysctl -n hw.ncpu)
+          # Ensure x86_64 environment is set for cmake
+          export HOMEBREW_PREFIX="/usr/local"
+          export PATH="/usr/local/bin:$PATH"
+          arch -x86_64 bash -c 'cmake --build build --config Release --parallel $(sysctl -n hw.ncpu)'
 
       # ===========================
       # 7. Verify Build
