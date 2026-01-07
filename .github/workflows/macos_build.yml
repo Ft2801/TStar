@@ -24,9 +24,12 @@ on:
   workflow_dispatch:  # Allows manual trigger from GitHub UI
 
 jobs:
-  build-macos:
-    name: Build macOS App
-    runs-on: macos-14  # Apple Silicon runner (faster)
+  # ============================================================================
+  # Apple Silicon Build (ARM64) - Faster, Recommended
+  # ============================================================================
+  build-macos-arm64:
+    name: Build macOS App (Apple Silicon - ARM64)
+    runs-on: macos-14  # Apple Silicon runner (fastest)
     
     env:
       QT_VERSION: "6.6.2"
@@ -50,7 +53,7 @@ jobs:
           path: |
             ~/Library/Caches/Homebrew
             /opt/homebrew/Cellar
-          key: ${{ runner.os }}-brew-${{ hashFiles('**/CMakeLists_macos.txt') }}
+          key: ${{ runner.os }}-brew-${{ hashFiles('**/CMakeLists.txt') }}
           restore-keys: |
             ${{ runner.os }}-brew-
 
@@ -64,8 +67,19 @@ jobs:
           brew link --overwrite cmake ninja pkg-config || true
           
           echo ">>> Installing Qt6..."
-          brew install qt || true
+          brew install qt
           brew link --overwrite qt || true
+          brew install qtsvg
+          brew link --overwrite qtsvg || true
+          
+          echo ">>> Installing Qt runtime dependencies (fix for uic crash)..."
+          brew install double-conversion brotli libb2 pcre2 harfbuzz freetype
+          brew link --overwrite double-conversion || true
+          brew link --overwrite brotli || true
+          brew link --overwrite libb2 || true
+          brew link --overwrite pcre2 || true
+          brew link --overwrite harfbuzz || true
+          brew link --overwrite freetype || true
           
           echo ">>> Installing image/scientific libraries..."
           brew install opencv
@@ -90,8 +104,8 @@ jobs:
           brew link --overwrite create-dmg || true
           
           echo ">>> Installing Python..."
-          brew install python@3.11
-          brew link --overwrite python@3.11 || true
+          brew install python@3.12
+          brew link --overwrite python@3.12 || true
           
           echo ">>> All dependencies installed!"
 
@@ -108,29 +122,156 @@ jobs:
       # ===========================
       - name: Configure CMake
         run: |
-          # Get Qt path - try qt first, then qt@6 for older systems
-          if brew --prefix qt &>/dev/null; then
-            QT_PREFIX=$(brew --prefix qt)
-          else
-            QT_PREFIX=$(brew --prefix qt@6)
+          # Definitive Qt6 Detection for Homebrew (v7: Deep Cellar Search)
+          echo ">>> Detecting Qt6 paths via Deep Cellar Search..."
+          
+          # Initialize variables
+          QT_PREFIXES=""
+          QT6_DIR_DETECTED=""
+          
+          # 0. Attempt to repair symlinks first
+          echo ">>> Attempting to repair Qt symlinks..."
+          brew link --overwrite qt 2>/dev/null || true
+          brew link --overwrite qtbase 2>/dev/null || true
+          
+          # 1. Primary discovery via qmake (still best if it works)
+          PRIMARY_QT_PREFIX=$( (brew --prefix qt 2>/dev/null || brew --prefix qt@6 2>/dev/null) | tr -d '[:space:]' )
+          if [ -n "$PRIMARY_QT_PREFIX" ]; then
+             echo "ℹ️  Primary prefix: '$PRIMARY_QT_PREFIX'"
+             QMAKE_BIN=""
+             if [ -x "$PRIMARY_QT_PREFIX/bin/qmake6" ]; then QMAKE_BIN="$PRIMARY_QT_PREFIX/bin/qmake6";
+             elif [ -x "$PRIMARY_QT_PREFIX/bin/qmake" ]; then QMAKE_BIN="$PRIMARY_QT_PREFIX/bin/qmake"; fi
+             
+             if [ -n "$QMAKE_BIN" ]; then
+                 QT_INSTALL_LIBS=$("$QMAKE_BIN" -query QT_INSTALL_LIBS | tr -d '[:space:]')
+                 if [ -d "$QT_INSTALL_LIBS/cmake/Qt6" ]; then
+                     QT6_DIR_DETECTED="$QT_INSTALL_LIBS/cmake/Qt6"
+                     echo "✅ Verified Qt6 CMake dir via qmake: '$QT6_DIR_DETECTED'"
+                 fi
+             fi
           fi
-          QT6_DIR="${QT_PREFIX}/lib/cmake/Qt6"
-          echo "Qt6 found at: $QT_PREFIX"
-          echo "Qt6_DIR set to: $QT6_DIR"
           
-          # Get libomp path for OpenMP support with Apple Clang
-          LIBOMP_PREFIX=$(brew --prefix libomp)
-          echo "libomp found at: $LIBOMP_PREFIX"
+          # 2. Deep Cellar Search Fallback
+          # If qmake failed, search the physical Cellar directory directly.
+          if [ -z "$QT6_DIR_DETECTED" ]; then
+             echo ">>> Searching for Qt6Config.cmake in /opt/homebrew/Cellar..."
+             # Find first instance of Qt6Config.cmake in Cellar. 
+             # No -L because we are looking at physical files now.
+             FOUND_CONFIG=$(find /opt/homebrew/Cellar -maxdepth 6 -name "Qt6Config.cmake" -print -quit 2>/dev/null)
+             
+             if [ -n "$FOUND_CONFIG" ]; then
+                  QT6_DIR_DETECTED=$(dirname "$FOUND_CONFIG")
+                  echo "✅ Found Qt6Config.cmake in Cellar at: '$QT6_DIR_DETECTED'"
+             else
+                  echo "⚠️  Cellar search failed. Trying generic brew list..."
+                  # Last resort: ask brew where the files are
+                  BREW_FILES=$(brew list qt 2>/dev/null | grep "Qt6Config.cmake" | head -n 1 | tr -d '[:space:]')
+                  if [ -n "$BREW_FILES" ]; then
+                      QT6_DIR_DETECTED=$(dirname "$BREW_FILES")
+                      echo "✅ Found via brew list: '$QT6_DIR_DETECTED'"
+                  fi
+             fi
+          fi
           
-          # Use the macOS-specific CMakeLists
-          cp CMakeLists_macos.txt CMakeLists.txt
+          # 3. Detect Components (Svg, LinguistTools)
+          # These live in separate kegs (qtsvg, qttools) and need their own DIR helpers
+          # because the main Qt link is incomplete.
           
-          # Configure with CMake - pass OpenMP paths explicitly
+          echo ">>> Searching for component configs..."
+          QT6_SVG_DIR=""
+          QT6_LINGUIST_DIR=""
+          
+          # Find Qt6Svg
+          FOUND_SVG=$(find /opt/homebrew/Cellar/qtsvg -maxdepth 6 -name "Qt6SvgConfig.cmake" -print -quit 2>/dev/null)
+          if [ -n "$FOUND_SVG" ]; then
+             QT6_SVG_DIR=$(dirname "$FOUND_SVG")
+             echo "✅ Found Qt6Svg: $QT6_SVG_DIR"
+          else
+             echo "⚠️  Qt6SvgConfig.cmake not found in Cellar/qtsvg"
+          fi
+          
+          # Find Qt6LinguistTools
+          FOUND_LINGUIST=$(find /opt/homebrew/Cellar/qttools -maxdepth 6 -name "Qt6LinguistToolsConfig.cmake" -print -quit 2>/dev/null)
+          if [ -n "$FOUND_LINGUIST" ]; then
+             QT6_LINGUIST_DIR=$(dirname "$FOUND_LINGUIST")
+             echo "✅ Found Qt6LinguistTools: $QT6_LINGUIST_DIR"
+          else
+             echo "⚠️  Qt6LinguistToolsConfig.cmake not found in Cellar/qttools"
+          fi
+          
+          # 4. Construct CMAKE_PREFIX_PATH (Sanitized)
+          for pkg in qt qt@6 qtbase qtsvg qttools; do
+            PKG_PATH=$(brew --prefix $pkg 2>/dev/null | tr -d '[:space:]')
+            if [ -n "$PKG_PATH" ]; then
+              if [ -z "$QT_PREFIXES" ]; then QT_PREFIXES="$PKG_PATH"; else QT_PREFIXES="${QT_PREFIXES};${PKG_PATH}"; fi
+            fi
+          done
+          
+          # Export for use in next commands
+          export CMAKE_PREFIX_PATH="$QT_PREFIXES"
+          export Qt6_DIR="$QT6_DIR_DETECTED"
+          export Qt6Svg_DIR="$QT6_SVG_DIR"
+          export Qt6LinguistTools_DIR="$QT6_LINGUIST_DIR"
+          
+          echo ">>> Final CMAKE_PREFIX_PATH: $CMAKE_PREFIX_PATH"
+          echo ">>> Final Qt6_DIR: $Qt6_DIR"
+          echo ">>> Final Qt6Svg_DIR: $Qt6Svg_DIR"
+          
+          # 4. Dependency Harvester (Runtime & Link Time)
+          # "Scavenge" physical paths for broken symlinks (libomp, libb2, double-conversion, etc.)
+          echo ">>> Harvesting physical dependency paths..."
+          FIXED_DYLD_PATH=""
+          FOUND_LIBOMP=""
+          
+          # List of known fragile dependencies
+          DEP_LIST="libomp libb2 double-conversion brotli pcre2 harfbuzz freetype"
+          
+          for dep in $DEP_LIST; do
+             # Search Cellar for the lib directory (heuristic: /opt/homebrew/Cellar/<dep>/<version>/lib)
+             FOUND_LIB_DIR=$(find /opt/homebrew/Cellar/$dep -maxdepth 3 -name "lib" -type d -print -quit 2>/dev/null)
+             
+             if [ -n "$FOUND_LIB_DIR" ]; then
+                echo "✅ Found $dep lib: $FOUND_LIB_DIR"
+                if [ -z "$FIXED_DYLD_PATH" ]; then FIXED_DYLD_PATH="$FOUND_LIB_DIR"; else FIXED_DYLD_PATH="$FIXED_DYLD_PATH:$FOUND_LIB_DIR"; fi
+                
+                # Capture libomp prefix specifically for CMake
+                if [ "$dep" == "libomp" ]; then
+                   FOUND_LIBOMP=$(dirname "$FOUND_LIB_DIR")
+                fi
+             else
+                echo "⚠️  Could not find physical lib for $dep"
+             fi
+          done
+          
+          # Add standard paths as fallback
+          FIXED_DYLD_PATH="$FIXED_DYLD_PATH:/usr/lib:/usr/local/lib"
+          
+          echo ">>> Setting DYLD_FALLBACK_LIBRARY_PATH=$FIXED_DYLD_PATH"
+          # Export to GITHUB_ENV so it persists for the Build step (where uic runs)
+          echo "DYLD_FALLBACK_LIBRARY_PATH=$FIXED_DYLD_PATH" >> $GITHUB_ENV
+          
+          # Define LIBOMP_PREFIX for this step
+          LIBOMP_PREFIX="$FOUND_LIBOMP"
+          if [ -z "$LIBOMP_PREFIX" ]; then
+             echo "⚠️  Physical libomp not found, falling back to brew --prefix"
+             LIBOMP_PREFIX=$(brew --prefix libomp)
+          fi
+          echo ">>> Using LIBOMP_PREFIX: $LIBOMP_PREFIX"
+          
+          # CMakeLists.txt is now unified for Windows and macOS
+          # No need to copy CMakeLists_macos.txt anymore
+          
+          # Configure with CMake (Surgical pass of Qt6_DIR)
+          CMAKE_EXTRA_ARGS=""
+          if [ -n "$Qt6_DIR" ]; then CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DQt6_DIR=$Qt6_DIR"; fi
+          if [ -n "$Qt6Svg_DIR" ]; then CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DQt6Svg_DIR=$Qt6Svg_DIR"; fi
+          if [ -n "$Qt6LinguistTools_DIR" ]; then CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DQt6LinguistTools_DIR=$Qt6LinguistTools_DIR"; fi
+          
+          # Note: CMAKE_PREFIX_PATH is exported above
           cmake -S . -B build \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DQt6_DIR="$QT6_DIR" \
-            -DCMAKE_PREFIX_PATH="$QT_PREFIX" \
+            $CMAKE_EXTRA_ARGS \
             -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0" \
             -DOpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I${LIBOMP_PREFIX}/include" \
             -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I${LIBOMP_PREFIX}/include" \
@@ -222,3 +363,225 @@ jobs:
           echo "- Built on macOS runner with Apple Silicon" >> $GITHUB_STEP_SUMMARY
           echo "- Compatible with macOS 11.0 (Big Sur) and later" >> $GITHUB_STEP_SUMMARY
           echo "- First launch: Right-click → Open to bypass Gatekeeper" >> $GITHUB_STEP_SUMMARY
+  # ============================================================================
+  # Intel Mac Build (x86_64) - Native Intel Compilation
+  # ============================================================================
+  build-macos-intel:
+    name: Build macOS App (Intel x86_64)
+    runs-on: macos-13  # Intel runner (Ventura, native Intel support)
+    
+    env:
+      QT_VERSION: "6.6.2"
+    
+    steps:
+      # ===========================
+      # 1. Checkout Repository
+      # ===========================
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ===========================
+      # 2. Cache Homebrew packages
+      # ===========================
+      - name: Cache Homebrew packages
+        uses: actions/cache@v4
+        id: cache-brew
+        with:
+          path: |
+            ~/Library/Caches/Homebrew
+            /usr/local/Cellar
+          key: ${{ runner.os }}-brew-intel-${{ hashFiles('**/CMakeLists.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-brew-intel-
+
+      # ===========================
+      # 3. Install System Dependencies (Homebrew for Intel under Rosetta)
+      # ===========================
+      - name: Install Dependencies via Homebrew (Intel under Rosetta)
+        run: |
+          # Check if x86_64 Homebrew is available at /usr/local
+          if [ ! -f "/usr/local/bin/brew" ]; then
+            echo ">>> Setting up x86_64 Homebrew at /usr/local..."
+            arch -x86_64 bash -c '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+          fi
+          
+          # Clean up any conflicting Python symlinks from system Python
+          echo ">>> Cleaning up conflicting system Python symlinks..."
+          rm -f /usr/local/bin/python3 /usr/local/bin/python3.* /usr/local/bin/pip3* /usr/local/bin/idle3* /usr/local/bin/pydoc3* /usr/local/bin/python3*-config 2>/dev/null || true
+          
+          # Use x86_64 Homebrew explicitly
+          export HOMEBREW_PREFIX="/usr/local"
+          export PATH="/usr/local/bin:$PATH"
+          
+          echo ">>> Installing build tools (x86_64)..."
+          arch -x86_64 bash -c "brew install cmake ninja pkg-config"
+          
+          echo ">>> Installing Qt6 for x86_64..."
+          arch -x86_64 bash -c "brew install qt@6"
+          arch -x86_64 bash -c "brew link --overwrite qt@6 || true"
+          arch -x86_64 bash -c "brew install qtsvg"
+          
+          echo ">>> Installing Qt runtime dependencies (x86_64)..."
+          arch -x86_64 bash -c "brew install double-conversion brotli libb2 pcre2 harfbuzz freetype"
+          
+          echo ">>> Installing image/scientific libraries (x86_64)..."
+          arch -x86_64 bash -c "brew install opencv gsl cfitsio || true"
+          
+          echo ">>> Installing Python (x86_64)..."
+          arch -x86_64 bash -c "brew install python@3.12"
+          arch -x86_64 bash -c "brew link --overwrite python@3.12 || true"
+          
+          echo ">>> Installing compression libraries (x86_64)..."
+          arch -x86_64 bash -c "brew install lz4 zstd"
+          
+          echo ">>> Installing OpenMP (x86_64)..."
+          arch -x86_64 bash -c "brew install libomp"
+          
+          echo ">>> Installing DMG creation tool (x86_64)..."
+          arch -x86_64 bash -c "brew install create-dmg"
+          
+          echo ">>> All dependencies installed for x86_64!"
+
+      # ===========================
+      # 4. Setup Python Environment
+      # ===========================
+      - name: Setup Python Virtual Environment
+        run: |
+          chmod +x setup_python_macos.sh
+          ./setup_python_macos.sh
+
+      # ===========================
+      # 5. Configure CMake (Intel)
+      # ===========================
+      - name: Configure CMake (Intel)
+        run: |
+          # Use x86_64 Homebrew at /usr/local
+          export HOMEBREW_PREFIX="/usr/local"
+          export PATH="/usr/local/bin:$PATH"
+          
+          HOMEBREW_PREFIX="/usr/local"
+          QT6_DIR="$HOMEBREW_PREFIX/opt/qt@6"
+          
+          echo "Homebrew prefix: $HOMEBREW_PREFIX"
+          echo "QT6_DIR: $QT6_DIR"
+          
+          # Verify Qt6 exists for x86_64
+          if [ ! -d "$QT6_DIR/lib/cmake/Qt6" ]; then
+            echo "❌ Qt6 not found at $QT6_DIR"
+            echo "Checking available Qt installations:"
+            ls -la /usr/local/opt/ | grep qt || echo "No Qt found in /usr/local/opt"
+            ls -la /opt/homebrew/opt/ | grep qt || echo "No Qt found in /opt/homebrew/opt"
+            exit 1
+          fi
+          
+          echo "✅ Qt6 found at: $QT6_DIR"
+          
+          echo "✅ Qt6 found at: $QT6_DIR"
+          
+          # Get libomp path (from Intel Homebrew)
+          LIBOMP_PREFIX="$HOMEBREW_PREFIX/opt/libomp"
+          if [ ! -d "$LIBOMP_PREFIX" ]; then
+            LIBOMP_PREFIX=$(arch -x86_64 bash -c "brew --prefix libomp")
+          fi
+          
+          # Export QT6_DIR for CMake
+          export QT6_DIR="$QT6_DIR"
+          
+          # Configure CMake for Intel x86_64 (must run under Rosetta)
+          arch -x86_64 cmake -S . -B build \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES=x86_64 \
+            -DCMAKE_PREFIX_PATH="$HOMEBREW_PREFIX/opt/qt@6" \
+            -DQt6_DIR="$QT6_DIR/lib/cmake/Qt6" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0" \
+            -DOpenMP_C_FLAGS="-Xpreprocessor -fopenmp -I${LIBOMP_PREFIX}/include" \
+            -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I${LIBOMP_PREFIX}/include" \
+            -DOpenMP_C_LIB_NAMES="omp" \
+            -DOpenMP_CXX_LIB_NAMES="omp" \
+            -DOpenMP_omp_LIBRARY="${LIBOMP_PREFIX}/lib/libomp.dylib"
+
+      # ===========================
+      # 6. Build Application
+      # ===========================
+      - name: Build TStar (Intel x86_64)
+        run: |
+          arch -x86_64 cmake --build build --config Release --parallel $(sysctl -n hw.ncpu)
+
+      # ===========================
+      # 7. Verify Build
+      # ===========================
+      - name: Verify Build Output
+        run: |
+          if [ -d "build/TStar.app" ]; then
+            echo "✅ TStar.app bundle created successfully"
+            file build/TStar.app/Contents/MacOS/TStar
+            ls -la build/TStar.app/Contents/MacOS/
+          elif [ -f "build/TStar" ]; then
+            echo "✅ TStar binary created (non-bundle)"
+          else
+            echo "❌ Build output not found!"
+            exit 1
+          fi
+
+      # ===========================
+      # 8. Package Distribution
+      # ===========================
+      - name: Package App Bundle (Intel)
+        run: |
+          chmod +x src/package_macos.sh
+          ./src/package_macos.sh --silent
+
+      # ===========================
+      # 9. Create DMG Installer
+      # ===========================
+      - name: Create DMG Installer (Intel)
+        run: |
+          chmod +x src/build_installer_macos.sh
+          ./src/build_installer_macos.sh
+
+      # ===========================
+      # 10. Upload DMG Artifact
+      # ===========================
+      - name: Upload DMG Artifact (Intel)
+        uses: actions/upload-artifact@v4
+        with:
+          name: TStar-macOS-Installer-Intel-x86_64
+          path: installer_output/*.dmg
+          if-no-files-found: error
+          retention-days: 30
+
+      # ===========================
+      # 11. Upload App Bundle
+      # ===========================
+      - name: Upload App Bundle (Intel)
+        uses: actions/upload-artifact@v4
+        with:
+          name: TStar-macOS-App-Intel-x86_64
+          path: dist/TStar.app
+          if-no-files-found: warn
+          retention-days: 30
+
+      # ===========================
+      # 12. Build Summary
+      # ===========================
+      - name: Build Summary (Intel)
+        run: |
+          echo "## macOS Intel Build Complete! 🎉" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          VERSION=$(grep -E "^Version [0-9.]+" changelog.txt | head -1 | awk '{print $2}')
+          echo "**Version:** $VERSION (Intel x86_64)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "- **DMG Installer:** \`installer_output/TStar_Setup_${VERSION}.dmg\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **App Bundle:** \`dist/TStar.app\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### Notes" >> $GITHUB_STEP_SUMMARY
+          echo "- Built on Intel macOS runner (macos-13)" >> $GITHUB_STEP_SUMMARY
+          echo "- Native Intel x86_64 build" >> $GITHUB_STEP_SUMMARY
+          echo "- Compatible with Intel Mac systems on macOS 11.0+" >> $GITHUB_STEP_SUMMARY
