@@ -210,8 +210,9 @@ if(APPLE)
     if(OPENCV_PREFIX AND EXISTS "${OPENCV_PREFIX}")
         set(OpenCV_DIR "${OPENCV_PREFIX}/lib/cmake/opencv4")
     endif()
-    # Explicitly list components to avoid linking unused modules like dnn (which pulls in openvino)
-    find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs photo features2d calib3d video videoio highgui objdetect)
+    # Explicitly exclude dnn module which depends on OpenVINO
+    # Only include modules actually used by TStar to minimize dependencies
+    find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs photo features2d calib3d)
 else()
     # Windows: local deps
     set(OpenCV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/opencv")

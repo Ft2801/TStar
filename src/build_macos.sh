@@ -57,7 +57,12 @@ DEPS=("opencv" "gsl" "cfitsio" "libomp")
 for dep in "${DEPS[@]}"; do
     DEP_PREFIX=$(brew --prefix "$dep" 2>/dev/null || echo "")
     if [ -z "$DEP_PREFIX" ] || [ ! -d "$DEP_PREFIX" ]; then
-        echo "[WARNING] $dep not found. Install with: brew install $dep"
+        if [ "$dep" == "opencv" ]; then
+            echo "[WARNING] $dep not found. Install with: brew install $dep"
+            echo "  NOTE: TStar is built WITHOUT OpenCV DNN to avoid external dependencies like OpenVINO"
+        else
+            echo "[WARNING] $dep not found. Install with: brew install $dep"
+        fi
     else
         echo "  - $dep: OK"
     fi

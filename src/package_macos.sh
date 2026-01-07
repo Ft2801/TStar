@@ -153,7 +153,7 @@ copy_dylib "liblz4" "lz4" || true
 copy_dylib "libzstd" "zstd" || true
 copy_dylib "libomp" "libomp" || true
 
-# OpenCV (only required modules - dnn excluded to avoid libprotobuf conflict)
+# OpenCV (only required modules - dnn and video excluded to avoid external dependencies)
 OPENCV_PREFIX=$(brew --prefix opencv 2>/dev/null || echo "")
 if [ ! -d "$OPENCV_PREFIX/lib" ]; then
     # OpenCV Fallback
@@ -162,20 +162,35 @@ if [ ! -d "$OPENCV_PREFIX/lib" ]; then
 fi
 
 if [ -n "$OPENCV_PREFIX" ] && [ -d "$OPENCV_PREFIX/lib" ]; then
-    # Only copy the modules TStar actually uses to avoid protobuf conflicts
-    # TStar uses: core, imgproc, imgcodecs, photo
-    # Excluded: dnn (links protobuf), video, videoio, objdetect, ml, highgui
-    OPENCV_MODULES="core imgproc imgcodecs photo"
+    # Only copy the modules TStar actually uses (matching CMakeLists.txt requirements)
+    # INCLUDED: core, imgproc, imgcodecs, photo, features2d, calib3d
+    # EXCLUDED: dnn (OpenVINO dependency), video, videoio, objdetect (not required)
+    OPENCV_MODULES="core imgproc imgcodecs photo features2d calib3d"
     
+    COPIED_COUNT=0
     for module in $OPENCV_MODULES; do
         for dylib in "$OPENCV_PREFIX/lib"/libopencv_${module}*.dylib; do
             if [ -f "$dylib" ]; then
                 cp "$dylib" "$FRAMEWORKS_DIR/" 2>/dev/null || true
+                COPIED_COUNT=$((COPIED_COUNT + 1))
             fi
         done
     done
-    echo "  - OpenCV (core, imgproc, imgcodecs, photo): OK"
-    echo "    (dnn and video modules excluded to avoid protobuf conflict)"
+    
+    if [ $COPIED_COUNT -gt 0 ]; then
+        echo "  - OpenCV (core, imgproc, imgcodecs, photo, features2d, calib3d): OK"
+    else
+        echo "  - OpenCV: NOT FOUND"
+    fi
+    echo "    (dnn, video, videoio, objdetect excluded to avoid external dependencies)"
+    
+    # Verify no OpenVINO or other problematic dependencies are bundled
+    PROBLEMATIC_LIBS=$(find "$FRAMEWORKS_DIR" -name "*openvino*" -o -name "*protobuf*" 2>/dev/null | grep -v "/Applications" || true)
+    if [ -n "$PROBLEMATIC_LIBS" ]; then
+        echo "  [WARNING] Found external dependencies that should not be bundled:"
+        echo "$PROBLEMATIC_LIBS" | xargs rm -f
+        echo "    Removed problematic dylibs"
+    fi
 else
     echo "  - OpenCV: NOT FOUND"
 fi

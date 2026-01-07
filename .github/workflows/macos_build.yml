@@ -82,7 +82,8 @@ jobs:
           brew link --overwrite freetype || true
           
           echo ">>> Installing image/scientific libraries..."
-          brew install opencv
+          # OpenCV: build without OpenVINO to avoid binary bloat and external dependencies
+          brew install opencv --without-openvino 2>/dev/null || brew install opencv || true
           brew link --overwrite opencv || true
           brew install gsl
           brew link --overwrite gsl || true
@@ -432,7 +433,9 @@ jobs:
           arch -x86_64 bash -c "brew install double-conversion brotli libb2 pcre2 harfbuzz freetype"
           
           echo ">>> Installing image/scientific libraries (x86_64)..."
-          arch -x86_64 bash -c "brew install opencv gsl cfitsio || true"
+          # OpenCV: build without OpenVINO to avoid binary bloat and external dependencies
+          arch -x86_64 bash -c "brew install opencv --without-openvino 2>/dev/null || brew install opencv || true"
+          arch -x86_64 bash -c "brew install gsl cfitsio || true"
           
           echo ">>> Installing Python (x86_64)..."
           arch -x86_64 bash -c "brew install python@3.12"
