@@ -59,14 +59,29 @@ void UpdateChecker::onReplyFinished(QNetworkReply* reply) {
                 QString name = asset["name"].toString();
 #if defined(Q_OS_WIN)
                 if (name.endsWith(".exe", Qt::CaseInsensitive)) {
-#elif defined(Q_OS_MAC)
-                if (name.endsWith(".dmg", Qt::CaseInsensitive)) {
-#else
-                if (false) { // Linux: fallback to html_url
-#endif
                     m_pendingDownloadUrl = asset["browser_download_url"].toString();
                     break; 
                 }
+#elif defined(Q_OS_MAC)
+                // macOS: Detect architecture and select correct installer
+                QString arch = detectMacOSArchitecture();
+                bool isArm64 = (arch == "arm64");
+                bool isIntel = (arch == "x86_64");
+                
+                if (isArm64 && (name.contains("Apple-Silicon", Qt::CaseInsensitive) || name.contains("ARM64", Qt::CaseInsensitive) || name.contains("aarch64", Qt::CaseInsensitive))) {
+                    m_pendingDownloadUrl = asset["browser_download_url"].toString();
+                    break;
+                } else if (isIntel && (name.contains("Intel", Qt::CaseInsensitive) || name.contains("x86_64", Qt::CaseInsensitive))) {
+                    m_pendingDownloadUrl = asset["browser_download_url"].toString();
+                    break;
+                }
+                // Fallback: if no specific architecture match found, try generic .dmg (not ideal but better than nothing)
+                if (m_pendingDownloadUrl.isEmpty() && name.endsWith(".dmg", Qt::CaseInsensitive)) {
+                    m_pendingDownloadUrl = asset["browser_download_url"].toString();
+                }
+#else
+                if (false) { // Linux: fallback to html_url
+#endif
             }
             
             // If no platform-specific installer found, fallback to html_url of the release page
@@ -96,6 +111,23 @@ void UpdateChecker::fetchChangelog() {
     QNetworkRequest request(QUrl("https://raw.githubusercontent.com/Ft2801/TStar/master/changelog.txt"));
     request.setHeader(QNetworkRequest::UserAgentHeader, "TStar-Updater");
     m_nam->get(request);
+}
+
+QString UpdateChecker::detectMacOSArchitecture() {
+#if defined(Q_OS_MAC)
+    // Detect native architecture at runtime
+    // On Apple Silicon (M1/M2/M3...), this will return "arm64"
+    // On Intel Macs, this will return "x86_64"
+    #if defined(__arm64__) || defined(__aarch64__)
+        return "arm64";
+    #elif defined(__x86_64__) || defined(__i386__)
+        return "x86_64";
+    #else
+        return "unknown";
+    #endif
+#else
+    return "unknown";
+#endif
 }
 
 bool UpdateChecker::isNewer(const QString& current, const QString& remote) {

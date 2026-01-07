@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QString>
 
 class UpdateChecker : public QObject {
     Q_OBJECT
@@ -30,6 +31,7 @@ private:
 
     bool isNewer(const QString& current, const QString& remote);
     void fetchChangelog();
+    QString detectMacOSArchitecture();
 };
 
 #endif // UPDATECHECKER_H

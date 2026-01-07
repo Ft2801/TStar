@@ -310,12 +310,17 @@ jobs:
           ./src/package_macos.sh --silent
 
       # ===========================
-      # 9. Create DMG Installer
+      # 9. Create DMG Installer (with Apple Silicon naming)
       # ===========================
       - name: Create DMG Installer
         run: |
           chmod +x src/build_installer_macos.sh
           ./src/build_installer_macos.sh
+          # Rename DMG to include Apple Silicon identifier
+          if ls installer_output/TStar_Setup_*.dmg 1> /dev/null 2>&1; then
+            VERSION=$(ls installer_output/TStar_Setup_*.dmg | head -1 | sed 's/.*TStar_Setup_//' | sed 's/.dmg//')
+            mv "installer_output/TStar_Setup_${VERSION}.dmg" "installer_output/TStar_Setup_${VERSION}-AppleSilicon-ARM64.dmg"
+          fi
 
       # ===========================
       # 10. Upload DMG Artifact
@@ -538,12 +543,17 @@ jobs:
           ./src/package_macos.sh --silent
 
       # ===========================
-      # 9. Create DMG Installer
+      # 9. Create DMG Installer (with Intel x86_64 naming)
       # ===========================
       - name: Create DMG Installer (Intel)
         run: |
           chmod +x src/build_installer_macos.sh
           ./src/build_installer_macos.sh
+          # Rename DMG to include Intel x86_64 identifier
+          if ls installer_output/TStar_Setup_*.dmg 1> /dev/null 2>&1; then
+            VERSION=$(ls installer_output/TStar_Setup_*.dmg | head -1 | sed 's/.*TStar_Setup_//' | sed 's/.dmg//')
+            mv "installer_output/TStar_Setup_${VERSION}.dmg" "installer_output/TStar_Setup_${VERSION}-Intel-x86_64.dmg"
+          fi
 
       # ===========================
       # 10. Upload DMG Artifact

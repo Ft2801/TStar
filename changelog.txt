@@ -1,6 +1,11 @@
 TStar Changelog
 ===============
 
+Version 1.3.3
+-------------
+- Fixed pixel math and star recomposition bugs
+- First Intel MacOS version test
+
 Version 1.3.2
 -------------
 - MacOS build fix
