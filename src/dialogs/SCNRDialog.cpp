@@ -7,12 +7,10 @@
 #include <QPointer>
 #include "../ImageViewer.h"
 
-SCNRDialog::SCNRDialog(QWidget* parent) : QDialog(parent) {
-    setWindowTitle(tr("SCNR (Remove Green Noise)"));
+SCNRDialog::SCNRDialog(QWidget* parent) : DialogBase(parent, "SCNR (Remove Green Noise)", 350, 200) {
     setModal(false);
     setWindowModality(Qt::NonModal);
     setWindowIcon(QIcon(":/images/Logo.png"));
-    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint); // Remove ? button
 
     QVBoxLayout* layout = new QVBoxLayout(this);
 
@@ -73,9 +71,6 @@ SCNRDialog::SCNRDialog(QWidget* parent) : QDialog(parent) {
     connect(applyBtn, &QPushButton::clicked, this, &SCNRDialog::apply);
     connect(closeBtn, &QPushButton::clicked, this, &QDialog::close);
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 SCNRDialog::~SCNRDialog() {}

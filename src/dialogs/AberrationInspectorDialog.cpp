@@ -11,16 +11,10 @@
 #include <QPushButton>
 
 AberrationInspectorDialog::AberrationInspectorDialog(const ImageBuffer& img, QWidget* parent)
-    : QDialog(parent), m_source(img), m_panelSize(200)
+    : DialogBase(parent, "Aberration Inspector", 800, 800), m_source(img), m_panelSize(200)
 {
-    setWindowTitle(tr("Aberration Inspector"));
-    resize(800, 800);
     setupUi();
     updatePanels();
-
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 AberrationInspectorDialog::~AberrationInspectorDialog() {}

@@ -179,7 +179,7 @@ bool SimpleTiffReader::readFloat32(const QString& path, int& width, int& height,
     std::vector<float> rawData;
     rawData.resize(width * height * channels, 0.0f);
 
-    int pixelIdx = 0;
+    // Pixel index tracking removed - not used in current logic
     
     // Debug Stats
     float dMin = 1e9f, dMax = -1e9f;
@@ -354,7 +354,7 @@ bool SimpleTiffReader::readFloat32(const QString& path, int& width, int& height,
             for (int ch = 0; ch < channels; ++ch) {
                 int srcIdx = ch * planeSize + i;
                 int dstIdx = i * channels + ch;
-                if (srcIdx < rawData.size()) {
+                if ((int)srcIdx < (int)rawData.size()) {
                     data[dstIdx] = rawData[srcIdx];
                 }
             }

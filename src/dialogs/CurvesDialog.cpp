@@ -363,7 +363,7 @@ void CurvesGraph::mouseMoveEvent(QMouseEvent* event) {
     }
 }
 
-void CurvesGraph::mouseReleaseEvent(QMouseEvent* event) {
+void CurvesGraph::mouseReleaseEvent([[maybe_unused]] QMouseEvent* event) {
     m_dragIdx = -1;
     update();
 }
@@ -371,9 +371,8 @@ void CurvesGraph::mouseReleaseEvent(QMouseEvent* event) {
 // --- CurvesDialog ---
 
 CurvesDialog::CurvesDialog(ImageViewer* viewer, QWidget* parent) 
-    : QDialog(parent), m_viewer(viewer)
+    : DialogBase(parent, "Curves Transformation", 700, 500), m_viewer(viewer)
 {
-    setWindowTitle(tr("Curves Transformation"));
     setMinimumWidth(500);
     
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -606,7 +605,7 @@ void CurvesDialog::onApply() {
     accept();
 }
 
-void CurvesDialog::onPreviewToggled(bool checked) {
+void CurvesDialog::onPreviewToggled([[maybe_unused]] bool checked) {
     onCurvesChanged(true);
 }
 

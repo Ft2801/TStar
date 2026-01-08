@@ -412,7 +412,7 @@ std::vector<FitsHeaderUtils::HeaderCard> FitsHeaderUtils::ensureMinimalHeader(
     std::vector<HeaderCard> result = cards;
     
     // Check if SIMPLE is present
-    bool hasSimple = false;
+    [[maybe_unused]] bool hasSimple = false;
     bool hasDateObs = false;
     
     for (const auto& card : cards) {

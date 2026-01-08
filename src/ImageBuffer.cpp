@@ -22,8 +22,33 @@
 #include "algos/StatisticalStretch.h"
 #include <opencv2/opencv.hpp>
 
-ImageBuffer::ImageBuffer() {}
+ImageBuffer::ImageBuffer() : m_mutex(std::make_unique<QReadWriteLock>()) {}
 ImageBuffer::~ImageBuffer() {}
+
+// Custom copy constructor to handle non-copyable mutex
+ImageBuffer::ImageBuffer(const ImageBuffer& other)
+    : m_width(other.m_width), m_height(other.m_height), m_channels(other.m_channels),
+      m_data(other.m_data), m_meta(other.m_meta), m_name(other.m_name),
+      m_modified(other.m_modified), m_mask(other.m_mask), m_hasMask(other.m_hasMask),
+      m_mutex(std::make_unique<QReadWriteLock>()) {}
+
+// Custom copy assignment to handle non-copyable mutex
+ImageBuffer& ImageBuffer::operator=(const ImageBuffer& other) {
+    if (this != &other) {
+        m_width = other.m_width;
+        m_height = other.m_height;
+        m_channels = other.m_channels;
+        m_data = other.m_data;
+        m_meta = other.m_meta;
+        m_name = other.m_name;
+        m_modified = other.m_modified;
+        m_mask = other.m_mask;
+        m_hasMask = other.m_hasMask;
+        // Keep existing mutex or create new one
+        if (!m_mutex) m_mutex = std::make_unique<QReadWriteLock>();
+    }
+    return *this;
+}
 
 QString ImageBuffer::getHeaderValue(const QString& key) const {
     for (const auto& card : m_meta.rawHeaders) {
@@ -84,6 +109,8 @@ void ImageBuffer::resize(int width, int height, int channels) {
 }
 
 void ImageBuffer::applyWhiteBalance(float r, float g, float b) {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_channels < 3) return; // Only for color images
 
     ImageBuffer original;
@@ -299,7 +326,7 @@ static ChStats computeStats(const std::vector<float>& data, int width, int heigh
     // Note: Accessing QSettings in a tight loop/helper might be slightly inefficient if done repeatedly, 
     // but this is called once per channel per display update, so it is negligible.
     // We do it here to transparently upgrade the existing calls.
-    static bool use24Bit = false;
+    // Static variable removed - not used in current logic
     // We read it fresh every time or cache it? caching static might be tricky if user changes it.
     // Ideally passed in, but signature change is larger.
     // Let's read QSettings. It is usually fast enough (cached in memory by Qt).
@@ -383,7 +410,7 @@ static ChStats computeStats(const std::vector<float>& data, int width, int heigh
 
 // ====== Standard MTF Function ======
 // Added safety guards for edge cases
-static float standardMTF(float x, float m, float lo, float hi) {
+[[maybe_unused]] static float standardMTF(float x, float m, float lo, float hi) {
     if (x <= lo) return 0.f;
     if (x >= hi) return 1.f;
     if (hi <= lo) return 0.5f; // Safety: avoid division by zero
@@ -409,7 +436,7 @@ struct StandardSTFParams {
 };
 
 // Computes standard AutoStretch params for a single channel
-static StandardSTFParams computeStandardSTF(const std::vector<float>& data, int w, int h, int ch, int channelIdx) {
+[[maybe_unused]] static StandardSTFParams computeStandardSTF(const std::vector<float>& data, [[maybe_unused]] int w, [[maybe_unused]] int h, int ch, int channelIdx) {
     const float AS_DEFAULT_SHADOWS_CLIPPING = -2.80f;
     const float AS_DEFAULT_TARGET_BACKGROUND = 0.25f;
     
@@ -493,6 +520,8 @@ static StandardSTFParams computeStandardSTF(const std::vector<float>& data, int 
 }
 
 QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::vector<std::vector<float>>* overrideLUT, int maxWidth, int maxHeight, bool showMask, bool inverted, bool falseColor) const {
+    ReadLock lock(this);  // Thread-safe read access
+    
     if (m_data.empty()) return QImage();
 
     // Check for 24-bit High Definition Stretch setting
@@ -991,7 +1020,7 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
                 if (mVal > 0) {
                      float overlayAlpha = 0.5f * mVal; // Max 50% opacity
                      
-                     int off = (fmt == QImage::Format_Grayscale8) ? x : x*3;
+                     // Format check - variable removed
                      int r = (fmt == QImage::Format_Grayscale8) ? dest[x] : dest[x*3+0];
                      int g = (fmt == QImage::Format_Grayscale8) ? dest[x] : dest[x*3+1];
                      int b = (fmt == QImage::Format_Grayscale8) ? dest[x] : dest[x*3+2];
@@ -1111,7 +1140,7 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
             float maxVal = (depth == Depth_16Int) ? 65535.0f : ((depth == Depth_32Int) ? 4294967295.0f : 255.0f);
             
              if (m_channels == 1) {
-                 for(size_t i=0; i<nelements; ++i) planarData[i] = m_data[i] * maxVal;
+                 for(int i=0; i<(int)nelements; ++i) planarData[i] = m_data[i] * maxVal;
              } else {
                  long planeSize = m_width * m_height;
                  for (int i = 0; i < planeSize; ++i) {
@@ -1210,7 +1239,7 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
     }
 }
 
-static float stretch_fn(float r, float med, float target) {
+[[maybe_unused]] static float stretch_fn(float r, float med, float target) {
     if (r < 0) r = 0; // Clip input
     float num = (med - 1.0f) * target * r;
     float den = med * (target + r - 1.0f) - target * r;
@@ -1235,7 +1264,7 @@ static float apply_curve(float val, const std::vector<float>& x, const std::vect
 // Helper to get stats for a channel (Legacy/TrueStretch version)
 struct TrueStretchStats { float median; float bp; float den; };
 
-static TrueStretchStats getTrueStretchStats(const std::vector<float>& data, int stride, float nSig, int offset, int channels) {
+[[maybe_unused]] static TrueStretchStats getTrueStretchStats(const std::vector<float>& data, int stride, float nSig, int offset, int channels) {
     std::vector<float> sample;
     float minVal = 1e30f;
     
@@ -1273,6 +1302,8 @@ static TrueStretchStats getTrueStretchStats(const std::vector<float>& data, int 
 }
 
 void ImageBuffer::performTrueStretch(const StretchParams& params) {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_data.empty()) return;
 
     // Mask Support: Copy original if mask is present
@@ -1671,6 +1702,8 @@ static inline void hsl_to_rgb(float h, float s, float l, float& r, float& g, flo
 }
 
 void ImageBuffer::applyGHS(const GHSParams& params) {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_data.empty()) return;
 
     ImageBuffer original;
@@ -1871,6 +1904,8 @@ std::vector<float> ImageBuffer::computeGHSLUT(const GHSParams& params, int size)
 }
 
 void ImageBuffer::blendResult(const ImageBuffer& original, bool inverseMask) {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (!hasMask() || m_mask.data.empty()) return;
     if (m_data.size() != original.m_data.size()) return;
 
@@ -1897,7 +1932,7 @@ void ImageBuffer::blendResult(const ImageBuffer& original, bool inverseMask) {
 }
 
 // WCS Reframing Helper
-void ImageBuffer::reframeWCS(const QTransform& trans, int oldWidth, int oldHeight) {
+void ImageBuffer::reframeWCS(const QTransform& trans, [[maybe_unused]] int oldWidth, [[maybe_unused]] int oldHeight) {
     if (m_meta.ra == 0 && m_meta.dec == 0) return;
     double crpix1_0 = m_meta.crpix1 - 1.0;
     double crpix2_0 = m_meta.crpix2 - 1.0;
@@ -1933,6 +1968,8 @@ void ImageBuffer::reframeWCS(const QTransform& trans, int oldWidth, int oldHeigh
 
 // Geometric Ops
 void ImageBuffer::crop(int x, int y, int w, int h) {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_data.empty()) return;
 
     int oldW = m_width;
@@ -1980,6 +2017,8 @@ void ImageBuffer::crop(int x, int y, int w, int h) {
 }
 
 void ImageBuffer::rotate(float angleDegrees) {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_data.empty()) return;
     if (std::abs(angleDegrees) < 0.1f) return;
     
@@ -2095,6 +2134,8 @@ void ImageBuffer::rotate(float angleDegrees) {
 }
 
 void ImageBuffer::applySCNR(float amount, int method) {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_data.empty() || m_channels < 3) return; // Only works on Color images
 
     ImageBuffer original;
@@ -2140,6 +2181,7 @@ void ImageBuffer::applySCNR(float amount, int method) {
 }
 
 void ImageBuffer::cropRotated(float cx, float cy, float w, float h, float angleDegrees) {
+    WriteLock lock(this);  // Thread-safe write access
     if (m_data.empty()) return;
     if (w <= 1 || h <= 1) return;
 
@@ -2341,6 +2383,8 @@ std::vector<std::vector<int>> ImageBuffer::computeHistogram(int bins) const {
 }
 
 void ImageBuffer::rotate90() {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_data.empty()) return;
     
     int oldW = m_width;
@@ -2386,6 +2430,8 @@ void ImageBuffer::rotate90() {
 }
 
 void ImageBuffer::rotate180() {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_data.empty()) return;
     
     int h = m_height;
@@ -2437,6 +2483,8 @@ void ImageBuffer::rotate180() {
 }
 
 void ImageBuffer::rotate270() {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_data.empty()) return;
     
     int oldW = m_width;
@@ -2484,6 +2532,8 @@ void ImageBuffer::rotate270() {
 
 
 void ImageBuffer::mirrorX() {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_data.empty()) return;
     
     // Capture old dimensions before mod (though mirror doesn't change W/H)
@@ -2550,6 +2600,8 @@ void ImageBuffer::syncWcsToHeaders() {
 
 
 void ImageBuffer::mirrorY() {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_data.empty()) return;
     
     int h = m_height;
@@ -2585,6 +2637,8 @@ void ImageBuffer::mirrorY() {
 }
 
 void ImageBuffer::multiply(float factor) {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_data.empty()) return;
     #pragma omp parallel for
     for (size_t i = 0; i < m_data.size(); ++i) {
@@ -2593,6 +2647,8 @@ void ImageBuffer::multiply(float factor) {
 }
 
 void ImageBuffer::subtract(float r, float g, float b) {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_data.empty()) return;
     
     int ch = m_channels;
@@ -2933,10 +2989,8 @@ std::vector<ImageBuffer::DetectedStar> ImageBuffer::extractStars(const std::vect
     return stars;
 }
 
-
-
-
-// HSL Conversion Helpers for Saturation Tool
+// HSL Conversion Helpers for Saturation Tool (UNUSED - COMMENTED OUT)
+/*
 static void rgbToHsl(float r, float g, float b, float& h, float& s, float& l) {
     float maxv = std::max({r, g, b});
     float minv = std::min({r, g, b});
@@ -2974,8 +3028,11 @@ static void hslToRgb(float h, float s, float l, float& r, float& g, float& b) {
         b = hueToRgb(p, q, h - 1.0f/3.0f);
     }
 }
+*/  // End of unused HSL conversion functions
 
 void ImageBuffer::applySaturation(const SaturationParams& params) {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_channels != 3 || m_data.empty()) return;
 
     ImageBuffer original;
@@ -3063,6 +3120,8 @@ void ImageBuffer::applySaturation(const SaturationParams& params) {
 }
 
 void ImageBuffer::applyArcSinh(float stretchFactor) {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_data.empty()) return;
 
     ImageBuffer original;
@@ -3091,6 +3150,8 @@ void ImageBuffer::applyArcSinh(float stretchFactor) {
 }
 
 void ImageBuffer::applyArcSinh(float stretchFactor, float blackPoint, bool humanLuminance) {
+    WriteLock lock(this);  // Thread-safe write access
+    
     if (m_data.empty()) return;
 
     ImageBuffer original;

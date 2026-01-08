@@ -1,19 +1,18 @@
 #ifndef RECOMBINELUMINANCEDIALOG_H
 #define RECOMBINELUMINANCEDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <vector>
-#include "../ImageBuffer.h"
 
+class MainWindowCallbacks;
 class QComboBox;
 class QDoubleSpinBox;
 class QGroupBox;
 class QCheckBox;
 class QSlider;
 class QLabel;
-class MainWindow;
 
-class RecombineLuminanceDialog : public QDialog {
+class RecombineLuminanceDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit RecombineLuminanceDialog(QWidget* parent = nullptr);
@@ -37,7 +36,7 @@ private slots:
     void updateBlendLabel(int val);
 
 private:
-    MainWindow* m_mainWindow;
+    MainWindowCallbacks* m_mainWindow;
     
     QComboBox* m_sourceCombo;
     QComboBox* m_methodCombo;

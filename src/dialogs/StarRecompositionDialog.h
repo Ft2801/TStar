@@ -1,7 +1,7 @@
 #ifndef STARRECOMPOSITIONDIALOG_H
 #define STARRECOMPOSITIONDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <QComboBox>
 #include <QSlider>
 #include <QLabel>
@@ -9,13 +9,12 @@
 #include "../ImageBuffer.h"
 #include "../algos/StarRecompositionRunner.h"
 
-class MainWindow;
+class MainWindowCallbacks;
 class ImageViewer;
-
-class StarRecompositionDialog : public QDialog {
+class StarRecompositionDialog : public DialogBase {
     Q_OBJECT
 public:
-    explicit StarRecompositionDialog(MainWindow* mainWin, QWidget* parent = nullptr);
+    explicit StarRecompositionDialog(QWidget* parent = nullptr);
 
     void setViewer(ImageViewer* v);
 
@@ -28,7 +27,6 @@ private:
     void createUI();
     void populateCombos();
     
-    MainWindow* m_mainWin;
     StarRecompositionRunner m_runner;
     
     QComboBox* m_cmbStarless;

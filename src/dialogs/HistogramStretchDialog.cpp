@@ -18,18 +18,12 @@ static constexpr float AS_DEFAULT_TARGET_BACKGROUND = 0.25f;
 static constexpr float MAD_NORM = 1.4826f;
 
 HistogramStretchDialog::HistogramStretchDialog(ImageViewer* viewer, QWidget* parent)
-    : QDialog(parent), m_viewer(nullptr), m_applied(false)
+    : DialogBase(parent, "Histogram Transformation", 700, 600), m_viewer(nullptr), m_applied(false)
 {
-    setWindowTitle(tr("Histogram Transformation"));
     setMinimumWidth(500);
     setMinimumHeight(480);
-    
     setupUI();
     setViewer(viewer);
-
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 

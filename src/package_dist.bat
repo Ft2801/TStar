@@ -15,23 +15,21 @@ if %SILENT_MODE%==0 (
 REM Move to project root (parent directory of this script)
 pushd "%~dp0.."
 
+REM Import shared utilities
+call src\windows_utils.bat
+
 set "BUILD_DIR=build"
 set "DIST_DIR=dist\TStar"
 set "ERROR_COUNT=0"
 set "COPY_COUNT=0"
 
-REM Read version from changelog.txt
-set "VERSION=1.0.0"
-if exist "changelog.txt" (
-    for /f "tokens=2" %%v in ('findstr /R "^Version [0-9.]*" changelog.txt') do (
-        set "VERSION=%%v"
-        goto :VersionDone
-    )
-)
-:VersionDone
+REM Read version from changelog.txt using shared function
+call :GetVersion
+echo Version detected: %VERSION%
 
 REM --- Verify build exists ---
-if not exist "%BUILD_DIR%\TStar.exe" (
+call :VerifyFile "%BUILD_DIR%\TStar.exe" "TStar.exe"
+if errorlevel 1 (
     echo [ERROR] TStar.exe not found in %BUILD_DIR%
     echo Please run build_all.bat first.
     if %SILENT_MODE%==0 pause
@@ -40,8 +38,8 @@ if not exist "%BUILD_DIR%\TStar.exe" (
 
 REM --- Clean old dist ---
 echo [STEP 1] Preparing distribution folder...
-if exist dist rmdir /s /q dist
-mkdir "%DIST_DIR%"
+call :SafeRmDir "dist"
+call :EnsureDir "%DIST_DIR%"
 if not exist "%DIST_DIR%" (
     echo [ERROR] Failed to create distribution directory
     if %SILENT_MODE%==0 pause
@@ -74,6 +72,7 @@ if exist "%DIST_DIR%\TStar.exe" (
 
 echo.
 echo [STEP 3] Copying Qt DLLs...
+setlocal enabledelayedexpansion
 for %%f in (Qt6Core.dll Qt6Gui.dll Qt6Network.dll Qt6Svg.dll Qt6Widgets.dll Qt6Xml.dll) do (
     copy "%BUILD_DIR%\%%f" "%DIST_DIR%\" >nul 2>&1
     if exist "%DIST_DIR%\%%f" (
@@ -84,9 +83,11 @@ for %%f in (Qt6Core.dll Qt6Gui.dll Qt6Network.dll Qt6Svg.dll Qt6Widgets.dll Qt6X
         echo   [ERROR] %%f: FAILED
     )
 )
+endlocal & set "COPY_COUNT=%COPY_COUNT%" & set "ERROR_COUNT=%ERROR_COUNT%"
 
 echo.
 echo [STEP 4] Copying MinGW runtime...
+setlocal enabledelayedexpansion
 for %%f in (libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll libgomp-1.dll) do (
     copy "%BUILD_DIR%\%%f" "%DIST_DIR%\" >nul 2>&1
     if exist "%DIST_DIR%\%%f" (
@@ -97,6 +98,7 @@ for %%f in (libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll libgomp-1.dll
         echo   [ERROR] %%f: FAILED
     )
 )
+endlocal & set "COPY_COUNT=%COPY_COUNT%" & set "ERROR_COUNT=%ERROR_COUNT%"
 
 echo.
 echo [STEP 5] Copying OpenGL (optional)...

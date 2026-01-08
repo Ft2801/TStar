@@ -1,7 +1,7 @@
 #ifndef HISTOGRAMSTRETCHDIALOG_H
 #define HISTOGRAMSTRETCHDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <QSlider>
 #include <QDoubleSpinBox>
 #include <QCheckBox>
@@ -15,7 +15,7 @@
 
 #include <QPointer>
 
-class HistogramStretchDialog : public QDialog {
+class HistogramStretchDialog : public DialogBase {
     Q_OBJECT
 
 public:

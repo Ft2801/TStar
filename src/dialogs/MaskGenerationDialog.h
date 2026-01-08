@@ -17,7 +17,9 @@ class MaskCanvas;
 class LivePreviewDialog;
 class QVBoxLayout;
 
-class MaskGenerationDialog : public QDialog {
+#include "DialogBase.h"
+
+class MaskGenerationDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit MaskGenerationDialog(const ImageBuffer& image, QWidget* parent = nullptr);

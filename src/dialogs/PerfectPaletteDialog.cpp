@@ -1,5 +1,6 @@
 #include "PerfectPaletteDialog.h"
-#include "../MainWindow.h"
+#include "MainWindowCallbacks.h"
+#include "DialogBase.h"
 #include "../ImageViewer.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -11,17 +12,11 @@
 #include <QPixmap>
 #include <QIcon>
 
-PerfectPaletteDialog::PerfectPaletteDialog(MainWindow* mainWin, QWidget* parent)
-    : QDialog(parent), m_mainWin(mainWin), m_selectedPalette("SHO")
+PerfectPaletteDialog::PerfectPaletteDialog(QWidget* parent)
+    : DialogBase(parent, "Perfect Palette Picker", 1000, 700), m_selectedPalette("SHO")
 {
-    setWindowTitle(tr("Perfect Palette Picker"));
-    setWindowIcon(QIcon(":/images/Logo.png"));
+    m_mainWin = getCallbacks();
     createUI();
-    resize(1000, 700);
-
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 void PerfectPaletteDialog::setViewer(ImageViewer* v) {
@@ -124,7 +119,8 @@ void PerfectPaletteDialog::createUI() {
 }
 
 void PerfectPaletteDialog::onLoadChannel(const QString& channel) {
-    QList<ImageViewer*> viewers = m_mainWin->findChildren<ImageViewer*>();
+    if (!m_mainWin) return;
+    QList<ImageViewer*> viewers = m_mainWin->getCurrentViewer()->window()->findChildren<ImageViewer*>();
     QStringList titles;
     QMap<QString, ImageViewer*> map;
     for (ImageViewer* v : viewers) {
@@ -291,7 +287,7 @@ void PerfectPaletteDialog::onApply() {
     ImageBuffer result;
     QString err;
     if (m_runner.run(&m_ha, &m_oiii, &m_sii, result, params, &err)) {
-        m_mainWin->createNewImageWindow(result, "Palette_" + m_selectedPalette);
+        if (m_mainWin) m_mainWin->createResultWindow(result, "Palette_" + m_selectedPalette);
         accept();
     } else {
         QMessageBox::critical(this, tr("Error"), err);

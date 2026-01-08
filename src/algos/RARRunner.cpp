@@ -9,6 +9,7 @@
 #include <QDir>
 #include <QDebug>
 #include <QStandardPaths>
+#include <iostream>
 
 RARRunner::RARRunner(QObject* parent) : QObject(parent) {}
 
@@ -61,13 +62,26 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
     p.setProcessChannelMode(QProcess::MergedChannels);
     
     // Connect output
-    connect(&p, &QProcess::readyReadStandardOutput, [&p, this](){
-        QString txt = p.readAllStandardOutput().trimmed();
+    connect(&p, &QProcess::readyReadStandardOutput, [this, &p](){
+        QByteArray data = p.readAllStandardOutput();
+        QString txt = QString::fromUtf8(data).trimmed();
         if(!txt.isEmpty()){
             // Log logic
-            if(txt.contains("INFO") || txt.contains("Progress")) emit processOutput(txt);
-            else if(txt.startsWith("RESULT")) emit processOutput(txt);
-            else emit processOutput("LOG: " + txt);
+            if(txt.contains("Progress:")) {
+                // Console output for CLI users (updates same line)
+                std::cout << "\r" << txt.toStdString() << "    " << std::flush;
+                emit processOutput(txt);
+            }
+            else if(txt.startsWith("RESULT")) {
+                std::cout << "\n[AI] " << txt.toStdString() << std::endl;
+                emit processOutput(txt);
+            }
+            else {
+                if(txt.contains("INFO") || txt.contains("DEBUG")) {
+                     std::cout << "\n[AI] " << txt.toStdString() << std::endl;
+                }
+                emit processOutput(txt);
+            }
         }
     });
 

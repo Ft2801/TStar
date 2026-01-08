@@ -63,7 +63,7 @@ void StarDetector::computeBackgroundStats(const ImageBuffer& img, int channel, d
 }
 
 // Helper for Separable Gaussian Blur
-static void applySeparableBlur(const float* src, float* dst, int w, int h, int ch, int targetChannel, float sigma) {
+[[maybe_unused]] static void applySeparableBlur(const float* src, float* dst, int w, int h, int ch, int targetChannel, float sigma) {
     if (sigma <= 0) {
         #pragma omp parallel for
         for (int i = 0; i < w * h; ++i) dst[i] = src[i * ch + targetChannel];
@@ -239,7 +239,7 @@ std::vector<DetectedStar> StarDetector::detect(const ImageBuffer& image, int cha
         return a.flux > b.flux;
     });
     
-    if (stars.size() > m_maxStars) stars.resize(m_maxStars);
+    if ((int)stars.size() > m_maxStars) stars.resize(m_maxStars);
     
     return stars;
 }

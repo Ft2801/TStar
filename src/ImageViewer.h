@@ -9,6 +9,9 @@
 #include <QPolygonF>
 #include <QScrollBar> // Added
 #include "ImageBuffer.h"
+#include <memory>
+
+class ImageHistoryManager;  // Forward declaration
 
 class ImageViewer : public QGraphicsView {
     Q_OBJECT
@@ -138,8 +141,12 @@ private:
     
     // Data & History
     ImageBuffer m_buffer;
-    std::vector<ImageBuffer> m_undoStack;
-    std::vector<ImageBuffer> m_redoStack;
+    std::vector<ImageBuffer> m_undoStack;  // Backward-compat: stores full copies (legacy mode)
+    std::vector<ImageBuffer> m_redoStack;  // Backward-compat: stores full copies (legacy mode)
+    
+    // Delta-based history (new, memory-efficient)
+    std::unique_ptr<ImageHistoryManager> m_historyManager;
+    bool m_useDeltaHistory = true;  // Feature flag: use delta compression
 
     QImage m_displayImage;
     double m_scaleFactor = 1.0;

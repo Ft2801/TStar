@@ -1,11 +1,10 @@
 #ifndef PCCDISTRIBUTIONDIALOG_H
 #define PCCDISTRIBUTIONDIALOG_H
 
-#include <QDialog>
-#include <vector>
-#include "photometry/PCCCalibrator.h"
+#include "DialogBase.h"
+#include "../photometry/PCCCalibrator.h"
 
-class PCCDistributionDialog : public QDialog {
+class PCCDistributionDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit PCCDistributionDialog(const PCCResult& result, QWidget* parent = nullptr);

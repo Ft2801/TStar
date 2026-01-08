@@ -1,7 +1,7 @@
 #ifndef CURVESDIALOG_H
 #define CURVESDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <vector>
 #include "algos/CubicSpline.h"
 
@@ -62,7 +62,7 @@ private:
     int m_hoverIdx = -1;
 };
 
-class CurvesDialog : public QDialog {
+class CurvesDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit CurvesDialog(ImageViewer* viewer, QWidget* parent = nullptr);

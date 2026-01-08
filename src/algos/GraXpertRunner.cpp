@@ -9,53 +9,63 @@
 #include <QEventLoop>
 #include <QRegularExpression>
 #include <QStandardPaths>
-
 #include <QThread>
+#include <QTimer>
 
-GraXpertRunner::GraXpertRunner(QObject* parent) : QObject(parent) {}
+// ============================================================================
+// GraXpertWorker Implementation
+// ============================================================================
 
-QString GraXpertRunner::getExecutablePath() {
+GraXpertWorker::GraXpertWorker(QObject* parent) : QObject(parent) {}
+
+QString GraXpertWorker::getExecutablePath() {
     QSettings settings;
     return settings.value("paths/graxpert").toString();
 }
 
-bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const GraXpertParams& params, QString* errorMsg) {
+void GraXpertWorker::process(const ImageBuffer& input, const GraXpertParams& params) {
+    QString errorMsg;
+    ImageBuffer output;
+    
+    if (input.data().empty()) {
+        emit finished(output, "Input buffer is empty");
+        return;
+    }
+    
     QString exe = getExecutablePath();
     if (exe.isEmpty()) {
-        if (errorMsg) *errorMsg = "GraXpert path not set.";
-        return false;
+        emit finished(output, "GraXpert path not set.");
+        return;
     }
     m_stop = false;
 
     QTemporaryDir tempDir;
     if (!tempDir.isValid()) {
-        if (errorMsg) *errorMsg = "Failed to create temp dir.";
-        return false;
+        emit finished(output, "Failed to create temp dir.");
+        return;
     }
 
     // 1. Ensure bridge script path
     QString scriptPath = QCoreApplication::applicationDirPath() + "/scripts/graxpert_bridge.py";
     if (!QFile::exists(scriptPath)) {
-        // Try Resources folder (macOS DMG bundle)
         scriptPath = QCoreApplication::applicationDirPath() + "/../Resources/scripts/graxpert_bridge.py";
     }
     if (!QFile::exists(scriptPath)) {
-        // Fallback for dev environment
         scriptPath = QCoreApplication::applicationDirPath() + "/../src/scripts/graxpert_bridge.py";
     }
 
     if (!QFile::exists(scriptPath)) {
-        if (errorMsg) *errorMsg = "Bridge script not found at: " + scriptPath;
-        return false;
+        emit finished(output, "Bridge script not found at: " + scriptPath);
+        return;
     }
 
     // 2. Write Input to Raw Float
     QString rawInputFile = tempDir.filePath("input.raw");
     {
         QFile raw(rawInputFile);
-        if(!raw.open(QIODevice::WriteOnly)) {
-            if(errorMsg) *errorMsg = "Failed to write raw input.";
-            return false;
+        if (!raw.open(QIODevice::WriteOnly)) {
+            emit finished(output, "Failed to write raw input.");
+            return;
         }
         raw.write((const char*)input.data().data(), input.data().size() * sizeof(float));
         raw.close();
@@ -69,8 +79,6 @@ bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const Gr
              << QString::number(input.width()) << QString::number(input.height()) << QString::number(input.channels())
              << rawInputFile;
         
-        QProcess p;
-        // Check for bundled python - cross-platform
         QString pythonExe;
 #if defined(Q_OS_MAC)
         QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
@@ -85,15 +93,19 @@ bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const Gr
         else if (!foundPython.isEmpty()) pythonExe = foundPython;
         else pythonExe = "python3";
         
+        QProcess p;
         p.start(pythonExe, args);
-        p.waitForFinished();
+        if (!p.waitForFinished(60000)) {
+            emit finished(output, "Bridge timeout saving TIFF.");
+            return;
+        }
+        
         if (p.exitCode() != 0) {
-            if(errorMsg) *errorMsg = "Bridge failed to save TIFF: " + p.readAllStandardOutput();
-            return false;
+            emit finished(output, "Bridge failed to save TIFF: " + p.readAllStandardOutput());
+            return;
         }
     }
     emit processOutput("Input staged via Python Bridge: " + inputFile);
-
 
     QString op = params.isDenoise ? "denoising" : "background-extraction";
     QStringList args;
@@ -119,36 +131,48 @@ bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const Gr
     // Real-time output
     connect(&process, &QProcess::readyReadStandardOutput, [&process, this](){
         QString out = process.readAllStandardOutput();
-        if(!out.isEmpty()) emit processOutput(out.trimmed());
+        if (!out.isEmpty()) emit processOutput(out.trimmed());
     });
     connect(&process, &QProcess::readyReadStandardError, [&process, this](){
         QString err = process.readAllStandardError();
-        if(!err.isEmpty()) {
+        if (!err.isEmpty()) {
             QString trimmed = err.trimmed();
-            if (trimmed.contains("INFO") || trimmed.contains("Progress")) emit processOutput(trimmed);
-            else emit processOutput("LOG: " + trimmed);
+            if (trimmed.contains("INFO") || trimmed.contains("Progress")) {
+                emit processOutput(trimmed);
+            } else {
+                emit processOutput("LOG: " + trimmed);
+            }
         }
     });
 
     process.start();
     
-    // Blocking wait with cancellation check (for worker thread)
-    while(process.state() != QProcess::NotRunning) {
+    // Wait with cancellation check (10 min timeout)
+    int elapsed = 0;
+    int interval = 100;
+    while (process.state() != QProcess::NotRunning) {
         if (m_stop) {
             process.kill();
             process.waitForFinished();
-            if(errorMsg) *errorMsg = "Process cancelled by user.";
-            return false;
+            emit finished(output, "Process cancelled by user.");
+            return;
         }
         QCoreApplication::processEvents();
-        QThread::msleep(50);
+        QThread::msleep(interval);
+        elapsed += interval;
+        if (elapsed > 600000) {  // 10 minutes
+            process.kill();
+            emit finished(output, "Process timed out.");
+            return;
+        }
     }
 
     if (process.exitCode() != 0) {
-        if (errorMsg) *errorMsg = QString("GraXpert failed (Exit Code %1): %2")
-                                    .arg(process.exitCode())
-                                    .arg(process.errorString().isEmpty() ? "Unknown error" : process.errorString());
-        return false;
+        errorMsg = QString("GraXpert failed (Exit Code %1): %2")
+                    .arg(process.exitCode())
+                    .arg(process.errorString().isEmpty() ? "Unknown error" : process.errorString());
+        emit finished(output, errorMsg);
+        return;
     }
 
     // Output filename convention: filename_GraXpert.tiff
@@ -158,10 +182,10 @@ bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const Gr
         // Fallback check
         QStringList filters; filters << "input_GraXpert.*";
         QFileInfoList found = QDir(tempDir.path()).entryInfoList(filters, QDir::Files);
-        if(!found.isEmpty()) outputFile = found.first().absoluteFilePath();
+        if (!found.isEmpty()) outputFile = found.first().absoluteFilePath();
         else {
-            if (errorMsg) *errorMsg =  "GraXpert output file not found.";
-            return false;
+            emit finished(output, "GraXpert output file not found.");
+            return;
         }
     }
 
@@ -171,7 +195,6 @@ bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const Gr
         QStringList args;
         args << scriptPath << "load" << outputFile << rawResult;
         
-        // Check for bundled python - cross-platform
         QString pythonExe = "python";
 #if defined(Q_OS_MAC)
         QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
@@ -185,14 +208,17 @@ bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const Gr
 
         QProcess p;
         p.start(pythonExe, args);
-        p.waitForFinished();
+        if (!p.waitForFinished(60000)) {
+            emit finished(output, "Bridge timeout loading result.");
+            return;
+        }
         
         QString outData = p.readAllStandardOutput().trimmed();
         emit processOutput("Bridge Output:\n" + outData);
 
         if (outData.contains("Error")) {
-             if(errorMsg) *errorMsg = "Bridge error: " + outData;
-             return false;
+            emit finished(output, "Bridge error: " + outData);
+            return;
         }
 
         // Find the line starting with RESULT:
@@ -206,14 +232,14 @@ bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const Gr
         }
 
         if (resultLine.isEmpty()) {
-             if(errorMsg) *errorMsg = "Bridge failed to provide result marker: " + outData;
-             return false;
+            emit finished(output, "Bridge failed to provide result marker: " + outData);
+            return;
         }
 
         QStringList parts = resultLine.mid(7).trimmed().split(QRegularExpression("\\s+"));
         if (parts.size() < 3) {
-             if(errorMsg) *errorMsg = "Bridge failed to parse dimensions: " + resultLine;
-             return false;
+            emit finished(output, "Bridge failed to parse dimensions: " + resultLine);
+            return;
         }
         
         int w = parts[0].toInt();
@@ -221,23 +247,99 @@ bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, const Gr
         int c = parts[2].toInt();
 
         if (w <= 0 || h <= 0) {
-            if(errorMsg) *errorMsg = "Bridge returned invalid dimensions: " + resultLine;
-            return false;
+            emit finished(output, "Bridge returned invalid dimensions: " + resultLine);
+            return;
         }
         
         QFile rawRes(rawResult);
-        if(rawRes.open(QIODevice::ReadOnly)) {
+        if (rawRes.open(QIODevice::ReadOnly)) {
             QByteArray blob = rawRes.readAll();
             std::vector<float> data(blob.size()/4);
             memcpy(data.data(), blob.constData(), blob.size());
             output.setData(w, h, c, data);
+            output.setMetadata(input.metadata());
             emit processOutput(QString("Loaded via Bridge: %1x%2 %3ch").arg(w).arg(h).arg(c));
         } else {
-             if(errorMsg) *errorMsg = "Failed to read raw result.";
-             return false;
+            emit finished(output, "Failed to read raw result.");
+            return;
         }
     }
     
-    output.setMetadata(input.metadata()); // Preserve WCS and other metadata
+    emit finished(output, "");  // Success
+}
+
+// ============================================================================
+// GraXpertRunner Implementation
+// ============================================================================
+
+GraXpertRunner::GraXpertRunner(QObject* parent) 
+    : QObject(parent) {}
+
+GraXpertRunner::~GraXpertRunner() {
+    if (m_thread) {
+        m_thread->quit();
+        if (!m_thread->wait(5000)) {
+            m_thread->terminate();
+            m_thread->wait();
+        }
+    }
+}
+
+bool GraXpertRunner::run(const ImageBuffer& input, ImageBuffer& output, 
+                         const GraXpertParams& params, QString* errorMsg) {
+    // Create thread and worker if not already created
+    if (!m_thread) {
+        m_thread = new QThread(this);
+        m_worker = new GraXpertWorker();
+        m_worker->moveToThread(m_thread);
+        
+        // Connect signals
+        connect(m_thread, &QThread::finished, m_worker, &QObject::deleteLater);
+        connect(m_worker, &GraXpertWorker::finished, this, &GraXpertRunner::onWorkerFinished);
+        connect(m_worker, &GraXpertWorker::processOutput, this, &GraXpertRunner::processOutput);
+        
+        m_thread->start();
+    }
+    
+    // Reset synchronization flag
+    m_finished = false;
+    
+    // Emit process signal (queued call in worker thread)
+    QMetaObject::invokeMethod(m_worker, "process", Qt::QueuedConnection,
+                              Q_ARG(const ImageBuffer&, input),
+                              Q_ARG(const GraXpertParams&, params));
+    
+    // Wait for completion with event loop
+    QEventLoop loop;
+    connect(this, &GraXpertRunner::finished, &loop, &QEventLoop::quit);
+    
+    // Timeout: 15 minutes
+    QTimer timer;
+    timer.setSingleShot(true);
+    timer.start(15 * 60 * 1000);
+    connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+    
+    loop.exec();
+    timer.stop();
+    
+    if (!m_finished) {
+        if (errorMsg) *errorMsg = "Operation timed out";
+        m_errorMsg = "Operation timed out";
+        return false;
+    }
+    
+    if (!m_errorMsg.isEmpty()) {
+        if (errorMsg) *errorMsg = m_errorMsg;
+        return false;
+    }
+    
+    output = m_output;
     return true;
+}
+
+void GraXpertRunner::onWorkerFinished(const ImageBuffer& output, const QString& errorMsg) {
+    m_output = output;
+    m_errorMsg = errorMsg;
+    m_finished = true;
+    emit finished();
 }

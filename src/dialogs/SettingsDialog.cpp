@@ -10,9 +10,7 @@
 #include <QGroupBox>
 #include <QCheckBox>
 
-SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
-    setWindowTitle(tr("Preferences"));
-    resize(600, 500);
+SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, "Settings", 500, 400) {
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     
@@ -104,9 +102,6 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
     // Insert Display group after General group (index 1)
     mainLayout->insertWidget(1, displayGroup);
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 void SettingsDialog::pickStarNetPath() {

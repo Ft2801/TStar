@@ -7,10 +7,7 @@
 #include <QMessageBox>
 #include "../ImageViewer.h"
 
-CropRotateDialog::CropRotateDialog(QWidget* parent) : QDialog(parent) {
-    setWindowTitle(tr("Rotate & Crop Tool"));
-    setWindowIcon(QIcon(":/images/Logo.png"));
-    
+CropRotateDialog::CropRotateDialog(QWidget* parent) : DialogBase(parent, "Rotate & Crop Tool", 300, 200) {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     
     // Rotation Controls

@@ -19,10 +19,8 @@
 #include <QUuid>
 
 MaskGenerationDialog::MaskGenerationDialog(const ImageBuffer& image, QWidget* parent) 
-    : QDialog(parent), m_sourceImage(image) 
+    : DialogBase(parent, "Mask Generation", 1024, 800), m_sourceImage(image) 
 {
-    setWindowTitle(tr("Mask Creation"));
-    resize(980, 640);
     setWindowFlag(Qt::Window); // Allow minimize/maximize
     
     m_livePreview = nullptr; // Create only when Preview Mask is clicked
@@ -569,7 +567,7 @@ std::vector<float> MaskGenerationDialog::getStarMask(int w, int h) const {
      // 3. Draw
      cv::Mat mask = cv::Mat::zeros(h, w, CV_32FC1);
      
-     float scale = (float)w / m_sourceImage.width();
+     // Scale variable removed - not used
 
      for (const auto& s : stars) {
          int r = std::max(1, (int)(s.hfr * 2.0f)); 
@@ -589,7 +587,7 @@ std::vector<float> MaskGenerationDialog::getStarMask() const {
     return getStarMask(m_sourceImage.width(), m_sourceImage.height());
 }
 
-std::vector<float> MaskGenerationDialog::generateRangeMask(const std::vector<float>& base) {
+std::vector<float> MaskGenerationDialog::generateRangeMask([[maybe_unused]] const std::vector<float>& base) {
 
     std::vector<float> comp = getComponentLightness();
     

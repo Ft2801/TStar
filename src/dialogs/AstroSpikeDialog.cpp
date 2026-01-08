@@ -145,7 +145,6 @@ StarDetectionThread::StarDetectionThread(const ImageBuffer& buffer, float thresh
         m_lumData.resize(total);
         m_rgbData.resize(total * 3);
         
-        const uint8_t* bits = m_bufferImage.constBits();
         // Assuming Format_RGB888 or Format_ARGB32 (4 bytes)
         // Let's iterate safely using scanlines
         int depth = m_bufferImage.depth() / 8;
@@ -356,7 +355,7 @@ void AstroSpikeCanvas::fitToView() {
     update();
 }
 
-void AstroSpikeCanvas::paintEvent(QPaintEvent* event) {
+void AstroSpikeCanvas::paintEvent([[maybe_unused]] QPaintEvent* event) {
     QPainter p(this);
     p.fillRect(rect(), Qt::black);
     
@@ -672,7 +671,7 @@ void AstroSpikeCanvas::mouseMoveEvent(QMouseEvent* event) {
     }
 }
 
-void AstroSpikeCanvas::mouseReleaseEvent(QMouseEvent* event) {
+void AstroSpikeCanvas::mouseReleaseEvent([[maybe_unused]] QMouseEvent* event) {
     if (m_dragging) {
         m_dragging = false;
         setCursor(Qt::OpenHandCursor);
@@ -734,9 +733,8 @@ void AstroSpikeCanvas::handleTool(const QPointF& imgPos) {
 // =============================================================================
 
 AstroSpikeDialog::AstroSpikeDialog(ImageViewer* viewer, QWidget* parent)
-    : QDialog(parent), m_viewer(viewer)
+    : DialogBase(parent, "AstroSpike", 1000, 600), m_viewer(viewer)
 {
-    setWindowTitle(tr("AstroSpike"));
     resize(1800, 1200); // Increased size as requested
     
     // Setup UI

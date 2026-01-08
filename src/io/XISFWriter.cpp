@@ -26,9 +26,7 @@ bool XISFWriter::write(const QString& filePath, const ImageBuffer& buffer,
         return false;
     }
 
-    int w = buffer.width();
-    int h = buffer.height();
-    int c = buffer.channels();
+    
     
     // Prepare image data (interleaved -> planar, convert to target format)
     QByteArray rawData = prepareImageData(buffer, depth);

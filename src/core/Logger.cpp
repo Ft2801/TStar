@@ -8,7 +8,12 @@
 #ifdef Q_OS_WIN
 #include <windows.h>
 #include <dbghelp.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#ifdef _MSC_VER
 #pragma comment(lib, "dbghelp.lib")
+#endif
+#pragma GCC diagnostic pop
 #endif
 
 // Static member initialization

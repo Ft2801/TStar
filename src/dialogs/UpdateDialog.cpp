@@ -16,10 +16,8 @@
 #include <QDebug>
 
 UpdateDialog::UpdateDialog(QWidget* parent, const QString& version, const QString& changelog, const QString& downloadUrl) 
-    : QDialog(parent), m_downloadUrl(downloadUrl), m_nam(nullptr), m_reply(nullptr), m_file(nullptr)
+    : DialogBase(parent, "Update Available: v" + version, 500, 400), m_downloadUrl(downloadUrl), m_nam(nullptr), m_reply(nullptr), m_file(nullptr)
 {
-    setWindowTitle(tr("Update Available: v%1").arg(version));
-    resize(500, 400);
     setWindowIcon(QIcon(":/images/Logo.png"));
 
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -58,9 +56,6 @@ UpdateDialog::UpdateDialog(QWidget* parent, const QString& version, const QStrin
     connect(m_updateBtn, &QPushButton::clicked, this, &UpdateDialog::startDownload);
     connect(m_cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 UpdateDialog::~UpdateDialog() {

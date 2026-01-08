@@ -1,7 +1,7 @@
 #ifndef STRETCHDIALOG_H
 #define STRETCHDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <QSlider>
 #include <QDoubleSpinBox>
 #include <QCheckBox>
@@ -13,7 +13,7 @@
 #include "ImageBuffer.h"
 #include <QPointer>
 
-class StretchDialog : public QDialog {
+class StretchDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit StretchDialog(QWidget* parent = nullptr);

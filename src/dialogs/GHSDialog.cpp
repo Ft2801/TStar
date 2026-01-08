@@ -21,16 +21,12 @@
 #include <QKeySequence>
 
 
-GHSDialog::GHSDialog(QWidget *parent) : QDialog(parent), m_previewPending(false), m_activeViewer(nullptr), m_applied(false) {
+GHSDialog::GHSDialog(QWidget *parent) : DialogBase(parent, "Generalized Hyperbolic Stretch (GHT)", 500, 700), m_previewPending(false), m_activeViewer(nullptr), m_applied(false) {
     // Interaction
     m_interactionEnabled = false;
-
-    setWindowTitle(tr("Generalized Hyperbolic Stretch (GHT)"));
-    setWindowIcon(QIcon(":/images/Logo.png"));
-    resize(500, 700);
+    setModal(false);
     setupUI();
     connectSignals();
-    setModal(false);
 }
 
 GHSDialog::~GHSDialog() {

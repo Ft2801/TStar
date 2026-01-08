@@ -6,17 +6,11 @@
 #include <cmath>
 
 SaturationDialog::SaturationDialog(QWidget* parent, ImageViewer* viewer) 
-    : QDialog(parent), m_viewer(nullptr), m_buffer(nullptr) {
-    setWindowTitle(tr("Color Saturation"));
-    setMinimumWidth(350);
+    : DialogBase(parent, "Color Saturation", 350, 400), m_viewer(nullptr), m_buffer(nullptr) {
     setupUI();
     
     if (viewer) {
-        setTarget(viewer);
-    }
-
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
+        setViewer(viewer);
     }
 }
 
@@ -139,7 +133,7 @@ void SaturationDialog::onPresetChanged(int index) {
 
 // ... setupUI (keep mostly same but remove old constructor dependency if needed) ...
 
-void SaturationDialog::setTarget(ImageViewer* viewer) {
+void SaturationDialog::setViewer(ImageViewer* viewer) {
     if (m_viewer == viewer) return;
 
     // 1. Restore OLD viewer if we have an uncommitted preview

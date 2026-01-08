@@ -9,7 +9,9 @@
 #include <QHBoxLayout>
 #include "core/MaskLayer.h"
 
-class ApplyMaskDialog : public QDialog {
+#include "DialogBase.h"
+
+class ApplyMaskDialog : public DialogBase {
     Q_OBJECT
 public:
     ApplyMaskDialog(int targetWidth, int targetHeight, QWidget* parent = nullptr);

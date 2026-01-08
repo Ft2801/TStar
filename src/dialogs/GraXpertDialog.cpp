@@ -18,14 +18,9 @@ static bool detectGpuAvailable() {
     return hasCuda || hasDirectML;
 }
 
-GraXpertDialog::GraXpertDialog(QWidget* parent) : QDialog(parent) {
-    setWindowTitle(tr("GraXpert"));
+GraXpertDialog::GraXpertDialog(QWidget* parent) : DialogBase(parent, "GraXpert", 350, 250) {
     setWindowIcon(QIcon(":/images/Logo.png"));
-    resize(350, 250);
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     QGroupBox* grp = new QGroupBox(tr("Operation"), this);

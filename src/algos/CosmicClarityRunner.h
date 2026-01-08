@@ -3,6 +3,8 @@
 
 #include <QString>
 #include <QObject>
+#include <QPointer>
+#include <QThread>
 #include "ImageBuffer.h"
 #include <atomic>
 
@@ -30,17 +32,19 @@ struct CosmicClarityParams {
     bool useGpu = true;
 };
 
-class CosmicClarityRunner : public QObject {
+// Worker class runs in separate thread
+class CosmicClarityWorker : public QObject {
     Q_OBJECT
 public:
-    explicit CosmicClarityRunner(QObject* parent = nullptr);
-    bool run(const ImageBuffer& input, ImageBuffer& output, const CosmicClarityParams& params, QString* errorMsg);
+    explicit CosmicClarityWorker(QObject* parent = nullptr);
+    
+public slots:
+    void process(const ImageBuffer& input, const CosmicClarityParams& params);
+    void cancel() { m_stop = true; }
 
 signals:
+    void finished(const ImageBuffer& output, const QString& errorMsg);
     void processOutput(const QString& text);
-
-public slots:
-    void cancel() { m_stop = true; }
 
 private:
     QString getCosmicFolder();
@@ -48,4 +52,35 @@ private:
     std::atomic<bool> m_stop{false};
 };
 
-#endif // COSMICCLARITYRUNNER_H
+class CosmicClarityRunner : public QObject {
+    Q_OBJECT
+public:
+    explicit CosmicClarityRunner(QObject* parent = nullptr);
+    ~CosmicClarityRunner();  // Proper cleanup
+    
+    // Thread-safe run method
+    bool run(const ImageBuffer& input, ImageBuffer& output, const CosmicClarityParams& params, QString* errorMsg);
+
+signals:
+    void processOutput(const QString& text);
+    void workerDone();
+
+public slots:
+    void cancel() { 
+        if (m_worker) {
+            m_worker->cancel();
+        }
+    }
+
+private slots:
+    void onWorkerFinished(const ImageBuffer& output, const QString& errorMsg);
+
+private:
+    QPointer<QThread> m_thread;          // Safe pointer to thread
+    QPointer<CosmicClarityWorker> m_worker; // Safe pointer to worker
+    ImageBuffer m_output;                // Temporary storage for result
+    QString m_errorMsg;                  // Temporary storage for error
+    bool m_finished = false;             // Synchronization flag
+};
+
+#endif // COSMICCLARITYRUNNER_H // COSMICCLARITYRUNNER_H

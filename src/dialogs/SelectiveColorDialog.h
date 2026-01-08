@@ -1,11 +1,11 @@
 #ifndef SELECTIVECOLORDIALOG_H
 #define SELECTIVECOLORDIALOG_H
 
-#include <QDialog>
-#include <QImage>
+#include "DialogBase.h"
+#include <QPointer>
+#include <QImage> // Kept as it's not explicitly removed and likely still needed
 #include "../ImageBuffer.h"
 
-class QSlider;
 class QLabel;
 class QComboBox;
 class QCheckBox;
@@ -15,12 +15,13 @@ class QGraphicsView;
 class QGraphicsScene;
 class QGraphicsPixmapItem;
 class QPushButton;
-class MainWindow;
+class QSlider;
+class MainWindowCallbacks;
 
-class SelectiveColorDialog : public QDialog {
+class SelectiveColorDialog : public DialogBase { // Changed base class
     Q_OBJECT
 public:
-    explicit SelectiveColorDialog(MainWindow* parent);
+    explicit SelectiveColorDialog(QWidget* parent = nullptr); // Changed constructor
     ~SelectiveColorDialog();
     
     void setSource(const ImageBuffer& img);
@@ -37,7 +38,6 @@ private:
     ImageBuffer applyAdjustments(const ImageBuffer& src, const std::vector<float>& mask);
     std::vector<float> computeHueMask(const ImageBuffer& src);
     
-    MainWindow* m_mainWindow;
     ImageBuffer m_sourceImage;
     ImageBuffer m_previewImage;
     std::vector<float> m_mask;

@@ -133,13 +133,13 @@ ImageBuffer ChannelOps::computeLuminance(const ImageBuffer& src, LumaMethod meth
 
     // Determine Weights
     float wr = 0.333f, wg = 0.333f, wb = 0.333f;
-    bool useWeights = true;
+    [[maybe_unused]] bool useWeights = true;
     
     if (method == LumaMethod::MAX || method == LumaMethod::MEDIAN) {
         useWeights = false;
     } else if (method == LumaMethod::SNR) {
         std::vector<float> sigmas = customNoiseSigma;
-        if (sigmas.size() != c) {
+        if ((int)sigmas.size() != c) {
             sigmas = estimateNoiseSigma(src);
         }
         // w = 1 / (sigma^2 + eps), normalized
@@ -326,9 +326,9 @@ ImageBuffer ChannelOps::debayer(const ImageBuffer& mosaic, const std::string& pa
     
     // Determine color type at position based on pattern
     auto getColorType = [&](int x, int y) -> int {
-        int px = x % 2, py = y % 2;
-        if (px == offsets[0] && py == offsets[1]) return 0; // R
-        if (px == offsets[6] && py == offsets[7]) return 2; // B
+        int py = y % 2;
+        if (x % 2 == offsets[0] && py == offsets[1]) return 0; // R
+        if (x % 2 == offsets[6] && py == offsets[7]) return 2; // B
         return 1; // G
     };
     
@@ -386,7 +386,7 @@ ImageBuffer ChannelOps::debayer(const ImageBuffer& mosaic, const std::string& pa
             else { // G pixel
                 g = getPixel(x, y);
                 // Determine R/B axis from pattern position
-                int px = x % 2, py = y % 2;
+                int py = y % 2;
                 bool rOnRow = (py == offsets[1]); // R is on this row
                 
                 if (rOnRow) {
@@ -433,8 +433,7 @@ float ChannelOps::computeDebayerScore(const ImageBuffer& rgb) {
     
     for (int y = 1; y < h - 1; y += 2) {
         for (int x = 1; x < w - 1; x += 2) {
-            int idx = (y * w + x) * 3;
-            float r = data[idx], g = data[idx + 1], b = data[idx + 2];
+            // Compute score at this position
             
             // Horizontal gradient for R-G difference
             int idxL = (y * w + x - 1) * 3;

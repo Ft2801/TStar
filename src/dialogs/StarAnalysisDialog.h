@@ -53,7 +53,9 @@ private:
 // ... (Classes)
 
 // Main Dialog
-class StarAnalysisDialog : public QDialog {
+#include "DialogBase.h"
+
+class StarAnalysisDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit StarAnalysisDialog(QWidget* parent = nullptr, ImageViewer* viewer = nullptr);

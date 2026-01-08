@@ -200,7 +200,7 @@ void LinkStrip::mouseMoveEvent(QMouseEvent *event) {
     
     QDrag *drag = new QDrag(this);
     QMimeData *mimeData = new QMimeData();
-    bool isLink = true; // Always link mode from LinkStrip
+    // Link mode always true for LinkStrip
     
     QWidget* widget = this;
     while(widget && !widget->inherits("CustomMdiSubWindow")) {

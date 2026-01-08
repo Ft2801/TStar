@@ -1,28 +1,28 @@
 #ifndef ANNOTATION_TOOL_DIALOG_H
 #define ANNOTATION_TOOL_DIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <QPushButton>
-#include <QToolButton>
-#include <QButtonGroup>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QProgressBar>
 #include <QLabel>
-#include <QPointer>
-#include <QVector>
 #include <QStack>
+#include <QVector>
+#include <QPointer>
+#include "../ImageViewer.h"
+#include <QComboBox>
+#include <QButtonGroup>
+#include <QToolButton>
+#include "../ImageBuffer.h"
 
 class ImageViewer;
-class MainWindow;
+class MainWindowCallbacks;
 class AnnotationOverlay;
 struct CatalogObject;
 struct Annotation;
 
-class AnnotationToolDialog : public QDialog {
+class AnnotationToolDialog : public DialogBase {
     Q_OBJECT
 public:
-    explicit AnnotationToolDialog(MainWindow* parent);
+    explicit AnnotationToolDialog(QWidget* parent = nullptr);
     ~AnnotationToolDialog();
 
     void setViewer(ImageViewer* viewer);
@@ -47,7 +47,6 @@ private:
     void pushUndoState();
     void updateUndoRedoButtons();
 
-    MainWindow* m_mainWindow;
     QPointer<ImageViewer> m_viewer;
     AnnotationOverlay* m_overlay = nullptr;
 

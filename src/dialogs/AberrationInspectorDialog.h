@@ -10,7 +10,9 @@ class QGraphicsView;
 class QSpinBox;
 class QLabel;
 
-class AberrationInspectorDialog : public QDialog {
+#include "DialogBase.h"
+
+class AberrationInspectorDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit AberrationInspectorDialog(const ImageBuffer& img, QWidget* parent = nullptr);

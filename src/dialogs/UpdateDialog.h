@@ -12,7 +12,9 @@ class QProgressBar;
 class QLabel;
 class QPushButton;
 
-class UpdateDialog : public QDialog {
+#include "DialogBase.h"
+
+class UpdateDialog : public DialogBase {
     Q_OBJECT
 public:
     UpdateDialog(QWidget* parent, const QString& version, const QString& changelog, const QString& downloadUrl);

@@ -12,7 +12,9 @@
 #include <QPointer>
 #include "../ImageViewer.h"
 
-class PCCDialog : public QDialog {
+#include "DialogBase.h"
+
+class PCCDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit PCCDialog(ImageViewer* viewer, QWidget* parent = nullptr);

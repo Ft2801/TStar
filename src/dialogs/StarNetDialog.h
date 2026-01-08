@@ -1,23 +1,22 @@
 #ifndef STARNETDIALOG_H
 #define STARNETDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <QCheckBox>
-#include <QSpinBox>
 #include <QPushButton>
+#include <QSpinBox>
 
-class MainWindow;
+class MainWindowCallbacks;
 
-class StarNetDialog : public QDialog {
+class StarNetDialog : public DialogBase {
     Q_OBJECT
 public:
-    explicit StarNetDialog(MainWindow* parent = nullptr);
+    explicit StarNetDialog(QWidget* parent = nullptr);
 
 private slots:
     void onRun();
 
 private:
-    MainWindow* m_mainWin;
     QCheckBox* m_chkLinear;
     QCheckBox* m_chkGenerateMask;
     QCheckBox* m_chkGpu;

@@ -6,11 +6,9 @@
 #include <QIcon>
 
 ChannelCombinationDialog::ChannelCombinationDialog(const std::vector<ChannelSource>& availableSources, QWidget* parent)
-    : QDialog(parent), m_sources(availableSources)
+    : DialogBase(parent, "Channel Combination", 400, 200), m_sources(availableSources)
 {
-    setWindowTitle(tr("Channel Combination"));
     setWindowIcon(QIcon(":/images/Logo.png"));
-    resize(400, 200);
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
@@ -51,9 +49,6 @@ ChannelCombinationDialog::ChannelCombinationDialog(const std::vector<ChannelSour
     connect(btnOk, &QPushButton::clicked, this, &ChannelCombinationDialog::onApply);
     connect(btnCancel, &QPushButton::clicked, this, &ChannelCombinationDialog::onCancel);
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 void ChannelCombinationDialog::onApply() {

@@ -5,7 +5,9 @@
 #include <QScrollArea>
 #include <QTextBrowser>
 
-class HelpDialog : public QDialog
+#include "DialogBase.h"
+
+class HelpDialog : public DialogBase
 {
     Q_OBJECT
 public:

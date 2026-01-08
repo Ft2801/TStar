@@ -7,7 +7,9 @@
 #include <QLineEdit>
 #include "ImageBuffer.h"
 
-class HeaderViewerDialog : public QDialog {
+#include "DialogBase.h"
+
+class HeaderViewerDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit HeaderViewerDialog(const ImageBuffer::Metadata& meta, QWidget* parent = nullptr);

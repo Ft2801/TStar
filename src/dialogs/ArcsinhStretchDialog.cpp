@@ -11,17 +11,11 @@
 #endif
 
 ArcsinhStretchDialog::ArcsinhStretchDialog(ImageViewer* viewer, QWidget* parent)
-    : QDialog(parent), m_viewer(nullptr), m_applied(false)
+    : DialogBase(parent, "Arcsinh Stretch", 500, 400), m_viewer(nullptr), m_applied(false)
 {
-    setWindowTitle(tr("Arcsinh Stretch"));
     setMinimumWidth(400);
-    
     setupUI();
-    setViewer(viewer); // Use centralized logic
-
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
+    setViewer(viewer);
 }
 
 void ArcsinhStretchDialog::setViewer(ImageViewer* v) {

@@ -1,5 +1,6 @@
 #include "ContinuumSubtractionDialog.h"
-#include "../MainWindow.h"
+#include "MainWindowCallbacks.h"
+#include "DialogBase.h"
 #include "../ImageViewer.h"
 #include "../ImageBuffer.h"
 #include "../algos/ChannelOps.h"
@@ -13,9 +14,9 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 
-ContinuumSubtractionDialog::ContinuumSubtractionDialog(MainWindow* parent)
-    : QDialog(parent), m_mainWindow(parent) {
-    setWindowTitle(tr("Continuum Subtraction"));
+ContinuumSubtractionDialog::ContinuumSubtractionDialog(QWidget* parent)
+    : DialogBase(parent, tr("Continuum Subtraction")) {
+    m_mainWindow = getCallbacks();
     setMinimumWidth(400);
     
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -97,9 +98,6 @@ ContinuumSubtractionDialog::ContinuumSubtractionDialog(MainWindow* parent)
     
     refreshImageList();
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 void ContinuumSubtractionDialog::setViewer(ImageViewer* v) {
@@ -118,16 +116,14 @@ void ContinuumSubtractionDialog::refreshImageList() {
     if (!m_mainWindow) return;
     
     // Find MDI area and populate with open images
-    QMdiArea* mdi = m_mainWindow->findChild<QMdiArea*>();
-    if (!mdi) return;
-    
-    for (QMdiSubWindow* sub : mdi->subWindowList()) {
-        CustomMdiSubWindow* csw = qobject_cast<CustomMdiSubWindow*>(sub);
-        if (!csw) continue;
+    ImageViewer* v_cur = m_mainWindow ? m_mainWindow->getCurrentViewer() : nullptr;
+    if (!v_cur) return;
+    auto sublist = v_cur->window()->findChildren<CustomMdiSubWindow*>();
+    for (CustomMdiSubWindow* csw : sublist) {
         ImageViewer* v = csw->viewer();
         if (!v) continue;
         
-        QString title = sub->windowTitle();
+        QString title = csw->windowTitle();
         m_narrowbandCombo->addItem(title, QVariant::fromValue(reinterpret_cast<quintptr>(v)));
         m_continuumCombo->addItem(title, QVariant::fromValue(reinterpret_cast<quintptr>(v)));
     }
@@ -223,7 +219,7 @@ void ContinuumSubtractionDialog::onApply() {
     
     // Create new window with result
     QString title = QString("%1_ContinuumSub").arg(m_narrowbandCombo->currentText());
-    m_mainWindow->createNewImageWindow(result, title);
+    if (m_mainWindow) m_mainWindow->createResultWindow(result, title);
     
     m_progress->setValue(100);
     m_statusLabel->setText(tr("Done."));

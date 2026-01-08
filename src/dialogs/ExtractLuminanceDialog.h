@@ -3,15 +3,15 @@
 
 #include <QDialog>
 #include <vector>
-#include "../ImageBuffer.h"
+#include "DialogBase.h"
 
 class QComboBox;
 class QDoubleSpinBox;
 class QGroupBox;
 class QCheckBox;
-class MainWindow;
+class MainWindowCallbacks; // Changed from MainWindow to MainWindowCallbacks, and moved up
 
-class ExtractLuminanceDialog : public QDialog {
+class ExtractLuminanceDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit ExtractLuminanceDialog(QWidget* parent = nullptr);
@@ -45,7 +45,7 @@ private:
     QDoubleSpinBox* m_sigmaG;
     QDoubleSpinBox* m_sigmaB;
     
-    MainWindow* m_mainWindow;
+    MainWindowCallbacks* m_mainWindow;
 };
 
 #endif // EXTRACTLUMINANCEDIALOG_H

@@ -1,5 +1,8 @@
 #include "ClaheDialog.h"
-#include "../MainWindow.h"
+#include "MainWindowCallbacks.h"
+#include "DialogBase.h"
+#include "../ImageViewer.h"
+#include "../ImageBuffer.h"
 #include <QGraphicsView>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -15,23 +18,21 @@
 #include <QTimer>
 #include <opencv2/opencv.hpp>
 
-ClaheDialog::ClaheDialog(MainWindow* parent) 
-    : QDialog(parent), m_mainWindow(parent), m_previewDirty(false)
+ClaheDialog::ClaheDialog(QWidget* parent) 
+    : DialogBase(parent, tr("CLAHE"))
 {
+    m_mainWindow = getCallbacks();
     setWindowTitle(tr("CLAHE (Contrast Limited Adaptive Histogram Equalization)"));
     resize(800, 600);
     
     // Grab current image
-    if (m_mainWindow->currentViewer() && m_mainWindow->currentViewer()->getBuffer().isValid()) {
-        m_sourceImage = m_mainWindow->currentViewer()->getBuffer();
+    if (m_mainWindow && m_mainWindow->getCurrentViewer() && m_mainWindow->getCurrentViewer()->getBuffer().isValid()) {
+        m_sourceImage = m_mainWindow->getCurrentViewer()->getBuffer();
     }
     
     setupUi();
     onReset(); // Default values
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 ClaheDialog::~ClaheDialog() {}
@@ -197,10 +198,9 @@ void ClaheDialog::onApply() {
     float clip = m_clipSlider->value() / 10.0f;
     int grid = m_tileSlider->value();
     
-    m_mainWindow->pushUndo();
-    
+    if (!m_mainWindow) return;
     // Apply directly to current image
-    ImageViewer* viewer = m_mainWindow->currentViewer();
+    ImageViewer* viewer = m_mainWindow->getCurrentViewer();
     if (viewer && viewer->getBuffer().isValid()) {
         ImageBuffer& buffer = viewer->getBuffer();
         
@@ -220,7 +220,7 @@ void ClaheDialog::onApply() {
         }
         
         viewer->refreshDisplay();
-        m_mainWindow->statusBar()->showMessage(tr("CLAHE applied."));
+        m_mainWindow->logMessage(tr("CLAHE applied."), 1, true);
     }
     
     accept();

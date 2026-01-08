@@ -8,7 +8,9 @@
 #include <QCheckBox>
 #include "algos/GraXpertRunner.h"
 
-class GraXpertDialog : public QDialog {
+#include "DialogBase.h"
+
+class GraXpertDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit GraXpertDialog(QWidget* parent = nullptr);

@@ -18,70 +18,67 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/.."
 PROJECT_ROOT="$(pwd)"
 
-# --- Read version ---
-VERSION="1.0.0"
-if [ -f "changelog.txt" ]; then
-    VERSION=$(grep -E "^Version [0-9.]+" changelog.txt | head -1 | awk '{print $2}')
-    if [ -z "$VERSION" ]; then
-        VERSION="1.0.0"
-    fi
+# Load utilities
+if [ -f "$SCRIPT_DIR/macos_utils.sh" ]; then
+    source "$SCRIPT_DIR/macos_utils.sh"
+else
+    echo "[ERROR] macos_utils.sh not found!"
+    exit 1
 fi
-echo "[INFO] Building version: $VERSION"
-echo ""
+
+# --- Read version ---
+VERSION=$(get_version)
+log_info "Building version: $VERSION"
 
 # --- STEP 0: Verify Prerequisites ---
 echo "[STEP 0] Verifying prerequisites..."
 
-# Check for hdiutil (built into macOS)
-if ! command -v hdiutil &> /dev/null; then
-    echo "[ERROR] hdiutil not found (should be built into macOS)"
+check_command hdiutil || {
+    log_error "hdiutil not found (should be built into macOS)"
     exit 1
-fi
+}
 echo "  - hdiutil: OK"
 
 # Check for create-dmg (optional, better DMG aesthetics)
 CREATE_DMG=""
-if command -v create-dmg &> /dev/null; then
+if check_command create-dmg; then
     CREATE_DMG="create-dmg"
     echo "  - create-dmg: OK (will use for better styling)"
 else
-    echo "  - create-dmg: NOT FOUND (will use basic hdiutil)"
+    log_warning "create-dmg not found (will use basic hdiutil)"
     echo "  - TIP: Install with 'brew install create-dmg' for prettier DMGs"
 fi
 
 # --- STEP 1: Build Application ---
 echo ""
-echo "[STEP 1] Building application..."
+log_step 1 "Building application..."
 
 if [ ! -f "build/TStar.app/Contents/MacOS/TStar" ]; then
-    ./src/build_macos.sh
+    ./src/build_macos.sh --lto-on
 fi
 echo "  - Build: OK"
 
 # --- STEP 2: Create Distribution Package ---
 echo ""
-echo "[STEP 2] Creating distribution package..."
+log_step 2 "Creating distribution package..."
 
 ./src/package_macos.sh --silent
 echo "  - Distribution: OK"
 
 # Verify distribution
-if [ ! -d "dist/TStar.app" ]; then
-    echo "[ERROR] Distribution incomplete - TStar.app not found!"
-    exit 1
-fi
+verify_dir "dist/TStar.app" "Distribution" || exit 1
 
 # --- STEP 3: Clean Previous Output ---
 echo ""
-echo "[STEP 3] Cleaning previous installer output..."
+log_step 3 "Cleaning previous installer output..."
 
-mkdir -p "installer_output"
+ensure_dir "installer_output"
 rm -f "installer_output/TStar_Setup_"*.dmg
 echo "  - Cleaned"
 
 # --- STEP 4: Create DMG ---
 echo ""
-echo "[STEP 4] Creating DMG installer..."
+log_step 4 "Creating DMG installer..."
 
 DMG_NAME="TStar_Setup_${VERSION}.dmg"
 DMG_PATH="installer_output/$DMG_NAME"
@@ -89,8 +86,8 @@ DMG_TEMP="installer_output/TStar_temp.dmg"
 
 # Prepare staging directory
 STAGING_DIR="installer_output/dmg_staging"
-rm -rf "$STAGING_DIR"
-mkdir -p "$STAGING_DIR"
+safe_rm_rf "$STAGING_DIR"
+ensure_dir "$STAGING_DIR"
 
 # Copy app to staging
 cp -R "dist/TStar.app" "$STAGING_DIR/"
@@ -150,16 +147,13 @@ else
 fi
 
 # Clean staging
-rm -rf "$STAGING_DIR"
+safe_rm_rf "$STAGING_DIR"
 
 # --- STEP 5: Verify DMG ---
 echo ""
-echo "[STEP 5] Verifying DMG..."
+log_step 5 "Verifying DMG..."
 
-if [ ! -f "$DMG_PATH" ]; then
-    echo "[ERROR] DMG file not created!"
-    exit 1
-fi
+verify_file "$DMG_PATH" "DMG file" || exit 1
 
 DMG_SIZE=$(du -h "$DMG_PATH" | cut -f1)
 echo "  - DMG created: $DMG_NAME"

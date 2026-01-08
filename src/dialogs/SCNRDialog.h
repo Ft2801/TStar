@@ -1,13 +1,14 @@
 #ifndef SCNRDIALOG_H
 #define SCNRDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
+#include <QPointer>
+#include "../ImageViewer.h"
 #include <QComboBox>
 #include <QSlider>
 #include <QDoubleSpinBox>
-#include <QPointer>
 
-class SCNRDialog : public QDialog {
+class SCNRDialog : public DialogBase {
     Q_OBJECT
 public:
     enum ProtectionMethod {

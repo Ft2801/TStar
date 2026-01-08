@@ -1,6 +1,10 @@
 TStar Changelog
 ===============
 
+Version 1.4.0
+-------------
+- Major app optimizations across the entire codebase
+
 Version 1.3.4
 -------------
 - Fixed linked views bug

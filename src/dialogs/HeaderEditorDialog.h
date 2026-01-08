@@ -10,7 +10,9 @@
 
 class ImageViewer;
 
-class HeaderEditorDialog : public QDialog {
+#include "DialogBase.h"
+
+class HeaderEditorDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit HeaderEditorDialog(ImageViewer* viewer, QWidget* parent = nullptr);

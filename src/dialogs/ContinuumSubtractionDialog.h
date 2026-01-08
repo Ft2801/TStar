@@ -1,22 +1,22 @@
 #ifndef CONTINUUM_SUBTRACTION_DIALOG_H
 #define CONTINUUM_SUBTRACTION_DIALOG_H
 
-#include <QDialog>
 #include <QComboBox>
-#include <QLabel>
-#include <QPushButton>
-#include <QSlider>
 #include <QDoubleSpinBox>
+#include <QSlider>
 #include <QCheckBox>
+#include <QLabel>
 #include <QProgressBar>
+#include <QPushButton>
+#include "DialogBase.h"
 
 class ImageViewer;
-class MainWindow;
+class MainWindowCallbacks;
 
-class ContinuumSubtractionDialog : public QDialog {
+class ContinuumSubtractionDialog : public DialogBase {
     Q_OBJECT
 public:
-    explicit ContinuumSubtractionDialog(MainWindow* parent);
+    explicit ContinuumSubtractionDialog(QWidget* parent = nullptr);
 
     void setViewer(ImageViewer* v);
     void refreshImageList();
@@ -26,7 +26,7 @@ private slots:
     void onQFactorChanged(double val);
 
 private:
-    MainWindow* m_mainWindow;
+    MainWindowCallbacks* m_mainWindow;
     ImageViewer* m_viewer = nullptr;
     
     QComboBox* m_narrowbandCombo;

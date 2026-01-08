@@ -1,5 +1,6 @@
 #include "PixelMathDialog.h"
-#include "../MainWindow.h"
+#include "MainWindowCallbacks.h"
+#include "DialogBase.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>
@@ -247,19 +248,13 @@ private:
 // PixelMathDialog Implementation
 // ============================================================================
 
-PixelMathDialog::PixelMathDialog(MainWindow* parent, ImageViewer* viewer)
-    : QDialog(parent), m_mainWin(parent), m_viewer(viewer)
+PixelMathDialog::PixelMathDialog(QWidget* parent, ImageViewer* viewer)
+    : DialogBase(parent, tr("Pixel Math (Pro)"), 700, 450), m_viewer(viewer)
 {
-    setWindowTitle(tr("Pixel Math (Pro)"));
-    setWindowIcon(QIcon(":/images/Logo.png"));
-    resize(700, 450);
     setWindowFlags(windowFlags() | Qt::WindowMinMaxButtonsHint);
     
     setupUI();
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 PixelMathDialog::~PixelMathDialog() {}

@@ -6,14 +6,39 @@
 
 set -e  # Exit on error
 
+# Check for --clean flag
+CLEAN_MODE=0
+if [ "$1" == "--clean" ]; then
+    CLEAN_MODE=1
+fi
+
+# Check for --lto-on flag
+LTO_MODE="OFF"
+for arg in "$@"; do
+    if [ "$arg" == "--lto-on" ]; then
+        LTO_MODE="ON"
+    fi
+done
+
 echo "==========================================="
 echo " TStar Build Script (macOS)"
+if [ $CLEAN_MODE -eq 1 ]; then
+    echo " (CLEAN MODE - Reconfiguring CMake)"
+fi
 echo "==========================================="
 
 # Move to project root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/.."
 PROJECT_ROOT="$(pwd)"
+
+# Load utilities
+if [ -f "$SCRIPT_DIR/macos_utils.sh" ]; then
+    source "$SCRIPT_DIR/macos_utils.sh"
+else
+    echo "[ERROR] macos_utils.sh not found!"
+    exit 1
+fi
 
 # --- CONFIGURATION ---
 CMAKE_CMD="cmake"
@@ -31,22 +56,19 @@ fi
 echo ""
 echo "[STEP 1] Checking prerequisites..."
 
-# Check Homebrew
-if ! command -v brew &> /dev/null; then
-    echo "[ERROR] Homebrew not found!"
+check_command brew || {
+    log_error "Homebrew not found!"
     echo "Install with: /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
     exit 1
-fi
+}
 echo "  - Homebrew: OK"
 
-# Get Homebrew prefix
-HOMEBREW_PREFIX=$(brew --prefix)
+HOMEBREW_PREFIX=$(get_homebrew_prefix)
 echo "  - Homebrew prefix: $HOMEBREW_PREFIX"
 
-# Check Qt6
-QT_PREFIX=$(brew --prefix qt@6 2>/dev/null || echo "")
+QT_PREFIX=$(detect_qt_prefix)
 if [ -z "$QT_PREFIX" ] || [ ! -d "$QT_PREFIX" ]; then
-    echo "[ERROR] Qt6 not found!"
+    log_error "Qt6 not found!"
     echo "Install with: brew install qt@6"
     exit 1
 fi
@@ -96,19 +118,26 @@ else
 fi
 
 # --- 3. CMAKE CONFIGURATION ---
-echo ""
-echo "[STEP 3] Configuring CMake..."
+log_step 3 "Configuring CMake..."
 
-mkdir -p "$BUILD_DIR"
+ensure_dir "$BUILD_DIR"
 
-if [ -f "$BUILD_DIR/CMakeCache.txt" ]; then
+# Clean CMake cache if requested
+if [ $CLEAN_MODE -eq 1 ]; then
+    echo "[INFO] Cleaning CMake cache..."
+    safe_rm_rf "$BUILD_DIR/CMakeCache.txt"
+    safe_rm_rf "$BUILD_DIR/CMakeFiles"
+fi
+
+if [ -f "$BUILD_DIR/CMakeCache.txt" ] && [ $CLEAN_MODE -eq 0 ]; then
     echo "[INFO] CMakeCache.txt found. Skipping configuration."
 else
     "$CMAKE_CMD" -S . -B "$BUILD_DIR" \
         -G "$GENERATOR" \
         -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
         -DCMAKE_PREFIX_PATH="$QT_PREFIX" \
-        -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0"
+        -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0" \
+        -DENABLE_LTO="$LTO_MODE"
     
     if [ $? -ne 0 ]; then
         echo "[ERROR] CMake configuration failed!"
@@ -149,19 +178,6 @@ else
 fi
 
 echo ""
-
-
-# --- 6. SYMLINK SCRIPTS FOLDER FOR DEVELOPMENT ---
-echo ""
-echo "[STEP 6] Linking scripts folder for development..."
-SCRIPTS_DIR="$APP_BUNDLE/Contents/Resources/scripts"
-SRC_SCRIPTS_DIR="$PROJECT_ROOT/src/scripts"
-if [ -L "$SCRIPTS_DIR" ] || [ -d "$SCRIPTS_DIR" ]; then
-    rm -rf "$SCRIPTS_DIR"
-fi
-ln -s "$SRC_SCRIPTS_DIR" "$SCRIPTS_DIR"
-echo "  - Linked $SRC_SCRIPTS_DIR to $SCRIPTS_DIR"
-
 echo "==========================================="
 echo " SUCCESS!"
 echo " Executable: $EXECUTABLE"

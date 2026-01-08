@@ -129,7 +129,7 @@ namespace AbeMath {
         return (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2);
     }
 
-    float rbfKernel(float r2, float smooth) {
+    float rbfKernel(float r2, [[maybe_unused]] float smooth) {
         // Multiquadric kernel: sqrt(r^2 + 1) corresponds to epsilon=1.0
         return std::sqrt(r2 + 1.0f);
     }

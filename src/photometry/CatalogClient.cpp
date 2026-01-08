@@ -106,7 +106,8 @@ void CatalogClient::onReply(QNetworkReply* reply) {
             // 2. Parsing Data
             else if (name == "TR") {
                 double r=0, d=0, b=0, v=0, teff=0;
-                double g_mag=0, bp_mag=0, rp_mag=0;
+                double g_mag=0, bp_mag=0;
+                [[maybe_unused]] double rp_mag=0;
                 
                 int colIndex = 0;
                 

@@ -38,18 +38,13 @@ std::vector<MatchTriangle> TriangleMatcher::generateTriangles(const std::vector<
                 double d23 = (x2 - x3)*(x2 - x3) + (y2 - y3)*(y2 - y3); // a
                 double d31 = (x3 - x1)*(x3 - x1) + (y3 - y1)*(y3 - y1); // b
 
-                double a_sq = d23;
-                double b_sq = d31;
-                double c_sq = d12;
+// Distance squares - variables removed
 
                 // Sort sides so a is largest
                 // Start with assignments matching standard convention if possible
                 // Reference logic checks sides and reorders indices so a is longest.
                 
-                int idx_a = i, idx_b = j, idx_c = k; 
-                
                 // Bubble sort 3 items logic to find longest side 'a'
-                double sides[3] = {std::sqrt(a_sq), std::sqrt(b_sq), std::sqrt(c_sq)};
                 // Find longest side 'a'
                 // a = BC, b = AC, c = AB.
                 
@@ -186,7 +181,7 @@ bool TriangleMatcher::solve(const std::vector<MatchStar>& imgStars,
         for(int i=0; i<nA; ++i) tempVotes[i][max_j] = -1;
     }
     
-    if (winnerA.size() < required_pairs) return false;
+    if ((int)winnerA.size() < required_pairs) return false;
     
     // 5. Iterative Fit
     return iterativeFit(sA, sB, winnerA, winnerB, resultTrans);

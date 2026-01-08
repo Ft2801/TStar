@@ -1,7 +1,7 @@
 #ifndef CORRECTIONBRUSHDIALOG_H
 #define CORRECTIONBRUSHDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
@@ -15,7 +15,6 @@ class QSlider;
 class QPushButton;
 class QDoubleSpinBox;
 class QCheckBox;
-class MainWindow;
 
 // Worker for background processing
 enum class CorrectionMethod {
@@ -45,7 +44,7 @@ private:
     float medianCircle(const ImageBuffer& img, int cx, int cy, int radius, const std::vector<int>& channels);
 };
 
-class CorrectionBrushDialog : public QDialog {
+class CorrectionBrushDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit CorrectionBrushDialog(QWidget* parent = nullptr);
@@ -67,7 +66,6 @@ private slots:
     void updateDisplay(); // Refresh pixmap from m_currentImage
 
 private:
-    MainWindow* m_mainWindow;
     
     // UI
     QGraphicsView* m_view;

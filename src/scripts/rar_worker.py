@@ -101,6 +101,7 @@ def run_onnx_tiled(session, img, patch_size=512, overlap=64):
     
     print(f"INFO: Processing {total_tiles} tiles...")
     
+    last_pct = -1
     for c in range(C):
         for i in hs:
             for j in ws:
@@ -118,8 +119,11 @@ def run_onnx_tiled(session, img, patch_size=512, overlap=64):
                 wgt_buf[c:c+1, i:i+patch_size, j:j+patch_size] += win
                 
                 processed += 1
-                if processed % 10 == 0:
-                     print(f"Progress: {int(processed/total_tiles*100)}%")
+                pct = int(processed / total_tiles * 100)
+                if pct > last_pct:
+                     print(f"Progress: {pct}%")
+                     sys.stdout.flush()
+                     last_pct = pct
 
     # Normalize
     wgt_buf[wgt_buf == 0] = 1.0

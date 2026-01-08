@@ -143,7 +143,7 @@ void SidebarWidget::addPanel(const QString& name, const QString& iconPath, QWidg
     m_nameToId[name] = id;
 }
 
-void SidebarWidget::createTab(const QString& name, const QString& iconPath, int id) {
+void SidebarWidget::createTab(const QString& name, [[maybe_unused]] const QString& iconPath, int id) {
     // vertical button with text
     VerticalButton* btn = new VerticalButton(name, this);
     btn->setCheckable(true);

@@ -35,7 +35,9 @@ private:
     float m_dimmingGamma; // New
 };
 
-class WavescaleHDRDialog : public QDialog {
+#include "DialogBase.h"
+
+class WavescaleHDRDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit WavescaleHDRDialog(QWidget* parent = nullptr, ImageViewer* targetViewer = nullptr);

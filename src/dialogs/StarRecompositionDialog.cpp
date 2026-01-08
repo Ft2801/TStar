@@ -1,5 +1,6 @@
 #include "StarRecompositionDialog.h"
-#include "../MainWindow.h"
+#include "MainWindowCallbacks.h"
+#include "DialogBase.h"
 #include "../ImageViewer.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -10,25 +11,17 @@
 #include <QPushButton>
 #include <QIcon>
 
-StarRecompositionDialog::StarRecompositionDialog(MainWindow* mainWin, QWidget* parent)
-    : QDialog(parent), m_mainWin(mainWin)
+StarRecompositionDialog::StarRecompositionDialog(QWidget* parent)
+    : DialogBase(parent, "Star Recomposition", 500, 400)
 {
-    setWindowTitle(tr("Star Recomposition"));
-    setWindowIcon(QIcon(":/images/Logo.png"));
     createUI();
     populateCombos();
-    
-    // Set a reasonable minimum size
     setMinimumWidth(400);
-    
     m_initializing = false;
-
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
-void StarRecompositionDialog::setViewer(ImageViewer* v) {
+void StarRecompositionDialog::setViewer(ImageViewer* v)
+{
     Q_UNUSED(v);
     populateCombos(); // Refresh list to ensure new viewer is available
 }
@@ -155,7 +148,10 @@ void StarRecompositionDialog::populateCombos() {
     m_cmbStarless->clear();
     m_cmbStars->clear();
     
-    QList<ImageViewer*> viewers = m_mainWin->findChildren<ImageViewer*>();
+    MainWindowCallbacks* mw = getCallbacks();
+    if (!mw) return;
+    
+    QList<ImageViewer*> viewers = mw->getCurrentViewer()->window()->findChildren<ImageViewer*>();
     for (ImageViewer* v : viewers) {
         if (v == m_previewViewer) continue; // Skip our own preview window
         QString title = v->windowTitle();
@@ -261,8 +257,10 @@ void StarRecompositionDialog::onApply() {
     ImageBuffer result;
     QString err;
     if (m_runner.run(starlessViewer->getBuffer(), starsViewer->getBuffer(), result, params, &err)) {
-        m_mainWin->createNewImageWindow(result, "Stars_Recomposed");
+    if (MainWindowCallbacks* mw = getCallbacks()) {
+        mw->createResultWindow(result, "Stars_Recomposed");
         accept();
+    }
     } else {
         QMessageBox::critical(this, tr("Processing Error"), err);
     }

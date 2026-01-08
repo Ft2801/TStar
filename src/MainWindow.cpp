@@ -286,7 +286,7 @@ MainWindow::MainWindow(QWidget *parent)
                     if (m_satDlg) {
                         // SaturationDialog handles backup/restore internally now
                         m_satTarget = v; // Update tracker for menu updates
-                        m_satDlg->setTarget(v); 
+                        m_satDlg->setViewer(v); 
                         if (m_satStates.contains(v)) m_satDlg->setState(m_satStates[v]);
                     }
                     if (m_arcsinhDlg) m_arcsinhDlg->setViewer(v);
@@ -419,9 +419,7 @@ MainWindow::MainWindow(QWidget *parent)
     menuBar()->setVisible(false);
     
     // Standalone Actions (used later for toolbar/shortcuts)
-    QAction* fitAction = new QAction(tr("Fit to Window"), this);
-    QAction* zoomInAction = new QAction(tr("Zoom In"), this);
-    QAction* zoomOutAction = new QAction(tr("Zoom Out"), this);
+    // Actions removed - not used in current implementation
     
     m_stretchCombo = new QComboBox();
     m_stretchCombo->setFixedWidth(120);
@@ -459,7 +457,7 @@ MainWindow::MainWindow(QWidget *parent)
         "}"
     );
     
-    connect(m_stretchCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index){
+    connect(m_stretchCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]([[maybe_unused]] int index){
         m_displayMode = static_cast<ImageBuffer::DisplayMode>(m_stretchCombo->currentData().toInt());
         log(tr("Display Mode changed to: %1").arg(m_stretchCombo->currentText()), Log_Info);
         updateDisplay();
@@ -1675,7 +1673,7 @@ void MainWindow::openSaturationDialog() {
     if (m_satDlg) {
         m_satDlg->raise();
         m_satDlg->activateWindow();
-        m_satDlg->setTarget(viewer);
+        m_satDlg->setViewer(viewer);
         return;
     }
 
@@ -1687,7 +1685,7 @@ void MainWindow::openSaturationDialog() {
     
     // Pass 'apply' directly to logger/history only if needed, 
     // but dialog handles undo/buffer internally.
-    connect(m_satDlg, &SaturationDialog::applyInternal, this, [this](const ImageBuffer::SaturationParams& params) {
+    connect(m_satDlg, &SaturationDialog::applyInternal, this, [this]([[maybe_unused]] const ImageBuffer::SaturationParams& params) {
         log(tr("Saturation applied permanently"), Log_Success, true);
         if (m_satTarget) updateMenus();
     });
@@ -3316,6 +3314,12 @@ void MainWindow::openAberrationInspectorDialog() {
     
     log(tr("Opening Aberration Inspector..."), Log_Action, true);
     
+    // SAFETY: Check currentViewer() is not nullptr
+    if (!currentViewer()) {
+        log(tr("No image loaded. Cannot open Aberration Inspector."), Log_Error, true);
+        return;
+    }
+    
     auto* dlg = new AberrationInspectorDialog(currentViewer()->getBuffer(), this);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     
@@ -3359,4 +3363,32 @@ void MainWindow::openSelectiveColorDialog() {
             dlg->setSource(currentViewer()->getBuffer());
         }
     });
+}
+
+// ========== MainWindowCallbacks Pure Virtual Implementations ==========
+
+ImageBuffer* MainWindow::getCurrentImageBuffer() {
+    ImageViewer* viewer = currentViewer();
+    if (!viewer) return nullptr;
+    return &viewer->getBuffer();
+}
+
+ImageViewer* MainWindow::getCurrentViewer() {
+    return currentViewer();
+}
+
+void MainWindow::createResultWindow(const ImageBuffer& buffer, const QString& title) {
+    createNewImageWindow(buffer, title);
+}
+
+void MainWindow::logMessage(const QString& message, int severity, bool showPopup) {
+    // severity: 0=Info, 1=Success, 2=Warning, 3=Error
+    LogType type = Log_Info;
+    switch (severity) {
+        case 1: type = Log_Success; break;
+        case 2: type = Log_Warning; break;
+        case 3: type = Log_Error; break;
+        default: type = Log_Info; break;
+    }
+    log(message, type, showPopup);
 }

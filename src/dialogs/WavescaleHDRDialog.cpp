@@ -210,11 +210,8 @@ void WavescaleHDRWorker::run() {
 // ------ Dialog ------
  
 WavescaleHDRDialog::WavescaleHDRDialog(QWidget* parent, ImageViewer* targetViewer)
-    : QDialog(parent), m_targetViewer(targetViewer)
+    : DialogBase(parent, "Wavescale HDR", 1000, 700), m_targetViewer(targetViewer)
 {
-    setWindowTitle(tr("Wavescale HDR"));
-    setMinimumSize(800, 600);
-    resize(1000, 700);
     
     // Copy for preview
     if (m_targetViewer && m_targetViewer->getBuffer().isValid()) {
@@ -270,9 +267,6 @@ WavescaleHDRDialog::WavescaleHDRDialog(QWidget* parent, ImageViewer* targetViewe
     
     startPreview();
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 void WavescaleHDRDialog::setViewer(ImageViewer* v) {
@@ -355,7 +349,7 @@ void WavescaleHDRDialog::createUI() {
     m_gammaSlider->setRange(10, 1000);
     m_gammaSlider->setValue(500);
     m_gammaLabel = new QLabel("5.00");
-    connect(m_gammaSlider, &QSlider::valueChanged, this, [this](int v){
+    connect(m_gammaSlider, &QSlider::valueChanged, this, [this]([[maybe_unused]] int v){
         updateQuickMask();
     });
 

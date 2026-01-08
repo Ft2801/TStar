@@ -7,9 +7,10 @@
 #include <QLabel>
 #include <QFileDialog>
 #include <QComboBox>
-#include "MainWindow.h"
 
-class SettingsDialog : public QDialog {
+#include "DialogBase.h"
+
+class SettingsDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit SettingsDialog(QWidget* parent = nullptr);

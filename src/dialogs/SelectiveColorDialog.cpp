@@ -1,5 +1,7 @@
 #include "SelectiveColorDialog.h"
-#include "../MainWindow.h"
+#include "MainWindowCallbacks.h"
+#include "DialogBase.h"
+#include "../ImageViewer.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGridLayout>
@@ -21,11 +23,9 @@
 #include <algorithm>
 #include <opencv2/opencv.hpp>
 
-SelectiveColorDialog::SelectiveColorDialog(MainWindow* parent)
-    : QDialog(parent), m_mainWindow(parent), m_updatingPreset(false)
+SelectiveColorDialog::SelectiveColorDialog(QWidget* parent)
+    : DialogBase(parent, tr("Selective Color Correction"), 950, 700), m_updatingPreset(false)
 {
-    setWindowTitle(tr("Selective Color Correction"));
-    resize(950, 700);
     
     // Define hue presets (degrees 0-360)
     m_presets = {
@@ -40,8 +40,11 @@ SelectiveColorDialog::SelectiveColorDialog(MainWindow* parent)
     };
     
     // Grab current image
-    if (m_mainWindow->currentViewer() && m_mainWindow->currentViewer()->getBuffer().isValid()) {
-        m_sourceImage = m_mainWindow->currentViewer()->getBuffer();
+    // Grab current image
+    if (MainWindowCallbacks* mw = getCallbacks()) {
+        if (mw->getCurrentViewer() && mw->getCurrentViewer()->getBuffer().isValid()) {
+            m_sourceImage = mw->getCurrentViewer()->getBuffer();
+        }
     }
     
     setupUi();
@@ -461,12 +464,13 @@ void SelectiveColorDialog::onReset() {
 }
 
 void SelectiveColorDialog::onApply() {
-    if (!m_mainWindow) return;
+    MainWindowCallbacks* mw = getCallbacks();
+    if (!mw) return;
     
-    ImageViewer* v = m_mainWindow->currentViewer();
+    ImageViewer* v = mw->getCurrentViewer();
     if (!v) return;
     
-    m_mainWindow->pushUndo();
+    v->pushUndo();
     
     ImageBuffer& buffer = v->getBuffer();
     

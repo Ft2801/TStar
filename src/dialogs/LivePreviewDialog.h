@@ -7,7 +7,9 @@
 #include <QPixmap>
 #include <vector>
 
-class LivePreviewDialog : public QDialog {
+#include "DialogBase.h"
+
+class LivePreviewDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit LivePreviewDialog(int width, int height, QWidget* parent = nullptr);

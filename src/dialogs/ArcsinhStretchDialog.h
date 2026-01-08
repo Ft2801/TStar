@@ -1,7 +1,7 @@
 #ifndef ARCSINHSTRETCHDIALOG_H
 #define ARCSINHSTRETCHDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <QSlider>
 #include <QDoubleSpinBox>
 #include <QCheckBox>
@@ -12,7 +12,7 @@
 
 #include <QPointer>
 
-class ArcsinhStretchDialog : public QDialog {
+class ArcsinhStretchDialog : public DialogBase {
     Q_OBJECT
 
 public:

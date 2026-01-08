@@ -1,19 +1,20 @@
 #ifndef RARDIALOG_H
 #define RARDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <QLineEdit>
 #include <QSpinBox>
 #include <QComboBox>
 #include <QLabel>
 #include <QPointer>
+#include "../ImageViewer.h"
 
-class MainWindow;
+class MainWindowCallbacks;
 
-class RARDialog : public QDialog {
+class RARDialog : public DialogBase {
     Q_OBJECT
 public:
-    explicit RARDialog(MainWindow* parent = nullptr);
+    explicit RARDialog(QWidget* parent = nullptr);
 
     void setViewer(class ImageViewer* v);
 
@@ -23,7 +24,6 @@ private slots:
     void onRun();
 
 private:
-    MainWindow* m_mainWin;
     QLineEdit* m_editModelPath;
     QSpinBox* m_spinPatch;
     QSpinBox* m_spinOverlap;

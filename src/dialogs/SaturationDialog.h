@@ -1,25 +1,24 @@
 #ifndef SATURATIONDIALOG_H
 #define SATURATIONDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
+#include "../ImageBuffer.h"
+#include <QPointer>
+#include "../ImageViewer.h"
 #include <QSlider>
 #include <QLabel>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QGridLayout>
+#include <QLabel>
 #include <QComboBox>
-#include "ImageBuffer.h"
+#include <QPushButton>
 
-class ImageViewer; // Forward declaration
-
-class SaturationDialog : public QDialog {
+class SaturationDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit SaturationDialog(QWidget* parent, class ImageViewer* viewer);
     ~SaturationDialog();
     ImageBuffer::SaturationParams getParams() const;
     void setBuffer(ImageBuffer* buffer);
-    void setTarget(ImageViewer* viewer); // New: for retargeting
+    void setViewer(ImageViewer* viewer); // Renamed from setTarget
     void triggerPreview();
 
     struct State {
@@ -40,9 +39,9 @@ private slots:
     void handleApply();
 
 private:
+    QPointer<ImageViewer> m_viewer; // Tracking viewer
     ImageBuffer* m_buffer; // Pointer to LIVE buffer
     ImageBuffer m_originalBuffer; // Backup
-    ImageViewer* m_viewer; // Tracking viewer
     bool m_applied = false;
     
     QSlider* m_sldAmount;

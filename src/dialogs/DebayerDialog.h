@@ -1,16 +1,16 @@
 #ifndef DEBAYER_DIALOG_H
 #define DEBAYER_DIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <QComboBox>
 #include <QLabel>
-#include <QPushButton>
 #include <QProgressBar>
+#include <QPushButton>
 
+class MainWindowCallbacks;
 class ImageViewer;
-class MainWindow;
 
-class DebayerDialog : public QDialog {
+class DebayerDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit DebayerDialog(QWidget* parent = nullptr);

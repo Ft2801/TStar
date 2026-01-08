@@ -1,7 +1,8 @@
 #include "AnnotationToolDialog.h"
 #include "../widgets/AnnotationOverlay.h"
 #include "../ImageViewer.h"
-#include "../MainWindow.h"
+#include "MainWindowCallbacks.h"
+#include "DialogBase.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -23,23 +24,9 @@
 #include <QFileInfo>
 #include <QMap>
 
-AnnotationToolDialog::AnnotationToolDialog(MainWindow* parent)
-    : QDialog(parent)
-    , m_mainWindow(parent)
+AnnotationToolDialog::AnnotationToolDialog(QWidget* parent)
+    : DialogBase(parent, tr("Annotation Tool"))
 {
-    setWindowTitle(tr("Annotation Tool"));
-    setWindowFlags(Qt::Tool | Qt::WindowStaysOnTopHint);
-    setAttribute(Qt::WA_DeleteOnClose, false);
-    
-    setupUI();
-    
-
-}
-
-AnnotationToolDialog::~AnnotationToolDialog() {
-}
-
-void AnnotationToolDialog::setupUI() {
     auto* mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(8);
     mainLayout->setContentsMargins(10, 10, 10, 10);
@@ -160,9 +147,9 @@ void AnnotationToolDialog::setupUI() {
     setMinimumWidth(400);
     adjustSize();
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
+}
+
+AnnotationToolDialog::~AnnotationToolDialog() {
 }
 
 void AnnotationToolDialog::setViewer(ImageViewer* viewer) {

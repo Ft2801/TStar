@@ -8,6 +8,7 @@
 #include <functional>
 #include "algos/CubicSpline.h"
 #include <QPointer>
+#include "MainWindowCallbacks.h"
 
 class VizierClient;
 // Removed forward decls that are now included
@@ -44,7 +45,7 @@ class DebayerDialog;
 class ContinuumSubtractionDialog;
 class AnnotationToolDialog;
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow, public MainWindowCallbacks {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget* parent = nullptr);
@@ -56,6 +57,12 @@ public:
     void endLongProcess();
     void createNewImageWindow(const ImageBuffer& buffer, const QString& title, ImageBuffer::DisplayMode mode = ImageBuffer::Display_Linear);
     void pushUndo(); // Call before destructive actions
+    
+    // MainWindowCallbacks Implementation
+    ImageBuffer* getCurrentImageBuffer() override;
+    ImageViewer* getCurrentViewer() override;
+    void createResultWindow(const ImageBuffer& buffer, const QString& title) override;
+    void logMessage(const QString& message, int severity, bool showPopup = false) override;
     
     // Helper to check if tool is already open and activate it
     bool activateTool(const QString& title);

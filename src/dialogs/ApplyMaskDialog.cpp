@@ -6,9 +6,8 @@
 #include <opencv2/opencv.hpp>
 
 ApplyMaskDialog::ApplyMaskDialog(int targetWidth, int targetHeight, QWidget* parent)
-    : QDialog(parent), m_targetWidth(targetWidth), m_targetHeight(targetHeight)
+    : DialogBase(parent, "Apply Mask", 450, 400), m_targetWidth(targetWidth), m_targetHeight(targetHeight)
 {
-    setWindowTitle(tr("Apply Mask"));
     resize(600, 400);
 
     QHBoxLayout* mainLayout = new QHBoxLayout(this);

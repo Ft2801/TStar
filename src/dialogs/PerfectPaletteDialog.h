@@ -1,7 +1,7 @@
 #ifndef PERFECTPALETTEDIALOG_H
 #define PERFECTPALETTEDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <QComboBox>
 #include <QSlider>
 #include <QLabel>
@@ -12,13 +12,14 @@
 #include "../algos/PerfectPaletteRunner.h"
 #include <QPointer>
 
-class MainWindow;
+class MainWindowCallbacks;
+class MainWindowCallbacks;
 class ImageViewer;
 
-class PerfectPaletteDialog : public QDialog {
+class PerfectPaletteDialog : public DialogBase {
     Q_OBJECT
 public:
-    explicit PerfectPaletteDialog(MainWindow* mainWin, QWidget* parent = nullptr);
+    explicit PerfectPaletteDialog(QWidget* parent = nullptr);
     void setViewer(ImageViewer* v);
 
 private slots:
@@ -32,7 +33,7 @@ private:
     void createUI();
     void updateThumbnails();
     
-    MainWindow* m_mainWin;
+    MainWindowCallbacks* m_mainWin;
     QPointer<ImageViewer> m_viewer;
     PerfectPaletteRunner m_runner;
     

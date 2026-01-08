@@ -3,9 +3,9 @@
 #include <QLabel>
 #include <QCoreApplication>
 
-AboutDialog::AboutDialog(QWidget* parent, const QString& version, const QString& buildTimestamp) : QDialog(parent) {
-    setWindowTitle(tr("About TStar"));
-    
+AboutDialog::AboutDialog(QWidget* parent, const QString& version, const QString& buildTimestamp)
+    : DialogBase(parent, "About TStar", 450, 400)
+{
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(30, 20, 30, 20); // Balanced margins
     layout->setSpacing(20); // Spacing between sections
@@ -46,7 +46,4 @@ AboutDialog::AboutDialog(QWidget* parent, const QString& version, const QString&
     setMinimumWidth(400);
     adjustSize();
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }

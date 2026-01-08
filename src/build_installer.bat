@@ -9,24 +9,11 @@ echo.
 REM Move to project root (parent directory of this script)
 pushd "%~dp0.."
 
+REM Import shared utilities
+call src\windows_utils.bat
+
 REM --- Read version from changelog.txt ---
-set "VERSION=1.0.0"
-if exist "changelog.txt" (
-    REM Use type to handle potential encoding issues and pipe to findstr
-    for /f "tokens=2" %%v in ('type "changelog.txt" ^| findstr /R /C:"^Version [0-9][0-9.]*"') do (
-        set "TEMP_VER=%%v"
-        REM Simple check to ensure it starts with a number (basic validation)
-        echo !TEMP_VER!| findstr /R "^[0-9]" >nul && (
-            set "VERSION=!TEMP_VER!"
-            goto :VersionDone
-        )
-    )
-) else (
-    echo [ERROR] changelog.txt not found!
-    pause
-    exit /b 1
-)
-:VersionDone
+call :GetVersion
 echo [INFO] Building version: %VERSION%
 echo.
 
@@ -34,13 +21,7 @@ REM --- STEP 0: Verify Prerequisites ---
 echo [STEP 0] Verifying prerequisites...
 
 REM Check if Inno Setup is installed
-set "ISCC="
-if exist "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" (
-    set "ISCC=C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-) else if exist "C:\Program Files\Inno Setup 6\ISCC.exe" (
-    set "ISCC=C:\Program Files\Inno Setup 6\ISCC.exe"
-)
-
+call :FindInnoSetup
 if "!ISCC!"=="" (
     echo [ERROR] Inno Setup 6 not found!
     echo.
@@ -48,6 +29,16 @@ if "!ISCC!"=="" (
     echo   https://jrsoftware.org/isdl.php
     echo.
     echo After installing, run this script again.
+) else (
+    echo   - Inno Setup 6: OK at !ISCC!
+)
+
+REM Check changelog.txt exists
+call :VerifyFile "changelog.txt" "changelog.txt"
+if errorlevel 1 (
+    pause
+    exit /b 1
+)
     pause
     exit /b 1
 )
@@ -74,11 +65,8 @@ REM --- STEP 0.5: Prepare Assets ---
 echo [STEP 0.5] Preparing assets...
 if exist "tools\convert_icon.py" (
     python tools\convert_icon.py
-    if exist "src\images\Logo.ico" (
-        echo   - Icon converted: OK
-    ) else (
-        echo   [WARNING] Icon conversion failed, default icon might be used.
-    )
+    call :VerifyFile "src\images\Logo.ico" "Icon conversion"
+    if errorlevel 0 echo   - Icon converted: OK
     
     if exist "tools\convert_wizard_images.py" (
         python tools\convert_wizard_images.py
@@ -89,17 +77,14 @@ echo.
 
 REM --- STEP 1: Clean Previous Installer Output ---
 echo [STEP 1] Cleaning previous installer output...
-if exist "installer_output" (
-    rmdir /s /q "installer_output"
-    echo   - Removed old installer_output folder
-)
-mkdir "installer_output"
+call :SafeRmDir "installer_output"
+call :EnsureDir "installer_output"
 echo   - Created fresh installer_output folder
 echo.
 
 REM --- STEP 2: Build the Application ---
 echo [STEP 2] Building the application...
-call src\build_all.bat --silent
+call src\build_all.bat --silent --lto-on
 if %errorlevel% neq 0 (
     echo [ERROR] Build failed!
     pause
@@ -118,8 +103,9 @@ if %errorlevel% neq 0 (
 )
 
 REM Verify distribution was created correctly
-if not exist "dist\TStar\TStar.exe" (
-    echo [ERROR] Distribution incomplete - TStar.exe not found!
+call :VerifyFile "dist\TStar\TStar.exe" "Distribution TStar.exe"
+if errorlevel 1 (
+    echo [ERROR] Distribution incomplete!
     pause
     exit /b 1
 )
@@ -178,7 +164,8 @@ echo [STEP 6] Verifying installer...
 set "INSTALLER_NAME=TStar_Setup_%VERSION%.exe"
 set "INSTALLER_PATH=installer_output\%INSTALLER_NAME%"
 
-if not exist "%INSTALLER_PATH%" (
+call :VerifyFile "%INSTALLER_PATH%" "Installer file"
+if errorlevel 1 (
     echo [ERROR] Installer file not found: %INSTALLER_PATH%
     pause
     exit /b 1

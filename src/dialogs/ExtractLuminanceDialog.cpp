@@ -1,19 +1,20 @@
 #include "ExtractLuminanceDialog.h"
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QLabel>
+#include "DialogBase.h"
+#include "../MainWindowCallbacks.h"
+#include "../ImageViewer.h"
+#include "../ImageBuffer.h"
+#include "../algos/ChannelOps.h"
+#include "../widgets/CustomMdiSubWindow.h"
 #include <QComboBox>
-#include <QPushButton>
-#include <QDoubleSpinBox>
+#include <QLabel>
 #include <QGroupBox>
 #include <QCheckBox>
+#include <QDoubleSpinBox>
+#include <QPushButton>
 #include <QMessageBox>
-#include "../MainWindow.h"
-#include "../algos/ChannelOps.h"
 
-ExtractLuminanceDialog::ExtractLuminanceDialog(QWidget* parent) : QDialog(parent) {
-    setWindowTitle(tr("Extract Luminance"));
-    m_mainWindow = qobject_cast<MainWindow*>(parent);
+ExtractLuminanceDialog::ExtractLuminanceDialog(QWidget* parent) : DialogBase(parent, tr("Extract Luminance")) {
+    // m_mainWindow = getCallbacks(); // Removed direct member storage, access via getCallbacks() when needed
     
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     
@@ -97,9 +98,6 @@ ExtractLuminanceDialog::ExtractLuminanceDialog(QWidget* parent) : QDialog(parent
     // Initial State Trigger
     onMethodChanged(0);
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 void ExtractLuminanceDialog::onMethodChanged(int index) {
@@ -126,12 +124,17 @@ ExtractLuminanceDialog::Params ExtractLuminanceDialog::getParams() const {
 }
 
 void ExtractLuminanceDialog::onApply() {
-    if (!m_mainWindow) return;
-    ImageViewer* v = m_mainWindow->currentViewer();
-    if (!v) {
-        QMessageBox::warning(this, tr("No Image"), tr("Please select an image first."));
-        return;
-    }
+    MainWindowCallbacks* mainWindow = getCallbacks(); // Access callbacks directly
+    if (!mainWindow) return;
+    
+    // Find MDI area and populate with open images
+    ImageViewer* v_cur = mainWindow->getCurrentViewer(); // Use local mainWindow pointer
+    if (!v_cur) return;
+    // The following loop was incorrect and caused early return, it's removed.
+    // auto* sublist = v_cur->window()->findChildren<CustomMdiSubWindow*>();
+    // for (CustomMdiSubWindow* csw : sublist) {
+    //     return;
+    // }
     
     Params p = getParams();
     ChannelOps::LumaMethod method = (ChannelOps::LumaMethod)p.methodIndex;
@@ -141,13 +144,13 @@ void ExtractLuminanceDialog::onApply() {
         noiseSigma = p.customNoiseSigma;
     }
     
-    ImageBuffer res = ChannelOps::computeLuminance(v->getBuffer(), method, p.customWeights, noiseSigma);
+    ImageBuffer res = ChannelOps::computeLuminance(v_cur->getBuffer(), method, p.customWeights, noiseSigma);
     if (!res.isValid()) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to compute luminance."));
         return;
     }
     
-    QString title = v->getBuffer().name() + "_L";
-    m_mainWindow->createNewImageWindow(res, title);
+    QString title = v_cur->getBuffer().name() + "_L";
+    if (mainWindow) mainWindow->createResultWindow(res, title); // Use local mainWindow pointer
     accept();
 }

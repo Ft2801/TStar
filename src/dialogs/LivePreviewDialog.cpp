@@ -5,9 +5,7 @@
 #include <algorithm>
 
 LivePreviewDialog::LivePreviewDialog(int width, int height, QWidget* parent)
-    : QDialog(parent)
-{
-    setWindowTitle(tr("Live Mask Preview"));
+    : DialogBase(parent, "Live Mask Preview", width, height), m_targetWidth(width), m_targetHeight(height) {
     setWindowFlags(windowFlags() | Qt::Tool); // Make it a tool window
     
     // Calculate scaled size - limit to reasonable subwindow size (max 800x600)

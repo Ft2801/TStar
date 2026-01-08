@@ -1,5 +1,7 @@
 #include "StarNetDialog.h"
-#include "../MainWindow.h"
+#include "MainWindowCallbacks.h"
+#include "DialogBase.h"
+#include "../ImageViewer.h"
 #include "../algos/StarNetRunner.h"
 #include <QVBoxLayout>
 #include <QLabel>
@@ -21,14 +23,8 @@ static bool detectGpuAvailable() {
     return hasCuda || hasDirectML;
 }
 
-StarNetDialog::StarNetDialog(MainWindow* parent) : QDialog(parent), m_mainWin(parent) {
-    setWindowTitle(tr("StarNet++ Star Removal"));
-    setWindowIcon(QIcon(":/images/Logo.png"));
-    resize(300, 200);
+StarNetDialog::StarNetDialog(QWidget* parent) : DialogBase(parent, tr("StarNet++ Star Removal"), 300, 200) {
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 
     QVBoxLayout* layout = new QVBoxLayout(this);
 
@@ -76,7 +72,8 @@ StarNetDialog::StarNetDialog(MainWindow* parent) : QDialog(parent), m_mainWin(pa
 }
 
 void StarNetDialog::onRun() {
-    if (!m_mainWin->hasImage()) {
+    MainWindowCallbacks* mw = getCallbacks();
+    if (!mw || !mw->getCurrentViewer() || !mw->getCurrentViewer()->getBuffer().isValid()) {
         QMessageBox::warning(this, tr("Error"), tr("No image loaded (StarNet)."));
         return;
     }
@@ -89,20 +86,22 @@ void StarNetDialog::onRun() {
 
     QSettings().setValue("StarNet/useGpu", params.useGpu);
 
-    m_mainWin->startLongProcess();
-    m_mainWin->log(tr("Starting StarNet++..."));
+    mw->startLongProcess();
+    mw->logMessage(tr("Starting StarNet++..."), 0, false);
 
     QThread* thread = new QThread;
     StarNetRunner* runner = new StarNetRunner;
     runner->moveToThread(thread);
 
-    connect(runner, &StarNetRunner::processOutput, m_mainWin, [this](const QString& msg){
-        m_mainWin->log(msg);
+    connect(runner, &StarNetRunner::processOutput, this, [this](const QString& msg){
+        if (MainWindowCallbacks* mw = getCallbacks()) {
+            mw->logMessage(msg, 0, false);
+        }
     });
 
-    ImageViewer* viewer = m_mainWin->currentViewer();
+    ImageViewer* viewer = mw->getCurrentViewer();
     if (!viewer) {
-        m_mainWin->endLongProcess();
+        mw->endLongProcess();
         runner->deleteLater();
         thread->deleteLater();
         return;
@@ -117,7 +116,6 @@ void StarNetDialog::onRun() {
     
     // Capture state
     ImageBuffer input = viewer->getBuffer();
-    ImageBuffer::DisplayMode dispMode = m_mainWin->displayMode();
 
     connect(thread, &QThread::started, runner, [=]() mutable {
         ImageBuffer starless;
@@ -133,41 +131,49 @@ void StarNetDialog::onRun() {
             thread->deleteLater();
             runner->deleteLater();
             
-            m_mainWin->endLongProcess();
+            if (MainWindowCallbacks* mw = getCallbacks()) {
+                mw->endLongProcess();
+            }
             
             if (ok) {
-                m_mainWin->log(tr("StarNet completed successfully. Validating result..."));
-                if (starless.width() <= 0 || starless.height() <= 0 || starless.data().empty()) {
-                     m_mainWin->log(tr("ERR: StarNet result is empty!"));
-                     QMessageBox::critical(this, tr("Error"), tr("StarNet produced an empty image."));
-                } else {
-                    m_mainWin->createNewImageWindow(starless, tr("Starless"), dispMode);
-                    if (params.generateMask) {
-                        m_mainWin->log(tr("Generating Star Mask..."));
-                        if (input.width() != starless.width() || input.height() != starless.height()) {
-                             m_mainWin->log(tr("ERR: Dimension mismatch for mask."));
-                             QMessageBox::warning(this, tr("Warning"), tr("Could not generate mask due to size mismatch."));
-                        } else {
-                            ImageBuffer mask;
-                            size_t inputSize = input.data().size();
-                            std::vector<float> maskData(inputSize);
-                            const auto& od = input.data();
-                            const auto& sd = starless.data();
-                            for(size_t i=0; i<inputSize; ++i) {
-                                float val = od[i] - sd[i]; 
-                                maskData[i] = std::max(0.0f, val);
+                if (MainWindowCallbacks* mw = getCallbacks()) {
+                    mw->logMessage(tr("StarNet completed successfully. Validating result..."), 1, true);
+                    if (starless.width() <= 0 || starless.height() <= 0 || starless.data().empty()) {
+                         mw->logMessage(tr("ERR: StarNet result is empty!"), 3, true);
+                         QMessageBox::critical(this, tr("Error"), tr("StarNet produced an empty image."));
+                    } else {
+                        mw->createResultWindow(starless, tr("Starless"));
+                        if (params.generateMask) {
+                            mw->logMessage(tr("Generating Star Mask..."), 0, false);
+                            if (input.width() != starless.width() || input.height() != starless.height()) {
+                                 mw->logMessage(tr("ERR: Dimension mismatch for mask."), 3, true);
+                                 QMessageBox::warning(this, tr("Warning"), tr("Could not generate mask due to size mismatch."));
+                            } else {
+                                ImageBuffer mask;
+                                size_t inputSize = input.data().size();
+                                std::vector<float> maskData(inputSize);
+                                const auto& od = input.data();
+                                const auto& sd = starless.data();
+                                for(size_t i=0; i<inputSize; ++i) {
+                                    float val = od[i] - sd[i]; 
+                                    maskData[i] = std::max(0.0f, val);
+                                }
+                                mask.setData(input.width(), input.height(), input.channels(), maskData);
+                                mw->createResultWindow(mask, tr("Star Mask"));
                             }
-                            mask.setData(input.width(), input.height(), input.channels(), maskData);
-                            m_mainWin->createNewImageWindow(mask, tr("Star Mask"), ImageBuffer::Display_Linear);
                         }
                     }
                 }
                 accept();
             } else if (!errorMsg.isEmpty() && errorMsg != tr("StarNet process cancelled by user.")) {
-                m_mainWin->log(tr("ERR: StarNet failed: %1").arg(errorMsg));
+                if (MainWindowCallbacks* mw = getCallbacks()) {
+                    mw->logMessage(tr("ERR: StarNet failed: %1").arg(errorMsg), 3, true);
+                }
                 QMessageBox::critical(this, tr("StarNet Error"), errorMsg);
             } else if (errorMsg == tr("StarNet process cancelled by user.")) {
-                m_mainWin->log(tr("StarNet cancelled."));
+                if (MainWindowCallbacks* mw = getCallbacks()) {
+                    mw->logMessage(tr("StarNet cancelled."), 0, true);
+                }
             }
         });
     });

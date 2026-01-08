@@ -1,5 +1,7 @@
 #include "StarStretchDialog.h"
-#include "../MainWindow.h"
+#include "MainWindowCallbacks.h"
+#include "../ImageViewer.h"
+#include "DialogBase.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -9,22 +11,13 @@
 #include <QMessageBox>
 #include <QIcon>
 
-StarStretchDialog::StarStretchDialog(MainWindow* parent, ImageViewer* viewer)
-    : QDialog(parent), m_mainWin(parent), m_viewer(viewer)
+StarStretchDialog::StarStretchDialog(QWidget* parent, ImageViewer* viewer)
+    : DialogBase(parent, "Star Stretch", 500, 400), m_viewer(viewer)
 {
-    setWindowTitle(tr("Star Stretch"));
-    setWindowIcon(QIcon(":/images/Logo.png"));
     if (m_viewer) {
         m_originalBuffer = m_viewer->getBuffer();
     }
     createUI();
-    if (m_viewer) {
-        m_originalBuffer = m_viewer->getBuffer();
-    }
-
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 void StarStretchDialog::setViewer(ImageViewer* v) {
@@ -126,7 +119,9 @@ void StarStretchDialog::onApply() {
     updatePreview();
     
     m_applied = true;
-    m_mainWin->log(tr("Star Stretch applied."), MainWindow::Log_Success, true);
+    if (MainWindowCallbacks* mw = getCallbacks()) {
+        mw->logMessage(tr("Star Stretch applied."), 1, true);
+    }
     accept();
 }
 

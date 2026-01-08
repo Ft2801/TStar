@@ -1,14 +1,14 @@
 #ifndef CROPROTATEDIALOG_H
 #define CROPROTATEDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <QDoubleSpinBox>
 #include <QSlider>
 #include <QComboBox>
 #include <QPushButton>
 #include <QPointer>
 
-class CropRotateDialog : public QDialog {
+class CropRotateDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit CropRotateDialog(QWidget* parent = nullptr);

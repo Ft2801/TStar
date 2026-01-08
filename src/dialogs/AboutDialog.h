@@ -3,7 +3,9 @@
 
 #include <QDialog>
 
-class AboutDialog : public QDialog {
+#include "DialogBase.h"
+
+class AboutDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit AboutDialog(QWidget* parent = nullptr, const QString& version = "", const QString& buildTimestamp = "");

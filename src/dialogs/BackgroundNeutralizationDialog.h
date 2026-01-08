@@ -1,12 +1,11 @@
 #pragma once
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <QPushButton>
 #include <QLabel>
-#include <QRect>
 #include "../ImageBuffer.h"
 
-class MainWindow;
+class MainWindowCallbacks;
 class ImageViewer;
 
 /**
@@ -14,10 +13,11 @@ class ImageViewer;
  * Simplified UI: User selects a reference region directly on the main image viewer.
  */
 #include <QPointer>
-class BackgroundNeutralizationDialog : public QDialog {
+#include "../ImageViewer.h"
+class BackgroundNeutralizationDialog : public DialogBase {
     Q_OBJECT
 public:
-    explicit BackgroundNeutralizationDialog(MainWindow* parent);
+    explicit BackgroundNeutralizationDialog(QWidget* parent = nullptr);
     ~BackgroundNeutralizationDialog();
 
     static void neutralizeBackground(ImageBuffer& img, const QRect& rect);
@@ -39,7 +39,6 @@ private:
     void setupUI();
     void setSelectionMode(bool active);
 
-    MainWindow* m_mainWin;
     QPointer<ImageViewer> m_activeViewer;
     QRect m_selection;
     bool m_hasSelection = false;

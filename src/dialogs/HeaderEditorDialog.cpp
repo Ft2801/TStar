@@ -8,20 +8,14 @@
 #include <QGroupBox>
 
 HeaderEditorDialog::HeaderEditorDialog(ImageViewer* viewer, QWidget* parent) 
-    : QDialog(parent), m_viewer(viewer) {
+    : DialogBase(parent, "Header Editor", 700, 600), m_viewer(viewer) {
     if (viewer) {
         m_meta = viewer->getBuffer().metadata();
         setWindowTitle(tr("FITS Header Editor - %1").arg(viewer->windowTitle()));
-    } else {
-        setWindowTitle(tr("FITS Header Editor"));
     }
-    resize(700, 600);
     setupUI();
     loadMetadata();
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 void HeaderEditorDialog::setupUI() {

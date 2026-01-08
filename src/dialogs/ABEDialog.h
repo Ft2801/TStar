@@ -7,8 +7,11 @@
 class ImageViewer; // Fwd Decl
 
 #include <QPointer>
+#include "../ImageViewer.h"
 
-class ABEDialog : public QDialog {
+#include "DialogBase.h"
+
+class ABEDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit ABEDialog(QWidget* parent, ImageViewer* viewer, const ImageBuffer& buffer, bool initialStretch);

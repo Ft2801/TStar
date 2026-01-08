@@ -1,5 +1,6 @@
 #include "RARDialog.h"
-#include "../MainWindow.h"
+#include "MainWindowCallbacks.h"
+#include "../ImageViewer.h"
 #include "../algos/RARRunner.h"
 #include <QThread>
 #include <QProgressDialog>
@@ -37,15 +38,7 @@ static QString detectBestProvider() {
     return "CPU";
 }
 
-RARDialog::RARDialog(MainWindow* parent) : QDialog(parent), m_mainWin(parent) {
-    setWindowTitle(tr("Aberration Remover"));
-    setWindowIcon(QIcon(":/images/Logo.png"));
-    resize(400, 300);
-
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
-    
+RARDialog::RARDialog(QWidget* parent) : DialogBase(parent, "Aberration Remover", 400, 300) {
     QSettings s;
 
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -242,15 +235,20 @@ void RARDialog::onRun() {
         return;
     }
     
-    m_mainWin->startLongProcess();
-    m_mainWin->log(tr("Starting Aberration Removal..."));
+    MainWindowCallbacks* mw = getCallbacks();
+    if (mw) {
+        mw->startLongProcess();
+        mw->logMessage(tr("Starting Aberration Removal..."), 0, false);
+    }
     
     // Run inline (like GraXpert/CosmicClarity) for real-time progress
     RARRunner runner;
     
     // Direct connection for immediate logging in the event loop
-    connect(&runner, &RARRunner::processOutput, m_mainWin, [this](const QString& msg){
-        m_mainWin->log(msg);
+    connect(&runner, &RARRunner::processOutput, this, [this](const QString& msg){
+        if (MainWindowCallbacks* mw = getCallbacks()) {
+            mw->logMessage(msg, 0, false);
+        }
     }, Qt::DirectConnection);
     
     QProgressDialog* pd = new QProgressDialog(tr("Running Aberration Removal..."), tr("Cancel"), 0, 0, this);
@@ -268,17 +266,26 @@ void RARDialog::onRun() {
     
     pd->close();
     pd->deleteLater();
-    m_mainWin->endLongProcess();
+    
+    if (MainWindowCallbacks* mw = getCallbacks()) {
+        mw->endLongProcess();
+    }
     
     if (success) {
-        m_mainWin->createNewImageWindow(output, tr("RAR Result"), m_mainWin->displayMode());
-        m_mainWin->log(tr("Aberration Removal Complete."));
+        if (MainWindowCallbacks* mw = getCallbacks()) {
+            mw->createResultWindow(output, tr("RAR Result"));
+            mw->logMessage(tr("Aberration Removal Complete."), 1, true);
+        }
         accept();
     } else if (!err.isEmpty() && err != tr("Aborted by user.")) {
-        m_mainWin->log(tr("ERR: RAR Failed: %1").arg(err));
+        if (MainWindowCallbacks* mw = getCallbacks()) {
+            mw->logMessage(tr("ERR: RAR Failed: %1").arg(err), 3, true);
+        }
         QMessageBox::critical(this, tr("Error"), err);
     } else if (err == tr("Aborted by user.")) {
-        m_mainWin->log(tr("RAR cancelled."));
+        if (MainWindowCallbacks* mw = getCallbacks()) {
+            mw->logMessage(tr("RAR cancelled."), 0, true);
+        }
     }
 }
 

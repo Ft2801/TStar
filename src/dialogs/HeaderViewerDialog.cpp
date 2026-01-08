@@ -55,9 +55,8 @@ public:
 };
 
 HeaderViewerDialog::HeaderViewerDialog(const ImageBuffer::Metadata& meta, QWidget* parent) 
-    : QDialog(parent), m_meta(meta) {
-    setWindowTitle(tr("FITS/XISF Header Explorer"));
-    resize(600, 500);
+    : DialogBase(parent, "FITS Header", 800, 600), m_meta(meta)
+{
     setupUI();
 
     if (parentWidget()) {

@@ -8,7 +8,9 @@
 #include <QLabel>
 #include "algos/CosmicClarityRunner.h"
 
-class CosmicClarityDialog : public QDialog {
+#include "DialogBase.h"
+
+class CosmicClarityDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit CosmicClarityDialog(QWidget* parent = nullptr);

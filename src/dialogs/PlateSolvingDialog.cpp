@@ -4,26 +4,11 @@
 #include <QGroupBox>
 #include <QDoubleValidator>
 #include <QMessageBox>
-#include "MainWindow.h"
+#include "MainWindowCallbacks.h"
 #include "ImageViewer.h"
 
-// Helper
-static MainWindow* getMainWindow(QWidget* w) {
-    while (w) {
-        if (MainWindow* mw = qobject_cast<MainWindow*>(w)) return mw;
-        w = w->parentWidget();
-    }
-    return nullptr;
-}
 
-PlateSolvingDialog::PlateSolvingDialog(QWidget* parent) : QDialog(parent) {
-    setWindowTitle(tr("Plate Solving"));
-    resize(420, 320); // More compact window
-
-    // Ensure dialog is on screen
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
+PlateSolvingDialog::PlateSolvingDialog(QWidget* parent) : DialogBase(parent, tr("Plate Solving"), 420, 320) {
     
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(10, 10, 10, 10);
@@ -184,9 +169,9 @@ void PlateSolvingDialog::onSolve() {
     m_log->clear();
     m_log->append(tr("Starting Solver..."));
     
-    if (MainWindow* mw = getMainWindow(this)) {
+    if (MainWindowCallbacks* mw = getCallbacks()) {
         mw->startLongProcess();
-        mw->log(tr("Starting Plate Solving..."), MainWindow::Log_Info);
+        mw->logMessage(tr("Starting Plate Solving..."), 0, false);
     }
     
     // Capture target for consistency check
@@ -201,7 +186,7 @@ void PlateSolvingDialog::onSolverLog(const QString& text) {
 void PlateSolvingDialog::onSolverFinished(const NativeSolveResult& res) {
     m_solveBtn->setEnabled(true);
     
-    MainWindow* mw = getMainWindow(this);
+    MainWindowCallbacks* mw = getCallbacks();
     if (mw) mw->endLongProcess();
 
     if (res.success) {
@@ -230,18 +215,18 @@ void PlateSolvingDialog::onSolverFinished(const NativeSolveResult& res) {
                  ImageBuffer& liveBuf = m_jobTarget->getBuffer();
                  liveBuf.setMetadata(meta);
                  liveBuf.syncWcsToHeaders();
-                 mw->log(tr("WCS applied to %1.").arg(m_jobTarget->windowTitle()), MainWindow::Log_Success, true);
+                 mw->logMessage(tr("WCS applied to %1.").arg(m_jobTarget->windowTitle()), 1, true);
             } else if (m_viewer) {
                  // Fallback if job target closed but m_viewer replaced? Less likely but safe
                  m_viewer->getBuffer().setMetadata(meta);
                  m_viewer->getBuffer().syncWcsToHeaders();
-                 mw->log(tr("WCS applied to active image."), MainWindow::Log_Success, true);
+                 mw->logMessage(tr("WCS applied to active image."), 1, true);
             }
         }
         
         QMessageBox::information(this, tr("Success"), tr("Plate solving successful.\nSolution applied."));
     } else {
         m_log->append(tr("<b>Failed:</b> %1").arg(res.errorMsg));
-        if (mw) mw->log(tr("Solving Failed: %1").arg(res.errorMsg), MainWindow::Log_Error, true);
+        if (mw) mw->logMessage(tr("Solving Failed: %1").arg(res.errorMsg), 3, true);
     }
 }

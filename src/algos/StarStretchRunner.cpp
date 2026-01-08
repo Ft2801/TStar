@@ -6,7 +6,7 @@
 
 StarStretchRunner::StarStretchRunner(QObject* parent) : QObject(parent) {}
 
-static void applyPixelMath(std::vector<float>& data, int channels, float amount) {
+static void applyPixelMath(std::vector<float>& data, [[maybe_unused]] int channels, float amount) {
     if (std::abs(amount) < 1e-5f) return;
 
     double factor = std::pow(3.0, amount);
@@ -64,7 +64,7 @@ static void applySCNR(std::vector<float>& data, int w, int h, int c) {
     }
 }
 
-bool StarStretchRunner::run(const ImageBuffer& input, ImageBuffer& output, const StarStretchParams& params, QString* errorMsg) {
+bool StarStretchRunner::run(const ImageBuffer& input, ImageBuffer& output, const StarStretchParams& params, [[maybe_unused]] QString* errorMsg) {
     // Copy input to output
     output = input;
     

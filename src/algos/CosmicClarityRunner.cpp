@@ -9,16 +9,24 @@
 #include <QDebug>
 #include <QRegularExpression>
 #include <QEventLoop>
+#include <QTimer>
 #include <QStandardPaths>
+#include <QWaitCondition>
+#include <QMutex>
 
-CosmicClarityRunner::CosmicClarityRunner(QObject* parent) : QObject(parent) {}
+// ============================================================================
+// CosmicClarityWorker Implementation
+// ============================================================================
 
-QString CosmicClarityRunner::getCosmicFolder() {
+CosmicClarityWorker::CosmicClarityWorker(QObject* parent) 
+    : QObject(parent) {}
+
+QString CosmicClarityWorker::getCosmicFolder() {
     QSettings s;
     return s.value("paths/cosmic_clarity").toString();
 }
 
-QString CosmicClarityRunner::getExecutableName(CosmicClarityParams::Mode mode) {
+QString CosmicClarityWorker::getExecutableName(CosmicClarityParams::Mode mode) {
     if (mode == CosmicClarityParams::Mode_SuperRes) {
 #ifdef Q_OS_WIN
         return "setiastrocosmicclarity_superres.exe";
@@ -40,11 +48,20 @@ QString CosmicClarityRunner::getExecutableName(CosmicClarityParams::Mode mode) {
     return isWin ? "SetiAstroCosmicClarity.exe" : "SetiAstroCosmicClarity";
 }
 
-bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, const CosmicClarityParams& params, QString* errorMsg) {
+void CosmicClarityWorker::process(const ImageBuffer& input, const CosmicClarityParams& params) {
+    QString errorMsg;
+    ImageBuffer output;
+    
+    // Validate input
+    if (input.data().empty()) {
+        emit finished(output, "Input buffer is empty");
+        return;
+    }
+    
     QString root = getCosmicFolder();
     if (root.isEmpty() || !QDir(root).exists()) {
-        if (errorMsg) *errorMsg = "Cosmic Clarity folder not configured or not found. Please set it in Settings.";
-        return false;
+        emit finished(output, "Cosmic Clarity folder not configured or not found. Please set it in Settings.");
+        return;
     }
     m_stop = false;
 
@@ -63,7 +80,7 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
     purge(inputDir);
     purge(outputDir);
 
-    // Verify Python availability - cross-platform paths
+    // Verify Python availability
     QString pythonExe;
     
 #if defined(Q_OS_MAC)
@@ -87,19 +104,18 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
     QProcess pythonCheck;
     pythonCheck.start(pythonExe, QStringList() << "--version");
     if (!pythonCheck.waitForFinished(5000)) {
-        if(errorMsg) *errorMsg = "Python version check timed out.";
-        return false;
+        emit finished(output, "Python version check timed out.");
+        return;
     }
     
     if (pythonCheck.exitCode() != 0) {
-        if(errorMsg) *errorMsg = "Python interpreter failed to run (bundled python might be broken).";
-        return false;
+        emit finished(output, "Python interpreter failed to run (bundled python might be broken).");
+        return;
     }
 
-    // Embed cosmic_bridge.py
+    // Find bridge script
     QString bridgeScriptPath = QCoreApplication::applicationDirPath() + "/scripts/cosmic_bridge.py";
     if (!QFile::exists(bridgeScriptPath)) {
-        // Try Resources folder (macOS DMG bundle)
         bridgeScriptPath = QCoreApplication::applicationDirPath() + "/../Resources/scripts/cosmic_bridge.py";
     }
     if (!QFile::exists(bridgeScriptPath)) {
@@ -107,40 +123,40 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
     }
     
     if (!QFile::exists(bridgeScriptPath)) {
-        if(errorMsg) *errorMsg = "Bridge script not found.";
-        return false;
+        emit finished(output, "Bridge script not found.");
+        return;
     }
 
     // Helper to run process with cancellation and timeout
     auto runProcess = [&](QProcess& p, int timeoutMs = 600000) -> bool {
         p.start();
         if (!p.waitForStarted()) {
-             if (errorMsg) *errorMsg = "Failed to start process: " + p.program();
-             return false;
+            errorMsg = "Failed to start process: " + p.program();
+            return false;
         }
         
-        // Wait loop
+        // Wait loop with cancellation support
         int elapsed = 0;
         int interval = 100;
         while (!p.waitForFinished(interval)) {
-             if (m_stop) {
-                 p.kill();
-                 p.waitForFinished();
-                 if (errorMsg) *errorMsg = "Process cancelled by user.";
-                 return false;
-             }
-             elapsed += interval;
-             if (elapsed > timeoutMs) {
-                 p.kill();
-                 if (errorMsg) *errorMsg = "Process timed out.";
-                 return false;
-             }
+            if (m_stop) {
+                p.kill();
+                p.waitForFinished();
+                errorMsg = "Process cancelled by user.";
+                return false;
+            }
+            elapsed += interval;
+            if (elapsed > timeoutMs) {
+                p.kill();
+                errorMsg = "Process timed out.";
+                return false;
+            }
         }
         
         if (p.exitCode() != 0) {
             QString errOut = p.readAllStandardError();
             if (errOut.isEmpty()) errOut = p.readAllStandardOutput();
-            if (errorMsg) *errorMsg = "Process failed: " + errOut;
+            errorMsg = "Process failed: " + errOut;
             return false;
         }
         return true;
@@ -150,9 +166,9 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
     QString rawInputFile = inputDir.filePath("input.raw");
     {
         QFile raw(rawInputFile);
-        if(!raw.open(QIODevice::WriteOnly)) {
-            if(errorMsg) *errorMsg = "Failed to write raw input.";
-            return false;
+        if (!raw.open(QIODevice::WriteOnly)) {
+            emit finished(output, "Failed to write raw input.");
+            return;
         }
         raw.write((const char*)input.data().data(), input.data().size() * sizeof(float));
         raw.close();
@@ -170,8 +186,9 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
         p.setProgram(pythonExe);
         p.setArguments(args);
         
-        if (!runProcess(p, 60000)) { // 60s timeout for IO
-             return false;
+        if (!runProcess(p, 60000)) {
+            emit finished(output, errorMsg);
+            return;
         }
     }
     emit processOutput("Input staged via Python Bridge: " + savedTiff);
@@ -220,13 +237,13 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
             if (params.separateChannelsDenoise) args << "--separate_channels";
         }
         else if (s.toolMode == CosmicClarityParams::Mode_SuperRes) {
-             int scale = 2;
-             if (params.scaleFactor.contains("3")) scale = 3;
-             if (params.scaleFactor.contains("4")) scale = 4;
-             args << "--input" << currentInputFile;
-             args << "--output_dir" << outputDir.absolutePath();
-             args << "--scale" << QString::number(scale);
-             args << "--model_dir" << root;
+            int scale = 2;
+            if (params.scaleFactor.contains("3")) scale = 3;
+            if (params.scaleFactor.contains("4")) scale = 4;
+            args << "--input" << currentInputFile;
+            args << "--output_dir" << outputDir.absolutePath();
+            args << "--scale" << QString::number(scale);
+            args << "--model_dir" << root;
         }
 
         if (s.toolMode != CosmicClarityParams::Mode_SuperRes && !params.useGpu) {
@@ -242,48 +259,61 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
         
         connect(&process, &QProcess::readyReadStandardOutput, [&process, this](){
             QString txt = process.readAllStandardOutput();
-            if(!txt.isEmpty()) emit processOutput(txt.trimmed());
+            if (!txt.isEmpty()) emit processOutput(txt.trimmed());
         });
         connect(&process, &QProcess::readyReadStandardError, [&process, this](){
             QString txt = process.readAllStandardError();
-            if(!txt.isEmpty()) {
+            if (!txt.isEmpty()) {
                 QString trimmed = txt.trimmed();
-                if (trimmed.contains("INFO") || trimmed.contains("Progress")) emit processOutput(trimmed);
-                else emit processOutput("LOG: " + trimmed);
+                if (trimmed.contains("INFO") || trimmed.contains("Progress")) {
+                    emit processOutput(trimmed);
+                } else {
+                    emit processOutput("LOG: " + trimmed);
+                }
             }
         });
 
-        if (!runProcess(process, 600000)) { // 10 min timeout
-            purge(inputDir); purge(outputDir);
-            return false;
+        if (!runProcess(process, 600000)) {
+            purge(inputDir); 
+            purge(outputDir);
+            emit finished(output, errorMsg);
+            return;
         }
 
         // Determine Output
         QString expectedOutput;
         if (s.toolMode == CosmicClarityParams::Mode_SuperRes) {
-             int scale = 2;
-             if (params.scaleFactor.contains("3")) scale = 3;
-             if (params.scaleFactor.contains("4")) scale = 4;
-             QString suffix = QString("_upscaled%1").arg(scale);
-             QStringList filters; filters << baseName + suffix + ".*";
-             QFileInfoList found = outputDir.entryInfoList(filters, QDir::Files);
-             if (found.isEmpty()) { if(errorMsg) *errorMsg = "SuperRes output not found."; return false; }
-             expectedOutput = found.first().absoluteFilePath();
+            int scale = 2;
+            if (params.scaleFactor.contains("3")) scale = 3;
+            if (params.scaleFactor.contains("4")) scale = 4;
+            QString suffix = QString("_upscaled%1").arg(scale);
+            QStringList filters; filters << baseName + suffix + ".*";
+            QFileInfoList found = outputDir.entryInfoList(filters, QDir::Files);
+            if (found.isEmpty()) { 
+                purge(inputDir); purge(outputDir);
+                emit finished(output, "SuperRes output not found.");
+                return;
+            }
+            expectedOutput = found.first().absoluteFilePath();
         } else {
-             expectedOutput = outputDir.filePath(baseName + s.suffix + ".tif");
-             if (!QFile::exists(expectedOutput)) {
+            expectedOutput = outputDir.filePath(baseName + s.suffix + ".tif");
+            if (!QFile::exists(expectedOutput)) {
                 QStringList filters; filters << baseName + s.suffix + ".*";
                 QFileInfoList found = outputDir.entryInfoList(filters, QDir::Files);
                 if (!found.isEmpty()) expectedOutput = found.first().absoluteFilePath();
-                else { if (errorMsg) *errorMsg = "Output file not found: " + baseName + s.suffix; return false; }
-             }
+                else { 
+                    purge(inputDir); purge(outputDir);
+                    emit finished(output, "Output file not found: " + baseName + s.suffix);
+                    return;
+                }
+            }
         }
 
         if (i < steps.size() - 1) {
-             // Chain: Rename output to input/image.tif
-             QFile::remove(savedTiff); // remove old input
-             QFile::rename(expectedOutput, savedTiff);
-             emit processOutput("Chaining...");
+            // Chain: Rename output to input/image.tif
+            QFile::remove(savedTiff);
+            QFile::rename(expectedOutput, savedTiff);
+            emit processOutput("Chaining...");
         } else {
             // Load Results via Bridge
             QString rawResult = outputDir.filePath("result.raw");
@@ -296,15 +326,17 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
             
             if (!runProcess(p, 60000)) {
                 purge(inputDir); purge(outputDir);
-                return false;
+                emit finished(output, errorMsg);
+                return;
             }
             
             QString outData = p.readAllStandardOutput().trimmed();
             emit processOutput("Bridge Output:\n" + outData);
 
             if (outData.contains("Error")) {
-                 if(errorMsg) *errorMsg = "Bridge error: " + outData;
-                 return false;
+                purge(inputDir); purge(outputDir);
+                emit finished(output, "Bridge error: " + outData);
+                return;
             }
 
             // Find the line starting with RESULT:
@@ -318,14 +350,16 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
             }
 
             if (resultLine.isEmpty()) {
-                 if(errorMsg) *errorMsg = "Bridge failed to provide result marker: " + outData;
-                 return false;
+                purge(inputDir); purge(outputDir);
+                emit finished(output, "Bridge failed to provide result marker: " + outData);
+                return;
             }
 
             QStringList parts = resultLine.mid(7).trimmed().split(QRegularExpression("\\s+"));
             if (parts.size() < 3) {
-                 if(errorMsg) *errorMsg = "Bridge failed to parse dimensions: " + resultLine;
-                 return false;
+                purge(inputDir); purge(outputDir);
+                emit finished(output, "Bridge failed to parse dimensions: " + resultLine);
+                return;
             }
             
             int w = parts[0].toInt();
@@ -333,26 +367,29 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
             int c = parts[2].toInt();
 
             if (w <= 0 || h <= 0) {
-                if(errorMsg) *errorMsg = "Bridge returned invalid dimensions: " + resultLine;
-                return false;
+                purge(inputDir); purge(outputDir);
+                emit finished(output, "Bridge returned invalid dimensions: " + resultLine);
+                return;
             }
             
             QFile rawRes(rawResult);
-            if(rawRes.open(QIODevice::ReadOnly)) {
+            if (rawRes.open(QIODevice::ReadOnly)) {
                 QByteArray blob = rawRes.readAll();
                 std::vector<float> data(blob.size()/4);
                 memcpy(data.data(), blob.constData(), blob.size());
                 
                 output.setData(w, h, c, data);
+                output.setMetadata(input.metadata());
                 emit processOutput(QString("Loaded via Bridge: %1x%2 %3ch").arg(w).arg(h).arg(c));
             } else {
-                if(errorMsg) *errorMsg = "Failed to read raw result.";
-                return false;
+                purge(inputDir); purge(outputDir);
+                emit finished(output, "Failed to read raw result.");
+                return;
             }
              
-             // Cleanup
-             QFile::remove(expectedOutput);
-             QFile::remove(rawResult);
+            // Cleanup
+            QFile::remove(expectedOutput);
+            QFile::remove(rawResult);
         }
     }
     
@@ -361,6 +398,86 @@ bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, con
     purge(inputDir);
     purge(outputDir);
 
-    output.setMetadata(input.metadata()); // Preserve WCS and other metadata
+    emit finished(output, "");  // Success
+}
+
+// ============================================================================
+// CosmicClarityRunner Implementation
+// ============================================================================
+
+CosmicClarityRunner::CosmicClarityRunner(QObject* parent) 
+    : QObject(parent) {}
+
+CosmicClarityRunner::~CosmicClarityRunner() {
+    if (m_thread) {
+        m_thread->quit();
+        if (!m_thread->wait(5000)) {
+            m_thread->terminate();
+            m_thread->wait();
+        }
+    }
+}
+
+bool CosmicClarityRunner::run(const ImageBuffer& input, ImageBuffer& output, 
+                              const CosmicClarityParams& params, QString* errorMsg) {
+    // Create thread and worker if not already created
+    if (!m_thread) {
+        m_thread = new QThread(this);
+        m_worker = new CosmicClarityWorker();
+        m_worker->moveToThread(m_thread);
+        
+        // Connect signals
+        connect(m_thread, &QThread::finished, m_worker, &QObject::deleteLater);
+        connect(m_worker, &CosmicClarityWorker::finished, this, &CosmicClarityRunner::onWorkerFinished);
+        connect(m_worker, &CosmicClarityWorker::processOutput, this, &CosmicClarityRunner::processOutput);
+        
+        m_thread->start();
+    }
+    
+    // Reset synchronization flag
+    m_finished = false;
+    
+    // Emit process signal (queued call in worker thread)
+    QMetaObject::invokeMethod(m_worker, "process", Qt::QueuedConnection,
+                              Q_ARG(const ImageBuffer&, input),
+                              Q_ARG(const CosmicClarityParams&, params));
+    
+    // Wait for completion with event loop
+    QEventLoop loop;
+    // Connect to worker's finished signal instead of non-existent runner signal
+    QObject::connect(m_worker, QOverload<const ImageBuffer&, const QString&>::of(&CosmicClarityWorker::finished), 
+                    this, &CosmicClarityRunner::onWorkerFinished);
+    
+    // Connect onWorkerFinished to exit the loop
+    QObject::connect(this, &CosmicClarityRunner::workerDone, &loop, &QEventLoop::quit);
+    
+    // Timeout: 15 minutes
+    QTimer timer;
+    timer.setSingleShot(true);
+    timer.start(15 * 60 * 1000);
+    QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+    
+    loop.exec();
+    timer.stop();
+    
+    if (!m_finished) {
+        if (errorMsg) *errorMsg = "Operation timed out";
+        m_errorMsg = "Operation timed out";
+        return false;
+    }
+    
+    if (!m_errorMsg.isEmpty()) {
+        if (errorMsg) *errorMsg = m_errorMsg;
+        return false;
+    }
+    
+    output = m_output;
     return true;
+}
+
+void CosmicClarityRunner::onWorkerFinished(const ImageBuffer& output, const QString& errorMsg) {
+    m_output = output;
+    m_errorMsg = errorMsg;
+    m_finished = true;
+    emit workerDone();
 }

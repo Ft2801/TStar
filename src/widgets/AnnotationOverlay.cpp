@@ -337,7 +337,7 @@ void AnnotationOverlay::drawWCSObjects(QPainter& painter) {
                      candidates.push_back({ pBottom, QRectF(pBottom.x(), pBottom.y() - labelH + 2, labelW, labelH) });
                      
                      int bestIdx = 0;
-                     for (int i=0; i<candidates.size(); ++i) {
+                     for (int i=0; i<(int)candidates.size(); ++i) {
                          bool collision = false;
                          for (const auto& occupied : occupiedRects) {
                              if (candidates[i].r.intersects(occupied)) {

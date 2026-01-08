@@ -5,29 +5,16 @@
 #include <QScreen>
 #include <QGuiApplication>
 
-HelpDialog::HelpDialog(QWidget *parent) : QDialog(parent)
+HelpDialog::HelpDialog(QWidget *parent) : DialogBase(parent, "Help & Tutorial", 800, 600)
 {
-    setWindowTitle(tr("TStar Help & Tutorial"));
     setWindowIcon(QIcon(":/images/Logo.png"));
     setupUI();
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 void HelpDialog::setupUI()
 {
     // Fixed size as requested: 800x600
-    setFixedSize(800, 600);
-    
-    // Center on screen (like GHT dialog)
-    if (QScreen* screen = QGuiApplication::primaryScreen()) {
-        QRect screenGeometry = screen->availableGeometry();
-        int x = (screenGeometry.width() - width()) / 2;
-        int y = (screenGeometry.height() - height()) / 2;
-        move(x, y);
-    }
     
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(10, 10, 10, 10);

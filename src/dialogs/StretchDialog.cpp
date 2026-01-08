@@ -7,17 +7,10 @@
 
 #include "../ImageViewer.h"
 
-StretchDialog::StretchDialog(QWidget* parent) : QDialog(parent) {
-    setWindowTitle(tr("Statistical Stretch"));
-    setWindowIcon(QIcon(":/images/Logo.png"));
+StretchDialog::StretchDialog(QWidget* parent) : DialogBase(parent, "Statistical Stretch", 600, 400) {
     setMinimumWidth(450);
-    
     setupUI();
     setupConnections();
-
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 void StretchDialog::setupUI() {

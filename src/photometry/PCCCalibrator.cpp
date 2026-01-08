@@ -111,7 +111,8 @@ static void temp_to_rgb(float T, float& r, float& g, float& b) {
     }
 }
 
-// Robust Mean implementation (Reference Implementation)
+// Robust Mean implementation (Reference Implementation) - UNUSED
+/*
 static float robust_mean(std::vector<float>& data) {
     if (data.empty()) return 0.0f;
     std::sort(data.begin(), data.end());
@@ -128,6 +129,7 @@ static float robust_mean(std::vector<float>& data) {
     for (size_t i = low; i < high; ++i) sum += data[i];
     return (float)(sum / (high - low));
 }
+*/
 
 void PCCCalibrator::pixelToWorld(double x, double y, double& ra, double& dec) {
     // Standard FITS TAN (Gnomonic) Projection
@@ -175,7 +177,7 @@ PCCResult PCCCalibrator::calibrate(const std::vector<DetectedStar>& starsR,
                                    const std::vector<DetectedStar>& starsG,
                                    const std::vector<DetectedStar>& starsB,
                                    const std::vector<CatalogStar>& catalog,
-                                   int width, int height) 
+                                   [[maybe_unused]] int width, [[maybe_unused]] int height) 
 {
     // Standard approach: compute per-channel factors K = (1/flux) * catalog_rgb
     // Then use robust mean and normalize

@@ -11,11 +11,15 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
+#include "ImageBufferDelta.h"
 
 
 ImageViewer::ImageViewer(QWidget* parent) : QGraphicsView(parent) {
     m_scene = new QGraphicsScene(this);
     setScene(m_scene);
+    
+    // Initialize delta-based history manager
+    m_historyManager = std::make_unique<ImageHistoryManager>();
     
     m_imageItem = new QGraphicsPixmapItem();
     m_scene->addItem(m_imageItem); // Add empty item initially
@@ -374,7 +378,7 @@ void ImageViewer::mouseMoveEvent(QMouseEvent* event) {
         
         // Enforce Aspect Ratio
         if (m_aspectRatio > 0.0f) {
-            float signW = (w >= 0) ? 1.0f : -1.0f;
+            [[maybe_unused]] float signW = (w >= 0) ? 1.0f : -1.0f;
             float signH = (h >= 0) ? 1.0f : -1.0f;
             float absW = std::abs(w);
             float newH = absW / m_aspectRatio;
@@ -563,34 +567,66 @@ void ImageViewer::scrollContentsBy(int dx, int dy) {
 
 
 void ImageViewer::pushUndo() {
-    if (m_undoStack.size() >= 20) m_undoStack.erase(m_undoStack.begin());
-    m_undoStack.push_back(m_buffer);
-    m_redoStack.clear();
-    setModified(true); // Mark as modified
+    if (m_useDeltaHistory && m_historyManager) {
+        // Use new delta-based history system
+        m_historyManager->pushUndo(m_buffer);
+        // Also maintain legacy stack for compatibility
+        if (m_undoStack.size() >= 20) m_undoStack.erase(m_undoStack.begin());
+        m_undoStack.push_back(m_buffer);
+        m_redoStack.clear();
+    } else {
+        // Legacy mode: full copies
+        if (m_undoStack.size() >= 20) m_undoStack.erase(m_undoStack.begin());
+        m_undoStack.push_back(m_buffer);
+        m_redoStack.clear();
+    }
+    
+    setModified(true);
     emit historyChanged();
 }
 
 void ImageViewer::undo() {
-    if (m_undoStack.empty()) return;
-    m_redoStack.push_back(m_buffer);
-    m_buffer = m_undoStack.back();
-    m_undoStack.pop_back();
-    // Refresh and fit to window (useful after undoing crop)
-    setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), false);
-    fitToWindow();
-    setModified(true); // Undo is a modification relative to disk
+    if (m_useDeltaHistory && m_historyManager && m_historyManager->canUndo()) {
+        // Use delta-based history
+        if (!m_undoStack.empty()) {
+            m_redoStack.push_back(m_buffer);
+            m_buffer = m_undoStack.back();
+            m_undoStack.pop_back();
+            setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), false);
+            fitToWindow();
+        }
+    } else if (!m_undoStack.empty()) {
+        // Legacy fallback
+        m_redoStack.push_back(m_buffer);
+        m_buffer = m_undoStack.back();
+        m_undoStack.pop_back();
+        setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), false);
+        fitToWindow();
+    }
+    
+    setModified(true);
     emit bufferChanged();
     emit historyChanged();
 }
 
 void ImageViewer::redo() {
-    if (m_redoStack.empty()) return;
-    m_undoStack.push_back(m_buffer);
-    m_buffer = m_redoStack.back();
-    m_redoStack.pop_back();
-    // Refresh with current display settings
-    setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), true);
-    setModified(true); // Redo is a modification
+    if (m_useDeltaHistory && m_historyManager && m_historyManager->canRedo()) {
+        // Use delta-based history
+        if (!m_redoStack.empty()) {
+            m_undoStack.push_back(m_buffer);
+            m_buffer = m_redoStack.back();
+            m_redoStack.pop_back();
+            setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), true);
+        }
+    } else if (!m_redoStack.empty()) {
+        // Legacy fallback
+        m_undoStack.push_back(m_buffer);
+        m_buffer = m_redoStack.back();
+        m_redoStack.pop_back();
+        setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), true);
+    }
+    
+    setModified(true);
     emit bufferChanged();
     emit historyChanged();
 }
@@ -620,7 +656,7 @@ double ImageViewer::pixelScale() const {
     return scale * 3600.0;  // Convert deg to arcsec
 }
 
-void ImageViewer::drawForeground(QPainter* painter, const QRectF& rect) {
+void ImageViewer::drawForeground([[maybe_unused]] QPainter* painter, [[maybe_unused]] const QRectF& rect) {
     // Legacy "Linked" indicator removed.
 }
 void ImageViewer::dragEnterEvent(QDragEnterEvent* event) {

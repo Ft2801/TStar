@@ -1,5 +1,6 @@
 #include "BackgroundNeutralizationDialog.h"
-#include "../MainWindow.h"
+#include "MainWindowCallbacks.h"
+#include "DialogBase.h"
 #include "../ImageViewer.h"
 #include "../core/RobustStatistics.h"
 #include <QVBoxLayout>
@@ -9,12 +10,10 @@
 #include <algorithm>
 #include <numeric>
 
-BackgroundNeutralizationDialog::BackgroundNeutralizationDialog(MainWindow* parent)
-    : QDialog(parent), m_mainWin(parent)
+BackgroundNeutralizationDialog::BackgroundNeutralizationDialog(QWidget* parent)
+    : DialogBase(parent, tr("Background Neutralization"), 350, 150)
 {
-    setWindowTitle(tr("Background Neutralization"));
-    setWindowIcon(QIcon(":/images/Logo.png"));
-    resize(350, 150);
+    // Interaction Control: Initially disabled until focused
 
     
     // Interaction Control: Initially disabled until focused
@@ -22,9 +21,6 @@ BackgroundNeutralizationDialog::BackgroundNeutralizationDialog(MainWindow* paren
     
     setupUI();
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 void BackgroundNeutralizationDialog::setInteractionEnabled(bool enabled) {

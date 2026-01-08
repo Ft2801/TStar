@@ -1,22 +1,23 @@
 #ifndef CLAHEDIALOG_H
 #define CLAHEDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
+#include <QSlider>
 #include <QImage>
 #include "../ImageBuffer.h"
 
-class QSlider;
+class MainWindowCallbacks;
 class QLabel;
 class QGraphicsView;
 class QGraphicsScene;
 class QGraphicsPixmapItem;
 class QPushButton;
-class MainWindow;
+class MainWindowCallbacks;
 
-class ClaheDialog : public QDialog {
+class ClaheDialog : public DialogBase {
     Q_OBJECT
 public:
-    explicit ClaheDialog(MainWindow* parent);
+    explicit ClaheDialog(QWidget* parent = nullptr);
     ~ClaheDialog();
     
     void setSource(const ImageBuffer& img);
@@ -30,7 +31,7 @@ private:
     void setupUi();
     void createPreview(const ImageBuffer& src, float clipLimit, int tileGridSize);
     
-    MainWindow* m_mainWindow;
+    MainWindowCallbacks* m_mainWindow;
     ImageBuffer m_sourceImage;
     ImageBuffer m_previewImage;
     

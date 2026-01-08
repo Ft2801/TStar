@@ -8,7 +8,9 @@
 #include <vector>
 #include "../ImageBuffer.h"
 
-class ChannelCombinationDialog : public QDialog {
+#include "DialogBase.h"
+
+class ChannelCombinationDialog : public DialogBase {
     Q_OBJECT
 public:
     struct ChannelSource {

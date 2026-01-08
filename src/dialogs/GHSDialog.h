@@ -1,7 +1,7 @@
 #ifndef GHSDIALOG_H
 #define GHSDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <vector>
 #include "ImageBuffer.h"
 
@@ -14,11 +14,11 @@ class QSpinBox;
 class QToolButton;
 class HistogramWidget;
 class QScrollArea;
+class MainWindowCallbacks;
 class ImageViewer; // Forward declaration at global scope
 
 #include <QPointer>
-class GHSDialog : public QDialog {
-    friend class MainWindow;
+class GHSDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit GHSDialog(QWidget *parent = nullptr);

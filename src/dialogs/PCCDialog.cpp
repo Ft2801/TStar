@@ -4,21 +4,11 @@
 #include <QCoreApplication>
 #include "PCCDistributionDialog.h"
 #include "../photometry/StarDetector.h"
-#include "MainWindow.h"
+#include "../ImageViewer.h"
+#include "MainWindowCallbacks.h"
 
-// Helper to find MainWindow even if reparented
-static MainWindow* getMainWindow(QWidget* w) {
-    while (w) {
-        if (MainWindow* mw = qobject_cast<MainWindow*>(w)) return mw;
-        w = w->parentWidget();
-    }
-    return nullptr;
-}
 
-PCCDialog::PCCDialog(ImageViewer* viewer, QWidget* parent) : QDialog(parent), m_viewer(viewer) {
-    setWindowTitle(tr("Photometric Color Calibration"));
-    setMinimumWidth(300);
-    setMaximumHeight(120); // Strictly limit height
+PCCDialog::PCCDialog(ImageViewer* viewer, QWidget* parent) : DialogBase(parent, tr("Photometric Color Calibration"), 300, 120), m_viewer(viewer) {
     
     QVBoxLayout* lay = new QVBoxLayout(this);
     lay->setContentsMargins(10, 10, 10, 10);
@@ -63,9 +53,6 @@ PCCDialog::PCCDialog(ImageViewer* viewer, QWidget* parent) : QDialog(parent), m_
     
     m_calibrator = new PCCCalibrator();
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 void PCCDialog::setViewer(ImageViewer* v) {
@@ -127,9 +114,9 @@ void PCCDialog::onCatalogReady(const std::vector<CatalogStar>& stars) {
     m_btnRun->setEnabled(false);
     
     // Activate Console
-    if (MainWindow* mw = getMainWindow(this)) {
+    if (MainWindowCallbacks* mw = getCallbacks()) {
         mw->startLongProcess();
-        mw->log(tr("Starting PCC with %1 catalog stars...").arg(stars.size()), MainWindow::Log_Info);
+        mw->logMessage(tr("Starting PCC with %1 catalog stars...").arg(stars.size()), 0, false);
     }
     
     // Copy image for thread safety? 
@@ -197,7 +184,7 @@ void PCCDialog::onCatalogReady(const std::vector<CatalogStar>& stars) {
         watcher->deleteLater();
         m_btnRun->setEnabled(true);
         
-        MainWindow* mw = getMainWindow(this);
+        MainWindowCallbacks* mw = getCallbacks();
         if (mw) mw->endLongProcess();
         
         if (!res.valid) {
@@ -239,7 +226,7 @@ void PCCDialog::onCatalogReady(const std::vector<CatalogStar>& stars) {
             // Refresh display needed? Usually buffer change signals handled, but explicit might be safer
             targetViewer->refreshDisplay(); 
             
-            if (mw) mw->log(msg, MainWindow::Log_Success, true);
+            if (mw) mw->logMessage(msg, 1, true);
             
             QMessageBox::information(this, tr("PCC Result"), msg);
             accept(); // Close dialog? Or stay open? Previous logic was accept.

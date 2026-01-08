@@ -17,14 +17,9 @@ static bool detectGpuAvailable() {
     return hasCuda || hasDirectML;
 }
 
-CosmicClarityDialog::CosmicClarityDialog(QWidget* parent) : QDialog(parent) {
-    setWindowTitle(tr("Cosmic Clarity"));
+CosmicClarityDialog::CosmicClarityDialog(QWidget* parent) : DialogBase(parent, "Cosmic Clarity", 500, 500) {
     setWindowIcon(QIcon(":/images/Logo.png"));
-    resize(500, 500);
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     QGroupBox* grp = new QGroupBox(tr("Parameters"), this);

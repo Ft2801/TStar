@@ -26,40 +26,41 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/.."
 PROJECT_ROOT="$(pwd)"
 
+# Load utilities
+if [ -f "$SCRIPT_DIR/macos_utils.sh" ]; then
+    source "$SCRIPT_DIR/macos_utils.sh"
+else
+    echo "[ERROR] macos_utils.sh not found!"
+    exit 1
+fi
+
 BUILD_DIR="build"
 DIST_DIR="dist/TStar.app"
 APP_BUNDLE="$BUILD_DIR/TStar.app"
 ERROR_COUNT=0
 
-# --- Read version from changelog.txt ---
-VERSION="1.0.0"
-if [ -f "changelog.txt" ]; then
-    VERSION=$(grep -E "^Version [0-9.]+" changelog.txt | head -1 | awk '{print $2}' | tr -d '\r')
-    if [ -z "$VERSION" ]; then
-        VERSION="1.0.0"
-    fi
+# --- Read version ---
+VERSION=$(get_version)
+if [ $SILENT_MODE -eq 0 ]; then
+    echo "[INFO] Packaging version: $VERSION"
 fi
-echo "[INFO] Packaging version: $VERSION"
 
 # --- Verify build exists ---
 echo ""
-echo "[STEP 1] Verifying build..."
+log_step 1 "Verifying build..."
 
-if [ ! -d "$APP_BUNDLE" ]; then
-    echo "[ERROR] TStar.app not found in $BUILD_DIR"
+verify_dir "$APP_BUNDLE" "TStar.app" || {
     echo "Please run ./src/build_macos.sh first."
     exit 1
-fi
+}
 echo "  - TStar.app: OK"
 
 # --- Clean old dist ---
 echo ""
-echo "[STEP 2] Preparing distribution folder..."
+log_step 2 "Preparing distribution folder..."
 
-if [ -d "dist" ]; then
-    rm -rf "dist"
-fi
-mkdir -p "dist"
+safe_rm_rf "dist"
+ensure_dir "dist"
 
 # --- Copy app bundle ---
 echo ""
@@ -70,25 +71,10 @@ echo "  - App bundle copied"
 
 # --- Run macdeployqt ---
 echo ""
-echo "[STEP 4] Running macdeployqt..."
+log_step 4 "Running macdeployqt..."
 
-QT_PREFIX=$(brew --prefix qt@6 2>/dev/null || brew --prefix qt 2>/dev/null || echo "")
-
-# Fallback to Cellar if opt symlink is broken (Dependency Harvester logic)
-if [ ! -d "$QT_PREFIX/bin" ]; then
-    POTENTIAL_QT=$(find /opt/homebrew/Cellar/qtbase -maxdepth 2 -name "bin" -type d 2>/dev/null | head -1)
-    if [ -n "$POTENTIAL_QT" ]; then
-        QT_PREFIX=$(dirname "$POTENTIAL_QT")
-        echo "[INFO] Using physical Qt prefix: $QT_PREFIX"
-    fi
-fi
-
-MACDEPLOYQT="$QT_PREFIX/bin/macdeployqt"
-
-if [ ! -f "$MACDEPLOYQT" ]; then
-    # Try to find in PATH
-    MACDEPLOYQT=$(which macdeployqt 2>/dev/null || echo "")
-fi
+QT_PREFIX=$(detect_qt_prefix)
+MACDEPLOYQT=$(find_macdeployqt "$QT_PREFIX")
 
 if [ -f "$MACDEPLOYQT" ]; then
     # Run macdeployqt with Qt lib path and filter out rpath warnings
@@ -109,53 +95,20 @@ fi
 
 # --- Copy Homebrew dylibs ---
 echo ""
-echo "[STEP 5] Copying Homebrew libraries..."
+log_step 5 "Copying Homebrew libraries..."
 
 FRAMEWORKS_DIR="$DIST_DIR/Contents/Frameworks"
-mkdir -p "$FRAMEWORKS_DIR"
+ensure_dir "$FRAMEWORKS_DIR"
 
-copy_dylib() {
-    local lib_name="$1"
-    local brew_pkg="$2"
-    
-    local prefix=$(brew --prefix "$brew_pkg" 2>/dev/null || echo "")
-    
-    # Fallback to Cellar if opt symlink is broken
-    if [ ! -d "$prefix/lib" ]; then
-        CELLAR_PATH="/opt/homebrew/Cellar/$brew_pkg"
-        if [ -d "$CELLAR_PATH" ]; then
-             # Pick the first version found
-             VERSION_PATH=$(find "$CELLAR_PATH" -maxdepth 1 -mindepth 1 -type d | head -1)
-             if [ -n "$VERSION_PATH" ]; then
-                 prefix="$VERSION_PATH"
-                 echo "    (Using Cellar path for $lib_name)"
-             fi
-        fi
-    fi
-
-    if [ -n "$prefix" ] && [ -d "$prefix/lib" ]; then
-        local dylib=$(find "$prefix/lib" -name "${lib_name}*.dylib" -type f | head -1)
-        if [ -f "$dylib" ]; then
-            cp "$dylib" "$FRAMEWORKS_DIR/"
-            echo "  - $lib_name: OK"
-            return 0
-        fi
-    fi
-    echo "  - $lib_name: NOT FOUND"
-    return 1
-}
-
-# Copy required dylibs
-copy_dylib "libgsl" "gsl" || true
-copy_dylib "libgslcblas" "gsl" || true
-copy_dylib "libcfitsio" "cfitsio" || true
-copy_dylib "liblz4" "lz4" || true
-copy_dylib "libzstd" "zstd" || true
-copy_dylib "libomp" "libomp" || true
-
-# Brotli: must copy both common and dec (decompression)
-copy_dylib "libbrotlicommon" "brotli" || true
-copy_dylib "libbrotlidec" "brotli" || true
+# Copy required dylibs using shared function
+copy_dylib "libgsl" "gsl" "$FRAMEWORKS_DIR" || true
+copy_dylib "libgslcblas" "gsl" "$FRAMEWORKS_DIR" || true
+copy_dylib "libcfitsio" "cfitsio" "$FRAMEWORKS_DIR" || true
+copy_dylib "liblz4" "lz4" "$FRAMEWORKS_DIR" || true
+copy_dylib "libzstd" "zstd" "$FRAMEWORKS_DIR" || true
+copy_dylib "libomp" "libomp" "$FRAMEWORKS_DIR" || true
+copy_dylib "libbrotlicommon" "brotli" "$FRAMEWORKS_DIR" || true
+copy_dylib "libbrotlidec" "brotli" "$FRAMEWORKS_DIR" || true
 
 # OpenCV (only required modules - dnn and video excluded to avoid external dependencies)
 OPENCV_PREFIX=$(brew --prefix opencv 2>/dev/null || echo "")
@@ -202,59 +155,59 @@ fi
 
 # --- Copy Python environment ---
 echo ""
-echo "[STEP 6] Copying Python environment..."
+log_step 6 "Copying Python environment..."
 
 PYTHON_VENV="$PROJECT_ROOT/deps/python_venv"
 RESOURCES_DIR="$DIST_DIR/Contents/Resources"
 
+verify_dir "$PYTHON_VENV" "Python venv" || {
+    log_warning "Python venv not found. AI features may not work."
+    ERROR_COUNT=$((ERROR_COUNT + 1))
+}
+
 if [ -d "$PYTHON_VENV" ]; then
     cp -R "$PYTHON_VENV" "$RESOURCES_DIR/python_venv"
     echo "  - Python venv: OK"
-else
-    echo "[WARNING] Python venv not found. AI features may not work."
-    ERROR_COUNT=$((ERROR_COUNT + 1))
 fi
 
 # --- Copy scripts ---
 echo ""
-echo "[STEP 7] Copying scripts..."
+log_step 7 "Copying scripts..."
 
 if [ -d "src/scripts" ]; then
-    mkdir -p "$RESOURCES_DIR/scripts"
+    ensure_dir "$RESOURCES_DIR/scripts"
     cp -R src/scripts/* "$RESOURCES_DIR/scripts/"
     echo "  - Scripts: OK"
 else
-    echo "[WARNING] Scripts folder not found."
+    log_warning "Scripts folder not found."
 fi
 
 # --- Copy images ---
 echo ""
-echo "[STEP 8] Copying resources..."
+log_step 8 "Copying resources..."
 
 if [ -d "src/images" ]; then
-    mkdir -p "$RESOURCES_DIR/images"
+    ensure_dir "$RESOURCES_DIR/images"
     cp -R src/images/* "$RESOURCES_DIR/images/"
     echo "  - Images: OK"
 fi
 
 # --- Copy translations ---
 if [ -d "$BUILD_DIR/translations" ]; then
-    mkdir -p "$RESOURCES_DIR/translations"
+    ensure_dir "$RESOURCES_DIR/translations"
     cp -R "$BUILD_DIR/translations"/* "$RESOURCES_DIR/translations/"
     echo "  - Translations: OK"
 fi
 
 # --- Fix library paths (install_name_tool) ---
 echo ""
-echo "[STEP 9] Fixing library paths..."
+log_step 9 "Fixing library paths..."
 
-# This is a simplified fix - for production, use a proper tool like dylibbundler
 EXECUTABLE="$DIST_DIR/Contents/MacOS/TStar"
-if [ -f "$EXECUTABLE" ]; then
-    # Update rpath to look in Frameworks
+verify_file "$EXECUTABLE" "TStar executable" && {
     install_name_tool -add_rpath "@executable_path/../Frameworks" "$EXECUTABLE" 2>/dev/null || true
     echo "  - Updated rpath"
-fi
+}
 
 # --- Verify bundled dylibs dependencies ---
 echo ""
@@ -297,14 +250,14 @@ fi
 
 # --- Ad-hoc Code Signing ---
 echo ""
-echo "[STEP 9.5] Applying ad-hoc code signing..."
-# Required for Apple Silicon and helps with "damaged app" errors
-if command -v codesign &> /dev/null; then
+log_step 9.5 "Applying ad-hoc code signing..."
+
+check_command codesign && {
     codesign --force --deep -s - "$DIST_DIR"
     echo "  - Ad-hoc signed: OK"
-else
-    echo "  - codesign not found (skip)"
-fi
+} || {
+    log_warning "codesign not found (skip)"
+}
 
 # --- Create README ---
 echo ""

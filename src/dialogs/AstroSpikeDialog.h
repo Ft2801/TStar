@@ -162,7 +162,9 @@ private:
 };
 
 // Main Dialog
-class AstroSpikeDialog : public QDialog {
+#include "DialogBase.h"
+
+class AstroSpikeDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit AstroSpikeDialog(class ImageViewer* viewer, QWidget* parent = nullptr);

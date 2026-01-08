@@ -1,22 +1,21 @@
 #ifndef STARSTRETCHDIALOG_H
 #define STARSTRETCHDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include "../ImageBuffer.h"
 #include "../algos/StarStretchRunner.h"
 
 // Forward declarations
-class MainWindow;
 class ImageViewer;
 class QLabel;
 class QSlider;
 class QCheckBox;
 class QPushButton;
 
-class StarStretchDialog : public QDialog {
+class StarStretchDialog : public DialogBase {
     Q_OBJECT
 public:
-    explicit StarStretchDialog(MainWindow* parent, ImageViewer* viewer);
+    explicit StarStretchDialog(QWidget* parent, ImageViewer* viewer);
 
     void setViewer(ImageViewer* v);
 
@@ -27,7 +26,6 @@ public slots:
     void reject() override;
 
 private:
-    MainWindow* m_mainWin;
     ImageViewer* m_viewer;
     ImageBuffer m_originalBuffer;
     ImageBuffer m_previewBuffer;

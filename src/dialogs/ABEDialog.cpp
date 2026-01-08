@@ -1,5 +1,4 @@
 #include "ABEDialog.h"
-#include "../MainWindow.h"
 #include "algos/AbeMath.h"
 #include "ImageViewer.h" 
 #include <QVBoxLayout>
@@ -15,8 +14,8 @@
 #include <QLabel>
 #include <QProgressDialog>
 
-ABEDialog::ABEDialog(QWidget* parent, ImageViewer* viewer, const ImageBuffer& buffer, bool initialStretch)
-    : QDialog(parent), m_viewer(viewer), m_applied(false)
+ABEDialog::ABEDialog(QWidget* parent, ImageViewer* viewer, const ImageBuffer& buffer, [[maybe_unused]] bool initialStretch)
+    : DialogBase(parent, tr("Auto Background Extraction")), m_viewer(viewer), m_applied(false)
 {
     if (m_viewer) {
         m_originalBuffer = buffer; // Copy
@@ -83,9 +82,6 @@ ABEDialog::ABEDialog(QWidget* parent, ImageViewer* viewer, const ImageBuffer& bu
     
     mainLayout->setSizeConstraint(QLayout::SetFixedSize); // Shrink to fit content
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 ABEDialog::~ABEDialog() {

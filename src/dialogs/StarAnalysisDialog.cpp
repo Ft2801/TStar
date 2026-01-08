@@ -179,11 +179,8 @@ void StarAnalysisWorker::run() {
 // ------ Dialog ------
  
 StarAnalysisDialog::StarAnalysisDialog(QWidget* parent, ImageViewer* viewer)
-    : QDialog(parent), m_viewer(viewer)
+    : DialogBase(parent, "Star Analysis", 600, 500), m_viewer(viewer)
 {
-    setWindowTitle(tr("Controllo Distribuzione Stelle (PSF Analysis)"));
-    setMinimumSize(600, 450);
-    resize(800, 600);
     
     m_worker = new StarAnalysisWorker(this);
     connect(m_worker, &StarAnalysisWorker::finished, this, &StarAnalysisDialog::onWorkerFinished);

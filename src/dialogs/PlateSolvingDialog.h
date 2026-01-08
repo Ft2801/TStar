@@ -12,8 +12,11 @@
 // For passing the image buffer
 #include "../ImageBuffer.h"
 #include <QPointer>
+#include "../ImageViewer.h"
 
-class PlateSolvingDialog : public QDialog {
+#include "DialogBase.h"
+
+class PlateSolvingDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit PlateSolvingDialog(QWidget* parent = nullptr);

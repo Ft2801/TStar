@@ -54,6 +54,41 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # =============================================================================
+# Compiler Optimizations & Warnings
+# =============================================================================
+if(MSVC)
+    # Windows MSVC (less common for TStar but support if used)
+    add_compile_options(/W4 /WX)
+    add_compile_options($<$<CONFIG:Release>:/O2>)
+else()
+    # GCC/Clang (used on both macOS and Windows with MinGW)
+    add_compile_options(-Wall -Wextra -Wpedantic -Wno-missing-field-initializers)
+    add_compile_options(-ffast-math)  # Enable fast math for scientific computing
+    add_compile_options(-march=native)  # Architecture-specific optimizations
+    
+    # LTO Optimization (Conditional)
+    # LTO Optimization (Conditional)
+    option(ENABLE_LTO "Enable Link-Time Optimization" OFF)
+    if(ENABLE_LTO)
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+            add_compile_options($<$<CONFIG:Release>:-flto=auto>)
+            add_link_options($<$<CONFIG:Release>:-flto=auto>)
+        else()
+            add_compile_options($<$<CONFIG:Release>:-flto>)
+            add_link_options($<$<CONFIG:Release>:-flto>)
+        endif()
+        message(STATUS "Link-Time Optimization (LTO) enabled for Release builds")
+    endif()
+    
+    # Debug-specific flags
+    add_compile_options($<$<CONFIG:Debug>:-g>)
+    add_compile_options($<$<CONFIG:Debug>:-O0>)
+    
+    # Enable position-independent code (required for some platforms)
+    add_compile_options(-fPIC)
+endif()
+
+# =============================================================================
 # Platform-Specific Settings
 # =============================================================================
 if(APPLE)
@@ -335,14 +370,22 @@ set(TSTAR_SOURCES
     src/ImageViewer.h
     src/ImageBuffer.cpp
     src/ImageBuffer.h
+    src/ImageBufferDelta.cpp
+    src/ImageBufferDelta.h
+    src/MainWindowCallbacks.h
+    src/Icons.h
     src/resources.qrc
     
     # Core
     src/core/RobustStatistics.cpp
     src/core/RobustStatistics.h
     src/core/MaskManager.h
+    src/core/MaskLayer.h
     src/core/Logger.cpp
     src/core/Logger.h
+    src/core/DpiHelper.h
+    src/core/ErrorHandling.cpp
+    src/core/ErrorHandling.h
     
     # IO
     src/io/FitsLoader.cpp
@@ -350,6 +393,8 @@ set(TSTAR_SOURCES
     src/io/SimpleTiffWriter.cpp
     src/io/SimpleTiffReader.cpp
     src/io/SimpleTiffReader.h
+    src/io/SimpleTiffWriter.cpp
+    src/io/SimpleTiffWriter.h
     src/io/XISFReader.cpp
     src/io/XISFReader.h
     src/io/XISFWriter.cpp
@@ -375,9 +420,12 @@ set(TSTAR_SOURCES
     
     # Algorithms
     src/algos/AbeMath.cpp
+    src/algos/AbeMath.h
     src/algos/GHSAlgo.cpp
     src/algos/GHSAlgo.h
     src/algos/ChannelOps.cpp
+    src/algos/ChannelOps.h
+    src/algos/CubicSpline.h
     src/algos/GraXpertRunner.cpp
     src/algos/GraXpertRunner.h
     src/algos/CosmicClarityRunner.cpp
@@ -402,12 +450,18 @@ set(TSTAR_SOURCES
     # Dialogs
     src/dialogs/UpdateDialog.cpp
     src/dialogs/UpdateDialog.h
+    src/dialogs/DialogBase.cpp
+    src/dialogs/DialogBase.h
     src/dialogs/StretchDialog.cpp
     src/dialogs/StretchDialog.h
     src/dialogs/CropRotateDialog.cpp
     src/dialogs/CropRotateDialog.h
+    src/dialogs/AboutDialog.cpp
+    src/dialogs/AboutDialog.h
     src/dialogs/ABEDialog.cpp
+    src/dialogs/ABEDialog.h
     src/dialogs/SCNRDialog.cpp
+    src/dialogs/SCNRDialog.h
     src/dialogs/GHSDialog.cpp
     src/dialogs/GHSDialog.h
     src/dialogs/ChannelCombinationDialog.cpp
@@ -504,6 +558,7 @@ set(TSTAR_SOURCES
     src/photometry/CatalogClient.h
     src/photometry/PCCCalibrator.cpp
     src/photometry/PCCCalibrator.h
+    src/photometry/PCCResult.h
     src/photometry/AperturePhotometry.cpp
     src/photometry/AperturePhotometry.h
 )

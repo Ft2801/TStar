@@ -6,6 +6,9 @@
 #include <QString>
 #include <QMap>
 #include <QVariant>
+#include <QMutex>
+#include <QReadWriteLock>
+#include <QDebug>
 #include "photometry/CatalogClient.h"
 #include "photometry/PCCResult.h"
 #include "algos/CubicSpline.h"
@@ -17,11 +20,11 @@ public:
     ImageBuffer();
     ~ImageBuffer();
     
-    // Copy
-    ImageBuffer(const ImageBuffer& other) = default;
-    ImageBuffer& operator=(const ImageBuffer& other) = default;
+    // Custom copy to handle non-copyable mutex
+    ImageBuffer(const ImageBuffer& other);
+    ImageBuffer& operator=(const ImageBuffer& other);
 
-    // Move
+    // Move is allowed
     ImageBuffer(ImageBuffer&& other) noexcept = default;
     ImageBuffer& operator=(ImageBuffer&& other) noexcept = default;
 
@@ -33,21 +36,21 @@ public:
     void resize(int width, int height, int channels);
     
     // Raw Access
-    const std::vector<float>& data() const { return m_data; }
-    std::vector<float>& data() { return m_data; }
+    const std::vector<float>& data() const { Q_ASSERT(!m_data.empty()); return m_data; }
+    std::vector<float>& data() { Q_ASSERT(!m_data.empty()); return m_data; }
     
     bool loadStandard(const QString& filePath);
 
-    int width() const { return m_width; }
-    int height() const { return m_height; }
+    int width() const { Q_ASSERT(m_width > 0); return m_width; }
+    int height() const { Q_ASSERT(m_height > 0); return m_height; }
     
     // Header Access
     QString getHeaderValue(const QString& key) const;
 
     enum BitDepth { Depth_8Int, Depth_16Int, Depth_32Int, Depth_32Float };
     enum DisplayMode { Display_Linear, Display_AutoStretch, Display_ArcSinh, Display_Sqrt, Display_Log, Display_Histogram };
-    int channels() const { return m_channels; }
-    bool isValid() const { return !m_data.empty(); }
+    int channels() const { Q_ASSERT(m_channels > 0); return m_channels; }
+    bool isValid() const { return !m_data.empty() && m_width > 0 && m_height > 0; }
 
     // Display
     // Replaces the boolean autostretch with mode and link option
@@ -257,6 +260,34 @@ public:
     
     // Synchronize WCS struct values back to rawHeaders vector
     void syncWcsToHeaders();
+    
+    // Thread Safety: Lock/Unlock for multi-threaded access
+    // Usage: buffer.lockRead(); /* read data */ buffer.unlock();
+    // Or:    buffer.lockWrite(); /* modify data */ buffer.unlock();
+    void lockRead() const { if (!m_mutex) m_mutex = std::make_unique<QReadWriteLock>(); m_mutex->lockForRead(); }
+    void lockWrite() { if (!m_mutex) m_mutex = std::make_unique<QReadWriteLock>(); m_mutex->lockForWrite(); }
+    void unlock() const { if (m_mutex) m_mutex->unlock(); }
+    
+    // RAII Helper for automatic lock management
+    class ReadLock {
+    public:
+        explicit ReadLock(const ImageBuffer* buf) : m_buf(buf) { if (m_buf) m_buf->lockRead(); }
+        ~ReadLock() { if (m_buf) m_buf->unlock(); }
+        ReadLock(const ReadLock&) = delete;
+        ReadLock& operator=(const ReadLock&) = delete;
+    private:
+        const ImageBuffer* m_buf;
+    };
+    
+    class WriteLock {
+    public:
+        explicit WriteLock(ImageBuffer* buf) : m_buf(buf) { if (m_buf) m_buf->lockWrite(); }
+        ~WriteLock() { if (m_buf) m_buf->unlock(); }
+        WriteLock(const WriteLock&) = delete;
+        WriteLock& operator=(const WriteLock&) = delete;
+    private:
+        ImageBuffer* m_buf;
+    };
 
 private:
     int m_width = 0;
@@ -270,6 +301,10 @@ private:
     // Mask
     MaskLayer m_mask;
     bool m_hasMask = false;
+    
+    // Thread Safety: Read-Write lock for concurrent access
+    // Multiple readers allowed, exclusive write access required
+    mutable std::unique_ptr<QReadWriteLock> m_mutex;
 
     // Agile Autostretch (Display only)
     std::vector<float> computeAgileLUT(int channelIndex, float targetMedian = 0.25f);

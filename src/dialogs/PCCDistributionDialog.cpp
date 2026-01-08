@@ -5,17 +5,12 @@
 #include <cmath>
 
 PCCDistributionDialog::PCCDistributionDialog(const PCCResult& result, QWidget* parent)
-    : QDialog(parent), m_result(result) 
+    : DialogBase(parent, "Star Distribution (PCC Analysis)", 800, 400), m_result(result) 
 {
-    setWindowTitle(tr("Star Distribution (PCC Analysis)"));
-    resize(800, 400);
-
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
+    // Preferred size already handled by DialogBase
 }
 
-void PCCDistributionDialog::paintEvent(QPaintEvent* event) {
+void PCCDistributionDialog::paintEvent([[maybe_unused]] QPaintEvent* event) {
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
     p.fillRect(rect(), Qt::white);

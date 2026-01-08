@@ -10,13 +10,15 @@
 #include <QSlider>
 #include <QMessageBox>
 #include <QMdiSubWindow>
-#include "../MainWindow.h"
+#include "RecombineLuminanceDialog.h"
+#include "MainWindowCallbacks.h"
+#include "DialogBase.h"
 #include "../widgets/CustomMdiSubWindow.h"
 #include "../algos/ChannelOps.h"
+#include "../ImageViewer.h"
 
-RecombineLuminanceDialog::RecombineLuminanceDialog(QWidget* parent) : QDialog(parent) {
-    setWindowTitle(tr("Recombine Luminance"));
-    m_mainWindow = qobject_cast<MainWindow*>(parent);
+RecombineLuminanceDialog::RecombineLuminanceDialog(QWidget* parent) : DialogBase(parent, tr("Recombine Luminance")) {
+    m_mainWindow = getCallbacks();
     
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     
@@ -93,9 +95,6 @@ RecombineLuminanceDialog::RecombineLuminanceDialog(QWidget* parent) : QDialog(pa
     onMethodChanged(0);
     refreshSourceList();
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 void RecombineLuminanceDialog::refreshSourceList() {
@@ -103,8 +102,10 @@ void RecombineLuminanceDialog::refreshSourceList() {
     if (!m_mainWindow) return;
     
     // Enum windows
-    auto list = m_mainWindow->findChildren<CustomMdiSubWindow*>();
-    ImageViewer* current = m_mainWindow->currentViewer();
+    ImageViewer* current = m_mainWindow ? m_mainWindow->getCurrentViewer() : nullptr;
+    if (!current) return;
+    
+    auto list = current->window()->findChildren<CustomMdiSubWindow*>();
     
     for (auto* win : list) {
         ImageViewer* v = win->viewer();
@@ -125,7 +126,7 @@ void RecombineLuminanceDialog::onMethodChanged(int index) {
 }
 
 void RecombineLuminanceDialog::onApply() {
-    ImageViewer* target = m_mainWindow ? m_mainWindow->currentViewer() : nullptr;
+    ImageViewer* target = m_mainWindow ? m_mainWindow->getCurrentViewer() : nullptr;
     if (!target) return;
     
     // Resolve Source
@@ -137,7 +138,10 @@ void RecombineLuminanceDialog::onApply() {
     ImageViewer* srcViewer = (ImageViewer*)m_sourceCombo->itemData(idx).value<void*>();
     if (!srcViewer) return;
     
-    m_mainWindow->pushUndo(); // Save state
+    if (m_mainWindow) {
+        m_mainWindow->logMessage(tr("Recombining..."), 0); 
+        m_mainWindow->startLongProcess();
+    }
     
     ChannelOps::LumaMethod method = (ChannelOps::LumaMethod)m_methodCombo->currentData().toInt();
     float blend = m_blendSlider->value() / 100.0f;

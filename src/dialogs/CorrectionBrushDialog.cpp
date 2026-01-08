@@ -16,8 +16,11 @@
 #include <algorithm>
 #include <QScrollBar>
 #include <opencv2/opencv.hpp>
-#include "../MainWindow.h"
+#include "CorrectionBrushDialog.h"
+#include "MainWindowCallbacks.h"
+#include "DialogBase.h"
 #include "../widgets/CustomMdiSubWindow.h"
+#include "../ImageViewer.h"
 
 // ================= Worker =================
 
@@ -180,7 +183,7 @@ ImageBuffer CorrectionWorker::removeBlemish(const ImageBuffer& img, int x, int y
     std::sort(diffs.begin(), diffs.end());
     
     std::vector<std::pair<int,int>> selCenters;
-    for(int i=0; i<std::min((size_t)3, diffs.size()); ++i) {
+    for(int i=0; i<(int)std::min((size_t)3, diffs.size()); ++i) {
         selCenters.push_back(centers[diffs[i].second]);
     }
     
@@ -195,7 +198,7 @@ ImageBuffer CorrectionWorker::removeBlemish(const ImageBuffer& img, int x, int y
             float dist = std::hypot(j - x, i - y);
             if (dist > radius) continue;
             
-            float weight = 1.0f;
+            [[maybe_unused]] float weight = 1.0f;
             if (feather > 0.0f) {
                 weight = std::clamp((radius - dist) / (radius * feather), 0.0f, 1.0f);
             }
@@ -212,11 +215,7 @@ ImageBuffer CorrectionWorker::removeBlemish(const ImageBuffer& img, int x, int y
                 }
             }
             
-            float medianVal = 0.0f;
-            if (!samples.empty()) {
-                std::nth_element(samples.begin(), samples.begin() + samples.size()/2, samples.end());
-                medianVal = samples[samples.size()/2];
-            } else {
+            if (samples.empty()) {
                  continue; 
             }
         }
@@ -262,17 +261,12 @@ ImageBuffer CorrectionWorker::removeBlemish(const ImageBuffer& img, int x, int y
 
 // ================= Dialog =================
 
-CorrectionBrushDialog::CorrectionBrushDialog(QWidget* parent) : QDialog(parent) {
-    setWindowTitle(tr("Correction Brush"));
-    m_mainWindow = qobject_cast<MainWindow*>(parent);
-    
-    if (m_mainWindow && m_mainWindow->currentViewer()) {
-        m_currentImage = m_mainWindow->currentViewer()->getBuffer();
-    } else {
-        // Should not happen if guard in MainWindow
+CorrectionBrushDialog::CorrectionBrushDialog(QWidget* parent) : DialogBase(parent, tr("Correction Brush"), 900, 650) {
+    if (MainWindowCallbacks* mw = getCallbacks()) {
+        if (mw->getCurrentViewer()) {
+            m_currentImage = mw->getCurrentViewer()->getBuffer();
+        }
     }
-    
-    setMinimumSize(900, 650);
     
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     
@@ -373,9 +367,6 @@ CorrectionBrushDialog::CorrectionBrushDialog(QWidget* parent) : QDialog(parent) 
     updateDisplay();
     onFit();
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 CorrectionBrushDialog::~CorrectionBrushDialog() {
@@ -502,10 +493,11 @@ void CorrectionBrushDialog::onFit() {
 }
 
 void CorrectionBrushDialog::onApply() {
-    if (!m_mainWindow) return;
-    ImageViewer* v = m_mainWindow->currentViewer();
-    if (v) {
-        v->setBuffer(m_currentImage, v->getBuffer().name());
-        accept();
+    if (MainWindowCallbacks* mw = getCallbacks()) {
+        ImageViewer* v = mw->getCurrentViewer();
+        if (v) {
+            v->setBuffer(m_currentImage, v->getBuffer().name());
+            accept();
+        }
     }
 }

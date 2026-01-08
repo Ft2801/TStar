@@ -256,7 +256,7 @@ bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* err
             if (fits_read_record(fptr, i, card, &status_meta) == 0) {
                  // Parse key, value, and comment using fits_read_keyn
                  char keyname[FLEN_KEYWORD], value[FLEN_VALUE], comm[FLEN_COMMENT];
-                 int len = 0;
+                 // Variable unused - removed
                  if (fits_read_keyn(fptr, i, keyname, value, comm, &status_meta) == 0) {
                      meta.rawHeaders.push_back({QString(keyname), QString(value), QString(comm)});
                  } else {
@@ -563,7 +563,7 @@ bool FitsLoader::loadExtension(const QString& filePath, int hduIndex,
     return result;
 }
 
-bool FitsLoader::loadHDU(void* fitsptr, int hduIndex, ImageBuffer& buffer, QString* errorMsg) {
+bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuffer& buffer, QString* errorMsg) {
     fitsfile* fptr = static_cast<fitsfile*>(fitsptr);
     int status = 0;
     

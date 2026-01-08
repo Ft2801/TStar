@@ -10,7 +10,7 @@
 #include <QThread>
 
 DebayerDialog::DebayerDialog(QWidget* parent)
-    : QDialog(parent) {
+    : DialogBase(parent, "Debayer", 350, 400) {
     setWindowTitle(tr("Debayer"));
     setMinimumWidth(350);
     
@@ -71,9 +71,6 @@ DebayerDialog::DebayerDialog(QWidget* parent)
     btnLayout->addWidget(cancelBtn);
     mainLayout->addLayout(btnLayout);
 
-    if (parentWidget()) {
-        move(parentWidget()->window()->geometry().center() - rect().center());
-    }
 }
 
 void DebayerDialog::setViewer(ImageViewer* v) {
@@ -118,7 +115,7 @@ QString DebayerDialog::detectPatternFromHeader() {
                 return val;
             }
             // Check if pattern is embedded in value
-            for (const QString& pat : {"RGGB", "BGGR", "GRBG", "GBRG"}) {
+            for (const QString& pat : {QString("RGGB"), QString("BGGR"), QString("GRBG"), QString("GBRG")}) {
                 if (val.contains(pat)) return pat;
             }
         }
@@ -136,8 +133,8 @@ QString DebayerDialog::autoDetectByScoring() {
     QString bestPattern = "RGGB";
     float bestScore = std::numeric_limits<float>::max();
     
-    for (const QString& pat : {"RGGB", "BGGR", "GRBG", "GBRG"}) {
-        ImageBuffer rgb = ChannelOps::debayer(buf, pat.toStdString(), "bilinear");
+    for (const char* const pat : {"RGGB", "BGGR", "GRBG", "GBRG"}) {
+        ImageBuffer rgb = ChannelOps::debayer(buf, pat, "bilinear");
         if (!rgb.isValid()) continue;
         
         float score = ChannelOps::computeDebayerScore(rgb);

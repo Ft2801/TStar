@@ -26,8 +26,7 @@ void PerfectPaletteRunner::applyStatisticalStretch(ImageBuffer& buffer, float ta
         // For speed, let's use a strided sample if the image is huge
         
         const int MAX_SAMPLES = 200000;
-        int step = 1;
-        if (numPixels > MAX_SAMPLES) step = numPixels / MAX_SAMPLES;
+        if (numPixels > MAX_SAMPLES) { /* step = numPixels / MAX_SAMPLES; */ }
         
         // Gather samples for StdDev & Min
         std::vector<float> samples;

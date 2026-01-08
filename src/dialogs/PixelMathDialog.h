@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DialogBase.h"
 #include <QDialog>
 #include <QPlainTextEdit>
 #include <QPushButton>
@@ -9,12 +10,12 @@
 #include "../ImageBuffer.h"
 #include "../ImageViewer.h"
 
-class MainWindow;
+class MainWindowCallbacks;
 
-class PixelMathDialog : public QDialog {
+class PixelMathDialog : public DialogBase {
     Q_OBJECT
 public:
-    explicit PixelMathDialog(MainWindow* parent, ImageViewer* viewer);
+    explicit PixelMathDialog(QWidget* parent, ImageViewer* viewer);
     ~PixelMathDialog();
     
     void setViewer(ImageViewer* viewer);
@@ -32,7 +33,6 @@ private slots:
 private:
     void setupUI();
 
-    MainWindow* m_mainWin;
     QPointer<ImageViewer> m_viewer;
     
     QPlainTextEdit* m_exprEdit;
