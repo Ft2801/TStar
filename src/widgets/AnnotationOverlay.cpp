@@ -3,6 +3,10 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <cmath>
+#include <QFile>
+#include <QDir>
+#include <QDateTime>
+#include <QTextStream>
 
 static QString formatStarName(QString name) {
     if (name.isEmpty()) return name;
@@ -36,6 +40,16 @@ AnnotationOverlay::AnnotationOverlay(ImageViewer* parent)
     setAttribute(Qt::WA_TranslucentBackground, true);
     setMouseTracking(true);
     setDrawMode(DrawMode::None); // Correctly initializes TransparentForMouseEvents
+}
+
+AnnotationOverlay::~AnnotationOverlay() {
+    // Log to file for debugging
+    QFile logFile(QDir::homePath() + "/TStar_annotation_debug.log");
+    if (logFile.open(QIODevice::Append | QIODevice::Text)) {
+        QTextStream out(&logFile);
+        out << QDateTime::currentDateTime().toString("hh:mm:ss.zzz") << " | [AnnotationOverlay::~DESTRUCTOR] Destroying overlay with " << m_annotations.size() << " annotations\n";
+        logFile.close();
+    }
 }
 
 void AnnotationOverlay::setDrawMode(DrawMode mode) {
@@ -107,6 +121,13 @@ QPointF AnnotationOverlay::mapFromImage(const QPointF& imagePos) const {
 
 void AnnotationOverlay::paintEvent(QPaintEvent* event) {
     Q_UNUSED(event);
+    
+    // Skip drawing if viewer is processing (to prevent crashes during stretch/resize)
+    // Check the property that gets set during heavy operations
+    if (property("isProcessing").toBool() || !m_viewer) {
+        return;
+    }
+    
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 

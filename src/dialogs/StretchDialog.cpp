@@ -265,9 +265,19 @@ void StretchDialog::onPreview() {
     ImageBuffer::StretchParams p = getParams();
     
     if (p.lumaOnly || p.highRange || p.hdrCompress) {
+        // Disable overlay drawing during processing to prevent crashes
+        QWidget* overlay = m_viewer->findChild<QWidget*>("AnnotationOverlay", Qt::FindDirectChildrenOnly);
+        if (!overlay) overlay = m_viewer->findChild<QWidget*>();
+        if (overlay) overlay->setProperty("isProcessing", true);
+        
         ImageBuffer temp = m_originalBuffer;
         temp.performTrueStretch(p);
         m_viewer->setBuffer(temp, m_viewer->windowTitle(), false);
+        
+        if (overlay) {
+            overlay->setProperty("isProcessing", false);
+            overlay->update();
+        }
     } else {
         auto lut = m_originalBuffer.computeTrueStretchLUT(p);
         m_viewer->setPreviewLUT(lut);
@@ -276,6 +286,11 @@ void StretchDialog::onPreview() {
 
 void StretchDialog::onApply() {
     if (m_viewer && m_originalBuffer.isValid()) {
+        // Disable overlay drawing during processing to prevent crashes
+        QWidget* overlay = m_viewer->findChild<QWidget*>("AnnotationOverlay", Qt::FindDirectChildrenOnly);
+        if (!overlay) overlay = m_viewer->findChild<QWidget*>();
+        if (overlay) overlay->setProperty("isProcessing", true);
+        
         m_viewer->pushUndo();
         m_viewer->clearPreviewLUT(); 
         
@@ -284,6 +299,11 @@ void StretchDialog::onApply() {
         ImageBuffer::StretchParams p = getParams();
         m_viewer->getBuffer().performTrueStretch(p);
         m_viewer->refreshDisplay();
+        
+        if (overlay) {
+            overlay->setProperty("isProcessing", false);
+            overlay->update();
+        }
         
         m_applied = true;
         

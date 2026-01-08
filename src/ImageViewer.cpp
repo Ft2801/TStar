@@ -121,6 +121,7 @@ void ImageViewer::clearSelection() {
 
 void ImageViewer::resizeEvent(QResizeEvent* event) {
     QGraphicsView::resizeEvent(event);
+    emit resized();  // Notify listeners that viewer has been resized
 }
 
 void ImageViewer::setLinked(bool linked) {

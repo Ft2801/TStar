@@ -65,6 +65,7 @@ public:
     };
 
     explicit AnnotationOverlay(ImageViewer* parent);
+    ~AnnotationOverlay();
 
     void setDrawMode(DrawMode mode);
     DrawMode drawMode() const { return m_drawMode; }

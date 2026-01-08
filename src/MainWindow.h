@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QMdiArea>
+#include <QStack>
 #include "ImageViewer.h"
 #include "ImageBuffer.h"
 #include <functional>
@@ -44,6 +45,7 @@ class AstroSpikeDialog;
 class DebayerDialog;
 class ContinuumSubtractionDialog;
 class AnnotationToolDialog;
+struct Annotation;
 
 class MainWindow : public QMainWindow, public MainWindowCallbacks {
     Q_OBJECT
@@ -208,8 +210,15 @@ private:
     QPointer<class DebayerDialog> m_debayerDlg;
     QPointer<class ContinuumSubtractionDialog> m_continuumDlg;
     QPointer<class AnnotationToolDialog> m_annotatorDlg;
+    QPointer<class SettingsDialog> m_settingsDlg;
     
-    void showConsoleTemporarily(int durationMs = 3000);
+public:
+    // Persisted annotations across dialog destruction
+    QVector<struct Annotation> m_persistedAnnotations;
+    QStack<QVector<struct Annotation>> m_persistedUndoStack;
+    QStack<QVector<struct Annotation>> m_persistedRedoStack;
+
+private:
     // Move these to public above
     // void startLongProcess();
     // void endLongProcess();
@@ -244,6 +253,7 @@ private:
     class QPropertyAnimation* m_anim = nullptr;
     void startFadeIn();
     void startFadeOut();
+    void showConsoleTemporarily(int durationMs = 3000);
 
 protected:
     void showEvent(QShowEvent* event) override;

@@ -114,10 +114,6 @@
     <context>
         <name>AberrationInspectorDialog</name>
         <message>
-            <source>Aberration Inspector</source>
-            <translation type="finished">Inspector de Aberraciones</translation>
-        </message>
-        <message>
             <source>Close</source>
             <translation type="finished">Cerrar</translation>
         </message>
@@ -128,10 +124,6 @@
     </context>
     <context>
         <name>AboutDialog</name>
-        <message>
-            <source>About TStar</source>
-            <translation type="finished">Acerca de TStar</translation>
-        </message>
         <message>
             <source>Build:</source>
             <translation type="finished">Compilación:</translation>
@@ -224,10 +216,6 @@
             <translation type="finished">Ninguna imagen cargada</translation>
         </message>
         <message>
-            <source>Note: Keep this tool OPEN to burn annotations into the saved image (File &gt; Save).</source>
-            <translation type="finished">Nota: Mantenga esta herramienta ABIERTA para grabar anotaciones en la imagen guardada (Archivo &gt; Guardar).</translation>
-        </message>
-        <message>
             <source>Ready</source>
             <translation type="finished">Listo</translation>
         </message>
@@ -272,6 +260,10 @@
             <translation type="finished">Texto añadido. Haz clic de nuevo para añadir más.</translation>
         </message>
         <message>
+            <source>Tip: Annotations are saved as overlay. If you close the tool, annotations will disappear, and then reappear when you open this tool again. Open this tool to continue editing with full undo/redo support. To burn annotations into the image, use File &gt; Save while the tool is open.</source>
+            <translation type="finished">Consejo: Las anotaciones se guardan como superposición. Si cierras la herramienta, las anotaciones desaparecerán y luego reaparecerán cuando abras esta herramienta nuevamente. Abre esta herramienta para continuar editando con soporte completo de deshacer/rehacer. Para grabar anotaciones en la imagen, usa Archivo &gt; Guardar mientras la herramienta está abierta.</translation>
+        </message>
+        <message>
             <source>Undo</source>
             <translation type="finished">Deshacer</translation>
         </message>
@@ -286,10 +278,6 @@
     </context>
     <context>
         <name>ApplyMaskDialog</name>
-        <message>
-            <source>Apply Mask</source>
-            <translation type="finished">Aplicar Máscara</translation>
-        </message>
         <message>
             <source>Available Masks:</source>
             <translation type="finished">Máscaras Disponibles:</translation>
@@ -320,10 +308,6 @@
         <message>
             <source>Apply</source>
             <translation type="finished">Aplicar</translation>
-        </message>
-        <message>
-            <source>Arcsinh Stretch</source>
-            <translation type="finished">Arcsinh Stretching</translation>
         </message>
         <message>
             <source>Black Point:</source>
@@ -399,10 +383,6 @@
         <message>
             <source>Apply</source>
             <translation type="finished">Aplicar</translation>
-        </message>
-        <message>
-            <source>AstroSpike</source>
-            <translation type="finished">Deflagración Estelar</translation>
         </message>
         <message>
             <source>Blur</source>
@@ -618,10 +598,6 @@
             <translation type="finished">Cancelar</translation>
         </message>
         <message>
-            <source>Channel Combination</source>
-            <translation type="finished">Combinación Canales</translation>
-        </message>
-        <message>
             <source>Error</source>
             <translation type="finished">Error</translation>
         </message>
@@ -659,6 +635,10 @@
         <message>
             <source>Apply</source>
             <translation type="finished">Aplicar</translation>
+        </message>
+        <message>
+            <source>CLAHE</source>
+            <translation type="finished">CLAHE</translation>
         </message>
         <message>
             <source>CLAHE (Contrast Limited Adaptive Histogram Equalization)</source>
@@ -921,10 +901,6 @@
             <translation type="finished">Denoise Color: 0.50</translation>
         </message>
         <message>
-            <source>Cosmic Clarity</source>
-            <translation type="finished">Cosmic Clarity</translation>
-        </message>
-        <message>
             <source>Denoise</source>
             <translation type="finished">Denoise</translation>
         </message>
@@ -1052,10 +1028,6 @@
             <translation type="finished">Dibuje un rectángulo de recorte primero.</translation>
         </message>
         <message>
-            <source>Rotate &amp; Crop Tool</source>
-            <translation type="finished">Herramienta Rotar y Recortar</translation>
-        </message>
-        <message>
             <source>Rotation (deg):</source>
             <translation type="finished">Rotación (deg):</translation>
         </message>
@@ -1073,10 +1045,6 @@
         <message>
             <source>Cancel</source>
             <translation type="finished">Cancelar</translation>
-        </message>
-        <message>
-            <source>Curves Transformation</source>
-            <translation type="finished">Transformación Curvas</translation>
         </message>
         <message>
             <source>Grid</source>
@@ -1214,6 +1182,13 @@
         </message>
     </context>
     <context>
+        <name>DialogBase</name>
+        <message>
+            <source>...</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>ExtractLuminanceDialog</name>
         <message>
             <source>Auto Estimate Noise</source>
@@ -1262,14 +1237,6 @@
         <message>
             <source>Method:</source>
             <translation type="finished">Método:</translation>
-        </message>
-        <message>
-            <source>No Image</source>
-            <translation type="finished">Sin Imagen</translation>
-        </message>
-        <message>
-            <source>Please select an image first.</source>
-            <translation type="finished">Por favor, seleccione una imagen primero.</translation>
         </message>
         <message>
             <source>Rec. 2020</source>
@@ -1388,10 +1355,6 @@
         <message>
             <source>Generalized Hyperbolic Stretch</source>
             <translation type="finished">Generalized Hyperbolic Stretching</translation>
-        </message>
-        <message>
-            <source>Generalized Hyperbolic Stretch (GHT)</source>
-            <translation type="finished">Generalized Hyperbolic Stretching (GHT)</translation>
         </message>
         <message>
             <source>Global rescale</source>
@@ -1549,10 +1512,6 @@
             <translation type="finished">Denoise</translation>
         </message>
         <message>
-            <source>GraXpert</source>
-            <translation type="finished">GraXpert</translation>
-        </message>
-        <message>
             <source>Latest (auto)</source>
             <translation type="finished">Último (auto)</translation>
         </message>
@@ -1596,10 +1555,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Error</source>
             <translation type="finished">Error</translation>
-        </message>
-        <message>
-            <source>FITS Header Editor</source>
-            <translation type="finished">Editor Cabecera FITS</translation>
         </message>
         <message>
             <source>FITS Header Editor - %1</source>
@@ -1670,10 +1625,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Comment</source>
             <translation type="finished">Comentario</translation>
-        </message>
-        <message>
-            <source>FITS/XISF Header Explorer</source>
-            <translation type="finished">Explorador Cabecera FITS/XISF</translation>
         </message>
         <message>
             <source>FITS/XISF Header: %1</source>
@@ -2331,10 +2282,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">TStar - Procesamiento de Astrofotografía</translation>
         </message>
         <message>
-            <source>TStar Help &amp; Tutorial</source>
-            <translation type="finished">Ayuda y Tutorial TStar</translation>
-        </message>
-        <message>
             <source>TStar supports FITS, XISF, TIFF, and PNG image formats commonly used in astrophotography.</source>
             <translation type="finished">TStar soporta formatos FITS, XISF, TIFF y PNG comúnmente usados en astrofotografía.</translation>
         </message>
@@ -2446,10 +2393,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Luces:</translation>
         </message>
         <message>
-            <source>Histogram Transformation</source>
-            <translation type="finished">Transformación de Histograma</translation>
-        </message>
-        <message>
             <source>Low: %1%</source>
             <translation type="finished">Bajos: %1%</translation>
         </message>
@@ -2494,10 +2437,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
     </context>
     <context>
         <name>LivePreviewDialog</name>
-        <message>
-            <source>Live Mask Preview</source>
-            <translation type="finished">Previsualización de Maschera en Vivo</translation>
-        </message>
         <message>
             <source>No mask data</source>
             <translation type="finished">Sin datos de máscara</translation>
@@ -2806,6 +2745,14 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Fallo al cargar extensión %1: %2</translation>
         </message>
         <message>
+            <source>Failed to open Statistical Stretch dialog: %1</source>
+            <translation type="finished">No se pudo abrir el diálogo Statistical Stretch: %1</translation>
+        </message>
+        <message>
+            <source>Failed to open Statistical Stretch dialog: Unknown error</source>
+            <translation type="finished">No se pudo abrir el diálogo Statistical Stretch: Error desconocido</translation>
+        </message>
+        <message>
             <source>Failed to save image with annotations.</source>
             <translation type="finished">Fallo al guardar imagen con anotaciones.</translation>
         </message>
@@ -2820,10 +2767,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Fit to Screen</source>
             <translation type="finished">Ajustar a Pantalla</translation>
-        </message>
-        <message>
-            <source>Fit to Window</source>
-            <translation type="finished">Ajustar a Ventana</translation>
         </message>
         <message>
             <source>Flip Horiz</source>
@@ -2992,6 +2935,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>No Image</source>
             <translation type="finished">Sin Imagen</translation>
+        </message>
+        <message>
+            <source>No image loaded. Cannot open Aberration Inspector.</source>
+            <translation type="finished">Ninguna imagen cargada. No se puede abrir Aberration Inspector.</translation>
         </message>
         <message>
             <source>No mask to remove.</source>
@@ -3566,10 +3513,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Límite Inferior</translation>
         </message>
         <message>
-            <source>Mask Creation</source>
-            <translation type="finished">Creación de Máscara</translation>
-        </message>
-        <message>
             <source>Mask Type:</source>
             <translation type="finished">Tipo de Máscara:</translation>
         </message>
@@ -3806,10 +3749,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <source>R/G Distribution</source>
             <translation type="finished">Distribución R/G</translation>
         </message>
-        <message>
-            <source>Star Distribution (PCC Analysis)</source>
-            <translation type="finished">Distribución Estrellas (PCC)</translation>
-        </message>
     </context>
     <context>
         <name>PerfectPaletteDialog</name>
@@ -3840,10 +3779,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Not loaded</source>
             <translation type="finished">No cargado</translation>
-        </message>
-        <message>
-            <source>Perfect Palette Picker</source>
-            <translation type="finished">Selector Paleta Perfecta</translation>
         </message>
         <message>
             <source>Please select an image first.</source>
@@ -3881,6 +3816,14 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Expresión Vacía</translation>
         </message>
         <message>
+            <source>Expected ')' but found '%1'</source>
+            <translation type="finished">Se esperaba ')' pero se encontró '%1'</translation>
+        </message>
+        <message>
+            <source>Missing closing parenthesis</source>
+            <translation type="finished">Falta el paréntesis de cierre</translation>
+        </message>
+        <message>
             <source>Parse error: %1</source>
             <translation type="finished">Error análisis: %1</translation>
         </message>
@@ -3909,8 +3852,20 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Reescalar resultado (min-max a 0-1)</translation>
         </message>
         <message>
+            <source>Unclosed function call: %1</source>
+            <translation type="finished">Llamada de función no cerrada: %1</translation>
+        </message>
+        <message>
+            <source>Unknown function '%1' with %2 arguments</source>
+            <translation type="finished">Función desconocida '%1' con %2 argumentos</translation>
+        </message>
+        <message>
             <source>Unknown function or wrong arg count: %1</source>
             <translation type="finished">Función desconocida o arg incorrectos: %1</translation>
+        </message>
+        <message>
+            <source>Unknown variable or function: '%1' (only r, g, b are allowed)</source>
+            <translation type="finished">Variable o función desconocida: '%1' (solo r, g, b están permitidos)</translation>
         </message>
     </context>
     <context>
@@ -4057,10 +4012,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Aberration Removal Complete.</source>
             <translation type="finished">Eliminación de Aberraciones Completa.</translation>
-        </message>
-        <message>
-            <source>Aberration Remover</source>
-            <translation type="finished">Eliminador de Aberraciones</translation>
         </message>
         <message>
             <source>Aborted by user.</source>
@@ -4289,6 +4240,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <source>Recombine Luminance</source>
             <translation type="finished">Recombinar Luminancia</translation>
         </message>
+        <message>
+            <source>Recombining...</source>
+            <translation type="finished">Recombinando...</translation>
+        </message>
     </context>
     <context>
         <name>SCNRDialog</name>
@@ -4320,10 +4275,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <source>Protection Method:</source>
             <translation type="finished">Método Protección:</translation>
         </message>
-        <message>
-            <source>SCNR (Remove Green Noise)</source>
-            <translation type="finished">SCNR (Eliminar Ruido Verde)</translation>
-        </message>
     </context>
     <context>
         <name>SaturationDialog</name>
@@ -4350,10 +4301,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Cancel</source>
             <translation type="finished">Cancelar</translation>
-        </message>
-        <message>
-            <source>Color Saturation</source>
-            <translation type="finished">Saturación Color</translation>
         </message>
         <message>
             <source>Cyans</source>
@@ -4542,10 +4489,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Reinicie la aplicación para que los cambios de idioma surtan efecto.</translation>
         </message>
         <message>
-            <source>Preferences</source>
-            <translation type="finished">Preferencias</translation>
-        </message>
-        <message>
             <source>Restart Required</source>
             <translation type="finished">Reinicio Requerido</translation>
         </message>
@@ -4662,10 +4605,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Close</source>
             <translation type="finished">Cerrar</translation>
-        </message>
-        <message>
-            <source>Controllo Distribuzione Stelle (PSF Analysis)</source>
-            <translation type="finished">Control Distribución Estrellas (Análisis PSF)</translation>
         </message>
         <message>
             <source>Eccentricity</source>
@@ -4898,6 +4837,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Ajustar</translation>
         </message>
         <message>
+            <source>Invalid Images</source>
+            <translation type="finished">Imágenes no válidas</translation>
+        </message>
+        <message>
             <source>No Image</source>
             <translation type="finished">Sin Imagen</translation>
         </message>
@@ -4922,8 +4865,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Trama</translation>
         </message>
         <message>
-            <source>Star Recomposition</source>
-            <translation type="finished">Recomposición de Estrellas</translation>
+            <source>Selected views contain invalid image data.</source>
+            <translation type="finished">Las vistas seleccionadas contienen datos de imagen no válidos.</translation>
         </message>
         <message>
             <source>Starless View:</source>
@@ -4955,10 +4898,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Remove Green via SCNR (Optional)</source>
             <translation type="finished">Eliminar Verde vía SCNR (Opcional)</translation>
-        </message>
-        <message>
-            <source>Star Stretch</source>
-            <translation type="finished">Star Stretch</translation>
         </message>
         <message>
             <source>Star Stretch applied.</source>
@@ -5076,10 +5015,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Parámetros Estadísticos</translation>
         </message>
         <message>
-            <source>Statistical Stretch</source>
-            <translation type="finished">Statistical Stretch</translation>
-        </message>
-        <message>
             <source>Statistical Stretch applied (M=%1, BP=%2σ)</source>
             <translation type="finished">Statistical Stretch aplicado (M=%1, BP=%2σ)</translation>
         </message>
@@ -5162,10 +5097,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Listo para instalar</translation>
         </message>
         <message>
-            <source>Update Available: v%1</source>
-            <translation type="finished">Actualización disponibile: v%1</translation>
-        </message>
-        <message>
             <source>Update Failed</source>
             <translation type="finished">Error de actualización</translation>
         </message>
@@ -5235,10 +5166,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Update Preview</source>
             <translation type="finished">Actualizar Previsualización</translation>
-        </message>
-        <message>
-            <source>Wavescale HDR</source>
-            <translation type="finished">Wavescale HDR</translation>
         </message>
         <message>
             <source>© 2026 SetiAstro</source>

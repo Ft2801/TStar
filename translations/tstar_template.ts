@@ -114,10 +114,6 @@
     <context>
         <name>AberrationInspectorDialog</name>
         <message>
-            <source>Aberration Inspector</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Close</source>
             <translation type="unfinished" />
         </message>
@@ -128,10 +124,6 @@
     </context>
     <context>
         <name>AboutDialog</name>
-        <message>
-            <source>About TStar</source>
-            <translation type="unfinished" />
-        </message>
         <message>
             <source>Build:</source>
             <translation type="unfinished" />
@@ -224,10 +216,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Note: Keep this tool OPEN to burn annotations into the saved image (File &gt; Save).</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Ready</source>
             <translation type="unfinished" />
         </message>
@@ -272,6 +260,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Tip: Annotations are saved as overlay. If you close the tool, annotations will disappear, and then reappear when you open this tool again. Open this tool to continue editing with full undo/redo support. To burn annotations into the image, use File &gt; Save while the tool is open.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Undo</source>
             <translation type="unfinished" />
         </message>
@@ -286,10 +278,6 @@
     </context>
     <context>
         <name>ApplyMaskDialog</name>
-        <message>
-            <source>Apply Mask</source>
-            <translation type="unfinished" />
-        </message>
         <message>
             <source>Available Masks:</source>
             <translation type="unfinished" />
@@ -319,10 +307,6 @@
         <name>ArcsinhStretchDialog</name>
         <message>
             <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Arcsinh Stretch</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -398,10 +382,6 @@
         </message>
         <message>
             <source>Apply</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>AstroSpike</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -618,10 +598,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Channel Combination</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Error</source>
             <translation type="unfinished" />
         </message>
@@ -658,6 +634,10 @@
         <name>ClaheDialog</name>
         <message>
             <source>Apply</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>CLAHE</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -921,10 +901,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Cosmic Clarity</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Denoise</source>
             <translation type="unfinished" />
         </message>
@@ -1052,10 +1028,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Rotate &amp; Crop Tool</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Rotation (deg):</source>
             <translation type="unfinished" />
         </message>
@@ -1072,10 +1044,6 @@
         </message>
         <message>
             <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Curves Transformation</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1214,6 +1182,13 @@
         </message>
     </context>
     <context>
+        <name>DialogBase</name>
+        <message>
+            <source>...</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>ExtractLuminanceDialog</name>
         <message>
             <source>Auto Estimate Noise</source>
@@ -1261,14 +1236,6 @@
         </message>
         <message>
             <source>Method:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No Image</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Please select an image first.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1387,10 +1354,6 @@
         </message>
         <message>
             <source>Generalized Hyperbolic Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Generalized Hyperbolic Stretch (GHT)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1549,10 +1512,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>GraXpert</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Latest (auto)</source>
             <translation type="unfinished" />
         </message>
@@ -1593,10 +1552,6 @@
         </message>
         <message>
             <source>Error</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>FITS Header Editor</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1667,10 +1622,6 @@
         <name>HeaderViewerDialog</name>
         <message>
             <source>Comment</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>FITS/XISF Header Explorer</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2329,10 +2280,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>TStar Help &amp; Tutorial</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>TStar supports FITS, XISF, TIFF, and PNG image formats commonly used in astrophotography.</source>
             <translation type="unfinished" />
         </message>
@@ -2444,10 +2391,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Histogram Transformation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Low: %1%</source>
             <translation type="unfinished" />
         </message>
@@ -2492,10 +2435,6 @@
     </context>
     <context>
         <name>LivePreviewDialog</name>
-        <message>
-            <source>Live Mask Preview</source>
-            <translation type="unfinished" />
-        </message>
         <message>
             <source>No mask data</source>
             <translation type="unfinished" />
@@ -2804,6 +2743,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Failed to open Statistical Stretch dialog: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to open Statistical Stretch dialog: Unknown error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Failed to save image with annotations.</source>
             <translation type="unfinished" />
         </message>
@@ -2817,10 +2764,6 @@
         </message>
         <message>
             <source>Fit to Screen</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Fit to Window</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2989,6 +2932,10 @@
         </message>
         <message>
             <source>No Image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No image loaded. Cannot open Aberration Inspector.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3563,10 +3510,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Mask Creation</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Mask Type:</source>
             <translation type="unfinished" />
         </message>
@@ -3803,10 +3746,6 @@
             <source>R/G Distribution</source>
             <translation type="unfinished" />
         </message>
-        <message>
-            <source>Star Distribution (PCC Analysis)</source>
-            <translation type="unfinished" />
-        </message>
     </context>
     <context>
         <name>PerfectPaletteDialog</name>
@@ -3836,10 +3775,6 @@
         </message>
         <message>
             <source>Not loaded</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Perfect Palette Picker</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3878,6 +3813,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Expected ')' but found '%1'</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Missing closing parenthesis</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Parse error: %1</source>
             <translation type="unfinished" />
         </message>
@@ -3906,7 +3849,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Unclosed function call: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Unknown function '%1' with %2 arguments</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Unknown function or wrong arg count: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Unknown variable or function: '%1' (only r, g, b are allowed)</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -4053,10 +4008,6 @@
         <name>RARDialog</name>
         <message>
             <source>Aberration Removal Complete.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Aberration Remover</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4286,6 +4237,10 @@
             <source>Recombine Luminance</source>
             <translation type="unfinished" />
         </message>
+        <message>
+            <source>Recombining...</source>
+            <translation type="unfinished" />
+        </message>
     </context>
     <context>
         <name>SCNRDialog</name>
@@ -4317,10 +4272,6 @@
             <source>Protection Method:</source>
             <translation type="unfinished" />
         </message>
-        <message>
-            <source>SCNR (Remove Green Noise)</source>
-            <translation type="unfinished" />
-        </message>
     </context>
     <context>
         <name>SaturationDialog</name>
@@ -4346,10 +4297,6 @@
         </message>
         <message>
             <source>Cancel</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Color Saturation</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4539,10 +4486,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Preferences</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Restart Required</source>
             <translation type="unfinished" />
         </message>
@@ -4658,10 +4601,6 @@
         </message>
         <message>
             <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Controllo Distribuzione Stelle (PSF Analysis)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4895,6 +4834,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Invalid Images</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>No Image</source>
             <translation type="unfinished" />
         </message>
@@ -4919,7 +4862,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Star Recomposition</source>
+            <source>Selected views contain invalid image data.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4951,10 +4894,6 @@
         </message>
         <message>
             <source>Remove Green via SCNR (Optional)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Star Stretch</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5073,10 +5012,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Statistical Stretch</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Statistical Stretch applied (M=%1, BP=%2σ)</source>
             <translation type="unfinished" />
         </message>
@@ -5159,10 +5094,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Update Available: v%1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Update Failed</source>
             <translation type="unfinished" />
         </message>
@@ -5231,10 +5162,6 @@
         </message>
         <message>
             <source>Update Preview</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Wavescale HDR</source>
             <translation type="unfinished" />
         </message>
         <message>

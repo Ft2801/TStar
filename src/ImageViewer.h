@@ -94,6 +94,7 @@ signals:
     void requestNewView(const ImageBuffer& img, const QString& title);
     void bufferChanged(); // buffer content updated (e.g. undo/redo)
     void historyChanged(); // New: undo/redo stacks updated
+    void resized(); // Emitted when widget is resized
     
     // Linking Signals
     void viewChanged(float scale, float hVal, float vVal);

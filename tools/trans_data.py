@@ -1414,6 +1414,28 @@ TRANSLATIONS = {
 
     "Zoom:": {'it': 'Zoom:', 'es': 'Zoom:', 'fr': 'Zoom :', 'de': 'Zoom:'},
 
+    "Failed to open Statistical Stretch dialog: %1": {'it': 'Impossibile aprire la finestra di dialogo Statistical Stretch: %1', 'es': 'No se pudo abrir el diálogo Statistical Stretch: %1', 'fr': 'Impossible d\'ouvrir la boîte de dialogue Statistical Stretch : %1', 'de': 'Konnte Statistical Stretch-Dialog nicht öffnen: %1'},
+
+    "Failed to open Statistical Stretch dialog: Unknown error": {'it': 'Impossibile aprire la finestra di dialogo Statistical Stretch: Errore sconosciuto', 'es': 'No se pudo abrir el diálogo Statistical Stretch: Error desconocido', 'fr': 'Impossible d\'ouvrir la boîte de dialogue Statistical Stretch : Erreur inconnue', 'de': 'Konnte Statistical Stretch-Dialog nicht öffnen: Unbekannter Fehler'},
+
+    "No image loaded. Cannot open Aberration Inspector.": {'it': 'Nessuna immagine caricata. Impossibile aprire Aberration Inspector.', 'es': 'Ninguna imagen cargada. No se puede abrir Aberration Inspector.', 'fr': 'Aucune image chargée. Impossible d\'ouvrir Aberration Inspector.', 'de': 'Kein Bild geladen. Kann Aberration Inspector nicht öffnen.'},
+
+    "Expected ')' but found '%1'": {'it': 'Previsto \')\' ma trovato \'%1\'', 'es': 'Se esperaba \')\' pero se encontró \'%1\'', 'fr': 'Attendu \')\' mais trouvé \'%1\'', 'de': 'Erwartet \')\' aber gefunden \'%1\''},
+
+    "Missing closing parenthesis": {'it': 'Parentesi di chiusura mancante', 'es': 'Falta el paréntesis de cierre', 'fr': 'Parenthèse fermante manquante', 'de': 'Fehlende schließende Klammer'},
+
+    "Unclosed function call: %1": {'it': 'Chiamata di funzione non chiusa: %1', 'es': 'Llamada de función no cerrada: %1', 'fr': 'Appel de fonction non fermé : %1', 'de': 'Nicht geschlossener Funktionsaufruf: %1'},
+
+    "Unknown function '%1' with %2 arguments": {'it': 'Funzione sconosciuta \'%1\' con %2 argomenti', 'es': 'Función desconocida \'%1\' con %2 argumentos', 'fr': 'Fonction inconnue \'%1\' avec %2 arguments', 'de': 'Unbekannte Funktion \'%1\' mit %2 Argumenten'},
+
+    "Unknown variable or function: '%1' (only r, g, b are allowed)": {'it': 'Variabile o funzione sconosciuta: \'%1\' (solo r, g, b sono consentiti)', 'es': 'Variable o función desconocida: \'%1\' (solo r, g, b están permitidos)', 'fr': 'Variable ou fonction inconnue : \'%1\' (seuls r, g, b sont autorisés)', 'de': 'Unbekannte Variable oder Funktion: \'%1\' (nur r, g, b erlaubt)'},
+
+    "Recombining...": {'it': 'Ricombinazione in corso...', 'es': 'Recombinando...', 'fr': 'Recombinación en cours...', 'de': 'Wird rekombiniert...'},
+
+    "Invalid Images": {'it': 'Immagini non valide', 'es': 'Imágenes no válidas', 'fr': 'Images non valides', 'de': 'Ungültige Bilder'},
+
+    "Selected views contain invalid image data.": {'it': 'Le viste selezionate contengono dati di immagine non validi.', 'es': 'Las vistas seleccionadas contienen datos de imagen no válidos.', 'fr': 'Les vues sélectionnées contiennent des données d\'image invalides.', 'de': 'Die ausgewählten Ansichten enthalten ungültige Bilddaten.'},
+
     "[Saved] %1": {'it': '[Salvata] %1', 'es': '[Guardada] %1', 'fr': '[Enregistrée] %1', 'de': '[Gespeichert] %1'},
 
     "[View] %1": {'it': '[Vista] %1', 'es': '[Vista] %1', 'fr': '[Vue] %1', 'de': '[Ansicht] %1'},
@@ -2066,6 +2088,8 @@ TRANSLATIONS = {
     "Need at least 2 images to tile.": {'it': 'Necessarie almeno 2 immagini per affiancare.', 'es': 'Se necesitan al menos 2 imágenes para el mosaico.', 'fr': 'Nécessite au moins 2 images pour la mosaïque.', 'de': 'Mindestens 2 Bilder zum Anordnen erforderlich.'},
 
     "Tiled %1 images in %2x%3 layout.": {'it': 'Affiancate %1 immagini in un layout %2x%3.', 'es': 'Mosaico de %1 imágenes en diseño %2x%3.', 'fr': 'Mosaïque de %1 images en disposition %2x%3.', 'de': '%1 Bilder in %2x%3 Layout angeordnet.'},
+
+    "Tip: Annotations are saved as overlay. If you close the tool, annotations will disappear, and then reappear when you open this tool again. Open this tool to continue editing with full undo/redo support. To burn annotations into the image, use File > Save while the tool is open.": {'it': 'Suggerimento: Le annotazioni sono salvate come overlay. Se chiudi lo strumento, le annotazioni scompariranno e poi riappariranno quando riapri questo strumento. Apri questo strumento per continuare la modifica con supporto completo di annulla/ripeti. Per incidere le annotazioni nell\'immagine, usa File > Salva mentre lo strumento è aperto.', 'es': 'Consejo: Las anotaciones se guardan como superposición. Si cierras la herramienta, las anotaciones desaparecerán y luego reaparecerán cuando abras esta herramienta nuevamente. Abre esta herramienta para continuar editando con soporte completo de deshacer/rehacer. Para grabar anotaciones en la imagen, usa Archivo > Guardar mientras la herramienta está abierta.', 'fr': 'Astuce : Les annotations sont enregistrées en tant que superposition. Si vous fermez l\'outil, les annotations disparaîtront puis réapparaîtront lorsque vous rouvrirez cet outil. Ouvrez cet outil pour continuer l\'édition avec le support complet annuler/refaire. Pour imprimer les annotations dans l\'image, utilisez Fichier > Enregistrer tandis que l\'outil est ouvert.', 'de': 'Tipp: Annotationen werden als Overlay gespeichert. Wenn Sie das Tool schließen, verschwinden die Annotationen und erscheinen erneut, wenn Sie dieses Tool erneut öffnen. Öffnen Sie dieses Tool, um mit vollständiger Unterstützung für Rückgängig/Wiederherstellen zu bearbeiten. Zum Brennen von Anmerkungen in das Bild verwenden Sie Datei > Speichern, während das Tool geöffnet ist.'},
 }
 
 

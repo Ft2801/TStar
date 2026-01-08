@@ -72,6 +72,7 @@
 #include "dialogs/DebayerDialog.h"
 #include "dialogs/ContinuumSubtractionDialog.h"
 #include "dialogs/AnnotationToolDialog.h"
+#include "widgets/AnnotationOverlay.h"
 #include "widgets/SidebarWidget.h"
 #include "widgets/HeaderPanel.h"
 #include "dialogs/ExtractLuminanceDialog.h"
@@ -2513,8 +2514,15 @@ void MainWindow::centerToolWindow(CustomMdiSubWindow* sub) {
 
 
 void MainWindow::onSettingsAction() {
+    // If settings dialog already open, just raise and focus it
+    if (m_settingsDlg) {
+        m_settingsDlg->raise();
+        m_settingsDlg->activateWindow();
+        return;
+    }
+    
     auto dlg = new SettingsDialog(this);
-    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    m_settingsDlg = dlg;
     
     connect(dlg, &SettingsDialog::settingsChanged, this, [this](){
         updateActiveImage();
@@ -2528,9 +2536,12 @@ void MainWindow::onSettingsAction() {
         }
         log(tr("Settings applied. Display refreshed."), Log_Success);
     });
+    
+    // Clean up when dialog closes
+    connect(dlg, &QDialog::destroyed, this, [this]() { m_settingsDlg = nullptr; });
 
     CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, dlg, tr("Settings"));
-    sub->resize(sub->width() - 200, sub->height() - 100);
+    sub->resize(sub->width(), sub->height());
     centerToolWindow(sub);
 }
 
@@ -3047,10 +3058,20 @@ void MainWindow::openImageAnnotatorDialog() {
     }
     
     m_annotatorDlg = new AnnotationToolDialog(this);
-    m_annotatorDlg->setAttribute(Qt::WA_DeleteOnClose);
+    
+    // CRITICAL: Restore persisted annotations from previous dialog instance
+    if (!m_persistedAnnotations.isEmpty()) {
+        m_annotatorDlg->setPersistedAnnotations(m_persistedAnnotations);
+    }
+    
+    // REMOVED: setAttribute(Qt::WA_DeleteOnClose) - keep dialog and overlay alive
     m_annotatorDlg->setViewer(v);
     
-    connect(m_annotatorDlg, &QDialog::destroyed, this, [this]() { m_annotatorDlg = nullptr; });
+    // Don't delete on close - just hide so annotations persist
+    // Note: hideEvent() in AnnotationToolDialog will save annotations to m_persistedAnnotations
+    connect(m_annotatorDlg, &QDialog::destroyed, this, [this]() { 
+        m_annotatorDlg = nullptr; 
+    });
     
     setupToolSubwindow(nullptr, m_annotatorDlg, tr("Annotation Tool"));
 }

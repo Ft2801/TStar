@@ -24,7 +24,7 @@
  * @endcode
  * 
  * This consolidates common pattern that appears in 40+ dialog files:
- * - setWindowTitle(tr("..."))
+ * - setWindowTitle("...")
  * - setWindowIcon(QIcon(":/images/Logo.png"))
  * - resize(width, height)
  * - setAttribute(Qt::WA_DeleteOnClose)
