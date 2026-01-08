@@ -9,9 +9,6 @@ echo.
 REM Move to project root (parent directory of this script)
 pushd "%~dp0.."
 
-REM Import shared utilities
-call src\windows_utils.bat
-
 REM --- Read version from changelog.txt ---
 call :GetVersion
 echo [INFO] Building version: %VERSION%
@@ -36,9 +33,6 @@ if "!ISCC!"=="" (
 REM Check changelog.txt exists
 call :VerifyFile "changelog.txt" "changelog.txt"
 if errorlevel 1 (
-    pause
-    exit /b 1
-)
     pause
     exit /b 1
 )
@@ -178,7 +172,6 @@ echo   - Installer created: %INSTALLER_NAME%
 echo   - Size: ~%INSTALLER_SIZE_MB% MB
 echo.
 
-REM --- SUCCESS ---
 echo ===========================================
 echo  SUCCESS! Installer Build Complete
 echo ===========================================
@@ -195,4 +188,62 @@ echo    2. Upload to GitHub Releases
 echo.
 echo ===========================================
 pause
+exit /b 0
+
+:GetVersion
+set "VERSION=1.0.0"
+if exist "changelog.txt" (
+    for /f "tokens=2" %%v in ('type "changelog.txt" ^| findstr /R "^Version [0-9]"') do (
+        set "VERSION=%%v"
+        goto :EOF
+    )
+)
+goto :EOF
+
+:FindInnoSetup
+set "ISCC="
+if exist "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" (
+    set "ISCC=C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+    goto :EOF
+)
+if exist "C:\Program Files\Inno Setup 6\ISCC.exe" (
+    set "ISCC=C:\Program Files\Inno Setup 6\ISCC.exe"
+    goto :EOF
+)
+REM Fallback to searching registry
+for /f "tokens=2*" %%A in ('reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 6_is1" /v "InstallLocation" 2^>nul') do (
+    if exist "%%B\ISCC.exe" (
+        set "ISCC=%%B\ISCC.exe"
+        goto :EOF
+    )
+)
+goto :EOF
+
+:VerifyFile
+REM Usage: call :VerifyFile path description
+set "FILE_PATH=%~1"
+set "DESCRIPTION=%~2"
+if not exist "!FILE_PATH!" (
+    echo [ERROR] !DESCRIPTION! not found: !FILE_PATH!
+    exit /b 1
+)
+exit /b 0
+
+:VerifyDir
+set "DIR_PATH=%~1"
+set "DESCRIPTION=%~2"
+if not exist "!DIR_PATH!" (
+    echo [ERROR] !DESCRIPTION! not found: !DIR_PATH!
+    exit /b 1
+)
+exit /b 0
+
+:SafeRmDir
+if exist "%~1" (
+    rmdir /s /q "%~1"
+)
+exit /b 0
+
+:EnsureDir
+if not exist "%~1" mkdir "%~1"
 exit /b 0

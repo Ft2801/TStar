@@ -11,7 +11,7 @@ REM Call this to get the current version
 :GetVersion
 set "VERSION=1.0.0"
 if exist "changelog.txt" (
-    for /f "tokens=2" %%v in ('type "changelog.txt" ^| findstr /R "^Version [0-9]*"') do (
+    for /f "tokens=2" %%v in ('type "changelog.txt" ^| findstr /R "^Version [0-9]"') do (
         set "VERSION=%%v"
         goto :EOF
     )
