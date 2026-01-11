@@ -254,6 +254,28 @@ std::vector<QPolygonF> ImageViewer::getAbePolygons() const {
     return polys;
 }
 
+void ImageViewer::setBackgroundSamples(const std::vector<QPointF>& points) {
+    clearBackgroundSamples();
+    
+    for (const auto& p : points) {
+        // Draw green cross or circle
+        // Using circle for now
+        QGraphicsEllipseItem* item = m_scene->addEllipse(
+            p.x() - 5, p.y() - 5, 10, 10, 
+            QPen(Qt::green, 1), QBrush(QColor(0, 255, 0, 100)));
+        item->setZValue(30); // Above image/overlays
+        m_sampleItems.push_back(item);
+    }
+}
+
+void ImageViewer::clearBackgroundSamples() {
+    for (auto* item : m_sampleItems) {
+        m_scene->removeItem(item);
+        delete item;
+    }
+    m_sampleItems.clear();
+}
+
 void ImageViewer::mousePressEvent(QMouseEvent* event) {
     if (m_pickMode && event->button() == Qt::LeftButton) {
         QPointF scenePos = mapToScene(event->pos());

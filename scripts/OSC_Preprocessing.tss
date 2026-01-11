@@ -1,0 +1,61 @@
+############################################
+# TStar Script: OSC Preprocessing (with Flat, Dark, Bias)
+#
+# This script processes One-Shot Color (OSC) camera images
+# through a complete calibration and stacking workflow.
+#
+# Folder structure (in Home Directory):
+#   biases/   - Bias frames
+#   darks/    - Dark frames
+#   flats/    - Flat frames
+#   lights/   - Light frames
+############################################
+
+# ==========================================
+# STEP 1: Create Master Bias
+# ==========================================
+cd biases
+convert bias -out=../process
+cd ../process
+stack bias rej 3 3 -nonorm -out=../masters/bias_stacked
+cd ..
+
+# ==========================================
+# STEP 2: Create Master Dark
+# ==========================================
+cd darks
+convert dark -out=../process
+cd ../process
+stack dark rej 3 3 -nonorm -out=../masters/dark_stacked
+cd ..
+
+# ==========================================
+# STEP 3: Create Master Flat
+# ==========================================
+cd flats
+convert flat -out=../process
+cd ../process
+calibrate flat -bias=../masters/bias_stacked
+stack pp_flat rej 3 3 -norm=mul -out=../masters/pp_flat_stacked
+cd ..
+
+# ==========================================
+# STEP 4: Calibrate Light Frames
+# ==========================================
+cd lights
+convert light -out=../process
+cd ../process
+calibrate light -dark=../masters/dark_stacked -flat=../masters/pp_flat_stacked -cc=dark -cfa -equalize_cfa -debayer
+
+# ==========================================
+# STEP 5: Register Light Frames
+# ==========================================
+register pp_light
+
+# ==========================================
+# STEP 6: Stack Calibrated Lights
+# ==========================================
+stack r_pp_light rej 3 3 -norm=addscale -output_norm -rgb_equal -32b -out=../result
+
+cd ..
+load result.fit

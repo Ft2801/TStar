@@ -1,0 +1,43 @@
+############################################
+# OSC_Startrail
+# Star trail creation with full calibration
+#
+# Folder structure:
+#   biases/   flats/   darks/   lights/
+############################################
+
+# Convert Bias Frames
+cd biases
+convert bias -out=../process
+cd ../process
+stack bias rej 3 3 -nonorm -out=../masters/bias_stacked
+cd ..
+
+# Convert Flat Frames
+cd flats
+convert flat -out=../process
+cd ../process
+calibrate flat -bias=../masters/bias_stacked
+stack pp_flat rej 3 3 -norm=mul -out=../masters/pp_flat_stacked
+cd ..
+
+# Convert Dark Frames
+cd darks
+convert dark -out=../process
+cd ../process
+stack dark rej 3 3 -nonorm -out=../masters/dark_stacked
+cd ..
+
+# Convert Light Frames
+cd lights
+convert light -out=../process
+cd ../process
+
+# Calibrate Light Frames
+calibrate light -dark=../masters/dark_stacked -flat=../masters/pp_flat_stacked -cc=dark -cfa -equalize_cfa -debayer
+
+# Stack using MAX for star trails
+stack pp_light max -output_norm -out=../result
+
+cd ..
+close

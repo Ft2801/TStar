@@ -1,0 +1,21 @@
+############################################
+# StarTrails_WithoutDBF
+# Creates star trails without calibration frames
+#
+# Folder structure:
+#   lights/   - Copy your light files here
+############################################
+
+# Convert Light Frames
+cd lights
+convert light -out=../process
+cd ../process
+
+# Calibrate Light Frames (debayer only)
+calibrate light -cfa -equalize_cfa -debayer
+
+# Stack using MAX to create star trails
+stack pp_light max -output_norm -out=../result
+
+cd ..
+close

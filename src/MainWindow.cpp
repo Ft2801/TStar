@@ -12,6 +12,7 @@
 #include <QMenu>
 #include <QToolButton>
 #include <QToolBar>
+#include <cstdlib>
 #include <QMdiSubWindow>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -28,11 +29,15 @@
 #include <QDialogButtonBox>
 #include <QDialogButtonBox>
 #include <QApplication>
+#include <QTime>
+#include <QEventLoop>
+#include <QCoreApplication>
 #include "dialogs/CropRotateDialog.h"
 #include "dialogs/CurvesDialog.h"
 #include "io/FitsLoader.h"
 #include "io/SimpleTiffReader.h"
 #include "dialogs/StretchDialog.h"
+#include "dialogs/TextureAndClarityDialog.h"
 #include "dialogs/ABEDialog.h"
 #include "dialogs/SCNRDialog.h"
 #include "dialogs/SaturationDialog.h"
@@ -54,6 +59,16 @@
 #include "dialogs/UpdateDialog.h" // [NEW] Auto-updater dialog
 #include "network/UpdateChecker.h" // [NEW] Auto-updater checker
 #include "dialogs/HeaderViewerDialog.h"
+#include "dialogs/StackingDialog.h"
+#include "dialogs/RegistrationDialog.h"
+#include "dialogs/PreprocessingDialog.h"
+#include "dialogs/NewProjectDialog.h"
+#include "dialogs/ScriptDialog.h"
+#include "dialogs/ScriptBrowserDialog.h"
+#include "dialogs/ConversionDialog.h"
+#include "stacking/StackingProject.h"
+#include "scripting/StackingCommands.h"
+#include "scripting/ScriptRunner.h"
 #include "dialogs/HelpDialog.h"
 #include "dialogs/HeaderEditorDialog.h"
 #include "dialogs/AboutDialog.h"
@@ -91,6 +106,13 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
+
+#include <QThreadPool>
+#include "../core/ThreadState.h"
+
+MainWindow::~MainWindow() {
+    // Destructor - cleanup is handled in closeEvent
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent) {
@@ -483,6 +505,19 @@ MainWindow::MainWindow(QWidget *parent)
         return act;
     };
     
+    // 0. Home Directory (SVG)
+    auto homeBtn = addBtn(tr("Set Home"), "images/home.svg", [this](){
+        QString dir = QFileDialog::getExistingDirectory(this, tr("Select Home Directory"), QDir::currentPath());
+        if (!dir.isEmpty()) {
+            QDir::setCurrent(dir);
+            log(tr("Home Directory changed to: %1").arg(dir), Log_Success);
+            
+            // Also update ScriptRunner default CWD if available
+            // (Note: ScriptRunner reads QDir::currentPath() by default now, so this is implicit)
+        }
+    });
+    homeBtn->setToolTip(tr("Set Home Directory (CWD)"));
+    
     // 1. Open / Save (Files)
     addBtn(tr("Open"), "images/open.png", &MainWindow::openFile)->setShortcut(QKeySequence::Open);
     addBtn(tr("Save"), "images/save.png", &MainWindow::saveFile)->setShortcut(QKeySequence::Save);
@@ -738,6 +773,9 @@ MainWindow::MainWindow(QWidget *parent)
     addMenuAction(utilMenu, tr("Pixel Math"), "", [this](){
         openPixelMathDialog();
     });
+    addMenuAction(utilMenu, tr("Texture and Clarity"), "", [this](){
+        openTextureAndClarityDialog();
+    });
     addMenuAction(utilMenu, tr("Star Analysis"), "", [this](){
         openStarAnalysisDialog(); // Call handles checks
     });
@@ -782,6 +820,40 @@ MainWindow::MainWindow(QWidget *parent)
         "QToolButton::menu-indicator { image: none; }"
     );
     mainToolbar->addWidget(processBtn);
+    mainToolbar->addSeparator();
+
+    /* stacking menu removed for now */
+
+    // --- Stacking Menu ---
+    QToolButton* stackBtn = new QToolButton(this);
+    stackBtn->setText(tr("Stacking"));
+    stackBtn->setPopupMode(QToolButton::InstantPopup);
+    stackBtn->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    stackBtn->setStyleSheet(processBtn->styleSheet());
+
+    QMenu* stackMenu = new QMenu(this);
+    stackMenu->setStyleSheet(processMenu->styleSheet());
+    
+    // Project Management
+    addMenuAction(stackMenu, tr("New Project..."), "", &MainWindow::openNewProjectDialog);
+    addMenuAction(stackMenu, tr("Open Project..."), "", &MainWindow::openExistingProject);
+    stackMenu->addSeparator();
+    
+    // Conversion
+    addMenuAction(stackMenu, tr("Convert RAW to FITS..."), "", &MainWindow::openConvertDialog);
+    stackMenu->addSeparator();
+    
+    // Pipeline
+    addMenuAction(stackMenu, tr("Preprocessing (Calibration)..."), "", &MainWindow::openPreprocessingDialog);
+    addMenuAction(stackMenu, tr("Registration (Star Alignment)..."), "", &MainWindow::openRegistrationDialog);
+    addMenuAction(stackMenu, tr("Stacking..."), "", &MainWindow::openStackingDialog);
+    stackMenu->addSeparator();
+    
+    // Scripts
+    addMenuAction(stackMenu, tr("Run Script..."), "", &MainWindow::openScriptDialog);
+    
+    stackBtn->setMenu(stackMenu);
+    mainToolbar->addWidget(stackBtn);
     mainToolbar->addSeparator();
 
     // --- Mask Menu ---
@@ -1564,6 +1636,79 @@ void MainWindow::openStretchDialog() {
     }
 }
 
+void MainWindow::openTextureAndClarityDialog() {
+    ImageViewer* viewer = currentViewer();
+    if (!viewer || !viewer->getBuffer().isValid()) {
+        QMessageBox::warning(this, tr("No Image"), tr("Please select an image first."));
+        return;
+    }
+    
+    if (m_textureClarityDlg) {
+        log(tr("Activating Texture and Clarity Tool..."), Log_Action, true);
+        
+        m_textureClarityDlg->setViewer(viewer);
+        
+        QWidget* p = m_textureClarityDlg->parentWidget();
+        while (p && !qobject_cast<CustomMdiSubWindow*>(p)) p = p->parentWidget();
+        if (auto sub = qobject_cast<CustomMdiSubWindow*>(p)) {
+            centerToolWindow(sub);
+            sub->showNormal();
+            sub->raise();
+            sub->activateWindow();
+        } else {
+            m_textureClarityDlg->show();
+            m_textureClarityDlg->raise();
+            m_textureClarityDlg->activateWindow();
+        }
+        return;
+    }
+    
+    // Create new
+    try {
+        m_textureClarityDlg = new TextureAndClarityDialog(nullptr);
+        m_textureClarityDlg->setViewer(viewer);
+        m_textureClarityDlg->setAttribute(Qt::WA_DeleteOnClose, false);
+        
+        connect(m_textureClarityDlg, &TextureAndClarityDialog::applied, this, [this](const QString& msg){
+            log(msg, Log_Success, true);
+        });
+
+        log(tr("Opening Texture and Clarity..."), Log_Info, true);
+        CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+        setupToolSubwindow(sub, m_textureClarityDlg, tr("Texture and Clarity"));
+        sub->resize(500, 300);
+        centerToolWindow(sub);
+        
+        connect(m_textureClarityDlg, &QDialog::accepted, this, [this](){
+             if (m_textureClarityDlg && m_textureClarityDlg->viewer()) {
+                 ImageViewer* v = m_textureClarityDlg->viewer();
+                 QWidget* p = v->parentWidget(); 
+                 while (p && !qobject_cast<CustomMdiSubWindow*>(p) && !qobject_cast<QMdiSubWindow*>(p)) {
+                     p = p->parentWidget();
+                 }
+                 
+                 if (auto sub = qobject_cast<QMdiSubWindow*>(p)) {
+                     sub->raise();
+                     sub->activateWindow();
+                 }
+             }
+        });
+
+    } catch (const std::exception& e) {
+        QMessageBox::critical(this, tr("Error"), tr("Failed to open Texture and Clarity dialog: %1").arg(e.what()));
+        if (m_textureClarityDlg) {
+            delete m_textureClarityDlg;
+            m_textureClarityDlg = nullptr;
+        }
+    } catch (...) {
+        QMessageBox::critical(this, tr("Error"), tr("Failed to open Texture and Clarity dialog: Unknown error"));
+        if (m_textureClarityDlg) {
+            delete m_textureClarityDlg;
+            m_textureClarityDlg = nullptr;
+        }
+    }
+}
+
 void MainWindow::updateDisplay() {
     ImageViewer* v = currentViewer();
     if (!v) return;
@@ -2047,7 +2192,8 @@ void MainWindow::openPerfectPaletteDialog() {
     // Re-adding applyGeometry here as it was likely not in previous view range or needs MDI
 void MainWindow::applyGeometry(const QString& op) {
     if (auto v = currentViewer()) {
-        pushUndo(); // Calls MainWindow::pushUndo which updates menus!
+        // NOTE: Flip and rotate should NOT be saved to undo/redo stack
+        // to prevent other tools from resetting rotation state
         
         // Use OpenCV optimized calls directly via Buffer
         if (op == "rot90") v->getBuffer().rotate90();
@@ -2063,7 +2209,8 @@ void MainWindow::applyGeometry(const QString& op) {
 
 void MainWindow::applyGeometry(const QString& name, std::function<void(ImageBuffer&)> func) {
     if (auto v = currentViewer()) {
-        pushUndo();
+        // NOTE: Flip and rotate should NOT be saved to undo/redo stack
+        // to prevent other tools from resetting rotation state
         func(v->getBuffer());
         updateDisplay();
         log(tr("Geometry applied: ") + name, Log_Success);
@@ -2337,9 +2484,22 @@ void MainWindow::openBackgroundNeutralizationDialog() {
         return;
     }
     
+    // Check if already open
+    if (m_bnDlg) {
+        m_bnDlg->raise();
+        m_bnDlg->activateWindow();
+        if (viewer) m_bnDlg->setViewer(viewer);
+        return;
+    }
+
     auto dlg = new BackgroundNeutralizationDialog(this);
     m_bnDlg = dlg;
     
+    // Cleanup on destroy
+    connect(dlg, &QObject::destroyed, this, [this](){
+        m_bnDlg = nullptr;
+    });
+
     // Initial Setup
     if (auto v = currentViewer()) {
         m_bnDlg->setViewer(v);
@@ -2628,31 +2788,43 @@ void MainWindow::closeEvent(QCloseEvent* event) {
         return;
     }
     
-    QMessageBox::StandardButton res = QMessageBox::question(this, tr("Exit TStar"), tr("Are you sure you want to exit?"), 
-                                                            QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+    // Check if we are already in the shutdown sequence (re-entrant call or retry)
+    bool shutdownRequested = property("shutdownRequested").toBool();
     
-    if (res != QMessageBox::Yes) {
-        event->ignore();
-        return;
+    if (!shutdownRequested) {
+        QMessageBox::StandardButton res = QMessageBox::question(this, tr("Exit TStar"), tr("Are you sure you want to exit?"), 
+                                                                QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+        
+        if (res != QMessageBox::Yes) {
+            event->ignore();
+            return;
+        }
+        setProperty("shutdownRequested", true);
     }
 
-    // Attempt to close all MDI windows first WITHOUT animation to allow quitting interaction
+    // === FORCE CLEANUP ===
+    Threading::setThreadRun(false);
+    QThreadPool::globalInstance()->clear();
+    QThreadPool::globalInstance()->waitForDone(500);
+
+    // Attempt to close all MDI windows first
     if (m_mdiArea) {
-        for (auto sub : m_mdiArea->subWindowList()) {
-            if (auto customSub = qobject_cast<CustomMdiSubWindow*>(sub)) {
-                customSub->setSkipCloseAnimation(true);
-            }
-        }
         m_mdiArea->closeAllSubWindows();
         
-        // If canceled or still open windows (e.g. user said NO to unsaved changes)
+        // Wait for animations to finish (Async close)
+        // Give time for fade-out effects (150ms approx) + buffer
+        // If user canceled a save prompt, the window remains open and loop terminates after timeout
+        QTime deadline = QTime::currentTime().addMSecs(600);
+        while (!m_mdiArea->subWindowList().isEmpty() && QTime::currentTime() < deadline) {
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+            QThread::msleep(10);
+        }
+        
+        // If still open windows (e.g. user said NO to unsaved changes)
         if (!m_mdiArea->subWindowList().isEmpty()) {
             event->ignore();
-            for (auto sub : m_mdiArea->subWindowList()) {
-                if (auto customSub = qobject_cast<CustomMdiSubWindow*>(sub)) {
-                    customSub->setSkipCloseAnimation(false);
-                }
-            }
+            // Reset shutdown flag so user can try again
+            setProperty("shutdownRequested", false);
             return;
         }
     }
@@ -2694,6 +2866,8 @@ void MainWindow::startFadeOut() {
     connect(m_anim, &QPropertyAnimation::finished, this, [this](){
         m_isClosing = true;
         close();
+        // Force exit processes as requested to prevent hanging threads
+        std::exit(0); 
     });
     m_anim->start();
 }
@@ -3386,6 +3560,7 @@ void MainWindow::openSelectiveColorDialog() {
     });
 }
 
+<<<<<<< Updated upstream
 // ========== MainWindowCallbacks Pure Virtual Implementations ==========
 
 ImageBuffer* MainWindow::getCurrentImageBuffer() {
@@ -3412,4 +3587,85 @@ void MainWindow::logMessage(const QString& message, int severity, bool showPopup
         default: type = Log_Info; break;
     }
     log(message, type, showPopup);
+=======
+// ========== Stacking Suite ==========
+
+void MainWindow::openStackingDialog() {
+    log(tr("Opening Stacking Dialog..."), Log_Action, true);
+    StackingDialog dlg(this);
+    dlg.exec();
+}
+
+void MainWindow::openRegistrationDialog() {
+    log(tr("Opening Registration Dialog..."), Log_Action, true);
+    RegistrationDialog dlg(this);
+    dlg.exec();
+}
+
+void MainWindow::openPreprocessingDialog() {
+    log(tr("Opening Preprocessing Dialog..."), Log_Action, true);
+    PreprocessingDialog dlg(this);
+    dlg.exec();
+}
+
+void MainWindow::openNewProjectDialog() {
+    log(tr("Opening New Project Dialog..."), Log_Action, true);
+    NewProjectDialog dlg(this);
+    if (dlg.exec() == QDialog::Accepted) {
+        Stacking::StackingProject* project = dlg.createProject();
+        if (project) {
+            log(tr("Project created: %1").arg(project->rootDir()), Log_Success, true);
+            delete project;
+        } else {
+            log(tr("Failed to create project."), Log_Error, true);
+        }
+    }
+}
+
+void MainWindow::openExistingProject() {
+    QString dir = QFileDialog::getExistingDirectory(this,
+        tr("Select Project Directory"),
+        QDir::homePath());
+    
+    if (dir.isEmpty()) return;
+    
+    Stacking::StackingProject project;
+    QString projectFile = Stacking::StackingProject::findProjectFile(dir);
+    
+    if (!projectFile.isEmpty() && project.load(projectFile)) {
+        log(tr("Project loaded: %1").arg(project.name()), Log_Success, true);
+        // Open StackingDialog with this project
+        StackingDialog dlg(this);
+        dlg.exec();
+    } else {
+        log(tr("No valid project found at: %1").arg(dir), Log_Warning, true);
+    }
+}
+
+void MainWindow::openConvertDialog() {
+    log(tr("Opening Conversion Dialog..."), Log_Action, true);
+    ConversionDialog dlg(this);
+    dlg.exec();
+}
+
+void MainWindow::openScriptDialog() {
+    log(tr("Opening Script Browser..."), Log_Action, true);
+    ScriptBrowserDialog browserDlg(this);
+    
+    if (browserDlg.exec() == QDialog::Accepted) {
+        QString scriptFile = browserDlg.selectedScript();
+        if (scriptFile.isEmpty()) return;
+        
+        log(tr("Running script: %1").arg(QFileInfo(scriptFile).fileName()), Log_Action, true);
+        
+        // Open ScriptDialog with console and progress bar
+        ScriptDialog* scriptDlg = new ScriptDialog(this);
+        scriptDlg->setAttribute(Qt::WA_DeleteOnClose);
+        scriptDlg->loadScript(scriptFile);
+        scriptDlg->exec();
+        
+        // Log result after dialog closes
+        log(tr("Script dialog closed."), Log_Info);
+    }
+>>>>>>> Stashed changes
 }

@@ -1,0 +1,16 @@
+# RGB Composition Script
+
+requires 1.0
+
+# Convert input images (R, G, B) to sequence
+# Assumes files named R, G, B or similar in current dir
+convert colors -out=process
+cd process
+
+# Register images (align R, G, B)
+register colors
+
+rgbcomp r_colors_00003.fit r_colors_00002.fit r_colors_00001.fit -out=../rgb_result.fit
+
+cd ..
+close

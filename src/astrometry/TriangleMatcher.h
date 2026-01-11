@@ -6,9 +6,9 @@
 #include <algorithm>
 
 // Standard Constants
-#define AT_MATCH_NB_BRIGHTEST 100 // Default for plate solving
+#define AT_MATCH_NB_BRIGHTEST 40 // Default for plate solving
 #define AT_MATCH_TOLERANCE 0.005 // Tolerance for triangle sides ratio
-#define AT_MATCH_MAX_RADIUS 0.05 // Max distance in triangle space
+#define AT_MATCH_MAX_RADIUS 0.005 // Max distance in triangle space
 #define AT_MATCH_MIN_SCALE -1.0
 #define AT_MATCH_MAX_SCALE -1.0
 #define AT_MATCH_NOANGLE -999.0
@@ -61,7 +61,7 @@ public:
                double centerX = 0, double centerY = 0, double posTolerance = -1);
 
 private:
-    int m_maxStars = 80; // Standard often uses ~40-100
+    int m_maxStars = 40; // Standard often uses ~40-100
 
     std::vector<MatchTriangle> generateTriangles(const std::vector<MatchStar>& stars, int limit);
     

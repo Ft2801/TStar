@@ -1,0 +1,22 @@
+
+# Original pixel math formula by Bill Blanshan.
+
+requires 1.0
+
+# Create a copy of the current image and open it.
+save starReduction.fit
+load starReduction.fit
+
+# Run Starnet Star Removal. No star mask.
+starnet -nostarmask
+
+# Pixel math.
+# "~((~mtf(~0.20,$starReduction$)/~mtf(~0.20,$starless_starReduction$))*~$starless_starReduction$)"
+# Note: $starReduction$ refers to the original image saved above.
+# $starless_starReduction$ refers to the starless version (current, or on disk).
+# TStar PM engine resolves $vars$ to files.
+pm "~((~mtf(~0.20,$starReduction$)/~mtf(~0.20,$starless_starReduction$))*~$starless_starReduction$)"
+
+# Save and open the final image.
+save reducedStars_final.fit
+load reducedStars_final.fit

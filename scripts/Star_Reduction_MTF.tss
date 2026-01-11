@@ -1,0 +1,22 @@
+############################################
+# Star_Reduction_MTF
+# Star reduction using StarNet and pixel math
+#
+# Requirements:
+#   StarNet++ CLI must be configured
+############################################
+
+# Save current image
+save starReduction.fit
+load starReduction.fit
+
+# Run StarNet star removal
+starnet -nostarmask
+
+# Pixel math star reduction
+# Lower 0.20 to reduce stars more (change in both places)
+pm "~((~mtf(~0.20,$starReduction$)/~mtf(~0.20,$starless_starReduction$))*~$starless_starReduction$)"
+
+# Save final result
+save reducedStars_final.fit
+load reducedStars_final.fit

@@ -1,0 +1,49 @@
+############################################
+# OSC_Preprocessing_BGE
+# OSC preprocessing with background extraction
+#
+# Folder structure:
+#   biases/   flats/   darks/   lights/
+############################################
+
+# Convert Bias Frames
+cd biases
+convert bias -out=../process
+cd ../process
+stack bias rej 3 3 -nonorm
+cd ..
+
+# Convert Flat Frames
+cd flats
+convert flat -out=../process
+cd ../process
+calibrate flat -bias=bias_stacked
+stack pp_flat rej 3 3 -norm=mul
+cd ..
+
+# Convert Dark Frames
+cd darks
+convert dark -out=../process
+cd ../process
+stack dark rej 3 3 -nonorm
+cd ..
+
+# Convert Light Frames
+cd lights
+convert light -out=../process
+cd ../process
+
+# Pre-process Light Frames
+calibrate light -dark=dark_stacked -flat=pp_flat_stacked -cfa -equalize_cfa -debayer
+
+# Extract linear gradient (background extraction)
+background pp_light --degree=1
+
+# Align lights
+register bkg_pp_light
+
+# Stack calibrated lights
+stack r_bkg_pp_light rej 3 3 -norm=addscale -output_norm -rgb_equal -32b -out=../result
+
+cd ..
+close

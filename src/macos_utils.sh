@@ -83,11 +83,146 @@ find_macdeployqt() {
     echo "$macdeployqt"
 }
 
+<<<<<<< Updated upstream
+=======
+# --- Architecture Detection ---
+detect_build_architecture() {
+    # First, check if the executable exists and has an architecture
+    local executable="$1"
+    if [ -n "$executable" ] && [ -f "$executable" ]; then
+        # Use file command to get architecture
+        local file_output=$(file "$executable" 2>/dev/null || echo "")
+        if echo "$file_output" | grep -q "x86_64"; then
+            echo "x86_64"
+            return 0
+        elif echo "$file_output" | grep -q "arm64"; then
+            echo "arm64"
+            return 0
+        fi
+    fi
+    
+    # Fallback to native architecture
+    local native_arch=$(arch)
+    if [ "$native_arch" == "arm64" ] || [ "$native_arch" == "aarch64" ]; then
+        echo "arm64"
+    else
+        echo "x86_64"
+    fi
+}
+
+# Check if dylib has matching architecture
+dylib_matches_arch() {
+    local dylib="$1"
+    local target_arch="$2"
+    
+    if [ ! -f "$dylib" ]; then
+        return 1
+    fi
+    
+    local file_output=$(file "$dylib" 2>/dev/null || echo "")
+    
+    if [ "$target_arch" == "arm64" ]; then
+        # Accept arm64 but NOT x86_64
+        if echo "$file_output" | grep -q "arm64" && ! echo "$file_output" | grep -q "x86_64"; then
+            return 0
+        fi
+    else
+        # x86_64: Accept x86_64 but NOT arm64
+        if echo "$file_output" | grep -q "x86_64" && ! echo "$file_output" | grep -q "arm64"; then
+            return 0
+        fi
+    fi
+    
+    return 1
+}
+
+# Recursively copy all dependencies of a dylib
+copy_dylib_with_dependencies() {
+    local dylib="$1"
+    local dest_dir="$2"
+    local target_arch="$3"
+    local processed_dylibs="${4:-}"
+    
+    # Avoid infinite loops
+    if echo "$processed_dylibs" | grep -q "$(basename "$dylib")"; then
+        return 0
+    fi
+    processed_dylibs="$processed_dylibs $(basename "$dylib")"
+    
+    # Get all dependencies
+    local deps=$(otool -L "$dylib" 2>/dev/null | grep -v "^$dylib:" | grep "\.dylib" | awk '{print $1}' | sort -u || true)
+    
+    for dep in $deps; do
+        # Skip system dylibs
+        if echo "$dep" | grep -qE "^(/usr/lib|/System|@executable_path)"; then
+            continue
+        fi
+        
+        # Skip frameworks
+        if echo "$dep" | grep -q "\.framework"; then
+            continue
+        fi
+        
+        # Handle @rpath references
+        if echo "$dep" | grep -q "@rpath"; then
+            continue  # Will be handled by install_name_tool
+        fi
+        
+        # Check if already bundled
+        local dep_basename=$(basename "$dep")
+        if [ ! -f "$dest_dir/$dep_basename" ]; then
+            # Try to find and copy from Homebrew
+            local found=0
+            for brew_path in /opt/homebrew /usr/local; do
+                if [ -f "$brew_path/lib/$dep_basename" ]; then
+                    if dylib_matches_arch "$brew_path/lib/$dep_basename" "$target_arch"; then
+                        cp "$brew_path/lib/$dep_basename" "$dest_dir/" 2>/dev/null && found=1
+                        # Recursively copy its dependencies
+                        if [ $found -eq 1 ]; then
+                            copy_dylib_with_dependencies "$dest_dir/$dep_basename" "$dest_dir" "$target_arch" "$processed_dylibs" || true
+                        fi
+                    fi
+                    break
+                fi
+            done
+            
+            if [ $found -eq 0 ] && ! echo "$dep" | grep -qE "libSystem\.B|libobjc\.A|libstdc|libc\+\+"; then
+                # Only warn if it's not a system library we expect to be unavailable
+                true  # Silent skip for now
+            fi
+        fi
+    done
+}
+
+>>>>>>> Stashed changes
 # --- Dependency Utilities ---
 copy_dylib() {
     local lib_name="$1"
     local brew_pkg="$2"
     local dest_dir="$3"
+<<<<<<< Updated upstream
+=======
+    local target_arch="${4:-}"  # Optional: target architecture (x86_64 or arm64)
+    
+    # If no target arch specified, detect from the executable
+    if [ -z "$target_arch" ]; then
+        if [ -d "$dest_dir/../MacOS" ]; then
+            # Find the executable in the app bundle
+            local executable=$(find "$dest_dir/../MacOS" -name "TStar" -o -name "*.app" 2>/dev/null | head -1)
+            if [ -z "$executable" ]; then
+                executable=$(find "$dest_dir/../MacOS" -type f -executable 2>/dev/null | head -1)
+            fi
+            if [ -n "$executable" ]; then
+                target_arch=$(detect_build_architecture "$executable")
+            fi
+        fi
+    fi
+    
+    # Fallback to native architecture
+    if [ -z "$target_arch" ]; then
+        target_arch=$(detect_build_architecture "")
+    fi
+>>>>>>> Stashed changes
     
     local prefix=$(brew --prefix "$brew_pkg" 2>/dev/null || echo "")
     
@@ -111,6 +246,7 @@ copy_dylib() {
     fi
     
     if [ -n "$prefix" ] && [ -d "$prefix/lib" ]; then
+<<<<<<< Updated upstream
         local dylib=$(find "$prefix/lib" -name "${lib_name}*.dylib" -type f | head -1)
         if [ -f "$dylib" ]; then
             cp "$dylib" "$dest_dir/" 2>/dev/null
@@ -119,6 +255,30 @@ copy_dylib() {
         fi
     fi
     echo "  - $lib_name: NOT FOUND"
+=======
+        # Find all matching dylibs and check architecture
+        local dylibs=$(find "$prefix/lib" -name "${lib_name}*.dylib" -type f 2>/dev/null | sort)
+        
+        for dylib in $dylibs; do
+            if dylib_matches_arch "$dylib" "$target_arch"; then
+                cp "$dylib" "$dest_dir/" 2>/dev/null
+                echo "  - $lib_name: OK ($target_arch)"
+                return 0
+            fi
+        done
+        
+        # If no exact match found, warn and skip
+        if [ -n "$dylibs" ]; then
+            # Check what architectures were found
+            local found_archs=$(for dylib in $dylibs; do file "$dylib" 2>/dev/null | grep -o "x86_64\|arm64" | sort -u; done | tr '\n' '/' | sed 's|/$||')
+            echo "  - $lib_name: ARCH MISMATCH (target: $target_arch, found: $found_archs)"
+        else
+            echo "  - $lib_name: NOT FOUND"
+        fi
+    else
+        echo "  - $lib_name: NOT FOUND"
+    fi
+>>>>>>> Stashed changes
     return 1
 }
 

@@ -1,0 +1,23 @@
+# Batch Stacking Script
+
+requires 1.0
+
+# Process multiple folders
+# Assumes logical structure lights001, lights002 etc.
+
+cd lights001
+stack r_pp_light -method=mean -rej=winsorized 3 3 -norm=addscale -out=../stacked/result001.fit
+
+cd ../lights002
+stack r_pp_light -method=mean -rej=winsorized 3 3 -norm=addscale -out=../stacked/result002.fit
+
+cd ../lights003
+stack r_pp_light -method=mean -rej=winsorized 3 3 -norm=addscale -out=../stacked/result003.fit
+
+cd ../lights004
+stack r_pp_light -method=mean -rej=winsorized 3 3 -norm=addscale -out=../stacked/result004.fit
+
+cd ../lights005
+stack r_pp_light -method=mean -rej=winsorized 3 3 -norm=addscale -out=../stacked/result005.fit
+
+# Add more as needed...

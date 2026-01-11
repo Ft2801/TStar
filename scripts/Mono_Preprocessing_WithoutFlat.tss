@@ -1,0 +1,31 @@
+############################################
+# Mono_Preprocessing_WithoutFlat
+# Mono camera preprocessing with darks only
+#
+# Folder structure:
+#   darks/    lights/
+############################################
+
+# Convert Dark Frames
+cd darks
+convert dark -out=../process
+cd ../process
+stack dark rej 3 3 -nonorm
+cd ..
+
+# Convert Light Frames
+cd lights
+convert light -out=../process
+cd ../process
+
+# Pre-process Light Frames
+calibrate light -dark=dark_stacked
+
+# Align Lights
+register pp_light
+
+# Stack calibrated lights
+stack r_pp_light rej 3 3 -norm=addscale -output_norm -32b -out=../result
+
+cd ..
+close

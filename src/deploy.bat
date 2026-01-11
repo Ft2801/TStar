@@ -78,6 +78,9 @@ copy "deps\opencv\x64\mingw\bin\libopencv_photo*.dll" "!BUILD_DIR!\" >nul 2>&1
 copy "deps\opencv\x64\mingw\bin\libopencv_stitching*.dll" "!BUILD_DIR!\" >nul 2>&1
 copy "deps\opencv\x64\mingw\bin\libopencv_video*.dll" "!BUILD_DIR!\" >nul 2>&1
 
+REM Copy LibRaw DLL
+echo   - LibRaw: OK
+copy "deps\libraw\bin\libraw.dll" "!BUILD_DIR!\" >nul 2>&1
 
 echo.
 echo [SUCCESS] Dependencies copied to !BUILD_DIR!

@@ -18,6 +18,7 @@
 class ImageBuffer {
 public:
     ImageBuffer();
+    ImageBuffer(int width, int height, int channels);
     ~ImageBuffer();
     
     // Custom copy to handle non-copyable mutex
@@ -41,8 +42,18 @@ public:
     
     bool loadStandard(const QString& filePath);
 
+<<<<<<< Updated upstream
     int width() const { Q_ASSERT(m_width > 0); return m_width; }
     int height() const { Q_ASSERT(m_height > 0); return m_height; }
+=======
+    int width() const { return m_width; }
+    int height() const { return m_height; }
+
+    /**
+     * @brief Load a rectangular region of the image
+     */
+    bool loadRegion(const QString& filePath, int x, int y, int w, int h, QString* errorMsg = nullptr);
+>>>>>>> Stashed changes
     
     // Header Access
     QString getHeaderValue(const QString& key) const;
@@ -50,6 +61,10 @@ public:
     enum BitDepth { Depth_8Int, Depth_16Int, Depth_32Int, Depth_32Float };
     enum DisplayMode { Display_Linear, Display_AutoStretch, Display_ArcSinh, Display_Sqrt, Display_Log, Display_Histogram };
     int channels() const { Q_ASSERT(m_channels > 0); return m_channels; }
+<<<<<<< Updated upstream
+=======
+    size_t size() const { return static_cast<size_t>(m_width) * m_height * m_channels; }
+>>>>>>> Stashed changes
     bool isValid() const { return !m_data.empty() && m_width > 0 && m_height > 0; }
 
     // Display
@@ -73,7 +88,7 @@ public:
     //     Depth_8Int
     // };
 
-    bool save(const QString& filePath, const QString& format, BitDepth depth, QString* errorMsg = nullptr);
+    bool save(const QString& filePath, const QString& format, BitDepth depth, QString* errorMsg = nullptr) const;
     bool loadTiff32(const QString& filePath, QString* errorMsg = nullptr, QString* debugInfo = nullptr);
 
     struct StretchParams {
@@ -105,9 +120,15 @@ public:
         float hrSoftclipRolloff = 2.0f;   // Softclip rolloff strength
     };
     
+    struct TextureAndClarityParams {
+        float texture = 0.0f;      // Texture amount (-1 to +1, where -1 smooths, +1 increases)
+        float clarity = 0.0f;      // Clarity amount (-1 to +1, where -1 softens, +1 sharpens)
+        float radius = 5.0f;       // Radius for midtone detection (pixels)
+    };
+    
     // XISF Support
     bool loadXISF(const QString& filePath, QString* errorMsg = nullptr);
-    bool saveXISF(const QString& filePath, BitDepth depth, QString* errorMsg = nullptr);
+    bool saveXISF(const QString& filePath, BitDepth depth, QString* errorMsg = nullptr) const;
 
     // Geometric Ops
     void crop(int x, int y, int w, int h);
@@ -131,6 +152,10 @@ public:
     
     // Compute LUT for TrueStretch (for Preview)
     std::vector<std::vector<float>> computeTrueStretchLUT(const StretchParams& params, int size = 65536) const;
+
+    // Texture and Clarity
+    void performTextureAndClarity(const TextureAndClarityParams& params);
+    std::vector<std::vector<float>> computeTextureAndClarityLUT(const TextureAndClarityParams& params, int size = 65536) const;
 
     // Math Ops
     void multiply(float factor);
@@ -194,12 +219,17 @@ public:
     float getChannelMAD(int channelIndex, float median) const;
     float getRobustMedian(int channelIndex, float t0, float t1) const; 
     float getPixelValue(int x, int y, int c) const;
+    float value(int x, int y, int c = 0) const { return getPixelValue(x, y, c); }
+    float& value(int x, int y, int c = 0) { 
+        return m_data[(static_cast<size_t>(y) * m_width + x) * m_channels + c]; 
+    }
     float getPixelFlat(size_t index, int c) const;
     float getAreaMean(int x, int y, int w, int h, int c) const;
 
     struct Metadata {
         double focalLength = 0;
         double pixelSize = 0;
+        double exposure = 0;
         double ra = 0;
         double dec = 0;
         
@@ -226,6 +256,9 @@ public:
         QString filePath;      // Source file path for reference
         QString bitDepth;      // Original bit depth info
         bool isMono = false;   // True if originally mono image
+        int64_t stackCount = 0; // Number of images combined
+        double ccdTemp = 0.0;
+        QString bayerPattern; // e.g. "RGGB", "GBRG" etc. from BAYERPAT header
 
         // Persisted Catalog Stars for PCC
         std::vector<CatalogStar> catalogStars;
@@ -244,6 +277,7 @@ public:
 
     void setMetadata(const Metadata& meta) { m_meta = meta; }
     const Metadata& metadata() const { return m_meta; }
+    Metadata& metadata() { return m_meta; }
     
     // Computes clipping stats (pixels <= 0 and >= 1) - Parallelized
     void computeClippingStats(long& lowClip, long& highClip) const;

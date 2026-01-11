@@ -71,12 +71,12 @@ void Logger::init(const QString& logDirPath, int maxLogFiles)
         dir.mkpath(".");
     }
     
-    // Rotate old log files
-    rotateLogFiles();
-    
     // Create new log file with timestamp
-    QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd_HH-mm-ss");
-    s_currentLogPath = s_logDirPath + "/TStar_" + timestamp + ".log";
+    // FORCE ABSOLUTE PATH FOR DEBUGGING
+    s_currentLogPath = "C:/Users/fabio/Documents/GitHub/TStar/TStar_debug.log";
+    
+    // Rotate old logs disabled for now to avoid deleting our debug log
+    // rotateLogFiles();
     
     s_logFile = new QFile(s_currentLogPath);
     if (!s_logFile->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
@@ -176,16 +176,12 @@ void Logger::log(Level level, const QString& message, const QString& category)
     // Write to file
     if (s_logStream) {
         *s_logStream << formattedMsg << "\n";
-        
-        // Flush immediately for errors and above
-        if (level >= Error) {
-            s_logStream->flush();
-        }
+        s_logStream->flush(); // ALWAYS flush for debugging
     }
     
     // Also output to console in debug builds
 #ifdef QT_DEBUG
-    std::cerr << formattedMsg.toStdString() << std::endl;
+    // std::cerr << formattedMsg.toStdString() << std::endl;
 #endif
 }
 

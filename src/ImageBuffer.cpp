@@ -20,9 +20,21 @@
 #include "io/XISFReader.h" 
 #include "io/XISFWriter.h" 
 #include "algos/StatisticalStretch.h"
+#include "io/FitsLoader.h"
 #include <opencv2/opencv.hpp>
 
+<<<<<<< Updated upstream
 ImageBuffer::ImageBuffer() : m_mutex(std::make_unique<QReadWriteLock>()) {}
+=======
+ImageBuffer::ImageBuffer() {}
+
+ImageBuffer::ImageBuffer(int width, int height, int channels) 
+    : m_width(width), m_height(height), m_channels(channels)
+{
+    m_data.resize(static_cast<size_t>(width) * height * channels, 0.0f);
+}
+
+>>>>>>> Stashed changes
 ImageBuffer::~ImageBuffer() {}
 
 // Custom copy constructor to handle non-copyable mutex
@@ -60,7 +72,6 @@ QString ImageBuffer::getHeaderValue(const QString& key) const {
     return QString();
 }
 
-// ...
 void ImageBuffer::setMask(const MaskLayer& mask) {
     if (mask.isValid() && mask.width == m_width && mask.height == m_height) {
         m_mask = mask;
@@ -129,6 +140,36 @@ void ImageBuffer::applyWhiteBalance(float r, float g, float b) {
     if (hasMask()) {
         blendResult(original);
     }
+}
+
+
+
+bool ImageBuffer::loadRegion(const QString& filePath, int x, int y, int w, int h, QString* errorMsg) {
+    QFileInfo fi(filePath);
+    QString ext = fi.suffix().toLower();
+    
+    if (ext == "fit" || ext == "fits") {
+        return FitsLoader::loadRegion(filePath, *this, x, y, w, h, errorMsg);
+    }
+    
+    bool loaded = false;
+    if (ext == "tif" || ext == "tiff") {
+        loaded = loadTiff32(filePath, errorMsg);
+    } else if (ext == "xisf") {
+        loaded = loadXISF(filePath, errorMsg);
+    } else {
+        loaded = loadStandard(filePath);
+    }
+    
+    if (loaded) {
+        crop(x, y, w, h);
+        return true;
+    }
+    
+    if (errorMsg && errorMsg->isEmpty()) {
+        *errorMsg = "Failed to open file or format not supported";
+    }
+    return false;
 }
 
 bool ImageBuffer::loadStandard(const QString& filePath) {
@@ -241,7 +282,7 @@ bool ImageBuffer::loadXISF(const QString& filePath, QString* errorMsg) {
     return XISFReader::read(filePath, *this, errorMsg);
 }
 
-bool ImageBuffer::saveXISF(const QString& filePath, BitDepth depth, QString* errorMsg) {
+bool ImageBuffer::saveXISF(const QString& filePath, BitDepth depth, QString* errorMsg) const {
     return XISFWriter::write(filePath, *this, static_cast<int>(depth), errorMsg);
 }
 
@@ -1051,7 +1092,7 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
 #include <numeric>
 
 // ------ Saving Logic ------
-bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth depth, QString* errorMsg) {
+bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth depth, QString* errorMsg) const {
     if (m_data.empty()) return false;
 
     // XISF Support
@@ -1206,14 +1247,14 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
             double equinox = 2000.0;
             fits_update_key(fptr, TDOUBLE, "EQUINOX", &equinox, "Equinox of coordinates", &status);
             
-            fits_update_key(fptr, TDOUBLE, "CRVAL1", &m_meta.ra, "RA at reference pixel", &status);
-            fits_update_key(fptr, TDOUBLE, "CRVAL2", &m_meta.dec, "Dec at reference pixel", &status);
-            fits_update_key(fptr, TDOUBLE, "CRPIX1", &m_meta.crpix1, "Reference pixel x", &status);
-            fits_update_key(fptr, TDOUBLE, "CRPIX2", &m_meta.crpix2, "Reference pixel y", &status);
-            fits_update_key(fptr, TDOUBLE, "CD1_1", &m_meta.cd1_1, "", &status);
-            fits_update_key(fptr, TDOUBLE, "CD1_2", &m_meta.cd1_2, "", &status);
-            fits_update_key(fptr, TDOUBLE, "CD2_1", &m_meta.cd2_1, "", &status);
-            fits_update_key(fptr, TDOUBLE, "CD2_2", &m_meta.cd2_2, "", &status);
+            fits_update_key(fptr, TDOUBLE, "CRVAL1", (void*)&m_meta.ra, "RA at reference pixel", &status);
+            fits_update_key(fptr, TDOUBLE, "CRVAL2", (void*)&m_meta.dec, "Dec at reference pixel", &status);
+            fits_update_key(fptr, TDOUBLE, "CRPIX1", (void*)&m_meta.crpix1, "Reference pixel x", &status);
+            fits_update_key(fptr, TDOUBLE, "CRPIX2", (void*)&m_meta.crpix2, "Reference pixel y", &status);
+            fits_update_key(fptr, TDOUBLE, "CD1_1", (void*)&m_meta.cd1_1, "", &status);
+            fits_update_key(fptr, TDOUBLE, "CD1_2", (void*)&m_meta.cd1_2, "", &status);
+            fits_update_key(fptr, TDOUBLE, "CD2_1", (void*)&m_meta.cd2_1, "", &status);
+            fits_update_key(fptr, TDOUBLE, "CD2_2", (void*)&m_meta.cd2_2, "", &status);
             status = 0;
         }
 
@@ -3200,3 +3241,137 @@ void ImageBuffer::applyArcSinh(float stretchFactor, float blackPoint, bool human
         blendResult(original);
     }
 }
+
+void ImageBuffer::performTextureAndClarity(const TextureAndClarityParams& params) {
+    if (m_data.empty()) return;
+
+    // Mask Support: Copy original if mask is present
+    ImageBuffer original;
+    if (hasMask()) original = *this;
+
+    // Create a blurred version for midtone extraction
+    int blurRadius = static_cast<int>(params.radius);
+    if (blurRadius < 1) blurRadius = 1;
+    
+    // Simple box blur for midtone detection
+    std::vector<float> blurred = m_data;
+    
+    #pragma omp parallel for collapse(2)
+    for (int y = blurRadius; y < m_height - blurRadius; ++y) {
+        for (int x = blurRadius; x < m_width - blurRadius; ++x) {
+            for (int c = 0; c < m_channels; ++c) {
+                float sum = 0.0f;
+                int count = 0;
+                
+                for (int dy = -blurRadius; dy <= blurRadius; ++dy) {
+                    for (int dx = -blurRadius; dx <= blurRadius; ++dx) {
+                        int nx = x + dx;
+                        int ny = y + dy;
+                        if (nx >= 0 && nx < m_width && ny >= 0 && ny < m_height) {
+                            sum += m_data[(ny * m_width + nx) * m_channels + c];
+                            count++;
+                        }
+                    }
+                }
+                
+                blurred[(y * m_width + x) * m_channels + c] = sum / count;
+            }
+        }
+    }
+    
+    // Extract midtone details: original - blurred
+    #pragma omp parallel for
+    for (size_t i = 0; i < m_data.size(); ++i) {
+        float detail = m_data[i] - blurred[i];
+        
+        // Apply texture (reduce) or clarity (enhance) to midtone details
+        if (params.texture < 0.0f) {
+            // Texture negative: reduce midtone details (smoothing)
+            detail *= (1.0f + params.texture);  // texture is -1 to 0
+        } else if (params.texture > 0.0f) {
+            // Texture positive: increase midtone details
+            detail *= (1.0f + params.texture);  // texture is 0 to 1
+        }
+        
+        if (params.clarity < 0.0f) {
+            // Clarity negative: reduce midtone microcontrast (softening)
+            detail *= (1.0f + params.clarity);  // clarity is -1 to 0
+        } else if (params.clarity > 0.0f) {
+            // Clarity positive: increase midtone microcontrast
+            detail *= (1.0f + params.clarity * 1.5f);  // clarity boost is slightly stronger
+        }
+        
+        // Reconstruct: blurred + adjusted detail
+        m_data[i] = std::clamp(blurred[i] + detail, 0.0f, 1.0f);
+    }
+
+    if (hasMask()) {
+        blendResult(original);
+    }
+}
+
+std::vector<std::vector<float>> ImageBuffer::computeTextureAndClarityLUT(const TextureAndClarityParams& params, int size) const {
+    if (m_data.empty()) return {};
+
+    // For preview, apply texture/clarity adjustments directly to the LUT
+    std::vector<std::vector<float>> luts(m_channels, std::vector<float>(size));
+    
+    // Create a minimal blurred version using histogram binning (faster for LUT)
+    std::vector<int> histogram(size, 0);
+    int stride = (m_width * m_height) / 10000 + 1;
+    
+    #pragma omp parallel for
+    for (size_t i = 0; i < m_data.size(); i += stride) {
+        for (int c = 0; c < m_channels; ++c) {
+            int bin = static_cast<int>(m_data[i * m_channels + c] * (size - 1));
+            bin = std::clamp(bin, 0, size - 1);
+            #pragma omp atomic
+            histogram[bin]++;
+        }
+    }
+    
+    // Simple blur of histogram for midtone approximation
+    std::vector<int> blurredHist = histogram;
+    int blurRadius = std::max(1, static_cast<int>(params.radius / 2));
+    for (int i = blurRadius; i < size - blurRadius; ++i) {
+        int sum = 0, count = 0;
+        for (int j = i - blurRadius; j <= i + blurRadius; ++j) {
+            sum += histogram[j];
+            count++;
+        }
+        blurredHist[i] = sum / count;
+    }
+    
+    // Build identity LUT with texture/clarity applied
+    #pragma omp parallel for
+    for (int i = 0; i < size; ++i) {
+        float inVal = static_cast<float>(i) / (size - 1);
+        float outVal = inVal;
+        
+        // Extract detail from histogram
+        float detail = (histogram[i] - blurredHist[i]) / static_cast<float>(std::max(1, histogram[i] + blurredHist[i]));
+        
+        // Apply texture and clarity
+        if (params.texture < 0.0f) {
+            detail *= (1.0f + params.texture);
+        } else if (params.texture > 0.0f) {
+            detail *= (1.0f + params.texture);
+        }
+        
+        if (params.clarity < 0.0f) {
+            detail *= (1.0f + params.clarity);
+        } else if (params.clarity > 0.0f) {
+            detail *= (1.0f + params.clarity * 1.5f);
+        }
+        
+        // Reconstruct with adjusted detail
+        outVal = std::clamp(inVal + detail * 0.1f, 0.0f, 1.0f);
+        
+        for (int c = 0; c < m_channels; ++c) {
+            luts[c][i] = outVal;
+        }
+    }
+    
+    return luts;
+}
+

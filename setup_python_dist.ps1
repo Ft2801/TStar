@@ -1,5 +1,3 @@
-# setup_python_dist.ps1
-# Automates downloading Python Embeddable and installing dependencies for TStar
 
 $ErrorActionPreference = "Stop"
 
@@ -51,8 +49,8 @@ $PythonExe = Join-Path $PYTHON_DIR "python.exe"
 & $PythonExe $GetPip --no-warn-script-location
 
 # 6. Install Dependencies
-Write-Host "Installing Libraries: numpy, tifffile, astropy, onnxruntime..."
-& $PythonExe -m pip install numpy tifffile astropy onnxruntime --no-warn-script-location
+Write-Host "Installing Libraries: numpy, tifffile, imagecodecs, astropy, onnxruntime..."
+& $PythonExe -m pip install numpy tifffile imagecodecs astropy onnxruntime --no-warn-script-location
 
 # Cleanup
 Remove-Item $GetPip -Force

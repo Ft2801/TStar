@@ -54,6 +54,10 @@ public:
     void clearAbePolygons();
     std::vector<QPolygonF> getAbePolygons() const;
     
+    // Background Extraction Visualization
+    void setBackgroundSamples(const std::vector<QPointF>& points);
+    void clearBackgroundSamples();
+    
     // Pick Mode
     void setPickMode(bool active);
     void setRectQueryMode(bool active); // For Area Mean
@@ -180,6 +184,9 @@ private:
     class QGraphicsPolygonItem* m_currentLassoItem = nullptr;
     QPolygonF m_currentLassoPoly;
     bool m_lassoDrawing = false;
+    
+    // Background Samples
+    std::vector<class QGraphicsEllipseItem*> m_sampleItems;
     
     float m_aspectRatio = -1.0f; // -1 = Free
     

@@ -1,0 +1,22 @@
+############################################
+# OSC_Preprocessing_WithoutDBF
+# OSC preprocessing without calibration frames
+#
+# Folder structure:
+#   lights/   - Copy your light files here
+############################################
+
+# Convert lights
+cd lights
+convert light -out=../process
+cd ../process
+calibrate light -debayer
+
+# Align lights
+register pp_light
+
+# Stack calibrated lights
+stack r_pp_light rej 3 3 -norm=addscale -output_norm -rgb_equal -32b -out=../result
+
+cd ..
+close

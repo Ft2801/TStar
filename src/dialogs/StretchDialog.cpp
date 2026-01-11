@@ -4,6 +4,7 @@
 #include <QIcon>
 #include <QScrollArea>
 #include <QDebug>
+#include <QCloseEvent>
 
 #include "../ImageViewer.h"
 
@@ -226,14 +227,26 @@ void StretchDialog::showEvent(QShowEvent* event) {
 }
 
 void StretchDialog::reject() {
-    if (!m_applied && m_viewer) {
+    // Always restore when dialog is closed without applying
+    if (m_viewer) {
         m_viewer->clearPreviewLUT();
-        // Also restore original buffer for advanced modes that modify buffer directly
-        if (m_originalBuffer.isValid()) {
+        // Restore original buffer if we have a backup
+        if (m_originalBuffer.isValid() && !m_applied) {
             m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
         }
     }
     QDialog::reject();
+}
+
+void StretchDialog::closeEvent(QCloseEvent* event) {
+    // Ensure reject() is called when the window is closed via the X button
+    if (!m_applied && m_viewer) {
+        m_viewer->clearPreviewLUT();
+        if (m_originalBuffer.isValid()) {
+            m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
+        }
+    }
+    QDialog::closeEvent(event);
 }
 
 void StretchDialog::setViewer(ImageViewer* v) {

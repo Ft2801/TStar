@@ -1,0 +1,21 @@
+############################################
+# Mono_Preprocessing_WithoutDBF
+# Mono camera preprocessing without calibration
+#
+# Folder structure:
+#   lights/   - Copy your light files here
+############################################
+
+# Convert lights
+cd lights
+convert light -out=../process
+cd ../process
+
+# Align lights
+register light
+
+# Stack lights
+stack r_light rej 3 3 -norm=addscale -output_norm -32b -out=../result
+
+cd ..
+close

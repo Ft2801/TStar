@@ -1,0 +1,31 @@
+############################################
+# OSC_Preprocessing_WithoutFlat
+# OSC preprocessing with darks only
+#
+# Folder structure:
+#   darks/    lights/
+############################################
+
+# Convert Dark Frames
+cd darks
+convert dark -out=../process
+cd ../process
+stack dark rej 3 3 -nonorm
+cd ..
+
+# Convert Light Frames
+cd lights
+convert light -out=../process
+cd ../process
+
+# Pre-process Light Frames
+calibrate light -dark=dark_stacked -cfa -equalize_cfa -debayer
+
+# Align lights
+register pp_light
+
+# Stack calibrated lights
+stack r_pp_light rej 3 3 -norm=addscale -output_norm -rgb_equal -32b -out=../result
+
+cd ..
+close

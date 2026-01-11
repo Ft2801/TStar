@@ -97,9 +97,15 @@ fi
 echo ""
 log_step 5 "Copying Homebrew libraries..."
 
+# Detect build architecture from executable
+EXECUTABLE="$DIST_DIR/Contents/MacOS/TStar"
+BUILD_ARCH=$(detect_build_architecture "$EXECUTABLE")
+echo "  - Target architecture: $BUILD_ARCH"
+
 FRAMEWORKS_DIR="$DIST_DIR/Contents/Frameworks"
 ensure_dir "$FRAMEWORKS_DIR"
 
+<<<<<<< Updated upstream
 # Copy required dylibs using shared function
 copy_dylib "libgsl" "gsl" "$FRAMEWORKS_DIR" || true
 copy_dylib "libgslcblas" "gsl" "$FRAMEWORKS_DIR" || true
@@ -109,6 +115,17 @@ copy_dylib "libzstd" "zstd" "$FRAMEWORKS_DIR" || true
 copy_dylib "libomp" "libomp" "$FRAMEWORKS_DIR" || true
 copy_dylib "libbrotlicommon" "brotli" "$FRAMEWORKS_DIR" || true
 copy_dylib "libbrotlidec" "brotli" "$FRAMEWORKS_DIR" || true
+=======
+# Copy required dylibs using shared function (pass architecture)
+copy_dylib "libgsl" "gsl" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libgslcblas" "gsl" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libcfitsio" "cfitsio" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "liblz4" "lz4" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libzstd" "zstd" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libomp" "libomp" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libbrotlicommon" "brotli" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libbrotlidec" "brotli" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+>>>>>>> Stashed changes
 
 # OpenCV (only required modules - dnn and video excluded to avoid external dependencies)
 OPENCV_PREFIX=$(brew --prefix opencv 2>/dev/null || echo "")
@@ -199,6 +216,7 @@ if [ -d "$BUILD_DIR/translations" ]; then
     echo "  - Translations: OK"
 fi
 
+
 # --- Fix library paths (install_name_tool) ---
 echo ""
 log_step 9 "Fixing library paths..."
@@ -211,41 +229,41 @@ verify_file "$EXECUTABLE" "TStar executable" && {
 
 # --- Verify bundled dylibs dependencies ---
 echo ""
-echo "[STEP 9.1] Verifying bundled dylib dependencies..."
+echo "[STEP 9.1] Verifying and resolving bundled dylib dependencies..."
 
 MISSING_DEPS=0
 for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
     if [ -f "$dylib" ]; then
+        # Recursively copy any missing dependencies
+        copy_dylib_with_dependencies "$dylib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+    fi
+done
+
+# Final verification
+echo "  - Checking for remaining missing dependencies..."
+for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
+    if [ -f "$dylib" ]; then
         # Get all dependencies with @rpath reference
-        DEPS=$(otool -L "$dylib" 2>/dev/null | grep "@rpath" || true)
-        if [ -n "$DEPS" ]; then
+        UNRESOLVED=$(otool -L "$dylib" 2>/dev/null | grep "@rpath" | grep -v "^$dylib:" | grep -v "@rpath/Qt" | grep -v "@rpath/lib" || true)
+        if [ -n "$UNRESOLVED" ]; then
             while IFS= read -r dep_line; do
-                # Extract just the library name from @rpath/libXXX.dylib
                 DEP_NAME=$(echo "$dep_line" | awk '{print $1}' | sed 's|@rpath/||')
                 if [ -n "$DEP_NAME" ] && [ "$DEP_NAME" != "@rpath" ]; then
-                    # Check if the dependency is bundled
                     if [ ! -f "$FRAMEWORKS_DIR/$DEP_NAME" ]; then
-                        echo "  [WARNING] $dylib depends on $DEP_NAME (not bundled)"
-                        # Try to find and copy the missing library
-                        for brew_path in /opt/homebrew /usr/local; do
-                            if [ -f "$brew_path/lib/$DEP_NAME" ]; then
-                                echo "    -> Found at $brew_path/lib, copying..."
-                                cp "$brew_path/lib/$DEP_NAME" "$FRAMEWORKS_DIR/" 2>/dev/null && echo "    -> Copied successfully" || true
-                                break
-                            fi
-                        done
+                        echo "  [WARNING] Unresolved: $dylib -> $DEP_NAME"
                         MISSING_DEPS=$((MISSING_DEPS + 1))
                     fi
                 fi
-            done <<< "$DEPS"
+            done <<< "$UNRESOLVED"
         fi
     fi
 done
 
 if [ $MISSING_DEPS -gt 0 ]; then
-    echo "  [WARNING] Found $MISSING_DEPS unresolved dependencies - attempting fixes"
+    echo "  [WARNING] Found $MISSING_DEPS unresolved dependencies"
+    echo "           Some AI features may not work. Check logs above."
 else
-    echo "  - All bundled dylib dependencies verified"
+    echo "  - All bundled dylib dependencies resolved"
 fi
 
 # --- Ad-hoc Code Signing ---

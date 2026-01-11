@@ -1,0 +1,44 @@
+############################################
+# OSC_Preprocessing_Master_Dark_Bias
+# Uses pre-made master dark & bias files
+#
+# Folder structure:
+#   flats/    - Copy flat files here
+#   lights/   - Copy light files here
+#   masters/  - Copy master dark & bias here
+#             (rename to dark_stacked & bias_stacked)
+############################################
+
+# Convert Flat Frames
+cd flats
+convert flat -out=../process
+cd ../process
+
+# Calibrate Flat Frames
+calibrate flat -bias=../masters/bias_stacked
+
+# Stack Flat Frames
+stack pp_flat rej 3 3 -norm=mul -out=../masters/pp_flat_stacked
+cd ..
+
+# Convert Light Frames
+cd lights
+convert light -out=../process
+cd ../process
+
+# Calibrate Light Frames
+calibrate light -dark=../masters/dark_stacked -flat=../masters/pp_flat_stacked -cc=dark -cfa -equalize_cfa -debayer
+
+# Align lights
+register pp_light
+
+# Stack calibrated lights
+stack r_pp_light rej 3 3 -norm=addscale -output_norm -rgb_equal -32b -out=result
+
+# Flip if required
+load result
+mirrorx -bottomup
+save ../result
+
+cd ..
+close
