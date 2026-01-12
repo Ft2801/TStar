@@ -166,34 +166,84 @@ double Statistics::mad(const std::vector<float>& data, float med) {
 //=============================================================================
 
 double Statistics::computeNoise(const float* data, int width, int height) {
-    if (width < 2 || height < 2) return 0.0;
+    if (width < 3 || height < 2) return 0.0;
     
-    // But let's try full sampling first.
-    // Actually, std::vector<float> diffs(numDiffs) might be large.
-    // If we have 50MP image, 50M floats = 200MB.
-    // Let's sample 1% of rows to be fast.
+    // Siril's FnNoise1 implementation:
+    // noise = 1.0 / sqrt(2) * rms of (flux[i] - flux[i-1])
+    // using iterative sigma clipping (3 iters, 5.0 sigma)
     
     int step = 1;
-    if (height > 2000) step = height / 500; // Aim for ~500 rows sampled
+    if (height > 1000) step = height / 500; // Sample ~500 rows for speed
     
-    std::vector<float> diffs;
-    diffs.reserve((height / step) * (width - 1));
-    
+    std::vector<double> rowNoises;
+    rowNoises.reserve(height / step);
+
+    const int NITER = 3;
+    const double SIGMA_CLIP = 5.0;
+
     for (int y = 0; y < height; y += step) {
         const float* row = data + y * width;
+        std::vector<float> diffs;
+        diffs.reserve(width - 1);
+
+        // 1st order differences
         for (int x = 0; x < width - 1; ++x) {
-            float diff = std::abs(row[x] - row[x+1]);
-            // Filter NaNs/Infs?
-            if (std::isfinite(diff)) {
-                diffs.push_back(diff);
+            if (row[x] != 0.0f && row[x+1] != 0.0f) {
+                diffs.push_back(row[x] - row[x+1]);
             }
         }
+
+        if (diffs.size() < 2) continue;
+
+        // Iterative sigma clipping
+        double mean = 0.0;
+        double stdev = 0.0;
+        
+        // Initial pass
+        double sum = 0.0;
+        for(float v : diffs) sum += v;
+        mean = sum / diffs.size();
+        
+        double sumSq = 0.0;
+        for(float v : diffs) sumSq += (v - mean) * (v - mean);
+        stdev = std::sqrt(sumSq / (diffs.size() - 1));
+
+        if (stdev > 0.0) {
+            for (int iter = 0; iter < NITER; iter++) {
+                size_t keptCount = 0;
+                double newSum = 0.0;
+                
+                // Filter outliers
+                for (size_t i = 0; i < diffs.size(); ++i) {
+                    if (std::abs(diffs[i] - mean) < SIGMA_CLIP * stdev) {
+                        if (keptCount < i) diffs[keptCount] = diffs[i];
+                        newSum += diffs[keptCount];
+                        keptCount++;
+                    }
+                }
+
+                if (keptCount == diffs.size()) break;
+                if (keptCount < 2) break;
+
+                diffs.resize(keptCount);
+                mean = newSum / keptCount;
+                
+                double newSumSq = 0.0;
+                for(float v : diffs) newSumSq += (v - mean) * (v - mean);
+                stdev = std::sqrt(newSumSq / (keptCount - 1));
+            }
+        }
+
+        rowNoises.push_back(stdev);
     }
-    
-    if (diffs.empty()) return 0.0;
-    
-    float med = quickMedian(diffs);
-    return 1.048 * static_cast<double>(med);
+
+    if (rowNoises.empty()) return 0.0;
+
+    // Siril takes the median of row standard deviations
+    std::sort(rowNoises.begin(), rowNoises.end());
+    double medianStdev = rowNoises[rowNoises.size() / 2];
+
+    return 0.70710678118 * medianStdev; // 1/sqrt(2)
 }
 
 //=============================================================================

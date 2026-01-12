@@ -11,6 +11,7 @@ namespace Stacking {
 
 bool Weighting::computeWeights(const ImageSequence& sequence,
                                WeightingType type,
+                               const NormCoefficients& coefficients,
                                std::vector<double>& weights) {
     if (!sequence.isValid()) {
         return false;
@@ -29,59 +30,76 @@ bool Weighting::computeWeights(const ImageSequence& sequence,
     
     for (int i = 0; i < nbImages; ++i) {
         const auto& img = sequence.image(i);
-        double weight = 1.0;
         
-        switch (type) {
-            case WeightingType::StarCount:
-                // Weight by star count
-                weight = static_cast<double>(img.quality.starCount);
-                if (weight < 1.0) weight = 1.0;
-                break;
-                
-            case WeightingType::WeightedFWHM:
-                // Weight by inverse FWHM (sharper images = more weight)
-                if (img.quality.fwhm > 0.1) {
-                    weight = 1.0 / img.quality.fwhm;
-                } else {
-                    weight = 1.0;
-                }
-                break;
-                
-            case WeightingType::Noise:
-                // Weight by inverse noise (cleaner images = more weight)
-                if (img.quality.noise > 0.0) {
-                    weight = 1.0 / img.quality.noise;
-                } else {
-                    weight = 1.0;
-                }
-                break;
-                
-            case WeightingType::Roundness:
-                // Weight by roundness (rounder stars = better tracking)
-                weight = img.quality.roundness;
-                if (weight < 0.1) weight = 0.1;
-                break;
-                
-            case WeightingType::Quality:
-                // Use composite quality metric
-                weight = img.quality.quality;
-                if (weight < 0.01) weight = 0.01;
-                break;
-                
-            default:
-                weight = 1.0;
-                break;
-        }
-        
-        // Apply same weight to all channels for this image
         for (int c = 0; c < nbChannels; ++c) {
+            double weight = 1.0;
+            int layer = (nbChannels == 1) ? -1 : c;
+            
+            // Get scale factor from normalization
+            double scale = 1.0;
+            if (layer >= 0 && layer < 3) {
+                scale = coefficients.pscale[layer][i];
+            } else {
+                scale = coefficients.scale[i];
+            }
+            if (scale <= 0.0) scale = 1.0;
+
+            switch (type) {
+                case WeightingType::StarCount:
+                    weight = static_cast<double>(img.quality.starCount);
+                    if (weight < 1.0) weight = 1.0;
+                    break;
+                    
+                case WeightingType::WeightedFWHM:
+                    // Use scale as well for consistency? Siril uses noise mostly.
+                    // But if FWHM is requested, we follow the inverse square power trend.
+                    if (img.quality.fwhm > 0.1) {
+                        weight = 1.0 / (img.quality.fwhm * img.quality.fwhm * scale * scale);
+                    } else {
+                        weight = 1.0;
+                    }
+                    break;
+                    
+                case WeightingType::Noise:
+                    // Siril's weight: 1.0 / (noise * scale)^2
+                    if (img.quality.noise > 0.0) {
+                        double sigma = img.quality.noise;
+                        weight = 1.0 / (sigma * sigma * scale * scale);
+                    } else {
+                        weight = 1.0;
+                    }
+                    break;
+                    
+                case WeightingType::Roundness:
+                    weight = img.quality.roundness;
+                    if (weight < 0.1) weight = 0.1;
+                    break;
+                    
+                case WeightingType::Quality:
+                    weight = img.quality.quality;
+                    if (weight < 0.01) weight = 0.01;
+                    break;
+                    
+                default:
+                    weight = 1.0;
+                    break;
+            }
+            
             weights[c * nbImages + i] = weight;
         }
     }
     
     // Normalize weights per channel
     for (int c = 0; c < nbChannels; ++c) {
-        normalizeWeights(weights, nbImages);
+        double* chanWeights = &weights[c * nbImages];
+        // Compute mean for this channel
+        double sum = 0.0;
+        for (int i = 0; i < nbImages; ++i) sum += chanWeights[i];
+        
+        if (sum > 0.0) {
+            double invMean = static_cast<double>(nbImages) / sum;
+            for (int i = 0; i < nbImages; ++i) chanWeights[i] *= invMean;
+        }
     }
     
     return true;

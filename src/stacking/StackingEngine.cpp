@@ -107,7 +107,7 @@ StackResult StackingEngine::execute(StackingArgs& args) {
     // Compute weights if enabled
     if (args.params.weighting != WeightingType::None) {
         args.progress(tr("Computing image weights..."), -1);
-        if (!Weighting::computeWeights(*args.sequence, args.params.weighting, args.weights)) {
+        if (!Weighting::computeWeights(*args.sequence, args.params.weighting, args.coefficients, args.weights)) {
              args.log(tr("Warning: Weight computation failed, continuing without weighting"), "salmon");
              args.weights.clear();
         }
@@ -436,22 +436,25 @@ float StackingEngine::getInterpolatedPixel(const ImageBuffer& buffer,
     float arr[4];
     
     for (int j = 0; j < 4; ++j) {
-        float r[4];
-        // Clamp Y coordinate
         int py = y0 - 1 + j;
-        if (py < 0) py = 0;
-        else if (py >= height) py = height - 1;
+        if (py < 0 || py >= height) return 0.0f;
+    }
+    for (int i = 0; i < 4; ++i) {
+        int px = x0 - 1 + i;
+        if (px < 0 || px >= width) return 0.0f;
+    }
+    
+    for (int j = 0; j < 4; ++j) {
+        float r[4];
+        int py = y0 - 1 + j;
         
         for(int i=0; i<4; ++i) {
-             // Clamp X coordinate
              int px = x0 - 1 + i;
-             if (px < 0) px = 0;
-             else if (px >= width) px = width - 1;
-             
-             // Directly access buffer value (assumed safe for in-bounds)
+             // No clamping needed, we verified bounds above
              r[i] = buffer.value(px, py, channel);
         }
         
+        // SSE optimization (unchanged)
         __m128 mr = _mm_loadu_ps(r);
         __m128 mprod = _mm_mul_ps(mr, mw);
         
@@ -463,27 +466,9 @@ float StackingEngine::getInterpolatedPixel(const ImageBuffer& buffer,
     }
     
     float res = cubicHermite(arr[0], arr[1], arr[2], arr[3], dy);
-    
-    // Bounds check to avoid ringing artifacts, using Clamped Neighborhood
-    float minVal = std::numeric_limits<float>::max();
-    float maxVal = -std::numeric_limits<float>::max();
-    
-    for(int j=0; j<4; ++j) {
-        int py = y0 - 1 + j;
-        if (py < 0) py = 0; else if (py >= height) py = height - 1;
-        
-        for(int i=0; i<4; ++i) {
-             int px = x0 - 1 + i;
-             if (px < 0) px = 0; else if (px >= width) px = width - 1;
-             
-             float v = buffer.value(px, py, channel);
-             if (v < minVal) minVal = v;
-             if (v > maxVal) maxVal = v;
-        }
-    }
-    
-    if (res < minVal) res = minVal;
-    if (res > maxVal) res = maxVal;
+
+    // Prevent negative ringing (which creates black artifacts in averaging)
+    if (res < 0.0f) res = 0.0f;
     
     return res;
 }
@@ -682,7 +667,7 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
     std::vector<StackDataBlock> dataPool(poolSize);
     for (int i = 0; i < poolSize; ++i) {
         if (!dataPool[i].allocate(nbImages, pixelsPerBlock, channels,
-                                   args.params.rejection, false, false)) {
+                                   args.params.rejection, true, false)) { // Force hasMask=true for feathering
             args.log("Error: Failed to allocate data pool", "red");
             return StackResult::AllocError;
         }
@@ -690,6 +675,12 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
     
     args.log(tr("Allocated %1 data blocks, each ~%2 MB")
              .arg(poolSize).arg((nbImages * pixelsPerBlock * sizeof(float)) / (1024*1024)), "neutral");
+    
+    // Feathering distance (similar to Siril's feather_dist)
+    // Siril defaults to ~40 pixels for typical images, let's use a dynamic or fixed value
+    // For now, hardcode a reasonable feather distance or expose parameter
+    float featherDist = 40.0f; // Could be args.params.featherDist
+    bool useFeathering = true; // Always enable for smooth edges
     
     // ===== PRE-CALCULATE NORMALIZATION COEFFICIENTS =====
     struct NormCoeffs { double offset; double mul; double scale; };
@@ -870,6 +861,36 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
                         size_t destIdx = (static_cast<size_t>(y) * outputWidth + x) * channels + c;
                         data.pix[frame][destIdx] = val;
                     }
+
+                    // Compute Feathering Mask
+                    // Distance from edges in Original Image Coordinates
+                    // Coords: bufX, bufY relative to effective region. 
+                    // Need distance to 0,0 and width,height of SOURCE image.
+                    // srcGlobalX, srcGlobalY are coords in source image.
+                    if (useFeathering && data.maskPix && data.maskPix[frame]) {
+                         float weight = 0.0f;
+                         if (inBounds) {
+                             float dL = static_cast<float>(srcGlobalX);
+                             float dT = static_cast<float>(srcGlobalY);
+                             float dR = static_cast<float>(imgInfo.width - 1.0 - srcGlobalX);
+                             float dB = static_cast<float>(imgInfo.height - 1.0 - srcGlobalY);
+                             
+                             float minDist = std::min({dL, dT, dR, dB});
+                             if (minDist < 0.0f) minDist = 0.0f;
+                             
+                             if (minDist >= featherDist) {
+                                 weight = 1.0f;
+                             } else {
+                                 // Cubic ramp: x * x * (3 - 2 * x)
+                                 float t = minDist / featherDist;
+                                 weight = t * t * (3.0f - 2.0f * t);
+                             }
+                         }
+                         // Store single channel mask (interleaved not needed for 1 channel mask but consistent indexing simplifes)
+                         // Our maskPix is just 1 value per pixel (float array)
+                         size_t maskIdx = (static_cast<size_t>(y) * outputWidth + x);
+                         data.maskPix[frame][maskIdx] = weight;
+                    }
                 }
             }
         }
@@ -894,6 +915,12 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
                         data.stackRGB[2][frame] = data.pix[frame][pixelIdx + 2];
                     } else {
                         data.stack[frame] = data.pix[frame][pixelIdx];
+                    }
+                    
+                    // Fill Mask Stack 
+                    if (useFeathering && data.maskPix && data.maskPix[frame]) {
+                         size_t maskIdx = (lineIdx + x);
+                         if (data.mstack) data.mstack[frame] = data.maskPix[frame][maskIdx];
                     }
                 }
                 
@@ -950,8 +977,9 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
                                     else result = (s[keptPixels / 2 - 1] + s[keptPixels / 2]) * 0.5f;
                                 } else {
                                     // Use weighted mean if enabled
-                                    if (args.params.weighting != WeightingType::None && !args.weights.empty()) {
-                                        result = computeWeightedMean(data, keptPixels, nbImages, args.weights.data(), c);
+                                    if ((args.params.weighting != WeightingType::None && !args.weights.empty()) || useFeathering) {
+                                        float* mstackPtr = useFeathering ? data.mstack : nullptr;
+                                        result = computeWeightedMean(data, keptPixels, nbImages, args.weights.data(), mstackPtr, c);
                                     } else {
                                         // Standard Mean
                                         float sum = 0.0f;
@@ -974,8 +1002,9 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
                              else result = (data.stack[keptPixels / 2 - 1] + data.stack[keptPixels / 2]) * 0.5f;
                          } else {
                              // Use weighted mean if enabled
-                             if (args.params.weighting != WeightingType::None && !args.weights.empty()) {
-                                 result = computeWeightedMean(data, keptPixels, nbImages, args.weights.data(), -1);
+                             if ((args.params.weighting != WeightingType::None && !args.weights.empty()) || useFeathering) {
+                                  float* mstackPtr = useFeathering ? data.mstack : nullptr;
+                                  result = computeWeightedMean(data, keptPixels, nbImages, args.weights.data(), mstackPtr, -1);
                              } else {
                                  // Standard Mean
                                  float sum = 0.0f;
@@ -1005,61 +1034,6 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
         }
     }
     
-    // ===== RGB EQUALIZATION =====
-    // Align channel medians to remove global color cast (Purple tint)
-    if (channels == 3 && args.params.equalizeRGB && !failed && !m_cancelled) {
-         args.log(tr("Equalizing RGB channels..."), "neutral");
-         
-         double medians[3] = {0,0,0};
-         long totalPixels = static_cast<long>(outputWidth) * outputHeight;
-         
-         // 1. Compute Medians (Sampled for speed)
-         // Sample max 1 million pixels per channel
-         long step = 1;
-         if (totalPixels > 1000000) step = totalPixels / 1000000;
-         if (step < 1) step = 1;
-
-         std::vector<float> samples;
-         samples.reserve(totalPixels / step + 100);
-
-         for (int c = 0; c < 3; ++c) {
-             samples.clear();
-             for (long i = 0; i < totalPixels; i += step) {
-                 samples.push_back(outputData[i * channels + c]);
-             }
-             
-             if (!samples.empty()) {
-                 medians[c] = Statistics::quickMedian(samples);
-             }
-         }
-         
-         // 2. Average Target
-         double target = (medians[0] + medians[1] + medians[2]) / 3.0;
-         if (target < 1e-6) target = 1e-6; // Safety
-         
-         double scales[3];
-         for(int c=0; c<3; ++c) {
-             double m = medians[c] > 1e-6 ? medians[c] : 1e-6;
-             scales[c] = target / m;
-         }
-         // Log scaling factors for RGB equalization
-         args.log(tr("Equalization weights: R=%1 G=%2 B=%3")
-                  .arg(scales[0], 0, 'f', 4)
-                  .arg(scales[1], 0, 'f', 4)
-                  .arg(scales[2], 0, 'f', 4), "neutral"); 
-         // 3. Apply Scaling
-         #ifdef _OPENMP
-         #pragma omp parallel for
-         #endif
-         for (long i = 0; i < totalPixels; ++i) {
-             size_t idx = i * 3;
-             outputData[idx + 0] = static_cast<float>(outputData[idx + 0] * scales[0]);
-             outputData[idx + 1] = static_cast<float>(outputData[idx + 1] * scales[1]);
-             outputData[idx + 2] = static_cast<float>(outputData[idx + 2] * scales[2]);
-         }
-    }
-
-    // ===== CLEANUP =====
     for (auto& data : dataPool) {
         data.deallocate();
     }

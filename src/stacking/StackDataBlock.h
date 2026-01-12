@@ -25,10 +25,11 @@ struct StackDataBlock {
     // Pointers to pixel data for each image in the current block
     // pix[frame] points to frame's pixel data for this block
     float** pix;
-    
+    float** maskPix; // Holds mask values (0..1) for feathering
+
     // Current pixel stack (values from all frames for one pixel position)
     float* stack;
-    
+
     // Original unsorted stack (needed for weighted mean after sorting)
     float* o_stack;
     
@@ -71,6 +72,9 @@ struct StackDataBlock {
         // Block data: nbFrames * pixelsPerBlock * numChannels floats
         size_t blockDataSize = nbFrames * pixelsPerBlock * numChannels * elemSize;
         
+        // Mask data (if enabled): nbFrames * pixelsPerBlock floats (single channel mask)
+        size_t maskDataSize = hasMask ? (nbFrames * pixelsPerBlock * elemSize) : 0;
+
         // Stacks (per pixel): nbFrames * numChannels floats
         size_t stackSize = nbFrames * numChannels * elemSize;
         size_t oStackSize = nbFrames * numChannels * elemSize;
@@ -95,18 +99,24 @@ struct StackDataBlock {
         size_t dstackSize = hasDrizzle ? (nbFrames * elemSize) : 0;
         
         // Total size with alignment padding
-        size_t totalSize = blockDataSize + stackSize + oStackSize + rejectedSize + 
+        size_t totalSize = blockDataSize + maskDataSize + stackSize + oStackSize + rejectedSize + 
                           wStackSize + linearFitSize + mstackSize + dstackSize + 1024;
         
         // Allocate pix array
         pix = static_cast<float**>(std::malloc(pixArraySize));
         if (!pix) return false;
         
+        maskPix = nullptr;
+        if (hasMask) {
+            maskPix = static_cast<float**>(std::malloc(pixArraySize));
+            if (!maskPix) { std::free(pix); return false; }
+        }
+        
         // Allocate main memory block
         tmp = std::malloc(totalSize);
         if (!tmp) {
             std::free(pix);
-            pix = nullptr;
+            if(maskPix) std::free(maskPix);
             return false;
         }
         
@@ -118,6 +128,14 @@ struct StackDataBlock {
             pix[f] = reinterpret_cast<float*>(ptr + f * pixelsPerBlock * numChannels * elemSize);
         }
         ptr += blockDataSize;
+        
+        // 1b. Mask Pixels
+        if (hasMask && maskPix) {
+             for (int f = 0; f < nbFrames; ++f) {
+                 maskPix[f] = reinterpret_cast<float*>(ptr + f * pixelsPerBlock * elemSize);
+             }
+             ptr += maskDataSize;
+        }
         
         // 2. Stacks (stackRGB)
         // Divide the big chunk into numChannels small chunks
@@ -215,6 +233,10 @@ struct StackDataBlock {
         if (pix) {
             std::free(pix);
             pix = nullptr;
+        }
+        if (maskPix) {
+             std::free(maskPix);
+             maskPix = nullptr;
         }
         if (tmp) {
             std::free(tmp);

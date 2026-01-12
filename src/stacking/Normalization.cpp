@@ -90,6 +90,8 @@ bool Normalization::computeFullImageNormalization(
     
     int nbLayers = refBuffer.channels();
     
+    // If Equalize RGB is enabled, we normalize all channels against the reference's GREEN channel (index 1)
+    
     #pragma omp parallel for schedule(dynamic)
     for (int i = 0; i < nbImages; ++i) {
         if (i == refImage) {
@@ -104,15 +106,34 @@ bool Normalization::computeFullImageNormalization(
             continue;
         }
         
+        int regLayer = (params.registrationLayer >= 0 && params.registrationLayer < nbLayers) ? params.registrationLayer : 1; 
+
         for (int c = 0; c < nbLayers && c < 3; ++c) {
              size_t total = (size_t)refBuffer.width() * refBuffer.height();
-             std::vector<float> ref_vec(total);
-             const float* rptr = refBuffer.data().data();
-             for(size_t p=0; p<total; p++) ref_vec[p] = rptr[p * nbLayers + c];
+             // std::vector<float> ref_vec(total); // Removed to avoid dup
              
-             std::vector<float> tgt_vec(total);
+             // Determine which reference layer to use
+             int currentRefLayer = c;
+             if (params.equalizeRGB && nbLayers >= 3) {
+                 currentRefLayer = regLayer;
+             }
+
+             // Exclude zeros for robust statistics (matches Siril behavior)
+             std::vector<float> ref_vec;
+             ref_vec.reserve(total);
+             const float* rptr = refBuffer.data().data();
+             for(size_t p=0; p<total; p++) {
+                float v = rptr[p * nbLayers + currentRefLayer];
+                if (v != 0.0f) ref_vec.push_back(v);
+             }
+             
+             std::vector<float> tgt_vec;
+             tgt_vec.reserve(total);
              const float* tptr = tgtBuffer.data().data();
-             for(size_t p=0; p<total; p++) tgt_vec[p] = tptr[p * nbLayers + c];
+             for(size_t p=0; p<total; p++) {
+                float v = tptr[p * nbLayers + c];
+                if (v != 0.0f) tgt_vec.push_back(v);
+             }
 
              // Compute robust statistics (Identity if vectors empty)
              if (total == 0) continue;
@@ -201,15 +222,23 @@ bool Normalization::computeOverlapNormalization(
         if (!sequence.readImage(i, tgtBuffer)) continue;
         
         // Extract ROI
+        int regLayer = (params.registrationLayer >= 0 && params.registrationLayer < nbLayers) ? params.registrationLayer : 1;
         size_t roi_n = (size_t)r_w * r_h;
-        
+
         for (int c = 0; c < nbLayers && c < 3; ++c) {
-             std::vector<float> ref_roi(roi_n);
-             std::vector<float> tgt_roi(roi_n);
+             int currentRefLayer = c;
+             if (params.equalizeRGB && nbLayers >= 3) {
+                 currentRefLayer = regLayer;
+             }
+
+             std::vector<float> ref_roi;
+             std::vector<float> tgt_roi;
+             ref_roi.reserve(roi_n);
+             tgt_roi.reserve(roi_n);
+
              const float* rptr = refBuffer.data().data();
              const float* tptr = tgtBuffer.data().data();
              
-             // Copy ROI loop
              for(int y=0; y<r_h; ++y) {
                  for(int x=0; x<r_w; ++x) {
                      // Ref Coord
@@ -219,15 +248,22 @@ bool Normalization::computeOverlapNormalization(
                      int tx = rx - (int)dx; 
                      int ty = ry - (int)dy;
                      
-                     if (rx>=0 && rx<w && ry>=0 && ry<h)
-                        ref_roi[y*r_w+x] = rptr[(ry*w+rx)*nbLayers + c];
+                     if (rx>=0 && rx<w && ry>=0 && ry<h) {
+                        float v = rptr[(ry*w+rx)*nbLayers + currentRefLayer];
+                        if (v != 0.0f) ref_roi.push_back(v);
+                     }
                         
-                     if (tx>=0 && tx<w && ty>=0 && ty<h)
-                        tgt_roi[y*r_w+x] = tptr[(ty*w+tx)*nbLayers + c];
+                     if (tx>=0 && tx<w && ty>=0 && ty<h) {
+                        float v = tptr[(ty*w+tx)*nbLayers + c];
+                        if (v != 0.0f) tgt_roi.push_back(v);
+                     }
                  }
              }
              
-             if (ref_roi.empty() || tgt_roi.empty()) continue;
+             if (ref_roi.empty() || tgt_roi.empty()) {
+                 coefficients.set(i, c, 1.0, 0.0);
+                 continue;
+             }
 
              float m1 = Statistics::quickMedian(ref_roi);
              float m2 = Statistics::quickMedian(tgt_roi);
@@ -243,7 +279,8 @@ bool Normalization::computeOverlapNormalization(
                  if (std::abs(m2) > 1e-5f) slope = m1 / m2;
                  intercept = 0.0;
              }
-             else {
+             else if (params.normalization == NormalizationMethod::AdditiveScaling || 
+                      params.normalization == NormalizationMethod::MultiplicativeScaling) {
                  // Additive + Scaling
                  float s1 = Statistics::mad(ref_roi, m1);
                  float s2 = Statistics::mad(tgt_roi, m2);

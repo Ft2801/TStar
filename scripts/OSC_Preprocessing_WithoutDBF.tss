@@ -16,7 +16,7 @@ calibrate light -debayer
 register pp_light
 
 # Stack calibrated lights
-stack r_pp_light rej 3 3 -norm=addscale -output_norm -rgb_equal -32b -out=../result
+stack r_pp_light rej 3 3 -norm=addscale -output_norm -out=../result
 
 cd ..
 close

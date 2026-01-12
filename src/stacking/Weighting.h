@@ -13,6 +13,7 @@ public:
 
     static bool computeWeights(const ImageSequence& sequence,
                                WeightingType type,
+                               const NormCoefficients& coefficients,
                                std::vector<double>& weights);
     
     static float applyWeight(float pixel, int imageIndex, int channelIndex,

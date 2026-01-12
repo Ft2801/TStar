@@ -430,14 +430,14 @@ inline float computeWeightedMean(
     int keptPixels,
     int nbFrames,
     const double* weights,
+    const float* maskStack,
     int layer
 ) {
     if (keptPixels <= 0) return 0.0f;
     
     float* stack = (layer >= 0 && layer < 3) ? data.stackRGB[layer] : data.stack;
-    // float* o_stack = (layer >= 0 && layer < 3) ? data.o_stackRGB[layer] : data.o_stack;
     
-    if (!weights) {
+    if (!weights && !maskStack) {
         // Simple mean
         double sum = 0.0;
         for (int k = 0; k < keptPixels; ++k) {
@@ -446,7 +446,7 @@ inline float computeWeightedMean(
         return static_cast<float>(sum / keptPixels);
     }
     
-    // Weighted mean: need to use o_stack to maintain correspondence with weights
+    // Weighted mean: need to use o_stack to maintain correspondence with weights/masks
     float* o_stack_ptr = (layer >= 0 && layer < 3) ? data.o_stackRGB[layer] : data.o_stack;
     
     // Find min/max of kept pixels to identify which original pixels to include
@@ -460,19 +460,25 @@ inline float computeWeightedMean(
     double norm = 0.0;
     
     // Weights are stored as [ch0_img0...ch0_imgN, ch1_img0...ch1_imgN, ...]
-    const double* pweights = weights + (layer >= 0 ? layer : 0) * nbFrames;
+    const double* pweights = weights ? (weights + (layer >= 0 ? layer : 0) * nbFrames) : nullptr;
     
     for (int frame = 0; frame < nbFrames; ++frame) {
         float val = o_stack_ptr[frame];
-        if (val >= pmin && val <= pmax && val != 0.0f) {
-            double w = pweights[frame];
+        // Check if value is within kept range (was not rejected)
+        bool kept = (val >= pmin && val <= pmax && val != 0.0f);
+        
+        if (kept) {
+            double w = 1.0;
+            if (pweights) w *= pweights[frame];
+            if (maskStack) w *= maskStack[frame];
+            
             sum += val * w;
             norm += w;
         }
     }
     
     if (norm == 0.0) {
-        // Fallback to simple mean
+        // Fallback to simple mean of kept pixels if weights collapsed
         sum = 0.0;
         int count = 0;
         for (int frame = 0; frame < nbFrames; ++frame) {

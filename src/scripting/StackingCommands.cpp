@@ -420,9 +420,8 @@ bool StackingCommands::cmdStack(const ScriptCommand& cmd) {
         return false;
     }
     
-    // Save result
-    if (!Stacking::FitsIO::write(params.outputFilename, args.result, 
-                                  params.force32Bit ? 32 : 16)) {
+    // Save result - Force 32-bit float for stacking output to match Siril quality
+    if (!Stacking::FitsIO::write(params.outputFilename, args.result, 32)) {
         return false;
     }
     
@@ -1495,10 +1494,28 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd) {
                                 if (!src) src = lr->rawdata.raw_image;
                                 
                                 if (src) {
+                                    float black = (float)lr->color.black;
+                                    float maximum = (float)lr->color.maximum;
+                                    float range = maximum - black;
+                                    if (range <= 0.0f) range = 65535.0f;
+
+                                    float mul[4];
+                                    for (int i = 0; i < 4; ++i) mul[i] = lr->color.cam_mul[i];
+                                    float g_norm = mul[1]; 
+                                    if (g_norm <= 0.0f && mul[3] > 0.0f) g_norm = mul[3];
+                                    if (g_norm <= 0.0f) g_norm = 1.0f;
+                                    for (int i = 0; i < 4; ++i) mul[i] /= g_norm;
+
+                                    unsigned int f = lr->idata.filters;
+
                                     #pragma omp parallel for
                                     for (int y = 0; y < vh; ++y) {
+                                        int row = y + top;
                                         for (int x = 0; x < vw; ++x) {
-                                            dst[y * vw + x] = src[(y + top) * w + (x + left)] / 65535.0f;
+                                            int col = x + left;
+                                            int c = (f >> ((((row) << 1) & 14) + (col & 1)) * 2) & 3;
+                                            float val = (float)src[row * w + col];
+                                            dst[y * vw + x] = std::max(0.0f, (val - black) * mul[c & 3] / range);
                                         }
                                     }
                                     loaded = true;
@@ -1508,11 +1525,26 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd) {
                                 
                                 // Detect Bayer Pattern from LibRaw
                                 QString bayerPat = "RGGB";
-                                unsigned int f = lr->idata.filters;
                                 if (f == 0x94949494) bayerPat = "RGGB";
                                 else if (f == 0x16161616) bayerPat = "BGGR";
                                 else if (f == 0x61616161) bayerPat = "GRBG";
                                 else if (f == 0x49494949) bayerPat = "GBRG";
+                                
+                                // Adjust for crop/margins (Critical for correct color)
+                                // If left margin is odd, flip horizontal (RGGB -> GRBG)
+                                // If top margin is odd, flip vertical (RGGB -> GBRG)
+                                if (left % 2 != 0) {
+                                    if (bayerPat == "RGGB") bayerPat = "GRBG";
+                                    else if (bayerPat == "BGGR") bayerPat = "GBRG";
+                                    else if (bayerPat == "GRBG") bayerPat = "RGGB";
+                                    else if (bayerPat == "GBRG") bayerPat = "BGGR";
+                                }
+                                if (top % 2 != 0) {
+                                    if (bayerPat == "RGGB") bayerPat = "GBRG";
+                                    else if (bayerPat == "BGGR") bayerPat = "GRBG";
+                                    else if (bayerPat == "GRBG") bayerPat = "BGGR";
+                                    else if (bayerPat == "GBRG") bayerPat = "RGGB";
+                                }
                                 else {
                                     // Fallback using cdesc if non-standard 2x2
                                     // Common sensors are covered above.

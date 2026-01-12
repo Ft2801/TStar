@@ -135,10 +135,28 @@ int RegistrationEngine::registerSequence(ImageSequence& sequence, int referenceI
             cv::Mat src(h, w, CV_32FC(ch), (void*)imgBuffer.data().data());
             cv::Mat dst(h, w, CV_32FC(ch), (void*)warped.data().data());
             
-            // H maps Source -> Dest (Target -> Reference).
-            // warpPerspective takes Source -> Dest matrix by default (and inverts it for backward mapping).
-            // Do NOT use WARP_INVERSE_MAP unless H is already Dest -> Source.
             cv::warpPerspective(src, dst, H, dst.size(), cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar(0));
+            
+            // Masking Pass: Reject interpolation ramp
+            cv::Mat mask(h, w, CV_32FC1, cv::Scalar(1.0f));
+            cv::Mat dstMask(h, w, CV_32FC1);
+            cv::warpPerspective(mask, dstMask, H, dst.size(), cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar(0.0f));
+            
+            // Apply Mask
+            float* dstData = (float*)dst.data;
+            float* mData = (float*)dstMask.data;
+            size_t totalPixels = (size_t)w * h;
+            
+            // Check bounds strictly. If mask < 0.999, it means the pixel was touched by the void.
+            // We set it to 0.0f (STACKING_NO_DATA) so rejection excludes it.
+            #pragma omp parallel for
+            for (int p = 0; p < (int)totalPixels; ++p) {
+                if (mData[p] < 0.999f) {
+                    for (int c = 0; c < ch; ++c) {
+                        dstData[p * ch + c] = 0.0f;
+                    }
+                }
+            }
 
             QString inPath = sequence.image(i).filePath;
             QFileInfo fi(inPath);
@@ -213,9 +231,84 @@ RegistrationResult RegistrationEngine::registerImage(const ImageBuffer& image,
     return result;
 }
 
-//=============================================================================
-// ADAPTIVE STAR DETECTION (Siril-like)
-//=============================================================================
+// Gaussian Blur Helper (Separable, OMP optimized)
+static void applyGaussianBlur(const std::vector<float>& src, std::vector<float>& dst, 
+                            int width, int height, float sigma) {
+    dst.resize(src.size());
+    std::vector<float> temp(src.size());
+    
+    // Kernel generation (approx 4*sigma)
+    int kRadius = std::ceil(2.0f * sigma);
+    if (kRadius < 1) kRadius = 1;
+    int kSize = 2 * kRadius + 1;
+    std::vector<float> kernel(kSize);
+    float sum = 0.0f;
+    float sigma2 = 2.0f * sigma * sigma;
+    for (int i = -kRadius; i <= kRadius; ++i) {
+        float v = std::exp(-(i * i) / sigma2);
+        kernel[i + kRadius] = v;
+        sum += v;
+    }
+    for (float& v : kernel) v /= sum;
+    
+    // Horizontal Pass
+    #pragma omp parallel for
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            float val = 0.0f;
+            for (int k = -kRadius; k <= kRadius; ++k) {
+                int px = std::clamp(x + k, 0, width - 1);
+                val += src[y * width + px] * kernel[k + kRadius];
+            }
+            temp[y * width + x] = val;
+        }
+    }
+    
+    // Vertical Pass
+    #pragma omp parallel for
+    for (int x = 0; x < width; ++x) {
+        for (int y = 0; y < height; ++y) {
+            float val = 0.0f;
+            for (int k = -kRadius; k <= kRadius; ++k) {
+                int py = std::clamp(y + k, 0, height - 1);
+                val += temp[py * width + x] * kernel[k + kRadius];
+            }
+            dst[y * width + x] = val;
+        }
+    }
+}
+
+// Robust Global Statistics (Median + MAD/Sigma)
+static void computeGlobalStats(const std::vector<float>& data, float& median, float& sigma) {
+    if (data.empty()) {
+        median = 0; sigma = 0; return;
+    }
+    
+    std::vector<float> sample;
+    sample.reserve(data.size() / 100 + 1000);
+    int step = 100;
+    for(size_t i=0; i<data.size(); i+=step) {
+        sample.push_back(data[i]);
+    }
+    
+    if (sample.empty()) return;
+    
+    size_t n = sample.size();
+    size_t mid = n / 2;
+    std::nth_element(sample.begin(), sample.begin() + mid, sample.end());
+    median = sample[mid];
+    
+    // Sigma via MAD
+    std::vector<float> diffs;
+    diffs.reserve(n);
+    for(float v : sample) diffs.push_back(std::abs(v - median));
+    
+    std::nth_element(diffs.begin(), diffs.begin() + mid, diffs.end());
+    float mad = diffs[mid];
+    
+    // Normal distribution approximation
+    sigma = mad * 1.4826f;
+}
 
 struct BlockStats {
     float median;
@@ -302,65 +395,58 @@ public:
     }
 };
 
-struct Candidate {
-    int x;
-    int y;
-    float peakVal;
-};
+// Candidate struct removed as we process stars directly
+
 
 std::vector<DetectedStar> RegistrationEngine::detectStars(const ImageBuffer& image) {
     std::vector<DetectedStar> stars;
     
-    // Config: Enforce minimum 2000 stars
-    int maxStars = (m_params.maxStars < 2000) ? 2000 : m_params.maxStars;
-    
-    // Extract luminance
-    emit logMessage(tr("Extracting luminance..."), "");
+    // 1. Extract Luminance
+    // emit logMessage(tr("Extracting luminance..."), "");
     std::vector<float> lum = extractLuminance(image);
     int width = image.width();
     int height = image.height();
     
-    // DEBUG: Check range
-    float minLum = std::numeric_limits<float>::max();
-    float maxLum = std::numeric_limits<float>::lowest();
-    for(float v : lum) {
-        if(v < minLum) minLum = v;
-        if(v > maxLum) maxLum = v;
-    }
-    emit logMessage(tr("Luminance Range: [%1, %2]").arg(minLum).arg(maxLum), "blue");
-    
     if (m_cancelled) return stars;
 
-    // Compute Adaptive Background Mesh
-    emit logMessage(tr("Computing background mesh (%1x%2 blocks)...").arg(width/64).arg(height/64), "");
-    BackgroundMesh mesh;
-    mesh.compute(lum, width, height, 64); // 64x64 blocks
+    // 2. Gaussian Blur
+    std::vector<float> smoothLum;
+    applyGaussianBlur(lum, smoothLum, width, height, 2.0f);
+
+    // 3. Compute Global Threshold
+    float bg, sigma;
+    computeGlobalStats(lum, bg, sigma); // Stats on RAW luminance
     
-    // Threshold Logic
-    // If < 1.0, treat as ABSOLUTE threshold (Legacy/User specific).
-    // If >= 1.0, treat as Sigma multiplier (Adaptive).
-    bool useAdaptive = (m_params.detectionThreshold >= 1.0f);
-    float k = useAdaptive ? m_params.detectionThreshold : 0.0f;
-    float absThresh = useAdaptive ? 0.0f : m_params.detectionThreshold;
-    
-    if (useAdaptive) {
-        emit logMessage(tr("Method: Adaptive (K=%1)").arg(k), "blue");
+    float thresholdVal;
+    if (m_params.detectionThreshold > 100.0f) {
+        // Assume absolute data value
+        thresholdVal = m_params.detectionThreshold;
     } else {
-        emit logMessage(tr("Method: Absolute (Thresh=%1)").arg(absThresh), "blue");
+        // User passed value. default 4.0?
+        float k = m_params.detectionThreshold > 0.1f ? m_params.detectionThreshold : 5.0f;
+        thresholdVal = bg + k * sigma;
     }
     
-    // Identify peaks
-    const int border = 10;
-    std::atomic<int> aboveThresholdCount{0};
+    // emit logMessage(tr("Background: %1, Sigma: %2, Threshold: %3").arg(bg).arg(sigma).arg(thresholdVal), "blue");
     
-    // Thread-local candidates
+    // 4. Find Peaks in Smoothed Image
+    
+    // Helper to store candidates temporarily
+    struct PeakCand {
+        int x, y;
+        float val;
+    };
+    
+    // Thread-local storage
     #ifdef _OPENMP
     int maxThreads = omp_get_max_threads();
     #else
     int maxThreads = 1;
     #endif
     
-    std::vector<std::vector<Candidate>> threadCandidates(maxThreads);
+    std::vector<std::vector<DetectedStar>> threadStars(maxThreads);
+    
+    int r = 2; 
 
     #pragma omp parallel
     {
@@ -370,107 +456,102 @@ std::vector<DetectedStar> RegistrationEngine::detectStars(const ImageBuffer& ima
         int tid = 0;
         #endif
         
-        threadCandidates[tid].reserve(4000);
-
+        threadStars[tid].reserve(2000);
+        
         #pragma omp for
-        for (int y = border; y < height - border; ++y) {
-            const float* row = lum.data() + y * width;
-            const float* row_prev = lum.data() + (y - 1) * width;
-            const float* row_next = lum.data() + (y + 1) * width;
+        for (int y = r; y < height - r; ++y) {
+            const float* row = smoothLum.data() + y * width;
             
-            for (int x = border; x < width - border; ++x) {
+            for (int x = r; x < width - r; ++x) {
                 float val = row[x];
                 
-                // 1. Get local threshold
-                // Manually inline lookup
-                int bx = x / 64; if (bx >= mesh.cols) bx = mesh.cols-1;
-                int by = y / 64; if (by >= mesh.rows) by = mesh.rows-1;
-                const BlockStats& b = mesh.blocks[by * mesh.cols + bx];
+                if (val <= thresholdVal) continue;
                 
-                float bg = b.median;
-                float sigma = b.sigma;
-                
-                float threshVal = useAdaptive ? (bg + k * sigma) : absThresh;
-                
-                if (val < threshVal) continue;
-                
-                aboveThresholdCount++;
-                
-                // 2. Check local maximum (Use >= to allow plateaus/saturated stars)
-                if (val >= row[x-1] && val >= row[x+1] &&
-                    val >= row_prev[x] && val >= row_next[x]) {
-                    
-                    // 3. Check 8-connectivity
-                    if (val >= row_prev[x-1] && val >= row_prev[x+1] &&
-                        val >= row_next[x-1] && val >= row_next[x+1]) {
-                        threadCandidates[tid].push_back({x, y, val});
+                bool isMax = true;
+                for (int dy = -r; dy <= r; ++dy) {
+                    for (int dx = -r; dx <= r; ++dx) {
+                        if (dx == 0 && dy == 0) continue;
+                        if (smoothLum[(y + dy) * width + (x + dx)] > val) {
+                            isMax = false;
+                            break;
+                        }
                     }
+                    if (!isMax) break;
+                }
+                
+                if (isMax) {
+                    
+                    // d1 = first derivatives
+                    float vm10 = smoothLum[y * width + (x - 1)];
+                    float vp10 = smoothLum[y * width + (x + 1)];
+                    float v0m1 = smoothLum[(y - 1) * width + x];
+                    float v0p1 = smoothLum[(y + 1) * width + x];
+                    
+                    float d1x_l = val - vm10;
+                    // float d1x_r = vp10 - val; // Unused
+                    float d1y_u = val - v0m1;
+                    // float d1y_d = v0p1 - val; // Unused
+                    
+                    float denomX = vp10 + vm10 - 2.0f * val;
+                    float denomY = v0p1 + v0m1 - 2.0f * val;
+                    
+                    float dx = 0.0f;
+                    float dy = 0.0f;
+                    
+                    // Only refine if valid peak (curvature is negative)
+                    if (std::abs(denomX) > 1e-5f) {
+                         dx = -0.5f - (d1x_l / denomX); // Matches: -0.5 - (P - L)/(R - P - (P - L)) = -0.5 - (P-L)/(R+L-2P)
+                    }
+                    
+                    if (std::abs(denomY) > 1e-5f) {
+                        dy = -0.5f - (d1y_u / denomY);
+                    }
+                    
+                    // Clamp offsets (should be within [-0.5, 0.5] if true max)
+                    if (std::abs(dx) > 1.0f || std::abs(dy) > 1.0f) continue;
+                    
+                    DetectedStar s;
+                    s.x = x + dx;
+                    s.y = y + dy;
+                    s.peak = val; // Smoothed peak
+                    s.flux = val - bg; // Approximate relative flux
+                    
+                    if (denomX < 0) {
+                        float sx = std::sqrt(val / -denomX);
+                        s.fwhm = 2.355f * sx;
+                    } else s.fwhm = 2.0f;
+                    
+                    s.roundness = 1.0f; // Dummy
+                    
+                    // Quality Check
+                    if (s.fwhm < m_params.minFWHM || s.fwhm > m_params.maxFWHM) continue;
+                    
+                    threadStars[tid].push_back(s);
                 }
             }
         }
     }
     
-    emit logMessage(tr("Pixels above threshold: %1").arg(aboveThresholdCount.load()), "blue");
-    
-    // Merge
-    std::vector<Candidate> candidates;
-    for(const auto& tc : threadCandidates) candidates.insert(candidates.end(), tc.begin(), tc.end());
-    
-    emit logMessage(tr("Found %1 candidates. Filtering...").arg(candidates.size()), "");
-
-    // Optimization: Filter top candidates (maxStars * 5) BEFORE heavy refinement
-    int limit = (maxStars > 0) ? maxStars * 5 : 5000;
-    if (limit < 200) limit = 200; 
-    
-    if (static_cast<int>(candidates.size()) > limit) {
-        std::nth_element(candidates.begin(), candidates.begin() + limit, candidates.end(), 
-            [](const Candidate& a, const Candidate& b){
-                return a.peakVal > b.peakVal; 
-            });
-        candidates.resize(limit); 
-    }
-
-    // Refine in Parallel
-    std::vector<DetectedStar> refinedStars;
-    refinedStars.reserve(candidates.size());
-    
-    std::vector<std::vector<DetectedStar>> threadResults(maxThreads);
-    
-    #pragma omp parallel for
-    for (int i = 0; i < (int)candidates.size(); ++i) {
-        int tid = 0;
-        #ifdef _OPENMP
-        tid = omp_get_thread_num();
-        #endif
-        
-        const auto& cand = candidates[i];
-        DetectedStar star;
-        if (refineStarPosition(lum, width, height, cand.x, cand.y, star)) {
-            // Check params
-            if (star.fwhm >= m_params.minFWHM && star.fwhm <= m_params.maxFWHM &&
-                star.roundness >= m_params.minRoundness) {
-                threadResults[tid].push_back(star);
-            }
-        }
+    // 5. Merge and Sort
+    for(const auto& t : threadStars) {
+        stars.insert(stars.end(), t.begin(), t.end());
     }
     
-    // Merge results
-    for(const auto& tr : threadResults) stars.insert(stars.end(), tr.begin(), tr.end());
-    
-    // Sort by flux
-    std::sort(stars.begin(), stars.end(), [](const DetectedStar& a, const DetectedStar& b) {
-        return a.flux > b.flux;
+    // Sort by Flux (Peak in this case, close enough)
+    std::sort(stars.begin(), stars.end(), [](const DetectedStar& a, const DetectedStar& b){
+        return a.peak > b.peak;
     });
     
-    // Hard Limit Output
-    if (m_params.maxStars > 0 && static_cast<int>(stars.size()) > m_params.maxStars) {
-        stars.resize(m_params.maxStars);
+    // 6. Limit
+    int mMax = (m_params.maxStars > 0) ? m_params.maxStars : 2000;
+    if (stars.size() > (size_t)mMax) {
+        stars.resize(mMax);
     }
     
     if (stars.empty()) {
-        emit logMessage(tr("No stars detected"), "red");
+        // emit logMessage(tr("No stars detected"), "red");
     } else {
-        emit logMessage(tr("Detected %1 stars").arg(stars.size()), "green");
+        // emit logMessage(tr("Detected %1 stars").arg(stars.size()), "green");
     }
     
     return stars;
@@ -501,16 +582,13 @@ std::vector<float> RegistrationEngine::extractLuminance(const ImageBuffer& image
 }
 
 // Replaced by BackgroundMesh logic
+// Replaced by Global Stats logic
 void RegistrationEngine::computeBackground(const std::vector<float>& data,
                                            int width, int height,
                                            float& background, float& rms) {
-   // Legacy compatibility stub
-   BackgroundMesh mesh;
-   mesh.compute(data, width, height, width); // Single block
-   float b, s;
-   mesh.getStats(width/2, height/2, b, s);
-   background = b;
-   rms = s;
+   // Use global statistics
+   Q_UNUSED(width); Q_UNUSED(height);
+   computeGlobalStats(data, background, rms);
 }
 
 // Unused legacy helper
