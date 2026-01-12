@@ -41,19 +41,14 @@ public:
     std::vector<float>& data() { Q_ASSERT(!m_data.empty()); return m_data; }
     
     bool loadStandard(const QString& filePath);
-
-<<<<<<< Updated upstream
+    
     int width() const { Q_ASSERT(m_width > 0); return m_width; }
     int height() const { Q_ASSERT(m_height > 0); return m_height; }
-=======
-    int width() const { return m_width; }
-    int height() const { return m_height; }
-
+    
     /**
      * @brief Load a rectangular region of the image
      */
     bool loadRegion(const QString& filePath, int x, int y, int w, int h, QString* errorMsg = nullptr);
->>>>>>> Stashed changes
     
     // Header Access
     QString getHeaderValue(const QString& key) const;
@@ -61,10 +56,7 @@ public:
     enum BitDepth { Depth_8Int, Depth_16Int, Depth_32Int, Depth_32Float };
     enum DisplayMode { Display_Linear, Display_AutoStretch, Display_ArcSinh, Display_Sqrt, Display_Log, Display_Histogram };
     int channels() const { Q_ASSERT(m_channels > 0); return m_channels; }
-<<<<<<< Updated upstream
-=======
     size_t size() const { return static_cast<size_t>(m_width) * m_height * m_channels; }
->>>>>>> Stashed changes
     bool isValid() const { return !m_data.empty() && m_width > 0 && m_height > 0; }
 
     // Display

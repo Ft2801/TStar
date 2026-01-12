@@ -83,8 +83,6 @@ find_macdeployqt() {
     echo "$macdeployqt"
 }
 
-<<<<<<< Updated upstream
-=======
 # --- Architecture Detection ---
 detect_build_architecture() {
     # First, check if the executable exists and has an architecture
@@ -194,14 +192,11 @@ copy_dylib_with_dependencies() {
     done
 }
 
->>>>>>> Stashed changes
 # --- Dependency Utilities ---
 copy_dylib() {
     local lib_name="$1"
     local brew_pkg="$2"
     local dest_dir="$3"
-<<<<<<< Updated upstream
-=======
     local target_arch="${4:-}"  # Optional: target architecture (x86_64 or arm64)
     
     # If no target arch specified, detect from the executable
@@ -246,16 +241,6 @@ copy_dylib() {
     fi
     
     if [ -n "$prefix" ] && [ -d "$prefix/lib" ]; then
-<<<<<<< Updated upstream
-        local dylib=$(find "$prefix/lib" -name "${lib_name}*.dylib" -type f | head -1)
-        if [ -f "$dylib" ]; then
-            cp "$dylib" "$dest_dir/" 2>/dev/null
-            echo "  - $lib_name: OK"
-            return 0
-        fi
-    fi
-    echo "  - $lib_name: NOT FOUND"
-=======
         # Find all matching dylibs and check architecture
         local dylibs=$(find "$prefix/lib" -name "${lib_name}*.dylib" -type f 2>/dev/null | sort)
         
@@ -278,7 +263,6 @@ copy_dylib() {
     else
         echo "  - $lib_name: NOT FOUND"
     fi
->>>>>>> Stashed changes
     return 1
 }
 

@@ -479,11 +479,7 @@ bool FitsLoader::loadExtension(const QString& filePath, int hduIndex,
     return result;
 }
 
-<<<<<<< Updated upstream
-bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuffer& buffer, QString* errorMsg) {
-=======
 bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuffer& buffer, QString* errorMsg, int rx, int ry, int rw, int rh) {
->>>>>>> Stashed changes
     fitsfile* fptr = static_cast<fitsfile*>(fitsptr);
     int status = 0;
     

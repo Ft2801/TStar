@@ -71,6 +71,9 @@ public:
     void setInteractionMode(InteractionMode mode);
     InteractionMode getInteractionMode() const { return m_interactionMode; }
     
+    // Fast Preview (Downscaled)
+    void setPreviewImage(const QImage& img); // Replaces display but maintains scene rect
+    
     // GHS Preview
     void setPreviewLUT(const std::vector<std::vector<float>>& luts); // 3 channels x 65536
     void clearPreviewLUT();

@@ -23,21 +23,15 @@
 #include "io/FitsLoader.h"
 #include <opencv2/opencv.hpp>
 
-<<<<<<< Updated upstream
 ImageBuffer::ImageBuffer() : m_mutex(std::make_unique<QReadWriteLock>()) {}
-=======
-ImageBuffer::ImageBuffer() {}
 
 ImageBuffer::ImageBuffer(int width, int height, int channels) 
-    : m_width(width), m_height(height), m_channels(channels)
+    : m_width(width), m_height(height), m_channels(channels),
+      m_mutex(std::make_unique<QReadWriteLock>())
 {
     m_data.resize(static_cast<size_t>(width) * height * channels, 0.0f);
 }
 
->>>>>>> Stashed changes
-ImageBuffer::~ImageBuffer() {}
-
-// Custom copy constructor to handle non-copyable mutex
 ImageBuffer::ImageBuffer(const ImageBuffer& other)
     : m_width(other.m_width), m_height(other.m_height), m_channels(other.m_channels),
       m_data(other.m_data), m_meta(other.m_meta), m_name(other.m_name),
@@ -61,6 +55,8 @@ ImageBuffer& ImageBuffer::operator=(const ImageBuffer& other) {
     }
     return *this;
 }
+
+ImageBuffer::~ImageBuffer() {}
 
 QString ImageBuffer::getHeaderValue(const QString& key) const {
     for (const auto& card : m_meta.rawHeaders) {

@@ -1,59 +1,72 @@
 #ifndef TEXTUREANDCLARITYDIALOG_H
 #define TEXTUREANDCLARITYDIALOG_H
 
-#include <QDialog>
+#include "DialogBase.h"
 #include <QSlider>
 #include <QDoubleSpinBox>
 #include <QLabel>
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QGroupBox>
-#include "ImageBuffer.h"
 #include <QPointer>
+#include <QCheckBox>
+#include "../ImageBuffer.h"
 
-class TextureAndClarityDialog : public QDialog {
+// Forward declaration
+class ImageViewer;
+
+class TextureAndClarityDialog : public DialogBase {
     Q_OBJECT
 public:
-    explicit TextureAndClarityDialog(QWidget* parent = nullptr);
+    explicit TextureAndClarityDialog(QWidget* parent, ImageViewer* viewer);
     ~TextureAndClarityDialog();
-    void setViewer(class ImageViewer* v);
-    class ImageViewer* viewer() const { return m_viewer; }
+    
+    void setViewer(ImageViewer* viewer);
+    ImageViewer* viewer() const { return m_viewer; }
     void triggerPreview();
+    
+    // State management
+    struct State {
+        int texture;
+        int clarity;
+        int radius;
+        bool preview;
+    };
+    State getState() const;
+    void setState(const State& s);
+    void resetState();
 
 signals:
     void applied(const QString& msg);
 
 protected:
-    void reject() override;
-    void closeEvent(QCloseEvent* event) override;
     void showEvent(QShowEvent* event) override;
 
 private slots:
-    void onApply();
-    void onPreview();
     void onTextureSliderChanged(int value);
     void onClaritySliderChanged(int value);
-    void onRadiusChanged(double value);
-    
-    ImageBuffer::TextureAndClarityParams getParams() const;
+    void onRadiusSliderChanged(int value);
+    void onApply();
+    void onReset();
+    void onPreview(); // Helper for signal connections
 
 private:
     void setupUI();
-    void setupConnections();
     void updateLabels();
+    ImageBuffer::TextureAndClarityParams getParams() const;
 
-    QPointer<class ImageViewer> m_viewer = nullptr;
-    ImageBuffer m_originalBuffer;
-    bool m_applied = false;
-
-    // Texture Control
-    QSlider* m_textureSlider;
-    QLabel* m_textureValueLabel;
-    QDoubleSpinBox* m_radiusSpin;
+    QPointer<ImageViewer> m_viewer;
+    ImageBuffer* m_buffer = nullptr;         // Pointer to live buffer (in viewer)
+    ImageBuffer m_originalBuffer;  // Backup for preview/undo
     
-    // Clarity Control
-    QSlider* m_claritySlider;
-    QLabel* m_clarityValueLabel;
+    bool m_applied = false;
+    bool m_initializing = true;
+
+    // UI Controls
+    QSlider* m_textureSlider = nullptr;
+    QLabel* m_textureValueLabel = nullptr;
+    QSlider* m_radiusSlider = nullptr;
+    QLabel* m_radiusValueLabel = nullptr;
+    QSlider* m_claritySlider = nullptr;
+    QLabel* m_clarityValueLabel = nullptr;
+    QCheckBox* m_previewCheckbox = nullptr;
 };
 
 #endif // TEXTUREANDCLARITYDIALOG_H

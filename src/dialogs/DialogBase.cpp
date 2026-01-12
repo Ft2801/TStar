@@ -59,8 +59,12 @@ void DialogBase::setWindowProperties(const QString& title, int width, int height
         setWindowTitle(title);
     }
     
-    if (width > 0 && height > 0) {
-        resize(width, height);
+    if (width > 0) setMinimumWidth(width);
+    if (height > 0) setMinimumHeight(height);
+    
+    if (width > 0 || height > 0) {
+        resize(width > 0 ? width : size().width(), 
+               height > 0 ? height : size().height());
     }
 }
 

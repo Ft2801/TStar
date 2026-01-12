@@ -105,17 +105,6 @@ echo "  - Target architecture: $BUILD_ARCH"
 FRAMEWORKS_DIR="$DIST_DIR/Contents/Frameworks"
 ensure_dir "$FRAMEWORKS_DIR"
 
-<<<<<<< Updated upstream
-# Copy required dylibs using shared function
-copy_dylib "libgsl" "gsl" "$FRAMEWORKS_DIR" || true
-copy_dylib "libgslcblas" "gsl" "$FRAMEWORKS_DIR" || true
-copy_dylib "libcfitsio" "cfitsio" "$FRAMEWORKS_DIR" || true
-copy_dylib "liblz4" "lz4" "$FRAMEWORKS_DIR" || true
-copy_dylib "libzstd" "zstd" "$FRAMEWORKS_DIR" || true
-copy_dylib "libomp" "libomp" "$FRAMEWORKS_DIR" || true
-copy_dylib "libbrotlicommon" "brotli" "$FRAMEWORKS_DIR" || true
-copy_dylib "libbrotlidec" "brotli" "$FRAMEWORKS_DIR" || true
-=======
 # Copy required dylibs using shared function (pass architecture)
 copy_dylib "libgsl" "gsl" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libgslcblas" "gsl" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
@@ -125,7 +114,7 @@ copy_dylib "libzstd" "zstd" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libomp" "libomp" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libbrotlicommon" "brotli" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libbrotlidec" "brotli" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
->>>>>>> Stashed changes
+copy_dylib "libraw" "libraw" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 
 # OpenCV (only required modules - dnn and video excluded to avoid external dependencies)
 OPENCV_PREFIX=$(brew --prefix opencv 2>/dev/null || echo "")

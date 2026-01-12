@@ -80,6 +80,23 @@ void ImageViewer::setPreviewLUT(const std::vector<std::vector<float>>& luts) {
     setImage(img, true); // PRESERVE VIEW
 }
 
+void ImageViewer::setPreviewImage(const QImage& img) {
+    if (img.isNull()) return;
+    
+    // Update pixmap
+    m_imageItem->setPixmap(QPixmap::fromImage(img));
+    
+    // Scale to fit the original scene rect (assuming scene rect matches full image)
+    QRectF sceneR = m_scene->sceneRect();
+    if (sceneR.width() > 0 && sceneR.height() > 0) {
+        qreal sx = sceneR.width() / img.width();
+        qreal sy = sceneR.height() / img.height();
+        
+        // Reset transform and apply scale
+        m_imageItem->setTransform(QTransform::fromScale(sx, sy));
+    }
+}
+
 void ImageViewer::clearPreviewLUT() {
     m_previewLUT.clear();
     // Refresh with current state
@@ -615,16 +632,14 @@ void ImageViewer::undo() {
             m_redoStack.push_back(m_buffer);
             m_buffer = m_undoStack.back();
             m_undoStack.pop_back();
-            setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), false);
-            fitToWindow();
+            setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), true);
         }
     } else if (!m_undoStack.empty()) {
         // Legacy fallback
         m_redoStack.push_back(m_buffer);
         m_buffer = m_undoStack.back();
         m_undoStack.pop_back();
-        setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), false);
-        fitToWindow();
+        setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), true);
     }
     
     setModified(true);
@@ -653,6 +668,7 @@ void ImageViewer::redo() {
     emit bufferChanged();
     emit historyChanged();
 }
+
 
 bool ImageViewer::canUndo() const {
     return !m_undoStack.empty();

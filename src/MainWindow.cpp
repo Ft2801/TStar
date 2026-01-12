@@ -1665,8 +1665,7 @@ void MainWindow::openTextureAndClarityDialog() {
     
     // Create new
     try {
-        m_textureClarityDlg = new TextureAndClarityDialog(nullptr);
-        m_textureClarityDlg->setViewer(viewer);
+        m_textureClarityDlg = new TextureAndClarityDialog(this, viewer);
         m_textureClarityDlg->setAttribute(Qt::WA_DeleteOnClose, false);
         
         connect(m_textureClarityDlg, &TextureAndClarityDialog::applied, this, [this](const QString& msg){
@@ -1676,7 +1675,7 @@ void MainWindow::openTextureAndClarityDialog() {
         log(tr("Opening Texture and Clarity..."), Log_Info, true);
         CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
         setupToolSubwindow(sub, m_textureClarityDlg, tr("Texture and Clarity"));
-        sub->resize(500, 300);
+        sub->adjustSize();
         centerToolWindow(sub);
         
         connect(m_textureClarityDlg, &QDialog::accepted, this, [this](){
@@ -2809,6 +2808,13 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 
     // Attempt to close all MDI windows first
     if (m_mdiArea) {
+        // Disable animations to ensure closeAllSubWindows doesn't stop
+        for (auto* sub : m_mdiArea->subWindowList()) {
+            if (auto* csw = qobject_cast<CustomMdiSubWindow*>(sub)) {
+                csw->setSkipCloseAnimation(true);
+            }
+        }
+
         m_mdiArea->closeAllSubWindows();
         
         // Wait for animations to finish (Async close)
@@ -3560,7 +3566,6 @@ void MainWindow::openSelectiveColorDialog() {
     });
 }
 
-<<<<<<< Updated upstream
 // ========== MainWindowCallbacks Pure Virtual Implementations ==========
 
 ImageBuffer* MainWindow::getCurrentImageBuffer() {
@@ -3587,7 +3592,8 @@ void MainWindow::logMessage(const QString& message, int severity, bool showPopup
         default: type = Log_Info; break;
     }
     log(message, type, showPopup);
-=======
+}
+
 // ========== Stacking Suite ==========
 
 void MainWindow::openStackingDialog() {
@@ -3667,5 +3673,4 @@ void MainWindow::openScriptDialog() {
         // Log result after dialog closes
         log(tr("Script dialog closed."), Log_Info);
     }
->>>>>>> Stashed changes
 }
