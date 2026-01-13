@@ -36,6 +36,7 @@ private slots:
     void onHdrToggled(bool enabled);
     void onHighRangeToggled(bool enabled);
     void onLumaOnlyToggled(bool enabled);
+    void updatePreview();
     
     ImageBuffer::StretchParams getParams() const;
 

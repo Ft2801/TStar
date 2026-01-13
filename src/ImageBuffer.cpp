@@ -1608,6 +1608,7 @@ std::vector<std::vector<float>> ImageBuffer::computeTrueStretchLUT(const Stretch
              float den = stats[sIdx].denominator;
              float mr = medRescaled[sIdx];
              float rescaled = (1.0f - bp) / den;
+             if (rescaled < 0.0f) rescaled = 0.0f;
              float out = StatisticalStretch::stretchFormula(rescaled, mr, params.targetMedian);
              if (useCurves) out = apply_curve(out, cx, cy);
              if (out > globalMax) globalMax = out; 
@@ -1637,11 +1638,14 @@ std::vector<std::vector<float>> ImageBuffer::computeTrueStretchLUT(const Stretch
             if (out < 0.0f) out = 0.0f;
             
             if (params.normalize) {
-                out /= maxVals[c];
+                // Prevent division by near-zero to avoid NaN
+                if (maxVals[c] > 1e-9f) {
+                    out /= maxVals[c];
+                }
             }
             
-            // Final clip
-            if (out > 1.0f) out = 1.0f;
+            // Final clip to [0, 1]
+            out = std::clamp(out, 0.0f, 1.0f);
             
             luts[c][i] = out;
         }
@@ -2295,15 +2299,15 @@ void ImageBuffer::cropRotated(float cx, float cy, float w, float h, float angleD
     m_width = outW;
     m_height = outH;
     m_data = newData;
-
-    m_width = outW;
-    m_height = outH;
-    m_data = newData;
     
+    // WCS Transform: maps from new image coordinates to source image coordinates
+    // Sequence: translate to center of source, rotate, translate to center of destination
+    // This is the FORWARD mapping: dest_pixel -> source_pixel
+    // reframeWCS will invert it for the CD matrix, which is what we want
     QTransform wcsTrans;
-    wcsTrans.translate(halfW, halfH);
-    wcsTrans.rotate(angleDegrees);
-    wcsTrans.translate(-cx, -cy);
+    wcsTrans.translate(cx, cy);          // Center at source center
+    wcsTrans.rotate(-angleDegrees);      // Rotate by negative angle (inverse rotation)
+    wcsTrans.translate(-halfW, -halfH);  // Translate from destination center
     
     reframeWCS(wcsTrans, oldW, oldH);
     
