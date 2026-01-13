@@ -6,6 +6,10 @@
 #include <QCoreApplication>
 #include <QRegularExpression>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* errorMsg) {
     fitsfile* fptr;
     int status = 0;
@@ -46,7 +50,6 @@ bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* err
     // Check if 3D (e.g. RGB)
     int nChannels = 1;
     if (naxis == 3) {
-        // usually NAXIS3 = 3 for RGB
         if (naxes[2] == 3) nChannels = 3;
     }
     
@@ -54,15 +57,19 @@ bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* err
     int height = naxes[1];
     long npixelsPerPlane = width * height;
     
-    // Resize buffer (interleaved)
-    std::vector<float> allPixels(npixelsPerPlane * nChannels);
+    // Resize buffer (Reuse existing memory if possible)
+    buffer.resize(width, height, nChannels);
+    std::vector<float>& allPixels = buffer.data();
     
     float nulval = 0.0;
     int anynul = 0;
     
+    // Helper buffer for reading a single plane
+    // We can't read directly into interleaved buffer since FITS is planar
+    std::vector<float> planePixels(npixelsPerPlane);
+    
     for (int c = 0; c < nChannels; ++c) {
         long firstpix[3] = {1, 1, c + 1}; // FITS is 1-based. Plane starts at c+1
-        std::vector<float> planePixels(npixelsPerPlane);
         
         if (fits_read_pix(fptr, TFLOAT, firstpix, npixelsPerPlane, &nulval, planePixels.data(), &anynul, &status)) {
              if (errorMsg) {
@@ -74,184 +81,70 @@ bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* err
              return false;
         }
         
-        // Normalize plane immediately
-        // Read plane and copy to interleaved buffer
-        for (int i = 0; i < npixelsPerPlane; ++i) {
+        // Copy to interleaved buffer
+        // Parallelizing this copy can help slightly
+        #ifdef _OPENMP
+        #pragma omp parallel for
+        #endif
+        for (long i = 0; i < npixelsPerPlane; ++i) {
             allPixels[i * nChannels + c] = planePixels[i];
         }
     }
     
-    // Normalize Data (Global Max across all channels to preserve color balance)
+    // Normalize Data (Global Max across all channels)
+    // Use parallel reduction for min/max finding
     float globalMax = -1e30f;
     float globalMin = 1e30f;
     
-    for (float v : allPixels) {
+    // OpenMP reduction for min/max
+    #ifdef _OPENMP
+    #pragma omp parallel for reduction(max:globalMax) reduction(min:globalMin)
+    #endif
+    for (size_t i = 0; i < allPixels.size(); ++i) {
+        float v = allPixels[i];
         if (v > globalMax) globalMax = v;
         if (v < globalMin) globalMin = v;
     }
     
-    // Heuristic: if values are ints > 1.0, normalize.
     bool needsNorm = (globalMax > 1.0f);
     
     if (needsNorm) {
         float range = globalMax - globalMin;
         if (range < 1e-9) range = 1.0f;
         
-        // Normalize integer data by bit depth divisor to maintain absolute black at 0.
-        
         float divisor = 1.0f;
         if (bitpix == 8) divisor = 255.0f;
         else if (bitpix == 16) divisor = 65535.0f;
         else if (bitpix == 32) divisor = 4294967295.0f;
         
-        // If max value is roughly within range of divisor, use it.
-        // Otherwise use min/max scaling.
-        if (bitpix > 0 && globalMax <= divisor * 1.01f) {
-             for (auto& p : allPixels) p /= divisor;
-        } else {
-             // Arbitrary float range
-             for (auto& p : allPixels) p = (p - globalMin) / range;
+        bool useDivisor = (bitpix > 0 && globalMax <= divisor * 1.01f);
+        
+        #ifdef _OPENMP
+        #pragma omp parallel for
+        #endif
+        for (size_t i = 0; i < allPixels.size(); ++i) {
+            if (useDivisor) {
+                allPixels[i] /= divisor;
+            } else {
+                allPixels[i] = (allPixels[i] - globalMin) / range;
+            }
         }
     }
     
     // Extract Metadata
     ImageBuffer::Metadata meta;
-    char comment[FLEN_COMMENT];
-    double dv;
-    int status_meta = 0;
-    
-    // Focal Length (mm)
-    if (!fits_read_key(fptr, TDOUBLE, "FOCALLEN", &dv, comment, &status_meta)) meta.focalLength = dv;
-    else { status_meta = 0; if (!fits_read_key(fptr, TDOUBLE, "FOCAL", &dv, comment, &status_meta)) meta.focalLength = dv; }
-    status_meta = 0;
-    
-    // Pixel Size (microns)
-    if (!fits_read_key(fptr, TDOUBLE, "PIXSIZE", &dv, comment, &status_meta)) meta.pixelSize = dv;
-    else { status_meta = 0; if (!fits_read_key(fptr, TDOUBLE, "XPIXSZ", &dv, comment, &status_meta)) meta.pixelSize = dv; }
-    status_meta = 0;
-
-    // RA / Dec (degrees)
-    if (!fits_read_key(fptr, TDOUBLE, "RA", &dv, comment, &status_meta)) meta.ra = dv;
-    else { 
-        status_meta = 0; 
-        char raStr[FLEN_VALUE];
-        if (!fits_read_key(fptr, TSTRING, "OBJCTRA", raStr, comment, &status_meta)) {
-            // Attempt decimal string parse; HH:MM:SS conversion not yet implemented
-            meta.ra = QString(raStr).toDouble(); 
-        }
-    }
-    status_meta = 0;
-    
-    if (!fits_read_key(fptr, TDOUBLE, "DEC", &dv, comment, &status_meta)) meta.dec = dv;
-    else { 
-        status_meta = 0; 
-        char decStr[FLEN_VALUE];
-        if (!fits_read_key(fptr, TSTRING, "OBJCTDEC", decStr, comment, &status_meta)) {
-            meta.dec = QString(decStr).toDouble();
-        }
-    }
-    status_meta = 0;
-    
-    // WCS Keywords (Critical for PCC and Image Annotator)
-    if (!fits_read_key(fptr, TDOUBLE, "CRVAL1", &dv, comment, &status_meta)) { meta.ra = dv; }
-    status_meta = 0;
-    if (!fits_read_key(fptr, TDOUBLE, "CRVAL2", &dv, comment, &status_meta)) { meta.dec = dv; }
-    status_meta = 0;
-    if (!fits_read_key(fptr, TDOUBLE, "CRPIX1", &dv, comment, &status_meta)) { meta.crpix1 = dv; }
-    status_meta = 0;
-    if (!fits_read_key(fptr, TDOUBLE, "CRPIX2", &dv, comment, &status_meta)) { meta.crpix2 = dv; }
-    status_meta = 0;
-    
-    // Read CD Matrix or CDELT/PC
-    double cd11=0, cd12=0, cd21=0, cd22=0;
-    bool hasCD = false;
-    if (!fits_read_key(fptr, TDOUBLE, "CD1_1", &dv, comment, &status_meta)) { cd11 = dv; hasCD = true; }
-    status_meta = 0;
-    if (!fits_read_key(fptr, TDOUBLE, "CD1_2", &dv, comment, &status_meta)) { cd12 = dv; hasCD = true; }
-    status_meta = 0;
-    if (!fits_read_key(fptr, TDOUBLE, "CD2_1", &dv, comment, &status_meta)) { cd21 = dv; hasCD = true; }
-    status_meta = 0;
-    if (!fits_read_key(fptr, TDOUBLE, "CD2_2", &dv, comment, &status_meta)) { cd22 = dv; hasCD = true; }
-    status_meta = 0;
-
-    if (!hasCD) {
-        // Try CDELT + PC or CDELT + CROTA
-        double cdelt1=1, cdelt2=1;
-        if (!fits_read_key(fptr, TDOUBLE, "CDELT1", &dv, comment, &status_meta)) cdelt1 = dv;
-        status_meta = 0;
-        if (!fits_read_key(fptr, TDOUBLE, "CDELT2", &dv, comment, &status_meta)) cdelt2 = dv;
-        status_meta = 0;
-        
-        double pc11=1, pc12=0, pc21=0, pc22=1;
-        bool hasPC = false;
-        if (!fits_read_key(fptr, TDOUBLE, "PC1_1", &dv, comment, &status_meta)) { pc11 = dv; hasPC = true; }
-        status_meta = 0;
-        if (!fits_read_key(fptr, TDOUBLE, "PC1_2", &dv, comment, &status_meta)) { pc12 = dv; hasPC = true; }
-        status_meta = 0;
-        if (!fits_read_key(fptr, TDOUBLE, "PC2_1", &dv, comment, &status_meta)) { pc21 = dv; hasPC = true; }
-        status_meta = 0;
-        if (!fits_read_key(fptr, TDOUBLE, "PC2_2", &dv, comment, &status_meta)) { pc22 = dv; hasPC = true; }
-        status_meta = 0;
-
-        if (hasPC) {
-            cd11 = pc11 * cdelt1;
-            cd12 = pc12 * cdelt1;
-            cd21 = pc21 * cdelt2;
-            cd22 = pc22 * cdelt2;
-        } else {
-            // Check for CROTA2
-            double crota2 = 0;
-            if (!fits_read_key(fptr, TDOUBLE, "CROTA2", &dv, comment, &status_meta)) {
-                crota2 = dv * M_PI / 180.0;
-                cd11 = cdelt1 * cos(crota2);
-                cd12 = -cdelt2 * sin(crota2);
-                cd21 = cdelt1 * sin(crota2);
-                cd22 = cdelt2 * cos(crota2);
-            } else {
-                // Just Scale
-                cd11 = cdelt1;
-                cd22 = cdelt2;
-            }
-            status_meta = 0;
-        }
-    }
-    
-    meta.cd1_1 = cd11; meta.cd1_2 = cd12;
-    meta.cd2_1 = cd21; meta.cd2_2 = cd22;
-
-    // Read CTYPE for WCS
-    char strVal[FLEN_VALUE];
-    if (!fits_read_key(fptr, TSTRING, "CTYPE1", strVal, comment, &status_meta)) {
-        meta.ctype1 = QString::fromUtf8(strVal).trimmed().remove('\'');
-    }
-    status_meta = 0;
-    if (!fits_read_key(fptr, TSTRING, "CTYPE2", strVal, comment, &status_meta)) {
-        meta.ctype2 = QString::fromUtf8(strVal).trimmed().remove('\'');
-    }
-    status_meta = 0;
-    
-    // Equinox
-    if (!fits_read_key(fptr, TDOUBLE, "EQUINOX", &dv, comment, &status_meta)) {
-        meta.equinox = dv;
-    }
-    status_meta = 0;
-    
-    // Read SIP coefficients if present
-    readSIPCoefficients(fptr, meta);
-
-    if (!fits_read_key(fptr, TSTRING, "OBJECT", strVal, comment, &status_meta)) meta.objectName = QString::fromUtf8(strVal);
-    status_meta = 0;
-    if (!fits_read_key(fptr, TSTRING, "DATE-OBS", strVal, comment, &status_meta)) meta.dateObs = QString::fromUtf8(strVal);
-    
-    // Store file path for reference
+    readCommonMetadata(fptr, meta);
     meta.filePath = filePath;
     
-    // Read ALL Header Keys for Viewer
+    // ... (Metadata reading logic preserved below) ...
+    // Note: We need to reimplement metadata reading part here since we replaced the whole block
+    
+    // Read ALL Header Keys
     int nkeys = 0;
     int morekeys = 0;
-    status_meta = 0;
+    int status_meta = 0;
     if (fits_get_hdrspace(fptr, &nkeys, &morekeys, &status_meta) == 0) {
-        for (int i = 1; i <= nkeys; ++i) { // 1-indexed
+        for (int i = 1; i <= nkeys; ++i) { 
             char card[FLEN_CARD];
             if (fits_read_record(fptr, i, card, &status_meta) == 0) {
                  // Parse key, value, and comment using fits_read_keyn
@@ -266,17 +159,18 @@ bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* err
                      meta.rawHeaders.push_back({QString("RAW"), QString::fromUtf8(card, 80).trimmed(), ""});
                  }
             } else {
-                status_meta = 0; // reset
+                status_meta = 0; 
             }
         }
     }
     
-    // Final Close
+    buffer.setMetadata(meta);
+    // Don't call setData again, we already filled m_data via reference
+    // BUT we need to ensure m_width, m_height are set.
+    // buffer.resize() sets them, so we are good.
+    
     status = 0;
     fits_close_file(fptr, &status);
-
-    buffer.setMetadata(meta);
-    buffer.setData(width, height, nChannels, allPixels);   
     return true;
 }
 
@@ -522,6 +416,28 @@ bool FitsLoader::loadExtension(const QString& filePath, const QString& extension
     return false;
 }
 
+bool FitsLoader::loadRegion(const QString& filePath, ImageBuffer& buffer, int x, int y, int w, int h, QString* errorMsg) {
+    fitsfile* fptr;
+    int status = 0;
+    
+    // Open file
+    if (fits_open_file(&fptr, filePath.toUtf8().constData(), READONLY, &status)) {
+        if (errorMsg) {
+            char statusStr[FLEN_STATUS];
+            fits_get_errstatus(status, statusStr);
+            *errorMsg = QCoreApplication::translate("FitsLoader", "CFITSIO Open Error %1: %2\nPath: %3").arg(status).arg(statusStr).arg(filePath);
+        }
+        return false;
+    }
+
+    // Call loadHDU with region
+    bool res = loadHDU(fptr, 0, buffer, errorMsg, x, y, w, h);
+
+    status = 0;
+    fits_close_file(fptr, &status);
+    return res;
+}
+
 bool FitsLoader::loadExtension(const QString& filePath, int hduIndex, 
                                ImageBuffer& buffer, QString* errorMsg) {
     fitsfile* fptr;
@@ -563,7 +479,7 @@ bool FitsLoader::loadExtension(const QString& filePath, int hduIndex,
     return result;
 }
 
-bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuffer& buffer, QString* errorMsg) {
+bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuffer& buffer, QString* errorMsg, int rx, int ry, int rw, int rh) {
     fitsfile* fptr = static_cast<fitsfile*>(fitsptr);
     int status = 0;
     
@@ -586,19 +502,41 @@ bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuff
     }
     
     int nChannels = (naxis == 3 && naxes[2] == 3) ? 3 : 1;
-    int width = naxes[0];
-    int height = naxes[1];
-    long npixelsPerPlane = width * height;
+    int imgWidth = naxes[0];
+    int imgHeight = naxes[1];
+    
+    // Determine read region
+    int x1 = rx;
+    int y1 = ry;
+    int width = (rw > 0) ? rw : imgWidth;
+    int height = (rh > 0) ? rh : imgHeight;
+    
+    // Clamp to image bounds
+    if (x1 < 0) x1 = 0;
+    if (y1 < 0) y1 = 0;
+    if (x1 + width > imgWidth) width = imgWidth - x1;
+    if (y1 + height > imgHeight) height = imgHeight - y1;
+    
+    if (width <= 0 || height <= 0) {
+        if (errorMsg) *errorMsg = QCoreApplication::translate("FitsLoader", "Invalid read region");
+        return false;
+    }
+    
+    long npixelsPerPlane = (long)width * height;
     
     std::vector<float> allPixels(npixelsPerPlane * nChannels);
     float nulval = 0.0;
     int anynul = 0;
     
     for (int c = 0; c < nChannels; ++c) {
-        long firstpix[3] = {1, 1, c + 1};
+        // fits_read_subset params are 1-based
+        long fpixel[3] = { (long)x1 + 1, (long)y1 + 1, (long)c + 1 };
+        long lpixel[3] = { (long)x1 + width, (long)y1 + height, (long)c + 1 };
+        long inc[3] = { 1, 1, 1 };
+        
         std::vector<float> planePixels(npixelsPerPlane);
         
-        if (fits_read_pix(fptr, TFLOAT, firstpix, npixelsPerPlane, &nulval, planePixels.data(), &anynul, &status)) {
+        if (fits_read_subset(fptr, TFLOAT, fpixel, lpixel, inc, &nulval, planePixels.data(), &anynul, &status)) {
             if (errorMsg) {
                 char statusStr[FLEN_STATUS];
                 fits_get_errstatus(status, statusStr);
@@ -607,16 +545,26 @@ bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuff
             return false;
         }
         
-        for (int i = 0; i < npixelsPerPlane; ++i) {
+        // Parallel interleaving for multi-channel images
+        #ifdef _OPENMP
+        #pragma omp parallel for
+        #endif
+        for (long i = 0; i < npixelsPerPlane; ++i) {
             allPixels[i * nChannels + c] = planePixels[i];
         }
     }
     
-    // Normalize Data
+    // Normalize Data - parallel min/max finding
     float globalMax = -1e30f;
     float globalMin = 1e30f;
     
-    for (float v : allPixels) {
+    const size_t pixelCount = allPixels.size();
+    
+    #ifdef _OPENMP
+    #pragma omp parallel for reduction(max:globalMax) reduction(min:globalMin)
+    #endif
+    for (size_t i = 0; i < pixelCount; ++i) {
+        float v = allPixels[i];
         if (v > globalMax) globalMax = v;
         if (v < globalMin) globalMin = v;
     }
@@ -633,14 +581,76 @@ bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuff
         else if (bitpix == 32) divisor = 4294967295.0f;
         
         if (bitpix > 0 && globalMax <= divisor * 1.01f) {
-            for (auto& p : allPixels) p /= divisor;
+            const float invDiv = 1.0f / divisor;
+            #ifdef _OPENMP
+            #pragma omp parallel for
+            #endif
+            for (size_t i = 0; i < pixelCount; ++i) {
+                allPixels[i] *= invDiv;
+            }
         } else {
-            for (auto& p : allPixels) p = (p - globalMin) / range;
+            const float invRange = 1.0f / range;
+            #ifdef _OPENMP
+            #pragma omp parallel for
+            #endif
+            for (size_t i = 0; i < pixelCount; ++i) {
+                allPixels[i] = (allPixels[i] - globalMin) * invRange;
+            }
         }
     }
     
-    // Extract Metadata (same as load())
+    // Extract Metadata
     ImageBuffer::Metadata meta;
+    readCommonMetadata(fptr, meta);
+    
+    // Store extension info in metadata
+    char extname[FLEN_VALUE] = "";
+    int status_meta = 0;
+    fits_read_key(fptr, TSTRING, "EXTNAME", extname, nullptr, &status_meta);
+    if (strlen(extname) > 0) {
+        meta.objectName = meta.objectName.isEmpty() ? QString::fromUtf8(extname) : meta.objectName;
+    }
+    
+    buffer.setMetadata(meta);
+    buffer.setData(width, height, nChannels, allPixels);
+    return true;
+}
+
+bool FitsLoader::loadMetadata(const QString& filePath, ImageBuffer& buffer, QString* errorMsg) {
+    fitsfile* fptr;
+    int status = 0;
+    
+    if (fits_open_file(&fptr, filePath.toUtf8().constData(), READONLY, &status)) {
+        if (errorMsg) {
+            char statusStr[FLEN_STATUS];
+            fits_get_errstatus(status, statusStr);
+            *errorMsg = QCoreApplication::translate("FitsLoader", "CFITSIO Open Error %1: %2").arg(status).arg(statusStr);
+        }
+        return false;
+    }
+
+    int bitpix, naxis;
+    long naxes[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+    if (fits_get_img_param(fptr, 9, &bitpix, &naxis, naxes, &status)) {
+        fits_close_file(fptr, &status);
+        return false;
+    }
+
+    ImageBuffer::Metadata meta;
+    readCommonMetadata(fptr, meta);
+    meta.filePath = filePath;
+    
+    fits_close_file(fptr, &status);
+
+    int nChannels = (naxis == 3 && naxes[2] == 3) ? 3 : 1;
+    buffer = ImageBuffer(naxes[0], naxes[1], nChannels);
+    buffer.setMetadata(meta);
+    
+    return true;
+}
+
+void FitsLoader::readCommonMetadata(void* fitsptr, ImageBuffer::Metadata& meta) {
+    fitsfile* fptr = static_cast<fitsfile*>(fitsptr);
     char comment[FLEN_COMMENT];
     double dv;
     int status_meta = 0;
@@ -652,8 +662,27 @@ bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuff
     if (!fits_read_key(fptr, TDOUBLE, "PIXSIZE", &dv, comment, &status_meta)) meta.pixelSize = dv;
     else { status_meta = 0; if (!fits_read_key(fptr, TDOUBLE, "XPIXSZ", &dv, comment, &status_meta)) meta.pixelSize = dv; }
     status_meta = 0;
+
+    if (!fits_read_key(fptr, TDOUBLE, "RA", &dv, comment, &status_meta)) meta.ra = dv;
+    else { 
+        status_meta = 0; 
+        char raStr[FLEN_VALUE];
+        if (!fits_read_key(fptr, TSTRING, "OBJCTRA", raStr, comment, &status_meta)) {
+            meta.ra = parseRAString(raStr);
+        }
+    }
+    status_meta = 0;
     
-    // WCS
+    if (!fits_read_key(fptr, TDOUBLE, "DEC", &dv, comment, &status_meta)) meta.dec = dv;
+    else { 
+        status_meta = 0; 
+        char decStr[FLEN_VALUE];
+        if (!fits_read_key(fptr, TSTRING, "OBJCTDEC", decStr, comment, &status_meta)) {
+            meta.dec = parseDecString(decStr);
+        }
+    }
+    status_meta = 0;
+    
     if (!fits_read_key(fptr, TDOUBLE, "CRVAL1", &dv, comment, &status_meta)) { meta.ra = dv; }
     status_meta = 0;
     if (!fits_read_key(fptr, TDOUBLE, "CRVAL2", &dv, comment, &status_meta)) { meta.dec = dv; }
@@ -663,7 +692,6 @@ bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuff
     if (!fits_read_key(fptr, TDOUBLE, "CRPIX2", &dv, comment, &status_meta)) { meta.crpix2 = dv; }
     status_meta = 0;
     
-    // CD Matrix
     double cd11=0, cd12=0, cd21=0, cd22=0;
     bool hasCD = false;
     if (!fits_read_key(fptr, TDOUBLE, "CD1_1", &dv, comment, &status_meta)) { cd11 = dv; hasCD = true; }
@@ -674,12 +702,49 @@ bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuff
     status_meta = 0;
     if (!fits_read_key(fptr, TDOUBLE, "CD2_2", &dv, comment, &status_meta)) { cd22 = dv; hasCD = true; }
     status_meta = 0;
-    
-    if (hasCD) {
-        meta.cd1_1 = cd11; meta.cd1_2 = cd12;
-        meta.cd2_1 = cd21; meta.cd2_2 = cd22;
+
+    if (!hasCD) {
+        double cdelt1=1, cdelt2=1;
+        if (!fits_read_key(fptr, TDOUBLE, "CDELT1", &dv, comment, &status_meta)) cdelt1 = dv;
+        status_meta = 0;
+        if (!fits_read_key(fptr, TDOUBLE, "CDELT2", &dv, comment, &status_meta)) cdelt2 = dv;
+        status_meta = 0;
+        
+        double pc11=1, pc12=0, pc21=0, pc22=1;
+        bool hasPC = false;
+        if (!fits_read_key(fptr, TDOUBLE, "PC1_1", &dv, comment, &status_meta)) { pc11 = dv; hasPC = true; }
+        status_meta = 0;
+        if (!fits_read_key(fptr, TDOUBLE, "PC1_2", &dv, comment, &status_meta)) { pc12 = dv; hasPC = true; }
+        status_meta = 0;
+        if (!fits_read_key(fptr, TDOUBLE, "PC2_1", &dv, comment, &status_meta)) { pc21 = dv; hasPC = true; }
+        status_meta = 0;
+        if (!fits_read_key(fptr, TDOUBLE, "PC2_2", &dv, comment, &status_meta)) { pc22 = dv; hasPC = true; }
+        status_meta = 0;
+
+        if (hasPC) {
+            cd11 = pc11 * cdelt1;
+            cd12 = pc12 * cdelt1;
+            cd21 = pc21 * cdelt2;
+            cd22 = pc22 * cdelt2;
+        } else {
+            double crota2 = 0;
+            if (!fits_read_key(fptr, TDOUBLE, "CROTA2", &dv, comment, &status_meta)) {
+                crota2 = dv * M_PI / 180.0;
+                cd11 = cdelt1 * cos(crota2);
+                cd12 = -cdelt2 * sin(crota2);
+                cd21 = cdelt1 * sin(crota2);
+                cd22 = cdelt2 * cos(crota2);
+            } else {
+                cd11 = cdelt1;
+                cd22 = cdelt2;
+            }
+            status_meta = 0;
+        }
     }
     
+    meta.cd1_1 = cd11; meta.cd1_2 = cd12;
+    meta.cd2_1 = cd21; meta.cd2_2 = cd22;
+
     char strVal[FLEN_VALUE];
     if (!fits_read_key(fptr, TSTRING, "CTYPE1", strVal, comment, &status_meta)) {
         meta.ctype1 = QString::fromUtf8(strVal).trimmed().remove('\'');
@@ -696,21 +761,42 @@ bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuff
     status_meta = 0;
     
     readSIPCoefficients(fptr, meta);
-    
+
     if (!fits_read_key(fptr, TSTRING, "OBJECT", strVal, comment, &status_meta)) meta.objectName = QString::fromUtf8(strVal);
     status_meta = 0;
     if (!fits_read_key(fptr, TSTRING, "DATE-OBS", strVal, comment, &status_meta)) meta.dateObs = QString::fromUtf8(strVal);
-    
-    // Store extension info in metadata
-    char extname[FLEN_VALUE] = "";
     status_meta = 0;
-    fits_read_key(fptr, TSTRING, "EXTNAME", extname, nullptr, &status_meta);
-    if (strlen(extname) > 0) {
-        meta.objectName = meta.objectName.isEmpty() ? QString::fromUtf8(extname) : meta.objectName;
+    if (!fits_read_key(fptr, TSTRING, "EXPTIME", strVal, comment, &status_meta)) meta.exposure = QString::fromUtf8(strVal).toDouble();
+    else { status_meta = 0; if (!fits_read_key(fptr, TDOUBLE, "EXPOSURE", &dv, comment, &status_meta)) meta.exposure = dv; }
+    status_meta = 0;
+
+    // Bayer Pattern (Critical for correct colors)
+    if (!fits_read_key(fptr, TSTRING, "BAYERPAT", strVal, comment, &status_meta)) {
+        meta.bayerPattern = QString::fromUtf8(strVal).trimmed().remove('\'');
+    }
+    status_meta = 0;
+    if (meta.bayerPattern.isEmpty()) {
+        if (!fits_read_key(fptr, TSTRING, "COLORTYP", strVal, comment, &status_meta)) {
+            meta.bayerPattern = QString::fromUtf8(strVal).trimmed().remove('\'');
+        }
+        status_meta = 0;
     }
     
-    buffer.setMetadata(meta);
-    buffer.setData(width, height, nChannels, allPixels);
-    return true;
+    int nkeys = 0, morekeys = 0;
+    if (fits_get_hdrspace(fptr, &nkeys, &morekeys, &status_meta) == 0) {
+        for (int i = 1; i <= nkeys; ++i) {
+            char keyname[FLEN_KEYWORD], value[FLEN_VALUE], comm[FLEN_COMMENT];
+            if (fits_read_keyn(fptr, i, keyname, value, comm, &status_meta) == 0) {
+                meta.rawHeaders.push_back({QString(keyname), QString(value), QString(comm)});
+            } else {
+                status_meta = 0;
+                char card[FLEN_CARD];
+                if (fits_read_record(fptr, i, card, &status_meta) == 0) {
+                    meta.rawHeaders.push_back({QString("RAW"), QString::fromUtf8(card, 80).trimmed(), ""});
+                }
+                status_meta = 0;
+            }
+        }
+    }
 }
 

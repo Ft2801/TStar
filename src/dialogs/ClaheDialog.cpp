@@ -51,7 +51,7 @@ void ClaheDialog::setupUi() {
     
     // Clip Limit
     m_clipSlider = new QSlider(Qt::Horizontal);
-    m_clipSlider->setRange(10, 80); // 1.0 to 8.0
+    m_clipSlider->setRange(1, 80); // 0.1 to 8.0
     m_clipSlider->setValue(20);
     m_clipLabel = new QLabel("2.0");
     

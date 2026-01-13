@@ -1,4 +1,5 @@
 #include "TriangleMatcher.h"
+#include "../core/ThreadState.h"
 #include <vector>
 #include <cmath>
 #include <algorithm>
@@ -12,7 +13,7 @@
 // Replicate Reference logic for vote counting and iterative fitting.
 
 TriangleMatcher::TriangleMatcher() {
-    m_maxStars = 80;
+    m_maxStars = 40;
 }
 
 // Helper to sort stars by mag
@@ -206,6 +207,7 @@ std::vector<std::vector<int>> TriangleMatcher::computeVotes(const std::vector<Ma
 
     // Walk through B
     for (const auto& tb : triB) {
+        if (!Threading::getThreadRun()) return votes; // Cancellation check
         double ba_min = tb.ba - max_r;
         double ba_max = tb.ba + max_r;
         

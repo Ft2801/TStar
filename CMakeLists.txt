@@ -48,7 +48,7 @@ endif()
 
 add_definitions(-DTSTAR_VERSION="${TSTAR_VERSION}")
 
-project(TStar LANGUAGES CXX)
+project(TStar LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -159,6 +159,12 @@ if(APPLE)
         message(STATUS "Using Homebrew libomp from: ${LIBOMP_PREFIX}")
         add_library(OpenMP::OpenMP_CXX INTERFACE IMPORTED)
         set_target_properties(OpenMP::OpenMP_CXX PROPERTIES
+            INTERFACE_COMPILE_OPTIONS "-Xpreprocessor;-fopenmp"
+            INTERFACE_INCLUDE_DIRECTORIES "${LIBOMP_PREFIX}/include"
+            INTERFACE_LINK_LIBRARIES "${LIBOMP_PREFIX}/lib/libomp.dylib"
+        )
+        add_library(OpenMP::OpenMP_C INTERFACE IMPORTED)
+        set_target_properties(OpenMP::OpenMP_C PROPERTIES
             INTERFACE_COMPILE_OPTIONS "-Xpreprocessor;-fopenmp"
             INTERFACE_INCLUDE_DIRECTORIES "${LIBOMP_PREFIX}/include"
             INTERFACE_LINK_LIBRARIES "${LIBOMP_PREFIX}/lib/libomp.dylib"
@@ -354,6 +360,40 @@ if(NOT ZSTD_FOUND)
     message(STATUS "Zstd not found - XISF Zstd compression will be disabled")
 endif()
 
+# LibRaw
+if(APPLE)
+    execute_process(
+        COMMAND brew --prefix libraw
+        OUTPUT_VARIABLE LIBRAW_PREFIX
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    if(LIBRAW_PREFIX AND EXISTS "${LIBRAW_PREFIX}")
+        set(LIBRAW_FOUND TRUE)
+        set(LIBRAW_INCLUDE_DIRS "${LIBRAW_PREFIX}/include")
+        set(LIBRAW_LIBRARIES "${LIBRAW_PREFIX}/lib/libraw.dylib")
+        message(STATUS "Using Homebrew LibRaw from: ${LIBRAW_PREFIX}")
+    endif()
+else()
+    # Windows: local deps
+    set(LIBRAW_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/libraw")
+    if(EXISTS "${LIBRAW_DIR}/libraw/libraw.h")
+        set(LIBRAW_FOUND TRUE)
+        set(LIBRAW_INCLUDE_DIRS "${LIBRAW_DIR}")
+        if(WIN32)
+            # Prefer dynamic linking for MinGW compatibility with MSVC lib
+            if(EXISTS "${LIBRAW_DIR}/lib/libraw.lib")
+                set(LIBRAW_LIBRARIES "${LIBRAW_DIR}/lib/libraw.lib")
+            else()
+                set(LIBRAW_LIBRARIES "${LIBRAW_DIR}/lib/libraw_static.lib")
+            endif()
+        else()
+            set(LIBRAW_LIBRARIES raw)
+        endif()
+        message(STATUS "Using local LibRaw from ${LIBRAW_DIR}")
+    endif()
+endif()
+
 # Force disable AutoMoc predefs on Windows
 if(WIN32)
     set(CMAKE_AUTOMOC_COMPILER_PREDEFS OFF)
@@ -379,6 +419,8 @@ set(TSTAR_SOURCES
     # Core
     src/core/RobustStatistics.cpp
     src/core/RobustStatistics.h
+    src/core/ThreadState.cpp
+    src/core/ThreadState.h
     src/core/MaskManager.h
     src/core/MaskLayer.h
     src/core/Logger.cpp
@@ -390,6 +432,10 @@ set(TSTAR_SOURCES
     # IO
     src/io/FitsLoader.cpp
     src/io/FitsLoader.h
+    src/io/FitsLoaderC.c
+    src/io/FitsLoaderC.h
+    src/io/FitsLoaderCWrapper.cpp
+    src/io/FitsLoaderCWrapper.h
     src/io/SimpleTiffWriter.cpp
     src/io/SimpleTiffReader.cpp
     src/io/SimpleTiffReader.h
@@ -403,6 +449,9 @@ set(TSTAR_SOURCES
     src/io/CompressionUtils.h
     src/io/FitsHeaderUtils.cpp
     src/io/FitsHeaderUtils.h
+    src/io/SERFile.cpp
+    src/io/SERFile.h
+
     
     # Widgets
     src/widgets/HistogramWidget.cpp
@@ -417,6 +466,8 @@ set(TSTAR_SOURCES
     src/widgets/HeaderPanel.h
     src/widgets/AnnotationOverlay.cpp
     src/widgets/AnnotationOverlay.h
+    src/widgets/SimplePlotWidget.cpp
+    src/widgets/SimplePlotWidget.h
     
     # Algorithms
     src/algos/AbeMath.cpp
@@ -442,6 +493,48 @@ set(TSTAR_SOURCES
     src/algos/PerfectPaletteRunner.h
     src/algos/StatisticalStretch.cpp
     src/algos/StatisticalStretch.h
+    
+    # Background
+    src/background/BackgroundExtraction.cpp
+    src/background/BackgroundExtraction.h
+
+    # Stacking
+    src/stacking/StackingProject.cpp
+    src/stacking/StackingProject.h
+    src/stacking/SequenceFile.cpp
+    src/stacking/SequenceFile.h
+    src/stacking/StackingTypes.h
+    src/stacking/StackingEngine.cpp
+    src/stacking/StackingEngine.h
+    src/stacking/StackingSequence.cpp
+    src/stacking/StackingSequence.h
+    src/stacking/Registration.cpp
+    src/stacking/Registration.h
+    src/stacking/RejectionAlgorithms.cpp
+    src/stacking/RejectionAlgorithms.h
+    src/stacking/RejectionMaps.cpp
+    src/stacking/RejectionMaps.h
+    src/stacking/Normalization.cpp
+    src/stacking/Normalization.h
+    src/stacking/OverlapNormalization.cpp
+    src/stacking/OverlapNormalization.h
+    src/stacking/AnscombeTransform.h
+    src/stacking/Statistics.cpp
+    src/stacking/Statistics.h
+    src/stacking/Weighting.cpp
+    src/stacking/Weighting.h
+    src/stacking/Blending.cpp
+    src/stacking/Blending.h
+    src/stacking/DrizzleStacking.cpp
+    src/stacking/DrizzleStacking.h
+    src/stacking/ImageCache.cpp
+    src/stacking/ImageCache.h
+    src/stacking/PixelMath.cpp
+    src/stacking/Distortion.cpp
+    src/stacking/Distortion.h
+    src/stacking/CosmeticCorrection.cpp
+    src/stacking/CosmeticCorrection.h
+    src/stacking/PixelMath.h
     
     # Network
     src/network/UpdateChecker.cpp
@@ -506,6 +599,8 @@ set(TSTAR_SOURCES
     src/dialogs/WavescaleHDRDialog.h
     src/dialogs/SaturationDialog.cpp
     src/dialogs/SaturationDialog.h
+    src/dialogs/TextureAndClarityDialog.cpp
+    src/dialogs/TextureAndClarityDialog.h
     src/dialogs/StarAnalysisDialog.cpp
     src/dialogs/StarAnalysisDialog.h
     src/dialogs/HeaderEditorDialog.cpp
@@ -539,6 +634,18 @@ set(TSTAR_SOURCES
     src/dialogs/RecombineLuminanceDialog.h
     src/dialogs/AberrationInspectorDialog.cpp
     src/dialogs/AberrationInspectorDialog.h
+    src/dialogs/NewProjectDialog.cpp
+    src/dialogs/NewProjectDialog.h
+    src/dialogs/StackingDialog.cpp
+    src/dialogs/StackingDialog.h
+    src/dialogs/RegistrationDialog.cpp
+    src/dialogs/RegistrationDialog.h
+    src/dialogs/PreprocessingDialog.cpp
+    src/dialogs/PreprocessingDialog.h
+    src/dialogs/ScriptBrowserDialog.cpp
+    src/dialogs/ScriptBrowserDialog.h
+    src/dialogs/ConversionDialog.cpp
+    src/dialogs/ConversionDialog.h
     
     # Astrometry
     src/astrometry/SimbadSearcher.cpp
@@ -561,6 +668,37 @@ set(TSTAR_SOURCES
     src/photometry/PCCResult.h
     src/photometry/AperturePhotometry.cpp
     src/photometry/AperturePhotometry.h
+    
+    # Preprocessing
+    src/preprocessing/PreprocessingTypes.h
+    src/preprocessing/MasterFrames.cpp
+    src/preprocessing/MasterFrames.h
+    src/preprocessing/Preprocessing.cpp
+    src/preprocessing/Preprocessing.h
+    src/preprocessing/Debayer.cpp
+    src/preprocessing/Debayer.h
+    src/preprocessing/XTransDemosaic.cpp
+    src/preprocessing/XTransDemosaic.h
+    
+    # Calibration
+    src/calibration/CalibrationEngine.cpp
+    src/calibration/CalibrationC.c
+    src/calibration/CalibrationEngine.h
+
+    # Scripting
+    src/scripting/ScriptTypes.h
+    src/scripting/ScriptParser.cpp
+    src/scripting/ScriptParser.h
+    src/scripting/ScriptRunner.cpp
+    src/scripting/ScriptRunner.h
+    src/scripting/msvc_compat.cpp
+    src/scripting/StackingCommands.cpp
+    src/scripting/StackingCommands.h
+    
+
+
+    src/dialogs/ScriptDialog.cpp
+    src/dialogs/ScriptDialog.h
 )
 
 # =============================================================================
@@ -573,9 +711,9 @@ if(APPLE)
     
     if(EXISTS "${APP_ICON_MACOS}")
         set_source_files_properties(${APP_ICON_MACOS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-        add_executable(TStar MACOSX_BUNDLE ${TSTAR_SOURCES} ${APP_ICON_MACOS})
+        add_executable(TStar MACOSX_BUNDLE src/main.cpp ${TSTAR_SOURCES} ${APP_ICON_MACOS})
     else()
-        add_executable(TStar MACOSX_BUNDLE ${TSTAR_SOURCES})
+        add_executable(TStar MACOSX_BUNDLE src/main.cpp ${TSTAR_SOURCES})
     endif()
     
     set_target_properties(TStar PROPERTIES
@@ -623,6 +761,9 @@ target_include_directories(TStar PRIVATE
     src/widgets
     src/io
     src/algos
+    src/stacking
+    src/preprocessing
+    src/scripting
     ${GSL_INCLUDE_DIRS}
     ${CFITSIO_INCLUDE_DIR}
     ${OpenCV_INCLUDE_DIRS}
@@ -635,6 +776,10 @@ endif()
 if(ZSTD_FOUND)
     target_include_directories(TStar PRIVATE ${ZSTD_INCLUDE_DIRS})
     target_compile_definitions(TStar PRIVATE HAVE_ZSTD)
+endif()
+if(LIBRAW_FOUND)
+    target_include_directories(TStar PRIVATE ${LIBRAW_INCLUDE_DIRS})
+    target_compile_definitions(TStar PRIVATE HAVE_LIBRAW)
 endif()
 
 # =============================================================================
@@ -666,6 +811,9 @@ target_link_libraries(TStar PRIVATE
 if(TARGET OpenMP::OpenMP_CXX)
     target_link_libraries(TStar PRIVATE OpenMP::OpenMP_CXX)
 endif()
+if(TARGET OpenMP::OpenMP_C)
+    target_link_libraries(TStar PRIVATE OpenMP::OpenMP_C)
+endif()
 
 # Platform-specific libs
 if(APPLE)
@@ -684,6 +832,10 @@ endif()
 if(ZSTD_FOUND)
     target_link_libraries(TStar PRIVATE ${ZSTD_LIBRARIES})
     message(STATUS "Zstd compression enabled for XISF")
+endif()
+if(LIBRAW_FOUND)
+    target_link_libraries(TStar PRIVATE ${LIBRAW_LIBRARIES})
+    message(STATUS "LibRaw support enabled")
 endif()
 
 # =============================================================================

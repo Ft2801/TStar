@@ -29,10 +29,69 @@ const quint16 TAG_TileLength = 323;
 const quint16 TAG_TileOffsets = 324;
 const quint16 TAG_TileByteCounts = 325;
 
+bool SimpleTiffReader::readInfo(const QString& path, int& width, int& height, int& channels, int& bitsPerSample, QString* errorMsg) {
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        if (errorMsg) *errorMsg = QCoreApplication::translate("SimpleTiffReader", "File open failed: %1").arg(file.errorString());
+        return false;
+    }
+
+    QDataStream stream(&file);
+    stream.setByteOrder(QDataStream::LittleEndian);
+
+    quint16 byteOrder;
+    stream >> byteOrder;
+    if (byteOrder == 0x4949) stream.setByteOrder(QDataStream::LittleEndian);
+    else if (byteOrder == 0x4D4D) stream.setByteOrder(QDataStream::BigEndian);
+    else return false;
+
+    quint16 version;
+    stream >> version;
+    if (version != 42) return false;
+
+    quint32 ifdOffset;
+    stream >> ifdOffset;
+    if (!file.seek(ifdOffset)) return false;
+
+    quint16 numEntries;
+    stream >> numEntries;
+
+    quint32 t_width = 0, t_height = 0;
+    quint16 t_bits = 0, t_channels = 1;
+
+    for (int i = 0; i < numEntries; ++i) {
+        quint16 tag, type;
+        quint32 count, val;
+        stream >> tag >> type >> count >> val;
+
+        if (tag == TAG_ImageWidth) t_width = val;
+        else if (tag == TAG_ImageLength) t_height = val;
+        else if (tag == TAG_SamplesPerPixel) t_channels = val;
+        else if (tag == TAG_BitsPerSample) {
+            if (count == 1) t_bits = val;
+            else if (count == 2) t_bits = val & 0xFFFF;
+            else {
+                qint64 savePos = file.pos();
+                if (file.seek(val)) {
+                    quint16 v; stream >> v; t_bits = v;
+                }
+                file.seek(savePos);
+            }
+        }
+    }
+
+    width = t_width;
+    height = t_height;
+    channels = t_channels;
+    bitsPerSample = t_bits;
+
+    return (width > 0 && height > 0);
+}
+
 bool SimpleTiffReader::readFloat32(const QString& path, int& width, int& height, int& channels, std::vector<float>& data, QString* errorMsg, QString* debugInfo) {
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly)) {
-        if (errorMsg) *errorMsg = QCoreApplication::translate("SimpleTiffReader", "Use File open failed: %1").arg(file.errorString());
+        if (errorMsg) *errorMsg = QCoreApplication::translate("SimpleTiffReader", "File open failed: %1").arg(file.errorString());
         return false;
     }
 

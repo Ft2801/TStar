@@ -4,6 +4,7 @@
 #include <QIcon>
 #include <QScrollArea>
 #include <QDebug>
+#include <QCloseEvent>
 
 #include "../ImageViewer.h"
 
@@ -194,6 +195,8 @@ void StretchDialog::setupConnections() {
 void StretchDialog::onHdrToggled(bool enabled) {
     m_hdrAmountSpin->setEnabled(enabled);
     m_hdrKneeSpin->setEnabled(enabled);
+    // Update preview when HDR is toggled on/off
+    updatePreview();
 }
 
 void StretchDialog::onHighRangeToggled(bool enabled) {
@@ -201,6 +204,8 @@ void StretchDialog::onHighRangeToggled(bool enabled) {
     m_hrSoftCeilSpin->setEnabled(enabled);
     m_hrHardCeilSpin->setEnabled(enabled);
     m_hrSoftclipSpin->setEnabled(enabled);
+    // Update preview when HighRange mode is toggled
+    updatePreview();
 }
 
 void StretchDialog::onLumaOnlyToggled(bool enabled) {
@@ -210,10 +215,16 @@ void StretchDialog::onLumaOnlyToggled(bool enabled) {
     } else {
         m_linkedCheck->setEnabled(true);
     }
+    // Update preview when Luma-Only is toggled
+    updatePreview();
 }
 
 StretchDialog::~StretchDialog() {
-    if (!m_applied && m_viewer) {
+    // CRITICAL: Always restore original buffer if preview was active and not applied
+    if (!m_applied && m_viewer && m_originalBuffer.isValid()) {
+        // Restore original buffer to undo any preview
+        m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
+        // Clear LUT preview
         m_viewer->clearPreviewLUT();
     }
 }
@@ -226,14 +237,31 @@ void StretchDialog::showEvent(QShowEvent* event) {
 }
 
 void StretchDialog::reject() {
-    if (!m_applied && m_viewer) {
+    // Always restore when dialog is closed without applying
+    if (m_viewer) {
         m_viewer->clearPreviewLUT();
-        // Also restore original buffer for advanced modes that modify buffer directly
-        if (m_originalBuffer.isValid()) {
+        // Restore original buffer if we have a backup
+        if (m_originalBuffer.isValid() && !m_applied) {
             m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
         }
     }
     QDialog::reject();
+}
+
+void StretchDialog::closeEvent(QCloseEvent* event) {
+    // Ensure reject() is called when the window is closed via the X button
+    if (!m_applied && m_viewer) {
+        m_viewer->clearPreviewLUT();
+        if (m_originalBuffer.isValid()) {
+            m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
+        }
+    }
+    QDialog::closeEvent(event);
+}
+
+void StretchDialog::updatePreview() {
+    if (!m_viewer || !m_originalBuffer.isValid()) return;
+    onPreview();
 }
 
 void StretchDialog::setViewer(ImageViewer* v) {
@@ -252,6 +280,8 @@ void StretchDialog::setViewer(ImageViewer* v) {
     
     if (m_viewer && m_viewer->getBuffer().isValid()) {
         m_originalBuffer = m_viewer->getBuffer();
+        // Clear any previous preview state when switching viewers
+        m_viewer->clearPreviewLUT();
     }
 }
 
@@ -272,13 +302,18 @@ void StretchDialog::onPreview() {
         
         ImageBuffer temp = m_originalBuffer;
         temp.performTrueStretch(p);
-        m_viewer->setBuffer(temp, m_viewer->windowTitle(), false);
+        m_viewer->setBuffer(temp, m_viewer->windowTitle(), true);  // Changed to preserveView=true for better UX
         
         if (overlay) {
             overlay->setProperty("isProcessing", false);
             overlay->update();
         }
     } else {
+        // IMPORTANT: When switching from modal preview (full buffer) to LUT preview,
+        // we MUST restore the original buffer first, then apply LUT
+        // This prevents the image from remaining stretched
+        m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
+        m_viewer->clearPreviewLUT();
         auto lut = m_originalBuffer.computeTrueStretchLUT(p);
         m_viewer->setPreviewLUT(lut);
     }

@@ -1,11 +1,3 @@
-#!/bin/bash
-# =============================================================================
-# TStar Python Environment Setup for macOS
-# Equivalent of setup_python_dist.ps1 for Windows
-# =============================================================================
-# Creates a Python virtual environment with required dependencies
-# for AI tools (GraXpert bridge, StarNet converter, etc.)
-# =============================================================================
 
 set -e
 
@@ -107,6 +99,7 @@ echo "[STEP 5] Installing dependencies..."
 PACKAGES=(
     "numpy"
     "tifffile"
+    "imagecodecs"
     "astropy"
     "onnxruntime"
 )

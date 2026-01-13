@@ -1,0 +1,54 @@
+############################################
+# OSC_Preprocessing_BGE_Undistort
+# Full preprocessing with Background Extraction
+# and lens distortion correction
+#
+# Folder structure:
+#   biases/   darks/   flats/   lights/
+############################################
+
+# Convert Bias Frames
+cd biases
+convert bias -out=../process
+cd ../process
+stack bias rej 3 3 -nonorm -out=../masters/bias_stacked
+cd ..
+
+# Convert Flat Frames
+cd flats
+convert flat -out=../process
+cd ../process
+calibrate flat -bias=../masters/bias_stacked
+stack pp_flat rej 3 3 -norm=mul -out=../masters/pp_flat_stacked
+cd ..
+
+# Convert Dark Frames
+cd darks
+convert dark -out=../process
+cd ../process
+stack dark rej 3 3 -nonorm -out=../masters/dark_stacked
+cd ..
+
+# Convert Light Frames
+cd lights
+convert light -out=../process
+cd ../process
+
+# Calibrate Light Frames
+calibrate light -dark=../masters/dark_stacked -flat=../masters/pp_flat_stacked -cc=dark -cfa -equalize_cfa -debayer
+
+# Background Extraction
+background pp_light --degree=1
+
+# Align lights
+register bkg_pp_light
+
+# Stack calibrated lights
+stack r_bkg_pp_light rej 3 3 -norm=addscale -output_norm -rgb_equal -32b -out=result
+
+load result
+mirrorx -bottomup
+save ../result
+
+cd ..
+close

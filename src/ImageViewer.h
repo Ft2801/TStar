@@ -54,6 +54,10 @@ public:
     void clearAbePolygons();
     std::vector<QPolygonF> getAbePolygons() const;
     
+    // Background Extraction Visualization
+    void setBackgroundSamples(const std::vector<QPointF>& points);
+    void clearBackgroundSamples();
+    
     // Pick Mode
     void setPickMode(bool active);
     void setRectQueryMode(bool active); // For Area Mean
@@ -66,6 +70,9 @@ public:
     };
     void setInteractionMode(InteractionMode mode);
     InteractionMode getInteractionMode() const { return m_interactionMode; }
+    
+    // Fast Preview (Downscaled)
+    void setPreviewImage(const QImage& img); // Replaces display but maintains scene rect
     
     // GHS Preview
     void setPreviewLUT(const std::vector<std::vector<float>>& luts); // 3 channels x 65536
@@ -180,6 +187,9 @@ private:
     class QGraphicsPolygonItem* m_currentLassoItem = nullptr;
     QPolygonF m_currentLassoPoly;
     bool m_lassoDrawing = false;
+    
+    // Background Samples
+    std::vector<class QGraphicsEllipseItem*> m_sampleItems;
     
     float m_aspectRatio = -1.0f; // -1 = Free
     

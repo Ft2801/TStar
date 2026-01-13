@@ -21,6 +21,7 @@ class StretchDialog;
 #include <QSettings>
 
 class StretchDialog; 
+class TextureAndClarityDialog;
 class PixelMathDialog;
 class CustomMdiSubWindow;
 class ABEDialog;
@@ -51,6 +52,7 @@ class MainWindow : public QMainWindow, public MainWindowCallbacks {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget* parent = nullptr);
+    ~MainWindow() override;
     
     // Public API for Dialogs
     ImageViewer* currentViewer() const;
@@ -79,6 +81,7 @@ private slots:
     void openFile();
     void saveFile();
     void openStretchDialog();
+    void openTextureAndClarityDialog();
     void openAbeDialog();
     void openSCNRDialog();
     void openGHSDialog();
@@ -115,6 +118,15 @@ private slots:
     void openClaheDialog();
     void openAberrationInspectorDialog();
     void openSelectiveColorDialog();
+    
+    // Stacking Suite
+    void openStackingDialog();
+    void openRegistrationDialog();
+    void openPreprocessingDialog();
+    void openNewProjectDialog();
+    void openExistingProject();
+    void openConvertDialog();
+    void openScriptDialog();
     
     // Mask Tool Actions
     void createMaskAction();
@@ -187,6 +199,7 @@ private:
     QPointer<class GHSDialog> m_ghsDlg;
     QPointer<class CurvesDialog> m_curvesDlg;
     QPointer<class StretchDialog> m_stretchDlg;
+    QPointer<class TextureAndClarityDialog> m_textureClarityDlg;
     QPointer<class SaturationDialog> m_satDlg;
 
     // Tool Dialog Singletons

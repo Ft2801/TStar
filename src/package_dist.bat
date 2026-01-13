@@ -70,7 +70,7 @@ if exist "%DIST_DIR%\TStar.exe" (
 echo.
 echo [STEP 3] Copying Qt DLLs...
 setlocal enabledelayedexpansion
-for %%f in (Qt6Core.dll Qt6Gui.dll Qt6Network.dll Qt6Svg.dll Qt6Widgets.dll Qt6Xml.dll) do (
+for %%f in (Qt6Core.dll Qt6Gui.dll Qt6Network.dll Qt6Svg.dll Qt6Widgets.dll Qt6Xml.dll Qt6Concurrent.dll) do (
     copy "%BUILD_DIR%\%%f" "%DIST_DIR%\" >nul 2>&1
     if exist "%DIST_DIR%\%%f" (
         set /a COPY_COUNT+=1

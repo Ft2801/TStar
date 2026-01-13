@@ -1,0 +1,30 @@
+############################################
+# Seestar_Preprocessing
+# For Seestar/ZWO smart telescope images
+# Only lights needed (no calibration frames)
+#
+# Remove all JPG files before running!
+#
+# Folder structure:
+#   lights/
+############################################
+
+# Convert Light Frames
+cd lights
+convert light -out=../process
+cd ../process
+
+# Calibrate Light Frames (debayer only)
+calibrate light -debayer
+
+# Align lights (2-pass for better accuracy)
+register pp_light
+
+# Stack calibrated lights
+stack r_pp_light rej 3 3 -norm=addscale -output_norm -rgb_equal -32b -out=result
+
+# Flip if required
+load result
+mirrorx -bottomup
+save ../result
+close

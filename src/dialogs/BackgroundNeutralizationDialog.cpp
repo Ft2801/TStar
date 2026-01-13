@@ -7,6 +7,7 @@
 #include <QHBoxLayout>
 #include <QMessageBox>
 #include <QDebug>
+#include <QApplication>
 #include <algorithm>
 #include <numeric>
 

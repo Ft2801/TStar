@@ -1,0 +1,64 @@
+# OSC Preprocessing with Ha and OIII Extraction Script
+
+requires 1.0
+
+# Convert Bias
+cd biases
+convert bias -out=../process
+cd ../process
+
+# Stack Bias
+stack bias -method=median -rej=winsorized 3 3 -nonorm -out=../masters/bias_stacked
+cd ..
+
+# Convert Flats
+cd flats
+convert flat -out=../process
+cd ../process
+
+# Calibrate Flats
+calibrate flat -bias=../masters/bias_stacked
+
+# Stack Flats
+stack pp_flat -method=median -rej=winsorized 3 3 -norm=mul -out=../masters/pp_flat_stacked
+cd ..
+
+# Convert Darks
+cd darks
+convert dark -out=../process
+cd ../process
+
+# Stack Darks
+stack dark -method=median -rej=winsorized 3 3 -nonorm -out=../masters/dark_stacked
+cd ..
+
+# Convert Lights
+cd lights
+convert light -out=../process
+cd ../process
+
+# Calibrate Lights
+calibrate light -dark=../masters/dark_stacked -flat=../masters/pp_flat_stacked -cc -equalize_cfa
+
+# Extract Ha and OIII
+seqextract_HaOIII pp_light
+
+# Process Ha
+register Ha_pp_light
+stack r_Ha_pp_light -method=mean -rej=winsorized 3 3 -norm=addscale -output_norm -32b -out=result_Ha.fit
+mirrorx_single result_Ha.fit
+
+# Process OIII
+register OIII_pp_light
+stack r_OIII_pp_light -method=mean -rej=winsorized 3 3 -norm=addscale -output_norm -32b -out=result_OIII.fit
+mirrorx_single result_OIII.fit
+
+# Normalize OIII to match Ha statistics (Linear Match)
+# Replaces: pm $r_results_00002$*mad($r_results_00001$)/mad($r_results_00002$)-mad($r_results_00001$)/mad($r_results_00002$)*median($r_results_00002$)+median($r_results_00001$)
+linear_match result_Ha.fit result_OIII.fit
+
+save ../result_Ha.fit
+save ../result_OIII.fit
+
+cd ..
+close

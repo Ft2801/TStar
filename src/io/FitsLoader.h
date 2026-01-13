@@ -19,6 +19,8 @@ struct FitsExtensionInfo {
 class FitsLoader {
 public:
     static bool load(const QString& filePath, ImageBuffer& buffer, QString* errorMsg = nullptr);
+    
+    static bool loadMetadata(const QString& filePath, ImageBuffer& buffer, QString* errorMsg = nullptr);
 
     static QMap<QString, FitsExtensionInfo> listExtensions(const QString& filePath, QString* errorMsg = nullptr);
     
@@ -28,6 +30,14 @@ public:
     static bool loadExtension(const QString& filePath, int hduIndex, 
                               ImageBuffer& buffer, QString* errorMsg = nullptr);
 
+    /**
+     * @brief Load a rectangular region from the primary HDU
+     */
+    static bool loadRegion(const QString& filePath, 
+                          ImageBuffer& buffer, 
+                          int x, int y, int w, int h, 
+                          QString* errorMsg = nullptr);
+
 private:
     static double parseRAString(const QString& str, bool* ok = nullptr);
     
@@ -35,7 +45,10 @@ private:
     
     static void readSIPCoefficients(void* fptr, ImageBuffer::Metadata& meta);
     
-    static bool loadHDU(void* fptr, int hduIndex, ImageBuffer& buffer, QString* errorMsg);
+    static void readCommonMetadata(void* fptr, ImageBuffer::Metadata& meta);
+    
+    static bool loadHDU(void* fptr, int hduIndex, ImageBuffer& buffer, QString* errorMsg,
+                       int x = 0, int y = 0, int w = 0, int h = 0);
 };
 
 #endif // FITSLOADER_H

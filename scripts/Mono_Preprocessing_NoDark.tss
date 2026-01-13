@@ -1,0 +1,43 @@
+############################################
+# TStar Script: Mono Preprocessing (without Dark)
+#
+# This script processes Monochrome camera images
+# when dark frames are not available.
+# Note: Use with caution - dark current will not be removed.
+#
+# Variables to set before running:
+#   $WORKING_DIR - Directory containing your images
+#   $BIAS_PREFIX - Prefix for bias frames
+#   $FLAT_PREFIX - Prefix for flat frames
+#   $LIGHT_PREFIX - Prefix for light frames
+############################################
+
+cd ${WORKING_DIR}
+
+# ==========================================
+# STEP 1: Create Master Bias
+# ==========================================
+stack ${BIAS_PREFIX} --method=mean --rej=3 3 --norm=none --output=master_bias.fit --32b
+
+# ==========================================
+# STEP 2: Create Master Flat
+# ==========================================
+setmaster bias master_bias.fit
+stack ${FLAT_PREFIX} --method=mean --rej=3 3 --norm=mul --output=master_flat.fit --32b
+
+# ==========================================
+# STEP 3: Calibrate Light Frames (no dark)
+# ==========================================
+calibrate ${LIGHT_PREFIX} --bias=master_bias.fit --flat=master_flat.fit
+
+# ==========================================
+# STEP 4: Register Light Frames
+# ==========================================
+register pp_${LIGHT_PREFIX}
+
+# ==========================================
+# STEP 5: Stack Calibrated Lights
+# ==========================================
+stack r_pp_${LIGHT_PREFIX} --method=mean --rej=3 3 --norm=addscale --output=result.fit --32b --output_norm
+
+load result.fit

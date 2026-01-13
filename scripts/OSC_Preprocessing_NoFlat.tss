@@ -1,0 +1,42 @@
+############################################
+# TStar Script: OSC Preprocessing (without Flat)
+#
+# This script processes One-Shot Color (OSC) camera images
+# when flat frames are not available.
+#
+# Variables to set before running:
+#   $WORKING_DIR - Directory containing your images
+#   $BIAS_PREFIX - Prefix for bias frames (e.g., "Bias_")
+#   $DARK_PREFIX - Prefix for dark frames (e.g., "Dark_")
+#   $LIGHT_PREFIX - Prefix for light frames (e.g., "Light_")
+############################################
+
+cd ${WORKING_DIR}
+
+# ==========================================
+# STEP 1: Create Master Bias
+# ==========================================
+stack ${BIAS_PREFIX} --method=mean --rej=3 3 --norm=none --output=master_bias.fit --32b
+
+# ==========================================
+# STEP 2: Create Master Dark
+# ==========================================
+setmaster bias master_bias.fit
+stack ${DARK_PREFIX} --method=mean --rej=3 3 --norm=none --output=master_dark.fit --32b
+
+# ==========================================
+# STEP 3: Calibrate Light Frames (no flat)
+# ==========================================
+calibrate ${LIGHT_PREFIX} --bias=master_bias.fit --dark=master_dark.fit --cc --equalize_cfa --debayer --cfa=RGGB
+
+# ==========================================
+# STEP 4: Register Light Frames
+# ==========================================
+register pp_${LIGHT_PREFIX}
+
+# ==========================================
+# STEP 5: Stack Calibrated Lights
+# ==========================================
+stack r_pp_${LIGHT_PREFIX} --method=mean --rej=3 3 --norm=addscale --output=result.fit --32b --output_norm --rgb_equal
+
+load result.fit

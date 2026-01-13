@@ -27,6 +27,7 @@ signals:
 
 protected:
     void reject() override;
+    void closeEvent(QCloseEvent* event) override;
     void showEvent(QShowEvent* event) override;
 
 private slots:
@@ -35,6 +36,7 @@ private slots:
     void onHdrToggled(bool enabled);
     void onHighRangeToggled(bool enabled);
     void onLumaOnlyToggled(bool enabled);
+    void updatePreview();
     
     ImageBuffer::StretchParams getParams() const;
 
