@@ -1,6 +1,11 @@
 TStar Changelog
 ===============
 
+Version 1.5.0
+-------------
+- Stacking suite beta
+- Other overall bugfixes
+
 Version 1.4.1
 -------------
 - Fixed image annotator and settings dialog bugs
