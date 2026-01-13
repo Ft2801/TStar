@@ -19,7 +19,9 @@
 #include "StackingInterpolation.h"
 #include "InlineRejection.h"
 #include "../core/ThreadState.h"
+#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
 #include <emmintrin.h>
+#endif
 
 
 namespace Stacking {
@@ -431,6 +433,8 @@ float StackingEngine::getInterpolatedPixel(const ImageBuffer& buffer,
     float w2 = -1.5f*t3 + 2.0f*t2 + 0.5f*t;
     float w3 = 0.5f*t3 - 0.5f*t2;
     
+#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
+    // SSE Optimization for x86/x64
     __m128 mw = _mm_set_ps(w3, w2, w1, w0);
     
     float arr[4];
@@ -464,6 +468,44 @@ float StackingEngine::getInterpolatedPixel(const ImageBuffer& buffer,
         sums = _mm_add_ss(sums, shuf2);
         _mm_store_ss(&arr[j], sums);
     }
+#else
+    // Scalar Implementation for ARM64/Generic
+    float arr[4];
+    
+    // Bounds check
+    for (int j = 0; j < 4; ++j) {
+        int py = y0 - 1 + j;
+        if (py < 0 || py >= height) return 0.0f;
+    }
+    for (int i = 0; i < 4; ++i) {
+        int px = x0 - 1 + i;
+        if (px < 0 || px >= width) return 0.0f;
+    }
+
+    // Scalar dot product
+    // w0 corresponds to lowest index in _mm_set_ps but that loads in reverse order?
+    // _mm_set_ps(e3, e2, e1, e0) -> [e0, e1, e2, e3] (little endian/LSB first)
+    // w0 is the weight for t^0 term? 
+    // Looking at coefficients:
+    // w0, w1, w2, w3 are the weights for the 4 sample points.
+    // _mm_set_ps(w3, w2, w1, w0) creates vector [w0, w1, w2, w3]
+    // r array is [r0, r1, r2, r3]
+    // dot product is r0*w0 + r1*w1 + r2*w2 + r3*w3
+    
+    for (int j = 0; j < 4; ++j) {
+        int py = y0 - 1 + j;
+        float sum = 0.0f;
+        
+        // Unrolling explicitly for clarity matching the SSE logic
+        float r0 = buffer.value(x0 - 1, py, channel);
+        float r1 = buffer.value(x0,     py, channel);
+        float r2 = buffer.value(x0 + 1, py, channel);
+        float r3 = buffer.value(x0 + 2, py, channel);
+        
+        sum = r0 * w0 + r1 * w1 + r2 * w2 + r3 * w3;
+        arr[j] = sum;
+    }
+#endif
     
     float res = cubicHermite(arr[0], arr[1], arr[2], arr[3], dy);
 

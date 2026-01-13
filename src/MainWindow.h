@@ -57,8 +57,8 @@ public:
     // Public API for Dialogs
     ImageViewer* currentViewer() const;
     bool hasImage() const;
-    void startLongProcess();
-    void endLongProcess();
+    void startLongProcess() override;
+    void endLongProcess() override;
     void createNewImageWindow(const ImageBuffer& buffer, const QString& title, ImageBuffer::DisplayMode mode = ImageBuffer::Display_Linear);
     void pushUndo(); // Call before destructive actions
     
@@ -153,7 +153,7 @@ private slots:
     void updateActiveImage(); // Public wrapper to refresh viewer
 
 private:
-    void updateDisplay();
+    void updateDisplay() override;
     void updateMenus(); // Enable/Disable Undo/Redo
 
     QMdiArea* m_mdiArea;

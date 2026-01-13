@@ -217,7 +217,7 @@ copy_dylib() {
     if [ -z "$target_arch" ]; then
         target_arch=$(detect_build_architecture "")
     fi
->>>>>>> Stashed changes
+
     
     local prefix=$(brew --prefix "$brew_pkg" 2>/dev/null || echo "")
     
