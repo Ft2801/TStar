@@ -37,7 +37,6 @@
 #include "io/FitsLoader.h"
 #include "io/SimpleTiffReader.h"
 #include "dialogs/StretchDialog.h"
-#include "dialogs/TextureAndClarityDialog.h"
 #include "dialogs/ABEDialog.h"
 #include "dialogs/SCNRDialog.h"
 #include "dialogs/SaturationDialog.h"
@@ -773,9 +772,6 @@ MainWindow::MainWindow(QWidget *parent)
     addMenuAction(utilMenu, tr("Pixel Math"), "", [this](){
         openPixelMathDialog();
     });
-    addMenuAction(utilMenu, tr("Texture and Clarity"), "", [this](){
-        openTextureAndClarityDialog();
-    });
     addMenuAction(utilMenu, tr("Star Analysis"), "", [this](){
         openStarAnalysisDialog(); // Call handles checks
     });
@@ -826,7 +822,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // --- Stacking Menu ---
     QToolButton* stackBtn = new QToolButton(this);
-    stackBtn->setText(tr("Stacking"));
+    stackBtn->setText(tr("Stacking (Beta)"));
     stackBtn->setPopupMode(QToolButton::InstantPopup);
     stackBtn->setToolButtonStyle(Qt::ToolButtonTextOnly);
     stackBtn->setStyleSheet(processBtn->styleSheet());
@@ -1636,77 +1632,7 @@ void MainWindow::openStretchDialog() {
     }
 }
 
-void MainWindow::openTextureAndClarityDialog() {
-    ImageViewer* viewer = currentViewer();
-    if (!viewer || !viewer->getBuffer().isValid()) {
-        QMessageBox::warning(this, tr("No Image"), tr("Please select an image first."));
-        return;
-    }
-    
-    if (m_textureClarityDlg) {
-        log(tr("Activating Texture and Clarity Tool..."), Log_Action, true);
-        
-        m_textureClarityDlg->setViewer(viewer);
-        
-        QWidget* p = m_textureClarityDlg->parentWidget();
-        while (p && !qobject_cast<CustomMdiSubWindow*>(p)) p = p->parentWidget();
-        if (auto sub = qobject_cast<CustomMdiSubWindow*>(p)) {
-            centerToolWindow(sub);
-            sub->showNormal();
-            sub->raise();
-            sub->activateWindow();
-        } else {
-            m_textureClarityDlg->show();
-            m_textureClarityDlg->raise();
-            m_textureClarityDlg->activateWindow();
-        }
-        return;
-    }
-    
-    // Create new
-    try {
-        m_textureClarityDlg = new TextureAndClarityDialog(this, viewer);
-        m_textureClarityDlg->setAttribute(Qt::WA_DeleteOnClose, false);
-        
-        connect(m_textureClarityDlg, &TextureAndClarityDialog::applied, this, [this](const QString& msg){
-            log(msg, Log_Success, true);
-        });
 
-        log(tr("Opening Texture and Clarity..."), Log_Info, true);
-        CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-        setupToolSubwindow(sub, m_textureClarityDlg, tr("Texture and Clarity"));
-        sub->adjustSize();
-        centerToolWindow(sub);
-        
-        connect(m_textureClarityDlg, &QDialog::accepted, this, [this](){
-             if (m_textureClarityDlg && m_textureClarityDlg->viewer()) {
-                 ImageViewer* v = m_textureClarityDlg->viewer();
-                 QWidget* p = v->parentWidget(); 
-                 while (p && !qobject_cast<CustomMdiSubWindow*>(p) && !qobject_cast<QMdiSubWindow*>(p)) {
-                     p = p->parentWidget();
-                 }
-                 
-                 if (auto sub = qobject_cast<QMdiSubWindow*>(p)) {
-                     sub->raise();
-                     sub->activateWindow();
-                 }
-             }
-        });
-
-    } catch (const std::exception& e) {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to open Texture and Clarity dialog: %1").arg(e.what()));
-        if (m_textureClarityDlg) {
-            delete m_textureClarityDlg;
-            m_textureClarityDlg = nullptr;
-        }
-    } catch (...) {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to open Texture and Clarity dialog: Unknown error"));
-        if (m_textureClarityDlg) {
-            delete m_textureClarityDlg;
-            m_textureClarityDlg = nullptr;
-        }
-    }
-}
 
 void MainWindow::updateDisplay() {
     ImageViewer* v = currentViewer();

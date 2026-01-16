@@ -21,7 +21,6 @@ class StretchDialog;
 #include <QSettings>
 
 class StretchDialog; 
-class TextureAndClarityDialog;
 class PixelMathDialog;
 class CustomMdiSubWindow;
 class ABEDialog;
@@ -81,7 +80,6 @@ private slots:
     void openFile();
     void saveFile();
     void openStretchDialog();
-    void openTextureAndClarityDialog();
     void openAbeDialog();
     void openSCNRDialog();
     void openGHSDialog();
@@ -199,7 +197,6 @@ private:
     QPointer<class GHSDialog> m_ghsDlg;
     QPointer<class CurvesDialog> m_curvesDlg;
     QPointer<class StretchDialog> m_stretchDlg;
-    QPointer<class TextureAndClarityDialog> m_textureClarityDlg;
     QPointer<class SaturationDialog> m_satDlg;
 
     // Tool Dialog Singletons
