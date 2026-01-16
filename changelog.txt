@@ -1,6 +1,10 @@
 TStar Changelog
 ===============
 
+Version 1.5.1
+-------------
+- Removed Texture and Clarity tool
+
 Version 1.5.0
 -------------
 - Stacking suite beta

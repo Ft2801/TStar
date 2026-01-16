@@ -88,6 +88,7 @@ public:
     void setShaded(bool shaded);
     void setMaximized(bool maximized);
     void setZoom(int percent); // NEW: Update zoom display
+    void setMaximizeButtonVisible(bool visible); // NEW: Show/hide maximize button
     
 signals:
     void closeClicked();

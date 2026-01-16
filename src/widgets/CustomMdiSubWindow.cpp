@@ -402,6 +402,8 @@ void CustomTitleBar::setActive(bool active) {
 void CustomTitleBar::setShaded(bool shaded) {
     m_shaded = shaded;
     m_minBtn->setIcon(iconFromSvg(m_shaded ? Icons::WIN_UNSHADE : Icons::WIN_SHADE));
+    // Hide maximize button when shaded
+    setMaximizeButtonVisible(!shaded);
 }
 
 void CustomTitleBar::setZoom(int percent) {
@@ -417,6 +419,10 @@ void CustomTitleBar::setMaximized(bool maximized) {
     m_maximized = maximized;
     // User requested swap: use arrows (RESTORE) for 'to maximize' and square (MAXIMIZE) for 'to restore'
     m_maxBtn->setIcon(iconFromSvg(m_maximized ? Icons::WIN_MAXIMIZE : Icons::WIN_RESTORE));
+}
+
+void CustomTitleBar::setMaximizeButtonVisible(bool visible) {
+    m_maxBtn->setVisible(visible);
 }
 
 void CustomTitleBar::updateStyle() {

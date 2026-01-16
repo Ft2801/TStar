@@ -112,11 +112,6 @@ public:
         float hrSoftclipRolloff = 2.0f;   // Softclip rolloff strength
     };
     
-    struct TextureAndClarityParams {
-        float texture = 0.0f;      // Texture amount (-1 to +1, where -1 smooths, +1 increases)
-        float clarity = 0.0f;      // Clarity amount (-1 to +1, where -1 softens, +1 sharpens)
-        float radius = 5.0f;       // Radius for midtone detection (pixels)
-    };
     
     // XISF Support
     bool loadXISF(const QString& filePath, QString* errorMsg = nullptr);
@@ -144,10 +139,6 @@ public:
     
     // Compute LUT for TrueStretch (for Preview)
     std::vector<std::vector<float>> computeTrueStretchLUT(const StretchParams& params, int size = 65536) const;
-
-    // Texture and Clarity
-    void performTextureAndClarity(const TextureAndClarityParams& params);
-    std::vector<std::vector<float>> computeTextureAndClarityLUT(const TextureAndClarityParams& params, int size = 65536) const;
 
     // Math Ops
     void multiply(float factor);

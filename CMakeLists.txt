@@ -599,8 +599,6 @@ set(TSTAR_SOURCES
     src/dialogs/WavescaleHDRDialog.h
     src/dialogs/SaturationDialog.cpp
     src/dialogs/SaturationDialog.h
-    src/dialogs/TextureAndClarityDialog.cpp
-    src/dialogs/TextureAndClarityDialog.h
     src/dialogs/StarAnalysisDialog.cpp
     src/dialogs/StarAnalysisDialog.h
     src/dialogs/HeaderEditorDialog.cpp
