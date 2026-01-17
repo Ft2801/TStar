@@ -13,12 +13,24 @@
 #include <QDesktopServices>
 #include <QMessageBox>
 #include <QCoreApplication>
+#include <QApplication>
+#include <QScreen>
 #include <QDebug>
 
 UpdateDialog::UpdateDialog(QWidget* parent, const QString& version, const QString& changelog, const QString& downloadUrl) 
     : DialogBase(parent, "Update Available: v" + version, 500, 400), m_downloadUrl(downloadUrl), m_nam(nullptr), m_reply(nullptr), m_file(nullptr)
 {
     setWindowIcon(QIcon(":/images/Logo.png"));
+    
+    // Center on screen (override DialogBase positioning)
+    QScreen* screen = QApplication::primaryScreen();
+    if (screen) {
+        QRect screenGeometry = screen->geometry();
+        int x = (screenGeometry.width() - 500) / 2;
+        int y = (screenGeometry.height() - 400) / 2;
+        move(x, y);
+    }
+
 
     QVBoxLayout* layout = new QVBoxLayout(this);
 

@@ -420,7 +420,7 @@ bool StackingCommands::cmdStack(const ScriptCommand& cmd) {
         return false;
     }
     
-    // Save result - Force 32-bit float for stacking output to match Siril quality
+    // Save result - Force 32-bit float for stacking output
     if (!Stacking::FitsIO::write(params.outputFilename, args.result, 32)) {
         return false;
     }

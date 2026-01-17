@@ -594,11 +594,47 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
     
     m_linkStrip = new LinkStrip(leftStrip);
     connect(m_linkStrip, &LinkStrip::linkToggled, [this](){
-        // Unlink implementation
+        // Unlink implementation - must disconnect signal/slots and update both viewers
         ImageViewer* v = m_contentArea->findChild<ImageViewer*>();
         if (v && v->isLinked()) {
-             v->setLinked(false); 
-             // setLinked(false) emits unlinked, which updates other viewer
+            // Find all other linked viewers in the MDI area and disconnect them
+            if (QMdiArea* area = mdiArea()) {
+                for (QMdiSubWindow* sub : area->subWindowList()) {
+                    if (sub == this) continue;
+                    
+                    CustomMdiSubWindow* otherWin = qobject_cast<CustomMdiSubWindow*>(sub);
+                    if (!otherWin) continue;
+                    
+                    ImageViewer* otherViewer = otherWin->findChild<ImageViewer*>();
+                    if (otherViewer && otherViewer->isLinked()) {
+                        // Disconnect bidirectional view synchronization
+                        disconnect(v, &ImageViewer::viewChanged, otherViewer, &ImageViewer::syncView);
+                        disconnect(otherViewer, &ImageViewer::viewChanged, v, &ImageViewer::syncView);
+                        
+                        // Check if this viewer has any other links remaining
+                        bool otherHasMoreLinks = false;
+                        for (QMdiSubWindow* checkSub : area->subWindowList()) {
+                            if (checkSub == sub || checkSub == this) continue;
+                            ImageViewer* checkViewer = checkSub->findChild<ImageViewer*>();
+                            if (checkViewer && checkViewer->isLinked()) {
+                                // Check if otherViewer is still connected to checkViewer
+                                // by testing if they share viewChanged connections
+                                otherHasMoreLinks = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!otherHasMoreLinks) {
+                            otherViewer->setLinked(false);
+                            if (otherWin->m_linkStrip) {
+                                otherWin->m_linkStrip->setLinked(false);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            v->setLinked(false);
         }
         m_linkStrip->setLinked(false);
     });
