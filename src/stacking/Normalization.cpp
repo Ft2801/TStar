@@ -118,7 +118,7 @@ bool Normalization::computeFullImageNormalization(
                  currentRefLayer = regLayer;
              }
 
-             // Exclude zeros for robust statistics (matches Siril behavior)
+             // Exclude zeros for robust statistics
              std::vector<float> ref_vec;
              ref_vec.reserve(total);
              const float* rptr = refBuffer.data().data();

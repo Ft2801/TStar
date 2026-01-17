@@ -139,7 +139,7 @@ void SplashScreen::paintEvent(QPaintEvent*) {
     // Subtitle
     p.setFont(QFont("Segoe UI", 16));
     p.setPen(QColor(180, 180, 200));
-    QRect subtitleRect(0, 205, w, 25);
+    QRect subtitleRect(0, 205, w, 30);
     p.drawText(subtitleRect, Qt::AlignCenter, tr("Professional astro editing app"));
     
     // Progress bar

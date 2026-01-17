@@ -718,9 +718,6 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
     args.log(tr("Allocated %1 data blocks, each ~%2 MB")
              .arg(poolSize).arg((nbImages * pixelsPerBlock * sizeof(float)) / (1024*1024)), "neutral");
     
-    // Feathering distance (similar to Siril's feather_dist)
-    // Siril defaults to ~40 pixels for typical images, let's use a dynamic or fixed value
-    // For now, hardcode a reasonable feather distance or expose parameter
     float featherDist = 40.0f; // Could be args.params.featherDist
     bool useFeathering = true; // Always enable for smooth edges
     

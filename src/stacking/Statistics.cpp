@@ -168,7 +168,6 @@ double Statistics::mad(const std::vector<float>& data, float med) {
 double Statistics::computeNoise(const float* data, int width, int height) {
     if (width < 3 || height < 2) return 0.0;
     
-    // Siril's FnNoise1 implementation:
     // noise = 1.0 / sqrt(2) * rms of (flux[i] - flux[i-1])
     // using iterative sigma clipping (3 iters, 5.0 sigma)
     
@@ -239,7 +238,6 @@ double Statistics::computeNoise(const float* data, int width, int height) {
 
     if (rowNoises.empty()) return 0.0;
 
-    // Siril takes the median of row standard deviations
     std::sort(rowNoises.begin(), rowNoises.end());
     double medianStdev = rowNoises[rowNoises.size() / 2];
 

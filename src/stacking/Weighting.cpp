@@ -51,8 +51,6 @@ bool Weighting::computeWeights(const ImageSequence& sequence,
                     break;
                     
                 case WeightingType::WeightedFWHM:
-                    // Use scale as well for consistency? Siril uses noise mostly.
-                    // But if FWHM is requested, we follow the inverse square power trend.
                     if (img.quality.fwhm > 0.1) {
                         weight = 1.0 / (img.quality.fwhm * img.quality.fwhm * scale * scale);
                     } else {
@@ -61,7 +59,6 @@ bool Weighting::computeWeights(const ImageSequence& sequence,
                     break;
                     
                 case WeightingType::Noise:
-                    // Siril's weight: 1.0 / (noise * scale)^2
                     if (img.quality.noise > 0.0) {
                         double sigma = img.quality.noise;
                         weight = 1.0 / (sigma * sigma * scale * scale);
