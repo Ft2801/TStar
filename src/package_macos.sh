@@ -206,27 +206,44 @@ if [ -d "$BUILD_DIR/translations" ]; then
 fi
 
 
-# --- Fix library paths (install_name_tool) ---
+# --- Resolve & Fix Libraries ---
 echo ""
-log_step 9 "Fixing library paths..."
+log_step 9 "Resolving and Fixing Libraries..."
 
 EXECUTABLE="$DIST_DIR/Contents/MacOS/TStar"
-verify_file "$EXECUTABLE" "TStar executable" && {
+
+# 1. Recursive copy of missing dependencies
+echo "  - Recursively collecting dependencies..."
+# Loop multiple times to handle deep chains
+for i in {1..2}; do
+    for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
+        if [ -f "$dylib" ]; then
+            copy_dylib_with_dependencies "$dylib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+        fi
+    done
+done
+
+# 2. Fix dylib IDs and internal dependencies
+echo "  - Fixing dylib IDs and paths..."
+for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
+    if [ -f "$dylib" ]; then
+        fix_dylib_id_and_deps "$dylib" "$FRAMEWORKS_DIR"
+    fi
+done
+
+# 3. Fix executable dependencies
+if [ -f "$EXECUTABLE" ]; then
+    echo "  - Fixing executable dependencies..."
     install_name_tool -add_rpath "@executable_path/../Frameworks" "$EXECUTABLE" 2>/dev/null || true
-    echo "  - Updated rpath"
-}
+    fix_executable_deps "$EXECUTABLE" "$FRAMEWORKS_DIR"
+fi
 
 # --- Verify bundled dylibs dependencies ---
 echo ""
-echo "[STEP 9.1] Verifying and resolving bundled dylib dependencies..."
+echo "[STEP 9.1] Verifying bundled dependencies..."
 
 MISSING_DEPS=0
-for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
-    if [ -f "$dylib" ]; then
-        # Recursively copy any missing dependencies
-        copy_dylib_with_dependencies "$dylib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
-    fi
-done
+
 
 # Final verification
 echo "  - Checking for remaining missing dependencies..."

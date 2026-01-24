@@ -266,6 +266,64 @@ copy_dylib() {
     return 1
 }
 
+# --- Library Fixup Utilities ---
+fix_dylib_id_and_deps() {
+    local dylib_path="$1"
+    local frameworks_dir="$2"
+    
+    if [ ! -f "$dylib_path" ]; then
+        return
+    fi
+    
+    # Ensure writable
+    chmod +w "$dylib_path"
+    
+    local dylib_name=$(basename "$dylib_path")
+    
+    # 1. Set the ID to @rpath/...
+    install_name_tool -id "@rpath/$dylib_name" "$dylib_path" 2>/dev/null || true
+    
+    # 2. Fix dependencies
+    local deps=$(otool -L "$dylib_path" 2>/dev/null | grep -v "^$dylib_path:" | awk '{print $1}')
+    
+    for dep in $deps; do
+        local dep_name=$(basename "$dep")
+        
+        # If this dependency exists in our frameworks dir, repoint to @rpath
+        if [ -f "$frameworks_dir/$dep_name" ]; then
+            if [ "$dep" != "@rpath/$dep_name" ]; then
+                install_name_tool -change "$dep" "@rpath/$dep_name" "$dylib_path" 2>/dev/null || true
+            fi
+        fi
+    done
+}
+
+fix_executable_deps() {
+    local exec_path="$1"
+    local frameworks_dir="$2"
+    
+    if [ ! -f "$exec_path" ] || [ ! -d "$frameworks_dir" ]; then
+        return
+    fi
+    
+    # Ensure writable
+    chmod +w "$exec_path"
+    
+    local deps=$(otool -L "$exec_path" 2>/dev/null | grep -v "^$exec_path:" | awk '{print $1}')
+    
+    for dep in $deps; do
+        local dep_name=$(basename "$dep")
+        
+        # If this dependency exists in our frameworks dir, repoint to @rpath
+        if [ -f "$frameworks_dir/$dep_name" ]; then
+            if [ "$dep" != "@rpath/$dep_name" ]; then
+                install_name_tool -change "$dep" "@rpath/$dep_name" "$exec_path" 2>/dev/null || true
+                echo "    - Repointed $dep_name to bundled version"
+            fi
+        fi
+    done
+}
+
 # --- Python Detection ---
 find_compatible_python() {
     local COMPAT_VERSIONS=("3.13" "3.12" "3.11")
