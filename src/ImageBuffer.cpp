@@ -618,37 +618,31 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
         if (linked && m_channels == 3) {
             float avgMed = (stats[0].median + stats[1].median + stats[2].median) / 3.0f;
             float avgMad = (stats[0].mad + stats[1].mad + stats[2].mad) / 3.0f;
-            bool alreadyStretched = (avgMed > 0.05f);
             
             float shadow = 0.0f; 
             float mid = 0.5f;
             
-            if (!alreadyStretched) {
-                shadow = std::max(0.0f, avgMed + shadowClip * avgMad);
-                if (shadow >= avgMed) shadow = std::max(0.0f, avgMed - 0.001f);
-                mid = avgMed - shadow;
-                if (mid <= 0) mid = 0.5f;
-            }
+            shadow = std::max(0.0f, avgMed + shadowClip * avgMad);
+            if (shadow >= avgMed) shadow = std::max(0.0f, avgMed - 0.001f);
+            mid = avgMed - shadow;
+            if (mid <= 0) mid = 0.5f;
             
-            float m = alreadyStretched ? 0.5f : mtf_func(targetBG, mid);
+            float m = mtf_func(targetBG, mid);
             float norm = 1.0f / (1.0f - shadow + 1e-9f);
             
             for(int c=0; c<3; ++c) params[c] = {shadow, m, norm};
             
         } else {
             for (int c = 0; c < m_channels; ++c) {
-                bool alreadyStretched = (stats[c].median > 0.05f);
                 float shadow = 0.0f; 
                 float mid = 0.5f;
                 
-                if (!alreadyStretched) {
-                    shadow = std::max(0.0f, stats[c].median + shadowClip * stats[c].mad);
-                    if (shadow >= stats[c].median) shadow = std::max(0.0f, stats[c].median - 0.001f);
-                    mid = stats[c].median - shadow;
-                    if (mid <= 0) mid = 0.5f;
-                }
+                shadow = std::max(0.0f, stats[c].median + shadowClip * stats[c].mad);
+                if (shadow >= stats[c].median) shadow = std::max(0.0f, stats[c].median - 0.001f);
+                mid = stats[c].median - shadow;
+                if (mid <= 0) mid = 0.5f;
                 
-                float m = alreadyStretched ? 0.5f : mtf_func(targetBG, mid);
+                float m = mtf_func(targetBG, mid);
                 float norm = 1.0f / (1.0f - shadow + 1e-9f);
                 params[c] = {shadow, m, norm};
             }
@@ -764,58 +758,35 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
             float avgMed = (stats[0].median + stats[1].median + stats[2].median) / 3.0f;
             float avgMad = (stats[0].mad + stats[1].mad + stats[2].mad) / 3.0f;
             
-            // Detect if image is already stretched (high median indicates stretched data)
-            // Stretched images typically have median > 0.05-0.1
-            bool alreadyStretched = (avgMed > 0.05f);
+            float shadow = std::max(0.0f, avgMed + shadowClip * avgMad);
+            // If the image is uniform (mad=0) and bright (median=1), shadow becomes 1.0.
+            // We must ensure shadow < median to have a valid stretch.
+            if (shadow >= avgMed) shadow = std::max(0.0f, avgMed - 0.001f);
             
-            if (alreadyStretched) {
-                // For already stretched data, use a mild linear LUT (near identity)
-                for (int c = 0; c < 3; ++c) {
-                    for (int i = 0; i < LUT_SIZE; ++i) {
-                        luts[c][i] = (float)i / (LUT_SIZE - 1);
-                    }
-                }
-            } else {
-                float shadow = std::max(0.0f, avgMed + shadowClip * avgMad);
-                // If the image is uniform (mad=0) and bright (median=1), shadow becomes 1.0.
-                // We must ensure shadow < median to have a valid stretch.
-                if (shadow >= avgMed) shadow = std::max(0.0f, avgMed - 0.001f);
-                
-                float mid = avgMed - shadow; 
-                if (mid <= 0) mid = 0.5f; 
-                
-                float m = mtf_func(targetBG, mid);
-                for (int c = 0; c < 3; ++c) {
-                    for (int i = 0; i < LUT_SIZE; ++i) {
-                        float x = (float)i / (LUT_SIZE - 1);
-                        float normX = (x - shadow) / (1.0f - shadow + 1e-9f);
-                        luts[c][i] = mtf_func(m, normX);
-                    }
+            float mid = avgMed - shadow; 
+            if (mid <= 0) mid = 0.5f; 
+            
+            float m = mtf_func(targetBG, mid);
+            for (int c = 0; c < 3; ++c) {
+                for (int i = 0; i < LUT_SIZE; ++i) {
+                    float x = (float)i / (LUT_SIZE - 1);
+                    float normX = (x - shadow) / (1.0f - shadow + 1e-9f);
+                    luts[c][i] = mtf_func(m, normX);
                 }
             }
         } else {
             for (int c = 0; c < m_channels; ++c) {
-                // Detect if this channel is already stretched
-                bool alreadyStretched = (stats[c].median > 0.05f);
+                float shadow = std::max(0.0f, stats[c].median + shadowClip * stats[c].mad);
+                if (shadow >= stats[c].median) shadow = std::max(0.0f, stats[c].median - 0.001f);
                 
-                if (alreadyStretched) {
-                    // For already stretched data, use linear LUT
-                    for (int i = 0; i < LUT_SIZE; ++i) {
-                        luts[c][i] = (float)i / (LUT_SIZE - 1);
-                    }
-                } else {
-                    float shadow = std::max(0.0f, stats[c].median + shadowClip * stats[c].mad);
-                    if (shadow >= stats[c].median) shadow = std::max(0.0f, stats[c].median - 0.001f);
-                    
-                    float mid = stats[c].median - shadow;
-                    if (mid <= 0) mid = 0.5f;
+                float mid = stats[c].median - shadow;
+                if (mid <= 0) mid = 0.5f;
 
-                    float m = mtf_func(targetBG, mid);
-                    for (int i = 0; i < LUT_SIZE; ++i) {
-                        float x = (float)i / (LUT_SIZE - 1);
-                        float normX = (x - shadow) / (1.0f - shadow + 1e-9f);
-                        luts[c][i] = mtf_func(m, normX);
-                    }
+                float m = mtf_func(targetBG, mid);
+                for (int i = 0; i < LUT_SIZE; ++i) {
+                    float x = (float)i / (LUT_SIZE - 1);
+                    float normX = (x - shadow) / (1.0f - shadow + 1e-9f);
+                    luts[c][i] = mtf_func(m, normX);
                 }
             }
         }

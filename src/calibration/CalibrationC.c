@@ -418,6 +418,7 @@ static float evaluate_uncalibrated_noise(const float* light, const float* dark,
                                         int width, int height, int channels,
                                         float k, 
                                         int roi_x, int roi_y, int roi_w, int roi_h) {
+    (void)height;  // Not used in this function
     // Only sample the ROI to be fast
     // Compute Diff = Light - K*Dark
     int n_pixels = roi_w * roi_h;

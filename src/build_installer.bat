@@ -78,7 +78,7 @@ echo.
 
 REM --- STEP 2: Build the Application ---
 echo [STEP 2] Building the application...
-call src\build_all.bat --silent --lto-on
+call src\build_all.bat --silent
 if %errorlevel% neq 0 (
     echo [ERROR] Build failed!
     pause

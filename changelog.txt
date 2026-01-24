@@ -1,6 +1,10 @@
 TStar Changelog
 ===============
 
+Version 1.5.2
+-------------
+- Fixed a small display stretch bug
+
 Version 1.5.1
 -------------
 - Removed Texture and Clarity tool
