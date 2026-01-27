@@ -37,7 +37,18 @@ TStar/
 │   ├── opencv/
 │   │   ├── include/
 │   │   └── lib/
-│   └── gsl/
+│   ├── gsl/
+│   │   ├── include/
+│   │   └── lib/
+│   ├── libraw/ (Optional - for RAW image support)
+│   │   ├── libraw/
+│   │   │   └── libraw.h
+│   │   ├── lib/
+│   │   └── bin/
+│   ├── lz4/ (Optional - for XISF LZ4 compression)
+│   │   ├── include/
+│   │   └── lib/
+│   └── zstd/ (Optional - for XISF Zstd compression)
 │       ├── include/
 │       └── lib/
 ├── src/
@@ -70,6 +81,29 @@ make && make install
 
 - Pre-built MinGW binaries available from [MSYS2](https://www.msys2.org/)
 - Or build from source following [GSL documentation](https://www.gnu.org/software/gsl/)
+
+### LibRaw (Optional - RAW Image Support)
+
+**Recommended for full camera RAW support (CR2, NEF, ARW, etc.)**
+
+- Download pre-built Windows binaries from [LibRaw website](https://www.libraw.org/download)
+- Extract and place in `deps/libraw/`
+- Requires `libraw.dll` in `deps/libraw/bin/`
+- CMake will automatically detect and enable LibRaw support with `HAVE_LIBRAW` flag
+
+### LZ4 and Zstd (Optional - XISF Compression)
+
+**Optional dependencies for compressed XISF format support**
+
+- **LZ4**: Fast compression for XISF files
+  - Download from [LZ4 releases](https://github.com/lz4/lz4/releases)
+  - Extract to `deps/lz4/`
+  
+- **Zstd**: High-ratio compression for XISF files
+  - Download from [Zstd releases](https://github.com/facebook/zstd/releases)
+  - Extract to `deps/zstd/`
+
+CMake will automatically detect these libraries and enable compression features.
 
 ### Python Environment Discovery
 
@@ -118,9 +152,10 @@ package_dist.bat
 2. Checks for (and runs) `setup_python_dist.ps1` to ensure the Python environment is ready.
 3. Copies all Qt DLLs and plugins.
 4. Copies MinGW, GSL, and OpenCV runtime libraries.
-5. **Bundles the Python environment** into the `dist/TStar/python` subfolder.
-6. **Centralizes scripts** from `src/scripts` into `dist/TStar/scripts`.
-7. Generates a `README.txt` for the end user.
+5. **Copies optional dependency libraries** (LibRaw, LZ4, Zstd) if they exist.
+6. **Bundles the Python environment** into the `dist/TStar/python` subfolder.
+7. **Centralizes scripts** from `src/scripts` into `dist/TStar/scripts`.
+8. Generates a `README.txt` for the end user.
 
 The resulting folder in `dist/TStar` is completely standalone and can be moved to any machine without pre-installed dependencies.
 
@@ -152,7 +187,8 @@ From your MinGW `bin/` directory to the executable folder.
 |----|----------|------------|--------|
 | Windows 11 | MinGW 13.1 | Qt 6.7.0 | ✅ Tested |
 | Windows 10 | MinGW 11.2 | Qt 6.5.0 | ✅ Tested |
-| macOS 11+ (Big Sur) | Apple Clang | Qt 6.5+ | 🔧 Experimental |
+| macOS 11+ (Big Sur) - Apple Silicon | Apple Clang | Qt 6.5+ | ✅ Tested |
+| macOS 11+ (Big Sur) - Intel | Apple Clang | Qt 6.5+ | ✅ Tested |
 
 ---
 
@@ -175,12 +211,20 @@ From your MinGW `bin/` directory to the executable folder.
 brew install qt@6 cmake ninja pkg-config
 brew install opencv gsl cfitsio libomp
 
-# Optional (for XISF compression)
+# Optional - for XISF compression (Recommended)
 brew install lz4 zstd
+
+# Optional - for RAW image support (CR2, NEF, ARW, etc.)
+brew install libraw
 
 # Python for AI tools
 brew install python@3.11
 ```
+
+**Note on Architecture:**
+- **Apple Silicon (M1/M2/M3/M4)**: Homebrew installs to `/opt/homebrew` (arm64)
+- **Intel Macs**: Homebrew installs to `/usr/local` (x86_64)
+- The build scripts automatically detect your architecture and use the correct paths
 
 ### Build Steps
 
@@ -213,8 +257,22 @@ chmod +x src/build_installer_macos.sh
 
 ### Notes
 
-- **Apple Silicon (M1/M2/M3)**: Fully supported. Homebrew installs to `/opt/homebrew`
-- **Intel Macs**: Supported. Homebrew installs to `/usr/local`
+- **Apple Silicon (M1/M2/M3/M4)**: Fully supported with automatic architecture detection
+- **Intel Macs**: Fully supported with automatic architecture detection
+- **Universal Binaries**: The build system automatically creates architecture-specific builds
+- **Homebrew Paths**: Build scripts automatically detect and use the correct Homebrew prefix:
+  - Apple Silicon: `/opt/homebrew`
+  - Intel: `/usr/local`
 - **Gatekeeper**: On first run, right-click the app and select "Open" to bypass unsigned app warning
 - **Notarization**: For distribution, consider notarizing with `xcrun notarytool`
+
+### Optional Features
+
+The macOS build supports several optional features that are automatically enabled when dependencies are found:
+
+- **LibRaw**: RAW camera image support (CR2, NEF, ARW, DNG, etc.) - `brew install libraw`
+- **LZ4**: Fast XISF compression - `brew install lz4`
+- **Zstd**: High-ratio XISF compression - `brew install zstd`
+
+These libraries are automatically detected by CMake and bundled into the app during packaging.
 
