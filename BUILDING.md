@@ -99,7 +99,7 @@ make && make install
   - Download from [LZ4 releases](https://github.com/lz4/lz4/releases)
   - Extract to `deps/lz4/`
   
-- **Zstd**: High-ratio compression for XISF files  
+- **Zstd**: High-ratio compression for XISF files
   - Download from [Zstd releases](https://github.com/facebook/zstd/releases)
   - Extract to `deps/zstd/`
 
