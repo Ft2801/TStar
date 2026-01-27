@@ -43,6 +43,36 @@ Thank you for your interest in contributing to TStar! This document provides gui
 - **Formatting**: 4 spaces indentation, no tabs
 - **Qt**: Follow Qt naming conventions for signals/slots
 
+### Optional Features
+
+TStar supports several optional features that are enabled when dependencies are detected:
+
+- **LibRaw Support**: RAW camera image format support (CR2, NEF, ARW, DNG, etc.)
+  - Enabled with `HAVE_LIBRAW` flag when LibRaw is found
+  - Windows: Place in `deps/libraw/`
+  - macOS: `brew install libraw`
+  
+- **XISF Compression**: Advanced compression for XISF astronomical image format
+  - **LZ4**: Fast compression - enabled with `HAVE_LZ4` flag
+  - **Zstd**: High-ratio compression - enabled with `HAVE_ZSTD` flag
+  - Windows: Place in `deps/lz4/` and `deps/zstd/`
+  - macOS: `brew install lz4 zstd`
+
+When contributing code that uses these features, always guard usage with the appropriate preprocessor flags:
+```cpp
+#ifdef HAVE_LIBRAW
+    // LibRaw-specific code
+#endif
+
+#ifdef HAVE_LZ4
+    // LZ4 compression code
+#endif
+
+#ifdef HAVE_ZSTD
+    // Zstd compression code
+#endif
+```
+
 ### Python Guidelines
 
 - **Usage**: Only for bridge/worker scripts or AI integrations.
@@ -55,6 +85,25 @@ Thank you for your interest in contributing to TStar! This document provides gui
 ### Translations
 
 Translations are managed via Python dictionaries in `tools/trans_data.py`. If you add a new user-facing string in C++, add its translation entries to this file. The `translate_manager.py` script uses this dictionary to generate `.ts` files for Qt Linguist.
+
+### macOS Development
+
+When developing on macOS, be aware of architecture-specific considerations:
+
+- **Architecture Detection**: Build scripts automatically detect whether you're on Apple Silicon (arm64) or Intel (x86_64)
+- **Homebrew Paths**: Dependencies are pulled from architecture-specific Homebrew paths:
+  - Apple Silicon: `/opt/homebrew`
+  - Intel: `/usr/local`
+- **Testing Across Architectures**: If you have access to both Intel and Apple Silicon Macs:
+  - Test builds on both architectures when modifying low-level code or dependencies
+  - Verify that the `package_macos.sh` script correctly bundles libraries for your architecture
+  - Check that the app launches and functions correctly on both platforms
+- **Architecture Verification**: You can check the built executable's architecture:
+  ```bash
+  lipo -info build/TStar.app/Contents/MacOS/TStar
+  # or
+  file build/TStar.app/Contents/MacOS/TStar
+  ```
 
 
 ### Example
