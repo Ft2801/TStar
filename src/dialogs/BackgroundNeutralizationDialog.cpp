@@ -136,13 +136,14 @@ void BackgroundNeutralizationDialog::neutralizeBackground(ImageBuffer& img, cons
     for (int y = y0; y < y1; ++y) {
         for (int x = x0; x < x1; ++x) {
             size_t idx = (static_cast<size_t>(y) * w + x) * ch;
-            sample[0].push_back(data[idx]);
-            sample[1].push_back(data[idx + 1]);
-            sample[2].push_back(data[idx + 2]);
+            // Sanitize input: Skip NaNs or Inf
+            if (std::isfinite(data[idx])) sample[0].push_back(data[idx]);
+            if (std::isfinite(data[idx + 1])) sample[1].push_back(data[idx + 1]);
+            if (std::isfinite(data[idx + 2])) sample[2].push_back(data[idx + 2]);
         }
     }
 
-    if (sample[0].empty()) return;
+    if (sample[0].empty() || sample[1].empty() || sample[2].empty()) return;
 
     // 2. Compute Medians and Average Median (ref)
     double med[3];
@@ -158,6 +159,8 @@ void BackgroundNeutralizationDialog::neutralizeBackground(ImageBuffer& img, cons
     for (int c = 0; c < 3; ++c) {
         double mean = std::accumulate(sample[c].begin(), sample[c].end(), 0.0) / sample[c].size();
         offset[c] = mean - avgMed;
+        // Safety check for calculated offset
+        if (!std::isfinite(offset[c])) offset[c] = 0.0;
     }
 
     // 4. Apply Subtraction
