@@ -634,10 +634,13 @@ void PreprocessingDialog::onProgressChanged([[maybe_unused]] const QString& mess
 }
 
 void PreprocessingDialog::onLogMessage(const QString& message, const QString& color) {
-    if (color.isEmpty()) {
+    QString finalColor = color;
+    if (finalColor.toLower() == "neutral") finalColor = "";
+
+    if (finalColor.isEmpty()) {
         m_logText->append(message);
     } else {
-        m_logText->append(QString("<span style='color:%1'>%2</span>").arg(color, message));
+        m_logText->append(QString("<span style='color:%1'>%2</span>").arg(finalColor, message));
     }
 }
 

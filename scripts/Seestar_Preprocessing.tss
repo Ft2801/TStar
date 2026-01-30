@@ -24,7 +24,7 @@ register pp_light
 stack r_pp_light rej 3 3 -norm=addscale -output_norm -rgb_equal -32b -out=result
 
 # Flip if required
-load result
+
 mirrorx -bottomup
 save ../result
 close

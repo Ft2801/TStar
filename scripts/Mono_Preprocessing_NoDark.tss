@@ -40,4 +40,4 @@ register pp_${LIGHT_PREFIX}
 # ==========================================
 stack r_pp_${LIGHT_PREFIX} --method=mean --rej=3 3 --norm=addscale --output=result.fit --32b --output_norm
 
-load result.fit
+

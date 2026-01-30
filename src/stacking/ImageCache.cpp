@@ -7,6 +7,7 @@
 
 #include "ImageCache.h"
 #include <algorithm>
+#include "../core/ResourceManager.h"
 
 namespace Stacking {
 
@@ -32,6 +33,8 @@ void ImageCache::setSequence(ImageSequence* sequence) {
     }
 }
 
+
+
 const ImageBuffer* ImageCache::get(int index) {
     std::lock_guard<std::mutex> lock(m_mutex);
     
@@ -44,8 +47,16 @@ const ImageBuffer* ImageCache::get(int index) {
         return m_cache[index].get();
     }
     
-    // Check memory limit
-    if (m_maxImages > 0 && size() >= m_maxImages) {
+    // Calculate expected size
+    size_t expectedSize = static_cast<size_t>(m_sequence->width()) * 
+                          m_sequence->height() * 
+                          m_sequence->channels() * sizeof(float);
+                          
+    // Check if we need to evict based on count OR memory
+    while ( (m_maxImages > 0 && size() >= m_maxImages) || 
+            !ResourceManager::instance().isMemorySafe(expectedSize) ) {
+        
+        if (size() == 0) break; // Can't evict anymore
         evictOldest();
     }
     

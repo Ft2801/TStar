@@ -42,7 +42,6 @@ register pp_light -drizzle -scale=1.0 -pixfrac=1.0 -kernel=square -flat=../maste
 # Stack calibrated lights
 stack r_pp_light rej 3 3 -norm=addscale -output_norm -rgb_equal -32b -out=result
 
-load result
 mirrorx -bottomup
 save ../result_drizzle
 

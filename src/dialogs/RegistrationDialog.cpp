@@ -112,6 +112,19 @@ void RegistrationDialog::setupUI() {
     m_highPrecision->setChecked(true);
     paramLayout->addWidget(m_highPrecision, 2, 2, 1, 2);
     
+    // Row 3: Output Directory
+    paramLayout->addWidget(new QLabel(tr("Output Directory:"), this), 3, 0);
+    m_outputDir = new QLineEdit(this);
+    m_outputDir->setPlaceholderText(tr("Leave empty for source folder"));
+    paramLayout->addWidget(m_outputDir, 3, 1, 1, 2);
+    
+    QPushButton* browseDirBtn = new QPushButton(tr("..."), this);
+    connect(browseDirBtn, &QPushButton::clicked, this, [this](){
+        QString dir = QFileDialog::getExistingDirectory(this, tr("Select Output Directory"), m_outputDir->text());
+        if (!dir.isEmpty()) m_outputDir->setText(dir);
+    });
+    paramLayout->addWidget(browseDirBtn, 3, 3);
+    
     mainLayout->addWidget(m_paramsGroup);
     
     // Progress group
@@ -154,7 +167,10 @@ void RegistrationDialog::onLoadSequence() {
     
     m_sequence = std::make_unique<Stacking::ImageSequence>();
     
-    bool success = m_sequence->loadFromDirectory(dir, "*.fit",
+    QStringList filters;
+    filters << "*.fit" << "*.fits" << "*.fts" << "*.tif" << "*.tiff";
+    
+    bool success = m_sequence->loadFromDirectory(dir, filters,
         [this]([[maybe_unused]] const QString& msg, double pct) {
             m_progressBar->setValue(static_cast<int>(pct * 100));
             QApplication::processEvents();
@@ -250,6 +266,7 @@ Stacking::RegistrationParams RegistrationDialog::gatherParams() const {
     params.matchTolerance = static_cast<float>(m_matchTolerance->value());
     params.allowRotation = m_allowRotation->isChecked();
     params.highPrecision = m_highPrecision->isChecked();
+    params.outputDirectory = m_outputDir->text();
     return params;
 }
 
@@ -296,10 +313,13 @@ void RegistrationDialog::onProgressChanged([[maybe_unused]] const QString& messa
 }
 
 void RegistrationDialog::onLogMessage(const QString& message, const QString& color) {
-    if (color.isEmpty()) {
+    QString finalColor = color;
+    if (finalColor.toLower() == "neutral") finalColor = "";
+
+    if (finalColor.isEmpty()) {
         m_logText->append(message);
     } else {
-        m_logText->append(QString("<span style='color:%1'>%2</span>").arg(color, message));
+        m_logText->append(QString("<span style='color:%1'>%2</span>").arg(finalColor, message));
     }
 }
 

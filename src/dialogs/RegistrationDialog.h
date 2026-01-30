@@ -18,6 +18,7 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QTextEdit>
+#include <QLineEdit>
 #include <QLabel>
 #include <memory>
 
@@ -67,6 +68,7 @@ private:
     QLabel* m_referenceLbl;
     
     QGroupBox* m_paramsGroup;
+    QLineEdit* m_outputDir; // New output directory field
     QDoubleSpinBox* m_detectionSigma;
     QSpinBox* m_minStars;
     QSpinBox* m_maxStars;

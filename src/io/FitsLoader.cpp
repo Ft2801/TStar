@@ -91,12 +91,15 @@ bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* err
         }
     }
     
-    // Normalize Data (Global Max across all channels)
-    // Use parallel reduction for min/max finding
+    // Normalize Data
+    // We strictly convert Integers to [0,1] range based on bit depth.
+    // We AVOID Min-Max normalization as it destroys relative offsets needed for calibration.
+    // For Floats > 1.0 (ADU), we heuristically normalize if they look like 16-bit data.
+
     float globalMax = -1e30f;
     float globalMin = 1e30f;
     
-    // OpenMP reduction for min/max
+    // Compute stats for heuristic check
     #ifdef _OPENMP
     #pragma omp parallel for reduction(max:globalMax) reduction(min:globalMin)
     #endif
@@ -106,28 +109,41 @@ bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* err
         if (v < globalMin) globalMin = v;
     }
     
-    bool needsNorm = (globalMax > 1.0f);
-    
-    if (needsNorm) {
-        float range = globalMax - globalMin;
-        if (range < 1e-9) range = 1.0f;
-        
-        float divisor = 1.0f;
-        if (bitpix == 8) divisor = 255.0f;
-        else if (bitpix == 16) divisor = 65535.0f;
-        else if (bitpix == 32) divisor = 4294967295.0f;
-        
-        bool useDivisor = (bitpix > 0 && globalMax <= divisor * 1.01f);
-        
+    float divisor = 1.0f;
+    bool doScale = false;
+
+    if (bitpix == 8) {
+        divisor = 255.0f;
+        doScale = true;
+    } else if (bitpix == 16) {
+        divisor = 65535.0f;
+        doScale = true;
+    } else if (bitpix == 32) {
+        divisor = 4294967295.0f;
+        doScale = true;
+    } else if (bitpix < 0) {
+        // Floating point data.
+        // If data is in range [0, 1], do nothing.
+        // If data exceeds 1.0, it's likely ADU counts (e.g. 0-65535 saved as float).
+        // We normalize to [0, 1] for consistency with integer pipeline.
+        if (globalMax > 1.0f) {
+             // Heuristic: If max is within 16-bit range (plus margin), assume 16-bit scale
+             if (globalMax <= 66000.0f) {
+                 divisor = 65535.0f;
+                 doScale = true;
+             }
+             // Else: Leave it as is (e.g. stacked 32-bit HDR or unknown scale)
+             // This preserves large values but avoids destructive Min-Max.
+        }
+    }
+
+    if (doScale && divisor > 0.0f) {
+        float invDiv = 1.0f / divisor;
         #ifdef _OPENMP
         #pragma omp parallel for
         #endif
         for (size_t i = 0; i < allPixels.size(); ++i) {
-            if (useDivisor) {
-                allPixels[i] /= divisor;
-            } else {
-                allPixels[i] = (allPixels[i] - globalMin) / range;
-            }
+            allPixels[i] *= invDiv;
         }
     }
     
@@ -554,7 +570,11 @@ bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuff
         }
     }
     
-    // Normalize Data - parallel min/max finding
+    // Normalize Data
+    // We strictly convert Integers to [0,1] range based on bit depth.
+    // We AVOID Min-Max normalization as it destroys relative offsets needed for calibration.
+    // For Floats > 1.0 (ADU), we heuristically normalize if they look like 16-bit data.
+
     float globalMax = -1e30f;
     float globalMin = 1e30f;
     
@@ -569,33 +589,34 @@ bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuff
         if (v < globalMin) globalMin = v;
     }
     
-    bool needsNorm = (globalMax > 1.0f);
-    
-    if (needsNorm) {
-        float range = globalMax - globalMin;
-        if (range < 1e-9) range = 1.0f;
-        
-        float divisor = 1.0f;
-        if (bitpix == 8) divisor = 255.0f;
-        else if (bitpix == 16) divisor = 65535.0f;
-        else if (bitpix == 32) divisor = 4294967295.0f;
-        
-        if (bitpix > 0 && globalMax <= divisor * 1.01f) {
-            const float invDiv = 1.0f / divisor;
-            #ifdef _OPENMP
-            #pragma omp parallel for
-            #endif
-            for (size_t i = 0; i < pixelCount; ++i) {
-                allPixels[i] *= invDiv;
-            }
-        } else {
-            const float invRange = 1.0f / range;
-            #ifdef _OPENMP
-            #pragma omp parallel for
-            #endif
-            for (size_t i = 0; i < pixelCount; ++i) {
-                allPixels[i] = (allPixels[i] - globalMin) * invRange;
-            }
+    float divisor = 1.0f;
+    bool doScale = false;
+
+    if (bitpix == 8) {
+        divisor = 255.0f;
+        doScale = true;
+    } else if (bitpix == 16) {
+        divisor = 65535.0f;
+        doScale = true;
+    } else if (bitpix == 32) {
+        divisor = 4294967295.0f;
+        doScale = true;
+    } else if (bitpix < 0) {
+        if (globalMax > 1.0f) {
+             if (globalMax <= 66000.0f) {
+                 divisor = 65535.0f;
+                 doScale = true;
+             }
+        }
+    }
+
+    if (doScale && divisor > 0.0f) {
+        float invDiv = 1.0f / divisor;
+        #ifdef _OPENMP
+        #pragma omp parallel for
+        #endif
+        for (size_t i = 0; i < pixelCount; ++i) {
+            allPixels[i] *= invDiv;
         }
     }
     

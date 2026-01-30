@@ -13,6 +13,7 @@
 #include <QDir>
 #include <cmath>
 #include <algorithm>
+#include "../core/ResourceManager.h"
 
 namespace Preprocessing {
 
@@ -84,7 +85,18 @@ void PreprocessingEngine::setParams(const PreprocessParams& params) {
     if (m_params.useFlat && m_masters.isLoaded(MasterType::Flat)) {
         const ImageBuffer* flat = m_masters.get(MasterType::Flat);
         m_flatNormalization = Calibration::CalibrationEngine::computeFlatNormalization(*flat);
-        emit logMessage(tr("Cached flat normalization factor: %1").arg(m_flatNormalization), "neutral");
+        
+        QString pattern = "None/Mono";
+        if (m_params.bayerPattern != BayerPattern::None) {
+            switch(m_params.bayerPattern) {
+                case BayerPattern::RGGB: pattern = "RGGB"; break;
+                case BayerPattern::BGGR: pattern = "BGGR"; break;
+                case BayerPattern::GBRG: pattern = "GBRG"; break;
+                case BayerPattern::GRBG: pattern = "GRBG"; break;
+                default: pattern = "Auto/Unknown"; break;
+            }
+        }
+        emit logMessage(tr("Master Flat loaded (Norm: %1, Pattern: %2)").arg(m_flatNormalization, 0, 'f', 4).arg(pattern), "neutral");
     }
 }
 
@@ -220,12 +232,21 @@ int PreprocessingEngine::preprocessBatch(
     QAtomicInt processed(0);
     std::mutex progressMutex;
     
-    emit logMessage(tr("Preprocessing %1 files using %2 threads...").arg(total).arg(QThread::idealThreadCount()), "neutral");
+    emit logMessage(tr("Preprocessing %1 files using %2 threads...").arg(total).arg(ResourceManager::instance().maxThreads()), "neutral");
 
     QtConcurrent::blockingMap(inputFiles, [&](const QString& inputPath) {
         if (m_cancelled) return;
         
         QFileInfo fi(inputPath);
+        
+        // Memory safety check
+        // Conservative estimate: FileSize * 20 (approx 25MB Raw -> 500MB RAM during processing)
+        size_t estimatedMem = fi.size() * 20;
+        if (!ResourceManager::instance().isMemorySafe(estimatedMem)) {
+            emit logMessage(tr("Skipped %1: Insufficient memory (current usage > 90%)").arg(fi.fileName()), "red");
+            return;
+        }
+
         QString outputName = m_params.outputPrefix + fi.completeBaseName() + ".fit";
         QString outputPath = outDir.filePath(outputName);
         

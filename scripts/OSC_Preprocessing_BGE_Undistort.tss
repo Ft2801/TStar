@@ -46,7 +46,6 @@ register bkg_pp_light
 # Stack calibrated lights
 stack r_bkg_pp_light rej 3 3 -norm=addscale -output_norm -rgb_equal -32b -out=result
 
-load result
 mirrorx -bottomup
 save ../result
 

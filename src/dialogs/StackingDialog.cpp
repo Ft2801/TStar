@@ -386,6 +386,7 @@ void StackingDialog::setupParametersGroup() {
     m_weightingCombo->addItem(tr("Noise"), static_cast<int>(Stacking::WeightingType::Noise));
     m_weightingCombo->addItem(tr("Roundness"), static_cast<int>(Stacking::WeightingType::Roundness));
     m_weightingCombo->addItem(tr("Quality"), static_cast<int>(Stacking::WeightingType::Quality));
+    m_weightingCombo->setCurrentIndex(3); // Noise default (matches Scripts)
     layout->addWidget(m_weightingCombo, row++, 1);
 
     // Feathering
@@ -431,14 +432,15 @@ void StackingDialog::setupParametersGroup() {
     layout->addWidget(m_force32BitCheck, row++, 0, 1, 2);
     
     m_outputNormCheck = new QCheckBox(tr("Normalize output to [0,1]"), this);
-    m_outputNormCheck->setChecked(true);
+    m_outputNormCheck->setChecked(false); // Default OFF (Matches Scripts)
     layout->addWidget(m_outputNormCheck, row++, 0, 1, 2);
     
     m_equalizeRGBCheck = new QCheckBox(tr("Equalize RGB channels"), this);
-    m_equalizeRGBCheck->setChecked(true);
+    m_equalizeRGBCheck->setChecked(false); // Default OFF (Matches Scripts)
     layout->addWidget(m_equalizeRGBCheck, row++, 0, 1, 2);
     
     m_maximizeFramingCheck = new QCheckBox(tr("Maximize framing"), this);
+    m_maximizeFramingCheck->setChecked(false);
     layout->addWidget(m_maximizeFramingCheck, row++, 0, 1, 2);
     
     m_createRejMapsCheck = new QCheckBox(tr("Create rejection maps"), this);
@@ -550,7 +552,11 @@ void StackingDialog::onLoadSequence() {
     
     m_logText->append(tr("Loading sequence from: %1").arg(dir));
     
-    bool success = m_sequence->loadFromDirectory(dir, "*.fit",
+    // Support multiple extensions
+    QStringList filters;
+    filters << "*.fit" << "*.fits" << "*.fts" << "*.tif" << "*.tiff";
+    
+    bool success = m_sequence->loadFromDirectory(dir, filters,
         [this](const QString& msg, double pct) {
             m_progressBar->setValue(static_cast<int>(pct * 100));
             m_logText->append(msg);
@@ -562,7 +568,7 @@ void StackingDialog::onLoadSequence() {
         updateSummary();
         m_logText->append(tr("Loaded %1 images").arg(m_sequence->count()));
     } else {
-        m_logText->append(tr("<span style='color:red'>Failed to load sequence</span>"));
+        m_logText->append(tr("<span style='color:red'>Failed to load sequence or no images found</span>"));
         m_sequence.reset();
     }
     
@@ -934,11 +940,14 @@ void StackingDialog::onProgressChanged([[maybe_unused]] const QString& message, 
 }
 
 void StackingDialog::onLogMessage(const QString& message, const QString& color) {
-    if (color.isEmpty()) {
+    QString finalColor = color;
+    if (finalColor.toLower() == "neutral") finalColor = "";
+
+    if (finalColor.isEmpty()) {
         m_logText->append(message);
     } else {
         m_logText->append(QString("<span style='color:%1'>%2</span>")
-                         .arg(color, message));
+                         .arg(finalColor, message));
     }
 }
 
@@ -956,14 +965,32 @@ void StackingDialog::onStackingFinished(bool success) {
         m_result = std::make_unique<ImageBuffer>(std::move(m_worker->args().result));
         emit stackingComplete(m_result.get());
         
-        // Optionally load in viewer
-        if (m_mainWindow) {
-            // Would need to implement image loading in MainWindow
+        // Save the result to disk
+        QString outPath = m_worker->args().params.outputFilename;
+        if (!outPath.isEmpty()) {
+            // Ensure absolute path
+            QFileInfo fi(outPath);
+            if (fi.isRelative()) {
+                outPath = QDir::current().absoluteFilePath(outPath);
+            }
+            
+            // Determine bit depth
+            ImageBuffer::BitDepth depth = ImageBuffer::Depth_32Float;
+            if (!m_worker->args().params.force32Bit) {
+                depth = ImageBuffer::Depth_16Int;
+            }
+            
+            QString errorMsg;
+            if (m_result->save(outPath, "FITS", depth, &errorMsg)) {
+                m_logText->append(tr("<b>Saved output to: %1</b>").arg(outPath));
+            } else {
+                m_logText->append(tr("<span style='color:red'>Failed to save output: %1</span>").arg(errorMsg));
+            }
         }
         
         // Save Rejection Maps if generated
         if (m_worker->args().rejectionMaps.isInitialized()) {
-            QString outPath = m_worker->args().params.outputFilename;
+             // Reuse outPath base
             if (!outPath.isEmpty()) {
                 QFileInfo fi(outPath);
                 QString basePath = fi.absolutePath();

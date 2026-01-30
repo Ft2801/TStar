@@ -107,12 +107,12 @@ public:
     /**
      * @brief Load sequence from a directory
      * @param directory Path to directory containing images
-     * @param pattern File pattern (e.g., "*.fit")
+     * @param nameFilters List of file patterns (e.g., {"*.fit", "*.fits"})
      * @param progressCallback Optional progress callback
      * @return true if successful
      */
     bool loadFromDirectory(const QString& directory,
-                          const QString& pattern = "*.fit",
+                          const QStringList& nameFilters,
                           ProgressCallback progressCallback = nullptr);
     
     /**

@@ -89,7 +89,16 @@ int RegistrationEngine::registerSequence(ImageSequence& sequence, int referenceI
             QString inPath = sequence.image(i).filePath;
             QFileInfo fi(inPath);
             QString outName = "r_" + fi.fileName();
-            QString outPath = fi.dir().filePath(outName);
+            QString outPath;
+            
+            if (!m_params.outputDirectory.isEmpty()) {
+                 QDir d(m_params.outputDirectory);
+                 if (!d.exists()) d.mkpath(".");
+                 outPath = d.filePath(outName);
+            } else {
+                 outPath = fi.dir().filePath(outName);
+            }
+            
             FitsIO::write(outPath, refBuffer);
             emit logMessage(tr("Saved reference: %1").arg(outName), "");
 
@@ -161,7 +170,16 @@ int RegistrationEngine::registerSequence(ImageSequence& sequence, int referenceI
             QString inPath = sequence.image(i).filePath;
             QFileInfo fi(inPath);
             QString outName = "r_" + fi.fileName();
-            QString outPath = fi.dir().filePath(outName);
+            QString outPath;
+            
+            if (!m_params.outputDirectory.isEmpty()) {
+                 QDir d(m_params.outputDirectory);
+                 if (!d.exists()) d.mkpath(".");
+                 outPath = d.filePath(outName);
+            } else {
+                 outPath = fi.dir().filePath(outName);
+            }
+            
             FitsIO::write(outPath, warped);
             emit logMessage(tr("Saved: %1").arg(outName), "");
         } else {

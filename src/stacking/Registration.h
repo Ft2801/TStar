@@ -68,6 +68,9 @@ struct RegistrationParams {
     bool drizzle = false;
     float drizzleScale = 2.0f;
     float drizzleDropSize = 0.9f;
+    
+    // Output
+    QString outputDirectory;          ///< Optional output directory
 };
 
 /**

@@ -322,8 +322,8 @@ void ScriptDialog::onCommandFinished(const QString& name, bool success) {
 }
 
 void ScriptDialog::onLogMessage(const QString& message, const QString& color) {
-    QString finalColor = color.isEmpty() ? "#ffffff" : color;
-    if (finalColor == "neutral") finalColor = "#ffffff";
+    QString finalColor = color;
+    if (finalColor.isEmpty() || finalColor.toLower() == "neutral") finalColor = "white";
     
     m_outputLog->append(QString("<span style='color:%1'>%2</span>").arg(finalColor, message));
 }

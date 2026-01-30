@@ -48,7 +48,7 @@ register pp_light -drizzle
 stack pp_light -drizzle -scale=1.0 -pixfrac=1.0 -method=mean -rej=winsorized 3 3 -norm=addscale -output_norm -rgb_equal -32b -out=result
 
 # Finalize
-load result
+
 mirrorx -bottomup
 save ../result_drizzle.fit
 

@@ -433,6 +433,8 @@ set(TSTAR_SOURCES
     src/core/DpiHelper.h
     src/core/ErrorHandling.cpp
     src/core/ErrorHandling.h
+    src/core/ResourceManager.cpp
+    src/core/ResourceManager.h
     
     # IO
     src/io/FitsLoader.cpp

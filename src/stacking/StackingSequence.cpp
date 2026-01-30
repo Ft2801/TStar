@@ -71,18 +71,23 @@ bool ImageSequence::loadFromFiles(const QStringList& files,
 }
 
 bool ImageSequence::loadFromDirectory(const QString& directory,
-                                       const QString& pattern,
-                                       ProgressCallback progressCallback) {
+                                      const QStringList& nameFilters,
+                                      ProgressCallback progressCallback)
+{
+    m_directory = directory;
+    m_images.clear();
+    
     QDir dir(directory);
     if (!dir.exists()) {
         return false;
     }
     
-    QStringList filters;
-    filters << pattern;
+    // Use QDir to list files with pattern
+    QStringList files = dir.entryList(nameFilters, QDir::Files, QDir::Name);
     
-    QStringList files = dir.entryList(filters, QDir::Files, QDir::Name);
-    
+    if (files.empty()) {
+        return false;
+    }
     QStringList fullPaths;
     fullPaths.reserve(files.size());
     for (const QString& file : files) {

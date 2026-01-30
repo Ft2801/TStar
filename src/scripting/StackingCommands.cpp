@@ -21,6 +21,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QDirIterator>
+#include "../core/ResourceManager.h"
 
 namespace Scripting {
 
@@ -478,6 +479,7 @@ bool StackingCommands::cmdCalibrate(const ScriptCommand& cmd) {
     if (cmd.hasOption("debayer")) {
         params.debayer = true;
         QString pattern = cmd.option("cfa", "AUTO").toUpper();
+        if (pattern.isEmpty()) pattern = "AUTO"; // Handle empty flag
         if (pattern == "AUTO") params.bayerPattern = Preprocessing::BayerPattern::Auto;
         else if (pattern == "RGGB") params.bayerPattern = Preprocessing::BayerPattern::RGGB;
         else if (pattern == "BGGR") params.bayerPattern = Preprocessing::BayerPattern::BGGR;
@@ -638,6 +640,8 @@ bool StackingCommands::cmdDebayer(const ScriptCommand& cmd) {
     params.debayer = true;
     
     QString pattern = cmd.option("pattern", "AUTO").toUpper();
+    if (pattern.isEmpty()) pattern = "AUTO"; // Handle empty flag
+    
     if (pattern == "AUTO") params.bayerPattern = Preprocessing::BayerPattern::Auto;
     else if (pattern == "RGGB") params.bayerPattern = Preprocessing::BayerPattern::RGGB;
     else if (pattern == "BGGR") params.bayerPattern = Preprocessing::BayerPattern::BGGR;
@@ -1399,7 +1403,7 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd) {
          return true; // Not an error, just empty
     }
     
-    if (s_runner) s_runner->logMessage(QString("Converting %1 files using %2 threads...").arg(files.size()).arg(QThread::idealThreadCount()), "neutral");
+    if (s_runner) s_runner->logMessage(QString("Converting %1 files using %2 threads...").arg(files.size()).arg(ResourceManager::instance().maxThreads()), "neutral");
     
     QAtomicInt convertedCount(0);
     QAtomicInt failedCount(0);

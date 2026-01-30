@@ -12,6 +12,7 @@
 #include "MainWindow.h"
 #include "widgets/SplashScreen.h"
 #include "core/Logger.h"
+#include "core/ResourceManager.h"
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
@@ -56,6 +57,7 @@ int main(int argc, char *argv[])
     
     // Now initialize logger with proper paths
     Logger::init();
+    ResourceManager::instance().init();
     Logger::info("TStar starting up...", "Main");
     qDebug() << "TStar startup - Debug Log Initialized";
     

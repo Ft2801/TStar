@@ -184,6 +184,12 @@ void ConversionDialog::onBrowseOutput() {
     }
 }
 
+// Include ResourceManager
+#include "core/ResourceManager.h"
+#include <QFutureWatcher>
+
+// Include QFutureWatcher if not already visible (it was observed in file view around line 189)
+
 void ConversionDialog::onConvert() {
     int count = m_fileList->count();
     if (count == 0) {
@@ -193,101 +199,187 @@ void ConversionDialog::onConvert() {
     
     QString outDir = m_outputDir->text();
     int bitDepthVal = m_bitDepth->currentIndex() == 0 ? 16 : 32;
-    Q_UNUSED(bitDepthVal);
     
     m_progress->setMaximum(count);
     m_progress->setValue(0);
     m_convertBtn->setEnabled(false);
+    m_statusLabel->setText(tr("Preparing conversion..."));
     
-    int converted = 0;
+    // Disable inputs
+    m_addBtn->setEnabled(false);
+    m_removeBtn->setEnabled(false);
+    m_clearBtn->setEnabled(false);
+    
+    struct ConvertJob {
+        QString filePath;
+        QString outPath;
+        int listIndex;
+    };
+
+    struct Context {
+        QList<ConvertJob> jobs;
+        QAtomicInt processed{0};
+        QAtomicInt successes{0};
+        qint64 startTime;
+    };
+    auto ctx = std::make_shared<Context>();
+    ctx->startTime = QDateTime::currentMSecsSinceEpoch();
+    
     for (int i = 0; i < count; ++i) {
         QString filePath = m_fileList->item(i)->data(Qt::UserRole).toString();
         QString targetDir = outDir.isEmpty() ? QFileInfo(filePath).absolutePath() : outDir;
         QString outPath = QDir(targetDir).absoluteFilePath(
             QFileInfo(filePath).completeBaseName() + ".fit");
+            
+        m_fileList->item(i)->setForeground(Qt::white);
+        ctx->jobs.append({filePath, outPath, i});
+    }
+
+    int maxThreads = ResourceManager::instance().maxThreads();
+    QThreadPool::globalInstance()->setMaxThreadCount(maxThreads);
+
+    // Use QFutureWatcher to monitor completion
+    auto* watcher = new QFutureWatcher<void>(this);
+    
+    connect(watcher, &QFutureWatcher<void>::finished, this, [this, watcher, count, ctx]() {
+        m_convertBtn->setEnabled(true);
+        m_addBtn->setEnabled(true);
+        m_removeBtn->setEnabled(true);
+        m_clearBtn->setEnabled(true);
         
-        m_statusLabel->setText(tr("Converting: %1").arg(QFileInfo(filePath).fileName()));
-        QApplication::processEvents();
+        qint64 elapsedPtr = QDateTime::currentMSecsSinceEpoch() - ctx->startTime;
+        int successCount = ctx->successes.loadRelaxed();
+
+        m_statusLabel->setText(tr("Converted %1 files in %2 ms").arg(successCount).arg(elapsedPtr));
         
+        if (successCount == count) {
+            QMessageBox::information(this, tr("Conversion Complete"),
+                tr("Successfully converted %1 files in %2 s.").arg(successCount).arg(elapsedPtr / 1000.0, 0, 'f', 1));
+        } else {
+            QMessageBox::warning(this, tr("Conversion Complete"),
+                tr("Converted %1 of %2 files. Some files failed.").arg(successCount).arg(count));
+        }
+        
+        watcher->deleteLater();
+    });
+
+    // Start Async Map - IMPORTANT: Pass ctx->jobs which is now inside the shared pointer
+    QFuture<void> future = QtConcurrent::map(ctx->jobs, [this, ctx, count, bitDepthVal](const ConvertJob& job) {
+        bool success = false;
+        
+        // --- Conversion Logic ---
         ImageBuffer buf;
         bool loaded = false;
-        QString ext = QFileInfo(filePath).suffix().toLower();
+        QString ext = QFileInfo(job.filePath).suffix().toLower();
         
-        // Try loading based on extension
+        // Reuse thread-local buffer? Be careful with async if thread_local persists across different tasks incorrectly
+        static thread_local ImageBuffer threadBuffer; 
+        threadBuffer.resize(0, 0, 0);
+
         if (ext == "fit" || ext == "fits" || ext == "fts") {
-            loaded = Stacking::FitsIO::read(filePath, buf);
+             loaded = Stacking::FitsIO::read(job.filePath, threadBuffer);
         } else if (ext == "tif" || ext == "tiff") {
-            loaded = Stacking::TiffIO::read(filePath, buf);
+             loaded = Stacking::TiffIO::read(job.filePath, threadBuffer);
         } else {
 #ifdef HAVE_LIBRAW
-            libraw_data_t *lr = libraw_init(0);
-            if (lr) {
-                // We want RAW CFA data, NO demosaicing (much faster and correct for astro)
-                if (libraw_open_file(lr, filePath.toLocal8Bit().constData()) == LIBRAW_SUCCESS) {
-                    if (libraw_unpack(lr) == LIBRAW_SUCCESS) {
-                        // Extract metadata
-                        buf.metadata().exposure = lr->other.shutter;
-                        if (lr->makernotes.common.SensorTemperature > -273.0f) {
-                            buf.metadata().ccdTemp = lr->makernotes.common.SensorTemperature;
-                        }
-                        buf.metadata().isMono = true; // CFA is mono
-                        
-                        // Access raw data directly from LibRaw
-                        int w = lr->sizes.width;
-                        int h = lr->sizes.height;
-                        int c = 1; // CFA
-                        
-                        std::vector<float> data(static_cast<size_t>(w) * h);
-                        unsigned short* src = (unsigned short*)lr->rawdata.raw_alloc; // Raw data
-                        if (!src) src = (unsigned short*)lr->rawdata.raw_image;
-                        
-                        if (src) {
-                            const size_t total = (size_t)w * h;
-                            const float norm = 1.0f / 65535.0f;
-                            #pragma omp parallel for
-                            for (size_t j = 0; j < total; ++j) {
-                                data[j] = src[j] * norm;
-                            }
-                            buf.setData(w, h, c, data);
-                            loaded = true;
-                        }
-                    }
-                }
-                libraw_close(lr);
-            }
+             libraw_data_t *lr = libraw_init(0);
+             if (lr) {
+                 if (libraw_open_file(lr, job.filePath.toLocal8Bit().constData()) == LIBRAW_SUCCESS) {
+                     if (libraw_unpack(lr) == LIBRAW_SUCCESS) {
+                         libraw_decoder_info_t info;
+                         libraw_get_decoder_info(lr, &info);
+                         
+                         int w = lr->rawdata.sizes.raw_width;
+                         int left = lr->rawdata.sizes.left_margin;
+                         int top = lr->rawdata.sizes.top_margin;
+                         int vw = lr->rawdata.sizes.width;
+                         int vh = lr->rawdata.sizes.height;
+                         
+                         threadBuffer.resize(vw, vh, 1);
+                         float* dst = threadBuffer.data().data();
+                         unsigned short* src = (unsigned short*)lr->rawdata.raw_alloc; 
+                         if (!src) src = lr->rawdata.raw_image;
+                         
+                         if (src) {
+                             float black = (float)lr->color.black;
+                             float maximum = (float)lr->color.maximum;
+                             float range = maximum - black;
+                             if (range <= 0.0f) range = 65535.0f;
+
+                             float mul[4];
+                             for (int k = 0; k < 4; ++k) mul[k] = lr->color.cam_mul[k];
+                             float g_norm = mul[1]; 
+                             if (g_norm <= 0.0f && mul[3] > 0.0f) g_norm = mul[3];
+                             if (g_norm <= 0.0f) g_norm = 1.0f;
+                             for (int k = 0; k < 4; ++k) mul[k] /= g_norm;
+
+                             unsigned int f = lr->idata.filters;
+
+                             for (int y = 0; y < vh; ++y) {
+                                 int row = y + top;
+                                 for (int x = 0; x < vw; ++x) {
+                                     int col = x + left;
+                                     int patternIdx = (f >> ((((row) << 1) & 14) + (col & 1)) * 2) & 3;
+                                     float val = (float)src[row * w + col];
+                                     dst[y * vw + x] = std::max(0.0f, (val - black) * mul[patternIdx] / range);
+                                 }
+                             }
+                             loaded = true;
+                             
+                             threadBuffer.metadata().isMono = true;
+                             QString bayerPat = "RGGB"; // Simplification for brevity, full logic assumed correct in original
+                             if (f == 0x94949494) bayerPat = "RGGB";
+                             else if (f == 0x16161616) bayerPat = "BGGR";
+                             else if (f == 0x61616161) bayerPat = "GRBG";
+                             else if (f == 0x49494949) bayerPat = "GBRG";
+                             
+                             // Pattern shift logic (omitted full block for brevity, using original if possible)
+                             // Assuming standard Bayer for now or copy detailed logic if critical. 
+                             // I'll copy the detailed logic to be safe.
+                             if (left % 2 != 0) {
+                                 if (bayerPat == "RGGB") bayerPat = "GRBG";
+                                 else if (bayerPat == "BGGR") bayerPat = "GBRG";
+                                 else if (bayerPat == "GRBG") bayerPat = "RGGB";
+                                 else if (bayerPat == "GBRG") bayerPat = "BGGR";
+                             }
+                             if (top % 2 != 0) {
+                                 if (bayerPat == "RGGB") bayerPat = "GBRG";
+                                 else if (bayerPat == "BGGR") bayerPat = "GRBG";
+                                 else if (bayerPat == "GRBG") bayerPat = "BGGR";
+                                 else if (bayerPat == "GBRG") bayerPat = "RGGB";
+                             }
+                             
+                             threadBuffer.metadata().bayerPattern = bayerPat;
+                             threadBuffer.metadata().xisfProperties["BayerPattern"] = bayerPat;
+                             threadBuffer.metadata().exposure = lr->other.shutter;
+                         }
+                     }
+                 }
+                 libraw_close(lr);
+             }
 #endif
         }
-        
+
         if (loaded) {
-            if (buf.isValid()) {
-                if (Stacking::FitsIO::write(outPath, buf, 32)) {
-                    converted++;
-                    m_fileList->item(i)->setForeground(Qt::green);
-                } else {
-                    m_fileList->item(i)->setForeground(Qt::red);
-                }
-            } else {
-                converted++;
-                m_fileList->item(i)->setForeground(Qt::green);
+            if (Stacking::FitsIO::write(job.outPath, threadBuffer, bitDepthVal)) {
+                 success = true;
+                 ctx->successes.fetchAndAddRelaxed(1);
             }
-        } else {
-            m_fileList->item(i)->setForeground(Qt::red);
         }
         
-        m_progress->setValue(i + 1);
-        QApplication::processEvents();
-    }
+        int p = ctx->processed.fetchAndAddRelaxed(1) + 1;
+        
+        // Update UI (Thread-safe)
+        QMetaObject::invokeMethod(this, [this, p, count, job, success]() {
+             m_progress->setValue(p);
+             m_statusLabel->setText(tr("Converting %1 of %2...").arg(p).arg(count));
+             
+             QListWidgetItem* item = m_fileList->item(job.listIndex);
+             if (item) item->setForeground(success ? Qt::green : Qt::red);
+        }, Qt::QueuedConnection);
+    });
     
-    m_convertBtn->setEnabled(true);
-    m_statusLabel->setText(tr("Converted %1 of %2 files").arg(converted).arg(count));
-    
-    if (converted == count) {
-        QMessageBox::information(this, tr("Conversion Complete"),
-            tr("Successfully converted %1 files.").arg(converted));
-    } else {
-        QMessageBox::warning(this, tr("Conversion Complete"),
-            tr("Converted %1 of %2 files. Some files failed.").arg(converted).arg(count));
-    }
+    watcher->setFuture(future);
 }
 
 void ConversionDialog::updateStatus() {

@@ -360,9 +360,18 @@ bool StackingEngine::filterImages(StackingArgs& args) {
 bool StackingEngine::computeNormalization(StackingArgs& args) {
     args.progress(tr("Computing normalization coefficients..."), -1);
     
-    auto progressCallback = [this, &args](const QString& msg, double pct) {
+    int totalImages = args.nbImagesToStack;
+    auto progressCallback = [this, &args, totalImages](const QString& msg, double pct) mutable {
         args.progress(msg, pct);
         emit progressChanged(msg, pct);
+        
+        // Log explicitly (throttled if needed, but user wants visibility)
+        int current = static_cast<int>(pct * totalImages + 0.5);
+        if (current > 0 && current <= totalImages) {
+             // args.log is thread-safe (emits signal)
+             // Use "neutral" or "white" to ensure visibility
+             args.log(tr("Normalized image %1/%2").arg(current).arg(totalImages), "white"); 
+        }
     };
     
     return Normalization::computeCoefficients(
@@ -842,6 +851,9 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
         allCoeffs[c].resize(nbImages, {0.0, 1.0, 1.0});
         if (args.params.hasNormalization()) {
             for (int i = 0; i < nbImages; ++i) {
+                // Fix: Must use the original sequence index, not the stack loop index
+                int seqIdx = args.imageIndices[i];
+                
                 // If coefficients exist for this channel (and it's a valid index), use them.
                 // If not (e.g. Debayer enabled but normalization ran on Mono), use Channel 0.
                 int sourceCh = c;
@@ -849,10 +861,10 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
                     sourceCh = 0;
                 }
                 
-                if (sourceCh < 3 && i < static_cast<int>(args.coefficients.poffset[sourceCh].size())) {
-                    allCoeffs[c][i].offset = args.coefficients.poffset[sourceCh][i];
-                    allCoeffs[c][i].mul = args.coefficients.pmul[sourceCh][i];
-                    allCoeffs[c][i].scale = args.coefficients.pscale[sourceCh][i];
+                if (sourceCh < 3 && seqIdx < static_cast<int>(args.coefficients.poffset[sourceCh].size())) {
+                    allCoeffs[c][i].offset = args.coefficients.poffset[sourceCh][seqIdx];
+                    allCoeffs[c][i].mul = args.coefficients.pmul[sourceCh][seqIdx];
+                    allCoeffs[c][i].scale = args.coefficients.pscale[sourceCh][seqIdx];
                 }
             }
         }
