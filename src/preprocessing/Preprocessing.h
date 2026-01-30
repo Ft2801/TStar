@@ -162,6 +162,7 @@ private:
     std::atomic<bool> m_cancelled{false};
     
     std::vector<QPoint> m_deviantPixels; ///< Detected from master dark
+    double m_flatNormalization = 1.0; ///< Cached normalization factor for master flat
     
     void addHistory(ImageBuffer& image, const QString& message);
 };

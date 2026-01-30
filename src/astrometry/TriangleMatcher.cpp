@@ -13,7 +13,7 @@
 // Replicate Reference logic for vote counting and iterative fitting.
 
 TriangleMatcher::TriangleMatcher() {
-    m_maxStars = 40;
+    m_maxStars = 75; // Increased for better robustness (from 40)
 }
 
 // Helper to sort stars by mag

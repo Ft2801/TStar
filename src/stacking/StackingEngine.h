@@ -110,8 +110,39 @@ public:
      * @param args Stacking arguments (modified with results)
      * @return StackResult code
      */
+    /**
+     * @brief Execute stacking operation
+     * 
+     * Main entry point for stacking. This can be called from
+     * a worker thread for non-blocking operation.
+     * 
+     * @param args Stacking arguments (modified with results)
+     * @return StackResult code
+     */
     StackResult execute(StackingArgs& args);
     
+    //=========================================================================
+    // CONFIGURATION HELPERS
+    //=========================================================================
+
+    /**
+     * @brief Configure arguments for Master Bias generation
+     * Enforces: No Normalization, Winsorized Rejection, No Weighting
+     */
+    static void configureForMasterBias(StackingArgs& args);
+
+    /**
+     * @brief Configure arguments for Master Dark generation
+     * Enforces: No Normalization, Winsorized Rejection (Hot Pixel detection), No Weighting
+     */
+    static void configureForMasterDark(StackingArgs& args);
+
+    /**
+     * @brief Configure arguments for Master Flat generation
+     * Enforces: Multiplicative Normalization, Winsorized Rejection, No Weighting
+     */
+    static void configureForMasterFlat(StackingArgs& args);
+
     /**
      * @brief Request cancellation of current operation
      */

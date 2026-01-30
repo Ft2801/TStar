@@ -152,7 +152,7 @@ for %%f in (libgsl-28.dll libgslcblas-0.dll) do (
 )
 
 echo.
-echo [STEP 7.5] Copying LibRaw DLL...
+echo [STEP 7.5] Copying LibRaw DLL (optional)...
 set "LIBRAW_SRC_DIR=deps\libraw\bin"
 if not exist "%LIBRAW_SRC_DIR%" set "LIBRAW_SRC_DIR=%BUILD_DIR%"
 
@@ -162,12 +162,10 @@ if exist "%LIBRAW_SRC_DIR%\libraw.dll" (
         set /a COPY_COUNT+=1
         echo   - libraw.dll: OK
     ) else (
-        set /a ERROR_COUNT+=1
-        echo   [ERROR] libraw.dll: FAILED
+        echo   - libraw.dll: FAILED to copy
     )
 ) else (
-    set /a ERROR_COUNT+=1
-    echo   [ERROR] libraw.dll: NOT FOUND IN %LIBRAW_SRC_DIR%
+    echo   - libraw.dll: Not needed (Static)
 )
 
 echo.

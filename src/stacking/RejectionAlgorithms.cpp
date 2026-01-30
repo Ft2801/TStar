@@ -50,7 +50,7 @@ RejectionResult RejectionAlgorithms::apply(
             return percentileClipping(stack, sigmaLow, sigmaHigh, rejected, scratch);
             
         case Rejection::Sigma:
-            return sigmaClipping(stack, sigmaLow, sigmaHigh, rejected, scratch);
+            return sigmaClipping(stack, sigmaLow, sigmaHigh, rejected, scratch, weights);
             
         case Rejection::MAD:
             return madClipping(stack, sigmaLow, sigmaHigh, rejected, scratch);
@@ -59,13 +59,20 @@ RejectionResult RejectionAlgorithms::apply(
             return sigmaMedianClipping(stack, sigmaLow, sigmaHigh, rejected, scratch);
             
         case Rejection::Winsorized:
-            return winsorizedClipping(stack, sigmaLow, sigmaHigh, rejected, scratch);
+            return winsorizedClipping(stack, sigmaLow, sigmaHigh, rejected, scratch, weights);
             
         case Rejection::LinearFit:
             return linearFitClipping(stack, sigmaLow, sigmaHigh, rejected, scratch);
             
         case Rejection::GESDT:
             return gesdtClipping(stack, sigmaLow, sigmaHigh, rejected, scratch);
+            
+        case Rejection::Biweight:
+            return biweightClipping(stack, sigmaHigh > 0 ? sigmaHigh : 6.0f, rejected, scratch);
+            
+        case Rejection::ModifiedZScore:
+            // Use sigmaHigh as threshold (default 3.5)
+            return modifiedZScoreClipping(stack, sigmaHigh > 0 ? sigmaHigh : 3.5f, rejected, scratch);
             
         default:
             {
@@ -135,7 +142,8 @@ RejectionResult RejectionAlgorithms::sigmaClipping(
     std::vector<float>& stack,
     float sigmaLow, float sigmaHigh,
     std::vector<int>& rejected,
-    std::vector<float>* scratch)
+    std::vector<float>* scratch,
+    const std::vector<float>* weights)
 {
     RejectionResult result;
     int n = static_cast<int>(stack.size());
@@ -160,19 +168,26 @@ RejectionResult RejectionAlgorithms::sigmaClipping(
     while (changed && currentN > 3) {
         changed = false;
         
-        // 1. Gather valid pixels into 'work'
-        work.clear();
-        for (int i = 0; i < n; ++i) {
-            if (rejected[i] == 0) {
-                work.push_back(stack[i]);
+        float median = 0.0f;
+        double sigma = 0.0f;
+
+        if (weights) {
+            median = weightedMedian(stack, *weights, &rejected);
+            auto stats = weightedMeanAndStdDev(stack, *weights, &rejected);
+            sigma = stats.second;
+        } else {
+            // 1. Gather valid pixels into 'work'
+            work.clear();
+            for (int i = 0; i < n; ++i) {
+                if (rejected[i] == 0) {
+                    work.push_back(stack[i]);
+                }
             }
+            
+            // 2. Compute statistics
+            median = Statistics::quickMedian(work.data(), work.size());
+            sigma = Statistics::stdDev(work.data(), work.size(), nullptr);
         }
-        
-        // 2. Compute statistics on 'work' (kept pixels)
-        // quickMedian modifies 'work' (partial sort), but that's fine, it's a copy
-        // Or if 'work' is the scratch buffer, we can modify it.
-        float median = Statistics::quickMedian(work.data(), work.size());
-        double sigma = Statistics::stdDev(work.data(), work.size(), nullptr);
         
         // 3. Check each pixel in ORIGINAL stack
         for (int i = 0; i < n; ++i) {
@@ -202,8 +217,6 @@ RejectionResult RejectionAlgorithms::sigmaClipping(
             }
         }
     }
-    
-    // Do NOT compact the original stack. We want to preserve alignment with 'rejected'
     
     result.keptCount = currentN;
     return result;
@@ -354,7 +367,8 @@ RejectionResult RejectionAlgorithms::winsorizedClipping(
     std::vector<float>& stack,
     float sigmaLow, float sigmaHigh,
     std::vector<int>& rejected,
-    std::vector<float>* scratch)
+    std::vector<float>* scratch,
+    const std::vector<float>* weights)
 {
     RejectionResult result;
     int n = static_cast<int>(stack.size());
@@ -377,46 +391,62 @@ RejectionResult RejectionAlgorithms::winsorizedClipping(
     
     while (changed && currentN > 3) {
         changed = false;
-        
-        // Compute initial sigma from current Valid pixels?
-        // Original logic used whole stack stats, then winsorized.
-        // Let's implement correct Winsorized:
-        
-        // 1. Compute stats on current valid set
-        std::vector<float> validPixels; 
-        validPixels.reserve(n);
-        for(int i=0; i<n; ++i) if(rejected[i]==0) validPixels.push_back(stack[i]);
-        
-        if (validPixels.size() < 3) break;
-        
-        double sigma = Statistics::stdDev(validPixels.data(), validPixels.size(), nullptr);
-        float median = Statistics::quickMedian(validPixels.data(), validPixels.size());
+
+        float median = 0.0f;
+        double sigma = 0.0f;
+
+        if (weights) {
+             // Weighted Stats
+             median = weightedMedian(stack, *weights, &rejected);
+             auto stats = weightedMeanAndStdDev(stack, *weights, &rejected);
+             sigma = stats.second;
+        } else {
+             // Standard Stats
+             std::vector<float> validPixels; 
+             validPixels.reserve(n);
+             for(int i=0; i<n; ++i) if(rejected[i]==0) validPixels.push_back(stack[i]);
+             
+             if (validPixels.size() < 3) break;
+             
+             sigma = Statistics::stdDev(validPixels.data(), validPixels.size(), nullptr);
+             median = Statistics::quickMedian(validPixels.data(), validPixels.size());
+        }
         
         // Copy stack to wbuffer
-        wStack = stack; // Reset wStack
+        wStack = stack; 
         
         // Iterative winsorization
         double sigma0;
+        int wIters = 0;
         do {
             float m0 = median - 1.5f * static_cast<float>(sigma);
             float m1 = median + 1.5f * static_cast<float>(sigma);
             
             // Clip values to [m0, m1]
+            // Winsorize ALL pixels based on current center/scale
             for (int i = 0; i < n; ++i) {
-                // Only consider valid pixels for stats? Unclear defined behavior.
-                // Standard Winsorization replaces extreme values.
-                if (rejected[i] == 0)
-                     wStack[i] = std::min(m1, std::max(m0, wStack[i]));
+                 wStack[i] = std::min(m1, std::max(m0, wStack[i]));
             }
             
             sigma0 = sigma;
-            // Compute sigma of Winsorized data
-            std::vector<float> wValid;
-            for(int i=0; i<n; ++i) if(rejected[i]==0) wValid.push_back(wStack[i]);
             
-            sigma = 1.134 * Statistics::stdDev(wValid.data(), wValid.size(), nullptr);
+            if (weights) {
+                 // Weighted Sigma of Winsorized Data
+                 // Note: We use original pixel weights? Yes.
+                 // Treat rejected as invalid? winsorization usually operates on whole set, but here we process iteratively.
+                 // Let's assume we treat currently rejected as invalid for stats calc.
+                 auto wStats = weightedMeanAndStdDev(wStack, *weights, &rejected);
+                 sigma = 1.134 * wStats.second;
+            } else {
+                std::vector<float> wValid;
+                wValid.reserve(n);
+                for(int i=0; i<n; ++i) if(rejected[i]==0) wValid.push_back(wStack[i]);
+                sigma = 1.134 * Statistics::stdDev(wValid.data(), wValid.size(), nullptr);
+            }
             
-        } while (std::abs(sigma - sigma0) > sigma0 * 0.0005);
+            wIters++;
+            
+        } while (std::abs(sigma - sigma0) > sigma0 * 0.0005 && wIters < 10);
         
         // Use final sigma for rejection on original data
         for (int i = 0; i < n; ++i) {
@@ -619,6 +649,179 @@ RejectionResult RejectionAlgorithms::gesdtClipping(
     return result;
 }
 
+//=============================================================================
+// BIWEIGHT ESTIMATOR
+//=============================================================================
+
+RejectionResult RejectionAlgorithms::biweightClipping(
+    std::vector<float>& stack,
+    float tuningConstant,
+    std::vector<int>& rejected,
+    std::vector<float>* scratch)
+{
+    RejectionResult result;
+    int n = static_cast<int>(stack.size());
+    
+    // Biweight requires decent sample size
+    if (n < 4) {
+        result.keptCount = n;
+        return result;
+    }
+    
+    // 1. Initial robust location/scale (Median & MAD)
+    std::vector<float> localBuf;
+    if (!scratch) localBuf.resize(n);
+    std::vector<float>& work = scratch ? *scratch : localBuf;
+    work = stack; // Copy
+    
+    float median = Statistics::quickMedian(work.data(), n);
+    
+    // Compute MAD
+    for(int i=0; i<n; ++i) work[i] = std::abs(stack[i] - median);
+    float mad = Statistics::quickMedian(work.data(), n);
+    
+    if (mad < 1e-9f) {
+        // All pixels identical?
+        result.keptCount = n;
+        return result;
+    }
+    
+    // 2. Iterate to refine Location (Center) and Scale
+    // Usually 1-2 iterations are enough for convergence on well-behaved data
+    double center = median;
+    double scale = mad;
+    const int MAX_ITERS = 5;
+    const double C = (tuningConstant > 0) ? tuningConstant : 6.0;
+    
+    for(int iter=0; iter<MAX_ITERS; ++iter) {
+        // Update Center
+        // T_bi = M + [ sum( (x-M)(1-u^2)^2 ) / sum( (1-u^2)^2 ) ]
+        // where u = (x-M)/(c*MAD)
+        
+        bool converged = true;
+        
+        double num = 0.0;
+        double den = 0.0;
+        
+        for(int i=0; i<n; ++i) {
+             double u = (stack[i] - center) / (C * scale);
+             if (std::abs(u) < 1.0) {
+                 double w = (1.0 - u*u);
+                 w = w * w; // (1-u^2)^2
+                 num += (stack[i] - center) * w;
+                 den += w;
+             }
+        }
+        
+        if (den > 1e-9) {
+            double shift = num / den;
+            center += shift;
+            if (std::abs(shift) > 1e-5 * scale) converged = false;
+        }
+        
+        // Update Scale (simplified MAD update or just keep initial MAD?)
+        // Standard Biweight often just uses MAD or iterates scale too.
+        // For rejection purposes, fixing scale at MAD is often "robust enough" and safer.
+        // Let's stick to initial MAD for u-calculation to prevent run-away collapse, 
+        // effectively implementing "Biweight Location" rejection.
+        
+        if (converged) break;
+    }
+    
+    // 3. Reject pixels with zero weight (u >= 1)
+    // Actually, Biweight is soft-weighting, but for "Clipping" we need hard rejection.
+    // We reject points that are statistically far from the biweight center.
+    // Typically: deviations > tuningConstant * scale?
+    // Or just u >= 1.0? (Which is deviation > C * MAD) (e.g. > 6 * MAD).
+    // 6*MAD is huge. Usually for rejection we use sigma-limits.
+    // So we use the robust Center and Scale (MAD) to apply Sigma Clipping.
+    
+    // Better approach matching "Winsorized":
+    // Use Biweight Center and Biweight Midvariance (or MAD) as robust estimations of Mean and Sigma.
+    // Then reject based on SigmaLow/High provided? 
+    // Wait, the signature of this function takes "tuningConstant" which replaces sigmaLow/High?
+    // Let's assume the user wants standard Biweight Rejection which is hard-cutoff at u=1.
+    
+    // HOWEVER, typical implementation in stacking software:
+    // "Biweight" usually means "Compute Biweight Center, use it as the value".
+    // "Biweight Clipping" usually means "Reject pixels that would have 0 weight".
+    
+    double limit = C * scale; 
+    
+    for(int i=0; i<n; ++i) {
+        double dist = stack[i] - center;
+        if (std::abs(dist) >= limit) {
+             // Rejection
+             rejected[i] = (dist < 0) ? -1 : 1;
+             if (dist < 0) result.lowRejected++;
+             else result.highRejected++;
+        }
+    }
+    
+    result.keptCount = n - result.totalRejected();
+    return result;
+}
+
+//=============================================================================
+// MODIFIED Z-SCORE
+//=============================================================================
+
+RejectionResult RejectionAlgorithms::modifiedZScoreClipping(
+    std::vector<float>& stack,
+    float threshold,
+    std::vector<int>& rejected,
+    std::vector<float>* scratch)
+{
+    RejectionResult result;
+    int n = static_cast<int>(stack.size());
+    
+    if (n < 3) {
+        result.keptCount = n;
+        return result;
+    }
+    
+    // Median
+    std::vector<float> localBuf;
+    if (!scratch) localBuf.resize(n);
+    std::vector<float>& work = scratch ? *scratch : localBuf;
+    work = stack; 
+    
+    float median = Statistics::quickMedian(work.data(), n);
+    
+    // MAD
+    for(int i=0; i<n; ++i) work[i] = std::abs(stack[i] - median);
+    float mad = Statistics::quickMedian(work.data(), n);
+    
+    if (mad < 1e-9f) {
+        // All identical
+        result.keptCount = n;
+        return result;
+    }
+    
+    // Standard Z-Score factor for consistency with normal distribution
+    // M_i = 0.6745 * (deviations) / MAD
+    // But usually Modified Z-Score check is:
+    // M_i > Threshold (e.g. 3.5)
+    
+    // Factor 0.6745 makes MAD comparable to Sigma (Sigma = 1.4826 * MAD = MAD / 0.6745)
+    // So M_i = (x - med) / (MAD / 0.6745) = (x - med) / Sigma_est
+    // So checking M_i > Threshold is same as Sigma Clipping with robust sigma.
+    
+    float limit = threshold * (mad / 0.6745f);
+    
+    for (int i = 0; i < n; ++i) {
+        float dev = stack[i] - median;
+        if (std::abs(dev) > limit) {
+             rejected[i] = (dev < 0) ? -1 : 1;
+             if (dev < 0) result.lowRejected++;
+             else result.highRejected++;
+        }
+    }
+    
+    result.keptCount = n - result.totalRejected();
+    return result;
+}
+
 std::vector<float> RejectionAlgorithms::computeGesdtCriticalValues(
     int n, int maxOutliers, float significance)
 {
@@ -766,6 +969,110 @@ void RejectionAlgorithms::confirmGesdtOutliers(
             result.highRejected++;
         }
     }
+}
+
+//=============================================================================
+// WEIGHTED STATISTICS
+//=============================================================================
+
+float RejectionAlgorithms::weightedMedian(const std::vector<float>& data, 
+                             const std::vector<float>& weights,
+                             const std::vector<int>* validMask)
+{
+    int n = static_cast<int>(data.size());
+    if (n == 0 || n != (int)weights.size()) return 0.0f;
+    
+    // Create pairs of (value, weight)
+    struct ValWeight { float v; float w; };
+    std::vector<ValWeight> pairs;
+    pairs.reserve(n);
+    
+    double totalWeight = 0.0;
+    
+    for(int i=0; i<n; ++i) {
+        if (!validMask || (*validMask)[i] == 0) {
+            float w = weights[i];
+            if (w > 0.0f) {
+                pairs.push_back({data[i], w});
+                totalWeight += w;
+            }
+        }
+    }
+    
+    if (pairs.empty()) return 0.0f;
+    
+    // Sort by value
+    std::sort(pairs.begin(), pairs.end(), [](const ValWeight& a, const ValWeight& b) {
+        return a.v < b.v;
+    });
+    
+    double halfWeight = totalWeight * 0.5;
+    double currentWeight = 0.0;
+    
+    for(const auto& p : pairs) {
+        currentWeight += p.w;
+        if (currentWeight >= halfWeight) {
+            return p.v; 
+        }
+    }
+    
+    return pairs.back().v;
+}
+
+std::pair<double, double> RejectionAlgorithms::weightedMeanAndStdDev(
+                            const std::vector<float>& data,
+                            const std::vector<float>& weights,
+                            const std::vector<int>* validMask)
+{
+    int n = static_cast<int>(data.size());
+    if (n == 0 || n != (int)weights.size()) return {0.0, 0.0};
+    
+    double sumW = 0.0;
+    double sumValW = 0.0;
+    
+    // 1. Weighted Mean
+    for(int i=0; i<n; ++i) {
+        if (!validMask || (*validMask)[i] == 0) {
+            float w = weights[i];
+            float v = data[i];
+            if (w > 0.0f) {
+                sumW += w;
+                sumValW += (double)v * w;
+            }
+        }
+    }
+    
+    if (sumW == 0.0) return {0.0, 0.0};
+    double mean = sumValW / sumW;
+    
+    // 2. Weighted Variance
+    double sumSqDiffW = 0.0;
+    double sumSqW = 0.0; // Sum of squared weights
+    int count = 0;
+    
+    for(int i=0; i<n; ++i) {
+        if (!validMask || (*validMask)[i] == 0) {
+            float w = weights[i];
+            float v = data[i];
+            if (w > 0.0f) {
+                double diff = v - mean;
+                sumSqDiffW += diff * diff * w;
+                sumSqW += w * w;
+                count++;
+            }
+        }
+    }
+    
+    if (count <= 1) return {mean, 0.0};
+    
+    // Weighted Sample Variance correction
+    // Denom = SumW - (SumSqW / SumW)
+    double denom = sumW - (sumSqW / sumW);
+    if (denom <= 0.0) denom = sumW; 
+    
+    double variance = sumSqDiffW / denom;
+    
+    return {mean, std::sqrt(variance)};
 }
 
 } // namespace Stacking

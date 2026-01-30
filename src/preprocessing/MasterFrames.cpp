@@ -146,20 +146,24 @@ bool MasterFrames::createMasterBias(
     }
     
     // Configure stacking
-    Stacking::StackingParams params;
-    params.method = method;
-    params.rejection = rejection;
-    params.sigmaLow = sigmaLow;
-    params.sigmaHigh = sigmaHigh;
-    params.normalization = Stacking::NormalizationMethod::None;  // No normalization for bias
-    params.outputFilename = output;
-    params.force32Bit = true;
-    
-    // Stack
     Stacking::StackingArgs args;
-    args.params = params;
     args.sequence = &sequence;
     args.progressCallback = progress;
+    args.params.outputFilename = output;
+    args.params.force32Bit = true;
+    
+    // Pass User Parameters
+    args.params.method = method;
+    args.params.rejection = rejection;
+    args.params.sigmaLow = sigmaLow;
+    args.params.sigmaHigh = sigmaHigh;
+    
+    // Enforce calibration-specific rules
+    args.params.normalization = Stacking::NormalizationMethod::None;
+    args.params.weighting = Stacking::WeightingType::None;
+    args.params.maximizeFraming = false;
+    args.params.upscaleAtStacking = false;
+    args.params.drizzle = false;
     
     Stacking::StackingEngine engine;
     auto result = engine.execute(args);
@@ -202,20 +206,24 @@ bool MasterFrames::createMasterDark(
     }
     
     // Configure stacking
-    Stacking::StackingParams params;
-    params.method = method;
-    params.rejection = rejection;
-    params.sigmaLow = sigmaLow;
-    params.sigmaHigh = sigmaHigh;
-    params.normalization = Stacking::NormalizationMethod::None;  // No normalization for dark
-    params.outputFilename = output;
-    params.force32Bit = true;
-    
-    // Stack
     Stacking::StackingArgs args;
-    args.params = params;
     args.sequence = &sequence;
     args.progressCallback = progress;
+    args.params.outputFilename = output;
+    args.params.force32Bit = true;
+    
+    // Pass User Parameters
+    args.params.method = method;
+    args.params.rejection = rejection;
+    args.params.sigmaLow = sigmaLow;
+    args.params.sigmaHigh = sigmaHigh;
+    
+    // Enforce calibration-specific rules
+    args.params.normalization = Stacking::NormalizationMethod::None;
+    args.params.weighting = Stacking::WeightingType::None;
+    args.params.maximizeFraming = false;
+    args.params.upscaleAtStacking = false;
+    args.params.drizzle = false;
     
     Stacking::StackingEngine engine;
     auto result = engine.execute(args);
@@ -279,22 +287,27 @@ bool MasterFrames::createMasterFlat(
         return false;
     }
     
-    // Configure stacking - flats use multiplicative normalization
-    Stacking::StackingParams params;
-    params.method = method;
-    params.rejection = rejection;
-    params.sigmaLow = sigmaLow;
-    params.sigmaHigh = sigmaHigh;
-    params.normalization = Stacking::NormalizationMethod::Multiplicative;
-    params.outputFilename = output;
-    params.force32Bit = true;
-    
-    // Stack
+    // Configure stacking
     Stacking::StackingArgs args;
-    args.params = params;
     args.sequence = &sequence;
     args.progressCallback = progress;
+    args.params.outputFilename = output;
+    args.params.force32Bit = true;
     
+    // Pass User Parameters
+    args.params.method = method;
+    args.params.rejection = rejection;
+    args.params.sigmaLow = sigmaLow;
+    args.params.sigmaHigh = sigmaHigh;
+    
+    // Enforce calibration-specific rules
+    args.params.normalization = Stacking::NormalizationMethod::Multiplicative;
+    args.params.weighting = Stacking::WeightingType::None;
+    args.params.maximizeFraming = false;
+    args.params.upscaleAtStacking = false;
+    args.params.drizzle = false;
+    
+    // Stack
     Stacking::StackingEngine engine;
     auto result = engine.execute(args);
     

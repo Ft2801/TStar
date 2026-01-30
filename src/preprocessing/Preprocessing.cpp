@@ -78,6 +78,14 @@ void PreprocessingEngine::setParams(const PreprocessParams& params) {
             }
         }
     }
+    
+    // Cache flat normalization factor if flat is loaded
+    m_flatNormalization = 1.0;
+    if (m_params.useFlat && m_masters.isLoaded(MasterType::Flat)) {
+        const ImageBuffer* flat = m_masters.get(MasterType::Flat);
+        m_flatNormalization = Calibration::CalibrationEngine::computeFlatNormalization(*flat);
+        emit logMessage(tr("Cached flat normalization factor: %1").arg(m_flatNormalization), "neutral");
+    }
 }
 
 //=============================================================================
@@ -113,9 +121,9 @@ bool PreprocessingEngine::preprocessImage(const ImageBuffer& input, ImageBuffer&
     // 3. Flat field correction
     if (m_params.useFlat && m_masters.isLoaded(MasterType::Flat)) {
         const ImageBuffer* flat = m_masters.get(MasterType::Flat);
-        double norm = Calibration::CalibrationEngine::computeFlatNormalization(*flat);
-        if (Calibration::CalibrationEngine::applyFlat(output, *flat, norm)) {
-            addHistory(output, QString("Calibration: applied master flat (norm: %1)").arg(norm));
+        // Use cached normalization
+        if (Calibration::CalibrationEngine::applyFlat(output, *flat, m_flatNormalization)) {
+            addHistory(output, QString("Calibration: applied master flat (norm: %1)").arg(m_flatNormalization));
         } else {
             emit logMessage(tr("Flat correction failed"), "salmon");
         }

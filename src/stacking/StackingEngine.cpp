@@ -43,6 +43,56 @@ StackingEngine::~StackingEngine() = default;
 // MAIN ENTRY POINT
 //=============================================================================
 
+void StackingEngine::configureForMasterBias(StackingArgs& args) {
+    args.params.method = Method::Mean;
+    args.params.rejection = Rejection::Winsorized;
+    args.params.normalization = NormalizationMethod::None;
+    args.params.weighting = WeightingType::None;
+    
+    // Bias frames usually have very little signal variance, so standard sigma clipping
+    // or winsorized with tighter bounds is best.
+    args.params.sigmaLow = 3.0f;
+    args.params.sigmaHigh = 3.0f;
+    
+    // No alignment/registration for calibration frames
+    args.params.maximizeFraming = false;
+    args.params.upscaleAtStacking = false;
+    args.params.drizzle = false;
+}
+
+void StackingEngine::configureForMasterDark(StackingArgs& args) {
+    args.params.method = Method::Mean;
+    args.params.rejection = Rejection::Winsorized; // Essential for hot pixel rejection
+    args.params.normalization = NormalizationMethod::None; // Never normalize Darks
+    args.params.weighting = WeightingType::None; // Exposure weighting is irrelevant for same-exposure darks
+    
+    // Darks are prone to hot pixels (high outliers)
+    // Low sigma can be loose (thermal noise), High sigma strict (hot pixels)
+    args.params.sigmaLow = 3.0f;
+    args.params.sigmaHigh = 3.0f; 
+    
+    args.params.maximizeFraming = false;
+    args.params.upscaleAtStacking = false;
+    args.params.drizzle = false;
+}
+
+void StackingEngine::configureForMasterFlat(StackingArgs& args) {
+    args.params.method = Method::Mean;
+    args.params.rejection = Rejection::Winsorized;
+    
+    // Flats MUST be normalized to account for varying light source intensity
+    args.params.normalization = NormalizationMethod::Multiplicative; 
+    
+    args.params.weighting = WeightingType::None;
+    
+    args.params.sigmaLow = 3.0f;
+    args.params.sigmaHigh = 3.0f;
+    
+    args.params.maximizeFraming = false;
+    args.params.upscaleAtStacking = false;
+    args.params.drizzle = false;
+}
+
 StackResult StackingEngine::execute(StackingArgs& args) {
     m_cancelled = false;
     
@@ -62,33 +112,92 @@ StackResult StackingEngine::execute(StackingArgs& args) {
             .arg(methodToString(args.params.method)), "green");
     
     // 3. Prepare Comet Registration if needed
+    // 3. Prepare Comet Registration if needed
     if (args.params.useCometMode) {
         emit logMessage(tr("Preparing Comet Alignment..."), "neutral");
-        QDateTime refDate = QDateTime::fromString(args.params.refDate, Qt::ISODate);
-        if (!refDate.isValid()) {
-             // Try to get from reference image
-             auto refInfo = args.sequence->image(args.params.refImageIndex);
-             refDate = QDateTime::fromString(refInfo.metadata.dateObs, Qt::ISODate); 
-        }
         
+        // Ensure effectiveRegs is resized
         int totalImages = args.sequence->count();
         args.effectiveRegs.resize(totalImages);
         
+        // Get Reference Comet Position
+        // If Ref Image has explicit comet position, use it.
+        // Otherwise we define the Reference Comet Position as "where it would be at Ref Date" (usually 0 shift relative to stars if we pick Ref Frame as Ref)
+        
+        double refCometX = 0.0;
+        double refCometY = 0.0;
+        bool hasRefPos = false;
+        
+        const auto& refImg = args.sequence->image(args.params.refImageIndex);
+        if (refImg.registration.cometX > 0 && refImg.registration.cometY > 0) {
+            refCometX = refImg.registration.cometX;
+            refCometY = refImg.registration.cometY;
+            hasRefPos = true;
+        }
+
+        // Velocity fallback data
+        QDateTime refDate = QDateTime::fromString(args.params.refDate, Qt::ISODate);
+        if (!refDate.isValid()) {
+             refDate = QDateTime::fromString(refImg.metadata.dateObs, Qt::ISODate); 
+        }
+
         for (int idx : args.imageIndices) {
              RegistrationData reg = args.sequence->image(idx).registration;
-             auto info = args.sequence->image(idx);
-             QDateTime imgDate = QDateTime::fromString(info.metadata.dateObs, Qt::ISODate);
+             const auto& imgInfo = args.sequence->image(idx);
              
-             if (imgDate.isValid() && refDate.isValid()) {
-                 qint64 secs = refDate.secsTo(imgDate);
-                 double hours = secs / 3600.0;
+             // Strategy:
+             // 1. If we have explicit comet positions (Position Mode):
+             //    - Project Image Comet (raw) -> Ref Frame (using H_star)
+             //    - Calculate Delta = RefComet - ProjectedComet
+             //    - Add Delta to H_star translation
+             
+             // 2. If no positions, use Velocity (Velocity Mode):
+             //    - Calculate Delta based on (Time - RefTime) * Velocity
+             //    - Subtract Delta from H_star (to "freeze" the comet, we move the frame opposite to comet motion?)
+             //      Wait. If Comet moves +10px. To keep it centered, we must shift the image -10px. 
+             //      So subtract shift.
+             
+             bool usedPosition = false;
+             
+             if (hasRefPos && reg.cometX > 0 && reg.cometY > 0) {
+                 // Project current comet position to Reference Frame using Star Alignment
+                 QPointF projected = reg.transform(reg.cometX, reg.cometY);
                  
-                 double shiftX = hours * args.params.cometVx;
-                 double shiftY = hours * args.params.cometVy;
+                 // We want Projected to be at RefCometX/Y
+                 // Shift = Target - Current
+                 double dx = refCometX - projected.x();
+                 double dy = refCometY - projected.y();
                  
-                 reg.H[0][2] -= shiftX;
-                 reg.H[1][2] -= shiftY;
-                }
+                 // Apply shift to Homography (translation components are [0][2] and [1][2])
+                 // H' = T(dx,dy) * H
+                 reg.H[0][2] += dx;
+                 reg.H[1][2] += dy;
+                 reg.shiftX += dx;
+                 reg.shiftY += dy;
+                 
+                 usedPosition = true;
+             }
+             
+             if (!usedPosition) {
+                 // Fallback to velocity
+                 QDateTime imgDate = QDateTime::fromString(imgInfo.metadata.dateObs, Qt::ISODate);
+                 
+                 if (imgDate.isValid() && refDate.isValid()) {
+                     qint64 secs = refDate.secsTo(imgDate);
+                     double hours = secs / 3600.0;
+                     
+                     // Comet displacement relative to stars
+                     double comDisX = hours * args.params.cometVx;
+                     double comDisY = hours * args.params.cometVy;
+                     
+                     // To align on comet, shift image so comet stays fixed.
+                     // If comet moves +X, we shift image -X relative to star-aligned.
+                     reg.H[0][2] -= comDisX;
+                     reg.H[1][2] -= comDisY;
+                     reg.shiftX -= comDisX;
+                     reg.shiftY -= comDisY;
+                 }
+             }
              
              args.effectiveRegs[idx] = reg;
         }
@@ -556,7 +665,12 @@ StackResult StackingEngine::stackSum(StackingArgs& args) {
         totalExposure += imgInfo.exposure;
         
         // Scale registration for upscaling if needed
-        RegistrationData reg = imgInfo.registration;
+        RegistrationData reg;
+        if (!args.effectiveRegs.empty() && idx < static_cast<int>(args.effectiveRegs.size())) {
+            reg = args.effectiveRegs[idx];
+        } else {
+            reg = imgInfo.registration;
+        }
         if (args.params.upscaleAtStacking) {
             reg.shiftX *= 2.0;
             reg.shiftY *= 2.0;
@@ -1150,8 +1264,16 @@ void StackingEngine::loadBlockData(const StackingArgs& args,
             args.logCallback(QObject::tr("  Loading %1 (%2/%3)...").arg(imgInfo.fileName()).arg(i+1).arg(nbImages), "");
         }
         
-        double shiftX = imgInfo.registration.isShiftOnly() ? imgInfo.registration.shiftX : 0;
-        double shiftY = imgInfo.registration.isShiftOnly() ? imgInfo.registration.shiftY : 0;
+        // Use effective registration if available (e.g. Comet Mode)
+        RegistrationData reg;
+        if (!args.effectiveRegs.empty() && imgIdx < static_cast<int>(args.effectiveRegs.size())) {
+            reg = args.effectiveRegs[imgIdx];
+        } else {
+             reg = imgInfo.registration;
+        }
+        
+        double shiftX = reg.isShiftOnly() ? reg.shiftX : 0;
+        double shiftY = reg.isShiftOnly() ? reg.shiftY : 0;
         
         double srcMinX = offsetX - shiftX;
         double srcMaxX = offsetX + outputWidth - shiftX;
@@ -1501,6 +1623,15 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args) {
         
         // Compute Rejection Mask on-the-fly if enabled
         std::unique_ptr<ImageBuffer> dimRejectionMap;
+        
+        // Use effective registration if available
+        RegistrationData reg;
+        if (!args.effectiveRegs.empty() && idx < static_cast<int>(args.effectiveRegs.size())) {
+            reg = args.effectiveRegs[idx];
+        } else {
+             reg = args.sequence->image(idx).registration;
+        }
+
         if (referenceStack.isValid()) {
              dimRejectionMap = std::make_unique<ImageBuffer>(buffer.width(), buffer.height(), 1);
              float* maskData = dimRejectionMap->data().data();
@@ -1509,22 +1640,15 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args) {
              
              // Check each pixel against reference
              // Need to handle registration shift for comparison!
-             // Ref pixel (x,y) corresponds to Img pixel (x+shiftX, y+shiftY) ?
-             // Img pixel (x,y) corresponds to Ref pixel (x-shiftX, y-shiftY)
-             
-             const auto& imgInfo = args.sequence->image(idx);
              int shiftX = 0, shiftY = 0;
-             if (imgInfo.registration.hasRegistration) {
-                 shiftX = static_cast<int>(std::round(imgInfo.registration.shiftX));
-                 shiftY = static_cast<int>(std::round(imgInfo.registration.shiftY));
+             if (reg.hasRegistration) {
+                 shiftX = static_cast<int>(std::round(reg.shiftX));
+                 shiftY = static_cast<int>(std::round(reg.shiftY));
              }
              
              // Sigma threshold
              // Estimate noise level of the current image
              double ch0Noise = Statistics::computeNoise(buffer.data().data(), buffer.width(), buffer.height());
-             if (buffer.channels() > 1) {
-                 // Maybe check other channels
-             }
              
              float sigmaParam = std::max(args.params.sigmaLow, args.params.sigmaHigh);
              if (sigmaParam <= 0.0f) sigmaParam = 3.0f;
@@ -1573,11 +1697,10 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args) {
         }
         
         // Add to Drizzle
-        const auto& imgInfo = args.sequence->image(idx);
         const float* rejMapPtr = nullptr;
         if (dimRejectionMap) rejMapPtr = dimRejectionMap->data().data(); 
         
-        drizzle.addImage(buffer, imgInfo.registration, imgWeights, rejMapPtr); 
+        drizzle.addImage(buffer, reg, imgWeights, rejMapPtr); 
         
         processed++;
     }

@@ -71,9 +71,8 @@ void Logger::init(const QString& logDirPath, int maxLogFiles)
         dir.mkpath(".");
     }
     
-    // Create new log file with timestamp
-    // FORCE ABSOLUTE PATH FOR DEBUGGING
-    s_currentLogPath = "C:/Users/fabio/Documents/GitHub/TStar/TStar_debug.log";
+    // Create new log file
+    s_currentLogPath = s_logDirPath + "/TStar_debug.log";
     
     // Rotate old logs disabled for now to avoid deleting our debug log
     // rotateLogFiles();

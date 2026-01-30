@@ -33,7 +33,9 @@ enum class Rejection {
     SigmaMedian,     ///< Replace rejected with median (not remove)
     Winsorized,      ///< Winsorized sigma clipping (more robust)
     LinearFit,       ///< Linear fit clipping
-    GESDT            ///< Generalized Extreme Studentized Deviate Test
+    GESDT,           ///< Generalized Extreme Studentized Deviate Test
+    Biweight,        ///< Biweight Estimator (Robust)
+    ModifiedZScore   ///< Modified Z-Score (Robust, median based)
 };
 
 /**
@@ -447,6 +449,8 @@ inline QString rejectionToString(Rejection r) {
         case Rejection::Winsorized:  return QStringLiteral("Winsorized Sigma");
         case Rejection::LinearFit:   return QStringLiteral("Linear Fit Clipping");
         case Rejection::GESDT:       return QStringLiteral("Generalized ESD Test");
+        case Rejection::Biweight:    return QStringLiteral("Biweight Estimator");
+        case Rejection::ModifiedZScore: return QStringLiteral("Modified Z-Score");
         default:                     return QStringLiteral("Unknown");
     }
 }

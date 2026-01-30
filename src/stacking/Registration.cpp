@@ -379,23 +379,45 @@ public:
         }
     }
     
-    // Get local background statistics (Nearest neighbor is fastest)
-    // Inline for performance
+    // Bilinear Interpolation for smooth background
     inline void getStats(int x, int y, float& bg, float& sigma) const {
-        int bx = x / meshSize; // Integer division is fast
-        int by = y / meshSize;
-        if (bx >= cols) bx = cols - 1;
-        if (by >= rows) by = rows - 1;
+        // Center coordinates of the blocks
+        float fx = (float)x / meshSize - 0.5f;
+        float fy = (float)y / meshSize - 0.5f;
         
-        const BlockStats& b = blocks[by * cols + bx];
-        bg = b.median;
-        sigma = b.sigma;
+        int x0 = (int)std::floor(fx);
+        int y0 = (int)std::floor(fy);
+        
+        float wx = fx - x0;
+        float wy = fy - y0;
+        
+        // Clamp indices
+        int x1 = x0 + 1;
+        int y1 = y0 + 1;
+        
+        x0 = std::clamp(x0, 0, cols - 1);
+        y0 = std::clamp(y0, 0, rows - 1);
+        x1 = std::clamp(x1, 0, cols - 1);
+        y1 = std::clamp(y1, 0, rows - 1);
+        
+        const BlockStats& b00 = blocks[y0 * cols + x0];
+        const BlockStats& b10 = blocks[y0 * cols + x1];
+        const BlockStats& b01 = blocks[y1 * cols + x0];
+        const BlockStats& b11 = blocks[y1 * cols + x1];
+        
+        // Interpolate Median (Background)
+        float b_top = b00.median * (1.0f - wx) + b10.median * wx;
+        float b_bot = b01.median * (1.0f - wx) + b11.median * wx;
+        bg = b_top * (1.0f - wy) + b_bot * wy;
+        
+        // Interpolate Sigma (Noise)
+        float s_top = b00.sigma * (1.0f - wx) + b10.sigma * wx;
+        float s_bot = b01.sigma * (1.0f - wx) + b11.sigma * wx;
+        sigma = s_top * (1.0f - wy) + s_bot * wy;
         
         if (sigma < 1e-9f) sigma = 1e-5f;
     }
 };
-
-// Candidate struct removed as we process stars directly
 
 
 std::vector<DetectedStar> RegistrationEngine::detectStars(const ImageBuffer& image) {
@@ -409,25 +431,13 @@ std::vector<DetectedStar> RegistrationEngine::detectStars(const ImageBuffer& ima
     
     if (m_cancelled) return stars;
 
-    // 2. Gaussian Blur
+    // 2. Compute Background Mesh (SEP-like)
+    BackgroundMesh bgMesh;
+    bgMesh.compute(lum, width, height, 64); // 64x64 blocks
+
+    // 3. Gaussian Blur (for peak finding)
     std::vector<float> smoothLum;
     applyGaussianBlur(lum, smoothLum, width, height, 2.0f);
-
-    // 3. Compute Global Threshold
-    float bg, sigma;
-    computeGlobalStats(lum, bg, sigma); // Stats on RAW luminance
-    
-    float thresholdVal;
-    if (m_params.detectionThreshold > 100.0f) {
-        // Assume absolute data value
-        thresholdVal = m_params.detectionThreshold;
-    } else {
-        // User passed value. default 4.0?
-        float k = m_params.detectionThreshold > 0.1f ? m_params.detectionThreshold : 5.0f;
-        thresholdVal = bg + k * sigma;
-    }
-    
-    // emit logMessage(tr("Background: %1, Sigma: %2, Threshold: %3").arg(bg).arg(sigma).arg(thresholdVal), "blue");
     
     // 4. Find Peaks in Smoothed Image
     
@@ -446,7 +456,8 @@ std::vector<DetectedStar> RegistrationEngine::detectStars(const ImageBuffer& ima
     
     std::vector<std::vector<DetectedStar>> threadStars(maxThreads);
     
-    int r = 2; 
+    int r = 2;
+    float kSigma = m_params.detectionThreshold > 0.1f ? m_params.detectionThreshold : 3.0f; // Lower default for local thresholding
 
     #pragma omp parallel
     {
@@ -460,13 +471,18 @@ std::vector<DetectedStar> RegistrationEngine::detectStars(const ImageBuffer& ima
         
         #pragma omp for
         for (int y = r; y < height - r; ++y) {
-            const float* row = smoothLum.data() + y * width;
             
             for (int x = r; x < width - r; ++x) {
-                float val = row[x];
+                // Get local background statistics
+                float bg, sigma;
+                bgMesh.getStats(x, y, bg, sigma);
+                
+                float thresholdVal = bg + kSigma * sigma;
+                float val = smoothLum[y * width + x];
                 
                 if (val <= thresholdVal) continue;
                 
+                // Local Maxima Check
                 bool isMax = true;
                 for (int dy = -r; dy <= r; ++dy) {
                     for (int dx = -r; dx <= r; ++dx) {
@@ -488,9 +504,7 @@ std::vector<DetectedStar> RegistrationEngine::detectStars(const ImageBuffer& ima
                     float v0p1 = smoothLum[(y + 1) * width + x];
                     
                     float d1x_l = val - vm10;
-                    // float d1x_r = vp10 - val; // Unused
                     float d1y_u = val - v0m1;
-                    // float d1y_d = v0p1 - val; // Unused
                     
                     float denomX = vp10 + vm10 - 2.0f * val;
                     float denomY = v0p1 + v0m1 - 2.0f * val;
@@ -500,21 +514,21 @@ std::vector<DetectedStar> RegistrationEngine::detectStars(const ImageBuffer& ima
                     
                     // Only refine if valid peak (curvature is negative)
                     if (std::abs(denomX) > 1e-5f) {
-                         dx = -0.5f - (d1x_l / denomX); // Matches: -0.5 - (P - L)/(R - P - (P - L)) = -0.5 - (P-L)/(R+L-2P)
+                         dx = -0.5f - (d1x_l / denomX); 
                     }
                     
                     if (std::abs(denomY) > 1e-5f) {
                         dy = -0.5f - (d1y_u / denomY);
                     }
                     
-                    // Clamp offsets (should be within [-0.5, 0.5] if true max)
+                    // Clamp offsets
                     if (std::abs(dx) > 1.0f || std::abs(dy) > 1.0f) continue;
                     
                     DetectedStar s;
                     s.x = x + dx;
                     s.y = y + dy;
                     s.peak = val; // Smoothed peak
-                    s.flux = val - bg; // Approximate relative flux
+                    s.flux = val - bg; // Local flux above background
                     
                     if (denomX < 0) {
                         float sx = std::sqrt(val / -denomX);

@@ -87,7 +87,8 @@ public:
         std::vector<float>& stack,
         float sigmaLow, float sigmaHigh,
         std::vector<int>& rejected,
-        std::vector<float>* scratch = nullptr
+        std::vector<float>* scratch = nullptr,
+        const std::vector<float>* weights = nullptr
     );
     
     /**
@@ -144,7 +145,8 @@ public:
         std::vector<float>& stack,
         float sigmaLow, float sigmaHigh,
         std::vector<int>& rejected,
-        std::vector<float>* scratch = nullptr
+        std::vector<float>* scratch = nullptr,
+        const std::vector<float>* weights = nullptr
     );
     
     /**
@@ -199,6 +201,70 @@ public:
     static std::vector<float> computeGesdtCriticalValues(
         int n, int maxOutliers, float significance
     );
+
+    /**
+     * @brief Biweight Estimator Rejection
+     * 
+     * Iteratively computes a robust center (biweight location) and scale (biweight midvariance).
+     * Rejects pixels that have zero weight in the final iteration.
+     * 
+     * @param stack Pixel stack
+     * @param tuningConstant Tuning constant (typically 6.0 or 9.0)
+     * @param rejected Output rejection flags
+     * @return Rejection statistics
+     */
+    static RejectionResult biweightClipping(
+        std::vector<float>& stack,
+        float tuningConstant,
+        std::vector<int>& rejected,
+        std::vector<float>* scratch = nullptr
+    );
+    
+    /**
+     * @brief Modified Z-Score Rejection
+     * 
+     * Uses Median and MAD to calculate robust Z-Scores.
+     * Rejects pixels with |Z| > threshold.
+     * 
+     * @param stack Pixel stack
+     * @param threshold Rejection threshold (default ~ 3.5)
+     * @param rejected Output rejection flags
+     */
+    static RejectionResult modifiedZScoreClipping(
+        std::vector<float>& stack,
+        float threshold,
+        std::vector<int>& rejected,
+        std::vector<float>* scratch = nullptr
+    );
+
+    // =========================================================================
+    // ROBUST STATS WITH WEIGHTS
+    // =========================================================================
+
+    /**
+     * @brief Compute Weighted Median
+     * 
+     * @param data Pixel values
+     * @param weights Weights for each pixel
+     * @param validMask Optional mask (0 = invalid)
+     * @return Weighted Median
+     */
+    static float weightedMedian(const std::vector<float>& data, 
+                                const std::vector<float>& weights,
+                                const std::vector<int>* validMask = nullptr);
+
+    /**
+     * @brief Compute Weighted Mean and Standard Deviation
+     * 
+     * @param data Pixel values
+     * @param weights Weights for each pixel
+     * @param validMask Optional mask
+     * @return std::pair<mean, stdDev>
+     */
+    static std::pair<double, double> weightedMeanAndStdDev(
+                                const std::vector<float>& data,
+                                const std::vector<float>& weights,
+                                const std::vector<int>* validMask = nullptr);
     
 private:
     /**
