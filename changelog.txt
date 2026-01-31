@@ -1,6 +1,10 @@
 TStar Changelog
 ===============
 
+Version 1.5.5
+-------------
+- Testing some more stacking functions
+
 Version 1.5.4
 -------------
 - Beta testing new stacking engine
