@@ -12,6 +12,9 @@
 * [Tim Dicke](https://github.com/dickett): testing of the MacOS versions
 * Miroslav Bakoš: testing of the Windows version
 
+### Live TStar website:
+https://ft2801.github.io/TStar-Website/
+
 ## Overview
 
 TStar is a powerful, C++17/Qt6-based image processing platform explicitly designed for astrophotography. It combines high-performance signal processing algorithms with modern AI-based restoration tools to help astrophotographers produce scientific-grade images from their raw data.
