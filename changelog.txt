@@ -5,6 +5,7 @@ Version 1.5.6
 -------------
 - Added batch cropping in the crop tool
 - Fixed integration time in the stacking tool
+- Robust error handling across the app
 
 Version 1.5.5
 -------------

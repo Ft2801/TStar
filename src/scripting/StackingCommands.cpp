@@ -984,7 +984,10 @@ bool StackingCommands::cmdPixelMath(const ScriptCommand& cmd) {
                 // Let's use a static map in StackingCommands just for the duration?
                 // Better: locally scope them.
                 // But we don't know how many unique vars.
-                // For now, load and store in a local list.
+                // Store transiently in local list.
+                // These images are scoped to the command execution, which is the correct lifecycle
+                // preventing global state leaks.
+                // Unlike a global cache, this ensures memory is freed immediately after PixelMath completes.
             }
         }
         pos = end + 1;

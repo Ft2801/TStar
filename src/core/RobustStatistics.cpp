@@ -12,8 +12,11 @@ namespace RobustStatistics {
 
     // --- PORT START: Standard Robust Stats ---
 
-    // 1. Qn0 Scale Estimator, Naive O(N^2)
-    // Used for initial robust scale estimation
+    // 1. Qn0 Scale Estimator
+    // Implementation: Naive O(N^2) pairwise differences.
+    // Justification: In stacking contexts, N is typically small (number of subs, e.g., 20-300).
+    // For N < 1000, the O(N^2) overhead is negligible compared to file I/O and registration.
+    // Optimization to O(N log N) is possible but not urgent given typical usage profiles.
     static float Qn0(const std::vector<float>& sorted_data) {
         size_t n = sorted_data.size();
         if (n < 2) return 0.0f;

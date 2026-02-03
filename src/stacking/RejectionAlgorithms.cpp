@@ -601,11 +601,8 @@ RejectionResult RejectionAlgorithms::gesdtClipping(
     
     int currentSize = n;
     
-    // GESDT destructive logic on wStack... difficult to preserve indices without tracking.
-    // Simplifying: GESDT is complex to port to index-preserving without shuffling.
-    // For now, assume GESDT shuffles are OK if we just return stats, but we need 'rejected' array.
-    // We can't use the old implementation easily.
-    // Minimal stub for now to fix build/hang, or try to adapt?
+    // Simplifying: GESDT is destructive. We track original indices to map back to the 'rejected' array.
+    // Optimization: Use swap-remove (O(1)) instead of erase (O(N)) since Grubbs statistic is order-independent.
     // Let's adapt:
     
     // We need to track original indices.
@@ -636,9 +633,13 @@ RejectionResult RejectionAlgorithms::gesdtClipping(
             break;
         }
         
-        // Remove most extreme from working copy (and indices)
-        wStack.erase(wStack.begin() + maxIndexLocal);
-        indices.erase(indices.begin() + maxIndexLocal);
+        // Optimization: Swap with end and decrement size instead of erasing
+        // This keeps the loop O(K*N) instead of O(K*N^2)
+        if (maxIndexLocal != currentSize - 1) {
+            std::swap(wStack[maxIndexLocal], wStack[currentSize - 1]);
+            std::swap(indices[maxIndexLocal], indices[currentSize - 1]);
+        }
+        // "Remove" logically
         currentSize--;
     }
     

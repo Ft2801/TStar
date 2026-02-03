@@ -47,7 +47,7 @@ std::vector<FitsHeaderUtils::HeaderCard> FitsHeaderUtils::dropInvalidCards(
         }
         
         // Skip if value is too long for FITS (68 chars normally, more with CONTINUE)
-        // For now, just warn but include
+        // Warn on non-standard long strings but include them for compatibility.
         if (card.value.length() > 68) {
             qWarning() << "FITS keyword value too long, may cause issues:" << key;
         }

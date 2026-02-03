@@ -361,6 +361,7 @@ void CurvesGraph::mouseMoveEvent(QMouseEvent* event) {
         }
         update();
     }
+    emit mouseHover(mx, my);
 }
 
 void CurvesGraph::mouseReleaseEvent([[maybe_unused]] QMouseEvent* event) {
@@ -428,8 +429,8 @@ CurvesDialog::CurvesDialog(ImageViewer* viewer, QWidget* parent)
          m_graph->setHistogram(m_origHist);
     }
     m_graph->installEventFilter(this);
-    connect(m_graph, &CurvesGraph::curvesChanged, this, [this](){
-        onCurvesChanged(false); 
+    connect(m_graph, &CurvesGraph::mouseHover, this, [this](double x, double y){
+        m_statsLabel->setText(tr("Point: x=%1, y=%2").arg(x, 0, 'f', 3).arg(y, 0, 'f', 3));
     });
     
     mainLayout->addWidget(m_graph, 1);

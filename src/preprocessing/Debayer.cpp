@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <QDebug>
 
 namespace Preprocessing {
 
@@ -452,7 +453,9 @@ bool Debayer::superpixel(const ImageBuffer& input, ImageBuffer& output,
 
 bool Debayer::ahd(const ImageBuffer& input, ImageBuffer& output,
                   BayerPattern pattern) {
-    // AHD is complex - use VNG as fallback for now
+    // Adapter for High-quality Demosaicing (AHD)
+    // Currently relying on VNG as a robust alternative until fully implemented.
+    qWarning() << "Debayer: AHD algorithm requested but not yet fully implemented. Falling back to VNG.";
     return vng(input, output, pattern);
 }
 
@@ -462,7 +465,9 @@ bool Debayer::ahd(const ImageBuffer& input, ImageBuffer& output,
 
 bool Debayer::rcd(const ImageBuffer& input, ImageBuffer& output,
                   BayerPattern pattern) {
-    // RCD is complex - use VNG as fallback for now
+    // Ratio-Corrected Demosaicing (RCD)
+    // Currently relying on VNG as a robust alternative until fully implemented.
+    qWarning() << "Debayer: RCD algorithm requested but not yet fully implemented. Falling back to VNG.";
     return vng(input, output, pattern);
 }
 

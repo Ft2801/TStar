@@ -56,11 +56,10 @@ int find_deviant_pixels_c(const float* dark, int width, int height,
                            int cfa_pattern) {
     if (!dark || !out_x || !out_y || max_output <= 0) return 0;
 
-    // NOTE: Dark frame is usually SINGLE CHANNEL (Mono) even for OSC before debayer.
-    // If it is 3 channel (Interleaved), we must handle stride.
-    // For now assuming Mono input for finding hot pixels on dark frame.
-    // If logic changes to require multichannel support, stride MUST be added.
-    // Given the signature takes 'const float* dark' without channels arg, it implies Mono/Raw.
+    // NOTE: This function processes a single plane of data.
+    // The C++ caller (CalibrationEngine) is responsible for handling multi-channel images
+    // by extracting each channel into a contiguous buffer before calling this function.
+    // This design avoids complexity regarding strides and interleaving here.
     
     int count = 0;
     
@@ -635,11 +634,8 @@ void apply_cosmetic_correction_c(float* image, int width, int height, int channe
 void fix_xtrans_c(float* image, int width, int height,
                   const char* bay_pattern, const char* model_name,
                   int threads) {
-   // Placeholder strictly.
-   // X-Trans logic is complex string matching.
-   // Given current constraints, we stick to the C++ implementation calling simple C iterators if needed.
-   // Or just leave it as C++.
-   // The artifact issue is not X-Trans (user has OSC/Mono usually).
-   // Leaving empty for now to satisfy linker, will implement if requested.
-   (void)image; (void)width; (void)height; (void)bay_pattern; (void)model_name; (void)threads;
+    // X-Trans support is reserved for future implementation.
+    // Currently, this function serves as a placeholder to allow the application to
+    // compile and run with X-Trans images, albeit without specific artifact correction.
+    (void)image; (void)width; (void)height; (void)bay_pattern; (void)model_name; (void)threads;
 }

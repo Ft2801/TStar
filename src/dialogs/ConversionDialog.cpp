@@ -333,9 +333,7 @@ void ConversionDialog::onConvert() {
                              else if (f == 0x61616161) bayerPat = "GRBG";
                              else if (f == 0x49494949) bayerPat = "GBRG";
                              
-                             // Pattern shift logic (omitted full block for brevity, using original if possible)
-                             // Assuming standard Bayer for now or copy detailed logic if critical. 
-                             // I'll copy the detailed logic to be safe.
+                             // Pattern shift logic based on margins
                              if (left % 2 != 0) {
                                  if (bayerPat == "RGGB") bayerPat = "GRBG";
                                  else if (bayerPat == "BGGR") bayerPat = "GBRG";

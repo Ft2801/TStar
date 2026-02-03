@@ -79,7 +79,8 @@ void ImageHistoryManager::pushUndo(const ImageBuffer& buffer) {
         m_baseline = std::make_shared<ImageBuffer>(buffer);
     } else if (m_baseline) {
         // Compute delta from baseline
-        // For now, simplified: if sizes match, compute pixel-level delta
+        // Strategy: Only compute delta if dimensions and channel count match.
+        // If they differ, a full new baseline is required.
         if (m_baseline->width() == buffer.width() &&
             m_baseline->height() == buffer.height() &&
             m_baseline->channels() == buffer.channels()) {
@@ -90,7 +91,7 @@ void ImageHistoryManager::pushUndo(const ImageBuffer& buffer) {
             
             // Compute run-length encoded delta
             std::vector<uint8_t> deltaBytes;
-            deltaBytes.reserve(pixelCount / 10);  // Rough estimate
+            deltaBytes.reserve(pixelCount / 10);  // Heuristic reservation (10% change)
             
             // Simplified delta: store as index + value pairs for changed pixels
             for (size_t i = 0; i < pixelCount; ++i) {

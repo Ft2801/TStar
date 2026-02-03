@@ -36,7 +36,8 @@ enum class BayerPattern {
     RGGB,        ///< Red-Green-Green-Blue
     BGGR,        ///< Blue-Green-Green-Red  
     GBRG,        ///< Green-Blue-Red-Green
-    GRBG         ///< Green-Red-Blue-Green
+    GRBG,        ///< Green-Red-Blue-Green
+    XTrans       ///< Fujifilm X-Trans
 };
 
 /**

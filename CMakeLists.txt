@@ -443,6 +443,10 @@ set(TSTAR_SOURCES
     src/core/ErrorHandling.h
     src/core/ResourceManager.cpp
     src/core/ResourceManager.h
+    src/core/TStarApplication.cpp
+    src/core/TStarApplication.h
+    src/core/GlobalExceptionHandler.cpp
+    src/core/GlobalExceptionHandler.h
     ${CMAKE_CURRENT_BINARY_DIR}/generated/Version.cpp
     
     # IO

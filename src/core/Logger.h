@@ -60,6 +60,12 @@ public:
     static QString currentLogFile();
 
     /**
+     * @brief Get recent log messages
+     * @param lines Number of lines to retrieve
+     */
+    static QString getRecentLogs(int lines = 50);
+
+    /**
      * @brief Convenience methods
      */
     static void debug(const QString& msg, const QString& cat = QString())    { log(Debug, msg, cat); }

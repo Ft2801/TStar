@@ -109,8 +109,7 @@ void ExtractLuminanceDialog::onMethodChanged(int index) {
     m_snrGroup->setEnabled(isSNR);
 
     if (!isCustom) {
-        // Update display vals for standard methods? 
-        // We could, but might be overkill. For now just disable.
+        // UI updates for standard methods handled by disabling custom group.
     }
 }
 

@@ -99,14 +99,14 @@ void CalibrationEngine::equalizeCFAChannels(ImageBuffer& flat, Preprocessing::Ba
     // Map BayerPattern to C int
     // 0: RGGB, 1: BGGR, 2: GRBG, 3: GBRG, 4: XTRANS
     int cPattern = -1;
-    if (pattern == Preprocessing::BayerPattern::RGGB) cPattern = 0;
-    else if (pattern == Preprocessing::BayerPattern::BGGR) cPattern = 1;
-    else if (pattern == Preprocessing::BayerPattern::GRBG) cPattern = 2;
-    else if (pattern == Preprocessing::BayerPattern::GBRG) cPattern = 3;
-    
-    // Check for XTrans (usually detected by make/model or special enum, here simplified)
-    // If pattern implies XTrans (custom check needed in real app), set 4.
-    // For now, assume Bayer if one of the 4.
+    switch (pattern) {
+        case Preprocessing::BayerPattern::RGGB:   cPattern = 0; break;
+        case Preprocessing::BayerPattern::BGGR:   cPattern = 1; break;
+        case Preprocessing::BayerPattern::GRBG:   cPattern = 2; break;
+        case Preprocessing::BayerPattern::GBRG:   cPattern = 3; break;
+        case Preprocessing::BayerPattern::XTrans: cPattern = 4; break;
+        default: break;
+    }
     
     if (cPattern >= 0) {
         equalize_cfa_c(data, w, h, cPattern, omp_get_max_threads());

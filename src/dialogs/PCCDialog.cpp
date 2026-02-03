@@ -52,7 +52,9 @@ PCCDialog::PCCDialog(ImageViewer* viewer, QWidget* parent) : DialogBase(parent, 
     connect(m_catalog, &CatalogClient::errorOccurred, this, &PCCDialog::onCatalogError);
     
     m_calibrator = new PCCCalibrator();
-
+    
+    m_watcher = new QFutureWatcher<PCCResult>(this);
+    connect(m_watcher, &QFutureWatcher<PCCResult>::finished, this, &PCCDialog::onCalibrationFinished);
 }
 
 void PCCDialog::setViewer(ImageViewer* v) {
@@ -159,81 +161,79 @@ void PCCDialog::onCatalogReady(const std::vector<CatalogStar>& stars) {
         return res;
     });
     
-    // Watcher must be on heap or member (but we are in a Dialog, member is safer)
-    // We'll use a local watcher connected to a lambda that deletes itself? 
-    // Risky if dialog closes. Better: Make watcher a member.
-    // For now, let's just create a watcher on heap and parent it to this.
-    
-    // Watcher must be on heap or member
-    QFutureWatcher<PCCResult>* watcher = new QFutureWatcher<PCCResult>(this);
-    
+    // Watcher is now a member, persisting across calls (reused)
+    if (m_watcher->isRunning()) {
+        // Should not happen as button is disabled
+        return;
+    }
+    m_watcher->setFuture(future);
+}
+
+void PCCDialog::onCalibrationFinished() {
     // Capture the specific target viewer for this job
-    QPointer<ImageViewer> targetViewer = m_viewer;
+    // Note: m_viewer might have changed if non-modal? PCCDialog is usually modal or associated with specific viewer.
+    // If it's non-modal and user switched viewer, m_viewer is the CURRENT one.
+    // We should rely on m_viewer pointer if it's still valid.
     
-    connect(watcher, &QFutureWatcher<PCCResult>::finished, this, [this, watcher, targetViewer](){
-        if (!targetViewer) { watcher->deleteLater(); return; } // Target gone
-        
-        PCCResult res = watcher->result();
-        m_result = res;
-        
-        // Persist in metadata for standalone tool
-        ImageBuffer::Metadata meta = targetViewer->getBuffer().metadata();
-        meta.pccResult = res;
-        targetViewer->getBuffer().setMetadata(meta);
+    if (!m_viewer) return;
 
-        watcher->deleteLater();
-        m_btnRun->setEnabled(true);
-        
-        MainWindowCallbacks* mw = getCallbacks();
-        if (mw) mw->endLongProcess();
-        
-        if (!res.valid) {
-            m_status->setText(tr("Calibration Failed."));
-            QMessageBox::warning(this, tr("PCC Failed"), tr("Could not match enough stars. Check WCS and Image Quality."));
-        } else {
-            m_status->setText(tr("Success. Applying correction..."));
-            
-            bool neutralize = m_chkNeutralizeBackground->isChecked();
-            
-            float t0 = -2.8f; 
-            float t1 = +2.0f;
-            
-            float bg[3];
-            bg[0] = targetViewer->getBuffer().getRobustMedian(0, t0, t1);
-            bg[1] = targetViewer->getBuffer().getRobustMedian(1, t0, t1);
-            bg[2] = targetViewer->getBuffer().getRobustMedian(2, t0, t1);
-            
-            if (!neutralize) {
-                bg[0] = 0.0f; bg[1] = 0.0f; bg[2] = 0.0f;
-            }
-            
-            float kw[3] = { static_cast<float>(res.R_factor), static_cast<float>(res.G_factor), static_cast<float>(res.B_factor) };
-            float bg_mean = (bg[0] + bg[1] + bg[2]) / 3.0f;
-            
-            float offset[3];
-            for (int c=0; c<3; c++) {
-                offset[c] = -bg[c] * kw[c] + bg_mean;
-            }
+    PCCResult res = m_watcher->result();
+    m_result = res;
+    
+    // Persist in metadata for standalone tool
+    ImageBuffer::Metadata meta = m_viewer->getBuffer().metadata();
+    meta.pccResult = res;
+    m_viewer->getBuffer().setMetadata(meta);
 
-            QString msg = tr("Factors (K):\nR: %1\nG: %2\nB: %3\n\nBackground Ref (Detected):\nR: %4\nG: %5\nB: %6\n\nComputed Offsets:\nR: %7\nG: %8\nB: %9")
-                          .arg(kw[0], 0, 'f', 6).arg(kw[1], 0, 'f', 6).arg(kw[2], 0, 'f', 6)
-                          .arg(bg[0], 0, 'e', 5).arg(bg[1], 0, 'e', 5).arg(bg[2], 0, 'e', 5)
-                          .arg(offset[0], 0, 'e', 5).arg(offset[1], 0, 'e', 5).arg(offset[2], 0, 'e', 5);
-            
-            // Critical: Push Undo before applying
-            targetViewer->pushUndo();
-            targetViewer->getBuffer().applyPCC(kw[0], kw[1], kw[2], bg[0], bg[1], bg[2], bg_mean);
-            // Refresh display needed? Usually buffer change signals handled, but explicit might be safer
-            targetViewer->refreshDisplay(); 
-            
-            if (mw) mw->logMessage(msg, 1, true);
-            
-            QMessageBox::information(this, tr("PCC Result"), msg);
-            accept(); // Close dialog? Or stay open? Previous logic was accept.
+    m_btnRun->setEnabled(true);
+    
+    MainWindowCallbacks* mw = getCallbacks();
+    if (mw) mw->endLongProcess();
+    
+    if (!res.valid) {
+        m_status->setText(tr("Calibration Failed."));
+        QMessageBox::warning(this, tr("PCC Failed"), tr("Could not match enough stars. Check WCS and Image Quality."));
+    } else {
+        m_status->setText(tr("Success. Applying correction..."));
+        
+        bool neutralize = m_chkNeutralizeBackground->isChecked();
+        
+        float t0 = -2.8f; 
+        float t1 = +2.0f;
+        
+        float bg[3];
+        bg[0] = m_viewer->getBuffer().getRobustMedian(0, t0, t1);
+        bg[1] = m_viewer->getBuffer().getRobustMedian(1, t0, t1);
+        bg[2] = m_viewer->getBuffer().getRobustMedian(2, t0, t1);
+        
+        if (!neutralize) {
+            bg[0] = 0.0f; bg[1] = 0.0f; bg[2] = 0.0f;
         }
-    });
-    
-    watcher->setFuture(future);
+        
+        float kw[3] = { static_cast<float>(res.R_factor), static_cast<float>(res.G_factor), static_cast<float>(res.B_factor) };
+        float bg_mean = (bg[0] + bg[1] + bg[2]) / 3.0f;
+        
+        float offset[3];
+        for (int c=0; c<3; c++) {
+            offset[c] = -bg[c] * kw[c] + bg_mean;
+        }
+
+        QString msg = tr("Factors (K):\nR: %1\nG: %2\nB: %3\n\nBackground Ref (Detected):\nR: %4\nG: %5\nB: %6\n\nComputed Offsets:\nR: %7\nG: %8\nB: %9")
+                      .arg(kw[0], 0, 'f', 6).arg(kw[1], 0, 'f', 6).arg(kw[2], 0, 'f', 6)
+                      .arg(bg[0], 0, 'e', 5).arg(bg[1], 0, 'e', 5).arg(bg[2], 0, 'e', 5)
+                      .arg(offset[0], 0, 'e', 5).arg(offset[1], 0, 'e', 5).arg(offset[2], 0, 'e', 5);
+        
+        // Critical: Push Undo before applying
+        m_viewer->pushUndo();
+        m_viewer->getBuffer().applyPCC(kw[0], kw[1], kw[2], bg[0], bg[1], bg[2], bg_mean);
+        // Refresh display needed? Usually buffer change signals handled, but explicit might be safer
+        m_viewer->refreshDisplay(); 
+        
+        if (mw) mw->logMessage(msg, 1, true);
+        
+        QMessageBox::information(this, tr("PCC Result"), msg);
+        accept(); // Close dialog
+    }
 }
 
 void PCCDialog::onCatalogError(const QString& err) {

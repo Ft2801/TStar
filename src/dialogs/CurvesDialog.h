@@ -34,6 +34,7 @@ public:
 
 signals:
     void curvesChanged();
+    void mouseHover(double x, double y);
 
 protected:
     void paintEvent(QPaintEvent* event) override;

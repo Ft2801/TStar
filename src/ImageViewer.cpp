@@ -615,7 +615,8 @@ void ImageViewer::pushUndo() {
         m_undoStack.push_back(m_buffer);
         m_redoStack.clear();
     } else {
-        // Legacy mode: full copies
+        // Fallback: full copies.
+        // This strategy is used when delta compression is disabled or unavailable.
         if (m_undoStack.size() >= 20) m_undoStack.erase(m_undoStack.begin());
         m_undoStack.push_back(m_buffer);
         m_redoStack.clear();

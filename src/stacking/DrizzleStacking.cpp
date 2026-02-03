@@ -3,6 +3,8 @@
 #include <cmath>
 #include <algorithm>
 #include <numeric>
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgproc.hpp>
 
 namespace Stacking {
 
@@ -488,59 +490,43 @@ void MosaicFeathering::computeDistanceMask(
     int outWidth, int outHeight,
     std::vector<float>& output)
 {
+    // Use OpenCV's efficient O(N) Distance Transform
+    // Map existing binary data to cv::Mat
+    // binary: 255 = content, 0 = void.
+    // distanceTransform calculates distance to nearest ZERO pixel.
+    
+    cv::Mat binMat(height, width, CV_8UC1, (void*)binary.data());
+    cv::Mat distMat;
+    
+    // DIST_L2 = Euclidean distance
+    // DIST_MASK_5 = 5x5 mask for precise distance
+    cv::distanceTransform(binMat, distMat, cv::DIST_L2, cv::DIST_MASK_5);
+    
+    // Resize to output size
+    cv::Mat smallDist;
+    cv::resize(distMat, smallDist, cv::Size(outWidth, outHeight), 0, 0, cv::INTER_AREA);
+    
+    // Normalize and copy to float vector
+    // Existing logic normalized such that 50px = 1.0
+    // We should maintain this "ramp width" logic.
+    // The previous implementation used a fixed 50 pixel ramp *in original scale*?
+    // "float normalizedDist = static_cast<float>(minDist) / 50.0f;"
+    // Yes.
+    
     output.resize(static_cast<size_t>(outWidth) * outHeight);
+    float* outIdx = output.data();
     
-    // Simple distance transform approximation
-    // For production, use OpenCV's distanceTransform
+    // Since we resized DISTANCE map, the values are still in "Original Pixels" units (roughly).
+    // Actually cv::resize interpolates values. If we shrink image 2x, values are still 0..MaxDist.
+    // So threshold of 50.0f still applies to the values inside smallDist.
     
-    double scaleX = static_cast<double>(width) / outWidth;
-    double scaleY = static_cast<double>(height) / outHeight;
+    float* sPtr = (float*)smallDist.data;
+    size_t count = static_cast<size_t>(outWidth) * outHeight;
     
     #pragma omp parallel for
-    for (int oy = 0; oy < outHeight; oy++) {
-        for (int ox = 0; ox < outWidth; ox++) {
-            int x = static_cast<int>(ox * scaleX);
-            int y = static_cast<int>(oy * scaleY);
-            
-            x = std::clamp(x, 0, width - 1);
-            y = std::clamp(y, 0, height - 1);
-            
-            // Check if pixel is inside (non-zero)
-            if (binary[y * width + x] == 0) {
-                output[oy * outWidth + ox] = 0.0f;
-                continue;
-            }
-            
-            // Find minimum distance to edge (boundary pixel)
-            int minDist = std::min({x, y, width - 1 - x, height - 1 - y});
-            
-            // Search for closer edge (zero pixel)
-            for (int r = 1; r <= minDist; r++) {
-                bool foundEdge = false;
-                
-                for (int dy = -r; dy <= r && !foundEdge; dy++) {
-                    for (int dx = -r; dx <= r && !foundEdge; dx++) {
-                        if (std::abs(dx) != r && std::abs(dy) != r) continue; // Only check perimeter
-                        
-                        int nx = x + dx;
-                        int ny = y + dy;
-                        
-                        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-                            if (binary[ny * width + nx] == 0) {
-                                minDist = r;
-                                foundEdge = true;
-                            }
-                        }
-                    }
-                }
-                
-                if (foundEdge) break;
-            }
-            
-            // Normalize distance to 0-1 range (ramp width normalizes)
-            float normalizedDist = static_cast<float>(minDist) / 50.0f; // 50 pixel ramp
-            output[oy * outWidth + ox] = std::min(1.0f, normalizedDist);
-        }
+    for (size_t i = 0; i < count; ++i) {
+        float d = sPtr[i];
+        outIdx[i] = std::min(1.0f, d / 50.0f);
     }
 }
 

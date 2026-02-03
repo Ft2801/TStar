@@ -78,32 +78,61 @@ QPointF Distortion::transformRefToSrc(const QPointF& outP, const RegistrationDat
     QPointF refLin = applyForward(outP, refReg);
     
     // 2. Ref Linear -> Src Linear (Inverse Homography)
-    //    H maps Src -> Ref.
-    //    So Src = H_inv * Ref.
-    //    Note: H operates on "Linearized" coordinates now.
+    // We need to transform refLin back to srcLin using the INVERSE of the src->ref homography matrix H.
+    // H maps Src(linear) -> Ref(linear).
+    // So Src(linear) = H_inv * Ref(linear).
+
+    // Invert the 3x3 Homography Matrix srcReg.H
+    // H = | h00 h01 h02 |
+    //     | h10 h11 h12 |
+    //     | h20 h21 h22 |
     
-    // Manual homography transform (Inverse)
+    // Determinant
+    double h00 = srcReg.H[0][0], h01 = srcReg.H[0][1], h02 = srcReg.H[0][2];
+    double h10 = srcReg.H[1][0], h11 = srcReg.H[1][1], h12 = srcReg.H[1][2];
+    double h20 = srcReg.H[2][0], h21 = srcReg.H[2][1], h22 = srcReg.H[2][2];
     
-    // Invert H from SrcReg (assuming H matches LIN_SRC -> LIN_REF)
-    // ... Copy H ...
-    // Note: We need the Inverse of srcReg.H
-    // Reuse the inverse logic from StackingEngine or RegistrationData?
-    // RegistrationData::transform does Forward (Src->Ref).
+    double det = h00 * (h11 * h22 - h12 * h21) -
+                 h01 * (h10 * h22 - h12 * h20) +
+                 h02 * (h10 * h21 - h11 * h20);
+                 
+    if (std::abs(det) < 1e-9) {
+        // Singular matrix, cannot invert. Return input as fallback.
+        return applyReverse(refLin, srcReg);
+    }
     
-    // Let's assume we can compute H_inv here or helper exists.
-    // Hardcoding inverse for now (copy-paste from StackingEngine)
-    // It's better to implement `inverseTransform` in RegistrationData.
-    // For now, skipping full H_inv implementation in this snippet, assuming standard behavior.
+    double invDet = 1.0 / det;
     
-    // Placeholder linear transform inverse
-    // x_src_lin = (InvH * refLin).
+    // Inverse Matrix Elements (Unrolled)
+    double i00 = (h11 * h22 - h12 * h21) * invDet;
+    double i01 = (h02 * h21 - h01 * h22) * invDet;
+    double i02 = (h01 * h12 - h02 * h11) * invDet;
     
-    // Actually, let's use the `RegistrationData` inverse logic if possible.
-    // But `RegistrationData::transform` logic in `StackingTypes.h` is Forward.
+    double i10 = (h12 * h20 - h10 * h22) * invDet;
+    double i11 = (h00 * h22 - h02 * h20) * invDet;
+    double i12 = (h02 * h10 - h00 * h12) * invDet;
     
-    // Let's assume we have `srcLin`.
-    QPointF srcLin = refLin; // Placeholder for H^-1 transform
+    double i20 = (h10 * h21 - h11 * h20) * invDet;
+    double i21 = (h01 * h20 - h00 * h21) * invDet;
+    double i22 = (h00 * h11 - h01 * h10) * invDet;
     
+    // Project Point
+    // P_src = H_inv * P_ref
+    double rx = refLin.x();
+    double ry = refLin.y();
+    double w = 1.0; 
+    
+    double sx = i00 * rx + i01 * ry + i02 * w;
+    double sy = i10 * rx + i11 * ry + i12 * w;
+    double sw = i20 * rx + i21 * ry + i22 * w;
+    
+    if (std::abs(sw) > 1e-9) {
+        sx /= sw;
+        sy /= sw;
+    }
+    
+    QPointF srcLin(sx, sy);
+
     // 3. Src Linear -> Src Pixel (Reverse SIP on Src)
     return applyReverse(srcLin, srcReg);
 }

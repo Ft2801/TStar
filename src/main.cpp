@@ -1,4 +1,5 @@
-#include <QApplication>
+#include "core/TStarApplication.h"
+#include "core/GlobalExceptionHandler.h"
 #include <QStyleFactory>
 #include <QPalette>
 #include <QTimer>
@@ -55,7 +56,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("FabioTempera");
     QCoreApplication::setApplicationName("TStar");
     
-    QApplication app(argc, argv);
+    TStarApplication app(argc, argv);
     
     // Now initialize logger with proper paths
     Logger::init();
@@ -251,7 +252,16 @@ int main(int argc, char *argv[])
     Logger::info("Main window displayed", "Main");
     Logger::info("Application startup complete", "Main");
 
-    int result = app.exec();
+    int result = 0;
+    try {
+        result = app.exec();
+    } catch (const std::exception& e) {
+        GlobalExceptionHandler::handle(e);
+        result = -1;
+    } catch (...) {
+        GlobalExceptionHandler::handle(QString("Fatal error in main loop."));
+        result = -1;
+    }
     
     Logger::info(QString("Application exiting with code %1").arg(result), "Main");
     Logger::shutdown();

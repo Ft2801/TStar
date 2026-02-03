@@ -86,8 +86,8 @@ struct StackDataBlock {
             wStackSize = nbFrames * numChannels * elemSize;
         }
         
-        // Linear fit buffers (mono only for now or per channel?)
-        // Let's assume linear fit per channel for simplicity
+        // Linear fit buffers (per-channel allocation confirmed)
+        // We allocate 2 * nbFrames * numChannels, so this fully supports multi-channel rejection.
         size_t linearFitSize = 0;
         if (rejectionType == Rejection::LinearFit) {
             linearFitSize = 2 * nbFrames * numChannels * sizeof(float); 

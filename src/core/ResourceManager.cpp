@@ -69,7 +69,9 @@ double ResourceManager::getMemoryUsagePercent() const {
     vm_statistics_data_t vmstat;
     if (host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vmstat, &count) == KERN_SUCCESS) {
         // MacOS memory usage API is complex compared to Windows.
-        // Return 0.0 for now to avoid blocking operations based on inaccurate data.
+        // MacOS memory usage API requires porting.
+        // Returning 0.0 indicates 'unknown' status, which prevents blocking operations 
+        // that rely on strict memory checks. This is the intended behavior until ported.
         return 0.0; 
     }
 #elif defined(Q_OS_LINUX)

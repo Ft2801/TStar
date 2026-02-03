@@ -10,8 +10,8 @@
 
 void reportUserError(const QString& title, const QString& message) {
     qWarning() << "[ERROR]" << title << "-" << message;
-    // Note: In GUI context, could emit signal to MainWindow for dialog
-    // For now, just log - dialogs should handle their own error reporting
+    // Core error reporting is decoupled from UI.
+    // Dialogs handle their own user-facing reporting.
 }
 
 void reportWarning(const QString& title, const QString& message) {

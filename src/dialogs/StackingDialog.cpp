@@ -278,8 +278,7 @@ void StackingDialog::onComputeCometShifts() {
     
     if (m_sequence->computeCometShifts(m_cometRef1Index, m_cometRef2Index)) {
         m_logText->append(tr("Comet shifts computed successfully."));
-        // Update table to show shifts or custom column?
-        // For now just Log.
+        updateTable();
         QMessageBox::information(this, tr("Success"), tr("Comet shifts applied. You can now stack with 'Comet' mode (ensure registration is done)."));
     } else {
          m_logText->append(tr("Error computing comet shifts. Check dates/keywords."));

@@ -13,6 +13,7 @@
 #include "../ImageViewer.h"
 
 #include "DialogBase.h"
+#include <QFutureWatcher>
 
 class PCCDialog : public DialogBase {
     Q_OBJECT
@@ -27,6 +28,7 @@ private slots:
     void onRun();
     void onCatalogReady(const std::vector<CatalogStar>& stars);
     void onCatalogError(const QString& err);
+    void onCalibrationFinished();
 
 private:
     QPointer<ImageViewer> m_viewer;
@@ -37,6 +39,8 @@ private:
     CatalogClient* m_catalog;
     PCCCalibrator* m_calibrator;
     PCCResult m_result;
+    
+    QFutureWatcher<PCCResult>* m_watcher = nullptr;
 };
 
 #endif // PCCDIALOG_H

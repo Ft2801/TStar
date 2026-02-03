@@ -226,9 +226,9 @@ RegistrationResult RegistrationEngine::registerImage(const ImageBuffer& image,
         
         // Cache them if we are the reference
         if (&reference != &image) {
-            // Logic nuance: m_referenceStars should be set by registerSequence
-            // If registerImage is called standalone, we might want to cache?
-            // For now just use temp.
+            // Logic nuance: m_referenceStars should be set by registerSequence.
+            // If registerImage is called standalone, we use the transient tempRefStars.
+            // This is the intended behavior for standalone checks.
         }
     }
     

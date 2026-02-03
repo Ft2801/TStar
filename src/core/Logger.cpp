@@ -72,14 +72,15 @@ void Logger::init(const QString& logDirPath, int maxLogFiles)
         dir.mkpath(".");
     }
     
-    // Create new log file
-    s_currentLogPath = s_logDirPath + "/TStar_debug.log";
+    // Create new log file with timestamp to ensure unique session logs
+    QString timestamp = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
+    s_currentLogPath = s_logDirPath + QString("/TStar_%1.log").arg(timestamp);
     
-    // Rotate old logs disabled for now to avoid deleting our debug log
-    // rotateLogFiles();
+    // Rotate old logs to keep disk usage in check
+    rotateLogFiles();
     
     s_logFile = new QFile(s_currentLogPath);
-    if (!s_logFile->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
+    if (!s_logFile->open(QIODevice::WriteOnly | QIODevice::Text)) {
         std::cerr << "Failed to open log file: " << s_currentLogPath.toStdString() << std::endl;
         delete s_logFile;
         s_logFile = nullptr;
@@ -242,4 +243,63 @@ QString Logger::levelToString(Level level)
 QString Logger::currentLogFile()
 {
     return s_currentLogPath;
+}
+
+QString Logger::getRecentLogs(int lines)
+{
+    QMutexLocker locker(&s_mutex);
+    
+    if (!s_logFile || !s_logFile->isOpen()) {
+        return "Log file not accessible.";
+    }
+    
+    s_logStream->flush();
+    
+    QFile readFile(s_currentLogPath);
+    if (!readFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return "Failed to open log file for reading.";
+    }
+    
+    // Efficiently read last N lines by seeking to end and reading backwards in blocks
+    qint64 fileSize = readFile.size();
+    if (fileSize == 0) return "";
+    
+    const int bufferSize = 4096;
+    QByteArray buffer;
+    QStringList resultLines;
+    qint64 pos = fileSize;
+    
+    while (pos > 0 && resultLines.size() < lines + 1) { // +1 to handle potential partial line at end
+        qint64 readSize = std::min(pos, static_cast<qint64>(bufferSize));
+        pos -= readSize;
+        
+        readFile.seek(pos);
+        QByteArray chunk = readFile.read(readSize);
+        
+        // Prepend chunk to buffer (we are reading backwards)
+        buffer.prepend(chunk);
+        
+        // Count newlines in standardizing way
+        // Note: encoding is handled by QString conversion later, but newlines are ASCII safe
+        // Split and keeping structure
+    }
+    
+    // Convert buffer to string and split
+    // Using QString decoding
+    QString fullText = QString::fromUtf8(buffer); // Assuming UTF8 as set in init
+    resultLines = fullText.split('\n');
+    
+    // We might have read too much from the start of the chunk, so take the last N lines
+    // Also remove empty trailing line if present
+    if (!resultLines.isEmpty() && resultLines.last().isEmpty()) {
+        resultLines.removeLast();
+    }
+    
+    int start = std::max(0, static_cast<int>(resultLines.size()) - lines);
+    QString result;
+    for (int i = start; i < resultLines.size(); ++i) {
+        result += resultLines[i] + "\n";
+    }
+    
+    return result;
 }

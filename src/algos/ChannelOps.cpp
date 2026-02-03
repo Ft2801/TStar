@@ -131,53 +131,67 @@ ImageBuffer ChannelOps::computeLuminance(const ImageBuffer& src, LumaMethod meth
         return out;
     }
 
-    // Determine Weights
-    float wr = 0.333f, wg = 0.333f, wb = 0.333f;
-    [[maybe_unused]] bool useWeights = true;
+    // Generic channel weights
+    std::vector<float> weights(c, 0.0f);
     
     if (method == LumaMethod::MAX || method == LumaMethod::MEDIAN) {
-        useWeights = false;
+        // No weights needed
     } else if (method == LumaMethod::SNR) {
         std::vector<float> sigmas = customNoiseSigma;
         if ((int)sigmas.size() != c) {
             sigmas = estimateNoiseSigma(src);
         }
-        // w = 1 / (sigma^2 + eps), normalized
         float sumW = 0.0f;
-        std::vector<float> ws(c);
         for(int i=0; i<c; ++i) {
-            ws[i] = 1.0f / (sigmas[i] * sigmas[i] + 1e-12f);
-            sumW += ws[i];
+            weights[i] = 1.0f / (sigmas[i] * sigmas[i] + 1e-12f);
+            sumW += weights[i];
         }
         if (sumW > 0) {
-            if (c >= 3) {
-                wr = ws[0] / sumW; wg = ws[1] / sumW; wb = ws[2] / sumW;
-            } else {
-                // Should handle != 3 channels generically but for now TStar assumes RGB mainly
-                 wr=1.0f; wg=0; wb=0; // Fallback
-            }
+           for(int i=0; i<c; ++i) weights[i] /= sumW;
+        } else {
+           // Fallback: equal weights
+           for(int i=0; i<c; ++i) weights[i] = 1.0f / c;
         }
     } else {
-        wr = getLumaWeightR(method, customWeights);
-        wg = getLumaWeightG(method, customWeights);
-        wb = getLumaWeightB(method, customWeights);
+        // R, G, B weights specific logic
+        // If c >= 3, map 0->R, 1->G, 2->B. Others 0?
+        if (c >= 3) {
+            weights[0] = getLumaWeightR(method, customWeights);
+            weights[1] = getLumaWeightG(method, customWeights);
+            weights[2] = getLumaWeightB(method, customWeights);
+            // Renormalize if necessary? Usually luma weights sum to 1.
+        } else if (c == 2) {
+             // 2 Channels. Just avg or use R/G weights?
+             // Let's use 50/50 for safety unless custom
+             weights[0] = 0.5f; weights[1] = 0.5f;
+        }
     }
     
     // Compute
     for (int i = 0; i < w * h; ++i) {
         float val = 0.0f;
         if (method == LumaMethod::MAX) {
-            float v1 = s[i*c+0], v2 = s[i*c+1], v3 = s[i*c+2];
-            val = std::max({v1, v2, v3});
+            val = s[i*c];
+            for(int k=1; k<c; ++k) val = std::max(val, s[i*c+k]);
         } else if (method == LumaMethod::MEDIAN) {
-            float v[3] = {s[i*c+0], s[i*c+1], s[i*c+2]};
-            if (v[0] > v[1]) std::swap(v[0], v[1]);
-            if (v[1] > v[2]) std::swap(v[1], v[2]);
-            if (v[0] > v[1]) std::swap(v[0], v[1]);
-            val = v[1];
+             // Small optimization for common c=3
+             if (c==3) {
+                 float v[3] = {s[i*c+0], s[i*c+1], s[i*c+2]};
+                 if (v[0] > v[1]) std::swap(v[0], v[1]);
+                 if (v[1] > v[2]) std::swap(v[1], v[2]);
+                 if (v[0] > v[1]) std::swap(v[0], v[1]);
+                 val = v[1];
+             } else {
+                 std::vector<float> v(c);
+                 for(int k=0; k<c; ++k) v[k] = s[i*c+k];
+                 std::nth_element(v.begin(), v.begin() + c/2, v.end());
+                 val = v[c/2];
+             }
         } else {
             // Weighted Sum
-            val = s[i*c+0] * wr + s[i*c+1] * wg + s[i*c+2] * wb;
+            for(int k=0; k<c; ++k) {
+                val += s[i*c+k] * weights[k];
+            }
         }
         dst[i] = std::clamp(val, 0.0f, 1.0f);
     }
