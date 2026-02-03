@@ -29,7 +29,7 @@ public:
     ImageBuffer& getBuffer() { return m_buffer; }
     const ImageBuffer& getBuffer() const { return m_buffer; }
     QString getHeaderValue(const QString &key) const { return m_buffer.getHeaderValue(key); }
-    void setBuffer(const ImageBuffer& buffer, const QString& name = "Untitled", bool preserveView = false);
+    void setBuffer(const ImageBuffer& buffer, const QString& name = QString(), bool preserveView = false);
     void refreshDisplay(bool preserveView = true);
     void refresh() { refreshDisplay(true); } // Alias
 

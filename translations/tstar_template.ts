@@ -808,6 +808,113 @@
         </message>
     </context>
     <context>
+        <name>ConversionDialog</name>
+        <message>
+            <source>%1 file(s) ready for conversion</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Add Files...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Apply debayering (for color cameras)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Bit Depth:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Browse...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Clear All</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Conversion Complete</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Convert</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Convert RAW Files to FITS</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Converted %1 files in %2 ms</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Converted %1 of %2 files. Some files failed.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Converting %1 of %2...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Input Files</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No Files</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Output Directory:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Output Format:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Output Settings</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Please add files to convert.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preparing conversion...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Ready</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Remove</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Same as input files</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Output Directory</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select RAW Files</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Successfully converted %1 files in %2 s.</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>CorrectionBrushDialog</name>
         <message>
             <source>Apply to Document</source>
@@ -1012,7 +1119,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Apply this crop to %1 images?</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Aspect Ratio:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Batch Crop</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1052,6 +1167,10 @@
         </message>
         <message>
             <source>Log</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Point: x=%1, y=%2</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1182,13 +1301,6 @@
         </message>
     </context>
     <context>
-        <name>DialogBase</name>
-        <message>
-            <source>...</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
         <name>ExtractLuminanceDialog</name>
         <message>
             <source>Auto Estimate Noise</source>
@@ -1262,6 +1374,10 @@
     <context>
         <name>FitsLoader</name>
         <message>
+            <source>CFITSIO Open Error %1: %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>CFITSIO Open Error %1: %2\nPath: %3</source>
             <translation type="unfinished" />
         </message>
@@ -1294,6 +1410,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>File does not exist: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>HDU %1 is not an image extension</source>
             <translation type="unfinished" />
         </message>
@@ -1303,6 +1423,10 @@
         </message>
         <message>
             <source>Image has &lt; 2 dimensions (NAXIS=%1)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Invalid read region</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1494,6 +1618,29 @@
         </message>
         <message>
             <source>© 2026 Mike Cranfield</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>GlobalExceptionHandler</name>
+        <message>
+            <source>&lt;h3&gt;An unexpected error occurred&lt;/h3&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Application Error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Copy to Clipboard</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Log Context:</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -2451,6 +2598,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>16-bit</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>16-bit Integer</source>
             <translation type="unfinished" />
         </message>
@@ -2464,6 +2615,10 @@
         </message>
         <message>
             <source>32-bit Integer</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>8-bit</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2639,6 +2794,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Convert RAW to FITS...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Correction Brush</source>
             <translation type="unfinished" />
         </message>
@@ -2724,6 +2883,14 @@
         </message>
         <message>
             <source>FITS Header Editor</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to create project.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to extract channels.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2827,11 +2994,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Home Directory changed to: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Image Annotator</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Image already has multiple channels.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image must have at least 3 channels to extract.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2895,6 +3070,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Main Toolbar</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Mask</source>
             <translation type="unfinished" />
         </message>
@@ -2927,6 +3106,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>New Project...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>New version found: %1</source>
             <translation type="unfinished" />
         </message>
@@ -2951,6 +3134,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>No valid project found at: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Open</source>
             <translation type="unfinished" />
         </message>
@@ -2960,6 +3147,10 @@
         </message>
         <message>
             <source>Open Image(s)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Open Project...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3031,6 +3222,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Opening Conversion Dialog...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Opening Correction Brush...</source>
             <translation type="unfinished" />
         </message>
@@ -3059,6 +3254,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Opening New Project Dialog...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Opening Perfect Palette...</source>
             <translation type="unfinished" />
         </message>
@@ -3071,7 +3270,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Opening Preprocessing Dialog...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Opening Recombine Luminance...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening Registration Dialog...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3083,7 +3290,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Opening Script Browser...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Opening Selective Color Correction...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening Stacking Dialog...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3159,7 +3374,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Please select an image to extract channels from.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preprocessing (Calibration)...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Process</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Project created: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Project loaded: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3180,6 +3411,10 @@
         </message>
         <message>
             <source>Redo (Ctrl+Shift+Z)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Registration (Star Alignment)...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3215,11 +3450,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Run Script...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Running Cosmic Clarity...</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Running GraXpert...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Running script: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3275,6 +3518,18 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Script dialog closed.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Home Directory</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Project Directory</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Select image.</source>
             <translation type="unfinished" />
         </message>
@@ -3284,6 +3539,14 @@
         </message>
         <message>
             <source>Selective Color Correction applied.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Set Home</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Set Home Directory (CWD)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3300,6 +3563,14 @@
         </message>
         <message>
             <source>Square Root</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stacking (Beta)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stacking...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3579,6 +3850,13 @@
         </message>
     </context>
     <context>
+        <name>MasterFrames</name>
+        <message>
+            <source>Master %1 dimensions (%2x%3) don't match target (%4x%5)</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>NativePlateSolver</name>
         <message>
             <source>Catalog Error: %1</source>
@@ -3634,6 +3912,61 @@
         </message>
         <message>
             <source>WCS computed: CRPIX=(%1, %2) CRVAL=(%3, %4)</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>NewProjectDialog</name>
+        <message>
+            <source>A project already exists at this location.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Browse...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Create Project</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Directory Not Empty</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>My Stacking Project</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>New Stacking Project</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Project Exists</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Project Location</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Project Name:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Project Location</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select folder for project...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>The selected directory is not empty.\nCreate project structure anyway?</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -4005,6 +4338,360 @@
         </message>
     </context>
     <context>
+        <name>Preprocessing</name>
+        <message>
+            <source>Bias subtraction failed</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Calibrating image %1 (%2/%3)...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Complete: %1/%2 images processed</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Dark subtraction failed</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Debayering failed</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Detected %1 deviant pixels in master dark</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Equalized CFA channels in master flat</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to read: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to write: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Flat correction failed</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Master Flat loaded (Norm: %1, Pattern: %2)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preprocessing %1 files using %2 threads...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Skipped %1: Insufficient memory (current usage &gt; 90%)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Warning: Auto-detect Bayer Pattern failed (Header: '%1'). Defaulting to RGGB.</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>PreprocessingDialog</name>
+        <message>
+            <source>(Optional)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>(Same as input)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:green'&gt;Calibration complete!&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Failed to create master bias&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Failed to create master dark&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Failed to create master flat&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;✗ %1&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:salmon'&gt;Calibration finished with errors&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Add Files...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Algorithm:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Auto</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Bias value:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Bias:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Bilinear</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Calibration Options</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Clear All</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cold σ:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cosmetic correction:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Create</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Creating master bias from %1 frames...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Creating master dark from %1 frames...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Creating master flat from %1 frames...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Dark for Flat:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Dark:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Debayer:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Equalize CFA</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>FITS Files (*.fit *.fits);;All Files (*)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>FITS Files (*.fit)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Fix X-Trans</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Fix bad lines</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Fix banding</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Flat:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>From Master Dark</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Hot σ:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image Calibration</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Light Frames to Calibrate</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Master Calibration Frames</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Master bias created: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Master dark created: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Master flat created: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No Files</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Optimize dark scaling</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Output directory:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Pattern:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Pedestal:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Please add light frames to calibrate.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Prefix:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Progress</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Remove</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Save Master Bias</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Save Master Dark</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Save Master Flat</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Bias Frames</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Dark Frames</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Dark for Flat</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Flat Frames</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Light Frames</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Master Bias</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Master Dark</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Master Flat</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Output Directory</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select or create...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Sigma-clipping</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Start Calibration</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Starting calibration of %1 images...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Super Pixel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Use Bias calibration</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Use Dark calibration</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Use Flat calibration</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>VNG</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>✓ %1</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>RARDialog</name>
         <message>
             <source>Aberration Removal Complete.</source>
@@ -4243,6 +4930,252 @@
         </message>
     </context>
     <context>
+        <name>Registration</name>
+        <message>
+            <source>Analyzing reference</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Detected %1 stars</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Detecting stars in reference (uncached)...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Detecting stars in reference image...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Detecting stars in target image...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Extracting luminance...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to load image %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to load reference image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image %1: registration failed - %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image %1: shift=(%2, %3), rot=%4 deg, %5 matched</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Matching stars (%1 vs %2)...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No stars detected</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Not enough matches: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Not enough stars in reference: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Not enough stars: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reference: %1 stars detected</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Registering image %1/%2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Registration complete</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Saved reference: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Saved: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Target: %1 stars detected</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>RegistrationDialog</name>
+        <message>
+            <source>-</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:green'&gt;Registration complete!&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Failed to load sequence&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:salmon'&gt;Registration finished with some failures&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Allow Rotation</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Auto</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Auto-selected reference: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cannot Register</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Detection σ:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>FAIL</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Filename</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>High Precision (subpixel)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image Registration</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image Sequence</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Leave empty for source folder</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Load Folder...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Loaded %1 images</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Match Tolerance:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Max Stars:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Min Stars:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>OK</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Output Directory:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Please load at least 2 images.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Progress</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reference: %1 (%2)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reference: Not set</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Registered %1 of %2 images successfully</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Registration Parameters</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Image Folder</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Output Directory</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Set Reference</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Shift X</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Shift Y</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stars</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Start Registration</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Starting registration...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Status</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>SCNRDialog</name>
         <message>
             <source>Amount:</source>
@@ -4333,6 +5266,234 @@
         </message>
         <message>
             <source>Yellows</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>ScriptBrowserDialog</name>
+        <message>
+            <source>(No scripts found)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>(Scripts folder not found)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Available Scripts</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Edit Script</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Refresh</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Run Script</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Script Preview</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>TStar Scripts</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>ScriptDialog</name>
+        <message>
+            <source>(Select predefined script)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:lime'&gt;Script finished successfully.&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;  ✗ Failed&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Script failed: %1 (line %2)&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Script failed: %1&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:salmon'&gt;Script cancelled&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Add</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cannot open script file: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Empty Script</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Load Script</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Load...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Name</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Please enter or load a script to run.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Predefined:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Remove</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Run Script</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Running script...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Save Script</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Save...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Script</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Script Runner</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Script Runner - %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stop</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>TStar Scripts (*.tss)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>TStar Scripts (*.tss);;All Files (*)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Value</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Variables</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>→ %1</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>ScriptParser</name>
+        <message>
+            <source>%1: Unexpected end of file in continued line</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cannot open file: %1</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>ScriptRunner</name>
+        <message>
+            <source>Command failed: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>End of command %1, memory difference: %2 MB</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Exception in %1: %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Executing: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Execution time: %1 s</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Line %1: %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Parse error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Script cancelled</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Script complete</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Script file not found: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Too few arguments for %1: expected at least %2, got %3</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Too many arguments for %1: expected at most %2, got %3</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Total script execution time: %1 s</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Unknown command: %1</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -4547,6 +5708,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>File open failed: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Invalid TIFF byte order marker.</source>
             <translation type="unfinished" />
         </message>
@@ -4560,10 +5725,6 @@
         </message>
         <message>
             <source>Tile offset/count mismatch.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Use File open failed: %1</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -4586,6 +5747,690 @@
         </message>
         <message>
             <source>TStar v</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>StackingCommands</name>
+        <message>
+            <source>Calibrating frames...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Converted %1 of %2 files</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Found %1 light frames</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Pipeline complete! Output: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Project created: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Registering frames...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stacking cancelled</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stacking...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Starting pipeline for: %1</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>StackingDialog</name>
+        <message>
+            <source />
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>%1 vs Frame</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>%1/%2 images selected, %3 total exposure</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>32-bit output</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;b&gt;Saved output to: %1&lt;/b&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:green'&gt;Stacking complete!&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Failed to load sequence or no images found&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Failed to save output: %1&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Stacking failed or cancelled&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Add Files...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Additive</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Additive + Scaling</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Algo:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>All Images</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Analysis</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>BGGR</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Background</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Best FWHM</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Best Quality</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Best Roundness</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Bilinear (Fast)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Browse...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancelling...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cannot Stack</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Comet</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Comet shifts applied. You can now stack with 'Comet' mode (ensure registration is done).</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Comet shifts computed successfully.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Comet: Please click the comet center in the current image (First).</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Comet: Please click the comet center in the current image (Last).</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Compute Comet Shifts</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Create rejection maps</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Debayer (CFA Images)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Debayer images on-the-fly during stacking. Enable this for RAW/CFA images.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Deselect All</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Enable Drizzle 2x</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Equalize RGB channels</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error computing comet shifts. Check dates/keywords.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error: Please select the corresponding image row in the table first.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Exp</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>FITS Files (*.fit *.fits *.fts);;TIFF Files (*.tif *.tiff);;All Files (*)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>FITS Files (*.fit *.fits);;All Files (*)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>FWHM</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to compute shifts. Check DATE-OBS headers.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Feathering (px):</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Filename</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Filter:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>GBRG</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>GRBG</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Generalized ESD</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image Sequence</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image Stacking</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Images</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Keep:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Linear Fit</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Load Folder...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Loaded %1 images</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Loading sequence from: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>MAD Clipping</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Maximize framing</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Maximum</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Mean</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Median</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Method:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Metric:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Minimum</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Multiplicative</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Multiplicative + Scaling</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No quality data available</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No sequence loaded</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Noise</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>None</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Normalization:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Normalize output to [0,1]</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Output</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Pattern:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Percentile</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Pick First</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Pick Last</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>PixFrac: </source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Please load at least 2 images to stack.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Progress</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Quality</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Quality Score</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>RGGB</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Ref 1 set to frame %1 (x=%2, y=%3)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Ref 2 set to frame %1 (x=%2, y=%3)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Rejection maps saved as %1_low.fit / %1_high.fit</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Rejection:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Remove</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Roundness</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Save Stacked Image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Save to:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select All</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Image Files</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Image Folder</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Selected</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Set Reference</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Shift</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Sigma Clipping</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Sigma High:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Sigma Low:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Sigma-Median</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stacking Parameters</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Star Count</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Start Stacking</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Starting stacking with %1 images...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Status: No comet positions set.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Success</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Sum</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>VNG (Best)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Weighting:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Winsorized Sigma</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>W×H</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>result_stacked.fit</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>StackingEngine</name>
+        <message>
+            <source>  Loading %1 (%2/%3)...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>%1 stacking complete</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>, normalization: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>, rejection: %1 (%2%)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Allocated %1 data blocks, each ~%2 MB</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Auto-detected Bayer pattern: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Computing Cosmetic Correction Map...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Computing image weights...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Computing median (row %1/%2)...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Computing normalization coefficients...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Drizzle enabled: Running first pass for rejection...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Drizzling image %1/%2...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Equalizing RGB channels...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error: File not found: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error: Invalid or empty sequence</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error: No images selected for stacking</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Finalizing Drizzle...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Loading image %1/%2...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Mean stacking complete (accelerated C)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Normalized image %1/%2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Normalizing output...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preparing Comet Alignment...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Processing block %1/%2...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Processing image %1/%2...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Rejection statistics: low=%1% high=%2%</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stacking %1 images using %2 method...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stacking cancelled by user</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stacking complete: %1 images using %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stacking failed</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stacking image %1/%2...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Starting %1 stacking of %2 images (%3 x %4, %5 channels)...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Starting Drizzle stacking (Scale: %1x, PixFrac: %2)...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Starting stacking...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Sum stacking complete. Total exposure: %1s</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Using %1 parallel blocks of max %2 rows each</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Warning: Failed to load image %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Warning: Failed to read image %1, skipping</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Warning: Normalization computation failed, continuing without</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Warning: Weight computation failed, continuing without weighting</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>StackingSequence</name>
+        <message>
+            <source>Analyzing image %1/%2...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Computing quality metrics...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Loading %1...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Validating sequence...</source>
             <translation type="unfinished" />
         </message>
     </context>

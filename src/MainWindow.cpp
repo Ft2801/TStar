@@ -492,7 +492,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_linkViewsAction->setToolTip(tr("Link Zoom and Pan across all windows"));
 
     // Toolbar
-    QToolBar* mainToolbar = addToolBar("Main Toolbar");
+    QToolBar* mainToolbar = addToolBar(tr("Main Toolbar"));
     mainToolbar->setMovable(false);
     mainToolbar->setIconSize(QSize(24, 24));
     mainToolbar->setToolButtonStyle(Qt::ToolButtonIconOnly); // Icons only
@@ -818,8 +818,6 @@ MainWindow::MainWindow(QWidget *parent)
     );
     mainToolbar->addWidget(processBtn);
     mainToolbar->addSeparator();
-
-    /* stacking menu removed for now */
 
     // --- Stacking Menu ---
     QToolButton* stackBtn = new QToolButton(this);
@@ -1472,10 +1470,10 @@ void MainWindow::saveFile() {
     QString dStr = depthBox->currentText();
     ImageBuffer::BitDepth d = ImageBuffer::Depth_8Int;
     
-    if (dStr.contains("32-bit Float")) d = ImageBuffer::Depth_32Float;
-    else if (dStr.contains("32-bit Integer")) d = ImageBuffer::Depth_32Int;
-    else if (dStr.contains("16-bit")) d = ImageBuffer::Depth_16Int;
-    else if (dStr.contains("8-bit")) d = ImageBuffer::Depth_8Int;
+    if (dStr.contains(tr("32-bit Float"))) d = ImageBuffer::Depth_32Float;
+    else if (dStr.contains(tr("32-bit Integer"))) d = ImageBuffer::Depth_32Int;
+    else if (dStr.contains(tr("16-bit"))) d = ImageBuffer::Depth_16Int;
+    else if (dStr.contains(tr("8-bit"))) d = ImageBuffer::Depth_8Int;
     
     QString err;
     if (!v->getBuffer().save(path, format, d, &err)) { // Use viewer buffer
@@ -1490,19 +1488,19 @@ void MainWindow::saveFile() {
 void MainWindow::extractChannels() {
     ImageViewer* v = currentViewer();
     if (!v) {
-        QMessageBox::warning(this, "No Image", "Please select an image to extract channels from.");
+        QMessageBox::warning(this, tr("No Image"), tr("Please select an image to extract channels from."));
         return;
     }
 
     ImageBuffer src = v->getBuffer();
     if (src.channels() < 3) {
-        QMessageBox::warning(this, "Error", "Image must have at least 3 channels to extract.");
+        QMessageBox::warning(this, tr("Error"), tr("Image must have at least 3 channels to extract."));
         return;
     }
 
     std::vector<ImageBuffer> channels = ChannelOps::extractChannels(src);
     if (channels.empty()) {
-        log("Failed to extract channels.", Log_Error);
+        log(tr("Failed to extract channels."), Log_Error);
         return;
     }
 

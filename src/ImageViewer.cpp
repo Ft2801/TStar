@@ -166,7 +166,7 @@ void ImageViewer::setBuffer(const ImageBuffer& buffer, const QString& name, bool
     
     // Use current stored display state with all parameters
     QImage img = m_buffer.getDisplayImage(m_displayMode, m_displayLinked, nullptr, 0, 0, m_showMaskOverlay, m_displayInverted, m_displayFalseColor);
-    if (name != "Untitled") setWindowTitle(name);
+    if (!name.isEmpty()) setWindowTitle(name);
     
     setImage(img, preserveView);
     

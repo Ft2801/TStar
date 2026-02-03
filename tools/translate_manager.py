@@ -86,7 +86,8 @@ def translate_file(input_file, lang_code, output_file):
         print(f"Failed to translate: {e}")
 
 if __name__ == "__main__":
-    input_ts = "tstar_template.ts"
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    input_ts = os.path.join(script_dir, "../translations/tstar_template.ts")
     if len(sys.argv) > 1:
         input_ts = sys.argv[1]
     

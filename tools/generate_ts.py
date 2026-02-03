@@ -5,8 +5,9 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 
 # Configuration
-SOURCE_DIR = "../src"
-OUTPUT_FILE = "../translations/tstar_template.ts"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+SOURCE_DIR = os.path.join(script_dir, "../src")
+OUTPUT_FILE = os.path.join(script_dir, "../translations/tstar_template.ts")
 
 # Regex for matching tr("string") and QCoreApplication::translate("context", "string")
 # Handles escaped quotes mostly

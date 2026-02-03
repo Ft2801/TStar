@@ -808,6 +808,113 @@
         </message>
     </context>
     <context>
+        <name>ConversionDialog</name>
+        <message>
+            <source>%1 file(s) ready for conversion</source>
+            <translation type="finished">%1 file pronti per la conversione</translation>
+        </message>
+        <message>
+            <source>Add Files...</source>
+            <translation type="finished">Aggiungi File...</translation>
+        </message>
+        <message>
+            <source>Apply debayering (for color cameras)</source>
+            <translation type="finished">Applica debayerizzazione (per camere a colori)</translation>
+        </message>
+        <message>
+            <source>Bit Depth:</source>
+            <translation type="finished">Profondità Bit:</translation>
+        </message>
+        <message>
+            <source>Browse...</source>
+            <translation type="finished">Sfoglia...</translation>
+        </message>
+        <message>
+            <source>Clear All</source>
+            <translation type="finished">Cancella Tutto</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Chiudi</translation>
+        </message>
+        <message>
+            <source>Conversion Complete</source>
+            <translation type="finished">Conversione Completata</translation>
+        </message>
+        <message>
+            <source>Convert</source>
+            <translation type="finished">Converti</translation>
+        </message>
+        <message>
+            <source>Convert RAW Files to FITS</source>
+            <translation type="finished">Converti file RAW in FITS</translation>
+        </message>
+        <message>
+            <source>Converted %1 files in %2 ms</source>
+            <translation type="finished">Convertiti %1 file in %2 ms</translation>
+        </message>
+        <message>
+            <source>Converted %1 of %2 files. Some files failed.</source>
+            <translation type="finished">Convertiti %1 di %2 file. Alcuni falliti.</translation>
+        </message>
+        <message>
+            <source>Converting %1 of %2...</source>
+            <translation type="finished">Conversione %1 di %2...</translation>
+        </message>
+        <message>
+            <source>Input Files</source>
+            <translation type="finished">File Input</translation>
+        </message>
+        <message>
+            <source>No Files</source>
+            <translation type="finished">Nessun File</translation>
+        </message>
+        <message>
+            <source>Output Directory:</source>
+            <translation type="finished">Cartella Output:</translation>
+        </message>
+        <message>
+            <source>Output Format:</source>
+            <translation type="finished">Formato Output:</translation>
+        </message>
+        <message>
+            <source>Output Settings</source>
+            <translation type="finished">Impostazioni Output</translation>
+        </message>
+        <message>
+            <source>Please add files to convert.</source>
+            <translation type="finished">Aggiungi file da convertire.</translation>
+        </message>
+        <message>
+            <source>Preparing conversion...</source>
+            <translation type="finished">Preparazione conversione...</translation>
+        </message>
+        <message>
+            <source>Ready</source>
+            <translation type="finished">Pronto</translation>
+        </message>
+        <message>
+            <source>Remove</source>
+            <translation type="finished">Rimuovi</translation>
+        </message>
+        <message>
+            <source>Same as input files</source>
+            <translation type="finished">Come i file input</translation>
+        </message>
+        <message>
+            <source>Select Output Directory</source>
+            <translation type="finished">Seleziona Cartella Output</translation>
+        </message>
+        <message>
+            <source>Select RAW Files</source>
+            <translation type="finished">Seleziona File RAW</translation>
+        </message>
+        <message>
+            <source>Successfully converted %1 files in %2 s.</source>
+            <translation type="finished">Convertiti con successo %1 file in %2 s.</translation>
+        </message>
+    </context>
+    <context>
         <name>CorrectionBrushDialog</name>
         <message>
             <source>Apply to Document</source>
@@ -1012,8 +1119,16 @@
             <translation type="finished">Applica</translation>
         </message>
         <message>
+            <source>Apply this crop to %1 images?</source>
+            <translation type="finished">Applicare questo ritaglio a %1 immagini?</translation>
+        </message>
+        <message>
             <source>Aspect Ratio:</source>
             <translation type="finished">Rapporto d'aspetto:</translation>
+        </message>
+        <message>
+            <source>Batch Crop</source>
+            <translation type="finished">Ritaglio Batch</translation>
         </message>
         <message>
             <source>Close</source>
@@ -1053,6 +1168,10 @@
         <message>
             <source>Log</source>
             <translation type="finished">Log</translation>
+        </message>
+        <message>
+            <source>Point: x=%1, y=%2</source>
+            <translation type="finished">Punto: x=%1, y=%2</translation>
         </message>
         <message>
             <source>Point: x=0.000, y=0.000</source>
@@ -1182,13 +1301,6 @@
         </message>
     </context>
     <context>
-        <name>DialogBase</name>
-        <message>
-            <source>...</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
         <name>ExtractLuminanceDialog</name>
         <message>
             <source>Auto Estimate Noise</source>
@@ -1262,6 +1374,10 @@
     <context>
         <name>FitsLoader</name>
         <message>
+            <source>CFITSIO Open Error %1: %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>CFITSIO Open Error %1: %2\nPath: %3</source>
             <translation type="finished">Errore Apertura CFITSIO %1: %2\nPercorso: %3</translation>
         </message>
@@ -1294,6 +1410,10 @@
             <translation type="finished">Impossibile spostarsi su HDU %1: %2</translation>
         </message>
         <message>
+            <source>File does not exist: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>HDU %1 is not an image extension</source>
             <translation type="finished">HDU %1 non Ã¨ un'estensione immagine</translation>
         </message>
@@ -1304,6 +1424,10 @@
         <message>
             <source>Image has &lt; 2 dimensions (NAXIS=%1)</source>
             <translation type="finished">Immagine ha &lt; 2 dimensioni (NAXIS=%1)</translation>
+        </message>
+        <message>
+            <source>Invalid read region</source>
+            <translation type="unfinished" />
         </message>
         <message>
             <source>No image extensions found in file</source>
@@ -1495,6 +1619,29 @@
         <message>
             <source>© 2026 Mike Cranfield</source>
             <translation type="finished">© 2026 Mike Cranfield</translation>
+        </message>
+    </context>
+    <context>
+        <name>GlobalExceptionHandler</name>
+        <message>
+            <source>&lt;h3&gt;An unexpected error occurred&lt;/h3&gt;</source>
+            <translation type="finished">&lt;h3&gt;Si è verificato un errore imprevisto&lt;/h3&gt;</translation>
+        </message>
+        <message>
+            <source>Application Error</source>
+            <translation type="finished">Errore Applicazione</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Chiudi</translation>
+        </message>
+        <message>
+            <source>Copy to Clipboard</source>
+            <translation type="finished">Copia negli Appunti</translation>
+        </message>
+        <message>
+            <source>Log Context:</source>
+            <translation type="finished">Contesto Log:</translation>
         </message>
     </context>
     <context>
@@ -1759,7 +1906,7 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
         <message>
             <source>Auto Stretch:</source>
-            <translation type="finished">Auto-Stretch:</translation>
+            <translation type="finished">Auto Stretch:</translation>
         </message>
         <message>
             <source>Automatic histogram stretch for best visibility</source>
@@ -1959,7 +2106,7 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
         <message>
             <source>Fit to Window:</source>
-            <translation type="finished">Adatta alla Finestra:</translation>
+            <translation type="finished">Adatta alla finestra:</translation>
         </message>
         <message>
             <source>Fit to window</source>
@@ -2453,6 +2600,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished"> (Ridimensionato)</translation>
         </message>
         <message>
+            <source>16-bit</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>16-bit Integer</source>
             <translation type="finished">16-bit Intero</translation>
         </message>
@@ -2467,6 +2618,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>32-bit Integer</source>
             <translation type="finished">32-bit Intero</translation>
+        </message>
+        <message>
+            <source>8-bit</source>
+            <translation type="unfinished" />
         </message>
         <message>
             <source>8-bit Integer</source>
@@ -2641,6 +2796,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Sottrazione Continua</translation>
         </message>
         <message>
+            <source>Convert RAW to FITS...</source>
+            <translation type="finished">Converti RAW in FITS...</translation>
+        </message>
+        <message>
             <source>Correction Brush</source>
             <translation type="finished">Pennello Correttivo</translation>
         </message>
@@ -2727,6 +2886,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>FITS Header Editor</source>
             <translation type="finished">Editor Header FITS</translation>
+        </message>
+        <message>
+            <source>Failed to create project.</source>
+            <translation type="finished">Creazione progetto fallita.</translation>
+        </message>
+        <message>
+            <source>Failed to extract channels.</source>
+            <translation type="finished">Estrazione canali fallita.</translation>
         </message>
         <message>
             <source>Failed to load %1</source>
@@ -2829,12 +2996,20 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Trasformazione Istogramma applicata.</translation>
         </message>
         <message>
+            <source>Home Directory changed to: %1</source>
+            <translation type="finished">Home Directory cambiata in: %1</translation>
+        </message>
+        <message>
             <source>Image Annotator</source>
             <translation type="finished">Annotatore Immagini</translation>
         </message>
         <message>
             <source>Image already has multiple channels.</source>
             <translation type="finished">L'immagine ha già canali multipli.</translation>
+        </message>
+        <message>
+            <source>Image must have at least 3 channels to extract.</source>
+            <translation type="finished">L'immagine deve avere almeno 3 canali per l'estrazione.</translation>
         </message>
         <message>
             <source>Images (*.png *.jpg *.jpeg)</source>
@@ -2897,6 +3072,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Luminanza ricombinata.</translation>
         </message>
         <message>
+            <source>Main Toolbar</source>
+            <translation type="finished">Barra degli Strumenti Principale</translation>
+        </message>
+        <message>
             <source>Mask</source>
             <translation type="finished">Maschera</translation>
         </message>
@@ -2929,6 +3108,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Necessarie almeno 2 immagini per affiancare.</translation>
         </message>
         <message>
+            <source>New Project...</source>
+            <translation type="finished">Nuovo Progetto...</translation>
+        </message>
+        <message>
             <source>New version found: %1</source>
             <translation type="finished">Nuova versione trovata: %1</translation>
         </message>
@@ -2953,6 +3136,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Risultato PCC non valido.\nEsegui prima Calibrazione Colore Fotometrica.</translation>
         </message>
         <message>
+            <source>No valid project found at: %1</source>
+            <translation type="finished">Nessun progetto valido in: %1</translation>
+        </message>
+        <message>
             <source>Open</source>
             <translation type="finished">Apri</translation>
         </message>
@@ -2963,6 +3150,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Open Image(s)</source>
             <translation type="finished">Apri Immagini</translation>
+        </message>
+        <message>
+            <source>Open Project...</source>
+            <translation type="finished">Apri Progetto...</translation>
         </message>
         <message>
             <source>Open an image first.</source>
@@ -3033,6 +3224,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Apertura Sottrazione Continua...</translation>
         </message>
         <message>
+            <source>Opening Conversion Dialog...</source>
+            <translation type="finished">Apertura dialogo conversione...</translation>
+        </message>
+        <message>
             <source>Opening Correction Brush...</source>
             <translation type="finished">Apertura Pennello Correttivo...</translation>
         </message>
@@ -3061,6 +3256,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Apertura Trasformazione Istogramma...</translation>
         </message>
         <message>
+            <source>Opening New Project Dialog...</source>
+            <translation type="finished">Apertura dialogo nuovo progetto...</translation>
+        </message>
+        <message>
             <source>Opening Perfect Palette...</source>
             <translation type="finished">Apertura Perfect Palette...</translation>
         </message>
@@ -3073,8 +3272,16 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Apertura Risoluzione Astrometrica...</translation>
         </message>
         <message>
+            <source>Opening Preprocessing Dialog...</source>
+            <translation type="finished">Apertura dialogo preprocessing...</translation>
+        </message>
+        <message>
             <source>Opening Recombine Luminance...</source>
             <translation type="finished">Apertura Ricombinazione Luminanza...</translation>
+        </message>
+        <message>
+            <source>Opening Registration Dialog...</source>
+            <translation type="finished">Apertura dialogo allineamento...</translation>
         </message>
         <message>
             <source>Opening Rotate / Crop Tool...</source>
@@ -3085,8 +3292,16 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Apertura Strumento SCNR...</translation>
         </message>
         <message>
+            <source>Opening Script Browser...</source>
+            <translation type="finished">Apertura Script Browser...</translation>
+        </message>
+        <message>
             <source>Opening Selective Color Correction...</source>
             <translation type="finished">Apertura Correzione Colore Selettiva...</translation>
+        </message>
+        <message>
+            <source>Opening Stacking Dialog...</source>
+            <translation type="finished">Apertura dialogo stacking...</translation>
         </message>
         <message>
             <source>Opening Star Recomposition...</source>
@@ -3161,8 +3376,24 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Seleziona un'immagine da ritagliare.</translation>
         </message>
         <message>
+            <source>Please select an image to extract channels from.</source>
+            <translation type="finished">Seleziona un'immagine da cui estrarre i canali.</translation>
+        </message>
+        <message>
+            <source>Preprocessing (Calibration)...</source>
+            <translation type="finished">Preprocessing (Calibrazione)...</translation>
+        </message>
+        <message>
             <source>Process</source>
             <translation type="finished">Processo</translation>
+        </message>
+        <message>
+            <source>Project created: %1</source>
+            <translation type="finished">Progetto creato: %1</translation>
+        </message>
+        <message>
+            <source>Project loaded: %1</source>
+            <translation type="finished">Progetto caricato: %1</translation>
         </message>
         <message>
             <source>RGB Link: %1</source>
@@ -3183,6 +3414,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Redo (Ctrl+Shift+Z)</source>
             <translation type="finished">Ripeti (Ctrl+Shift+Z)</translation>
+        </message>
+        <message>
+            <source>Registration (Star Alignment)...</source>
+            <translation type="finished">Allineamento (Stelle)...</translation>
         </message>
         <message>
             <source>Remove Mask</source>
@@ -3217,12 +3452,20 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Ruota a Destra</translation>
         </message>
         <message>
+            <source>Run Script...</source>
+            <translation type="finished">Esegui Script...</translation>
+        </message>
+        <message>
             <source>Running Cosmic Clarity...</source>
             <translation type="finished">Esecuzione Cosmic Clarity...</translation>
         </message>
         <message>
             <source>Running GraXpert...</source>
             <translation type="finished">Esecuzione GraXpert...</translation>
+        </message>
+        <message>
+            <source>Running script: %1</source>
+            <translation type="finished">Esecuzione script: %1</translation>
         </message>
         <message>
             <source>SCNR</source>
@@ -3278,6 +3521,18 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Salvato: %1</translation>
         </message>
         <message>
+            <source>Script dialog closed.</source>
+            <translation type="finished">Dialogo script chiuso.</translation>
+        </message>
+        <message>
+            <source>Select Home Directory</source>
+            <translation type="finished">Seleziona Home Directory</translation>
+        </message>
+        <message>
+            <source>Select Project Directory</source>
+            <translation type="finished">Seleziona Cartella Progetto</translation>
+        </message>
+        <message>
             <source>Select image.</source>
             <translation type="finished">Seleziona immagine.</translation>
         </message>
@@ -3288,6 +3543,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Selective Color Correction applied.</source>
             <translation type="finished">Correzione Colore Selettiva applicata.</translation>
+        </message>
+        <message>
+            <source>Set Home</source>
+            <translation type="finished">Imposta Home</translation>
+        </message>
+        <message>
+            <source>Set Home Directory (CWD)</source>
+            <translation type="finished">Imposta Home Directory (CWD)</translation>
         </message>
         <message>
             <source>Settings</source>
@@ -3304,6 +3567,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Square Root</source>
             <translation type="finished">Radice Quadrata</translation>
+        </message>
+        <message>
+            <source>Stacking (Beta)</source>
+            <translation type="finished">Stacking (Beta)</translation>
+        </message>
+        <message>
+            <source>Stacking...</source>
+            <translation type="finished">Stacking...</translation>
         </message>
         <message>
             <source>Star Analysis</source>
@@ -3582,6 +3853,13 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
     </context>
     <context>
+        <name>MasterFrames</name>
+        <message>
+            <source>Master %1 dimensions (%2x%3) don't match target (%4x%5)</source>
+            <translation type="finished">Dimensioni Master %1 (%2x%3) non corrispondono al target (%4x%5)</translation>
+        </message>
+    </context>
+    <context>
         <name>NativePlateSolver</name>
         <message>
             <source>Catalog Error: %1</source>
@@ -3638,6 +3916,61 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>WCS computed: CRPIX=(%1, %2) CRVAL=(%3, %4)</source>
             <translation type="finished">WCS calcolato: CRPIX=(%1, %2) CRVAL=(%3, %4)</translation>
+        </message>
+    </context>
+    <context>
+        <name>NewProjectDialog</name>
+        <message>
+            <source>A project already exists at this location.</source>
+            <translation type="finished">Esiste già un progetto in questa posizione.</translation>
+        </message>
+        <message>
+            <source>Browse...</source>
+            <translation type="finished">Sfoglia...</translation>
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="finished">Annulla</translation>
+        </message>
+        <message>
+            <source>Create Project</source>
+            <translation type="finished">Crea Progetto</translation>
+        </message>
+        <message>
+            <source>Directory Not Empty</source>
+            <translation type="finished">Cartella non vuota</translation>
+        </message>
+        <message>
+            <source>My Stacking Project</source>
+            <translation type="finished">Il mio Progetto di Stacking</translation>
+        </message>
+        <message>
+            <source>New Stacking Project</source>
+            <translation type="finished">Nuovo Progetto Stacking</translation>
+        </message>
+        <message>
+            <source>Project Exists</source>
+            <translation type="finished">Il Progetto Esiste</translation>
+        </message>
+        <message>
+            <source>Project Location</source>
+            <translation type="finished">Posizione Progetto</translation>
+        </message>
+        <message>
+            <source>Project Name:</source>
+            <translation type="finished">Nome Progetto:</translation>
+        </message>
+        <message>
+            <source>Select Project Location</source>
+            <translation type="finished">Seleziona Posizione Progetto</translation>
+        </message>
+        <message>
+            <source>Select folder for project...</source>
+            <translation type="finished">Seleziona cartella per il progetto...</translation>
+        </message>
+        <message>
+            <source>The selected directory is not empty.\nCreate project structure anyway?</source>
+            <translation type="unfinished" />
         </message>
     </context>
     <context>
@@ -4008,6 +4341,360 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
     </context>
     <context>
+        <name>Preprocessing</name>
+        <message>
+            <source>Bias subtraction failed</source>
+            <translation type="finished">Sottrazione Bias fallita</translation>
+        </message>
+        <message>
+            <source>Calibrating image %1 (%2/%3)...</source>
+            <translation type="finished">Calibrazione immagine %1 (%2/%3)...</translation>
+        </message>
+        <message>
+            <source>Complete: %1/%2 images processed</source>
+            <translation type="finished">Completato: %1/%2 immagini elaborate</translation>
+        </message>
+        <message>
+            <source>Dark subtraction failed</source>
+            <translation type="finished">Sottrazione Dark fallita</translation>
+        </message>
+        <message>
+            <source>Debayering failed</source>
+            <translation type="finished">Debayerizzazione fallita</translation>
+        </message>
+        <message>
+            <source>Detected %1 deviant pixels in master dark</source>
+            <translation type="finished">Rilevati %1 pixel devianti nel master dark</translation>
+        </message>
+        <message>
+            <source>Equalized CFA channels in master flat</source>
+            <translation type="finished">Canali CFA equalizzati nel master flat</translation>
+        </message>
+        <message>
+            <source>Failed to read: %1</source>
+            <translation type="finished">Lettura fallita: %1</translation>
+        </message>
+        <message>
+            <source>Failed to write: %1</source>
+            <translation type="finished">Scrittura fallita: %1</translation>
+        </message>
+        <message>
+            <source>Flat correction failed</source>
+            <translation type="finished">Correzione Flat fallita</translation>
+        </message>
+        <message>
+            <source>Master Flat loaded (Norm: %1, Pattern: %2)</source>
+            <translation type="finished">Master Flat caricato (Norm: %1, Pattern: %2)</translation>
+        </message>
+        <message>
+            <source>Preprocessing %1 files using %2 threads...</source>
+            <translation type="finished">Preprocessing di %1 file usando %2 thread...</translation>
+        </message>
+        <message>
+            <source>Skipped %1: Insufficient memory (current usage &gt; 90%)</source>
+            <translation type="finished">Saltato %1: Memoria insufficiente (uso &gt; 90%)</translation>
+        </message>
+        <message>
+            <source>Warning: Auto-detect Bayer Pattern failed (Header: '%1'). Defaulting to RGGB.</source>
+            <translation type="finished">Attenzione: Auto-rilevamento Bayer fallito (Header: '%1'). Default su RGGB.</translation>
+        </message>
+    </context>
+    <context>
+        <name>PreprocessingDialog</name>
+        <message>
+            <source>(Optional)</source>
+            <translation type="finished">(Opzionale)</translation>
+        </message>
+        <message>
+            <source>(Same as input)</source>
+            <translation type="finished">(Come input)</translation>
+        </message>
+        <message>
+            <source>...</source>
+            <translation type="finished">...</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:green'&gt;Calibration complete!&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:green'&gt;Calibrazione completata!&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Failed to create master bias&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:red'&gt;Creazione Master Bias fallita&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Failed to create master dark&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:red'&gt;Creazione Master Dark fallita&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Failed to create master flat&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:red'&gt;Creazione Master Flat fallita&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;✗ %1&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:red'&gt;✗ %1&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:salmon'&gt;Calibration finished with errors&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:salmon'&gt;Calibrazione terminata con errori&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>Add Files...</source>
+            <translation type="finished">Aggiungi File...</translation>
+        </message>
+        <message>
+            <source>Algorithm:</source>
+            <translation type="finished">Algoritmo:</translation>
+        </message>
+        <message>
+            <source>Auto</source>
+            <translation type="finished">Auto</translation>
+        </message>
+        <message>
+            <source>Bias value:</source>
+            <translation type="finished">Valore Bias:</translation>
+        </message>
+        <message>
+            <source>Bias:</source>
+            <translation type="finished">Bias:</translation>
+        </message>
+        <message>
+            <source>Bilinear</source>
+            <translation type="finished">Bilineare</translation>
+        </message>
+        <message>
+            <source>Calibration Options</source>
+            <translation type="finished">Opzioni Calibrazione</translation>
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="finished">Annulla</translation>
+        </message>
+        <message>
+            <source>Clear All</source>
+            <translation type="finished">Cancella Tutto</translation>
+        </message>
+        <message>
+            <source>Cold σ:</source>
+            <translation type="finished">σ Freddo:</translation>
+        </message>
+        <message>
+            <source>Cosmetic correction:</source>
+            <translation type="finished">Correzione cosmetica:</translation>
+        </message>
+        <message>
+            <source>Create</source>
+            <translation type="finished">Crea</translation>
+        </message>
+        <message>
+            <source>Creating master bias from %1 frames...</source>
+            <translation type="finished">Creazione Master Bias da %1 frame...</translation>
+        </message>
+        <message>
+            <source>Creating master dark from %1 frames...</source>
+            <translation type="finished">Creazione Master Dark da %1 frame...</translation>
+        </message>
+        <message>
+            <source>Creating master flat from %1 frames...</source>
+            <translation type="finished">Creazione Master Flat da %1 frame...</translation>
+        </message>
+        <message>
+            <source>Dark for Flat:</source>
+            <translation type="finished">Dark per Flat:</translation>
+        </message>
+        <message>
+            <source>Dark:</source>
+            <translation type="finished">Dark:</translation>
+        </message>
+        <message>
+            <source>Debayer:</source>
+            <translation type="finished">Debayer:</translation>
+        </message>
+        <message>
+            <source>Equalize CFA</source>
+            <translation type="finished">Equalizza CFA</translation>
+        </message>
+        <message>
+            <source>FITS Files (*.fit *.fits);;All Files (*)</source>
+            <translation type="finished">File FITS (*.fit *.fits);;Tutti i file (*)</translation>
+        </message>
+        <message>
+            <source>FITS Files (*.fit)</source>
+            <translation type="finished">File FITS (*.fit)</translation>
+        </message>
+        <message>
+            <source>Fix X-Trans</source>
+            <translation type="finished">Correggi X-Trans</translation>
+        </message>
+        <message>
+            <source>Fix bad lines</source>
+            <translation type="finished">Correggi linee difettose</translation>
+        </message>
+        <message>
+            <source>Fix banding</source>
+            <translation type="finished">Correggi banding</translation>
+        </message>
+        <message>
+            <source>Flat:</source>
+            <translation type="finished">Flat:</translation>
+        </message>
+        <message>
+            <source>From Master Dark</source>
+            <translation type="finished">Dal Master Dark</translation>
+        </message>
+        <message>
+            <source>Hot σ:</source>
+            <translation type="finished">σ Caldo:</translation>
+        </message>
+        <message>
+            <source>Image Calibration</source>
+            <translation type="finished">Calibrazione Immagine</translation>
+        </message>
+        <message>
+            <source>Light Frames to Calibrate</source>
+            <translation type="finished">Light Frame da Calibrare</translation>
+        </message>
+        <message>
+            <source>Master Calibration Frames</source>
+            <translation type="finished">Master Frame di Calibrazione</translation>
+        </message>
+        <message>
+            <source>Master bias created: %1</source>
+            <translation type="finished">Master bias creato: %1</translation>
+        </message>
+        <message>
+            <source>Master dark created: %1</source>
+            <translation type="finished">Master dark creato: %1</translation>
+        </message>
+        <message>
+            <source>Master flat created: %1</source>
+            <translation type="finished">Master flat creato: %1</translation>
+        </message>
+        <message>
+            <source>No Files</source>
+            <translation type="finished">Nessun File</translation>
+        </message>
+        <message>
+            <source>Optimize dark scaling</source>
+            <translation type="finished">Ottimizza scalatura dark</translation>
+        </message>
+        <message>
+            <source>Output directory:</source>
+            <translation type="finished">Cartella output:</translation>
+        </message>
+        <message>
+            <source>Pattern:</source>
+            <translation type="finished">Pattern:</translation>
+        </message>
+        <message>
+            <source>Pedestal:</source>
+            <translation type="finished">Pedestallo:</translation>
+        </message>
+        <message>
+            <source>Please add light frames to calibrate.</source>
+            <translation type="finished">Aggiungi light frame da calibrare.</translation>
+        </message>
+        <message>
+            <source>Prefix:</source>
+            <translation type="finished">Prefisso:</translation>
+        </message>
+        <message>
+            <source>Progress</source>
+            <translation type="finished">Progresso</translation>
+        </message>
+        <message>
+            <source>Remove</source>
+            <translation type="finished">Rimuovi</translation>
+        </message>
+        <message>
+            <source>Save Master Bias</source>
+            <translation type="finished">Salva Master Bias</translation>
+        </message>
+        <message>
+            <source>Save Master Dark</source>
+            <translation type="finished">Salva Master Dark</translation>
+        </message>
+        <message>
+            <source>Save Master Flat</source>
+            <translation type="finished">Salva Master Flat</translation>
+        </message>
+        <message>
+            <source>Select Bias Frames</source>
+            <translation type="finished">Seleziona Frame Bias</translation>
+        </message>
+        <message>
+            <source>Select Dark Frames</source>
+            <translation type="finished">Seleziona Frame Dark</translation>
+        </message>
+        <message>
+            <source>Select Dark for Flat</source>
+            <translation type="finished">Seleziona Dark per Flat</translation>
+        </message>
+        <message>
+            <source>Select Flat Frames</source>
+            <translation type="finished">Seleziona Frame Flat</translation>
+        </message>
+        <message>
+            <source>Select Light Frames</source>
+            <translation type="finished">Seleziona Light Frame</translation>
+        </message>
+        <message>
+            <source>Select Master Bias</source>
+            <translation type="finished">Seleziona Master Bias</translation>
+        </message>
+        <message>
+            <source>Select Master Dark</source>
+            <translation type="finished">Seleziona Master Dark</translation>
+        </message>
+        <message>
+            <source>Select Master Flat</source>
+            <translation type="finished">Seleziona Master Flat</translation>
+        </message>
+        <message>
+            <source>Select Output Directory</source>
+            <translation type="finished">Seleziona Cartella Output</translation>
+        </message>
+        <message>
+            <source>Select or create...</source>
+            <translation type="finished">Seleziona o crea...</translation>
+        </message>
+        <message>
+            <source>Sigma-clipping</source>
+            <translation type="finished">Sigma-clipping</translation>
+        </message>
+        <message>
+            <source>Start Calibration</source>
+            <translation type="finished">Avvia Calibrazione</translation>
+        </message>
+        <message>
+            <source>Starting calibration of %1 images...</source>
+            <translation type="finished">Avvio calibrazione di %1 immagini...</translation>
+        </message>
+        <message>
+            <source>Super Pixel</source>
+            <translation type="finished">Super Pixel</translation>
+        </message>
+        <message>
+            <source>Use Bias calibration</source>
+            <translation type="finished">Usa calibrazione Bias</translation>
+        </message>
+        <message>
+            <source>Use Dark calibration</source>
+            <translation type="finished">Usa calibrazione Dark</translation>
+        </message>
+        <message>
+            <source>Use Flat calibration</source>
+            <translation type="finished">Usa calibrazione Flat</translation>
+        </message>
+        <message>
+            <source>VNG</source>
+            <translation type="finished">VNG</translation>
+        </message>
+        <message>
+            <source>✓ %1</source>
+            <translation type="finished">✓ %1</translation>
+        </message>
+    </context>
+    <context>
         <name>RARDialog</name>
         <message>
             <source>Aberration Removal Complete.</source>
@@ -4246,6 +4933,252 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
     </context>
     <context>
+        <name>Registration</name>
+        <message>
+            <source>Analyzing reference</source>
+            <translation type="finished">Analisi riferimento</translation>
+        </message>
+        <message>
+            <source>Detected %1 stars</source>
+            <translation type="finished">Rilevate %1 stelle</translation>
+        </message>
+        <message>
+            <source>Detecting stars in reference (uncached)...</source>
+            <translation type="finished">Rilevamento stelle nel riferimento (no cache)...</translation>
+        </message>
+        <message>
+            <source>Detecting stars in reference image...</source>
+            <translation type="finished">Rilevamento stelle immagine di riferimento...</translation>
+        </message>
+        <message>
+            <source>Detecting stars in target image...</source>
+            <translation type="finished">Rilevamento stelle immagine target...</translation>
+        </message>
+        <message>
+            <source>Extracting luminance...</source>
+            <translation type="finished">Estrazione luminanza...</translation>
+        </message>
+        <message>
+            <source>Failed to load image %1</source>
+            <translation type="finished">Caricamento immagine %1 fallito</translation>
+        </message>
+        <message>
+            <source>Failed to load reference image</source>
+            <translation type="finished">Caricamento immagine di riferimento fallito</translation>
+        </message>
+        <message>
+            <source>Image %1: registration failed - %2</source>
+            <translation type="finished">Immagine %1: allineamento fallito - %2</translation>
+        </message>
+        <message>
+            <source>Image %1: shift=(%2, %3), rot=%4 deg, %5 matched</source>
+            <translation type="finished">Immagine %1: shift=(%2, %3), rot=%4 deg, %5 match</translation>
+        </message>
+        <message>
+            <source>Matching stars (%1 vs %2)...</source>
+            <translation type="finished">Matching stelle (%1 vs %2)...</translation>
+        </message>
+        <message>
+            <source>No stars detected</source>
+            <translation type="finished">Nessuna stella rilevata</translation>
+        </message>
+        <message>
+            <source>Not enough matches: %1</source>
+            <translation type="finished">Match insufficienti: %1</translation>
+        </message>
+        <message>
+            <source>Not enough stars in reference: %1</source>
+            <translation type="finished">Stelle insufficienti nel riferimento: %1</translation>
+        </message>
+        <message>
+            <source>Not enough stars: %1</source>
+            <translation type="finished">Stelle insufficienti: %1</translation>
+        </message>
+        <message>
+            <source>Reference: %1 stars detected</source>
+            <translation type="finished">Riferimento: %1 stelle rilevate</translation>
+        </message>
+        <message>
+            <source>Registering image %1/%2</source>
+            <translation type="finished">Allineamento immagine %1/%2</translation>
+        </message>
+        <message>
+            <source>Registration complete</source>
+            <translation type="finished">Allineamento completato</translation>
+        </message>
+        <message>
+            <source>Saved reference: %1</source>
+            <translation type="finished">Riferimento salvato: %1</translation>
+        </message>
+        <message>
+            <source>Saved: %1</source>
+            <translation type="finished">Salvato: %1</translation>
+        </message>
+        <message>
+            <source>Target: %1 stars detected</source>
+            <translation type="finished">Target: %1 stelle rilevate</translation>
+        </message>
+    </context>
+    <context>
+        <name>RegistrationDialog</name>
+        <message>
+            <source>-</source>
+            <translation type="finished">-</translation>
+        </message>
+        <message>
+            <source>...</source>
+            <translation type="finished">...</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:green'&gt;Registration complete!&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:green'&gt;Allineamento completato!&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Failed to load sequence&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:red'&gt;Caricamento sequenza fallito&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:salmon'&gt;Registration finished with some failures&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:salmon'&gt;Allineamento terminato con alcuni fallimenti&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>Allow Rotation</source>
+            <translation type="finished">Consenti Rotazione</translation>
+        </message>
+        <message>
+            <source>Auto</source>
+            <translation type="finished">Auto</translation>
+        </message>
+        <message>
+            <source>Auto-selected reference: %1</source>
+            <translation type="finished">Riferimento auto-selezionato: %1</translation>
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="finished">Annulla</translation>
+        </message>
+        <message>
+            <source>Cannot Register</source>
+            <translation type="finished">Impossibile Allineare</translation>
+        </message>
+        <message>
+            <source>Detection σ:</source>
+            <translation type="finished">σ Rilevamento:</translation>
+        </message>
+        <message>
+            <source>FAIL</source>
+            <translation type="finished">FALLITO</translation>
+        </message>
+        <message>
+            <source>Filename</source>
+            <translation type="finished">Nome file</translation>
+        </message>
+        <message>
+            <source>High Precision (subpixel)</source>
+            <translation type="finished">Alta Precisione (subpixel)</translation>
+        </message>
+        <message>
+            <source>Image Registration</source>
+            <translation type="finished">Allineamento Immagine</translation>
+        </message>
+        <message>
+            <source>Image Sequence</source>
+            <translation type="finished">Sequenza Immagini</translation>
+        </message>
+        <message>
+            <source>Leave empty for source folder</source>
+            <translation type="finished">Lascia vuoto per cartella sorgente</translation>
+        </message>
+        <message>
+            <source>Load Folder...</source>
+            <translation type="finished">Carica Cartella...</translation>
+        </message>
+        <message>
+            <source>Loaded %1 images</source>
+            <translation type="finished">Caricate %1 immagini</translation>
+        </message>
+        <message>
+            <source>Match Tolerance:</source>
+            <translation type="finished">Tolleranza Match:</translation>
+        </message>
+        <message>
+            <source>Max Stars:</source>
+            <translation type="finished">Max Stelle:</translation>
+        </message>
+        <message>
+            <source>Min Stars:</source>
+            <translation type="finished">Min Stelle:</translation>
+        </message>
+        <message>
+            <source>OK</source>
+            <translation type="finished">OK</translation>
+        </message>
+        <message>
+            <source>Output Directory:</source>
+            <translation type="finished">Cartella Output:</translation>
+        </message>
+        <message>
+            <source>Please load at least 2 images.</source>
+            <translation type="finished">Carica almeno 2 immagini.</translation>
+        </message>
+        <message>
+            <source>Progress</source>
+            <translation type="finished">Progresso</translation>
+        </message>
+        <message>
+            <source>Reference: %1 (%2)</source>
+            <translation type="finished">Riferimento: %1 (%2)</translation>
+        </message>
+        <message>
+            <source>Reference: Not set</source>
+            <translation type="finished">Riferimento: Non impostato</translation>
+        </message>
+        <message>
+            <source>Registered %1 of %2 images successfully</source>
+            <translation type="finished">Allineate %1 di %2 immagini con successo</translation>
+        </message>
+        <message>
+            <source>Registration Parameters</source>
+            <translation type="finished">Parametri Allineamento</translation>
+        </message>
+        <message>
+            <source>Select Image Folder</source>
+            <translation type="finished">Seleziona Cartella Immagini</translation>
+        </message>
+        <message>
+            <source>Select Output Directory</source>
+            <translation type="finished">Seleziona Cartella Output</translation>
+        </message>
+        <message>
+            <source>Set Reference</source>
+            <translation type="finished">Imposta Riferimento</translation>
+        </message>
+        <message>
+            <source>Shift X</source>
+            <translation type="finished">Shift X</translation>
+        </message>
+        <message>
+            <source>Shift Y</source>
+            <translation type="finished">Shift Y</translation>
+        </message>
+        <message>
+            <source>Stars</source>
+            <translation type="finished">Stelle</translation>
+        </message>
+        <message>
+            <source>Start Registration</source>
+            <translation type="finished">Avvia Allineamento</translation>
+        </message>
+        <message>
+            <source>Starting registration...</source>
+            <translation type="finished">Avvio allineamento...</translation>
+        </message>
+        <message>
+            <source>Status</source>
+            <translation type="finished">Stato</translation>
+        </message>
+    </context>
+    <context>
         <name>SCNRDialog</name>
         <message>
             <source>Amount:</source>
@@ -4337,6 +5270,234 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Yellows</source>
             <translation type="finished">Gialli</translation>
+        </message>
+    </context>
+    <context>
+        <name>ScriptBrowserDialog</name>
+        <message>
+            <source>(No scripts found)</source>
+            <translation type="finished">(Nessuno script trovato)</translation>
+        </message>
+        <message>
+            <source>(Scripts folder not found)</source>
+            <translation type="finished">(Cartella script non trovata)</translation>
+        </message>
+        <message>
+            <source>Available Scripts</source>
+            <translation type="finished">Script Disponibili</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Chiudi</translation>
+        </message>
+        <message>
+            <source>Edit Script</source>
+            <translation type="finished">Modifica Script</translation>
+        </message>
+        <message>
+            <source>Refresh</source>
+            <translation type="finished">Aggiorna</translation>
+        </message>
+        <message>
+            <source>Run Script</source>
+            <translation type="finished">Esegui Script</translation>
+        </message>
+        <message>
+            <source>Script Preview</source>
+            <translation type="finished">Anteprima Script</translation>
+        </message>
+        <message>
+            <source>TStar Scripts</source>
+            <translation type="finished">Script TStar</translation>
+        </message>
+    </context>
+    <context>
+        <name>ScriptDialog</name>
+        <message>
+            <source>(Select predefined script)</source>
+            <translation type="finished">(Seleziona script predefinito)</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:lime'&gt;Script finished successfully.&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:lime'&gt;Script terminato con successo.&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;  ✗ Failed&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Script failed: %1 (line %2)&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:red'&gt;Script fallito: %1 (riga %2)&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Script failed: %1&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:red'&gt;Script fallito: %1&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:salmon'&gt;Script cancelled&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:salmon'&gt;Script annullato&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>Add</source>
+            <translation type="finished">Aggiungi</translation>
+        </message>
+        <message>
+            <source>Cannot open script file: %1</source>
+            <translation type="finished">Impossibile aprire file script: %1</translation>
+        </message>
+        <message>
+            <source>Empty Script</source>
+            <translation type="finished">Script Vuoto</translation>
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="finished">Errore</translation>
+        </message>
+        <message>
+            <source>Load Script</source>
+            <translation type="finished">Carica Script</translation>
+        </message>
+        <message>
+            <source>Load...</source>
+            <translation type="finished">Carica...</translation>
+        </message>
+        <message>
+            <source>Name</source>
+            <translation type="finished">Nome</translation>
+        </message>
+        <message>
+            <source>Please enter or load a script to run.</source>
+            <translation type="finished">Inserisci o carica uno script da eseguire.</translation>
+        </message>
+        <message>
+            <source>Predefined:</source>
+            <translation type="finished">Predefinito:</translation>
+        </message>
+        <message>
+            <source>Remove</source>
+            <translation type="finished">Rimuovi</translation>
+        </message>
+        <message>
+            <source>Run Script</source>
+            <translation type="finished">Esegui Script</translation>
+        </message>
+        <message>
+            <source>Running script...</source>
+            <translation type="finished">Esecuzione script...</translation>
+        </message>
+        <message>
+            <source>Save Script</source>
+            <translation type="finished">Salva Script</translation>
+        </message>
+        <message>
+            <source>Save...</source>
+            <translation type="finished">Salva...</translation>
+        </message>
+        <message>
+            <source>Script</source>
+            <translation type="finished">Script</translation>
+        </message>
+        <message>
+            <source>Script Runner</source>
+            <translation type="finished">Esecutore Script</translation>
+        </message>
+        <message>
+            <source>Script Runner - %1</source>
+            <translation type="finished">Esecutore Script - %1</translation>
+        </message>
+        <message>
+            <source>Stop</source>
+            <translation type="finished">Stop</translation>
+        </message>
+        <message>
+            <source>TStar Scripts (*.tss)</source>
+            <translation type="finished">Script TStar (*.tss)</translation>
+        </message>
+        <message>
+            <source>TStar Scripts (*.tss);;All Files (*)</source>
+            <translation type="finished">Script TStar (*.tss);;Tutti i file (*)</translation>
+        </message>
+        <message>
+            <source>Value</source>
+            <translation type="finished">Valore</translation>
+        </message>
+        <message>
+            <source>Variables</source>
+            <translation type="finished">Variabili</translation>
+        </message>
+        <message>
+            <source>→ %1</source>
+            <translation type="finished">→ %1</translation>
+        </message>
+    </context>
+    <context>
+        <name>ScriptParser</name>
+        <message>
+            <source>%1: Unexpected end of file in continued line</source>
+            <translation type="finished">%1: Fine file inattesa nella riga continua</translation>
+        </message>
+        <message>
+            <source>Cannot open file: %1</source>
+            <translation type="finished">Impossibile aprire il file: %1</translation>
+        </message>
+    </context>
+    <context>
+        <name>ScriptRunner</name>
+        <message>
+            <source>Command failed: %1</source>
+            <translation type="finished">Comando fallito: %1</translation>
+        </message>
+        <message>
+            <source>End of command %1, memory difference: %2 MB</source>
+            <translation type="finished">Fine comando %1, differenza memoria: %2 MB</translation>
+        </message>
+        <message>
+            <source>Exception in %1: %2</source>
+            <translation type="finished">Eccezione in %1: %2</translation>
+        </message>
+        <message>
+            <source>Executing: %1</source>
+            <translation type="finished">Esecuzione: %1</translation>
+        </message>
+        <message>
+            <source>Execution time: %1 s</source>
+            <translation type="finished">Tempo esecuzione: %1 s</translation>
+        </message>
+        <message>
+            <source>Line %1: %2</source>
+            <translation type="finished">Riga %1: %2</translation>
+        </message>
+        <message>
+            <source>Parse error</source>
+            <translation type="finished">Errore di parsing</translation>
+        </message>
+        <message>
+            <source>Script cancelled</source>
+            <translation type="finished">Script annullato</translation>
+        </message>
+        <message>
+            <source>Script complete</source>
+            <translation type="finished">Script completato</translation>
+        </message>
+        <message>
+            <source>Script file not found: %1</source>
+            <translation type="finished">File script non trovato: %1</translation>
+        </message>
+        <message>
+            <source>Too few arguments for %1: expected at least %2, got %3</source>
+            <translation type="finished">Troppo pochi argomenti per %1: attesi almeno %2, ottenuti %3</translation>
+        </message>
+        <message>
+            <source>Too many arguments for %1: expected at most %2, got %3</source>
+            <translation type="finished">Troppi argomenti per %1: attesi al massimo %2, ottenuti %3</translation>
+        </message>
+        <message>
+            <source>Total script execution time: %1 s</source>
+            <translation type="finished">Tempo totale esecuzione script: %1 s</translation>
+        </message>
+        <message>
+            <source>Unknown command: %1</source>
+            <translation type="finished">Comando sconosciuto: %1</translation>
         </message>
     </context>
     <context>
@@ -4550,6 +5711,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Impossibile raggiungere IFD.</translation>
         </message>
         <message>
+            <source>File open failed: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Invalid TIFF byte order marker.</source>
             <translation type="finished">Marcatore ordine byte TIFF invalido.</translation>
         </message>
@@ -4564,10 +5729,6 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Tile offset/count mismatch.</source>
             <translation type="finished">Discrepanza tile offset/count.</translation>
-        </message>
-        <message>
-            <source>Use File open failed: %1</source>
-            <translation type="finished">Uso apertura file fallito: %1</translation>
         </message>
     </context>
     <context>
@@ -4590,6 +5751,690 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>TStar v</source>
             <translation type="finished">TStar v</translation>
+        </message>
+    </context>
+    <context>
+        <name>StackingCommands</name>
+        <message>
+            <source>Calibrating frames...</source>
+            <translation type="finished">Calibrazione frame...</translation>
+        </message>
+        <message>
+            <source>Converted %1 of %2 files</source>
+            <translation type="finished">Convertiti %1 di %2 file</translation>
+        </message>
+        <message>
+            <source>Found %1 light frames</source>
+            <translation type="finished">Trovati %1 light frame</translation>
+        </message>
+        <message>
+            <source>Pipeline complete! Output: %1</source>
+            <translation type="finished">Pipeline completata! Output: %1</translation>
+        </message>
+        <message>
+            <source>Project created: %1</source>
+            <translation type="finished">Progetto creato: %1</translation>
+        </message>
+        <message>
+            <source>Registering frames...</source>
+            <translation type="finished">Allineamento frame...</translation>
+        </message>
+        <message>
+            <source>Stacking cancelled</source>
+            <translation type="finished">Stacking annullato</translation>
+        </message>
+        <message>
+            <source>Stacking...</source>
+            <translation type="finished">Stacking...</translation>
+        </message>
+        <message>
+            <source>Starting pipeline for: %1</source>
+            <translation type="finished">Avvio pipeline per: %1</translation>
+        </message>
+    </context>
+    <context>
+        <name>StackingDialog</name>
+        <message>
+            <source />
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>%1 vs Frame</source>
+            <translation type="finished">%1 vs Frame</translation>
+        </message>
+        <message>
+            <source>%1/%2 images selected, %3 total exposure</source>
+            <translation type="finished">%1/%2 immagini selezionate, esposizione totale %3</translation>
+        </message>
+        <message>
+            <source>32-bit output</source>
+            <translation type="finished">Output a 32-bit</translation>
+        </message>
+        <message>
+            <source>&lt;b&gt;Saved output to: %1&lt;/b&gt;</source>
+            <translation type="finished">&lt;b&gt;Output salvato in: %1&lt;/b&gt;</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:green'&gt;Stacking complete!&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:green'&gt;Stacking completato!&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Failed to load sequence or no images found&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:red'&gt;Caricamento sequenza fallito o nessuna immagine trovata&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Failed to save output: %1&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:red'&gt;Salvataggio output fallito: %1&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Stacking failed or cancelled&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:red'&gt;Stacking fallito o annullato&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>Add Files...</source>
+            <translation type="finished">Aggiungi File...</translation>
+        </message>
+        <message>
+            <source>Additive</source>
+            <translation type="finished">Additivo</translation>
+        </message>
+        <message>
+            <source>Additive + Scaling</source>
+            <translation type="finished">Additivo + Scalatura</translation>
+        </message>
+        <message>
+            <source>Algo:</source>
+            <translation type="finished">Algo:</translation>
+        </message>
+        <message>
+            <source>All Images</source>
+            <translation type="finished">Tutte le immagini</translation>
+        </message>
+        <message>
+            <source>Analysis</source>
+            <translation type="finished">Analisi</translation>
+        </message>
+        <message>
+            <source>BGGR</source>
+            <translation type="finished">BGGR</translation>
+        </message>
+        <message>
+            <source>Background</source>
+            <translation type="finished">Sfondo</translation>
+        </message>
+        <message>
+            <source>Best FWHM</source>
+            <translation type="finished">Miglior FWHM</translation>
+        </message>
+        <message>
+            <source>Best Quality</source>
+            <translation type="finished">Miglior Qualità</translation>
+        </message>
+        <message>
+            <source>Best Roundness</source>
+            <translation type="finished">Miglior Rotondità</translation>
+        </message>
+        <message>
+            <source>Bilinear (Fast)</source>
+            <translation type="finished">Bilineare (Veloce)</translation>
+        </message>
+        <message>
+            <source>Browse...</source>
+            <translation type="finished">Sfoglia...</translation>
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="finished">Annulla</translation>
+        </message>
+        <message>
+            <source>Cancelling...</source>
+            <translation type="finished">Annullamento...</translation>
+        </message>
+        <message>
+            <source>Cannot Stack</source>
+            <translation type="finished">Impossibile fare Stacking</translation>
+        </message>
+        <message>
+            <source>Comet</source>
+            <translation type="finished">Cometa</translation>
+        </message>
+        <message>
+            <source>Comet shifts applied. You can now stack with 'Comet' mode (ensure registration is done).</source>
+            <translation type="finished">Spostamenti cometa applicati. Ora puoi fare stacking in modalità "Cometa" (assicurati che l'allineamento sia fatto).</translation>
+        </message>
+        <message>
+            <source>Comet shifts computed successfully.</source>
+            <translation type="finished">Spostamenti cometa calcolati con successo.</translation>
+        </message>
+        <message>
+            <source>Comet: Please click the comet center in the current image (First).</source>
+            <translation type="finished">Cometa: Clicca sul centro della cometa nell'immagine attuale (Prima).</translation>
+        </message>
+        <message>
+            <source>Comet: Please click the comet center in the current image (Last).</source>
+            <translation type="finished">Cometa: Clicca sul centro della cometa nell'immagine attuale (Ultima).</translation>
+        </message>
+        <message>
+            <source>Compute Comet Shifts</source>
+            <translation type="finished">Calcola Spostamenti Cometa</translation>
+        </message>
+        <message>
+            <source>Create rejection maps</source>
+            <translation type="finished">Crea mappe di scarto</translation>
+        </message>
+        <message>
+            <source>Debayer (CFA Images)</source>
+            <translation type="finished">Debayer (Immagini CFA)</translation>
+        </message>
+        <message>
+            <source>Debayer images on-the-fly during stacking. Enable this for RAW/CFA images.</source>
+            <translation type="finished">Debayer al volo durante lo stacking. Abilita per immagini RAW/CFA.</translation>
+        </message>
+        <message>
+            <source>Deselect All</source>
+            <translation type="finished">Deseleziona Tutto</translation>
+        </message>
+        <message>
+            <source>Enable Drizzle 2x</source>
+            <translation type="finished">Abilita Drizzle 2x</translation>
+        </message>
+        <message>
+            <source>Equalize RGB channels</source>
+            <translation type="finished">Equalizza canali RGB</translation>
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="finished">Errore</translation>
+        </message>
+        <message>
+            <source>Error computing comet shifts. Check dates/keywords.</source>
+            <translation type="finished">Errore calcolo spostamenti cometa. Controlla date/keywords.</translation>
+        </message>
+        <message>
+            <source>Error: Please select the corresponding image row in the table first.</source>
+            <translation type="finished">Errore: Seleziona prima la riga dell'immagine corrispondente nella tabella.</translation>
+        </message>
+        <message>
+            <source>Exp</source>
+            <translation type="finished">Esp</translation>
+        </message>
+        <message>
+            <source>FITS Files (*.fit *.fits *.fts);;TIFF Files (*.tif *.tiff);;All Files (*)</source>
+            <translation type="finished">File FITS (*.fit *.fits *.fts);;File TIFF (*.tif *.tiff);;Tutti i file (*)</translation>
+        </message>
+        <message>
+            <source>FITS Files (*.fit *.fits);;All Files (*)</source>
+            <translation type="finished">File FITS (*.fit *.fits);;Tutti i file (*)</translation>
+        </message>
+        <message>
+            <source>FWHM</source>
+            <translation type="finished">FWHM</translation>
+        </message>
+        <message>
+            <source>Failed to compute shifts. Check DATE-OBS headers.</source>
+            <translation type="finished">Calcolo spostamenti fallito. Controlla header DATE-OBS.</translation>
+        </message>
+        <message>
+            <source>Feathering (px):</source>
+            <translation type="finished">Sfumatura (px):</translation>
+        </message>
+        <message>
+            <source>Filename</source>
+            <translation type="finished">Nome file</translation>
+        </message>
+        <message>
+            <source>Filter:</source>
+            <translation type="finished">Filtro:</translation>
+        </message>
+        <message>
+            <source>GBRG</source>
+            <translation type="finished">GBRG</translation>
+        </message>
+        <message>
+            <source>GRBG</source>
+            <translation type="finished">GRBG</translation>
+        </message>
+        <message>
+            <source>Generalized ESD</source>
+            <translation type="finished">ESD Generalizzato</translation>
+        </message>
+        <message>
+            <source>Image Sequence</source>
+            <translation type="finished">Sequenza Immagini</translation>
+        </message>
+        <message>
+            <source>Image Stacking</source>
+            <translation type="finished">Stacking Immagine</translation>
+        </message>
+        <message>
+            <source>Images</source>
+            <translation type="finished">Immagini</translation>
+        </message>
+        <message>
+            <source>Keep:</source>
+            <translation type="finished">Mantieni:</translation>
+        </message>
+        <message>
+            <source>Linear Fit</source>
+            <translation type="finished">Fit Lineare</translation>
+        </message>
+        <message>
+            <source>Load Folder...</source>
+            <translation type="finished">Carica Cartella...</translation>
+        </message>
+        <message>
+            <source>Loaded %1 images</source>
+            <translation type="finished">Caricate %1 immagini</translation>
+        </message>
+        <message>
+            <source>Loading sequence from: %1</source>
+            <translation type="finished">Caricamento sequenza da: %1</translation>
+        </message>
+        <message>
+            <source>MAD Clipping</source>
+            <translation type="finished">MAD Clipping</translation>
+        </message>
+        <message>
+            <source>Maximize framing</source>
+            <translation type="finished">Massimizza inquadratura</translation>
+        </message>
+        <message>
+            <source>Maximum</source>
+            <translation type="finished">Massimo</translation>
+        </message>
+        <message>
+            <source>Mean</source>
+            <translation type="finished">Media</translation>
+        </message>
+        <message>
+            <source>Median</source>
+            <translation type="finished">Mediana</translation>
+        </message>
+        <message>
+            <source>Method:</source>
+            <translation type="finished">Metodo:</translation>
+        </message>
+        <message>
+            <source>Metric:</source>
+            <translation type="finished">Metrica:</translation>
+        </message>
+        <message>
+            <source>Minimum</source>
+            <translation type="finished">Minimo</translation>
+        </message>
+        <message>
+            <source>Multiplicative</source>
+            <translation type="finished">Moltiplicativo</translation>
+        </message>
+        <message>
+            <source>Multiplicative + Scaling</source>
+            <translation type="finished">Moltiplicativo + Scalatura</translation>
+        </message>
+        <message>
+            <source>No quality data available</source>
+            <translation type="finished">Dati qualità non disponibili</translation>
+        </message>
+        <message>
+            <source>No sequence loaded</source>
+            <translation type="finished">Nessuna sequenza caricata</translation>
+        </message>
+        <message>
+            <source>Noise</source>
+            <translation type="finished">Rumore</translation>
+        </message>
+        <message>
+            <source>None</source>
+            <translation type="finished">Nessuno</translation>
+        </message>
+        <message>
+            <source>Normalization:</source>
+            <translation type="finished">Normalizzazione:</translation>
+        </message>
+        <message>
+            <source>Normalize output to [0,1]</source>
+            <translation type="finished">Normalizza output a [0,1]</translation>
+        </message>
+        <message>
+            <source>Output</source>
+            <translation type="finished">Output</translation>
+        </message>
+        <message>
+            <source>Pattern:</source>
+            <translation type="finished">Pattern:</translation>
+        </message>
+        <message>
+            <source>Percentile</source>
+            <translation type="finished">Percentile</translation>
+        </message>
+        <message>
+            <source>Pick First</source>
+            <translation type="finished">Scegli Prima</translation>
+        </message>
+        <message>
+            <source>Pick Last</source>
+            <translation type="finished">Scegli Ultima</translation>
+        </message>
+        <message>
+            <source>PixFrac: </source>
+            <translation type="finished">PixFrac:</translation>
+        </message>
+        <message>
+            <source>Please load at least 2 images to stack.</source>
+            <translation type="finished">Carica almeno 2 immagini per lo stacking.</translation>
+        </message>
+        <message>
+            <source>Progress</source>
+            <translation type="finished">Progresso</translation>
+        </message>
+        <message>
+            <source>Quality</source>
+            <translation type="finished">Qualità</translation>
+        </message>
+        <message>
+            <source>Quality Score</source>
+            <translation type="finished">Punteggio Qualità</translation>
+        </message>
+        <message>
+            <source>RGGB</source>
+            <translation type="finished">RGGB</translation>
+        </message>
+        <message>
+            <source>Ref 1 set to frame %1 (x=%2, y=%3)</source>
+            <translation type="finished">Rif 1 impostato su frame %1 (x=%2, y=%3)</translation>
+        </message>
+        <message>
+            <source>Ref 2 set to frame %1 (x=%2, y=%3)</source>
+            <translation type="finished">Rif 2 impostato su frame %1 (x=%2, y=%3)</translation>
+        </message>
+        <message>
+            <source>Rejection maps saved as %1_low.fit / %1_high.fit</source>
+            <translation type="finished">Mappe di scarto salvate come %1_low.fit / %1_high.fit</translation>
+        </message>
+        <message>
+            <source>Rejection:</source>
+            <translation type="finished">Reiezione:</translation>
+        </message>
+        <message>
+            <source>Remove</source>
+            <translation type="finished">Rimuovi</translation>
+        </message>
+        <message>
+            <source>Roundness</source>
+            <translation type="finished">Rotondità</translation>
+        </message>
+        <message>
+            <source>Save Stacked Image</source>
+            <translation type="finished">Salva Immagine Stackata</translation>
+        </message>
+        <message>
+            <source>Save to:</source>
+            <translation type="finished">Salva in:</translation>
+        </message>
+        <message>
+            <source>Select All</source>
+            <translation type="finished">Seleziona Tutto</translation>
+        </message>
+        <message>
+            <source>Select Image Files</source>
+            <translation type="finished">Seleziona File Immagine</translation>
+        </message>
+        <message>
+            <source>Select Image Folder</source>
+            <translation type="finished">Seleziona Cartella Immagini</translation>
+        </message>
+        <message>
+            <source>Selected</source>
+            <translation type="finished">Selezionato</translation>
+        </message>
+        <message>
+            <source>Set Reference</source>
+            <translation type="finished">Imposta Riferimento</translation>
+        </message>
+        <message>
+            <source>Shift</source>
+            <translation type="finished">Shift</translation>
+        </message>
+        <message>
+            <source>Sigma Clipping</source>
+            <translation type="finished">Sigma Clipping</translation>
+        </message>
+        <message>
+            <source>Sigma High:</source>
+            <translation type="finished">Sigma Alto:</translation>
+        </message>
+        <message>
+            <source>Sigma Low:</source>
+            <translation type="finished">Sigma Basso:</translation>
+        </message>
+        <message>
+            <source>Sigma-Median</source>
+            <translation type="finished">Sigma-Mediana</translation>
+        </message>
+        <message>
+            <source>Stacking Parameters</source>
+            <translation type="finished">Parametri Stacking</translation>
+        </message>
+        <message>
+            <source>Star Count</source>
+            <translation type="finished">Conteggio Stelle</translation>
+        </message>
+        <message>
+            <source>Start Stacking</source>
+            <translation type="finished">Avvia Stacking</translation>
+        </message>
+        <message>
+            <source>Starting stacking with %1 images...</source>
+            <translation type="finished">Avvio stacking con %1 immagini...</translation>
+        </message>
+        <message>
+            <source>Status: No comet positions set.</source>
+            <translation type="finished">Stato: Nessuna posizione cometa impostata.</translation>
+        </message>
+        <message>
+            <source>Success</source>
+            <translation type="finished">Successo</translation>
+        </message>
+        <message>
+            <source>Sum</source>
+            <translation type="finished">Somma</translation>
+        </message>
+        <message>
+            <source>VNG (Best)</source>
+            <translation type="finished">VNG (Migliore)</translation>
+        </message>
+        <message>
+            <source>Weighting:</source>
+            <translation type="finished">Ponderazione:</translation>
+        </message>
+        <message>
+            <source>Winsorized Sigma</source>
+            <translation type="finished">Winsorized Sigma</translation>
+        </message>
+        <message>
+            <source>W×H</source>
+            <translation type="finished">L×A</translation>
+        </message>
+        <message>
+            <source>result_stacked.fit</source>
+            <translation type="finished">risultato_stacked.fit</translation>
+        </message>
+    </context>
+    <context>
+        <name>StackingEngine</name>
+        <message>
+            <source>  Loading %1 (%2/%3)...</source>
+            <translation type="finished">Caricamento %1 (%2/%3)...</translation>
+        </message>
+        <message>
+            <source>%1 stacking complete</source>
+            <translation type="finished">Stacking %1 completato</translation>
+        </message>
+        <message>
+            <source>, normalization: %1</source>
+            <translation type="finished">, normalizzazione: %1</translation>
+        </message>
+        <message>
+            <source>, rejection: %1 (%2%)</source>
+            <translation type="finished">, reiezione: %1 (%2%)</translation>
+        </message>
+        <message>
+            <source>Allocated %1 data blocks, each ~%2 MB</source>
+            <translation type="finished">Allocati %1 blocchi dati, ognuno ~%2 MB</translation>
+        </message>
+        <message>
+            <source>Auto-detected Bayer pattern: %1</source>
+            <translation type="finished">Pattern Bayer rilevato: %1</translation>
+        </message>
+        <message>
+            <source>Computing Cosmetic Correction Map...</source>
+            <translation type="finished">Calcolo mappa correzione cosmetica...</translation>
+        </message>
+        <message>
+            <source>Computing image weights...</source>
+            <translation type="finished">Calcolo pesi immagini...</translation>
+        </message>
+        <message>
+            <source>Computing median (row %1/%2)...</source>
+            <translation type="finished">Calcolo mediana (riga %1/%2)...</translation>
+        </message>
+        <message>
+            <source>Computing normalization coefficients...</source>
+            <translation type="finished">Calcolo coefficienti normalizzazione...</translation>
+        </message>
+        <message>
+            <source>Drizzle enabled: Running first pass for rejection...</source>
+            <translation type="finished">Drizzle attivo: Esecuzione primo passaggio per reiezione...</translation>
+        </message>
+        <message>
+            <source>Drizzling image %1/%2...</source>
+            <translation type="finished">Drizzling immagine %1/%2...</translation>
+        </message>
+        <message>
+            <source>Equalizing RGB channels...</source>
+            <translation type="finished">Equalizzazione canali RGB...</translation>
+        </message>
+        <message>
+            <source>Error: File not found: %1</source>
+            <translation type="finished">Errore: File non trovato: %1</translation>
+        </message>
+        <message>
+            <source>Error: Invalid or empty sequence</source>
+            <translation type="finished">Errore: Sequenza non valida o vuota</translation>
+        </message>
+        <message>
+            <source>Error: No images selected for stacking</source>
+            <translation type="finished">Errore: Nessuna immagine selezionata per lo stacking</translation>
+        </message>
+        <message>
+            <source>Finalizing Drizzle...</source>
+            <translation type="finished">Finalizzazione Drizzle...</translation>
+        </message>
+        <message>
+            <source>Loading image %1/%2...</source>
+            <translation type="finished">Caricamento immagine %1/%2...</translation>
+        </message>
+        <message>
+            <source>Mean stacking complete (accelerated C)</source>
+            <translation type="finished">Stacking Media completato (accelerato C)</translation>
+        </message>
+        <message>
+            <source>Normalized image %1/%2</source>
+            <translation type="finished">Immagine normalizzata %1/%2</translation>
+        </message>
+        <message>
+            <source>Normalizing output...</source>
+            <translation type="finished">Normalizzazione output...</translation>
+        </message>
+        <message>
+            <source>Preparing Comet Alignment...</source>
+            <translation type="finished">Preparazione allineamento cometa...</translation>
+        </message>
+        <message>
+            <source>Processing block %1/%2...</source>
+            <translation type="finished">Elaborazione blocco %1/%2...</translation>
+        </message>
+        <message>
+            <source>Processing image %1/%2...</source>
+            <translation type="finished">Elaborazione immagine %1/%2...</translation>
+        </message>
+        <message>
+            <source>Rejection statistics: low=%1% high=%2%</source>
+            <translation type="finished">Statistiche reiezione: bassa=%1% alta=%2%</translation>
+        </message>
+        <message>
+            <source>Stacking %1 images using %2 method...</source>
+            <translation type="finished">Stacking di %1 immagini usando metodo %2...</translation>
+        </message>
+        <message>
+            <source>Stacking cancelled by user</source>
+            <translation type="finished">Stacking annullato dall'utente</translation>
+        </message>
+        <message>
+            <source>Stacking complete: %1 images using %2</source>
+            <translation type="finished">Stacking completato: %1 immagini usando %2</translation>
+        </message>
+        <message>
+            <source>Stacking failed</source>
+            <translation type="finished">Stacking fallito</translation>
+        </message>
+        <message>
+            <source>Stacking image %1/%2...</source>
+            <translation type="finished">Stacking immagine %1/%2...</translation>
+        </message>
+        <message>
+            <source>Starting %1 stacking of %2 images (%3 x %4, %5 channels)...</source>
+            <translation type="finished">Avvio stacking %1 di %2 immagini (%3 x %4, %5 canali)...</translation>
+        </message>
+        <message>
+            <source>Starting Drizzle stacking (Scale: %1x, PixFrac: %2)...</source>
+            <translation type="finished">Avvio stacking Drizzle (Scala: %1x, PixFrac: %2)...</translation>
+        </message>
+        <message>
+            <source>Starting stacking...</source>
+            <translation type="finished">Avvio stacking...</translation>
+        </message>
+        <message>
+            <source>Sum stacking complete. Total exposure: %1s</source>
+            <translation type="finished">Stacking Somma completato. Esposizione tot: %1s</translation>
+        </message>
+        <message>
+            <source>Using %1 parallel blocks of max %2 rows each</source>
+            <translation type="finished">Uso di %1 blocchi paralleli di max %2 righe ciascuno</translation>
+        </message>
+        <message>
+            <source>Warning: Failed to load image %1</source>
+            <translation type="finished">Attenzione: Caricamento immagine %1 fallito</translation>
+        </message>
+        <message>
+            <source>Warning: Failed to read image %1, skipping</source>
+            <translation type="finished">Attenzione: Lettura immagine %1 fallita, salto</translation>
+        </message>
+        <message>
+            <source>Warning: Normalization computation failed, continuing without</source>
+            <translation type="finished">Attenzione: Calcolo normalizzazione fallito, continuo senza</translation>
+        </message>
+        <message>
+            <source>Warning: Weight computation failed, continuing without weighting</source>
+            <translation type="finished">Attenzione: Calcolo pesi fallito, continuo senza pesi</translation>
+        </message>
+    </context>
+    <context>
+        <name>StackingSequence</name>
+        <message>
+            <source>Analyzing image %1/%2...</source>
+            <translation type="finished">Analisi immagine %1/%2...</translation>
+        </message>
+        <message>
+            <source>Computing quality metrics...</source>
+            <translation type="finished">Calcolo metriche qualità...</translation>
+        </message>
+        <message>
+            <source>Loading %1...</source>
+            <translation type="finished">Caricamento %1...</translation>
+        </message>
+        <message>
+            <source>Validating sequence...</source>
+            <translation type="finished">Convalida sequenza...</translation>
         </message>
     </context>
     <context>
