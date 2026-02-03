@@ -439,8 +439,6 @@ CurvesDialog::CurvesDialog(ImageViewer* viewer, QWidget* parent)
     QHBoxLayout* statsLayout = new QHBoxLayout();
     m_statsLabel = new QLabel(tr("Point: x=0.000, y=0.000"));
     statsLayout->addWidget(m_statsLabel);
-    // connect mouse move on graph to update stats? 
-    // For now we'll just update it in onCurvesChanged
     mainLayout->addLayout(statsLayout);
 
     // Bottom Controls
@@ -614,11 +612,7 @@ void CurvesDialog::onCurvesChanged(bool isFinal) {
     SplineData spline = m_graph->getSpline();
     bool ch[3] = {m_redBtn->isChecked(), m_greenBtn->isChecked(), m_blueBtn->isChecked()};
     
-    // Update stats label for last points or selected?
-    // We'll just show the last modified point for now
-    // (Actually graph should provide it)
-    
-    // 1. Real-time Histogram Update (Optimized)
+   
     // 1. Real-time Histogram Update (High Quality)
     if (!m_origHist.empty()) {
         const int HIST_SIZE = 65536;

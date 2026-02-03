@@ -1,6 +1,8 @@
 #include "PCCCalibrator.h"
 #include <cmath>
 #include <algorithm>
+#include <QString>
+#include <QStringList>
 #include <gsl/gsl_fit.h>
 #include <gsl/gsl_statistics.h>
 #include "../core/RobustStatistics.h"
@@ -21,7 +23,56 @@ void PCCCalibrator::setWCS(double crval1, double crval2, double crpix1, double c
     m_crpix1 = crpix1; m_crpix2 = crpix2;
     m_cd11 = cd1_1; m_cd12 = cd1_2;
     m_cd21 = cd2_1; m_cd22 = cd2_2;
-    // Note: This is a simplified linear WCS. Real world needs SIP/TAN projection handling.
+    // Base linear WCS
+}
+
+void PCCCalibrator::setSIP(int a_order, int b_order, int ap_order, int bp_order, const std::map<std::string, double>& coeffs) {
+    m_sipOrderA = a_order;
+    m_sipOrderB = b_order;
+    m_sipOrderAP = ap_order;
+    m_sipOrderBP = bp_order;
+    
+    m_sipA.clear(); m_sipB.clear();
+    m_sipAP.clear(); m_sipBP.clear();
+    
+    // Parse keys like "A_2_1"
+    for(const auto& [key, val] : coeffs) {
+        int i=0, j=0;
+        char type[10];
+        // Scanf is simple but dangerous, manual parsing is safer
+        QString k = QString::fromStdString(key);
+        QStringList parts = k.split('_');
+        if (parts.size() >= 3) {
+            bool ok1, ok2;
+            i = parts[1].toInt(&ok1);
+            j = parts[2].toInt(&ok2);
+            if (ok1 && ok2) {
+                if (parts[0] == "A") m_sipA[{i,j}] = val;
+                else if (parts[0] == "B") m_sipB[{i,j}] = val;
+                else if (parts[0] == "AP") m_sipAP[{i,j}] = val;
+                else if (parts[0] == "BP") m_sipBP[{i,j}] = val;
+            }
+        }
+    }
+    
+    m_useSip = (!m_sipA.empty() || !m_sipB.empty() || !m_sipAP.empty() || !m_sipBP.empty());
+}
+
+double PCCCalibrator::calculateSIP(double u, double v, const std::map<std::pair<int,int>, double>& coeffs, int order) const {
+    double sum = 0.0;
+    // Naive power implementation (can be optimized with Horner's or precomputed powers)
+    for (const auto& [p, val] : coeffs) {
+        // Optimization: Handle simple cases
+        double term = val;
+        if (p.first == 1) term *= u;
+        else if (p.first > 1) term *= std::pow(u, p.first);
+        
+        if (p.second == 1) term *= v;
+        else if (p.second > 1) term *= std::pow(v, p.second);
+        
+        sum += term;
+    }
+    return sum;
 }
 
 // Helper for Radians/Degrees
@@ -136,6 +187,13 @@ void PCCCalibrator::pixelToWorld(double x, double y, double& ra, double& dec) {
     // 1. Pixel to Intermediate World Coordinates (deg)
     double u = x - m_crpix1;
     double v = y - m_crpix2;
+    
+    if (m_useSip) {
+        double f_uv = calculateSIP(u, v, m_sipA, m_sipOrderA);
+        double g_uv = calculateSIP(u, v, m_sipB, m_sipOrderB);
+        u += f_uv;
+        v += g_uv;
+    }
     
     double xi = m_cd11 * u + m_cd12 * v;
     double eta = m_cd21 * u + m_cd22 * v;
@@ -302,6 +360,18 @@ void PCCCalibrator::worldToPixel(double ra, double dec, double& x, double& y) {
     
     double u = (m_cd22 * xi - m_cd12 * eta) / det;
     double v = (-m_cd21 * xi + m_cd11 * eta) / det;
+    
+    // Apply Inverse SIP (AP/BP) if available
+    if (m_useSip && (!m_sipAP.empty() || !m_sipBP.empty())) {
+        double f_uv = calculateSIP(u, v, m_sipAP, m_sipOrderAP);
+        double g_uv = calculateSIP(u, v, m_sipBP, m_sipOrderBP);
+        u += f_uv;
+        v += g_uv;
+    } else if (m_useSip) {
+        // We have forward SIP but no inverse. Iterative solution required?
+        // For now, assume AP/BP are usually provided with A/B in XISF.
+        // If not, the match will be approximate (linear guess), which might still work if distortion is small.
+    }
     
     x = u + m_crpix1;
     y = v + m_crpix2;

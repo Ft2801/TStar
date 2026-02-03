@@ -205,9 +205,7 @@ void ImageViewer::setCropAngle(float angle) {
 void ImageViewer::getCropState(float& cx, float& cy, float& w, float& h, float& angle) const {
     if (!m_cropItem) return;
     QRectF r = m_cropItem->rect();
-    // Item position in scene might be 0,0 if we only changed rect.
-    // If user moved it... wait, we only implement drawing for now.
-    // So pos is 0,0, rect defines geometry.
+    // Position is 0,0, rect defines geometry.
     // But rotation is around center.
     QPointF c = m_cropItem->mapToScene(r.center());
     cx = c.x();
@@ -276,13 +274,21 @@ void ImageViewer::setBackgroundSamples(const std::vector<QPointF>& points) {
     
     for (const auto& p : points) {
         // Draw green cross or circle
-        // Using circle for now
         QGraphicsEllipseItem* item = m_scene->addEllipse(
             p.x() - 5, p.y() - 5, 10, 10, 
             QPen(Qt::green, 1), QBrush(QColor(0, 255, 0, 100)));
         item->setZValue(30); // Above image/overlays
         m_sampleItems.push_back(item);
     }
+}
+
+std::vector<QPointF> ImageViewer::getBackgroundSamples() const {
+    std::vector<QPointF> points;
+    for (auto* item : m_sampleItems) {
+        // Robust center calculation regardless of how it was moved
+        points.push_back(item->mapToScene(item->rect().center()));
+    }
+    return points;
 }
 
 void ImageViewer::clearBackgroundSamples() {
@@ -300,8 +306,20 @@ void ImageViewer::mousePressEvent(QMouseEvent* event) {
         return; 
     }
 
-
-
+    // Allow dragging samples if they exist and we are not in a specific creation mode that conflicts
+    if (!m_sampleItems.empty() && event->button() == Qt::LeftButton && 
+        !m_drawing && !m_lassoDrawing) {
+         QPointF scenePos = mapToScene(event->pos());
+         for (auto* item : m_sampleItems) {
+             // Check if click is inside the item
+             if (item->contains(item->mapFromScene(scenePos))) {
+                 m_movingSample = item;
+                 m_lastPos = scenePos;
+                 setCursor(Qt::SizeAllCursor);
+                 return;
+             }
+         }
+    }
     
     // Shift+Drag for New View Logic
     if ((event->modifiers() & Qt::ShiftModifier) && event->button() == Qt::LeftButton) {
@@ -401,6 +419,13 @@ void ImageViewer::mousePressEvent(QMouseEvent* event) {
 void ImageViewer::mouseMoveEvent(QMouseEvent* event) {
     QPointF scenePos = mapToScene(event->pos());
     
+    if (m_movingSample) {
+        QPointF delta = scenePos - m_lastPos;
+        m_movingSample->moveBy(delta.x(), delta.y());
+        m_lastPos = scenePos;
+        return;
+    }
+    
     if (m_cropMode && m_moving) {
         QPointF delta = scenePos - m_lastPos;
         m_cropItem->moveBy(delta.x(), delta.y());
@@ -460,6 +485,14 @@ void ImageViewer::mouseMoveEvent(QMouseEvent* event) {
 }
 
 void ImageViewer::mouseReleaseEvent(QMouseEvent* event) {
+    if (m_movingSample) {
+        m_movingSample = nullptr;
+        setCursor(Qt::ArrowCursor);
+        // Emit changes
+        emit samplesMoved(getBackgroundSamples());
+        return;
+    }
+
     // Shift+Drag Release
     if ((event->modifiers() & Qt::ShiftModifier) && m_drawing) {
         m_drawing = false;

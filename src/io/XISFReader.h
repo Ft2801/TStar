@@ -103,7 +103,7 @@ private:
                                     int width, int height, int channels);
     
     // Property parsing helpers
-    static XISFProperty parseProperty(const QXmlStreamReader& xml);
+    static XISFProperty parseProperty(QXmlStreamReader& xml);
     static QVariant parsePropertyValue(const QString& type, const QString& valueStr,
                                        const QString& textContent, int length = 0,
                                        int rows = 0, int columns = 0);

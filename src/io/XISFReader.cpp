@@ -7,6 +7,8 @@
 #include <cmath>
 #include <QtEndian>
 #include <QCoreApplication>
+#include <QDateTime>
+#include <QRegularExpression>
 
 // For base64 decoding
 #include <QByteArray>
@@ -180,6 +182,13 @@ bool XISFReader::parseHeader(const QByteArray& headerXml, XISFHeaderInfo& info, 
                 while (!(xml.isEndElement() && xml.name() == "Image") && !xml.atEnd()) {
                     xml.readNext();
                     
+                    if (xml.isCharacters() && !xml.isWhitespace()) {
+                         if (info.locationType == XISFHeaderInfo::Embedded || 
+                             info.locationType == XISFHeaderInfo::Inline) {
+                             info.embeddedData += xml.text().toString();
+                         }
+                    }
+                    
                     if (xml.isStartElement()) {
                         QString childName = xml.name().toString();
                         
@@ -296,7 +305,7 @@ bool XISFReader::parseHeader(const QByteArray& headerXml, XISFHeaderInfo& info, 
     return foundImage;
 }
 
-XISFReader::XISFProperty XISFReader::parseProperty(const QXmlStreamReader& xml) {
+XISFReader::XISFProperty XISFReader::parseProperty(QXmlStreamReader& xml) {
     XISFProperty prop;
     prop.id = xml.attributes().value("id").toString();
     prop.type = xml.attributes().value("type").toString();
@@ -308,9 +317,8 @@ XISFReader::XISFProperty XISFReader::parseProperty(const QXmlStreamReader& xml) 
     int rows = xml.attributes().value("rows").toInt();
     int columns = xml.attributes().value("columns").toInt();
     
-    // Get text content for inline/embedded data
-    // Note: For a real implementation, we'd need to read until end element
-    QString textContent;
+    // Get text content for inline data (Vectors, Matrices, or Inline Blocks)
+    QString textContent = xml.readElementText();
     
     prop.value = parsePropertyValue(prop.type, valueStr, textContent, length, rows, columns);
     
@@ -320,7 +328,6 @@ XISFReader::XISFProperty XISFReader::parseProperty(const QXmlStreamReader& xml) 
 QVariant XISFReader::parsePropertyValue(const QString& type, const QString& valueStr,
                                         const QString& textContent, int length,
                                         int rows, int columns) {
-    Q_UNUSED(textContent);
     Q_UNUSED(length);
     Q_UNUSED(rows);
     Q_UNUSED(columns);
@@ -363,11 +370,36 @@ QVariant XISFReader::parsePropertyValue(const QString& type, const QString& valu
         return valueStr.isEmpty() ? textContent : valueStr;
     }
     else if (type == "TimePoint") {
-        return valueStr;  // Keep as string for now
+        // Parse ISO 8601 date time
+        QDateTime dt = QDateTime::fromString(valueStr, Qt::ISODate);
+        if (dt.isValid()) return dt;
+        return valueStr;
     }
     
-    // For Vector/Matrix types, would need to parse from inline/attached data
-    // Return empty for now - full implementation would decode the data block
+    // Vector and Matrix types
+    bool isVector = type.startsWith("Vector");
+    bool isMatrix = type.startsWith("Matrix");
+    
+    if (isVector || isMatrix) {
+        QString data = textContent;
+        if (data.isEmpty()) data = valueStr; // fallback
+        
+        // Clean up braces assuming " {{ val val } ... } " style or "{ val val }"
+        // Simple approach: Replace braces with spaces and split
+        data = data.replace('{', ' ').replace('}', ' ');
+        
+        QStringList parts = data.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+        QVariantList list;
+        for (const QString& s : parts) {
+            // Assume numeric for vectors/matrices in simplified implementation
+            // Complex (real+imag) types not fully supported here yet
+            if (type.contains("Int")) list << s.toInt();
+            else if (type.contains("Float") || type.contains("Double")) list << s.toDouble();
+            else list << s; // Fallback
+        }
+        return list;
+    }
+    
     return valueStr;
 }
 
@@ -377,16 +409,11 @@ QByteArray XISFReader::readDataBlock(QFile& file, const XISFHeaderInfo& info, QS
             return readAttachedDataBlock(file, info.dataLocation, info.dataSize, errorMsg);
             
         case XISFHeaderInfo::Inline:
-            // For inline data, we need to get it from the property text
-            // This would have been captured during header parsing
-            if (errorMsg) *errorMsg = QCoreApplication::translate("XISFReader", 
-                "Inline XISF data not fully supported yet.");
-            return QByteArray();
+            return decodeInlineData(info.embeddedData, info.inlineEncoding, errorMsg);
             
         case XISFHeaderInfo::Embedded:
-            if (errorMsg) *errorMsg = QCoreApplication::translate("XISFReader", 
-                "Embedded XISF data not fully supported yet.");
-            return QByteArray();
+            // Embedded data is implicitly base64 per XISF spec (if not otherwise specified via some other mechanism, but standard is base64)
+            return decodeInlineData(info.embeddedData, "base64", errorMsg);
             
         default:
             if (errorMsg) *errorMsg = QCoreApplication::translate("XISFReader", 

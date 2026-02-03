@@ -54,8 +54,8 @@ public:
     void clearAbePolygons();
     std::vector<QPolygonF> getAbePolygons() const;
     
-    // Background Extraction Visualization
     void setBackgroundSamples(const std::vector<QPointF>& points);
+    std::vector<QPointF> getBackgroundSamples() const; // New accessor
     void clearBackgroundSamples();
     
     // Pick Mode
@@ -69,8 +69,6 @@ public:
         Mode_ABE
     };
     void setInteractionMode(InteractionMode mode);
-    InteractionMode getInteractionMode() const { return m_interactionMode; }
-    
     // Fast Preview (Downscaled)
     void setPreviewImage(const QImage& img); // Replaces display but maintains scene rect
     
@@ -94,10 +92,11 @@ public:
     
     void clearSelection();
     QRectF getSelectionRect() const; // Returns current selection in scene coords
-
+    
 signals:
     void pointPicked(QPointF p); // Scene coordinates (pixels)
     void rectSelected(QRectF r);
+    void samplesMoved(const std::vector<QPointF>& points); // Emitted when samples are dragged
     void requestNewView(const ImageBuffer& img, const QString& title);
     void bufferChanged(); // buffer content updated (e.g. undo/redo)
     void historyChanged(); // New: undo/redo stacks updated
@@ -110,7 +109,7 @@ signals:
     
 public slots:
     void syncView(float scale, float hVal, float vVal);
-
+    
 public:
     // Accessors for Initial Sync
     float getScale() const { return (float)m_scaleFactor; }
@@ -190,6 +189,7 @@ private:
     
     // Background Samples
     std::vector<class QGraphicsEllipseItem*> m_sampleItems;
+    QGraphicsEllipseItem* m_movingSample = nullptr;
     
     float m_aspectRatio = -1.0f; // -1 = Free
     
