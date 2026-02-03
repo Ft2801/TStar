@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <QCoreApplication>
 #include <QRegularExpression>
+#include <QFileInfo>
+#include <QDir>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -15,7 +17,14 @@ bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* err
     int status = 0;
     
     // Open file
-    if (fits_open_file(&fptr, filePath.toUtf8().constData(), READONLY, &status)) {
+    QFileInfo fi(filePath);
+    if (!fi.exists()) {
+         if (errorMsg) *errorMsg = QCoreApplication::translate("FitsLoader", "File does not exist: %1").arg(filePath);
+         return false;
+    }
+    QString nativePath = QDir::toNativeSeparators(fi.absoluteFilePath());
+    
+    if (fits_open_file(&fptr, nativePath.toUtf8().constData(), READONLY, &status)) {
         if (errorMsg) {
             char statusStr[FLEN_STATUS];
             fits_get_errstatus(status, statusStr);
@@ -788,7 +797,14 @@ void FitsLoader::readCommonMetadata(void* fitsptr, ImageBuffer::Metadata& meta) 
     if (!fits_read_key(fptr, TSTRING, "DATE-OBS", strVal, comment, &status_meta)) meta.dateObs = QString::fromUtf8(strVal);
     status_meta = 0;
     if (!fits_read_key(fptr, TSTRING, "EXPTIME", strVal, comment, &status_meta)) meta.exposure = QString::fromUtf8(strVal).toDouble();
-    else { status_meta = 0; if (!fits_read_key(fptr, TDOUBLE, "EXPOSURE", &dv, comment, &status_meta)) meta.exposure = dv; }
+    else { 
+        status_meta = 0; 
+        if (!fits_read_key(fptr, TDOUBLE, "EXPOSURE", &dv, comment, &status_meta)) meta.exposure = dv; 
+        else {
+            status_meta = 0;
+            if (!fits_read_key(fptr, TDOUBLE, "EXP", &dv, comment, &status_meta)) meta.exposure = dv;
+        }
+    }
     status_meta = 0;
 
     // Bayer Pattern (Critical for correct colors)

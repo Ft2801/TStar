@@ -626,6 +626,9 @@ void ImageViewer::pushUndo() {
 }
 
 void ImageViewer::undo() {
+    int oldW = m_buffer.width();
+    int oldH = m_buffer.height();
+
     if (m_useDeltaHistory && m_historyManager && m_historyManager->canUndo()) {
         // Use delta-based history
         if (!m_undoStack.empty()) {
@@ -642,12 +645,19 @@ void ImageViewer::undo() {
         setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), true);
     }
     
+    if (m_buffer.width() != oldW || m_buffer.height() != oldH) {
+        fitToWindow();
+    }
+
     setModified(true);
     emit bufferChanged();
     emit historyChanged();
 }
 
 void ImageViewer::redo() {
+    int oldW = m_buffer.width();
+    int oldH = m_buffer.height();
+
     if (m_useDeltaHistory && m_historyManager && m_historyManager->canRedo()) {
         // Use delta-based history
         if (!m_redoStack.empty()) {
@@ -664,6 +674,10 @@ void ImageViewer::redo() {
         setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), true);
     }
     
+    if (m_buffer.width() != oldW || m_buffer.height() != oldH) {
+        fitToWindow();
+    }
+
     setModified(true);
     emit bufferChanged();
     emit historyChanged();

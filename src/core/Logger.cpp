@@ -1,4 +1,5 @@
 #include "Logger.h"
+#include "Version.h"
 #include <QStandardPaths>
 #include <QFileInfo>
 #include <QStringConverter>
@@ -91,7 +92,7 @@ void Logger::init(const QString& logDirPath, int maxLogFiles)
     // Write header
     *s_logStream << "================================================================================\n";
     *s_logStream << "TStar Log - Started " << QDateTime::currentDateTime().toString(Qt::ISODate) << "\n";
-    *s_logStream << "Version: " << TSTAR_VERSION << "\n";
+    *s_logStream << "Version: " << TStar::getVersion() << "\n";
 #ifdef Q_OS_WIN
     *s_logStream << "Platform: Windows\n";
 #elif defined(Q_OS_MAC)

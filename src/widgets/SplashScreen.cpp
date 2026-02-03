@@ -1,4 +1,5 @@
 #include "SplashScreen.h"
+#include "core/Version.h"
 #include <QPainter>
 #include <QGuiApplication>
 #include <QScreen>
@@ -134,7 +135,7 @@ void SplashScreen::paintEvent(QPaintEvent*) {
     p.setFont(QFont("Segoe UI", 24, QFont::Bold));
     p.setPen(Qt::white);
     QRect titleRect(0, 170, w, 35);
-    p.drawText(titleRect, Qt::AlignCenter, tr("TStar v") + QString(TSTAR_VERSION));
+    p.drawText(titleRect, Qt::AlignCenter, tr("TStar v") + QString(TStar::getVersion()));
     
     // Subtitle
     p.setFont(QFont("Segoe UI", 16));

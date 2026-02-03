@@ -188,6 +188,8 @@ bool ImageSequence::readImageMetadata(SequenceImage& img) {
         img.bitDepth = 16;  // Will be updated when reading
         img.isFloat = false;
         img.metadata = temp.metadata();
+        
+        // Exposure time is now robustly populated by FitsLoader
         img.exposure = temp.metadata().exposure;
         
         return img.width > 0 && img.height > 0;

@@ -12,7 +12,9 @@
 #include "MainWindow.h"
 #include "widgets/SplashScreen.h"
 #include "core/Logger.h"
+#include "core/Logger.h"
 #include "core/ResourceManager.h"
+#include "core/Version.h"
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
@@ -223,7 +225,7 @@ int main(int argc, char *argv[])
     waitStep(100);
 
     MainWindow* window = new MainWindow();
-    window->setWindowTitle("TStar v" + QString(TSTAR_VERSION));
+    window->setWindowTitle("TStar v" + QString(TStar::getVersion()));
     window->resize(1280, 800);
     
     // Set application icon for window and taskbar

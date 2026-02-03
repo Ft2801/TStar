@@ -46,7 +46,15 @@ if(WIN32)
     )
 endif()
 
-add_definitions(-DTSTAR_VERSION="${TSTAR_VERSION}")
+# Generate Version.cpp source file
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/Version.cpp.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/Version.cpp"
+    @ONLY
+)
+
+# Remove the global TSTAR_VERSION definition to prevent full recompiles
+# add_definitions(-DTSTAR_VERSION="${TSTAR_VERSION}")
 
 project(TStar LANGUAGES C CXX)
 
@@ -435,6 +443,7 @@ set(TSTAR_SOURCES
     src/core/ErrorHandling.h
     src/core/ResourceManager.cpp
     src/core/ResourceManager.h
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/Version.cpp
     
     # IO
     src/io/FitsLoader.cpp

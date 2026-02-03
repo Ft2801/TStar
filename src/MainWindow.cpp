@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+#include "core/Version.h"
 #include "widgets/CustomMdiSubWindow.h"
 #include "dialogs/GHSDialog.h"
 #include "Icons.h"
@@ -940,7 +941,7 @@ MainWindow::MainWindow(QWidget *parent)
     aboutBtn->setToolButtonStyle(Qt::ToolButtonTextOnly);
     aboutBtn->setStyleSheet(settingsBtn->styleSheet()); // Re-use style
     connect(aboutBtn, &QToolButton::clicked, this, [this](){
-        AboutDialog dlg(this, TSTAR_VERSION, __DATE__); // Only Date
+        AboutDialog dlg(this, TStar::getVersion(), __DATE__); // Only Date
         dlg.exec();
     });
     mainToolbar->addWidget(aboutBtn);
@@ -964,7 +965,7 @@ MainWindow::MainWindow(QWidget *parent)
         connect(checker, &UpdateChecker::errorOccurred, this, [this](const QString& err){
             log(tr("Update check failed: %1").arg(err), Log_Warning);
         });
-        checker->checkForUpdates(TSTAR_VERSION);
+        checker->checkForUpdates(TStar::getVersion());
     });
 
     resize(1280, 800);

@@ -1,0 +1,7 @@
+#include "core/Version.h"
+
+namespace TStar {
+    const char* getVersion() {
+        return "@TSTAR_VERSION@";
+    }
+}

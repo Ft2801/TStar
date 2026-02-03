@@ -6,6 +6,9 @@
 #include <QIcon>
 #include <QMessageBox>
 #include "../ImageViewer.h"
+#include "../widgets/CustomMdiSubWindow.h"
+#include <QMdiArea>
+#include <QMdiSubWindow>
 
 CropRotateDialog::CropRotateDialog(QWidget* parent) : DialogBase(parent, "Rotate & Crop Tool", 300, 200) {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -43,9 +46,11 @@ CropRotateDialog::CropRotateDialog(QWidget* parent) : DialogBase(parent, "Rotate
     // Buttons
     QHBoxLayout* btnLayout = new QHBoxLayout();
     QPushButton* applyBtn = new QPushButton(tr("Apply"));
+    QPushButton* batchBtn = new QPushButton(tr("Batch Crop"));
     QPushButton* closeBtn = new QPushButton(tr("Close"));
     
     btnLayout->addWidget(applyBtn);
+    btnLayout->addWidget(batchBtn);
     btnLayout->addWidget(closeBtn);
     mainLayout->addLayout(btnLayout);
     
@@ -65,6 +70,7 @@ CropRotateDialog::CropRotateDialog(QWidget* parent) : DialogBase(parent, "Rotate
     });
     
     connect(applyBtn, &QPushButton::clicked, this, &CropRotateDialog::onApply);
+    connect(batchBtn, &QPushButton::clicked, this, &CropRotateDialog::onBatchApply);
     connect(closeBtn, &QPushButton::clicked, this, &CropRotateDialog::reject); 
     
     connect(m_aspectCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CropRotateDialog::onRatioChanged);
@@ -139,4 +145,67 @@ void CropRotateDialog::onApply() {
     // Reset crop rect?
     m_viewer->setCropMode(false); // Reset internal state
     m_viewer->setCropMode(true);  // Re-enable for next op
+}
+
+void CropRotateDialog::onBatchApply() {
+    if (!m_viewer) return;
+    
+    float cx, cy, w, h, angle;
+    m_viewer->getCropState(cx, cy, w, h, angle);
+    
+    if (w <= 0 || h <= 0) {
+        QMessageBox::warning(this, tr("Warning"), tr("Please draw a crop rectangle first."));
+        return;
+    }
+    
+    // Find MDI Area via parent hierarchy or m_viewer
+    QMdiArea* mdiArea = nullptr;
+    QWidget* p = m_viewer->parentWidget();
+    while (p) {
+        if (QMdiSubWindow* sw = qobject_cast<QMdiSubWindow*>(p)) {
+             mdiArea = sw->mdiArea();
+             break;
+        }
+        p = p->parentWidget();
+    }
+    
+    if (!mdiArea) return;
+    
+    QList<QMdiSubWindow*> allWindows = mdiArea->subWindowList();
+    QList<CustomMdiSubWindow*> targetWindows;
+    
+    // Filter first to get correct count
+    for (auto* sub : allWindows) {
+        auto* csw = qobject_cast<CustomMdiSubWindow*>(sub);
+        if (csw && !csw->isToolWindow() && csw->viewer()) {
+            targetWindows.append(csw);
+        }
+    }
+    
+    // Ask confirmation if many images
+    if (targetWindows.size() > 1) {
+        if (QMessageBox::question(this, tr("Batch Crop"), 
+            tr("Apply this crop to %1 images?").arg(targetWindows.size()),
+            QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) {
+            return;
+        }
+    }
+
+    int count = 0;
+    for (auto* csw : targetWindows) {
+        if (ImageViewer* v = csw->viewer()) {
+            v->pushUndo();
+            v->getBuffer().cropRotated(cx, cy, w, h, angle);
+            v->refreshDisplay(false);
+            v->fitToWindow();
+            
+            // Ensure crop mode is kept off or consistent
+            v->setCropMode(false); 
+            count++;
+        }
+    }
+    
+    m_angleSpin->setValue(0);
+    // Re-enable crop mode on the active viewer if desired, but batch usually implies finishing
+    m_viewer->setCropMode(true);
 }

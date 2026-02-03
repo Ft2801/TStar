@@ -18,6 +18,7 @@ public:
 
 private slots:
     void onApply();
+    void onBatchApply();
     void onRotationChanged();
     void onRatioChanged();
 

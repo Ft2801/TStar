@@ -3,6 +3,8 @@
 
 
 #include <QDateTime>
+#include <QDir>
+#include <QFileInfo>
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -665,7 +667,15 @@ StackResult StackingEngine::stackSum(StackingArgs& args) {
         
         // Load image
         ImageBuffer buffer;
-        if (!args.sequence->readImage(idx, buffer)) {
+        QFileInfo fi(args.sequence->image(idx).filePath);
+        if (!fi.exists()) {
+             args.log(tr("Error: File not found: %1").arg(fi.filePath()), "salmon");
+             continue;
+        }
+        
+        // Use native separators to minimize CFITSIO parsing issues
+        QString nativePath = QDir::toNativeSeparators(fi.absoluteFilePath());
+        if (!args.sequence->readImage(idx, buffer)) { 
             args.log(tr("Warning: Failed to read image %1, skipping").arg(idx), "salmon");
             continue;
         }
