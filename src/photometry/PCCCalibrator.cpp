@@ -38,7 +38,6 @@ void PCCCalibrator::setSIP(int a_order, int b_order, int ap_order, int bp_order,
     // Parse keys like "A_2_1"
     for(const auto& [key, val] : coeffs) {
         int i=0, j=0;
-        char type[10];
         // Scanf is simple but dangerous, manual parsing is safer
         QString k = QString::fromStdString(key);
         QStringList parts = k.split('_');
@@ -58,7 +57,7 @@ void PCCCalibrator::setSIP(int a_order, int b_order, int ap_order, int bp_order,
     m_useSip = (!m_sipA.empty() || !m_sipB.empty() || !m_sipAP.empty() || !m_sipBP.empty());
 }
 
-double PCCCalibrator::calculateSIP(double u, double v, const std::map<std::pair<int,int>, double>& coeffs, int order) const {
+double PCCCalibrator::calculateSIP(double u, double v, const std::map<std::pair<int,int>, double>& coeffs, [[maybe_unused]] int order) const {
     double sum = 0.0;
     // Naive power implementation (can be optimized with Horner's or precomputed powers)
     for (const auto& [p, val] : coeffs) {

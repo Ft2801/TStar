@@ -1,6 +1,11 @@
 TStar Changelog
 ===============
 
+Version 1.5.7
+-------------
+- Swap memory management
+- Other small optimizations
+
 Version 1.5.6
 -------------
 - Added batch cropping in the crop tool

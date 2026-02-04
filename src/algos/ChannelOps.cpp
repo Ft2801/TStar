@@ -7,6 +7,9 @@
 std::vector<ImageBuffer> ChannelOps::extractChannels(const ImageBuffer& src) {
     std::vector<ImageBuffer> channels;
     if (!src.isValid()) return channels;
+    
+    // Lock source to prevent swapping during read
+    ImageBuffer::ReadLock lock(&src);
 
     int width = src.width();
     int height = src.height();
@@ -35,6 +38,12 @@ std::vector<ImageBuffer> ChannelOps::extractChannels(const ImageBuffer& src) {
 ImageBuffer ChannelOps::combineChannels(const ImageBuffer& r, const ImageBuffer& g, const ImageBuffer& b) {
     if (!r.isValid() || !g.isValid() || !b.isValid()) return ImageBuffer();
     
+    // Lock ALL sources
+    ImageBuffer::ReadLock lockR(&r);
+    ImageBuffer::ReadLock lockG(&g);
+    ImageBuffer::ReadLock lockB(&b);
+
+    
     if (r.width() != g.width() || r.width() != b.width() ||
         r.height() != g.height() || r.height() != b.height()) {
         std::cerr << "ChannelOps::combineChannels: Dimensions mismatch" << std::endl;
@@ -62,8 +71,11 @@ ImageBuffer ChannelOps::combineChannels(const ImageBuffer& r, const ImageBuffer&
 }
 
 // Helper: Estimate Noise Sigma (MAD based)
+// Helper: Estimate Noise Sigma (MAD based)
 std::vector<float> ChannelOps::estimateNoiseSigma(const ImageBuffer& src) {
     if (!src.isValid()) return {};
+    ImageBuffer::ReadLock lock(&src);
+
     int w = src.width();
     int h = src.height();
     int c = src.channels();
@@ -114,6 +126,8 @@ ImageBuffer ChannelOps::computeLuminance(const ImageBuffer& src, LumaMethod meth
                                         const std::vector<float>& customNoiseSigma) 
 {
     if (!src.isValid()) return ImageBuffer();
+    
+    ImageBuffer::ReadLock lock(&src);
     
     int w = src.width();
     int h = src.height();
@@ -210,6 +224,11 @@ bool ChannelOps::recombineLuminance(ImageBuffer& target, const ImageBuffer& sour
     if (!target.isValid() || !sourceL.isValid()) return false;
     if (sourceL.channels() != 1) return false;
     
+    // Write lock on target, Read lock on source
+    ImageBuffer::WriteLock lockTarget(&target);
+    ImageBuffer::ReadLock lockSource(&sourceL);
+
+    
     if (target.width() != sourceL.width() || target.height() != sourceL.height()) return false;
     
     int w = target.width();
@@ -303,6 +322,8 @@ float ChannelOps::getLumaWeightB(LumaMethod method, const std::vector<float>& cu
 
 ImageBuffer ChannelOps::debayer(const ImageBuffer& mosaic, const std::string& pattern, const std::string& method) {
     if (!mosaic.isValid() || mosaic.channels() != 1) return ImageBuffer();
+    
+    ImageBuffer::ReadLock lock(&mosaic);
     
     int w = mosaic.width();
     int h = mosaic.height();
@@ -437,6 +458,8 @@ ImageBuffer ChannelOps::debayer(const ImageBuffer& mosaic, const std::string& pa
 float ChannelOps::computeDebayerScore(const ImageBuffer& rgb) {
     if (!rgb.isValid() || rgb.channels() < 3) return std::numeric_limits<float>::max();
     
+    ImageBuffer::ReadLock lock(&rgb);
+    
     int w = rgb.width();
     int h = rgb.height();
     const float* data = rgb.data().data();
@@ -469,6 +492,10 @@ float ChannelOps::computeDebayerScore(const ImageBuffer& rgb) {
 
 ImageBuffer ChannelOps::continuumSubtract(const ImageBuffer& narrowband, const ImageBuffer& continuum, float qFactor) {
     if (!narrowband.isValid() || !continuum.isValid()) return ImageBuffer();
+    
+    ImageBuffer::ReadLock lockNB(&narrowband);
+    ImageBuffer::ReadLock lockCont(&continuum);
+
     if (narrowband.width() != continuum.width() || narrowband.height() != continuum.height()) {
         return ImageBuffer();
     }
@@ -519,6 +546,9 @@ ImageBuffer ChannelOps::continuumSubtract(const ImageBuffer& narrowband, const I
 
 void ChannelOps::removePedestal(ImageBuffer& img) {
     if (!img.isValid()) return;
+    
+    ImageBuffer::WriteLock lock(&img);
+    
     int w = img.width();
     int h = img.height();
     int c = img.channels();

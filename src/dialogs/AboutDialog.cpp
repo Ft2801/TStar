@@ -4,11 +4,11 @@
 #include <QCoreApplication>
 
 AboutDialog::AboutDialog(QWidget* parent, const QString& version, const QString& buildTimestamp)
-    : DialogBase(parent, "About TStar", 450, 400)
+    : DialogBase(parent, "About TStar", 450, 250)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(30, 20, 30, 20); // Balanced margins
-    layout->setSpacing(20); // Spacing between sections
+    layout->setContentsMargins(20, 15, 20, 15); // Reduced margins
+    layout->setSpacing(10); // Reduced spacing between sections
 
     QString v = version;
     if (v.isEmpty()) v = "1.0.0"; // Default or fetch from somewhere
@@ -26,7 +26,8 @@ AboutDialog::AboutDialog(QWidget* parent, const QString& version, const QString&
     }
     
     QString aboutText = aboutLines.join("");
-
+    // Remove extra paragraph spacing in HTML if needed, but <p> is standard.
+    
     QLabel* infoLabel = new QLabel(aboutText, this);
     infoLabel->setTextFormat(Qt::RichText);
     infoLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -34,7 +35,7 @@ AboutDialog::AboutDialog(QWidget* parent, const QString& version, const QString&
     infoLabel->setAlignment(Qt::AlignCenter);
     infoLabel->setWordWrap(true);
 
-    QLabel* descLabel = new QLabel(tr("TStar is a professional astrophotography image processing application designed to provide advanced tools for enhancing and analyzing astronomical images."), this);
+    QLabel* descLabel = new QLabel(tr("TStar is a professional astrophotography image processing application."), this);
     descLabel->setStyleSheet("font-style: italic; color: #aaaaaa;");
     descLabel->setAlignment(Qt::AlignCenter);
     descLabel->setWordWrap(true);
@@ -43,7 +44,7 @@ AboutDialog::AboutDialog(QWidget* parent, const QString& version, const QString&
     layout->addWidget(descLabel);
     
     // Set a reasonable minimum width and let the layout determine height
-    setMinimumWidth(400);
+    setMinimumWidth(350); // Slightly reduced width constraint too
     adjustSize();
 
 }

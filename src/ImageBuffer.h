@@ -14,6 +14,8 @@
 #include "algos/CubicSpline.h"
 #include "core/MaskLayer.h"
 #include <QTransform>
+#include <QDateTime>
+
 
 class ImageBuffer {
 public:
@@ -37,8 +39,21 @@ public:
     void resize(int width, int height, int channels);
     
     // Raw Access
-    const std::vector<float>& data() const { Q_ASSERT(!m_data.empty()); return m_data; }
-    std::vector<float>& data() { Q_ASSERT(!m_data.empty()); return m_data; }
+    // CRITICAL: Calling data() will trigger a swap-in if needed.
+    // Ensure you hold a lock if needed, though data() itself handles the swap logic.
+    const std::vector<float>& data() const;
+    std::vector<float>& data();
+    
+    // Explicit access marker for things that don't call data() but use the object
+    void touch();
+    qint64 getLastAccessTime() const { return m_lastAccess; }
+
+    // Swap Management
+    bool isSwapped() const { return m_isSwapped; }
+    bool canSwap() const; // Checks if it's safe to swap (e.g. valid size, not already swapped)
+    bool trySwapOut(); // Called by SwapManager. Attempts to lock and swap.
+    void forceSwapIn(); // Called manually or by data()
+
     
     bool loadStandard(const QString& filePath);
     
@@ -322,6 +337,14 @@ private:
     // Thread Safety: Read-Write lock for concurrent access
     // Multiple readers allowed, exclusive write access required
     mutable std::unique_ptr<QReadWriteLock> m_mutex;
+
+    // Swap Internals
+    void doSwapIn();
+    void doSwapOut();
+    mutable qint64 m_lastAccess = 0;
+    bool m_isSwapped = false;
+    QString m_swapFile;
+
 
     // Agile Autostretch (Display only)
     std::vector<float> computeAgileLUT(int channelIndex, float targetMedian = 0.25f);

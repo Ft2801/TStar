@@ -425,6 +425,10 @@ set(TSTAR_SOURCES
     src/core/TStarApplication.h
     src/core/GlobalExceptionHandler.cpp
     src/core/GlobalExceptionHandler.h
+    src/core/SwapManager.cpp
+    src/core/SwapManager.h
+    src/core/SimdOps.cpp
+    src/core/SimdOps.h
     ${CMAKE_CURRENT_BINARY_DIR}/generated/Version.cpp
     
     # IO

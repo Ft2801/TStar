@@ -928,6 +928,23 @@ MainWindow::MainWindow(QWidget *parent)
     helpBtn->setStyleSheet(settingsBtn->styleSheet());
     connect(helpBtn, &QToolButton::clicked, this, [this](){
         HelpDialog dlg(this);
+        
+        // Manual Centering to match other tools
+        dlg.adjustSize();
+        QSize dlgSize = dlg.size();
+        QRect mainGeom = this->geometry();
+        QPoint center = mainGeom.center();
+        int x = center.x() - dlgSize.width() / 2;
+        int y = center.y() - dlgSize.height() / 2;
+        
+        // Screen bounds check
+        if (auto scr = this->screen()) {
+             QRect screenGeom = scr->availableGeometry();
+             if (x < screenGeom.left()) x = screenGeom.left();
+             if (y < screenGeom.top()) y = screenGeom.top();
+        }
+        
+        dlg.move(x, y);
         dlg.exec();
     });
     mainToolbar->addWidget(helpBtn);
@@ -940,6 +957,23 @@ MainWindow::MainWindow(QWidget *parent)
     aboutBtn->setStyleSheet(settingsBtn->styleSheet()); // Re-use style
     connect(aboutBtn, &QToolButton::clicked, this, [this](){
         AboutDialog dlg(this, TStar::getVersion(), __DATE__); // Only Date
+        
+        // Manual Centering
+        dlg.adjustSize();
+        QSize dlgSize = dlg.size();
+        QRect mainGeom = this->geometry();
+        QPoint center = mainGeom.center();
+        int x = center.x() - dlgSize.width() / 2;
+        int y = center.y() - dlgSize.height() / 2;
+        
+         // Screen bounds check
+        if (auto scr = this->screen()) {
+             QRect screenGeom = scr->availableGeometry();
+             if (x < screenGeom.left()) x = screenGeom.left();
+             if (y < screenGeom.top()) y = screenGeom.top();
+        }
+        
+        dlg.move(x, y);
         dlg.exec();
     });
     mainToolbar->addWidget(aboutBtn);
