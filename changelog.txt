@@ -1,6 +1,11 @@
 TStar Changelog
 ===============
 
+Version 1.5.8
+-------------
+- Fixed Curves tool window dimensions
+- Updated global exception handler
+
 Version 1.5.7
 -------------
 - Swap memory management

@@ -21,7 +21,7 @@
 #include <QKeySequence>
 
 
-GHSDialog::GHSDialog(QWidget *parent) : DialogBase(parent, "Generalized Hyperbolic Stretch (GHT)", 500, 700), m_previewPending(false), m_activeViewer(nullptr), m_applied(false) {
+GHSDialog::GHSDialog(QWidget *parent) : DialogBase(parent, "Generalized Hyperbolic Stretch (GHT)", 440, 600), m_previewPending(false), m_activeViewer(nullptr), m_applied(false) {
     // Interaction
     m_interactionEnabled = false;
     setModal(false);

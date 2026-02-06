@@ -18,7 +18,7 @@
 // --- CurvesGraph ---
 
 CurvesGraph::CurvesGraph(QWidget* parent) : QWidget(parent) {
-    setMinimumSize(339, 281); 
+    setMinimumSize(340, 180); 
     setMouseTracking(true);
     reset();
 }
@@ -372,7 +372,7 @@ void CurvesGraph::mouseReleaseEvent([[maybe_unused]] QMouseEvent* event) {
 // --- CurvesDialog ---
 
 CurvesDialog::CurvesDialog(ImageViewer* viewer, QWidget* parent) 
-    : DialogBase(parent, "Curves Transformation", 700, 500), m_viewer(viewer)
+    : DialogBase(parent, "Curves Transformation", 700, 450), m_viewer(viewer)
 {
     setMinimumWidth(500);
     

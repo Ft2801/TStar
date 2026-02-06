@@ -11,7 +11,7 @@
 #endif
 
 ArcsinhStretchDialog::ArcsinhStretchDialog(ImageViewer* viewer, QWidget* parent)
-    : DialogBase(parent, "Arcsinh Stretch", 500, 400), m_viewer(nullptr), m_applied(false)
+    : DialogBase(parent, "Arcsinh Stretch", 500, 300), m_viewer(nullptr), m_applied(false)
 {
     setMinimumWidth(400);
     setupUI();

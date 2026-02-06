@@ -2470,6 +2470,12 @@ void MainWindow::openBackgroundNeutralizationDialog() {
         ImageViewer* v = currentViewer();
         if (!v) return;
         
+        // Validate buffer before processing to prevent crashes
+        if (!v->getBuffer().isValid() || v->getBuffer().channels() != 3) {
+            QMessageBox::warning(this, tr("Error"), tr("Cannot apply: buffer is invalid or not RGB."));
+            return;
+        }
+        
         // BN doesn't have a visual live preview on the viewer's main buffer usually, 
         // but if it did, we should restore it. 
         // Let's just make sure we push undo before capturing the buffer.

@@ -26,6 +26,11 @@ void GlobalExceptionHandler::handle(const QString& errorMessage)
 
 void GlobalExceptionHandler::showDialog(const QString& message)
 {
+    // Guard: Don't show dialog if app is closing
+    if (!QApplication::instance() || QApplication::closingDown()) {
+        return;
+    }
+    
     // Ensure we are in the main thread for UI
     if (QThread::currentThread() != QApplication::instance()->thread()) {
         QMetaObject::invokeMethod(QApplication::instance(), [message]() {
