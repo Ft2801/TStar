@@ -78,7 +78,6 @@ private:
     QPoint m_dragStartPos;
 };
 
-// ... CustomTitleBar remains similar ...
 class CustomTitleBar : public QWidget {
     Q_OBJECT
 public:

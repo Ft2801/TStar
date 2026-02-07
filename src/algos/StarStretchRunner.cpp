@@ -36,7 +36,7 @@ static void applySaturation(std::vector<float>& data, int w, int h, int c, float
         float g = data[i * c + 1];
         float b = data[i * c + 2];
         
-    float mean = (r + g + b) / 3.0f; // Simple mean (matches reference implementation)
+        float mean = (r + g + b) / 3.0f; // Simple mean (matches reference implementation)
         
         float r_new = mean + (r - mean) * amount;
         float g_new = mean + (g - mean) * amount;
@@ -67,8 +67,6 @@ static void applySCNR(std::vector<float>& data, int w, int h, int c) {
 bool StarStretchRunner::run(const ImageBuffer& input, ImageBuffer& output, const StarStretchParams& params, [[maybe_unused]] QString* errorMsg) {
     // Copy input to output
     output = input;
-    
-    // Ensure float32 range? ImageBuffer is usually 0-1 float.
     
     int w = output.width();
     int h = output.height();

@@ -119,7 +119,7 @@ public:
         
         auto p = points;
         // Assume sorted or sort
-        // std::sort(p.begin(), p.end()); // Better to pass sorted
+
         
         if (x <= p[0].x) return p[0].y;
         if (x >= p.back().x) return p.back().y;

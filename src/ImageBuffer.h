@@ -87,13 +87,7 @@ public:
     void invertMask();
 
     // Saving and Processing
-    // The original BitDepth enum was here, now it's moved up.
-    // enum BitDepth {
-    //     Depth_32Float,
-    //     Depth_32Int,
-    //     Depth_16Int,
-    //     Depth_8Int
-    // };
+
 
     bool save(const QString& filePath, const QString& format, BitDepth depth, QString* errorMsg = nullptr) const;
     bool loadTiff32(const QString& filePath, QString* errorMsg = nullptr, QString* debugInfo = nullptr);

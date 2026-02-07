@@ -120,7 +120,6 @@ bool SERFile::readFrame(int index, ImageBuffer& buffer) {
     
     // Metadata
     buffer.metadata().bitDepth = QString::number(bpp);
-    // buffer.metadata().dateObs = ... (Need to read timestamp block)
     
     return true;
 }

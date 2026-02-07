@@ -113,8 +113,7 @@ StackResult StackingEngine::execute(StackingArgs& args) {
             .arg(args.nbImagesToStack)
             .arg(methodToString(args.params.method)), "green");
     
-    // 3. Prepare Comet Registration if needed
-    // 3. Prepare Comet Registration if needed
+
     if (args.params.useCometMode) {
         emit logMessage(tr("Preparing Comet Alignment..."), "neutral");
         
@@ -252,7 +251,43 @@ StackResult StackingEngine::execute(StackingArgs& args) {
 
     if (args.params.useCosmetic) {
         args.progress(tr("Computing Cosmetic Correction Map..."), -1);
-        ImageBuffer masterDark;
+        
+        // Check if we have a pre-computed bad pixel map file
+        if (!args.params.cosmeticMapFile.isEmpty()) {
+            // Load map from file - expected format: master dark FITS/TIFF
+            ImageBuffer masterDark;
+            QString ext = QFileInfo(args.params.cosmeticMapFile).suffix().toLower();
+            bool loaded = false;
+            
+            if (ext == "fit" || ext == "fits" || ext == "fts") {
+                loaded = FitsLoader::load(args.params.cosmeticMapFile, masterDark);
+            }
+            // Add other formats if needed
+            
+            if (loaded && masterDark.isValid()) {
+                args.cosmeticMap = CosmeticCorrection::findDefects(
+                    masterDark,
+                    args.params.cosmeticHotSigma,
+                    args.params.cosmeticColdSigma,
+                    args.params.cosmeticIsCFA
+                );
+                
+                if (args.cosmeticMap.isValid()) {
+                    args.log(tr("Cosmetic Correction: Found %1 defects in master dark")
+                            .arg(args.cosmeticMap.count), "blue");
+                } else {
+                    args.log(tr("Warning: No defects found in master dark, cosmetic correction disabled"), "salmon");
+                    args.params.useCosmetic = false;
+                }
+            } else {
+                args.log(tr("Warning: Could not load cosmetic map file: %1")
+                        .arg(args.params.cosmeticMapFile), "salmon");
+                args.params.useCosmetic = false;
+            }
+        } else {
+            args.log(tr("Warning: Cosmetic correction enabled but no master dark provided"), "salmon");
+            args.params.useCosmetic = false;
+        }
     }
     
     // Initialize rejection maps if requested
@@ -1230,26 +1265,7 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
     return StackResult::OK;
 }
 
-// Keep processMeanBlock as a wrapper for compatibility, but it's no longer used
-StackResult StackingEngine::processMeanBlock(StackingArgs& args,
-                                 int startRow, int endRow,
-                                 int outputWidth, int channels,
-                                 int offsetX, int offsetY,
-                                 float* outputData,
-                                 ImageCache* cache)
-{
-    Q_UNUSED(args);
-    Q_UNUSED(startRow);
-    Q_UNUSED(endRow);
-    Q_UNUSED(outputWidth);
-    Q_UNUSED(channels);
-    Q_UNUSED(offsetX);
-    Q_UNUSED(offsetY);
-    Q_UNUSED(outputData);
-    Q_UNUSED(cache);
-    // This function is deprecated - all logic is now in stackMean
-    return StackResult::OK;
-}
+
 
 void StackingEngine::loadBlockData(const StackingArgs& args,
                                    int startRow, int endRow,
@@ -1311,6 +1327,11 @@ void StackingEngine::loadBlockData(const StackingArgs& args,
         rois[i].rW = rW; rois[i].rH = rH;
         rois[i].shiftX = shiftX; rois[i].shiftY = shiftY;
         rois[i].loaded = args.sequence->readImageRegion(imgIdx, rois[i].buffer, rX, rY, rW, rH, channel);
+        
+        // Apply cosmetic correction if enabled and map is valid
+        if (rois[i].loaded && args.params.useCosmetic && args.cosmeticMap.isValid()) {
+            CosmeticCorrection::apply(rois[i].buffer, args.cosmeticMap, rX, rY, args.params.cosmeticIsCFA);
+        }
     }
     
     // ===== PHASE 2: PARALLEL INTERPOLATION =====
@@ -1335,8 +1356,7 @@ void StackingEngine::loadBlockData(const StackingArgs& args,
         int rW = rois[i].rW, rH = rois[i].rH;
         double shiftX = rois[i].shiftX, shiftY = rois[i].shiftY;
 
-        // Apply Cosmetic Correction (if needed)
-        // ... (cosmetic correction code omitted for clarity, can be added back if needed)
+
         
         // Bicubic Interpolation into Block
         for (int y = 0; y < blockHeight; ++y) {
@@ -1556,9 +1576,7 @@ StackResult StackingEngine::stackMin(StackingArgs& args) {
         }
         
         const auto& imgInfo = args.sequence->image(idx);
-        RegistrationData reg = imgInfo.registration; // Use default unless effective passed? Original code used imgInfo.registration for Min?
-        // Wait, stackMax used logic to check effectiveRegs. stackMin didn't. 
-        // Let's copy the logic from stackMax to be safe.
+        RegistrationData reg = imgInfo.registration;
         if (!args.effectiveRegs.empty() && idx < (int)args.effectiveRegs.size()) {
              reg = args.effectiveRegs[idx];
         }

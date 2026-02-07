@@ -28,7 +28,7 @@
 
 #include <QFormLayout>
 #include <QDialogButtonBox>
-#include <QDialogButtonBox>
+
 #include <QApplication>
 #include <QTime>
 #include <QEventLoop>
@@ -55,7 +55,7 @@
 #include "dialogs/PCCDialog.h"
 #include "dialogs/BackgroundNeutralizationDialog.h"
 #include "dialogs/PixelMathDialog.h"
-#include "dialogs/PixelMathDialog.h"
+
 #include "dialogs/UpdateDialog.h" // [NEW] Auto-updater dialog
 #include "network/UpdateChecker.h" // [NEW] Auto-updater checker
 #include "dialogs/HeaderViewerDialog.h"
@@ -282,7 +282,6 @@ MainWindow::MainWindow(QWidget *parent)
                     m_lastActiveImageViewer = v;
                     log(tr("Active View Changed: %1").arg(v->windowTitle()), Log_Info);
 
-                    // --- Sync Tools to New Viewer ---
                     // --- Sync Tools to New Viewer ---
                     if (m_abeDlg) m_abeDlg->setViewer(v);
                     if (m_bnDlg) m_bnDlg->setViewer(v);
@@ -1274,9 +1273,9 @@ void MainWindow::propagateViewChange(float scale, float hVal, float vVal) {
     }
 }
 
-// ConsoleResizeHandle methods removed
 
-#include "io/XISFReader.h" // Added for multi-image XISF support
+
+#include "io/XISFReader.h"
 
 void MainWindow::openFile() {
     QString filter = tr("All Supported (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;") +
@@ -1560,7 +1559,6 @@ void MainWindow::combineChannels() {
             ImageViewer* v = cWin->widget()->findChild<ImageViewer*>();
             if (v && v->getBuffer().isValid()) {
                 // Currently taking whole buffers.
-                // Future enhancement: Allow selecting specific channels from images.
                 sources.push_back({win->windowTitle(), v->getBuffer()});
             }
         }
@@ -1649,7 +1647,7 @@ void MainWindow::openStretchDialog() {
              }
         });
 
-        // Removed duplicate setupToolSubwindow call
+
     } catch (const std::exception& e) {
         QMessageBox::critical(this, tr("Error"), tr("Failed to open Statistical Stretch dialog: %1").arg(e.what()));
         if (m_stretchDlg) {
@@ -2147,7 +2145,7 @@ void MainWindow::openPerfectPaletteDialog() {
 
     setupToolSubwindow(nullptr, dlg, tr("Perfect Palette"));
 }
-    // Re-adding applyGeometry here as it was likely not in previous view range or needs MDI
+
 void MainWindow::applyGeometry(const QString& op) {
     if (auto v = currentViewer()) {
         // NOTE: Flip and rotate should NOT be saved to undo/redo stack
@@ -2233,7 +2231,7 @@ void MainWindow::openGHSDialog() {
     // Lifecycle: Delete on close to ensure clean reset on reopen.
     sub->setAttribute(Qt::WA_DeleteOnClose); 
     
-    // Better: Connect GHS Dialog destroyed signal
+    // Connect GHS Dialog destroyed signal
     connect(m_ghsDlg, &QObject::destroyed, [this](){ 
         m_ghsDlg = nullptr; 
         m_ghsTarget = nullptr;
@@ -2322,6 +2320,7 @@ void MainWindow::openPCCDialog() {
     connect(dlg, &QDialog::accepted, [this, dlg, sub, viewer](){
          PCCResult res = dlg->result();
          if (res.valid) {
+             pushUndo();
              viewer->setBuffer(viewer->getBuffer(), viewer->windowTitle(), true); // Refresh display
              updateDisplay();
              log(tr("PCC Applied: R=%1 G=%2 B=%3 (BG: %4, %5, %6)")
@@ -2330,8 +2329,6 @@ void MainWindow::openPCCDialog() {
          }
          sub->close();
     });
-    
-    pushUndo();
 }
 
 void MainWindow::openCurvesDialog() {
@@ -2476,9 +2473,7 @@ void MainWindow::openBackgroundNeutralizationDialog() {
             return;
         }
         
-        // BN doesn't have a visual live preview on the viewer's main buffer usually, 
-        // but if it did, we should restore it. 
-        // Let's just make sure we push undo before capturing the buffer.
+        // Capture buffer for undo before processing
         v->pushUndo();
         ImageBuffer buf = v->getBuffer();
         BackgroundNeutralizationDialog::neutralizeBackground(buf, rect);
@@ -2521,8 +2516,8 @@ void MainWindow::openPixelMathDialog() {
     }
     
     m_pixelMathDialog = new PixelMathDialog(this, nullptr); 
-    m_pixelMathDialog->setAttribute(Qt::WA_DeleteOnClose, true); // Changed to true for QPointer auto-clean
-    // connect(m_pixelMathDialog, &QObject::destroyed, [this](){ m_pixelMathDialog = nullptr; }); // QPointer handles this!
+    m_pixelMathDialog->setAttribute(Qt::WA_DeleteOnClose, true);
+
     
     // Logic setup...
     connect(m_pixelMathDialog, &PixelMathDialog::apply, [this](const QString& expr, bool rescale){
@@ -3002,7 +2997,7 @@ void MainWindow::openStarAnalysisDialog() {
     setupToolSubwindow(nullptr, dlg, tr("Star Analysis"));
 }
 
-// ...
+
 #include "dialogs/MaskGenerationDialog.h"
 #include "dialogs/ApplyMaskDialog.h"
 #include "core/MaskManager.h"
@@ -3209,7 +3204,7 @@ void MainWindow::openImageAnnotatorDialog() {
         m_annotatorDlg->setPersistedAnnotations(m_persistedAnnotations);
     }
     
-    // REMOVED: setAttribute(Qt::WA_DeleteOnClose) - keep dialog and overlay alive
+
     m_annotatorDlg->setViewer(v);
     
     // Don't delete on close - just hide so annotations persist

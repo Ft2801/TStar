@@ -497,10 +497,10 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
             
             // Restore valid normal geometry if available
             if (!m_validNormalGeometry.isNull()) {
-                qDebug() << "  -> Restoring valid normal geometry:" << m_validNormalGeometry;
+                // qDebug() << "  -> Restoring valid normal geometry:" << m_validNormalGeometry;
                 setGeometry(m_validNormalGeometry);
             } else {
-                qDebug() << "  -> WARNING: No valid normal geometry, using fallback";
+                // qDebug() << "  -> WARNING: No valid normal geometry, using fallback";
                 resize(800, 600); // Reasonable fallback
                 // Center on screen
                 if (QMdiArea* area = mdiArea()) {
@@ -521,7 +521,7 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
             // Save valid normal geometry before maximizing
             if (!m_shaded) {
                 m_validNormalGeometry = geometry();
-                qDebug() << "  -> Saved Normal Geometry:" << m_validNormalGeometry;
+                // qDebug() << "  -> Saved Normal Geometry:" << m_validNormalGeometry;
             }
 
             // If shaded, we need to unshade first with robust logic
@@ -787,7 +787,7 @@ void CustomMdiSubWindow::toggleShade() {
     // Guard against rapid successive calls (e.g., from double-click triggering twice)
     static QElapsedTimer lastCallTimer;
     if (lastCallTimer.isValid() && lastCallTimer.elapsed() < 200) {
-        qDebug() << "toggleShade: BLOCKED (too rapid, elapsed=" << lastCallTimer.elapsed() << "ms)";
+        // qDebug() << "toggleShade: BLOCKED (too rapid, elapsed=" << lastCallTimer.elapsed() << "ms)";
         return;
     }
     lastCallTimer.start();
@@ -795,7 +795,7 @@ void CustomMdiSubWindow::toggleShade() {
     m_shaded = !m_shaded;
     m_titleBar->setShaded(m_shaded);
     
-    qDebug() << "toggleShade: m_shaded now =" << m_shaded << ", m_isMaximized =" << m_isMaximized << ", m_wasMaximized =" << m_wasMaximized;
+    // qDebug() << "toggleShade: m_shaded now =" << m_shaded << ", m_isMaximized =" << m_isMaximized << ", m_wasMaximized =" << m_wasMaximized;
     
     QPoint center = geometry().center();
     

@@ -13,7 +13,7 @@
 #include "MainWindow.h"
 #include "widgets/SplashScreen.h"
 #include "core/Logger.h"
-#include "core/Logger.h"
+
 #include "core/ResourceManager.h"
 #include "core/Version.h"
 #include <QFile>

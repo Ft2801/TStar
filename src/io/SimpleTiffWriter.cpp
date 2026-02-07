@@ -75,7 +75,7 @@ bool SimpleTiffWriter::write(const QString& filename, int width, int height, int
                 uint16_t v = static_cast<uint16_t>(std::max(0.0f, std::min(65535.0f, val * 65535.0f)));
                 dOut << v;
             } else if (fmt == Format_uint32) {
-                uint32_t v = static_cast<uint32_t>(std::max(0.0f, val * 4294967295.0f)); // Range check?
+                uint32_t v = static_cast<uint32_t>(std::max(0.0f, std::min(4294967295.0f, val * 4294967295.0f)));
                 dOut << v;
             } else if (fmt == Format_float32) {
                 dOut << val;
@@ -139,8 +139,7 @@ bool SimpleTiffWriter::write(const QString& filename, int width, int height, int
     // 11. YResolution
     writeEntry(out, TAG_YResolution, 5, 1, yResOffset);
     // 12. SampleFormat
-    writeEntry(out, TAG_SampleFormat, 3, 1, sampleFormat); // Use 1 for uint instead of count if same
-    // Wait, SampleFormat usually 1 value if all same.
+    writeEntry(out, TAG_SampleFormat, 3, 1, sampleFormat);
     
     out << (uint32_t)0; // Next IFD
     

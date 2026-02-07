@@ -238,7 +238,7 @@ bool SimpleTiffReader::readFloat32(const QString& path, int& width, int& height,
     std::vector<float> rawData;
     rawData.resize(width * height * channels, 0.0f);
 
-    // Pixel index tracking removed - not used in current logic
+
     
     // Debug Stats
     float dMin = 1e9f, dMax = -1e9f;

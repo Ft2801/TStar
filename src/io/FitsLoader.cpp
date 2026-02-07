@@ -160,9 +160,7 @@ bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* err
     ImageBuffer::Metadata meta;
     readCommonMetadata(fptr, meta);
     meta.filePath = filePath;
-    
-    // ... (Metadata reading logic preserved below) ...
-    // Note: We need to reimplement metadata reading part here since we replaced the whole block
+
     
     // Read ALL Header Keys
     int nkeys = 0;

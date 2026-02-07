@@ -643,9 +643,6 @@ bool ImageSequence::computeCometShifts(int refIndex, int targetIndex) {
     QDateTime targetTime = QDateTime::fromString(targetImg.metadata.dateObs, Qt::ISODate);
     
     if (!refTime.isValid() || !targetTime.isValid()) {
-        // Try alternate formats or assume failure
-        // Common FITS format: YYYY-MM-DDTHH:MM:SS[.sss]
-        // Sometimes spaces instead of T
         return false;
     }
     
@@ -683,8 +680,6 @@ bool ImageSequence::computeCometShifts(int refIndex, int targetIndex) {
         // Update registration
         img.registration.shiftX += shiftCometX;
         img.registration.shiftY += shiftCometY;
-        
-        // We might want to flag that this is now comet-aligned
     }
     
     return true;

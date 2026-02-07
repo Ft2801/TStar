@@ -71,7 +71,7 @@ ImageBuffer ChannelOps::combineChannels(const ImageBuffer& r, const ImageBuffer&
 }
 
 // Helper: Estimate Noise Sigma (MAD based)
-// Helper: Estimate Noise Sigma (MAD based)
+
 std::vector<float> ChannelOps::estimateNoiseSigma(const ImageBuffer& src) {
     if (!src.isValid()) return {};
     ImageBuffer::ReadLock lock(&src);

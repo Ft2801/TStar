@@ -54,9 +54,6 @@ void CosmeticCorrection::computeStats(const ImageBuffer& img, float& median, flo
 //-----------------------------------------------------------------------------
 // Find Defects
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-// Find Defects
-//-----------------------------------------------------------------------------
 CosmeticMap CosmeticCorrection::findDefects(const ImageBuffer& dark, float hotSigma, float coldSigma, bool cfa) {
     CosmeticMap map;
     if (!dark.isValid()) return map;
