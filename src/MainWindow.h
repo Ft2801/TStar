@@ -10,17 +10,15 @@
 #include "algos/CubicSpline.h"
 #include <QPointer>
 #include "MainWindowCallbacks.h"
-
-class VizierClient;
-// Removed forward decls that are now included
-class StretchDialog; 
 #include "dialogs/GHSDialog.h"
 #include "dialogs/CurvesDialog.h"
 #include "dialogs/SaturationDialog.h"
 #include <QMap>
 #include <QSettings>
 
-class StretchDialog; 
+
+class VizierClient;
+class StretchDialog;
 class PixelMathDialog;
 class CustomMdiSubWindow;
 class ABEDialog;
@@ -28,7 +26,6 @@ class BackgroundNeutralizationDialog;
 class WavescaleHDRDialog;
 class HistogramStretchDialog;
 class ArcsinhStretchDialog;
-class SCNRDialog;
 class SCNRDialog;
 class RARDialog;
 class StarStretchDialog;
@@ -229,9 +226,7 @@ public:
     QStack<QVector<struct Annotation>> m_persistedRedoStack;
 
 private:
-    // Move these to public above
-    // void startLongProcess();
-    // void endLongProcess();
+
 
     // UI Elements
     class QComboBox* m_stretchCombo;

@@ -484,13 +484,6 @@ static ChStats computeStatsHighPrecision(const std::vector<float>& data, int wid
 
 static ChStats computeStats(const std::vector<float>& data, int width, int height, int channels, int channelIndex) {
     // Check Settings for 24-bit Override
-    // Note: Accessing QSettings in a tight loop/helper might be slightly inefficient if done repeatedly, 
-    // but this is called once per channel per display update, so it is negligible.
-    // We do it here to transparently upgrade the existing calls.
-    // Static variable removed - not used in current logic
-    // We read it fresh every time or cache it? caching static might be tricky if user changes it.
-    // Ideally passed in, but signature change is larger.
-    // Let's read QSettings. It is usually fast enough (cached in memory by Qt).
     QSettings settings;
     if (settings.value("display/24bit_stf", true).toBool()) {
         return computeStatsHighPrecision(data, width, height, channels, channelIndex);
@@ -786,20 +779,14 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
             int srcY = y * stepY;
             if (srcY >= m_height) srcY = m_height - 1;
             
-            // For now, SIMD path assumes packed RGB. 
-            // If we have stride (stepX > 1), we cannot use continuous SIMD easily.
-            // But we can gather into a temp buffer?
-            // If stepX == 1 (Full Res View), we use SIMD directly.
+            // Optimized SIMD path for full-resolution, packed RGB data.
+            // Strided/zoomed views use the scalar fallback below.
             if (stepX == 1 && m_channels == 3) {
                  const float* srcRow = m_data.data() + (size_t)srcY * m_width * 3;
                  SimdOps::applySTF_Row(srcRow, dest, outW, stf, inverted);
                  
-                 // Handle Mask Overlay Scalar (if needed)
+                 // Apply Mask Overlay if enabled
                  if (m_hasMask && showMask) {
-                     // Second pass scalar for mask blending?
-                     // Or just do scalar if mask is ON.
-                     // The mask logic complicates things.
-                     // Let's check mask presence.
                      for (int x = 0; x < outW; ++x) {
                         float maskAlpha = m_mask.pixel(x, srcY);
                         if (m_mask.inverted) maskAlpha = 1.0f - maskAlpha;
@@ -834,14 +821,8 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
                 
                 float r_out, g_out, b_out;
                 
-                // Fetch & Stretch...
-                // (Existing scalar logic continued manually...)
-                // Since replace block ends before full logic, we need to be careful.
-                // The previous code had a huge loop body.
-                // I will rewrite the body to handle subsampling or call scalar helper.
-                
-                // Existing scalar logic was inside. Let's replicate what was there roughly or delegate?
-                // Re-implementing the scalar loop here since I cut it off.
+                // Fetch & Stretch (Scalar Fallback Implementation)
+                // This path is used when SIMD is not possible (e.g. strided access, masking, or non-standard channels)
                 
                 float v[3];
                 for(int c=0; c<3; ++c) {
@@ -2272,9 +2253,9 @@ void ImageBuffer::rotate(float angleDegrees) {
     // Rotates around CENTER of image.
     // T = T_newCenter * R * T_-oldCenter
     QTransform t;
-    t.translate(centerX, centerY);    // Qt transform order: last applied is first in multiply? 
-    t.rotate(angleDegrees);           // No, QTransform API order: T' = T * thisOp
-    t.translate(-centerX, -centerY);  // We want: p_new = T_newCenter * R * T_-oldCenter * p_old
+    t.translate(centerX, centerY);
+    t.rotate(angleDegrees);
+    t.translate(-centerX, -centerY);
     // Let's build explicitly:
     QTransform wcsTrans;
     wcsTrans.translate(newCenterX, newCenterY);
@@ -3144,46 +3125,6 @@ std::vector<ImageBuffer::DetectedStar> ImageBuffer::extractStars(const std::vect
     return stars;
 }
 
-// HSL Conversion Helpers for Saturation Tool (UNUSED - COMMENTED OUT)
-/*
-static void rgbToHsl(float r, float g, float b, float& h, float& s, float& l) {
-    float maxv = std::max({r, g, b});
-    float minv = std::min({r, g, b});
-    l = (maxv + minv) / 2.0f;
-    if (maxv == minv) {
-        h = s = 0.0f;
-    } else {
-        float d = maxv - minv;
-        s = l > 0.5f ? d / (2.0f - maxv - minv) : d / (maxv + minv);
-        if (maxv == r) h = (g - b) / d + (g < b ? 6.0f : 0.0f);
-        else if (maxv == g) h = (b - r) / d + 2.0f;
-        else if (maxv == b) h = (r - g) / d + 4.0f;
-        h *= 60.0f;
-    }
-}
-
-static float hueToRgb(float p, float q, float t) {
-    if (t < 0.0f) t += 1.0f;
-    if (t > 1.0f) t -= 1.0f;
-    if (t < 1.0f/6.0f) return p + (q - p) * 6.0f * t;
-    if (t < 1.0f/2.0f) return q;
-    if (t < 2.0f/3.0f) return p + (q - p) * (2.0f/3.0f - t) * 6.0f;
-    return p;
-}
-
-static void hslToRgb(float h, float s, float l, float& r, float& g, float& b) {
-    if (s == 0.0f) {
-        r = g = b = l;
-    } else {
-        h /= 360.0f;
-        float q = l < 0.5f ? l * (1.0f + s) : l + s - l * s;
-        float p = 2.0f * l - q;
-        r = hueToRgb(p, q, h + 1.0f/3.0f);
-        g = hueToRgb(p, q, h);
-        b = hueToRgb(p, q, h - 1.0f/3.0f);
-    }
-}
-*/  // End of unused HSL conversion functions
 
 void ImageBuffer::applySaturation(const SaturationParams& params) {
     WriteLock lock(this);  // Thread-safe write access
