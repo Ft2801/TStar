@@ -704,23 +704,6 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
         QImage::Format fmt = (m_channels == 1 && !falseColor) ? QImage::Format_Grayscale8 : QImage::Format_RGB888;
         QImage result(outW, outH, fmt);
 
-        // False Color Helper
-        auto hsvToRgb = [](float h, float s, float v, uchar& r, uchar& g, uchar& b) {
-            if (s <= 0.0f) { r = g = b = static_cast<uchar>(v * 255.0f); return; }
-            float hh = h; if (hh >= 360.0f) hh = 0.0f; hh /= 60.0f;
-            int i = static_cast<int>(hh); float ff = hh - i;
-            float p = v * (1.0f - s); float q = v * (1.0f - (s * ff)); float t = v * (1.0f - (s * (1.0f - ff)));
-            float rr, gg, bb;
-            switch (i) {
-                case 0: rr = v; gg = t; bb = p; break;
-                case 1: rr = q; gg = v; bb = p; break;
-                case 2: rr = p; gg = v; bb = t; break;
-                case 3: rr = p; gg = q; bb = v; break;
-                case 4: rr = t; gg = p; bb = v; break;
-                default: rr = v; gg = p; bb = q; break;
-            }
-            r = static_cast<uchar>(rr * 255.0f); g = static_cast<uchar>(gg * 255.0f); b = static_cast<uchar>(bb * 255.0f);
-        };
 
         // 1. Calculate Stretch Parameters
         struct MtfParams { float shadow; float midtone; float norm; };
