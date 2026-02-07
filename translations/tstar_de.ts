@@ -133,8 +133,8 @@
             <translation type="finished">Copyright © 2026</translation>
         </message>
         <message>
-            <source>TStar is a professional astrophotography image processing application designed to provide advanced tools for enhancing and analyzing astronomical images.</source>
-            <translation type="finished">TStar ist eine professionelle Anwendung zur Bearbeitung von astronomischen Bildern, die entwickelt wurde, um fortschrittliche Werkzeuge zur Verbesserung und Analyse astronomischer Bilder bereitzustellen.</translation>
+            <source>TStar is a professional astrophotography image processing application.</source>
+            <translation type="finished">TStar ist eine professionelle Anwendung zur Bildverarbeitung in der Astrofotografie.</translation>
         </message>
         <message>
             <source>Written by Fabio Tempera</source>
@@ -1375,7 +1375,7 @@
         <name>FitsLoader</name>
         <message>
             <source>CFITSIO Open Error %1: %2</source>
-            <translation type="unfinished" />
+            <translation type="finished">CFITSIO Öffnungsfehler %1: %2</translation>
         </message>
         <message>
             <source>CFITSIO Open Error %1: %2\nPath: %3</source>
@@ -1411,7 +1411,7 @@
         </message>
         <message>
             <source>File does not exist: %1</source>
-            <translation type="unfinished" />
+            <translation type="finished">Datei existiert nicht: %1</translation>
         </message>
         <message>
             <source>HDU %1 is not an image extension</source>
@@ -1427,7 +1427,7 @@
         </message>
         <message>
             <source>Invalid read region</source>
-            <translation type="unfinished" />
+            <translation type="finished">Ungültiger Lesebereich</translation>
         </message>
         <message>
             <source>No image extensions found in file</source>
@@ -1845,6 +1845,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Anpassen von Cyan/Magenta/Gelb, RGB, Luminanz, Sättigung und Kontrast für den ausgewählten Bereich</translation>
         </message>
         <message>
+            <source>Adjust Q-Factor to control subtraction strength</source>
+            <translation type="finished">Passen Sie den Q-Faktor an, um die Subtraktionsstärke zu steuern</translation>
+        </message>
+        <message>
             <source>Adjust color saturation with protection for highlights and shadows.</source>
             <translation type="finished">Farbsättigung mit Schutz für Lichter und Schatten anpassen.</translation>
         </message>
@@ -1859,6 +1863,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Adjust tonal curves for each RGB channel independently or together.</source>
             <translation type="finished">Tonwertkurven für jeden RGB-Kanal unabhängig oder zusammen anpassen.</translation>
+        </message>
+        <message>
+            <source>Adjusts protection of bright areas</source>
+            <translation type="finished">Passt den Schutz heller Bereiche an</translation>
         </message>
         <message>
             <source>Advanced stretch tool with full control:</source>
@@ -1957,6 +1965,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Subtrahieren oder Dividieren Modus wählen</translation>
         </message>
         <message>
+            <source>Choose from presets like SHO (Hubble), HOO, HSO, Foraxx, and more</source>
+            <translation type="finished">Wählen Sie aus Voreinstellungen wie SHO (Hubble), HOO, HSO, Foraxx und mehr</translation>
+        </message>
+        <message>
             <source>Click Open or press Ctrl+O</source>
             <translation type="finished">Klicken Sie auf Öffnen oder drücken Sie Strg+O</translation>
         </message>
@@ -2005,8 +2017,20 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Kombiniert separate Kanalbilder zu einem RGB-Bild.</translation>
         </message>
         <message>
+            <source>Compares measured star colors (Image) vs expected colors (Catalog)</source>
+            <translation type="finished">Vergleicht gemessene Sternfarben (Bild) mit erwarteten Farben (Katalog)</translation>
+        </message>
+        <message>
+            <source>Compression:</source>
+            <translation type="finished">Komprimierung:</translation>
+        </message>
+        <message>
             <source>Content-Aware:</source>
             <translation type="finished">Inhaltsbewusst:</translation>
+        </message>
+        <message>
+            <source>Continuum Subtraction</source>
+            <translation type="finished">Kontinuum-Subtraktion</translation>
         </message>
         <message>
             <source>Contrast Limited Adaptive Histogram Equalization. Enhances local contrast in different regions of the image:</source>
@@ -2015,6 +2039,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Controls contrast amplification. Higher values increase contrast but may introduce noise.</source>
             <translation type="finished">Steuert die Kontrastverstärkung. Höhere Werte erhöhen den Kontrast, können aber Rauschen verursachen.</translation>
+        </message>
+        <message>
+            <source>Controls dynamic range compression strength</source>
+            <translation type="finished">Steuert die Stärke der Dynamikbereichskompression</translation>
         </message>
         <message>
             <source>Controls stretch intensity (0-10)</source>
@@ -2043,6 +2071,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Create and apply luminosity masks for selective processing:</source>
             <translation type="finished">Erstellen und Anwenden von Luminanzmasken für selektive Bearbeitung:</translation>
+        </message>
+        <message>
+            <source>Create stunning narrowband composites with full control:</source>
+            <translation type="finished">Erstellen Sie atemberaubende Schmalband-Komposite mit voller Kontrolle:</translation>
         </message>
         <message>
             <source>Creates a starless version of your image</source>
@@ -2087,6 +2119,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Enable in Settings for smoother gradients and reduced banding in auto-stretched previews. Uses high-precision floating-point calculations instead of 16-bit histogram binning.</source>
             <translation type="finished">In den Einstellungen aktivieren für glattere Verläufe und reduziertes Banding in Auto-Stretch-Vorschauen. Verwendet hochpräzise Fließkommaberechnungen anstelle von 16-Bit-Histogramm-Binning.</translation>
+        </message>
+        <message>
+            <source>Enhances narrowband details by subtracting broadband continuum/star light:</source>
+            <translation type="finished">Verbessert Schmalbanddetails durch Subtraktion von Breitband-Kontinuum/Sternenlicht:</translation>
         </message>
         <message>
             <source>Extract Channels</source>
@@ -2201,8 +2237,16 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Manuelle Histogrammstreckung mit Schatten-, Mittelton- und Lichterregelung.</translation>
         </message>
         <message>
+            <source>Mask Gamma:</source>
+            <translation type="finished">Masken-Gamma:</translation>
+        </message>
+        <message>
             <source>Masks</source>
             <translation type="finished">Masken</translation>
+        </message>
+        <message>
+            <source>Mix Ha, OIII, and SII channels with adjustable intensity</source>
+            <translation type="finished">Mischen Sie Ha-, OIII- und SII-Kanäle mit einstellbarer Intensität</translation>
         </message>
         <message>
             <source>More powerful than traditional ABE</source>
@@ -2211,6 +2255,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Mouse wheel or Ctrl + and Ctrl -</source>
             <translation type="finished">Mausrad oder Strg++ und Strg+-</translation>
+        </message>
+        <message>
+            <source>Multiscale HDR transformation to reveal details in both highlights and shadows:</source>
+            <translation type="finished">Multiskalen-HDR-Transformation zur Enthüllung von Details in Lichtern und Schatten:</translation>
         </message>
         <message>
             <source>Navigation Controls</source>
@@ -2223,6 +2271,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Non-linear stretch preserving star colors</source>
             <translation type="finished">Nichtlineare Streckung die Sternfarben erhält</translation>
+        </message>
+        <message>
+            <source>Number of wavelet layers to process</source>
+            <translation type="finished">Anzahl zu verarbeitender Wavelet-Ebenen</translation>
         </message>
         <message>
             <source>Open Image:</source>
@@ -2241,8 +2293,16 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Erstellt optional eine Nur-Sterne-Maske</translation>
         </message>
         <message>
+            <source>PCC Distribution</source>
+            <translation type="finished">PCC-Verteilung</translation>
+        </message>
+        <message>
             <source>Pan:</source>
             <translation type="finished">Schwenken:</translation>
+        </message>
+        <message>
+            <source>Perfect Palette Picker</source>
+            <translation type="finished">Perfekter Palettenwähler</translation>
         </message>
         <message>
             <source>Photometric Color Calibration (PCC)</source>
@@ -2271,6 +2331,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Raw pixel values without stretch</source>
             <translation type="finished">Rohpixelwerte ohne Streckung</translation>
+        </message>
+        <message>
+            <source>Real-time preview of the color palette</source>
+            <translation type="finished">Echtzeit-Vorschau der Farbpalette</translation>
         </message>
         <message>
             <source>Recombine Luminance</source>
@@ -2325,6 +2389,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Erfordert astrometrisch gelöstes Bild (WCS-Daten)</translation>
         </message>
         <message>
+            <source>Reveals faint nebular structures hidden by stars</source>
+            <translation type="finished">Enthüllt schwache Nebelstrukturen, die von Sternen verborgen sind</translation>
+        </message>
+        <message>
             <source>SCNR (Selective Color Noise Reduction)</source>
             <translation type="finished">SCNR (Selektive Farbrauschreduzierung)</translation>
         </message>
@@ -2343,6 +2411,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Save file</source>
             <translation type="finished">Datei speichern</translation>
+        </message>
+        <message>
+            <source>Scales:</source>
+            <translation type="finished">Skalen:</translation>
         </message>
         <message>
             <source>Select a color range using presets (Red, Green, Blue, etc.) or custom hue values</source>
@@ -2367,6 +2439,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Show Overlay:</source>
             <translation type="finished">Überlagerung anzeigen:</translation>
+        </message>
+        <message>
+            <source>Shows Red/Green and Blue/Green scatter plots</source>
+            <translation type="finished">Zeigt Rot/Grün- und Blau/Grün-Streudiagramme</translation>
         </message>
         <message>
             <source>Size of tiles for local processing. Smaller tiles increase local detail.</source>
@@ -2421,6 +2497,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Streckungswerkzeuge</translation>
         </message>
         <message>
+            <source>Subtracts a scaled continuum image (or RGB channel) from narrowband data</source>
+            <translation type="finished">Subtrahiert ein skaliertes Kontinuumsbild (oder RGB-Kanal) von Schmalbanddaten</translation>
+        </message>
+        <message>
             <source>Symmetry Point</source>
             <translation type="finished">Symmetriepunkt</translation>
         </message>
@@ -2473,6 +2553,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Variablen wie $T (Ziel), $R, $G, $B verwenden</translation>
         </message>
         <message>
+            <source>Useful for verifying calibration accuracy</source>
+            <translation type="finished">Nützlich zur Überprüfung der Kalibrierungsgenauigkeit</translation>
+        </message>
+        <message>
             <source>Uses AI inpainting for seamless removal (slower but best quality)</source>
             <translation type="finished">Verwendet KI-Inpainting für nahtloses Entfernen (langsamer, aber beste Qualität)</translation>
         </message>
@@ -2485,12 +2569,24 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Verwendet Referenzsterne für genaue Farbkalibrierung</translation>
         </message>
         <message>
+            <source>Uses wavelet decomposition to process different structural scales</source>
+            <translation type="finished">Verwendet Wavelet-Zerlegung zur Verarbeitung verschiedener struktureller Skalen</translation>
+        </message>
+        <message>
             <source>Utilities</source>
             <translation type="finished">Werkzeuge</translation>
         </message>
         <message>
             <source>View and edit FITS header metadata.</source>
             <translation type="finished">FITS-Header-Metadaten anzeigen und bearbeiten.</translation>
+        </message>
+        <message>
+            <source>Visualizes the color distribution of stars after Photometric Color Calibration:</source>
+            <translation type="finished">Visualisiert die Farbverteilung der Sterne nach der photometrischen Farbkalibrierung:</translation>
+        </message>
+        <message>
+            <source>Wavescale HDR</source>
+            <translation type="finished">Wavescale HDR</translation>
         </message>
         <message>
             <source>Welcome to TStar! This guide covers all features and tools available in the application.</source>
@@ -2601,7 +2697,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>16-bit</source>
-            <translation type="unfinished" />
+            <translation type="finished">16-Bit</translation>
         </message>
         <message>
             <source>16-bit Integer</source>
@@ -2621,7 +2717,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>8-bit</source>
-            <translation type="unfinished" />
+            <translation type="finished">8-Bit</translation>
         </message>
         <message>
             <source>8-bit Integer</source>
@@ -2766,6 +2862,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Cancel</source>
             <translation type="finished">Abbrechen</translation>
+        </message>
+        <message>
+            <source>Cannot apply: buffer is invalid or not RGB.</source>
+            <translation type="finished">Kann nicht angewendet werden: Puffer ungültig oder kein RGB.</translation>
         </message>
         <message>
             <source>Cannot burn annotations into raw data formats (FITS/XISF)</source>
@@ -3325,7 +3425,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>PCC Distribution</source>
-            <translation type="finished">PCC Verteilung</translation>
+            <translation type="finished">PCC-Verteilung</translation>
         </message>
         <message>
             <source>Pedestal removed.</source>
@@ -3337,7 +3437,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>Perfect Palette Picker</source>
-            <translation type="finished">Perfekte Palette Wähler</translation>
+            <translation type="finished">Perfekter Palettenwähler</translation>
         </message>
         <message>
             <source>Photometric Color Calibration</source>
@@ -3970,7 +4070,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>The selected directory is not empty.\nCreate project structure anyway?</source>
-            <translation type="unfinished" />
+            <translation type="finished">Das gewählte Verzeichnis ist nicht leer.\nProjektstruktur trotzdem erstellen?</translation>
         </message>
     </context>
     <context>
@@ -5323,7 +5423,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>&lt;span style='color:red'&gt;  ✗ Failed&lt;/span&gt;</source>
-            <translation type="unfinished" />
+            <translation type="finished">&lt;span style='color:red'&gt; ✗ Fehlgeschlagen&lt;/span&gt;</translation>
         </message>
         <message>
             <source>&lt;span style='color:red'&gt;Script failed: %1 (line %2)&lt;/span&gt;</source>
@@ -5712,7 +5812,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>File open failed: %1</source>
-            <translation type="unfinished" />
+            <translation type="finished">Dateiöffnung fehlgeschlagen: %1</translation>
         </message>
         <message>
             <source>Invalid TIFF byte order marker.</source>
@@ -7036,10 +7136,6 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Datenblock zu klein: erwartet %1 Bytes, erhalten %2</translation>
         </message>
         <message>
-            <source>Embedded XISF data not fully supported yet.</source>
-            <translation type="finished">Eingebettete XISF-Daten noch nicht vollständig unterstützt.</translation>
-        </message>
-        <message>
             <source>Image index %1 out of range (file has %2 images)</source>
             <translation type="finished">Bildindex %1 außerhalb des Bereichs (Datei hat %2 Bilder)</translation>
         </message>
@@ -7050,10 +7146,6 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Incomplete data read: expected %1 bytes, got %2</source>
             <translation type="finished">Unvollständige Datenlesung: erwartet %1 Bytes, erhalten %2</translation>
-        </message>
-        <message>
-            <source>Inline XISF data not fully supported yet.</source>
-            <translation type="finished">Inline XISF-Daten noch nicht vollständig unterstützt.</translation>
         </message>
         <message>
             <source>Invalid Header Length: %1</source>

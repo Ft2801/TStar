@@ -16,6 +16,8 @@
 #include <algorithm>
 #include <QScrollBar>
 #include <opencv2/opencv.hpp>
+#include <opencv2/photo.hpp>
+#include <opencv2/imgproc.hpp>
 #include "CorrectionBrushDialog.h"
 #include "MainWindowCallbacks.h"
 #include "DialogBase.h"
@@ -71,25 +73,32 @@ float CorrectionWorker::medianCircle(const ImageBuffer& img, int cx, int cy, int
 
 ImageBuffer CorrectionWorker::removeBlemish(const ImageBuffer& img, int x, int y, int radius, float feather, float opacity, const std::vector<int>& channels, CorrectionMethod method) {
     if (method == CorrectionMethod::ContentAware) {
-        // OpenCV Telea Inpaint - Professional quality content-aware fill
+        // Smart Patch - Context-Aware Fill
+        // 1. Search for best matching texture in neighborhood
+        // 2. Seamlessly clone the best patch into the blemish area
+
         int w = img.width();
         int h = img.height();
         int c = img.channels();
         
-        // Define ROI to minimize processing
-        int pad = radius + 2;
+        // Search Radius: How far to look for a patch (3x blemish radius)
+        int searchRad = radius * 4;
+        int pad = searchRad + 20; // Extra padding for safe convolution/cloning
+        
         int x0 = std::max(0, x - pad);
         int y0 = std::max(0, y - pad);
         int x1 = std::min(w, x + pad + 1);
         int y1 = std::min(h, y + pad + 1);
+        
         int roiW = x1 - x0;
         int roiH = y1 - y0;
         
         if (roiW <= 0 || roiH <= 0) return img;
         
+        // Convert ROI to 8-bit CV_8UC3 for seamlessClone (required)
         cv::Mat roiMat;
         if (c == 3) roiMat = cv::Mat(roiH, roiW, CV_8UC3);
-        else roiMat = cv::Mat(roiH, roiW, CV_8UC1);
+        else roiMat = cv::Mat(roiH, roiW, CV_8UC3); // Force 3 channels for seamlessClone support
         
         const float* srcData = img.data().data();
         
@@ -97,62 +106,140 @@ ImageBuffer CorrectionWorker::removeBlemish(const ImageBuffer& img, int x, int y
             for (int j=0; j<roiW; ++j) {
                 int sx = x0 + j;
                 int sy = y0 + i;
-                if (c == 3) {
-                    roiMat.at<cv::Vec3b>(i,j)[0] = (uint8_t)(std::clamp(srcData[(sy*w+sx)*c+2], 0.0f, 1.0f) * 255.0f); // B
-                    roiMat.at<cv::Vec3b>(i,j)[1] = (uint8_t)(std::clamp(srcData[(sy*w+sx)*c+1], 0.0f, 1.0f) * 255.0f); // G
-                    roiMat.at<cv::Vec3b>(i,j)[2] = (uint8_t)(std::clamp(srcData[(sy*w+sx)*c+0], 0.0f, 1.0f) * 255.0f); // R
+                uchar b, g, r;
+                if (c >= 3) {
+                    b = (uchar)std::clamp(srcData[(sy*w+sx)*c+2] * 255.0f, 0.0f, 255.0f);
+                    g = (uchar)std::clamp(srcData[(sy*w+sx)*c+1] * 255.0f, 0.0f, 255.0f);
+                    r = (uchar)std::clamp(srcData[(sy*w+sx)*c+0] * 255.0f, 0.0f, 255.0f);
                 } else {
-                    roiMat.at<uint8_t>(i,j) = (uint8_t)(std::clamp(srcData[(sy*w+sx)*c], 0.0f, 1.0f) * 255.0f);
+                    uchar v = (uchar)std::clamp(srcData[(sy*w+sx)*c] * 255.0f, 0.0f, 255.0f);
+                    b = g = r = v;
                 }
+                roiMat.at<cv::Vec3b>(i,j) = cv::Vec3b(b, g, r);
             }
         }
         
-        // Create Mask
-        cv::Mat mask = cv::Mat::zeros(roiH, roiW, CV_8UC1);
-        cv::circle(mask, cv::Point(x - x0, y - y0), radius, cv::Scalar(255), -1);
+        // Define Template (The hole surroundings)
+        int tRad = radius + 2; // Template radius (slightly larger than blemish)
+        int tSize = 2 * tRad + 1;
         
-        // Inpaint using Telea (Fast Marching Method - best quality)
-        cv::Mat dilatedMask;
-        cv::dilate(mask, dilatedMask, cv::Mat(), cv::Point(-1,-1), 2);
+        // Center of blemish in ROI coordinates
+        int cx = x - x0;
+        int cy = y - y0;
         
-        cv::Mat inpainted;
-        cv::inpaint(roiMat, mask, inpainted, 3.0, cv::INPAINT_TELEA);
+        // Check bounds
+        if (cx - tRad < 0 || cy - tRad < 0 || cx + tRad >= roiW || cy + tRad >= roiH) {
+             // Fallback to simple logic if too close to edge
+             return img;
+        }
+
+        // Create Mask for Template Matching (1=Valid Context, 0=Hole)
+        cv::Mat tMask = cv::Mat::ones(tSize, tSize, CV_8UC1);
+        cv::circle(tMask, cv::Point(tRad, tRad), radius, cv::Scalar(0), -1); // Mask out the hole
         
-        // Blend back
+        // Extract Template from ROI (The context around the hole)
+        cv::Rect tRect(cx - tRad, cy - tRad, tSize, tSize);
+        cv::Mat templ = roiMat(tRect);
+        
+        // Template Matching
+        cv::Mat matchResult;
+        
+        // Perform template matching using SQDIFF (Squared Difference).
+        // tMask is used to ignore the blemish area during matching, ensuring we only match the context.
+        // If the OpenCV version does not support masked matchTemplate with SQDIFF, we fall back to unmasked matching.
+        try {
+            cv::matchTemplate(roiMat, templ, matchResult, cv::TM_SQDIFF, tMask);
+        } catch(...) {
+            cv::matchTemplate(roiMat, templ, matchResult, cv::TM_SQDIFF);
+        }
+        
+        // Blank out the area around the blemish in the result map so we don't pick the blemish itself
+        // The result map corresponds to the top-left corner of the sliding window.
+        // The self-match corresponds to placement at (cx - tRad, cy - tRad).
+        int excludeRad = radius + 5;
+        // Fix: Coordinates must be top-left of the match, not the center of ROI.
+        cv::circle(matchResult, cv::Point(cx - tRad, cy - tRad), excludeRad, cv::Scalar(FLT_MAX), -1);
+        
+        double minVal; cv::Point minLoc;
+        cv::minMaxLoc(matchResult, &minVal, nullptr, &minLoc, nullptr);
+        
+        // Best source patch top-left in ROI
+        cv::Point bestTL = minLoc;
+        
+        // Verify source patch is within bounds
+        cv::Rect srcRect(bestTL.x, bestTL.y, tSize, tSize);
+        if (srcRect.x < 0 || srcRect.y < 0 || srcRect.x + srcRect.width > roiW || srcRect.y + srcRect.height > roiH) {
+             return img;
+        }
+
+        cv::Mat sourcePatch = roiMat(srcRect);
+        
+        // Seamless Clone
+        // src: The source patch
+        // dst: The ROI
+        // mask: The area we want to replace (the hole).
+        // p: The center of the hole in ROI.
+        
+        cv::Mat cloneMask = cv::Mat::zeros(tSize, tSize, CV_8UC1);
+        cv::circle(cloneMask, cv::Point(tRad, tRad), radius, cv::Scalar(255), -1);
+        
+        cv::Mat blendedROI;
+        try {
+            // Note: seamlessClone assumes sourcePatch is the 'object' to be placed.
+            // We want to place sourcePatch into roiMat at (cx, cy).
+            cv::seamlessClone(sourcePatch, roiMat, cloneMask, cv::Point(cx, cy), blendedROI, cv::NORMAL_CLONE);
+        } catch (const cv::Exception& e) {
+            // Fallback if seamless clone fails (e.g. boundary issues)
+             blendedROI = roiMat.clone();
+             // Simple copy
+             sourcePatch.copyTo(blendedROI(cv::Rect(cx - tRad, cy - tRad, tSize, tSize)), cloneMask);
+        }
+        
+        // Write back to result
         ImageBuffer result = img;
         float* dstData = result.data().data();
         
         for (int i=0; i<roiH; ++i) {
             for (int j=0; j<roiW; ++j) {
-                // Check if inside mask (with feather support)
+                // Determine if we are in the modified area (blemish + feather)
                 float dist = std::hypot(x0 + j - x, y0 + i - y);
-                if (dist > radius) continue; // Pure outside
+                if (dist > radius + 2) continue; // Only update affected area
                 
                 float weight = 1.0f;
-                // Feather
-                if (feather > 0.0f) {
-                     weight = std::clamp((radius - dist) / (radius * feather), 0.0f, 1.0f);
+                if (feather > 0.0f && dist > radius * (1.0f - feather)) {
+                     // Simple feathering at edge
+                     // Note: seamlessClone handles internal gradient blending, 
+                     // but we might want to feather the opacity of the entire correction
                 }
                 
-                float wOp = weight * opacity;
+                // Mask for blending original vs corrected
+                if (dist > radius) weight = 0.0f; // Hard cut at radius for now, let seamlessClone handle blend
+                else weight = 1.0f;
                 
+                // Opacity mix
+                float wOp = weight * opacity;
+                if (wOp <= 0.001f) continue;
+
                 int sx = x0 + j;
                 int sy = y0 + i;
                 
+                cv::Vec3b px = blendedROI.at<cv::Vec3b>(i, j);
+                float r = px[2] / 255.0f;
+                float g = px[1] / 255.0f;
+                float b = px[0] / 255.0f;
+                
                 if (c == 3) {
-                    float b = inpainted.at<cv::Vec3b>(i,j)[0] / 255.0f;
-                    float g = inpainted.at<cv::Vec3b>(i,j)[1] / 255.0f;
-                    float r = inpainted.at<cv::Vec3b>(i,j)[2] / 255.0f;
-                    
                     dstData[(sy*w+sx)*c+0] = dstData[(sy*w+sx)*c+0] * (1.0f - wOp) + r * wOp;
                     dstData[(sy*w+sx)*c+1] = dstData[(sy*w+sx)*c+1] * (1.0f - wOp) + g * wOp;
                     dstData[(sy*w+sx)*c+2] = dstData[(sy*w+sx)*c+2] * (1.0f - wOp) + b * wOp;
                 } else {
-                    float v = inpainted.at<uint8_t>(i,j) / 255.0f;
-                    dstData[(sy*w+sx)*c] = dstData[(sy*w+sx)*c] * (1.0f - wOp) + v * wOp;
+                    // For mono, just take G channel or average
+                    float gray = (r + g + b) / 3.0f;
+                    dstData[(sy*w+sx)*c] = dstData[(sy*w+sx)*c] * (1.0f - wOp) + gray * wOp;
                 }
             }
         }
+        
         return result;
     }
     

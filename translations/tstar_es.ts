@@ -133,8 +133,8 @@
             <translation type="finished">Copyright © 2026</translation>
         </message>
         <message>
-            <source>TStar is a professional astrophotography image processing application designed to provide advanced tools for enhancing and analyzing astronomical images.</source>
-            <translation type="finished">TStar es una aplicación profesional de procesamiento de imágenes astronómicas diseñada para proporcionar herramientas avanzadas para mejorar y analizar imágenes astronómicas.</translation>
+            <source>TStar is a professional astrophotography image processing application.</source>
+            <translation type="finished">TStar es una aplicación profesional de procesamiento de imágenes de astrofotografía.</translation>
         </message>
         <message>
             <source>Written by Fabio Tempera</source>
@@ -736,7 +736,7 @@
         </message>
         <message>
             <source>Continuum Subtraction</source>
-            <translation type="finished">Sustracción Continua</translation>
+            <translation type="finished">Sustracción del Continuo</translation>
         </message>
         <message>
             <source>Continuum:</source>
@@ -1375,7 +1375,7 @@
         <name>FitsLoader</name>
         <message>
             <source>CFITSIO Open Error %1: %2</source>
-            <translation type="unfinished" />
+            <translation type="finished">Error Apertura CFITSIO %1: %2</translation>
         </message>
         <message>
             <source>CFITSIO Open Error %1: %2\nPath: %3</source>
@@ -1411,7 +1411,7 @@
         </message>
         <message>
             <source>File does not exist: %1</source>
-            <translation type="unfinished" />
+            <translation type="finished">El archivo no existe: %1</translation>
         </message>
         <message>
             <source>HDU %1 is not an image extension</source>
@@ -1427,7 +1427,7 @@
         </message>
         <message>
             <source>Invalid read region</source>
-            <translation type="unfinished" />
+            <translation type="finished">Región de lectura inválida</translation>
         </message>
         <message>
             <source>No image extensions found in file</source>
@@ -1845,6 +1845,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Ajuste cian/magenta/amarillo, RGB, luminancia, saturación y contraste para el rango seleccionado</translation>
         </message>
         <message>
+            <source>Adjust Q-Factor to control subtraction strength</source>
+            <translation type="finished">Ajusta el Factor Q para controlar la fuerza de sustracción</translation>
+        </message>
+        <message>
             <source>Adjust color saturation with protection for highlights and shadows.</source>
             <translation type="finished">Ajusta la saturación de color con protección para luces y sombras.</translation>
         </message>
@@ -1859,6 +1863,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Adjust tonal curves for each RGB channel independently or together.</source>
             <translation type="finished">Ajusta las curvas tonales para cada canal RGB de forma independiente o juntos.</translation>
+        </message>
+        <message>
+            <source>Adjusts protection of bright areas</source>
+            <translation type="finished">Ajusta protección de áreas brillantes</translation>
         </message>
         <message>
             <source>Advanced stretch tool with full control:</source>
@@ -1957,6 +1965,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Elige el modo Restar o Dividir</translation>
         </message>
         <message>
+            <source>Choose from presets like SHO (Hubble), HOO, HSO, Foraxx, and more</source>
+            <translation type="finished">Elige entre preajustes como SHO (Hubble), HOO, HSO, Foraxx y más</translation>
+        </message>
+        <message>
             <source>Click Open or press Ctrl+O</source>
             <translation type="finished">Haz clic en Abrir o presiona Ctrl+O</translation>
         </message>
@@ -2005,8 +2017,20 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Combina imágenes de canales separados en una imagen RGB.</translation>
         </message>
         <message>
+            <source>Compares measured star colors (Image) vs expected colors (Catalog)</source>
+            <translation type="finished">Compara colores medidos (Imagen) vs esperados (Catálogo)</translation>
+        </message>
+        <message>
+            <source>Compression:</source>
+            <translation type="finished">Compresión:</translation>
+        </message>
+        <message>
             <source>Content-Aware:</source>
             <translation type="finished">Consciente del Contenido:</translation>
+        </message>
+        <message>
+            <source>Continuum Subtraction</source>
+            <translation type="finished">Sustracción del Continuo</translation>
         </message>
         <message>
             <source>Contrast Limited Adaptive Histogram Equalization. Enhances local contrast in different regions of the image:</source>
@@ -2015,6 +2039,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Controls contrast amplification. Higher values increase contrast but may introduce noise.</source>
             <translation type="finished">Controla la amplificación del contraste. Valores más altos aumentan el contraste pero pueden introducir ruido.</translation>
+        </message>
+        <message>
+            <source>Controls dynamic range compression strength</source>
+            <translation type="finished">Controla fuerza de compresión de rango dinámico</translation>
         </message>
         <message>
             <source>Controls stretch intensity (0-10)</source>
@@ -2043,6 +2071,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Create and apply luminosity masks for selective processing:</source>
             <translation type="finished">Crea y aplica máscaras de luminosidad para procesamiento selectivo:</translation>
+        </message>
+        <message>
+            <source>Create stunning narrowband composites with full control:</source>
+            <translation type="finished">Crea composiciones de banda estrecha impresionantes con control total:</translation>
         </message>
         <message>
             <source>Creates a starless version of your image</source>
@@ -2087,6 +2119,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Enable in Settings for smoother gradients and reduced banding in auto-stretched previews. Uses high-precision floating-point calculations instead of 16-bit histogram binning.</source>
             <translation type="finished">Habilitar en los ajustes para gradientes más suaves y banding reducido en las previsualizaciones de auto-stretch. Utiliza cálculos de punto flotante de alta precisión en lugar de binning de histograma de 16 bits.</translation>
+        </message>
+        <message>
+            <source>Enhances narrowband details by subtracting broadband continuum/star light:</source>
+            <translation type="finished">Mejora detalles de banda estrecha restando luz continua/estelar de banda ancha:</translation>
         </message>
         <message>
             <source>Extract Channels</source>
@@ -2201,8 +2237,16 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Estiramiento manual del histograma con controles de sombras, tonos medios y luces.</translation>
         </message>
         <message>
+            <source>Mask Gamma:</source>
+            <translation type="finished">Gamma Máscara:</translation>
+        </message>
+        <message>
             <source>Masks</source>
             <translation type="finished">Máscaras</translation>
+        </message>
+        <message>
+            <source>Mix Ha, OIII, and SII channels with adjustable intensity</source>
+            <translation type="finished">Mezcla canales Ha, OIII y SII con intensidad ajustable</translation>
         </message>
         <message>
             <source>More powerful than traditional ABE</source>
@@ -2211,6 +2255,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Mouse wheel or Ctrl + and Ctrl -</source>
             <translation type="finished">Rueda del ratón o Ctrl + y Ctrl -</translation>
+        </message>
+        <message>
+            <source>Multiscale HDR transformation to reveal details in both highlights and shadows:</source>
+            <translation type="finished">Transformación HDR multiescala para revelar detalles en luces y sombras:</translation>
         </message>
         <message>
             <source>Navigation Controls</source>
@@ -2223,6 +2271,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Non-linear stretch preserving star colors</source>
             <translation type="finished">Estiramiento no lineal que preserva los colores de las estrellas</translation>
+        </message>
+        <message>
+            <source>Number of wavelet layers to process</source>
+            <translation type="finished">Número de capas wavelet a procesar</translation>
         </message>
         <message>
             <source>Open Image:</source>
@@ -2241,8 +2293,16 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Opcionalmente crea una máscara solo de estrellas</translation>
         </message>
         <message>
+            <source>PCC Distribution</source>
+            <translation type="finished">Distribución PCC</translation>
+        </message>
+        <message>
             <source>Pan:</source>
             <translation type="finished">Desplazar:</translation>
+        </message>
+        <message>
+            <source>Perfect Palette Picker</source>
+            <translation type="finished">Selector de Paleta Perfecta</translation>
         </message>
         <message>
             <source>Photometric Color Calibration (PCC)</source>
@@ -2271,6 +2331,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Raw pixel values without stretch</source>
             <translation type="finished">Valores de píxeles sin estirar</translation>
+        </message>
+        <message>
+            <source>Real-time preview of the color palette</source>
+            <translation type="finished">Vista previa en tiempo real de la paleta de colores</translation>
         </message>
         <message>
             <source>Recombine Luminance</source>
@@ -2325,6 +2389,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Requiere imagen resuelta astrométricamente (datos WCS)</translation>
         </message>
         <message>
+            <source>Reveals faint nebular structures hidden by stars</source>
+            <translation type="finished">Revela estructuras nebulares tenues ocultas por estrellas</translation>
+        </message>
+        <message>
             <source>SCNR (Selective Color Noise Reduction)</source>
             <translation type="finished">SCNR (Reducción Selectiva de Ruido de Color)</translation>
         </message>
@@ -2343,6 +2411,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Save file</source>
             <translation type="finished">Guardar archivo</translation>
+        </message>
+        <message>
+            <source>Scales:</source>
+            <translation type="finished">Escalas:</translation>
         </message>
         <message>
             <source>Select a color range using presets (Red, Green, Blue, etc.) or custom hue values</source>
@@ -2367,6 +2439,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Show Overlay:</source>
             <translation type="finished">Mostrar Superposición:</translation>
+        </message>
+        <message>
+            <source>Shows Red/Green and Blue/Green scatter plots</source>
+            <translation type="finished">Muestra gráficos de dispersión Rojo/Verde y Azul/Verde</translation>
         </message>
         <message>
             <source>Size of tiles for local processing. Smaller tiles increase local detail.</source>
@@ -2421,6 +2497,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Herramientas de Estiramiento</translation>
         </message>
         <message>
+            <source>Subtracts a scaled continuum image (or RGB channel) from narrowband data</source>
+            <translation type="finished">Resta una imagen continua escalada (o canal RGB) de datos de banda estrecha</translation>
+        </message>
+        <message>
             <source>Symmetry Point</source>
             <translation type="finished">Punto de Simetría</translation>
         </message>
@@ -2473,6 +2553,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Usa variables como $T (objetivo), $R, $G, $B</translation>
         </message>
         <message>
+            <source>Useful for verifying calibration accuracy</source>
+            <translation type="finished">Útil para verificar la precisión de la calibración</translation>
+        </message>
+        <message>
             <source>Uses AI inpainting for seamless removal (slower but best quality)</source>
             <translation type="finished">Utiliza inpainting de IA para una eliminación perfecta (más lenta pero de mejor calidad)</translation>
         </message>
@@ -2485,12 +2569,24 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Usa estrellas de referencia para calibración de color precisa</translation>
         </message>
         <message>
+            <source>Uses wavelet decomposition to process different structural scales</source>
+            <translation type="finished">Usa descomposición wavelet para procesar diferentes escalas estructurales</translation>
+        </message>
+        <message>
             <source>Utilities</source>
             <translation type="finished">Utilidades</translation>
         </message>
         <message>
             <source>View and edit FITS header metadata.</source>
             <translation type="finished">Visualiza y edita los metadatos del encabezado FITS.</translation>
+        </message>
+        <message>
+            <source>Visualizes the color distribution of stars after Photometric Color Calibration:</source>
+            <translation type="finished">Visualiza la distribución de color de las estrellas tras la Calibración Fotométrica de Color:</translation>
+        </message>
+        <message>
+            <source>Wavescale HDR</source>
+            <translation type="finished">Wavescale HDR</translation>
         </message>
         <message>
             <source>Welcome to TStar! This guide covers all features and tools available in the application.</source>
@@ -2601,7 +2697,7 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         </message>
         <message>
             <source>16-bit</source>
-            <translation type="unfinished" />
+            <translation type="finished">16-bit</translation>
         </message>
         <message>
             <source>16-bit Integer</source>
@@ -2621,7 +2717,7 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         </message>
         <message>
             <source>8-bit</source>
-            <translation type="unfinished" />
+            <translation type="finished">8-bit</translation>
         </message>
         <message>
             <source>8-bit Integer</source>
@@ -2768,6 +2864,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Cancelar</translation>
         </message>
         <message>
+            <source>Cannot apply: buffer is invalid or not RGB.</source>
+            <translation type="finished">No se puede aplicar: búfer inválido o no RGB.</translation>
+        </message>
+        <message>
             <source>Cannot burn annotations into raw data formats (FITS/XISF)</source>
             <translation type="finished">No se pueden grabar anotaciones en formatos raw (FITS/XISF)</translation>
         </message>
@@ -2793,7 +2893,7 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         </message>
         <message>
             <source>Continuum Subtraction</source>
-            <translation type="finished">Sustracción Continua</translation>
+            <translation type="finished">Sustracción del Continuo</translation>
         </message>
         <message>
             <source>Convert RAW to FITS...</source>
@@ -3337,7 +3437,7 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         </message>
         <message>
             <source>Perfect Palette Picker</source>
-            <translation type="finished">Selector Paleta Perfecta</translation>
+            <translation type="finished">Selector de Paleta Perfecta</translation>
         </message>
         <message>
             <source>Photometric Color Calibration</source>
@@ -3970,7 +4070,7 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         </message>
         <message>
             <source>The selected directory is not empty.\nCreate project structure anyway?</source>
-            <translation type="unfinished" />
+            <translation type="finished">El directorio seleccionado no está vacío.\n¿Crear estructura del proyecto de todos modos?</translation>
         </message>
     </context>
     <context>
@@ -5323,7 +5423,7 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         </message>
         <message>
             <source>&lt;span style='color:red'&gt;  ✗ Failed&lt;/span&gt;</source>
-            <translation type="unfinished" />
+            <translation type="finished">&lt;span style='color:red'&gt; ✗ Fallido&lt;/span&gt;</translation>
         </message>
         <message>
             <source>&lt;span style='color:red'&gt;Script failed: %1 (line %2)&lt;/span&gt;</source>
@@ -5712,7 +5812,7 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         </message>
         <message>
             <source>File open failed: %1</source>
-            <translation type="unfinished" />
+            <translation type="finished">Fallo apertura archivo: %1</translation>
         </message>
         <message>
             <source>Invalid TIFF byte order marker.</source>
@@ -7036,10 +7136,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Bloque datos muy pequeño: esperados %1 bytes, obtenidos %2</translation>
         </message>
         <message>
-            <source>Embedded XISF data not fully supported yet.</source>
-            <translation type="finished">Datos XISF incrustados no soportados completamente.</translation>
-        </message>
-        <message>
             <source>Image index %1 out of range (file has %2 images)</source>
             <translation type="finished">Índice imagen %1 fuera rango (archivo tiene %2 imágenes)</translation>
         </message>
@@ -7050,10 +7146,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Incomplete data read: expected %1 bytes, got %2</source>
             <translation type="finished">Lectura datos incompleta: esperados %1 bytes, obtenidos %2</translation>
-        </message>
-        <message>
-            <source>Inline XISF data not fully supported yet.</source>
-            <translation type="finished">Datos XISF en línea no soportados completamente.</translation>
         </message>
         <message>
             <source>Invalid Header Length: %1</source>

@@ -133,8 +133,8 @@
             <translation type="finished">Copyright © 2026</translation>
         </message>
         <message>
-            <source>TStar is a professional astrophotography image processing application designed to provide advanced tools for enhancing and analyzing astronomical images.</source>
-            <translation type="finished">TStar est une application professionnelle de traitement d'images d'astronomie conçue pour fournir des outils avancés pour l'amélioration et l'analyse d'images astronomiques.</translation>
+            <source>TStar is a professional astrophotography image processing application.</source>
+            <translation type="finished">TStar est une application professionnelle de traitement d'images d'astrophotographie.</translation>
         </message>
         <message>
             <source>Written by Fabio Tempera</source>
@@ -736,7 +736,7 @@
         </message>
         <message>
             <source>Continuum Subtraction</source>
-            <translation type="finished">Soustraction Continu</translation>
+            <translation type="finished">Soustraction du Continuum</translation>
         </message>
         <message>
             <source>Continuum:</source>
@@ -1375,7 +1375,7 @@
         <name>FitsLoader</name>
         <message>
             <source>CFITSIO Open Error %1: %2</source>
-            <translation type="unfinished" />
+            <translation type="finished">Erreur Ouverture CFITSIO %1 : %2</translation>
         </message>
         <message>
             <source>CFITSIO Open Error %1: %2\nPath: %3</source>
@@ -1411,7 +1411,7 @@
         </message>
         <message>
             <source>File does not exist: %1</source>
-            <translation type="unfinished" />
+            <translation type="finished">Le fichier n'existe pas : %1</translation>
         </message>
         <message>
             <source>HDU %1 is not an image extension</source>
@@ -1427,7 +1427,7 @@
         </message>
         <message>
             <source>Invalid read region</source>
-            <translation type="unfinished" />
+            <translation type="finished">Région de lecture invalide</translation>
         </message>
         <message>
             <source>No image extensions found in file</source>
@@ -1845,6 +1845,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Ajuster Cyan/Magenta/Jaune, RGB, Luminance, Saturation et Contraste pour la plage sélectionnée</translation>
         </message>
         <message>
+            <source>Adjust Q-Factor to control subtraction strength</source>
+            <translation type="finished">Ajustez le Facteur Q pour contrôler la force de soustraction</translation>
+        </message>
+        <message>
             <source>Adjust color saturation with protection for highlights and shadows.</source>
             <translation type="finished">Ajustez la saturation des couleurs avec protection pour les hautes lumières et les ombres.</translation>
         </message>
@@ -1859,6 +1863,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Adjust tonal curves for each RGB channel independently or together.</source>
             <translation type="finished">Ajustez les courbes tonales pour chaque canal RGB indépendamment ou ensemble.</translation>
+        </message>
+        <message>
+            <source>Adjusts protection of bright areas</source>
+            <translation type="finished">Ajuste la protection des zones lumineuses</translation>
         </message>
         <message>
             <source>Advanced stretch tool with full control:</source>
@@ -1957,6 +1965,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Choisissez le mode Soustraire ou Diviser</translation>
         </message>
         <message>
+            <source>Choose from presets like SHO (Hubble), HOO, HSO, Foraxx, and more</source>
+            <translation type="finished">Choisissez parmi des préréglages comme SHO (Hubble), HOO, HSO, Foraxx et plus</translation>
+        </message>
+        <message>
             <source>Click Open or press Ctrl+O</source>
             <translation type="finished">Cliquez sur Ouvrir ou appuyez sur Ctrl+O</translation>
         </message>
@@ -2005,8 +2017,20 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Combine les images de canaux séparés en une seule image RGB.</translation>
         </message>
         <message>
+            <source>Compares measured star colors (Image) vs expected colors (Catalog)</source>
+            <translation type="finished">Compare les couleurs mesurées (Image) vs attendues (Catalogue)</translation>
+        </message>
+        <message>
+            <source>Compression:</source>
+            <translation type="finished">Compresion :</translation>
+        </message>
+        <message>
             <source>Content-Aware:</source>
             <translation type="finished">Sensible au Contenu :</translation>
+        </message>
+        <message>
+            <source>Continuum Subtraction</source>
+            <translation type="finished">Soustraction du Continuum</translation>
         </message>
         <message>
             <source>Contrast Limited Adaptive Histogram Equalization. Enhances local contrast in different regions of the image:</source>
@@ -2015,6 +2039,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Controls contrast amplification. Higher values increase contrast but may introduce noise.</source>
             <translation type="finished">Contrôle l'amplification du contraste. Des valeurs plus élevées augmentent le contraste mais peuvent introduire du bruit.</translation>
+        </message>
+        <message>
+            <source>Controls dynamic range compression strength</source>
+            <translation type="finished">Contrôle la force de compression de la plage dynamique</translation>
         </message>
         <message>
             <source>Controls stretch intensity (0-10)</source>
@@ -2043,6 +2071,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Create and apply luminosity masks for selective processing:</source>
             <translation type="finished">Créez et appliquez des masques de luminosité pour un traitement sélectif :</translation>
+        </message>
+        <message>
+            <source>Create stunning narrowband composites with full control:</source>
+            <translation type="finished">Créez des composites à bande étroite époustouflants avec un contrôle total :</translation>
         </message>
         <message>
             <source>Creates a starless version of your image</source>
@@ -2087,6 +2119,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Enable in Settings for smoother gradients and reduced banding in auto-stretched previews. Uses high-precision floating-point calculations instead of 16-bit histogram binning.</source>
             <translation type="finished">Activer dans les paramètres pour des dégradés plus lisses et un banding réduit dans les aperçus auto-stretch. Utilise des calculs en virgule flottante haute précision au lieu du binning d'histogramme 16 bits.</translation>
+        </message>
+        <message>
+            <source>Enhances narrowband details by subtracting broadband continuum/star light:</source>
+            <translation type="finished">Améliore les détails à bande étroite en soustrayant la lumière continue/stellaire à large bande :</translation>
         </message>
         <message>
             <source>Extract Channels</source>
@@ -2201,8 +2237,16 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Étirement manuel de l'histogramme avec contrôles des ombres, tons moyens et hautes lumières.</translation>
         </message>
         <message>
+            <source>Mask Gamma:</source>
+            <translation type="finished">Gamma Masque :</translation>
+        </message>
+        <message>
             <source>Masks</source>
             <translation type="finished">Masques</translation>
+        </message>
+        <message>
+            <source>Mix Ha, OIII, and SII channels with adjustable intensity</source>
+            <translation type="finished">Mélangez les canaux Ha, OIII et SII avec intensité réglable</translation>
         </message>
         <message>
             <source>More powerful than traditional ABE</source>
@@ -2211,6 +2255,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Mouse wheel or Ctrl + and Ctrl -</source>
             <translation type="finished">Molette de la souris ou Ctrl + et Ctrl -</translation>
+        </message>
+        <message>
+            <source>Multiscale HDR transformation to reveal details in both highlights and shadows:</source>
+            <translation type="finished">Transformation HDR multi-échelle pour révéler détails dans hautes lumières et ombres :</translation>
         </message>
         <message>
             <source>Navigation Controls</source>
@@ -2223,6 +2271,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Non-linear stretch preserving star colors</source>
             <translation type="finished">Étirement non linéaire préservant les couleurs des étoiles</translation>
+        </message>
+        <message>
+            <source>Number of wavelet layers to process</source>
+            <translation type="finished">Nombre de couches d'ondelettes à traiter</translation>
         </message>
         <message>
             <source>Open Image:</source>
@@ -2241,8 +2293,16 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Crée optionnellement un masque d'étoiles uniquement</translation>
         </message>
         <message>
+            <source>PCC Distribution</source>
+            <translation type="finished">Distribution PCC</translation>
+        </message>
+        <message>
             <source>Pan:</source>
             <translation type="finished">Panoramique :</translation>
+        </message>
+        <message>
+            <source>Perfect Palette Picker</source>
+            <translation type="finished">Sélecteur de Palette Parfaite</translation>
         </message>
         <message>
             <source>Photometric Color Calibration (PCC)</source>
@@ -2271,6 +2331,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Raw pixel values without stretch</source>
             <translation type="finished">Valeurs de pixels brutes sans étirement</translation>
+        </message>
+        <message>
+            <source>Real-time preview of the color palette</source>
+            <translation type="finished">Aperçu en temps réel de la palette de couleurs</translation>
         </message>
         <message>
             <source>Recombine Luminance</source>
@@ -2325,6 +2389,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Nécessite une image résolue astrométriquement (données WCS)</translation>
         </message>
         <message>
+            <source>Reveals faint nebular structures hidden by stars</source>
+            <translation type="finished">Révèle de faibles structures nébuleuses cachées par les étoiles</translation>
+        </message>
+        <message>
             <source>SCNR (Selective Color Noise Reduction)</source>
             <translation type="finished">SCNR (Réduction Sélective du Bruit de Couleur)</translation>
         </message>
@@ -2343,6 +2411,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Save file</source>
             <translation type="finished">Enregistrer fichier</translation>
+        </message>
+        <message>
+            <source>Scales:</source>
+            <translation type="finished">Échelles :</translation>
         </message>
         <message>
             <source>Select a color range using presets (Red, Green, Blue, etc.) or custom hue values</source>
@@ -2367,6 +2439,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Show Overlay:</source>
             <translation type="finished">Afficher Superposition :</translation>
+        </message>
+        <message>
+            <source>Shows Red/Green and Blue/Green scatter plots</source>
+            <translation type="finished">Affiche les nuages de points Rouge/Vert et Bleu/Vert</translation>
         </message>
         <message>
             <source>Size of tiles for local processing. Smaller tiles increase local detail.</source>
@@ -2421,6 +2497,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Outils d'Étirement</translation>
         </message>
         <message>
+            <source>Subtracts a scaled continuum image (or RGB channel) from narrowband data</source>
+            <translation type="finished">Soustrait une image continue mise à l'échelle (ou canal RGB) des données à bande étroite</translation>
+        </message>
+        <message>
             <source>Symmetry Point</source>
             <translation type="finished">Point de Symétrie</translation>
         </message>
@@ -2473,6 +2553,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Utilisez des variables comme $T (cible), $R, $G, $B</translation>
         </message>
         <message>
+            <source>Useful for verifying calibration accuracy</source>
+            <translation type="finished">Utile pour vérifier la précision de la calibration</translation>
+        </message>
+        <message>
             <source>Uses AI inpainting for seamless removal (slower but best quality)</source>
             <translation type="finished">Utilise l'inpainting IA pour une suppression transparente (plus lente mais meilleure qualité)</translation>
         </message>
@@ -2485,12 +2569,24 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Utilise des étoiles de référence pour une calibration précise des couleurs</translation>
         </message>
         <message>
+            <source>Uses wavelet decomposition to process different structural scales</source>
+            <translation type="finished">Utilise décomposition en ondelettes pour traiter différentes échelles structurelles</translation>
+        </message>
+        <message>
             <source>Utilities</source>
             <translation type="finished">Utilitaires</translation>
         </message>
         <message>
             <source>View and edit FITS header metadata.</source>
             <translation type="finished">Affiche et modifie les métadonnées de l'en-tête FITS.</translation>
+        </message>
+        <message>
+            <source>Visualizes the color distribution of stars after Photometric Color Calibration:</source>
+            <translation type="finished">Visualise la distribution des couleurs des étoiles après la Calibration Photométrique:</translation>
+        </message>
+        <message>
+            <source>Wavescale HDR</source>
+            <translation type="finished">Wavescale HDR</translation>
         </message>
         <message>
             <source>Welcome to TStar! This guide covers all features and tools available in the application.</source>
@@ -2601,7 +2697,7 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         </message>
         <message>
             <source>16-bit</source>
-            <translation type="unfinished" />
+            <translation type="finished">16-bit</translation>
         </message>
         <message>
             <source>16-bit Integer</source>
@@ -2621,7 +2717,7 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         </message>
         <message>
             <source>8-bit</source>
-            <translation type="unfinished" />
+            <translation type="finished">8-bit</translation>
         </message>
         <message>
             <source>8-bit Integer</source>
@@ -2768,6 +2864,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Annuler</translation>
         </message>
         <message>
+            <source>Cannot apply: buffer is invalid or not RGB.</source>
+            <translation type="finished">Impossible d'appliquer : tampon invalide ou non RGB.</translation>
+        </message>
+        <message>
             <source>Cannot burn annotations into raw data formats (FITS/XISF)</source>
             <translation type="finished">Impossible de graver les annotations sur les formats bruts (FITS/XISF)</translation>
         </message>
@@ -2793,7 +2893,7 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         </message>
         <message>
             <source>Continuum Subtraction</source>
-            <translation type="finished">Soustraction Continu</translation>
+            <translation type="finished">Soustraction du Continuum</translation>
         </message>
         <message>
             <source>Convert RAW to FITS...</source>
@@ -3337,7 +3437,7 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         </message>
         <message>
             <source>Perfect Palette Picker</source>
-            <translation type="finished">Sélecteur Palette Parfaite</translation>
+            <translation type="finished">Sélecteur de Palette Parfaite</translation>
         </message>
         <message>
             <source>Photometric Color Calibration</source>
@@ -3970,7 +4070,7 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         </message>
         <message>
             <source>The selected directory is not empty.\nCreate project structure anyway?</source>
-            <translation type="unfinished" />
+            <translation type="finished">Le dossier sélectionné n'est pas vide.\nCréer la structure du projet quand même ?</translation>
         </message>
     </context>
     <context>
@@ -5323,7 +5423,7 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         </message>
         <message>
             <source>&lt;span style='color:red'&gt;  ✗ Failed&lt;/span&gt;</source>
-            <translation type="unfinished" />
+            <translation type="finished">&lt;span style='color:red'&gt; ✗ Échec&lt;/span&gt;</translation>
         </message>
         <message>
             <source>&lt;span style='color:red'&gt;Script failed: %1 (line %2)&lt;/span&gt;</source>
@@ -5712,7 +5812,7 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         </message>
         <message>
             <source>File open failed: %1</source>
-            <translation type="unfinished" />
+            <translation type="finished">Échec ouverture fichier : %1</translation>
         </message>
         <message>
             <source>Invalid TIFF byte order marker.</source>
@@ -7036,10 +7136,6 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Bloc de données trop petit : attendu %1 octets, reçu %2</translation>
         </message>
         <message>
-            <source>Embedded XISF data not fully supported yet.</source>
-            <translation type="finished">Données XISF intégrées pas encore entièrement supportées.</translation>
-        </message>
-        <message>
             <source>Image index %1 out of range (file has %2 images)</source>
             <translation type="finished">Index image %1 hors plage (fichier a %2 images)</translation>
         </message>
@@ -7050,10 +7146,6 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Incomplete data read: expected %1 bytes, got %2</source>
             <translation type="finished">Lecture données incomplète : attendu %1 octets, reçu %2</translation>
-        </message>
-        <message>
-            <source>Inline XISF data not fully supported yet.</source>
-            <translation type="finished">Données XISF en ligne pas encore entièrement supportées.</translation>
         </message>
         <message>
             <source>Invalid Header Length: %1</source>

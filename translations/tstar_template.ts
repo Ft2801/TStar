@@ -133,7 +133,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>TStar is a professional astrophotography image processing application designed to provide advanced tools for enhancing and analyzing astronomical images.</source>
+            <source>TStar is a professional astrophotography image processing application.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1843,6 +1843,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Adjust Q-Factor to control subtraction strength</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Adjust color saturation with protection for highlights and shadows.</source>
             <translation type="unfinished" />
         </message>
@@ -1856,6 +1860,10 @@
         </message>
         <message>
             <source>Adjust tonal curves for each RGB channel independently or together.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Adjusts protection of bright areas</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1955,6 +1963,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Choose from presets like SHO (Hubble), HOO, HSO, Foraxx, and more</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Click Open or press Ctrl+O</source>
             <translation type="unfinished" />
         </message>
@@ -2003,7 +2015,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Compares measured star colors (Image) vs expected colors (Catalog)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Compression:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Content-Aware:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Continuum Subtraction</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2012,6 +2036,10 @@
         </message>
         <message>
             <source>Controls contrast amplification. Higher values increase contrast but may introduce noise.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Controls dynamic range compression strength</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2040,6 +2068,10 @@
         </message>
         <message>
             <source>Create and apply luminosity masks for selective processing:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Create stunning narrowband composites with full control:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2084,6 +2116,10 @@
         </message>
         <message>
             <source>Enable in Settings for smoother gradients and reduced banding in auto-stretched previews. Uses high-precision floating-point calculations instead of 16-bit histogram binning.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Enhances narrowband details by subtracting broadband continuum/star light:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2199,7 +2235,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Mask Gamma:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Masks</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Mix Ha, OIII, and SII channels with adjustable intensity</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2208,6 +2252,10 @@
         </message>
         <message>
             <source>Mouse wheel or Ctrl + and Ctrl -</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Multiscale HDR transformation to reveal details in both highlights and shadows:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2220,6 +2268,10 @@
         </message>
         <message>
             <source>Non-linear stretch preserving star colors</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Number of wavelet layers to process</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2239,7 +2291,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>PCC Distribution</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Pan:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Perfect Palette Picker</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2268,6 +2328,10 @@
         </message>
         <message>
             <source>Raw pixel values without stretch</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Real-time preview of the color palette</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2323,6 +2387,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Reveals faint nebular structures hidden by stars</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>SCNR (Selective Color Noise Reduction)</source>
             <translation type="unfinished" />
         </message>
@@ -2340,6 +2408,10 @@
         </message>
         <message>
             <source>Save file</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Scales:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2364,6 +2436,10 @@
         </message>
         <message>
             <source>Show Overlay:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Shows Red/Green and Blue/Green scatter plots</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2419,6 +2495,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Subtracts a scaled continuum image (or RGB channel) from narrowband data</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Symmetry Point</source>
             <translation type="unfinished" />
         </message>
@@ -2471,6 +2551,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Useful for verifying calibration accuracy</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Uses AI inpainting for seamless removal (slower but best quality)</source>
             <translation type="unfinished" />
         </message>
@@ -2483,11 +2567,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Uses wavelet decomposition to process different structural scales</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Utilities</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>View and edit FITS header metadata.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Visualizes the color distribution of stars after Photometric Color Calibration:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Wavescale HDR</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2763,6 +2859,10 @@
         </message>
         <message>
             <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cannot apply: buffer is invalid or not RGB.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -7033,10 +7133,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Embedded XISF data not fully supported yet.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Image index %1 out of range (file has %2 images)</source>
             <translation type="unfinished" />
         </message>
@@ -7046,10 +7142,6 @@
         </message>
         <message>
             <source>Incomplete data read: expected %1 bytes, got %2</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Inline XISF data not fully supported yet.</source>
             <translation type="unfinished" />
         </message>
         <message>

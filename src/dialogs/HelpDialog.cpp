@@ -164,6 +164,14 @@ QString HelpDialog::buildHelpContent()
     html += "<li>" + tr("Select a region of pure background") + "</li>";
     html += "<li>" + tr("The tool will balance RGB channels") + "</li>";
     html += "</ul>";
+
+    html += "<h3>" + tr("PCC Distribution") + "</h3>";
+    html += "<p>" + tr("Visualizes the color distribution of stars after Photometric Color Calibration:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Shows Red/Green and Blue/Green scatter plots") + "</li>";
+    html += "<li>" + tr("Compares measured star colors (Image) vs expected colors (Catalog)") + "</li>";
+    html += "<li>" + tr("Useful for verifying calibration accuracy") + "</li>";
+    html += "</ul>";
     
     html += "<h3>" + tr("SCNR (Selective Color Noise Reduction)") + "</h3>";
     html += "<p>" + tr("Removes green color cast common in OSC/DSLR images.") + "</p>";
@@ -233,6 +241,22 @@ QString HelpDialog::buildHelpContent()
     html += "<h3>" + tr("Remove Pedestal") + "</h3>";
     html += "<p>" + tr("Automatically detects and subtracts the minimum pixel value (black floor) from the image. Essential before stretching to ensure true black levels.") + "</p>";
 
+    html += "<h3>" + tr("Perfect Palette Picker") + "</h3>";
+    html += "<p>" + tr("Create stunning narrowband composites with full control:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Mix Ha, OIII, and SII channels with adjustable intensity") + "</li>";
+    html += "<li>" + tr("Choose from presets like SHO (Hubble), HOO, HSO, Foraxx, and more") + "</li>";
+    html += "<li>" + tr("Real-time preview of the color palette") + "</li>";
+    html += "</ul>";
+
+    html += "<h3>" + tr("Continuum Subtraction") + "</h3>";
+    html += "<p>" + tr("Enhances narrowband details by subtracting broadband continuum/star light:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Subtracts a scaled continuum image (or RGB channel) from narrowband data") + "</li>";
+    html += "<li>" + tr("Adjust Q-Factor to control subtraction strength") + "</li>";
+    html += "<li>" + tr("Reveals faint nebular structures hidden by stars") + "</li>";
+    html += "</ul>";
+
     // Utilities
     html += "<h2>" + tr("Utilities") + "</h2>";
     
@@ -264,6 +288,15 @@ QString HelpDialog::buildHelpContent()
     html += "<ul>";
     html += "<li><b>" + tr("Clip Limit:") + "</b> " + tr("Controls contrast amplification. Higher values increase contrast but may introduce noise.") + "</li>";
     html += "<li><b>" + tr("Grid Size:") + "</b> " + tr("Size of tiles for local processing. Smaller tiles increase local detail.") + "</li>";
+    html += "</ul>";
+
+    html += "<h3>" + tr("Wavescale HDR") + "</h3>";
+    html += "<p>" + tr("Multiscale HDR transformation to reveal details in both highlights and shadows:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Uses wavelet decomposition to process different structural scales") + "</li>";
+    html += "<li><b>" + tr("Compression:") + "</b> " + tr("Controls dynamic range compression strength") + "</li>";
+    html += "<li><b>" + tr("Scales:") + "</b> " + tr("Number of wavelet layers to process") + "</li>";
+    html += "<li><b>" + tr("Mask Gamma:") + "</b> " + tr("Adjusts protection of bright areas") + "</li>";
     html += "</ul>";
 
     html += "<h3>" + tr("Aberration Inspector") + "</h3>";
