@@ -20,35 +20,6 @@
 #include <QTextStream>
 #include <QDateTime>
 
-void debugMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
-
-void debugMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
-{
-    Q_UNUSED(context);
-    static QFile outFile("C:/Users/fabio/Documents/GitHub/TStar/TStar_debug.log");
-    if (!outFile.isOpen()) {
-        if (!outFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
-            return;
-        }
-    }
-    
-    QTextStream ts(&outFile);
-    QString txt;
-    switch (type) {
-    case QtDebugMsg:    txt = QString("Debug: %1").arg(msg); break;
-    case QtWarningMsg:  txt = QString("Warning: %1").arg(msg); break;
-    case QtCriticalMsg: txt = QString("Critical: %1").arg(msg); break;
-    case QtFatalMsg:    txt = QString("Fatal: %1").arg(msg); break;
-    case QtInfoMsg:     txt = QString("Info: %1").arg(msg); break;
-    }
-    
-    ts << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz ") << txt << Qt::endl;
-    
-    // Also print to stderr just in case
-    fprintf(stderr, "%s\n", txt.toLocal8Bit().constData());
-    fflush(stderr);
-}
-
 int main(int argc, char *argv[])
 {
     // Initialize logging system BEFORE QApplication

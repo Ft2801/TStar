@@ -3,6 +3,7 @@
 #include "DialogBase.h"
 #include "../ImageViewer.h"
 #include "../core/RobustStatistics.h"
+#include "../core/Logger.h" // Added for persistent logging
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QMessageBox>
@@ -14,14 +15,12 @@
 BackgroundNeutralizationDialog::BackgroundNeutralizationDialog(QWidget* parent)
     : DialogBase(parent, tr("Background Neutralization"), 350, 150)
 {
-    // Interaction Control: Initially disabled until focused
-
+    Logger::info(QString("BackgroundNeutralizationDialog Created: %1").arg((quintptr)this), "BackgroundNeutralization");
     
     // Interaction Control: Initially disabled until focused
     m_interactionEnabled = false;
     
     setupUI();
-
 }
 
 void BackgroundNeutralizationDialog::setInteractionEnabled(bool enabled) {
@@ -35,6 +34,7 @@ void BackgroundNeutralizationDialog::setInteractionEnabled(bool enabled) {
 }
 
 BackgroundNeutralizationDialog::~BackgroundNeutralizationDialog() {
+    Logger::info(QString("BackgroundNeutralizationDialog Destroyed: %1").arg((quintptr)this), "BackgroundNeutralization");
     setSelectionMode(false);
 }
 
@@ -90,6 +90,14 @@ void BackgroundNeutralizationDialog::setViewer(ImageViewer* viewer) {
 }
 
 void BackgroundNeutralizationDialog::onRectSelected(const QRectF& r) {
+    // Safety checks to prevent potential crashes
+    if (!m_statusLabel || !m_btnApply) {
+        Logger::error("BackgroundNeutralizationDialog::onRectSelected - Critical: UI members invalid", "BackgroundNeutralization");
+        return;
+    }
+    
+    Logger::info(QString("onRectSelected: %1 %2 %3 %4").arg(r.x()).arg(r.y()).arg(r.width()).arg(r.height()), "BackgroundNeutralization");
+
     m_selection = r.toRect();
     if (m_selection.width() >= 2 && m_selection.height() >= 2) {
         m_hasSelection = true;

@@ -59,9 +59,11 @@ void Logger::init(const QString& logDirPath, int maxLogFiles)
     
     // Determine log directory
     if (logDirPath.isEmpty()) {
-        // Default: app directory/logs
-        QString appDir = QCoreApplication::applicationDirPath();
-        s_logDirPath = appDir + "/logs";
+        // Default: AppLocalCustomLocation/logs
+        // Windows: C:/Users/<User>/AppData/Local/TStar/logs
+        // We avoid AppLocalDataLocation because it includes the OrganizationName (FabioTempera)
+        QString dataDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+        s_logDirPath = dataDir + "/TStar/logs";
     } else {
         s_logDirPath = logDirPath;
     }

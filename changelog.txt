@@ -1,6 +1,11 @@
 TStar Changelog
 ===============
 
+Version 1.5.9
+-------------
+- Fixed a small bug in the logging system
+- Fixed a crash in the background neutralization tool
+
 Version 1.5.8
 -------------
 - Fixed Curves tool window dimensions

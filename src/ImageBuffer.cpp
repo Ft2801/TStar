@@ -2462,6 +2462,10 @@ float ImageBuffer::getAreaMean(int x, int y, int w, int h, int c) const {
     if (x + w > m_width) w = m_width - x;
     if (y + h > m_height) h = m_height - y;
     if (w <= 0 || h <= 0) return 0.0f;
+    if (m_data.empty()) {
+        // Critical safety check
+        return 0.0f;
+    }
     
     double sum = 0.0;
     long count = static_cast<long>(w) * h;
