@@ -12,7 +12,7 @@
 #include <QIcon>
 
 StarStretchDialog::StarStretchDialog(QWidget* parent, ImageViewer* viewer)
-    : DialogBase(parent, "Star Stretch", 500, 400), m_viewer(viewer)
+    : DialogBase(parent, "Star Stretch", 450, 200), m_viewer(viewer)
 {
     if (m_viewer) {
         m_originalBuffer = m_viewer->getBuffer();
