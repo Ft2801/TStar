@@ -275,33 +275,36 @@ copy_dylib() {
         
         # Method A: Standard library path
         if [ -d "$base_path/lib" ]; then
-             # Standard search
-             candidates+=($(find "$base_path/lib" -name "${lib_name}*.dylib" -type f 2>/dev/null | grep -v ".dSYM" | sort))
+             # Standard search (following symlinks is CRITICAL for Homebrew)
+             # We remove -type f because many lib paths are symlinks.
+             # grep -v ".dSYM" avoids copying debug symbols.
+             local found=$(find -L "$base_path/lib" -name "${lib_name}*.dylib" -maxdepth 1 2>/dev/null | grep -v ".dSYM" | sort)
+             if [ -n "$found" ]; then candidates+=($found); fi
         fi
         
         # Method B: Cellar fallback (specific version folders)
         if [ -d "$base_path/Cellar/$brew_pkg" ]; then
-             candidates+=($(find "$base_path/Cellar/$brew_pkg" -name "${lib_name}*.dylib" -type f 2>/dev/null | grep -v ".dSYM" | sort))
+             local found=$(find -L "$base_path/Cellar/$brew_pkg" -name "${lib_name}*.dylib" -maxdepth 4 2>/dev/null | grep -v ".dSYM" | sort)
+             if [ -n "$found" ]; then candidates+=($found); fi
         fi
 
         # Method C: Special catch-all for difficult libs (like libraw)
         if [ "$brew_pkg" == "libraw" ]; then
              # Use maxdepth 8 to catch deeply nested Cellar paths
-             candidates+=($(find "$base_path" -maxdepth 8 -name "${lib_name}*.dylib" -type f 2>/dev/null | grep -v ".dSYM" | sort))
+             local found=$(find -L "$base_path" -maxdepth 8 -name "${lib_name}*.dylib" 2>/dev/null | grep -v ".dSYM" | sort)
+             if [ -n "$found" ]; then candidates+=($found); fi
         fi
 
         for dylib in "${candidates[@]}"; do
             if [ -f "$dylib" ]; then
                  if dylib_matches_arch "$dylib" "$target_arch"; then
-                    # COPY AND RENAME: Ensure we copy to the base name (e.g. libraw.dylib)
-                    # This fixes issues where the bundle expects libraw.dylib but we copied libraw.23.dylib
-                    cp "$dylib" "$dest_dir/${lib_name}.dylib" 2>/dev/null
+                    # COPY AND CANONICALIZE: Ensure we have the base name (e.g. libraw.dylib)
+                    # Use -L to copy the actual file if it's a symlink
+                    cp -L "$dylib" "$dest_dir/${lib_name}.dylib" 2>/dev/null
                     
-                    # If it was a versioned file, we might want the versioned name too for compatibility
-                    # but typically the base name is enough if ID is fixed.
+                    # Also copy as original name for safety
                     if [ "$(basename "$dylib")" != "${lib_name}.dylib" ]; then
-                        # Also copy as original name just in case something links exclusively to it
-                        cp "$dylib" "$dest_dir/" 2>/dev/null
+                        cp -L "$dylib" "$dest_dir/" 2>/dev/null
                     fi
                     
                     echo "  - $lib_name: OK ($target_arch) [from: $base_path]"
@@ -318,8 +321,12 @@ copy_dylib() {
     # If we get here, valid library was not found
     if [ -n "$found_any_arch" ]; then
         echo "  - $lib_name: ARCH MISMATCH (target: $target_arch, found: $found_any_arch in checked paths)"
+        if [ "$target_arch" == "x86_64" ] && [ "$found_any_arch" == "arm64" ]; then
+            echo "    [TIP] Try: arch -x86_64 brew install $brew_pkg"
+        fi
     else
         echo "  - $lib_name: NOT FOUND (checked: $checked_paths)"
+        echo "    [TIP] Try: brew install $brew_pkg"
     fi
     return 1
 }

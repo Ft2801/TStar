@@ -103,11 +103,13 @@ if [ -f "$MACDEPLOYQT" ]; then
         fi
     fi
     
-    # Run macdeployqt with expanded libpath
+    # Run macdeployqt with expanded libpath and filter non-fatal errors
+    # We filter "Cannot resolve rpath" and missing file errors for /opt/homebrew/opt
+    # which we manually fix anyway in the next steps.
     "$MACDEPLOYQT" "$DIST_DIR" \
         -verbose=1 \
         $LIBPATH_ARGS \
-        2>&1 | grep -v "Cannot resolve rpath" | grep -v "using QList" || true
+        2>&1 | grep -v "Cannot resolve rpath" | grep -v "using QList" | grep -v "No such file or directory" | grep -v "error: /opt/homebrew/opt" || true
     echo "  - Qt frameworks deployed"
 else
     echo "[WARNING] macdeployqt not found. Qt frameworks not bundled."
@@ -141,9 +143,16 @@ copy_dylib "libraw" "libraw" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 # OpenCV (only required modules - dnn and video excluded to avoid external dependencies)
 OPENCV_PREFIX=$(brew --prefix opencv 2>/dev/null || echo "")
 if [ ! -d "$OPENCV_PREFIX/lib" ]; then
-    # OpenCV Fallback
-    OPENCV_PREFIX=$(find /opt/homebrew/Cellar/opencv -maxdepth 2 -name "lib" -type d 2>/dev/null | head -1)
-    if [ -n "$OPENCV_PREFIX" ]; then OPENCV_PREFIX=$(dirname "$OPENCV_PREFIX"); fi
+    # OpenCV Fallback (search BOTH possible Homebrew paths)
+    for base in /opt/homebrew /usr/local; do
+        if [ -d "$base/Cellar/opencv" ]; then
+            OPENCV_PREFIX=$(find "$base/Cellar/opencv" -maxdepth 2 -name "lib" -type d 2>/dev/null | head -1)
+            if [ -n "$OPENCV_PREFIX" ]; then 
+                OPENCV_PREFIX=$(dirname "$OPENCV_PREFIX")
+                break
+            fi
+        fi
+    done
 fi
 
 if [ -n "$OPENCV_PREFIX" ] && [ -d "$OPENCV_PREFIX/lib" ]; then
