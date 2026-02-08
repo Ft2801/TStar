@@ -90,17 +90,33 @@ detect_build_architecture() {
     if [ -n "$executable" ] && [ -f "$executable" ]; then
         # Use file command to get architecture
         local file_output=$(file "$executable" 2>/dev/null || echo "")
-        if echo "$file_output" | grep -q "x86_64"; then
-            echo "x86_64"
-            return 0
-        elif echo "$file_output" | grep -q "arm64"; then
-            echo "arm64"
-            return 0
+        
+        # Check host machine architecture to decide priority
+        local host_arch=$(uname -m)
+        
+        if [ "$host_arch" == "arm64" ]; then
+            # On Apple Silicon, prefer arm64 if available
+             if echo "$file_output" | grep -q "arm64"; then
+                echo "arm64"
+                return 0
+            elif echo "$file_output" | grep -q "x86_64"; then
+                echo "x86_64"
+                return 0
+            fi
+        else
+            # On Intel, prefer x86_64 if available
+            if echo "$file_output" | grep -q "x86_64"; then
+                echo "x86_64"
+                return 0
+            elif echo "$file_output" | grep -q "arm64"; then
+                echo "arm64"
+                return 0
+            fi
         fi
     fi
     
     # Fallback to native architecture
-    local native_arch=$(arch)
+    local native_arch=$(uname -m)
     if [ "$native_arch" == "arm64" ] || [ "$native_arch" == "aarch64" ]; then
         echo "arm64"
     else
