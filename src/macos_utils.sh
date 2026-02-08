@@ -135,16 +135,10 @@ dylib_matches_arch() {
     
     local file_output=$(file "$dylib" 2>/dev/null || echo "")
     
-    if [ "$target_arch" == "arm64" ]; then
-        # Accept arm64 but NOT x86_64
-        if echo "$file_output" | grep -q "arm64" && ! echo "$file_output" | grep -q "x86_64"; then
-            return 0
-        fi
-    else
-        # x86_64: Accept x86_64 but NOT arm64
-        if echo "$file_output" | grep -q "x86_64" && ! echo "$file_output" | grep -q "arm64"; then
-            return 0
-        fi
+    # PERMISSIVE CHECK: If it contains the target architecture, it's fine.
+    # This allows Universal binaries (containing both archs) which were previously rejected.
+    if echo "$file_output" | grep -q "$target_arch"; then
+        return 0
     fi
     
     return 1
@@ -245,21 +239,11 @@ copy_dylib() {
         search_paths=("/opt/homebrew" "/usr/local")
     fi
 
-    # 1. Try standard brew prefix first (if matches architecture)
-    local prefix=$(brew --prefix "$brew_pkg" 2>/dev/null || echo "")
-    if [ -n "$prefix" ]; then
-        # Check if this prefix matches our target architecture
-        # /usr/local -> x86_64, /opt/homebrew -> arm64
-        local prefix_is_compatible=0
-        if [[ "$prefix" == "/usr/local"* ]] && [ "$target_arch" == "x86_64" ]; then prefix_is_compatible=1; fi
-        if [[ "$prefix" == "/opt/homebrew"* ]] && [ "$target_arch" == "arm64" ]; then prefix_is_compatible=1; fi
-        
-        if [ $prefix_is_compatible -eq 1 ]; then
-            # Add to front of search paths if not already there
-            if [[ ! " ${search_paths[@]} " =~ " ${prefix} " ]]; then
-                search_paths=("$prefix" "${search_paths[@]}")
-            fi
-        fi
+    # 1. Ask Homebrew directly for the prefix (MOST RELIABLE)
+    # We add /opt/$brew_pkg specifically because Homebrew often keeps versions there
+    local brew_prefix=$(brew --prefix "$brew_pkg" 2>/dev/null || echo "")
+    if [ -n "$brew_prefix" ]; then
+        search_paths=("$brew_prefix" "${search_paths[@]}")
     fi
 
     # Iterate through search paths
@@ -276,22 +260,24 @@ copy_dylib() {
         # Method A: Standard library path
         if [ -d "$base_path/lib" ]; then
              # Standard search (following symlinks is CRITICAL for Homebrew)
-             # We remove -type f because many lib paths are symlinks.
-             # grep -v ".dSYM" avoids copying debug symbols.
-             local found=$(find -L "$base_path/lib" -name "${lib_name}*.dylib" -maxdepth 1 2>/dev/null | grep -v ".dSYM" | sort)
+             local found=$(find -L "$base_path/lib" -name "${lib_name}*.dylib" -maxdepth 2 2>/dev/null | grep -v ".dSYM" | sort)
              if [ -n "$found" ]; then candidates+=($found); fi
         fi
         
         # Method B: Cellar fallback (specific version folders)
+        # We try to go deeper if we are in Cellar
         if [ -d "$base_path/Cellar/$brew_pkg" ]; then
-             local found=$(find -L "$base_path/Cellar/$brew_pkg" -name "${lib_name}*.dylib" -maxdepth 4 2>/dev/null | grep -v ".dSYM" | sort)
+             local found=$(find -L "$base_path/Cellar/$brew_pkg" -name "${lib_name}*.dylib" -maxdepth 6 2>/dev/null | grep -v ".dSYM" | sort)
              if [ -n "$found" ]; then candidates+=($found); fi
         fi
 
-        # Method C: Special catch-all for difficult libs (like libraw)
-        if [ "$brew_pkg" == "libraw" ]; then
-             # Use maxdepth 8 to catch deeply nested Cellar paths
-             local found=$(find -L "$base_path" -maxdepth 8 -name "${lib_name}*.dylib" 2>/dev/null | grep -v ".dSYM" | sort)
+        # Method C: Aggressive search in the whole prefix (Fallback for difficult libs)
+        # We search for both lib_name and lib_name_r (reentrant version)
+        if [ -z "$found_any_arch" ] && [ ${#candidates[@]} -eq 0 ]; then
+             local name_pattern="${lib_name}*.dylib"
+             if [ "$brew_pkg" == "libraw" ]; then name_pattern="*raw*.dylib"; fi
+             
+             local found=$(find -L "$base_path" -maxdepth 8 -name "$name_pattern" 2>/dev/null | grep -v ".dSYM" | sort)
              if [ -n "$found" ]; then candidates+=($found); fi
         fi
 
@@ -325,8 +311,8 @@ copy_dylib() {
             echo "    [TIP] Try: arch -x86_64 brew install $brew_pkg"
         fi
     else
-        echo "  - $lib_name: NOT FOUND (checked: $checked_paths)"
-        echo "    [TIP] Try: brew install $brew_pkg"
+        echo "  - $lib_name: NOT FOUND in paths: $checked_paths"
+        echo "    [TIP] If building for arm64, ensure 'brew install $brew_pkg' was run."
     fi
     return 1
 }
