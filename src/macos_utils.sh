@@ -270,13 +270,24 @@ copy_dylib() {
 
         # Method C: Special catch-all for difficult libs (like libraw)
         if [ "$brew_pkg" == "libraw" ]; then
-             candidates+=($(find "$base_path" -name "${lib_name}*.dylib" -type f 2>/dev/null | grep -v ".dSYM" | sort))
+             # Use maxdepth to avoid deep recursion but check relevant lib dirs
+             candidates+=($(find "$base_path" -maxdepth 4 -name "${lib_name}*.dylib" -type f 2>/dev/null | grep -v ".dSYM" | sort))
         fi
 
         for dylib in "${candidates[@]}"; do
             if [ -f "$dylib" ]; then
                  if dylib_matches_arch "$dylib" "$target_arch"; then
-                    cp "$dylib" "$dest_dir/" 2>/dev/null
+                    # COPY AND RENAME: Ensure we copy to the base name (e.g. libraw.dylib)
+                    # This fixes issues where the bundle expects libraw.dylib but we copied libraw.23.dylib
+                    cp "$dylib" "$dest_dir/${lib_name}.dylib" 2>/dev/null
+                    
+                    # If it was a versioned file, we might want the versioned name too for compatibility
+                    # but typically the base name is enough if ID is fixed.
+                    if [ "$(basename "$dylib")" != "${lib_name}.dylib" ]; then
+                        # Also copy as original name just in case something links exclusively to it
+                        cp "$dylib" "$dest_dir/" 2>/dev/null
+                    fi
+                    
                     echo "  - $lib_name: OK ($target_arch) [from: $base_path]"
                     return 0
                  else

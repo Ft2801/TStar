@@ -80,23 +80,41 @@ if [ -f "$MACDEPLOYQT" ]; then
     # Run macdeployqt with Qt lib path and filter out rpath warnings
     # The rpath warnings are non-fatal and occur because some plugins reference
     # Qt frameworks that will be bundled. We filter them to keep output clean.
-    # We also filter "no file at /opt/homebrew/opt" because macdeployqt is confused by
-    # the broken symlinks, but we manually fix these dependencies in Step 5.
-    # Detect Homebrew prefix for extra libpath
-    HB_PREFIX="/usr/local"
-    if [ -d "/opt/homebrew" ]; then HB_PREFIX="/opt/homebrew"; fi
-
-    # Build libpath string with all Homebrew opt directories
-    LIBPATH_ARGS="-libpath=$QT_PREFIX/lib -libpath=$HB_PREFIX/lib"
     
-    # Add all /opt/homebrew/opt/*/lib directories for Homebrew dependencies
-    # This includes: libomp, webp, openjpeg, openexr, imath, openblas, md4c, tbb, dbus, etc.
-    if [ -d "$HB_PREFIX/opt" ]; then
-        for opt_dir in "$HB_PREFIX/opt"/*/lib; do
-            if [ -d "$opt_dir" ]; then
-                LIBPATH_ARGS="$LIBPATH_ARGS -libpath=$opt_dir"
+    # EXECUTABLE path was defined earlier or needs re-definition here if used
+    EXECUTABLE="$DIST_DIR/Contents/MacOS/TStar"
+    TARGET_ARCH=$(detect_build_architecture "$EXECUTABLE")
+
+    # Build libpath string with architecture-specific paths
+    LIBPATH_ARGS="-libpath=$QT_PREFIX/lib"
+    
+    # Only add Homebrew paths matching the target architecture
+    if [ "$TARGET_ARCH" == "arm64" ]; then
+        # Apple Silicon: Add /opt/homebrew
+        if [ -d "/opt/homebrew" ]; then
+            LIBPATH_ARGS="$LIBPATH_ARGS -libpath=/opt/homebrew/lib"
+            if [ -d "/opt/homebrew/opt" ]; then
+                # Add optic homebrew/opt subdirs
+                for opt_dir in "/opt/homebrew/opt"/*/lib; do
+                    if [ -d "$opt_dir" ]; then
+                        LIBPATH_ARGS="$LIBPATH_ARGS -libpath=$opt_dir"
+                    fi
+                done
             fi
-        done
+        fi
+    else
+        # Intel: Add /usr/local
+        if [ -d "/usr/local" ]; then
+             LIBPATH_ARGS="$LIBPATH_ARGS -libpath=/usr/local/lib"
+             if [ -d "/usr/local/opt" ]; then
+                # Add /usr/local/opt subdirs
+                for opt_dir in "/usr/local/opt"/*/lib; do
+                    if [ -d "$opt_dir" ]; then
+                        LIBPATH_ARGS="$LIBPATH_ARGS -libpath=$opt_dir"
+                    fi
+                done
+             fi
+        fi
     fi
     
     # Run macdeployqt with expanded libpath
