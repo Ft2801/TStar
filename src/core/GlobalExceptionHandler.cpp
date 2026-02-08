@@ -15,6 +15,7 @@
 #include <QDir>
 #include <QProcess>
 #include <csignal>
+#include <cstdio>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -169,8 +170,12 @@ void GlobalExceptionHandler::showDialog(const QString& message, bool isFatal)
 
     // Checking if app is dying
     if (!QApplication::instance()) {
-        // No Qt? Use MessageBox
+        // No Qt? Use MessageBox on Windows, stderr elsewhere
+#ifdef Q_OS_WIN
         MessageBoxW(NULL, message.toStdWString().c_str(), L"Critical Error", MB_ICONERROR | MB_OK);
+#else
+        fprintf(stderr, "CRITICAL ERROR: %s\n", qPrintable(message));
+#endif
         if (isFatal) std::exit(-1);
         return;
     }

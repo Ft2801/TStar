@@ -88,6 +88,7 @@ double ResourceManager::getMemoryUsagePercent() const {
 }
 
 bool ResourceManager::isMemorySafe(size_t estimatedBytes) const {
+    Q_UNUSED(estimatedBytes);
     double usage = getMemoryUsagePercent();
     
     // If we can't measure, assume safe (don't block user)

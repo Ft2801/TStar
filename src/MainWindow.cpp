@@ -234,7 +234,7 @@ MainWindow::MainWindow(QWidget *parent)
         m_mdiArea->viewport()->installEventFilter(this);
     }
     
-    connect(m_mdiArea, &QMdiArea::subWindowActivated, [this, makeIcon](QMdiSubWindow *window) {
+    connect(m_mdiArea, &QMdiArea::subWindowActivated, [this](QMdiSubWindow *window) {
         if (m_isUpdating) return;
         m_isUpdating = true;
         
@@ -989,7 +989,7 @@ MainWindow::MainWindow(QWidget *parent)
             UpdateDialog dlg(this, ver, body, url);
             dlg.exec(); 
         });
-        connect(checker, &UpdateChecker::noUpdateAvailable, this, [this](){
+        connect(checker, &UpdateChecker::noUpdateAvailable, this, [](){
             // log(tr("TStar is up to date."), Log_Info);
         });
         connect(checker, &UpdateChecker::errorOccurred, this, [this](const QString& err){
@@ -2236,7 +2236,7 @@ void MainWindow::openGHSDialog() {
         m_ghsTarget = nullptr;
     });
 
-    connect(m_ghsDlg, &GHSDialog::finished, [this, sub](int){
+    connect(m_ghsDlg, &GHSDialog::finished, [sub](int){
         // If dialog calls 'done' (e.g. via Close button if it had one), close the subwindow
         if (sub) sub->close();
     });
