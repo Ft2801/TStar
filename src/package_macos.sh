@@ -82,9 +82,14 @@ if [ -f "$MACDEPLOYQT" ]; then
     # Qt frameworks that will be bundled. We filter them to keep output clean.
     # We also filter "no file at /opt/homebrew/opt" because macdeployqt is confused by
     # the broken symlinks, but we manually fix these dependencies in Step 5.
+    # Detect Homebrew prefix for extra libpath
+    HB_PREFIX="/usr/local"
+    if [ -d "/opt/homebrew" ]; then HB_PREFIX="/opt/homebrew"; fi
+
     "$MACDEPLOYQT" "$DIST_DIR" \
         -verbose=1 \
         -libpath="$QT_PREFIX/lib" \
+        -libpath="$HB_PREFIX/lib" \
         2>&1 | grep -v "Cannot resolve rpath" | grep -v "using QList" | grep -v "ERROR: no file at \"/opt/homebrew/opt" || true
     echo "  - Qt frameworks deployed"
 else
