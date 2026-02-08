@@ -168,15 +168,14 @@ ImageBuffer ChannelOps::computeLuminance(const ImageBuffer& src, LumaMethod meth
         }
     } else {
         // R, G, B weights specific logic
-        // If c >= 3, map 0->R, 1->G, 2->B. Others 0?
+        // For 3+ channels, default to Rec709 weights (implied).
+        // Higher channels are ignored for luminance.
         if (c >= 3) {
             weights[0] = getLumaWeightR(method, customWeights);
             weights[1] = getLumaWeightG(method, customWeights);
             weights[2] = getLumaWeightB(method, customWeights);
-            // Renormalize if necessary? Usually luma weights sum to 1.
         } else if (c == 2) {
-             // 2 Channels. Just avg or use R/G weights?
-             // Let's use 50/50 for safety unless custom
+             // For 2 channels, use 50/50 split unless custom
              weights[0] = 0.5f; weights[1] = 0.5f;
         }
     }

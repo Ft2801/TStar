@@ -299,7 +299,7 @@ void ScriptDialog::onRunScript() {
     
     // Run in background thread to keep UI responsive
     QThreadPool::globalInstance()->start([this, script]() {
-        // QMessageBox::information(nullptr, "Debug", "Running script logic now..."); // Debug Popup
+
         m_runner.executeString(script);
     });
 }

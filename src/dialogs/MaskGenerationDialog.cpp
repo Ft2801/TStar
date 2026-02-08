@@ -118,20 +118,14 @@ void MaskGenerationDialog::setupUI() {
     connect(m_typeCombo, &QComboBox::currentTextChanged, this, &MaskGenerationDialog::onTypeChanged);
     connect(m_typeCombo, &QComboBox::currentTextChanged, this, &MaskGenerationDialog::updateLivePreview);
     
-    // Add logic to update background when stretch mode changes (using the preview stretch combo which acts as visualization control)
-    // Actually, m_previewStretchCombo is for "Preview Visualization" of the MASK. 
-    // BUT the user complains the background image is always AutoStretch'ed. 
-    // We should probably add a dedicated control for the BACKGROUND image display mode or reuse the same if it makes sense.
-    // Given the user request, let's reuse m_previewStretchCombo to ALSO update the background canvas if "Preview Visualization" usually implies seeing the image context.
-    // However, usually "Preview Visualization" controls how the MASK comes out in the LivePreviewDialog.
-    // Let's add a connection to update the canvas background too.
+    // Use preview stretch combo to also update the background canvas visualization
+    // This allows the user to see the image context more clearly
     controls->addWidget(m_typeCombo);
     
     controls->addWidget(new QLabel(tr("Edge Blur (px):")));
     m_blurSlider = new QSlider(Qt::Horizontal);
     m_blurSlider->setRange(0, 300);
     m_blurLabel = new QLabel("0");
-    // Update label during drag, but update preview only on release (blur is expensive)
     // Update label and preview during drag (now fast due to downsampling)
     connect(m_blurSlider, &QSlider::valueChanged, [this](int v){ 
         m_blurLabel->setText(QString::number(v)); 
@@ -374,9 +368,7 @@ MaskLayer MaskGenerationDialog::getGeneratedMask(int requestedW, int requestedH)
         // Need Range Mask at target size
         std::vector<float> comp = getLightness(targetW, targetH);
         
-        // Inline generateRangeMask logic adapted for resizing
-        // Or reuse generateRangeMask but modifying it to take input buffer??
-        // Let's copy logic here or refactor. Inline is safer given const constraints.
+        // Inline logic adapted for resizing (avoids modifying const constraints)
         
         float L = m_lowerSl->value() / 100.0f;
         float U = m_upperSl->value() / 100.0f;
@@ -385,8 +377,6 @@ MaskLayer MaskGenerationDialog::getGeneratedMask(int requestedW, int requestedH)
         bool screen = m_screenCb->isChecked();
         bool inv = m_invertCb->isChecked();
         
-        // If preview, scale smooth (blur) significantly down?
-        // Smooth is in pixels. If we scale down image 10x, blur should be 10x smaller.
         if (isPreview) {
             float scale = (float)targetW / m_sourceImage.width();
             smooth = std::max(0, (int)(smooth * scale));
@@ -496,9 +486,7 @@ std::vector<float> MaskGenerationDialog::getChrominance(int w, int h) const {
          return getComponentChrominance();
      }
      
-     // For preview, we should really compute on the resized image for speed
-     // But getComponentChrominance computes on full.
-     // Let's create a resized RGB image and compute on that.
+     // Create a resized RGB image for computation
      cv::Mat src(h, w, CV_32FC3);
      
      // Resize raw data
@@ -555,20 +543,15 @@ std::vector<float> MaskGenerationDialog::getComponentChrominance() const {
 }
 
 std::vector<float> MaskGenerationDialog::getStarMask(int w, int h) const {
-     // Get Star Mask at resolution
      // 1. Get Lightness at resolution
      std::vector<float> L = getLightness(w, h);
      
      // 2. Extract stars
-     // If resolution is lower, we might need to adjust detection threshold?
-     // Actually extractStars works on pixels.
      auto stars = ImageBuffer::extractStars(L, w, h, 3.0f, 5);
      
      // 3. Draw
      cv::Mat mask = cv::Mat::zeros(h, w, CV_32FC1);
      
-     // Scale variable removed - not used
-
      for (const auto& s : stars) {
          int r = std::max(1, (int)(s.hfr * 2.0f)); 
          cv::circle(mask, cv::Point((int)s.x, (int)s.y), r, cv::Scalar(1.0), -1); 

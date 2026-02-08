@@ -108,7 +108,7 @@ void UpdateDialog::startDownload() {
 
     // UI Updates
     m_updateBtn->setEnabled(false);
-    m_cancelBtn->setEnabled(false); // Can't cancel easily once started without cleanup logic, keep it simple
+    m_cancelBtn->setEnabled(false); // Disable cancellation to simplify cleanup logic
     m_progressBar->setVisible(true);
     m_progressBar->setValue(0);
     m_statusLabel->setText(tr("Downloading update..."));

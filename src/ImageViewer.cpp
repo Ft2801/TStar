@@ -556,7 +556,16 @@ void ImageViewer::mouseReleaseEvent(QMouseEvent* event) {
 }
 
 void ImageViewer::zoomIn() {
-    scale(1.25, 1.25);
+    qreal currentScale = transform().m11();
+    qreal nextScale = currentScale * 1.25;
+    
+    if (nextScale > 120.0) { // Limit to 12000%
+        nextScale = 120.0;
+    }
+    
+    qreal factor = nextScale / currentScale;
+    scale(factor, factor);
+    
     m_scaleFactor = transform().m11();
     emit viewChanged(m_scaleFactor, horizontalScrollBar()->value(), verticalScrollBar()->value());
 }
@@ -571,6 +580,13 @@ void ImageViewer::fitToWindow() {
     if (!m_imageItem->pixmap().isNull()) {
         fitInView(m_imageItem, Qt::KeepAspectRatio);
         m_scaleFactor = transform().m11();
+
+        if (m_scaleFactor > 120.0) {
+             qreal factor = 120.0 / m_scaleFactor;
+             scale(factor, factor);
+             m_scaleFactor = transform().m11();
+        }
+
         emit viewChanged(m_scaleFactor, horizontalScrollBar()->value(), verticalScrollBar()->value());
     }
 }

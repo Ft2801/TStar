@@ -115,9 +115,7 @@ void StarHistogramWidget::paintEvent(QPaintEvent* /*event*/) {
         float hRatio = (float)hist[i] / maxCount;
         int barH = (int)(hRatio * drawH);
         
-        // Log-spaced bars or equal width bars?
-        // If we used equal log steps, bars are equal width in visual X if X is standard.
-        // Let's just draw equal width bars and label X accordingly.
+        // Draw equal width bars for visual consistency, labeling X axis accordingly.
         float x1 = margin + (float)i / bins * drawW;
         float x2 = margin + (float)(i+1) / bins * drawW;
         p.drawRect(QRectF(x1, h - margin - barH, x2 - x1, barH));
@@ -152,9 +150,8 @@ void StarAnalysisWorker::run() {
         return;
     }
     
-    // Extract Stars
-    // Need to handle channels? extractStars works on vector<float>.
-    // Convert to mono luminance if RGB
+    // Extract Stars.
+    // extractStars works on vector<float>, so convert to mono luminance if input is RGB.
     std::vector<float> mono;
     if (m_src.channels() == 1) {
         mono = m_src.data();

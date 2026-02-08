@@ -233,7 +233,7 @@ void StretchDialog::showEvent(QShowEvent* event) {
     QDialog::showEvent(event);
     qDebug() << "Statistical Stretch tool opened.";
     // If we wanted to log to the actual UI console from here, 
-    // we should emit a signal that MainWindow listens to.
+    // Emit signal for MainWindow update
 }
 
 void StretchDialog::reject() {

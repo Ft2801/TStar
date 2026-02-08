@@ -62,7 +62,7 @@ void InteractiveEllipseItem::interactiveResize(const QString& role, float dx, fl
     m_resizing = true;
     prepareGeometryChange();
     setRect(r.normalized());
-    // updateHandles(); // Optimization: defer?
+    // updateHandles();
     m_resizing = false;
 }
 
@@ -72,7 +72,7 @@ HandleItem::HandleItem(const QString& r, InteractiveEllipseItem* parent)
 {
     setBrush(Qt::red);
     // setFlag(ItemIsMovable, false); // We handle movement manually
-    setFlag(ItemIgnoresTransformations, true); // Keep size constant on zoom? No, 'cosmetic' maybe better?  
+    setFlag(ItemIgnoresTransformations, true);
     
     if (role == "top" || role == "bottom") setCursor(Qt::SizeVerCursor);
     else if (role == "left" || role == "right") setCursor(Qt::SizeHorCursor);
@@ -254,7 +254,7 @@ void MaskCanvas::mouseMoveEvent(QMouseEvent* event) {
     if (m_mode == "ellipse" && m_tempEllipse) {
         m_tempEllipse->setRect(QRectF(m_ellipseOrigin, pt).normalized());
     }
-    // CRITICAL FIX: Freehand drawing - continuously append points during drag
+    // Freehand drawing - continuously append points during drag
     else if (m_mode == "polygon" && m_tempPath) {
         m_polyPoints.append(pt);
         
@@ -352,7 +352,7 @@ std::vector<float> MaskCanvas::createMask(int w, int h) {
             QPolygonF qpts = poly->polygon();
             std::vector<cv::Point> pts;
             for (const QPointF& p : qpts) {
-                // IMPORTANT FIX: Map local point to scene
+                // Map local point to scene
                 QPointF ps = poly->mapToScene(p);
                 pts.push_back(cv::Point(qRound(ps.x() * scaleX), qRound(ps.y() * scaleY)));
             }

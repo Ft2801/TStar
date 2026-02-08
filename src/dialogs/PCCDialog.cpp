@@ -104,7 +104,6 @@ void PCCDialog::onRun() {
     m_catalog->queryGaiaDR3(ra, dec, 1.0);
 }
 
-// ... (QtConcurrent includes remain)
 // Include QtConcurrent
 #include <QtConcurrent/QtConcurrent>
 #include <QFutureWatcher>
@@ -121,12 +120,8 @@ void PCCDialog::onCatalogReady(const std::vector<CatalogStar>& stars) {
         mw->logMessage(tr("Starting PCC with %1 catalog stars...").arg(stars.size()), 0, false);
     }
     
-    // Copy image for thread safety? 
-    // PCC needs to read image. Passing reference to main thread object is risky if main thread modifies it?
-    // PCC is read-only on image for detection. 
-    // But buffer might be modified by other tools?
-    // Ideally we clone the buffer for the worker.
-    ImageBuffer scopy = m_viewer->getBuffer(); // DEEP COPY
+    // Create a deep copy for thread safety as the worker runs asynchronously
+    ImageBuffer scopy = m_viewer->getBuffer();
     
     // Run Heavy Lifting in Background
     QFuture<PCCResult> future = QtConcurrent::run([scopy, stars]() {
@@ -170,10 +165,7 @@ void PCCDialog::onCatalogReady(const std::vector<CatalogStar>& stars) {
 }
 
 void PCCDialog::onCalibrationFinished() {
-    // Capture the specific target viewer for this job
-    // Note: m_viewer might have changed if non-modal? PCCDialog is usually modal or associated with specific viewer.
-    // If it's non-modal and user switched viewer, m_viewer is the CURRENT one.
-    // We should rely on m_viewer pointer if it's still valid.
+    // Capture the specific target viewer
     
     if (!m_viewer) return;
 

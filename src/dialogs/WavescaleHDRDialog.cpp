@@ -124,7 +124,6 @@ void WavescaleHDRWorker::run() {
     emit progress(20);
 
     // 2. Decompose L
-    // Need to scale L to 0..100? rgb2lab returns 0..100.
     // atrousDecompose expects float buffer.
     std::vector<std::vector<float>> planes = ImageBuffer::atrousDecompose(L, w, h, m_scales);
 
@@ -502,9 +501,7 @@ void WavescaleHDRDialog::onWorkerFinished(ImageBuffer result, ImageBuffer mask) 
         m_viewer->setModified(false);  // Prevent "unsaved changes" dialog
     }
     
-    // NOTE: We do NOT update the mask preview here anymore.
-    // The Quick Mask (updateQuickMask) handles the mask preview in real-time
-    // and is much faster/responsive. The worker's mask is just a side-effect.
+    // The Quick Mask (updateQuickMask) handles real-time preview; worker's mask is secondary.
 }
 
 void WavescaleHDRDialog::toggleOriginal(bool showOriginal) {

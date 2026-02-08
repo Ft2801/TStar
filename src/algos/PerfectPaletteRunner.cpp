@@ -20,10 +20,8 @@ void PerfectPaletteRunner::applyStatisticalStretch(ImageBuffer& buffer, float ta
         // ImageBuffer::getChannelMedian uses stepping for speed on large images
         float med = buffer.getChannelMedian(ch);
         
-        // 2. We still need detailed stats for stdDev, but maybe we can just scan
-        // Scan for min, accumulate mean/stdDev
-        // Ideally we do this in one pass or use sampled stats. 
-        // For speed, let's use a strided sample if the image is huge
+        // 2. Scan for minimum value and accumulate mean/stdDev.
+        // We use a strided sample if the image is large for performance.
         
         const int MAX_SAMPLES = 200000;
 

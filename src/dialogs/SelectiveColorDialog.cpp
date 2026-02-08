@@ -40,7 +40,6 @@ SelectiveColorDialog::SelectiveColorDialog(QWidget* parent)
     };
     
     // Grab current image
-    // Grab current image
     if (MainWindowCallbacks* mw = getCallbacks()) {
         if (mw->getCurrentViewer() && mw->getCurrentViewer()->getBuffer().isValid()) {
             m_sourceImage = mw->getCurrentViewer()->getBuffer();
