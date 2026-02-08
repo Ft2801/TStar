@@ -86,34 +86,20 @@ if [ -f "$MACDEPLOYQT" ]; then
     TARGET_ARCH=$(detect_build_architecture "$EXECUTABLE")
 
     # Build libpath string with architecture-specific paths
+    # SIMPLIFIED: Only pass main lib directories, avoid looping over opt subdirs
+    # which confuses macdeployqt when symlinks are broken or libs are missing
     LIBPATH_ARGS="-libpath=$QT_PREFIX/lib"
     
     # Only add Homebrew paths matching the target architecture
     if [ "$TARGET_ARCH" == "arm64" ]; then
-        # Apple Silicon: Add /opt/homebrew
-        if [ -d "/opt/homebrew" ]; then
+        # Apple Silicon: Add /opt/homebrew main lib
+        if [ -d "/opt/homebrew/lib" ]; then
             LIBPATH_ARGS="$LIBPATH_ARGS -libpath=/opt/homebrew/lib"
-            if [ -d "/opt/homebrew/opt" ]; then
-                # Add optic homebrew/opt subdirs
-                for opt_dir in "/opt/homebrew/opt"/*/lib; do
-                    if [ -d "$opt_dir" ]; then
-                        LIBPATH_ARGS="$LIBPATH_ARGS -libpath=$opt_dir"
-                    fi
-                done
-            fi
         fi
     else
-        # Intel: Add /usr/local
-        if [ -d "/usr/local" ]; then
+        # Intel: Add /usr/local main lib
+        if [ -d "/usr/local/lib" ]; then
              LIBPATH_ARGS="$LIBPATH_ARGS -libpath=/usr/local/lib"
-             if [ -d "/usr/local/opt" ]; then
-                # Add /usr/local/opt subdirs
-                for opt_dir in "/usr/local/opt"/*/lib; do
-                    if [ -d "$opt_dir" ]; then
-                        LIBPATH_ARGS="$LIBPATH_ARGS -libpath=$opt_dir"
-                    fi
-                done
-             fi
         fi
     fi
     

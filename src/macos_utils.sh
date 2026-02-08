@@ -286,8 +286,8 @@ copy_dylib() {
 
         # Method C: Special catch-all for difficult libs (like libraw)
         if [ "$brew_pkg" == "libraw" ]; then
-             # Use maxdepth to avoid deep recursion but check relevant lib dirs
-             candidates+=($(find "$base_path" -maxdepth 4 -name "${lib_name}*.dylib" -type f 2>/dev/null | grep -v ".dSYM" | sort))
+             # Use maxdepth 8 to catch deeply nested Cellar paths
+             candidates+=($(find "$base_path" -maxdepth 8 -name "${lib_name}*.dylib" -type f 2>/dev/null | grep -v ".dSYM" | sort))
         fi
 
         for dylib in "${candidates[@]}"; do
