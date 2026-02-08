@@ -1624,6 +1624,10 @@
     <context>
         <name>GlobalExceptionHandler</name>
         <message>
+            <source>&lt;h3&gt;A critical error occurred&lt;/h3&gt;&lt;p&gt;The application must terminate.&lt;/p&gt;</source>
+            <translation type="finished">&lt;h3&gt;Ocurrió un error crítico&lt;/h3&gt;&lt;p&gt;La aplicación debe cerrarse.&lt;/p&gt;</translation>
+        </message>
+        <message>
             <source>&lt;h3&gt;An unexpected error occurred&lt;/h3&gt;</source>
             <translation type="finished">&lt;h3&gt;Ocurrió un error inesperado&lt;/h3&gt;</translation>
         </message>
@@ -1640,8 +1644,20 @@
             <translation type="finished">Copiar al Portapapeles</translation>
         </message>
         <message>
+            <source>Critical Error</source>
+            <translation type="finished">Error Crítico</translation>
+        </message>
+        <message>
+            <source>Exit</source>
+            <translation type="finished">Salir</translation>
+        </message>
+        <message>
             <source>Log Context:</source>
             <translation type="finished">Contexto Log:</translation>
+        </message>
+        <message>
+            <source>Open Log Folder</source>
+            <translation type="finished">Abrir Carpeta de Log</translation>
         </message>
     </context>
     <context>
@@ -4194,8 +4210,20 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">&lt;b&gt;Canales Banda Estrecha&lt;/b&gt;</translation>
         </message>
         <message>
+            <source>&lt;b&gt;Stretch Settings&lt;/b&gt;</source>
+            <translation type="finished">&lt;b&gt;Ajustes de Estiramiento&lt;/b&gt;</translation>
+        </message>
+        <message>
             <source>Apply to New View</source>
             <translation type="finished">Aplicar a Nueva Vista</translation>
+        </message>
+        <message>
+            <source>Auto Stretch Channels</source>
+            <translation type="finished">Auto Stretch Canales</translation>
+        </message>
+        <message>
+            <source>Automatically stretch linear data to non-linear for preview/result.</source>
+            <translation type="finished">Estira automáticamente datos lineales a no lineales para vista previa/resultado.</translation>
         </message>
         <message>
             <source>Error</source>
@@ -4214,6 +4242,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">No cargado</translation>
         </message>
         <message>
+            <source>Perfect Palette Picker</source>
+            <translation type="finished">Selector de Paleta Perfecta</translation>
+        </message>
+        <message>
             <source>Please select an image first.</source>
             <translation type="finished">Por favor, seleccione una imagen primero.</translation>
         </message>
@@ -4224,6 +4256,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Source for %1:</source>
             <translation type="finished">Fuente para %1:</translation>
+        </message>
+        <message>
+            <source>Strength:</source>
+            <translation type="finished">Fuerza:</translation>
         </message>
         <message>
             <source>© 2026 SetiAstro</source>
@@ -6402,6 +6438,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Calculando coeficientes de normalización...</translation>
         </message>
         <message>
+            <source>Cosmetic Correction: Found %1 defects in master dark</source>
+            <translation type="finished">Corrección Cosmética: Encontrados %1 defectos en el master dark</translation>
+        </message>
+        <message>
             <source>Drizzle enabled: Running first pass for rejection...</source>
             <translation type="finished">Drizzle activo: Ejecutando primer paso para rechazo...</translation>
         </message>
@@ -6502,12 +6542,24 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Usando %1 bloques paralelos de máx %2 filas c/u</translation>
         </message>
         <message>
+            <source>Warning: Cosmetic correction enabled but no master dark provided</source>
+            <translation type="finished">Advertencia: Corrección cosmética habilitada pero no se proporcionó master dark</translation>
+        </message>
+        <message>
+            <source>Warning: Could not load cosmetic map file: %1</source>
+            <translation type="finished">Advertencia: No se pudo cargar el archivo de mapa cosmético: %1</translation>
+        </message>
+        <message>
             <source>Warning: Failed to load image %1</source>
             <translation type="finished">Aviso: Fallo al cargar imagen %1</translation>
         </message>
         <message>
             <source>Warning: Failed to read image %1, skipping</source>
             <translation type="finished">Aviso: Fallo al leer imagen %1, omitiendo</translation>
+        </message>
+        <message>
+            <source>Warning: No defects found in master dark, cosmetic correction disabled</source>
+            <translation type="finished">Advertencia: No se encontraron defectos en el master dark, corrección cosmética desactivada</translation>
         </message>
         <message>
             <source>Warning: Normalization computation failed, continuing without</source>

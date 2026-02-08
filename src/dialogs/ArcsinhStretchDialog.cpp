@@ -198,7 +198,7 @@ void ArcsinhStretchDialog::onPreviewToggled(bool checked) {
         // Restore original
         // Restore original
         if (m_viewer && m_originalBuffer.isValid()) {
-            m_viewer->setBuffer(m_originalBuffer);
+            m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
         }
         m_lowClipLabel->setText(tr("Low: 0.00%"));
         m_highClipLabel->setText(tr("High: 0.00%"));
@@ -217,7 +217,7 @@ void ArcsinhStretchDialog::onReset() {
     m_humanLuminance = true;
     
     if (m_viewer && m_originalBuffer.isValid()) {
-        m_viewer->setBuffer(m_originalBuffer);
+        m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
     }
     m_lowClipLabel->setText(tr("Low: 0.00%"));
     m_highClipLabel->setText(tr("High: 0.00%"));
@@ -237,7 +237,7 @@ void ArcsinhStretchDialog::onApply() {
         buf.applyArcSinh(m_stretch, m_blackPoint, m_humanLuminance);
         
         // 4. Set the final buffer
-        m_viewer->setBuffer(buf);
+        m_viewer->setBuffer(buf, m_viewer->windowTitle(), true);
         m_applied = true;
     }
     accept();
@@ -248,7 +248,7 @@ void ArcsinhStretchDialog::updatePreview() {
     
     ImageBuffer buf = m_originalBuffer;
     buf.applyArcSinh(m_stretch, m_blackPoint, m_humanLuminance);
-    m_viewer->setBuffer(buf);
+    m_viewer->setBuffer(buf, m_viewer->windowTitle(), true);
     
     // Update clipping stats
     updateClippingStats(buf);

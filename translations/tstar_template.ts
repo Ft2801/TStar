@@ -1624,6 +1624,10 @@
     <context>
         <name>GlobalExceptionHandler</name>
         <message>
+            <source>&lt;h3&gt;A critical error occurred&lt;/h3&gt;&lt;p&gt;The application must terminate.&lt;/p&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>&lt;h3&gt;An unexpected error occurred&lt;/h3&gt;</source>
             <translation type="unfinished" />
         </message>
@@ -1640,7 +1644,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Critical Error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Exit</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Log Context:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Open Log Folder</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -4191,7 +4207,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>&lt;b&gt;Stretch Settings&lt;/b&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Apply to New View</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Auto Stretch Channels</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Automatically stretch linear data to non-linear for preview/result.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4211,6 +4239,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Perfect Palette Picker</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Please select an image first.</source>
             <translation type="unfinished" />
         </message>
@@ -4220,6 +4252,10 @@
         </message>
         <message>
             <source>Source for %1:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Strength:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -6399,6 +6435,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Cosmetic Correction: Found %1 defects in master dark</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Drizzle enabled: Running first pass for rejection...</source>
             <translation type="unfinished" />
         </message>
@@ -6499,11 +6539,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Warning: Cosmetic correction enabled but no master dark provided</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Warning: Could not load cosmetic map file: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Warning: Failed to load image %1</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Warning: Failed to read image %1, skipping</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Warning: No defects found in master dark, cosmetic correction disabled</source>
             <translation type="unfinished" />
         </message>
         <message>

@@ -205,7 +205,7 @@ void DebayerDialog::onApply() {
     
     // Apply result
     m_viewer->pushUndo();
-    m_viewer->setBuffer(rgb);
+    m_viewer->setBuffer(rgb, m_viewer->windowTitle(), true);
     
     m_progress->setValue(100);
     m_statusLabel->setText(tr("Done."));

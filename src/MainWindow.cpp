@@ -25,6 +25,7 @@
 #include <QDropEvent>
 #include <cmath> // for std::abs
 #include <QSet>
+#include <exception>
 
 #include <QFormLayout>
 #include <QDialogButtonBox>
@@ -917,8 +918,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(settingsBtn, &QToolButton::clicked, this, &MainWindow::onSettingsAction);
     
     mainToolbar->addWidget(settingsBtn);
-
-    mainToolbar->addSeparator();
 
     // Help Button
     QToolButton* helpBtn = new QToolButton(this);

@@ -230,7 +230,7 @@ void StarRecompositionDialog::onUpdatePreview() {
         // Set result to preview viewer
         // Important: Force Linear display state so we see the exact output of the blend (0-1)
         // without auto-stretch interfering.
-        m_previewViewer->setBuffer(result, "Preview"); 
+        m_previewViewer->setBuffer(result, "Preview", true); 
         m_previewViewer->setDisplayState(ImageBuffer::Display_Linear, false);
     }
 }

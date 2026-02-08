@@ -10,6 +10,8 @@ TRANSLATIONS = {
 
     "16-bit Integer": {'it': '16-bit Intero', 'es': '16-bit Entero', 'fr': '16-bit Entier', 'de': '16-bit Ganzzahl'},
 
+    "<h3>A critical error occurred</h3><p>The application must terminate.</p>": {'it': '<h3>Si è verificato un errore critico</h3><p>L\'applicazione deve terminare.</p>', 'es': '<h3>Ocurrió un error crítico</h3><p>La aplicación debe cerrarse.</p>', 'fr': '<h3>Une erreur critique est survenue</h3><p>L\'application doit se terminer.</p>', 'de': '<h3>Ein kritischer Fehler ist aufgetreten</h3><p>Die Anwendung muss beendet werden.</p>'},
+
     "1:1 (Square)": {'it': '1:1 (Quadrato)', 'es': '1:1 (Cuadrado)', 'fr': '1:1 (Carré)', 'de': '1:1 (Quadrat)'},
 
     "24-bit Autostretch (Smoother gradients)": {'it': 'Autostretch a 24-bit (Gradienti più fluidi)', 'es': 'Autostretch 24-bit (Gradientes más suaves)', 'fr': 'Autostretch 24-bit (Dégradés plus lisses)', 'de': '24-Bit Autostretch (Glattere Verläufe)'},
@@ -27,6 +29,8 @@ TRANSLATIONS = {
     "<b>Failed:</b> %1": {'it': '<b>Fallito:</b> %1', 'es': '<b>Fallido:</b> %1', 'fr': '<b>Échec :</b> %1', 'de': '<b>Fehlgeschlagen:</b> %1'},
 
     "<b>Intensities</b>": {'it': '<b>Intensità</b>', 'es': '<b>Intensidades</b>', 'fr': '<b>Intensités</b>', 'de': '<b>Intensitäten</b>'},
+
+    "<b>Stretch Settings</b>": {'it': '<b>Impostazioni Stretch</b>', 'es': '<b>Ajustes de Estiramiento</b>', 'fr': "<b>Paramètres d'Étirement</b>", 'de': '<b>Streckungseinstellungen</b>'},
 
     "<b>Narrowband Channels</b>": {'it': '<b>Canali Banda Stretta</b>', 'es': '<b>Canales Banda Estrecha</b>', 'fr': '<b>Canaux Bande Étroite</b>', 'de': '<b>Schmalbandkanäle</b>'},
 
@@ -126,6 +130,10 @@ TRANSLATIONS = {
 
     "Auto Stretch": {'it': 'Auto-Stretch', 'es': 'Auto-Stretch', 'fr': 'Auto-Stretch', 'de': 'Auto-Stretch'},
 
+    "Auto Stretch Channels": {'it': 'Auto Stretch Canali', 'es': 'Auto Stretch Canales', 'fr': 'Auto Stretch Canaux', 'de': 'Auto Stretch Kanäle'},
+
+    "Automatically stretch linear data to non-linear for preview/result.": {'it': 'Stretcha automaticamente i dati lineari in non-lineari per anteprima/risultato.', 'es': 'Estira automáticamente datos lineales a no lineales para vista previa/resultado.', 'fr': "Étire automatiquement les données linéaires en non-linéaires pour l'aperçu/résultat.", 'de': 'Dehnt lineare Daten automatisch auf nicht-lineare für Vorschau/Ergebnis.'},
+
     "Auto-open console on log": {'it': 'Apri console al log', 'es': 'Abrir consola al log', 'fr': 'Ouvrir console sur log', 'de': 'Konsole bei Log öffnen'},
 
     "AutoStretch": {'it': 'AutoStretch', 'es': 'AutoStretch', 'fr': 'AutoStretch', 'de': 'AutoStretch'},
@@ -135,6 +143,8 @@ TRANSLATIONS = {
     "Average Neutral": {'it': 'Neutro Medio', 'es': 'Neutro Promedio', 'fr': 'Neutre Moyen', 'de': 'Durchschnitt Neutral'},
 
     "B/G Distribution": {'it': 'Distribuzione B/G', 'es': 'Distribución B/G', 'fr': 'Distribution B/G', 'de': 'B/G Verteilung'},
+
+    "Source for %1:": {'it': 'Sorgente per %1:', 'es': 'Origen para %1:', 'fr': 'Source pour %1 :', 'de': 'Quelle für %1:'},
 
     "BG Factor:": {'it': 'Fattore BG:', 'es': 'Factor BG:', 'fr': 'Facteur BG :', 'de': 'HG-Faktor:'},
 
@@ -266,6 +276,8 @@ TRANSLATIONS = {
 
     "Copyright © 2026": {'it': 'Copyright © 2026', 'es': 'Copyright © 2026', 'fr': 'Copyright © 2026', 'de': 'Copyright © 2026'},
 
+    "Critical Error": {'it': 'Errore Critico', 'es': 'Error Crítico', 'fr': 'Erreur Critique', 'de': 'Kritischer Fehler'},
+
     "Content-Aware:": {'it': 'Consapevole del Contenuto:', 'es': 'Consciente del Contenido:', 'fr': 'Sensible au Contenu :', 'de': 'Inhaltsbewusst:'},
 
     "Contrast Limited Adaptive Histogram Equalization. Enhances local contrast in different regions of the image:": {'it': "Equalizzazione Adattiva dell'Istogramma a Contrasto Limitato. Migliora il contrasto locale in diverse regioni dell'immagine:", 'es': 'Ecualización Adaptativa del Histograma con Contraste Limitado. Mejora el contraste local en diferentes regiones de la imagen:', 'fr': "Égalisation Adaptative d'Histogramme à Contraste Limité. Améliore le contraste local dans différentes régions de l'image :", 'de': 'Kontrastbegrenzte Adaptive Histogramm-Egalisierung. Verbessert den lokalen Kontrast in verschiedenen Bereichen des Bildes:'},
@@ -273,6 +285,8 @@ TRANSLATIONS = {
     "Controls contrast amplification. Higher values increase contrast but may introduce noise.": {'it': "Controlla l'amplificazione del contrasto. Valori più alti aumentano il contrasto ma possono introdurre rumore.", 'es': 'Controla la amplificación del contraste. Valores más altos aumentan el contraste pero pueden introducir ruido.', 'fr': "Contrôle l'amplification du contraste. Des valeurs plus élevées augmentent le contraste mais peuvent introduire du bruit.", 'de': 'Steuert die Kontrastverstärkung. Höhere Werte erhöhen den Kontrast, können aber Rauschen verursachen.'},
 
     "Correction Brush": {'it': 'Pennello di Correzione', 'es': 'Pincel de Corrección', 'fr': 'Pinceau de Correction', 'de': 'Korrekturpinsel'},
+
+    "Cosmetic Correction: Found %1 defects in master dark": {'it': 'Correzione Cosmetica: Trovati %1 difetti nel master dark', 'es': 'Corrección Cosmética: Encontrados %1 defectos en el master dark', 'fr': 'Correction Cosmétique : %1 défauts trouvés dans le master dark', 'de': 'Kosmetische Korrektur: %1 Defekte im Master Dark gefunden'},
 
     "Cosmic Clarity": {'it': 'Cosmic Clarity', 'es': 'Cosmic Clarity', 'fr': 'Cosmic Clarity', 'de': 'Cosmic Clarity'},
 
@@ -399,6 +413,8 @@ TRANSLATIONS = {
     "Even Weighted Luminance": {'it': 'Luminanza ponderata pari', 'es': 'Luminancia ponderada par', 'fr': 'Luminance pondérée paire', 'de': 'Gleichmäßig gewichtete Luminanz'},
 
     "Executables (*.exe);;All Files (*)": {'it': 'Eseguibili (*.exe);;Tutti i file (*)', 'es': 'Ejecutables (*.exe);;Todos los archivos (*)', 'fr': 'Exécutables (*.exe);;Tous les fichiers (*)', 'de': 'Ausführbare Dateien (*.exe);;Alle Dateien (*)'},
+
+    "Exit": {'it': 'Esci', 'es': 'Salir', 'fr': 'Quitter', 'de': 'Beenden'},
 
     "Expected (Catalog)": {'it': 'Atteso (Catalogo)', 'es': 'Esperado (Catálogo)', 'fr': 'Attendu (Catalogue)', 'de': 'Erwartet (Katalog)'},
 
@@ -811,6 +827,8 @@ TRANSLATIONS = {
     "Open": {'it': 'Apri', 'es': 'Abrir', 'fr': 'Ouvrir', 'de': 'Öffnen'},
 
     "Open Image(s)": {'it': 'Apri Immagini', 'es': 'Abrir Imágenes', 'fr': 'Ouvrir Image(s)', 'de': 'Bilder öffnen'},
+
+    "Open Log Folder": {'it': 'Apri Cartella Log', 'es': 'Abrir Carpeta de Log', 'fr': 'Ouvrir Dossier de Log', 'de': 'Log-Ordner öffnen'},
 
     "Open an image first.": {'it': "Apri prima un'immagine.", 'es': 'Abra una imagen primero.', 'fr': "Ouvrez d'abord une image.", 'de': 'Zuerst ein Bild öffnen.'},
 
@@ -1912,6 +1930,8 @@ TRANSLATIONS = {
     "Sharpens stars and details": {'it': "Affina stelle e dettagli", 'es': "Afila estrellas y detalles", 'fr': "Accentue les étoiles et les détails", 'de': "Schärft Sterne und Details"},
     "Reduces noise without losing detail": {'it': "Riduce il rumore senza perdere dettagli", 'es': "Reduce el ruido sin perder detalles", 'fr': "Réduit le bruit sans perdre de détails", 'de': "Reduziert Rauschen ohne Detailverlust"},
     "Requires external Cosmic Clarity installation": {'it': "Richiede installazione esterna di Cosmic Clarity", 'es': "Requiere instalación externa de Cosmic Clarity", 'fr': "Nécessite une installation externe de Cosmic Clarity", 'de': "Erfordert externe Cosmic Clarity Installation"},
+
+    "Perfect Palette Picker": {'it': 'Selettore Palette Perfetta', 'es': 'Selector de Paleta Perfecta', 'fr': 'Sélecteur de Palette Parfaite', 'de': 'Perfekter Paletten-Wähler'},
     "AI-based gradient removal:": {'it': "Rimozione gradienti basata su AI:", 'es': "Eliminación de gradientes basada en IA:", 'fr': "Suppression de gradient basée sur IA :", 'de': "KI-basierte Gradientenentfernung:"},
     "Automatically detects and removes gradients": {'it': "Rileva e rimuove automaticamente i gradienti", 'es': "Detecta y elimina automáticamente los gradientes", 'fr': "Détecte et supprime automatiquement les gradients", 'de': "Erkennt und entfernt Gradienten automatisch"},
     "More powerful than traditional ABE": {'it': "Più potente dell'ABE tradizionale", 'es': "Más potente que el ABE tradicional", 'fr': "Plus puissant que l'ABE traditionnel", 'de': "Leistungsfähiger als traditionelles ABE"},
@@ -1945,6 +1965,8 @@ TRANSLATIONS = {
     "Add object labels and annotations using catalog data.": {'it': "Aggiungi etichette e annotazioni usando dati del catalogo.", 'es': "Añade etiquetas y anotaciones usando datos del catálogo.", 'fr': "Ajoutez des étiquettes et annotations en utilisant les données du catalogue.", 'de': "Objektbeschriftungen und Annotationen mit Katalogdaten hinzufügen."},
     "Masks": {'it': "Maschere", 'es': "Máscaras", 'fr': "Masques", 'de': "Masken"},
     "Create and apply luminosity masks for selective processing:": {'it': "Crea e applica maschere di luminosità per elaborazione selettiva:", 'es': "Crea y aplica máscaras de luminosidad para procesamiento selectivo:", 'fr': "Créez et appliquez des masques de luminosité pour un traitement sélectif :", 'de': "Erstellen und Anwenden von Luminanzmasken für selektive Bearbeitung:"},
+
+    "Select View": {'it': 'Seleziona Vista', 'es': 'Seleccionar Vista', 'fr': 'Sélectionner une Vue', 'de': 'Ansicht auswählen'},
     "Create Mask:": {'it': "Crea Maschera:", 'es': "Crear Máscara:", 'fr': "Créer Masque :", 'de': "Maske erstellen:"},
     "Generate mask from image luminosity": {'it': "Genera maschera dalla luminosità dell'immagine", 'es': "Genera máscara a partir de la luminosidad de la imagen", 'fr': "Générer un masque à partir de la luminosité de l'image", 'de': "Maske aus Bildluminanz generieren"},
     "Apply Mask:": {'it': "Applica Maschera:", 'es': "Aplicar Máscara:", 'fr': "Appliquer Masque :", 'de': "Maske anwenden:"},
@@ -1953,6 +1975,8 @@ TRANSLATIONS = {
     "Invert mask selection": {'it': "Inverti selezione maschera", 'es': "Invertir selección de máscara", 'fr': "Inverser la sélection du masque", 'de': "Maskenauswahl invertieren"},
     "Show Overlay:": {'it': "Mostra Sovrapposizione:", 'es': "Mostrar Superposición:", 'fr': "Afficher Superposition :", 'de': "Überlagerung anzeigen:"},
     "Toggle mask visualization": {'it': "Attiva/disattiva visualizzazione maschera", 'es': "Activar/desactivar visualización de máscara", 'fr': "Activer/désactiver la visualisation du masque", 'de': "Maskenvisualisierung ein-/ausschalten"},
+    "Select View": {'it': 'Seleziona Vista', 'es': 'Seleccionar Vista', 'fr': 'Sélectionner une Vue', 'de': 'Ansicht auswählen'},
+
     "Adds artificial diffraction spikes to bright stars for aesthetic effect.": {'it': "Aggiunge spikes di diffrazione artificiali alle stelle luminose per effetto estetico.", 'es': "Añade picos de difracción artificiales a estrellas brillantes para efecto estético.", 'fr': "Ajoute des aigrettes de diffraction artificielles aux étoiles brillantes pour un effet esthétique.", 'de': "Fügt künstliche Beugungsspikes zu hellen Sternen für ästhetischen Effekt hinzu."},
     "Keyboard Shortcuts": {'it': "Scorciatoie da Tastiera", 'es': "Atajos de Teclado", 'fr': "Raccourcis Clavier", 'de': "Tastenkürzel"},
     "Open file": {'it': "Apri file", 'es': "Abrir archivo", 'fr': "Ouvrir fichier", 'de': "Datei öffnen"},
@@ -1969,6 +1993,7 @@ TRANSLATIONS = {
     "Star Stretch": {'it': "Star Stretch", 'es': "Star Stretch", 'fr': "Star Stretch", 'de': "Star Stretch"},
     "Specialized tool to stretch stars while preserving their color and size:": {'it': "Strumento specializzato per stretchare le stelle preservandone colore e dimensioni:", 'es': "Herramienta especializada para estirar estrellas preservando su color y tamaño:", 'fr': "Outil spécialisé pour étirer les étoiles tout en préservant leur couleur et leur taille :", 'de': "Spezialisiertes Werkzeug zum Strecken von Sternen unter Beibehaltung ihrer Farbe und Größe:"},
     "Stretch Amount:": {'it': "Intensità Stretch:", 'es': "Cantidad de Estiramiento:", 'fr': "Intensité de l'étirement :", 'de': "Streckungsbetrag:"},
+    "Strength:": {'it': "Forza:", 'es': "Fuerza:", 'fr': "Force :", 'de': "Stärke:"},
     "Controls the non-linear expansion of stars.": {'it': "Controlla l'espansione non lineare delle stelle.", 'es': "Controla la expansión no lineal de las estrellas.", 'fr': "Contrôle l'expansion non linéaire des étoiles.", 'de': "Steuert die nichtlineare Ausdehnung von Sternen."},
     "Color Boost:": {'it': "Potenziamento Colore:", 'es': "Potenciación de Color:", 'fr': "Boost de Couleur :", 'de': "Farbverstärkung:"},
     "Increases color saturation specifically for stars.": {'it': "Aumenta la saturazione del colore specificamente per le stelle.", 'es': "Aumenta la saturación de color específicamente para las estrellas.", 'fr': "Augmente la saturation des couleurs spécifiquement pour les étoiles.", 'de': "Erhöht die Farbsättigung speziell für Sterne."},
@@ -2098,6 +2123,8 @@ TRANSLATIONS = {
     "%1/%2 images selected, %3 total exposure": {'it': '%1/%2 immagini selezionate, esposizione totale %3', 'es': '%1/%2 imágenes seleccionadas, exposición total %3', 'fr': '%1/%2 images sélectionnées, exposition totale %3', 'de': '%1/%2 Bilder ausgewählt, Gesamtbelichtung %3'},
     "%1: Unexpected end of file in continued line": {'it': '%1: Fine file inattesa nella riga continua', 'es': '%1: Fin de archivo inesperado en línea continua', 'fr': '%1 : Fin de fichier inattendue dans la ligne continue', 'de': '%1: Unerwartetes Dateiende in fortgesetzter Zeile'},
     "(No scripts found)": {'it': '(Nessuno script trovato)', 'es': '(No se encontraron scripts)', 'fr': '(Aucun script trouvé)', 'de': '(Keine Skripte gefunden)'},
+
+    "© 2026 SetiAstro": {'it': '© 2026 SetiAstro', 'es': '© 2026 SetiAstro', 'fr': '© 2026 SetiAstro', 'de': '© 2026 SetiAstro'},
     "(Optional)": {'it': '(Opzionale)', 'es': '(Opcional)', 'fr': '(Optionnel)', 'de': '(Optional)'},
     "(Same as input)": {'it': '(Come input)', 'es': '(Igual que entrada)', 'fr': '(Identique à l\'entrée)', 'de': '(Wie Eingabe)'},
     "(Scripts folder not found)": {'it': '(Cartella script non trovata)', 'es': '(Carpeta de scripts no encontrada)', 'fr': '(Dossier de scripts introuvable)', 'de': '(Skriptordner nicht gefunden)'},
@@ -2485,6 +2512,12 @@ TRANSLATIONS = {
     "Warning: Failed to read image %1, skipping": {'it': 'Attenzione: Lettura immagine %1 fallita, salto', 'es': 'Aviso: Fallo al leer imagen %1, omitiendo', 'fr': 'Attention : Échec lecture image %1, ignorée', 'de': 'Warnung: Lesen von Bild %1 fehlgeschlagen, überspringe'},
     "Warning: Normalization computation failed, continuing without": {'it': 'Attenzione: Calcolo normalizzazione fallito, continuo senza', 'es': 'Aviso: Fallo cálculo normalización, continuando sin ella', 'fr': 'Attention : Échec calcul normalisation, suite sans', 'de': 'Warnung: Normalisierungsberechnung fehlgeschlagen, fahre ohne fort'},
     "Warning: Weight computation failed, continuing without weighting": {'it': 'Attenzione: Calcolo pesi fallito, continuo senza pesi', 'es': 'Aviso: Fallo cálculo pesos, continuando sin ponderación', 'fr': 'Attention : Échec calcul poids, suite sans pondération', 'de': 'Warnung: Gewichtsberechnung fehlgeschlagen, fahre ohne fort'},
+
+    "Warning: Cosmetic correction enabled but no master dark provided": {'it': 'Avviso: Correzione cosmetica abilitata ma nessun master dark fornito', 'es': 'Advertencia: Corrección cosmética habilitada pero no se proporcionó master dark', 'fr': 'Avertissement : Correction cosmétique activée mais aucun master dark fourni', 'de': 'Warnung: Kosmetische Korrektur aktiviert, aber kein Master Dark bereitgestellt'},
+
+    "Warning: Could not load cosmetic map file: %1": {'it': 'Avviso: Impossibile caricare il file mappa cosmetica: %1', 'es': 'Advertencia: No se pudo cargar el archivo de mapa cosmético: %1', 'fr': 'Avertissement : Impossible de charger le fichier de carte cosmétique : %1', 'de': 'Warnung: Kosmetische Kartendatei konnte nicht geladen werden: %1'},
+
+    "Warning: No defects found in master dark, cosmetic correction disabled": {'it': 'Avviso: Nessun difetto trovato nel master dark, correzione cosmetica disabilitata', 'es': 'Advertencia: No se encontraron defectos en el master dark, corrección cosmética desactivada', 'fr': 'Avertissement : Aucun défaut trouvé dans le master dark, correction cosmétique désactivée', 'de': 'Warnung: Keine Defekte im Master Dark gefunden, kosmetische Korrektur deaktiviert'},
     "Weighting:": {'it': 'Ponderazione:', 'es': 'Ponderación:', 'fr': 'Pondération :', 'de': 'Gewichtung:'},
     "Winsorized Sigma": {'it': 'Winsorized Sigma', 'es': 'Winsorized Sigma', 'fr': 'Winsorized Sigma', 'de': 'Winsorized Sigma'},
     "W×H": {'it': 'L×A', 'es': 'An×Al', 'fr': 'L×H', 'de': 'B×H'},

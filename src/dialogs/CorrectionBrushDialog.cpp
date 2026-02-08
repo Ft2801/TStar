@@ -583,7 +583,7 @@ void CorrectionBrushDialog::onApply() {
     if (MainWindowCallbacks* mw = getCallbacks()) {
         ImageViewer* v = mw->getCurrentViewer();
         if (v) {
-            v->setBuffer(m_currentImage, v->getBuffer().name());
+            v->setBuffer(m_currentImage, v->getBuffer().name(), true);
             accept();
         }
     }

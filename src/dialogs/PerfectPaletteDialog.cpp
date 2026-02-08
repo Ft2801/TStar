@@ -13,7 +13,7 @@
 #include <QIcon>
 
 PerfectPaletteDialog::PerfectPaletteDialog(QWidget* parent)
-    : DialogBase(parent, "Perfect Palette Picker", 1000, 700), m_selectedPalette("SHO")
+    : DialogBase(parent, tr("Perfect Palette Picker"), 1000, 700), m_selectedPalette("SHO")
 {
     m_mainWin = getCallbacks();
     createUI();
@@ -64,6 +64,30 @@ void PerfectPaletteDialog::createUI() {
     addSlider("Ha", &m_sliderHa, &m_lblValHa);
     addSlider("OIII", &m_sliderOiii, &m_lblValOiii);
     addSlider("SII", &m_sliderSii, &m_lblValSii);
+    
+    ctrlLayout->addSpacing(20);
+    ctrlLayout->addWidget(new QLabel(tr("<b>Stretch Settings</b>")));
+    
+    // Auto Stretch Checkbox
+    m_chkAutoStretch = new QCheckBox(tr("Auto Stretch Channels"));
+    m_chkAutoStretch->setChecked(true);
+    m_chkAutoStretch->setToolTip(tr("Automatically stretch linear data to non-linear for preview/result."));
+    ctrlLayout->addWidget(m_chkAutoStretch);
+    
+    // Stretch Strength Slider
+    QHBoxLayout* hlStretch = new QHBoxLayout();
+    hlStretch->addWidget(new QLabel(tr("Strength:")));
+    m_sliderStretch = new QSlider(Qt::Horizontal);
+    m_sliderStretch->setRange(10, 50); // 0.10 to 0.50
+    m_sliderStretch->setValue(25); // Default 0.25
+    m_lblStretchVal = new QLabel("0.25");
+    hlStretch->addWidget(m_sliderStretch);
+    hlStretch->addWidget(m_lblStretchVal);
+    ctrlLayout->addLayout(hlStretch);
+    
+    // Connections
+    connect(m_chkAutoStretch, &QCheckBox::toggled, this, &PerfectPaletteDialog::onStretchChanged);
+    connect(m_sliderStretch, &QSlider::valueChanged, this, &PerfectPaletteDialog::onStretchChanged);
     
     ctrlLayout->addStretch();
     
@@ -239,6 +263,19 @@ void PerfectPaletteDialog::onPaletteSelected(const QString& name) {
     onCreatePalettes();
 }
 
+    // Logic updates
+    
+void PerfectPaletteDialog::onStretchChanged() {
+    float val = m_sliderStretch->value() / 100.0f;
+    m_lblStretchVal->setText(QString::number(val, 'f', 2));
+    
+    // Enable/Disable slider based on checkbox
+    m_sliderStretch->setEnabled(m_chkAutoStretch->isChecked());
+    m_lblStretchVal->setEnabled(m_chkAutoStretch->isChecked());
+    
+    onCreatePalettes();
+}
+
 void PerfectPaletteDialog::onCreatePalettes() {
     if (!m_oiii.isValid() || (!m_ha.isValid() && !m_sii.isValid())) return;
     
@@ -247,7 +284,10 @@ void PerfectPaletteDialog::onCreatePalettes() {
     params.haFactor = m_sliderHa->value() / 100.0f;
     params.oiiiFactor = m_sliderOiii->value() / 100.0f;
     params.siiFactor = m_sliderSii->value() / 100.0f;
-    params.applyStatisticalStretch = true;
+    
+    // Get Stretch Settings
+    params.applyStatisticalStretch = m_chkAutoStretch->isChecked();
+    params.targetMedian = m_sliderStretch->value() / 100.0f;
 
     ImageBuffer result;
     QString err;
@@ -259,13 +299,16 @@ void PerfectPaletteDialog::onCreatePalettes() {
         int h = result.height();
         QImage qimg(w, h, QImage::Format_RGB888);
         const float* data = result.data().data();
+        
+        // Parallel conversion for responsiveness
+        #pragma omp parallel for
         for (int y = 0; y < h; ++y) {
             for (int x = 0; x < w; ++x) {
                 int idx = (y * w + x) * 3;
                 qimg.setPixel(x, y, qRgb(
-                    (int)(data[idx + 0] * 255),
-                    (int)(data[idx + 1] * 255),
-                    (int)(data[idx + 2] * 255)
+                    std::min(255, std::max(0, (int)(data[idx + 0] * 255))),
+                    std::min(255, std::max(0, (int)(data[idx + 1] * 255))),
+                    std::min(255, std::max(0, (int)(data[idx + 2] * 255)))
                 ));
             }
         }
@@ -282,7 +325,10 @@ void PerfectPaletteDialog::onApply() {
     params.haFactor = m_sliderHa->value() / 100.0f;
     params.oiiiFactor = m_sliderOiii->value() / 100.0f;
     params.siiFactor = m_sliderSii->value() / 100.0f;
-    params.applyStatisticalStretch = true;
+    
+    // Get Stretch Settings
+    params.applyStatisticalStretch = m_chkAutoStretch->isChecked();
+    params.targetMedian = m_sliderStretch->value() / 100.0f;
 
     ImageBuffer result;
     QString err;

@@ -1,6 +1,12 @@
 TStar Changelog
 ===============
 
+Version 1.5.10
+--------------
+- Fixed a crash when trying to display stretch a b/w image
+- Fixed zoom resetting bug when toggling image preview in a tool
+- Added stretch level controller in PPP
+
 Version 1.5.9
 -------------
 - Fixed a small bug in the logging system

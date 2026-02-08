@@ -1624,6 +1624,10 @@
     <context>
         <name>GlobalExceptionHandler</name>
         <message>
+            <source>&lt;h3&gt;A critical error occurred&lt;/h3&gt;&lt;p&gt;The application must terminate.&lt;/p&gt;</source>
+            <translation type="finished">&lt;h3&gt;Ein kritischer Fehler ist aufgetreten&lt;/h3&gt;&lt;p&gt;Die Anwendung muss beendet werden.&lt;/p&gt;</translation>
+        </message>
+        <message>
             <source>&lt;h3&gt;An unexpected error occurred&lt;/h3&gt;</source>
             <translation type="finished">&lt;h3&gt;Ein unerwarteter Fehler ist aufgetreten&lt;/h3&gt;</translation>
         </message>
@@ -1640,8 +1644,20 @@
             <translation type="finished">In Zwischenablage kopieren</translation>
         </message>
         <message>
+            <source>Critical Error</source>
+            <translation type="finished">Kritischer Fehler</translation>
+        </message>
+        <message>
+            <source>Exit</source>
+            <translation type="finished">Beenden</translation>
+        </message>
+        <message>
             <source>Log Context:</source>
             <translation type="finished">Log-Kontext:</translation>
+        </message>
+        <message>
+            <source>Open Log Folder</source>
+            <translation type="finished">Log-Ordner öffnen</translation>
         </message>
     </context>
     <context>
@@ -4194,8 +4210,20 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">&lt;b&gt;Schmalbandkanäle&lt;/b&gt;</translation>
         </message>
         <message>
+            <source>&lt;b&gt;Stretch Settings&lt;/b&gt;</source>
+            <translation type="finished">&lt;b&gt;Streckungseinstellungen&lt;/b&gt;</translation>
+        </message>
+        <message>
             <source>Apply to New View</source>
             <translation type="finished">Auf neue Ansicht anwenden</translation>
+        </message>
+        <message>
+            <source>Auto Stretch Channels</source>
+            <translation type="finished">Auto Stretch Kanäle</translation>
+        </message>
+        <message>
+            <source>Automatically stretch linear data to non-linear for preview/result.</source>
+            <translation type="finished">Dehnt lineare Daten automatisch auf nicht-lineare für Vorschau/Ergebnis.</translation>
         </message>
         <message>
             <source>Error</source>
@@ -4214,16 +4242,24 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Nicht geladen</translation>
         </message>
         <message>
+            <source>Perfect Palette Picker</source>
+            <translation type="finished">Perfekter Palettenwähler</translation>
+        </message>
+        <message>
             <source>Please select an image first.</source>
             <translation type="finished">Bitten wählen Sie zuerst ein Bild aus.</translation>
         </message>
         <message>
             <source>Select View</source>
-            <translation type="finished">Ansicht wählen</translation>
+            <translation type="finished">Ansicht auswählen</translation>
         </message>
         <message>
             <source>Source for %1:</source>
             <translation type="finished">Quelle für %1:</translation>
+        </message>
+        <message>
+            <source>Strength:</source>
+            <translation type="finished">Stärke:</translation>
         </message>
         <message>
             <source>© 2026 SetiAstro</source>
@@ -6402,6 +6438,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Berechne Normalisierungskoeffizienten...</translation>
         </message>
         <message>
+            <source>Cosmetic Correction: Found %1 defects in master dark</source>
+            <translation type="finished">Kosmetische Korrektur: %1 Defekte im Master Dark gefunden</translation>
+        </message>
+        <message>
             <source>Drizzle enabled: Running first pass for rejection...</source>
             <translation type="finished">Drizzle aktiv: Erster Durchlauf für Zurückweisung...</translation>
         </message>
@@ -6502,12 +6542,24 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Verwende %1 parallele Blöcke mit je max %2 Zeilen</translation>
         </message>
         <message>
+            <source>Warning: Cosmetic correction enabled but no master dark provided</source>
+            <translation type="finished">Warnung: Kosmetische Korrektur aktiviert, aber kein Master Dark bereitgestellt</translation>
+        </message>
+        <message>
+            <source>Warning: Could not load cosmetic map file: %1</source>
+            <translation type="finished">Warnung: Kosmetische Kartendatei konnte nicht geladen werden: %1</translation>
+        </message>
+        <message>
             <source>Warning: Failed to load image %1</source>
             <translation type="finished">Warnung: Laden von Bild %1 fehlgeschlagen</translation>
         </message>
         <message>
             <source>Warning: Failed to read image %1, skipping</source>
             <translation type="finished">Warnung: Lesen von Bild %1 fehlgeschlagen, überspringe</translation>
+        </message>
+        <message>
+            <source>Warning: No defects found in master dark, cosmetic correction disabled</source>
+            <translation type="finished">Warnung: Keine Defekte im Master Dark gefunden, kosmetische Korrektur deaktiviert</translation>
         </message>
         <message>
             <source>Warning: Normalization computation failed, continuing without</source>

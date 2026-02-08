@@ -1,13 +1,14 @@
 #ifndef PERFECTPALETTEDIALOG_H
 #define PERFECTPALETTEDIALOG_H
 
-#include "DialogBase.h"
+#include <DialogBase.h>
 #include <QComboBox>
 #include <QSlider>
 #include <QLabel>
 #include <QPushButton>
 #include <QGridLayout>
 #include <QScrollArea>
+#include <QCheckBox>
 #include "../ImageBuffer.h"
 #include "../algos/PerfectPaletteRunner.h"
 #include <QPointer>
@@ -28,6 +29,7 @@ private slots:
     void onPaletteSelected(const QString& name);
     void onApply();
     void onIntensityChanged();
+    void onStretchChanged();
 
 private:
     void createUI();
@@ -50,6 +52,11 @@ private:
     
     QSlider *m_sliderHa, *m_sliderOiii, *m_sliderSii;
     QLabel *m_lblValHa, *m_lblValOiii, *m_lblValSii;
+    
+    // Stretch Controls
+    QCheckBox* m_chkAutoStretch;
+    QSlider* m_sliderStretch;
+    QLabel* m_lblStretchVal;
     
     QString m_selectedPalette;
     

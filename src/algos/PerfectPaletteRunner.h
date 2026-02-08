@@ -12,6 +12,7 @@ struct PerfectPaletteParams {
     float oiiiFactor = 1.0f;
     float siiFactor = 1.0f;
     bool applyStatisticalStretch = true;
+    float targetMedian = 0.25f; // [NEW] Control stretch level
 };
 
 class PerfectPaletteRunner : public QObject {
@@ -22,7 +23,7 @@ public:
     bool run(const ImageBuffer* ha, const ImageBuffer* oiii, const ImageBuffer* sii,
              ImageBuffer& output, const PerfectPaletteParams& params, QString* errorMsg = nullptr);
 
-    // Helper for statistical stretch (0.25 target median)
+    // Helper for statistical stretch (default 0.25 target median)
     static void applyStatisticalStretch(ImageBuffer& buffer, float targetMedian = 0.25f);
 
 signals:

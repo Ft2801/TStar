@@ -272,7 +272,7 @@ void HistogramStretchDialog::onPreviewToggled(bool checked) {
     if (checked) {
         updatePreview();
     } else {
-        if (m_viewer) m_viewer->setBuffer(m_backup);
+        if (m_viewer) m_viewer->setBuffer(m_backup, m_viewer->windowTitle(), true);
         m_lowClipLabel->setText(tr("Low: 0.00%"));
         m_highClipLabel->setText(tr("High: 0.00%"));
     }
@@ -325,7 +325,7 @@ void HistogramStretchDialog::onReset() {
     m_greenBtn->setChecked(true);
     m_blueBtn->setChecked(true);
     
-    if (m_viewer) m_viewer->setBuffer(m_backup);
+    if (m_viewer) m_viewer->setBuffer(m_backup, m_viewer->windowTitle(), true);
     if (m_histogram && m_backup.isValid()) {
         auto bins = m_backup.computeHistogram(65536);
         m_histogram->setData(bins, m_backup.channels());
@@ -340,7 +340,7 @@ void HistogramStretchDialog::onApply() {
         m_viewer->clearPreviewLUT();
 
         // 1. Restore to backup (clean state)
-        m_viewer->setBuffer(m_backup);
+        m_viewer->setBuffer(m_backup, m_viewer->windowTitle(), true);
 
         // 2. Push Undo de backup
         m_viewer->pushUndo();
@@ -348,7 +348,7 @@ void HistogramStretchDialog::onApply() {
         // 3. Apply MTF
         ImageBuffer buf = m_backup;
         applyMTF(buf, m_shadows, m_midtones, m_highlights, m_doRed, m_doGreen, m_doBlue);
-        m_viewer->setBuffer(buf);
+        m_viewer->setBuffer(buf, m_viewer->windowTitle(), true);
         // Reset display mode to linear to avoid double-stretching (applying AutoStretch on already stretched data)
         m_viewer->setDisplayState(ImageBuffer::Display_Linear, true);
         m_applied = true;

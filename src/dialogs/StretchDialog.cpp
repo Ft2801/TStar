@@ -329,7 +329,7 @@ void StretchDialog::onApply() {
         m_viewer->pushUndo();
         m_viewer->clearPreviewLUT(); 
         
-        m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), false);
+        m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
         
         ImageBuffer::StretchParams p = getParams();
         m_viewer->getBuffer().performTrueStretch(p);

@@ -108,9 +108,9 @@ bool PerfectPaletteRunner::run(const ImageBuffer* ha, const ImageBuffer* oiii, c
     if (sii) fSii = *sii;
 
     if (params.applyStatisticalStretch) {
-        if (ha) applyStatisticalStretch(fHa);
-        if (oiii) applyStatisticalStretch(fOiii);
-        if (sii) applyStatisticalStretch(fSii);
+        if (ha) applyStatisticalStretch(fHa, params.targetMedian);
+        if (oiii) applyStatisticalStretch(fOiii, params.targetMedian);
+        if (sii) applyStatisticalStretch(fSii, params.targetMedian);
     }
     
     if (params.haFactor != 1.0f && fHa.isValid()) fHa.multiply(params.haFactor);

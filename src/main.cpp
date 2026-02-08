@@ -22,6 +22,9 @@
 
 int main(int argc, char *argv[])
 {
+    // Initialize Global Exception Handlers (SEH, Signals, Terminate)
+    GlobalExceptionHandler::init();
+
     // Initialize logging system BEFORE QApplication
     // This ensures we capture any early errors
     QCoreApplication::setOrganizationName("FabioTempera");

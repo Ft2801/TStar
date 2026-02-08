@@ -1624,6 +1624,10 @@
     <context>
         <name>GlobalExceptionHandler</name>
         <message>
+            <source>&lt;h3&gt;A critical error occurred&lt;/h3&gt;&lt;p&gt;The application must terminate.&lt;/p&gt;</source>
+            <translation type="finished">&lt;h3&gt;Une erreur critique est survenue&lt;/h3&gt;&lt;p&gt;L'application doit se terminer.&lt;/p&gt;</translation>
+        </message>
+        <message>
             <source>&lt;h3&gt;An unexpected error occurred&lt;/h3&gt;</source>
             <translation type="finished">&lt;h3&gt;Une erreur inattendue est survenue&lt;/h3&gt;</translation>
         </message>
@@ -1640,8 +1644,20 @@
             <translation type="finished">Copier dans le presse-papier</translation>
         </message>
         <message>
+            <source>Critical Error</source>
+            <translation type="finished">Erreur Critique</translation>
+        </message>
+        <message>
+            <source>Exit</source>
+            <translation type="finished">Quitter</translation>
+        </message>
+        <message>
             <source>Log Context:</source>
             <translation type="finished">Contexte Log :</translation>
+        </message>
+        <message>
+            <source>Open Log Folder</source>
+            <translation type="finished">Ouvrir Dossier de Log</translation>
         </message>
     </context>
     <context>
@@ -4194,8 +4210,20 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">&lt;b&gt;Canaux Bande Étroite&lt;/b&gt;</translation>
         </message>
         <message>
+            <source>&lt;b&gt;Stretch Settings&lt;/b&gt;</source>
+            <translation type="finished">&lt;b&gt;Paramètres d'Étirement&lt;/b&gt;</translation>
+        </message>
+        <message>
             <source>Apply to New View</source>
             <translation type="finished">Appliquer à Nouvelle Vue</translation>
+        </message>
+        <message>
+            <source>Auto Stretch Channels</source>
+            <translation type="finished">Auto Stretch Canaux</translation>
+        </message>
+        <message>
+            <source>Automatically stretch linear data to non-linear for preview/result.</source>
+            <translation type="finished">Étire automatiquement les données linéaires en non-linéaires pour l'aperçu/résultat.</translation>
         </message>
         <message>
             <source>Error</source>
@@ -4214,16 +4242,24 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Non chargé</translation>
         </message>
         <message>
+            <source>Perfect Palette Picker</source>
+            <translation type="finished">Sélecteur de Palette Parfaite</translation>
+        </message>
+        <message>
             <source>Please select an image first.</source>
             <translation type="finished">Veuillez d'abord sélectionner une image.</translation>
         </message>
         <message>
             <source>Select View</source>
-            <translation type="finished">Sélectionner Vue</translation>
+            <translation type="finished">Sélectionner une Vue</translation>
         </message>
         <message>
             <source>Source for %1:</source>
             <translation type="finished">Source pour %1 :</translation>
+        </message>
+        <message>
+            <source>Strength:</source>
+            <translation type="finished">Force :</translation>
         </message>
         <message>
             <source>© 2026 SetiAstro</source>
@@ -6402,6 +6438,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Calcul des coefficients de normalisation...</translation>
         </message>
         <message>
+            <source>Cosmetic Correction: Found %1 defects in master dark</source>
+            <translation type="finished">Correction Cosmétique : %1 défauts trouvés dans le master dark</translation>
+        </message>
+        <message>
             <source>Drizzle enabled: Running first pass for rejection...</source>
             <translation type="finished">Drizzle activé : Première passe pour le rejet...</translation>
         </message>
@@ -6502,12 +6542,24 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Utilisation de %1 blocs parallèles de max %2 lignes</translation>
         </message>
         <message>
+            <source>Warning: Cosmetic correction enabled but no master dark provided</source>
+            <translation type="finished">Avertissement : Correction cosmétique activée mais aucun master dark fourni</translation>
+        </message>
+        <message>
+            <source>Warning: Could not load cosmetic map file: %1</source>
+            <translation type="finished">Avertissement : Impossible de charger le fichier de carte cosmétique : %1</translation>
+        </message>
+        <message>
             <source>Warning: Failed to load image %1</source>
             <translation type="finished">Attention : Échec chargement image %1</translation>
         </message>
         <message>
             <source>Warning: Failed to read image %1, skipping</source>
             <translation type="finished">Attention : Échec lecture image %1, ignorée</translation>
+        </message>
+        <message>
+            <source>Warning: No defects found in master dark, cosmetic correction disabled</source>
+            <translation type="finished">Avertissement : Aucun défaut trouvé dans le master dark, correction cosmétique désactivée</translation>
         </message>
         <message>
             <source>Warning: Normalization computation failed, continuing without</source>

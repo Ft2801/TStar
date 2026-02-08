@@ -837,9 +837,13 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
                      b_out = b_out * (1.0f - maskAlpha);
                 }
                 
-                dest[x*3+0] = static_cast<uchar>(r_out * 255.0f + 0.5f);
-                dest[x*3+1] = static_cast<uchar>(g_out * 255.0f + 0.5f);
-                dest[x*3+2] = static_cast<uchar>(b_out * 255.0f + 0.5f);
+                if (fmt == QImage::Format_Grayscale8) {
+                    dest[x] = static_cast<uchar>(r_out * 255.0f + 0.5f);
+                } else {
+                    dest[x*3+0] = static_cast<uchar>(r_out * 255.0f + 0.5f);
+                    dest[x*3+1] = static_cast<uchar>(g_out * 255.0f + 0.5f);
+                    dest[x*3+2] = static_cast<uchar>(b_out * 255.0f + 0.5f);
+                }
                 } // End scalar x loop 
 
         }

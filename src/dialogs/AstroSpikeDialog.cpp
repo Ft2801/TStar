@@ -1138,7 +1138,7 @@ void AstroSpikeDialog::applyToDocument() {
         }
     }
     
-    m_viewer->setBuffer(newBuffer, m_viewer->windowTitle());
+    m_viewer->setBuffer(newBuffer, m_viewer->windowTitle(), true);
     accept(); 
 }
 
