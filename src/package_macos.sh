@@ -86,11 +86,24 @@ if [ -f "$MACDEPLOYQT" ]; then
     HB_PREFIX="/usr/local"
     if [ -d "/opt/homebrew" ]; then HB_PREFIX="/opt/homebrew"; fi
 
+    # Build libpath string with all Homebrew opt directories
+    LIBPATH_ARGS="-libpath=$QT_PREFIX/lib -libpath=$HB_PREFIX/lib"
+    
+    # Add all /opt/homebrew/opt/*/lib directories for Homebrew dependencies
+    # This includes: libomp, webp, openjpeg, openexr, imath, openblas, md4c, tbb, dbus, etc.
+    if [ -d "$HB_PREFIX/opt" ]; then
+        for opt_dir in "$HB_PREFIX/opt"/*/lib; do
+            if [ -d "$opt_dir" ]; then
+                LIBPATH_ARGS="$LIBPATH_ARGS -libpath=$opt_dir"
+            fi
+        done
+    fi
+    
+    # Run macdeployqt with expanded libpath
     "$MACDEPLOYQT" "$DIST_DIR" \
         -verbose=1 \
-        -libpath="$QT_PREFIX/lib" \
-        -libpath="$HB_PREFIX/lib" \
-        2>&1 | grep -v "Cannot resolve rpath" | grep -v "using QList" | grep -v "ERROR: no file at \"/opt/homebrew/opt" || true
+        $LIBPATH_ARGS \
+        2>&1 | grep -v "Cannot resolve rpath" | grep -v "using QList" || true
     echo "  - Qt frameworks deployed"
 else
     echo "[WARNING] macdeployqt not found. Qt frameworks not bundled."
