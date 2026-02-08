@@ -261,7 +261,27 @@ copy_dylib() {
             echo "  - $lib_name: NOT FOUND"
         fi
     else
-        echo "  - $lib_name: NOT FOUND"
+        # Special handling for libraw: try broader search
+        if [ "$brew_pkg" == "libraw" ]; then
+            # Try searching everywhere in /opt/homebrew
+            local found_dylib=$(find /opt/homebrew -name "libraw.dylib" -type f 2>/dev/null | head -1)
+            if [ -z "$found_dylib" ]; then
+                found_dylib=$(find /usr/local -name "libraw.dylib" -type f 2>/dev/null | head -1)
+            fi
+            
+            if [ -n "$found_dylib" ] && dylib_matches_arch "$found_dylib" "$target_arch"; then
+                cp "$found_dylib" "$dest_dir/" 2>/dev/null
+                echo "  - $lib_name: OK ($target_arch) [from: $(dirname $found_dylib)]"
+                return 0
+            elif [ -n "$found_dylib" ]; then
+                local found_arch=$(file "$found_dylib" 2>/dev/null | grep -o "x86_64\|arm64" | head -1)
+                echo "  - $lib_name: ARCH MISMATCH (target: $target_arch, found: $found_arch)"
+            else
+                echo "  - $lib_name: NOT FOUND"
+            fi
+        else
+            echo "  - $lib_name: NOT FOUND"
+        fi
     fi
     return 1
 }

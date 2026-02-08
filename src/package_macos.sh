@@ -290,6 +290,19 @@ else
     echo "  - All bundled dylib dependencies resolved"
 fi
 
+# --- Check for critical libraries ---
+echo ""
+echo "[STEP 9.2] Verifying critical libraries..."
+
+if [ ! -f "$FRAMEWORKS_DIR/libraw.dylib" ]; then
+    echo "  [ERROR] libraw.dylib NOT FOUND in bundle!"
+    echo "         RAW image file support will NOT work!"
+    echo "         Make sure: brew install libraw"
+    ERROR_COUNT=$((ERROR_COUNT + 1))
+else
+    echo "  - libraw.dylib: OK"
+fi
+
 # --- Ad-hoc Code Signing ---
 echo ""
 log_step 9.5 "Applying ad-hoc code signing..."

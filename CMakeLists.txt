@@ -354,11 +354,38 @@ if(APPLE)
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET
     )
+    
+    # Check if the prefix is valid, if not try Cellar directly
+    if(NOT (LIBRAW_PREFIX AND EXISTS "${LIBRAW_PREFIX}"))
+        # Fallback: search in Homebrew Cellar directly
+        file(GLOB LIBRAW_CELLAR_PATHS "/opt/homebrew/Cellar/libraw/*")
+        if(LIBRAW_CELLAR_PATHS)
+            list(GET LIBRAW_CELLAR_PATHS 0 LIBRAW_PREFIX)
+        else()
+            # Try Intel Homebrew location
+            file(GLOB LIBRAW_CELLAR_PATHS "/usr/local/Cellar/libraw/*")
+            if(LIBRAW_CELLAR_PATHS)
+                list(GET LIBRAW_CELLAR_PATHS 0 LIBRAW_PREFIX)
+            endif()
+        endif()
+    endif()
+    
     if(LIBRAW_PREFIX AND EXISTS "${LIBRAW_PREFIX}")
         set(LIBRAW_FOUND TRUE)
         set(LIBRAW_INCLUDE_DIRS "${LIBRAW_PREFIX}/include")
-        set(LIBRAW_LIBRARIES "${LIBRAW_PREFIX}/lib/libraw.dylib")
+        
+        # Find the actual libraw dylib file
+        find_library(LIBRAW_DYLIB NAMES libraw PATHS "${LIBRAW_PREFIX}/lib" NO_DEFAULT_PATH)
+        if(LIBRAW_DYLIB)
+            set(LIBRAW_LIBRARIES "${LIBRAW_DYLIB}")
+        else()
+            # Fallback to generic name, let linker find it
+            set(LIBRAW_LIBRARIES raw)
+        endif()
+        
         message(STATUS "Using Homebrew LibRaw from: ${LIBRAW_PREFIX}")
+        message(STATUS "  - Include: ${LIBRAW_INCLUDE_DIRS}")
+        message(STATUS "  - Library: ${LIBRAW_LIBRARIES}")
     endif()
 else()
     # Windows: local deps
@@ -788,6 +815,22 @@ endif()
 target_link_directories(TStar PRIVATE
     ${GSL_LIBRARY_DIRS}
 )
+
+# Add Homebrew lib directories for macOS to find optional deps
+if(APPLE)
+    # Add standard Homebrew lib paths for linker
+    if(EXISTS "/opt/homebrew/lib")
+        target_link_directories(TStar PRIVATE /opt/homebrew/lib)
+    endif()
+    if(EXISTS "/usr/local/lib")
+        target_link_directories(TStar PRIVATE /usr/local/lib)
+    endif()
+    
+    # Add specific Homebrew package lib directories if found
+    if(LIBRAW_FOUND AND LIBRAW_PREFIX)
+        target_link_directories(TStar PRIVATE "${LIBRAW_PREFIX}/lib")
+    endif()
+endif()
 
 # =============================================================================
 # Link Libraries
