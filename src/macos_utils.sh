@@ -219,69 +219,80 @@ copy_dylib() {
     fi
 
     
+    # Determine search paths based on target architecture priority
+    local search_paths=()
+    if [ "$target_arch" == "x86_64" ]; then
+        # Intel target: prioritize /usr/local
+        search_paths=("/usr/local" "/opt/homebrew")
+    else
+        # ARM/Native target: prioritize /opt/homebrew
+        search_paths=("/opt/homebrew" "/usr/local")
+    fi
+
+    # 1. Try standard brew prefix first (if matches architecture)
     local prefix=$(brew --prefix "$brew_pkg" 2>/dev/null || echo "")
-    
-    # Fallback to Cellar if symlink broken
-    if [ ! -d "$prefix/lib" ]; then
-        local cellar_path="/opt/homebrew/Cellar/$brew_pkg"
-        if [ -d "$cellar_path" ]; then
-            local version_path=$(find "$cellar_path" -maxdepth 1 -mindepth 1 -type d | head -1)
-            if [ -n "$version_path" ]; then
-                prefix="$version_path"
-            fi
-        fi
+    if [ -n "$prefix" ]; then
+        # Check if this prefix matches our target architecture
+        # /usr/local -> x86_64, /opt/homebrew -> arm64
+        local prefix_is_compatible=0
+        if [[ "$prefix" == "/usr/local"* ]] && [ "$target_arch" == "x86_64" ]; then prefix_is_compatible=1; fi
+        if [[ "$prefix" == "/opt/homebrew"* ]] && [ "$target_arch" == "arm64" ]; then prefix_is_compatible=1; fi
         
-        # Intel fallback
-        if [ ! -d "$prefix/lib" ] && [ -d "/usr/local/Cellar/$brew_pkg" ]; then
-            local version_path=$(find "/usr/local/Cellar/$brew_pkg" -maxdepth 1 -mindepth 1 -type d | head -1)
-            if [ -n "$version_path" ]; then
-                prefix="$version_path"
+        if [ $prefix_is_compatible -eq 1 ]; then
+            # Add to front of search paths if not already there
+            if [[ ! " ${search_paths[@]} " =~ " ${prefix} " ]]; then
+                search_paths=("$prefix" "${search_paths[@]}")
             fi
         fi
     fi
-    
-    if [ -n "$prefix" ] && [ -d "$prefix/lib" ]; then
-        # Find all matching dylibs and check architecture
-        local dylibs=$(find "$prefix/lib" -name "${lib_name}*.dylib" -type f 2>/dev/null | sort)
+
+    # Iterate through search paths
+    local found_any_arch=""
+    local checked_paths=""
+
+    for base_path in "${search_paths[@]}"; do
+        if [ ! -d "$base_path" ]; then continue; fi
+        checked_paths="$checked_paths $base_path"
+
+        # Define candidate paths for this base
+        local candidates=()
         
-        for dylib in $dylibs; do
-            if dylib_matches_arch "$dylib" "$target_arch"; then
-                cp "$dylib" "$dest_dir/" 2>/dev/null
-                echo "  - $lib_name: OK ($target_arch)"
-                return 0
+        # Method A: Standard library path
+        if [ -d "$base_path/lib" ]; then
+             # Standard search
+             candidates+=($(find "$base_path/lib" -name "${lib_name}*.dylib" -type f 2>/dev/null | grep -v ".dSYM" | sort))
+        fi
+        
+        # Method B: Cellar fallback (specific version folders)
+        if [ -d "$base_path/Cellar/$brew_pkg" ]; then
+             candidates+=($(find "$base_path/Cellar/$brew_pkg" -name "${lib_name}*.dylib" -type f 2>/dev/null | grep -v ".dSYM" | sort))
+        fi
+
+        # Method C: Special catch-all for difficult libs (like libraw)
+        if [ "$brew_pkg" == "libraw" ]; then
+             candidates+=($(find "$base_path" -name "${lib_name}*.dylib" -type f 2>/dev/null | grep -v ".dSYM" | sort))
+        fi
+
+        for dylib in "${candidates[@]}"; do
+            if [ -f "$dylib" ]; then
+                 if dylib_matches_arch "$dylib" "$target_arch"; then
+                    cp "$dylib" "$dest_dir/" 2>/dev/null
+                    echo "  - $lib_name: OK ($target_arch) [from: $base_path]"
+                    return 0
+                 else
+                    # Found, but wrong architecture. Keep looking but remember for error message.
+                    local found_arch=$(file "$dylib" 2>/dev/null | grep -o "x86_64\|arm64" | head -1)
+                    found_any_arch="$found_arch"
+                 fi
             fi
         done
-        
-        # If no exact match found, warn and skip
-        if [ -n "$dylibs" ]; then
-            # Check what architectures were found
-            local found_archs=$(for dylib in $dylibs; do file "$dylib" 2>/dev/null | grep -o "x86_64\|arm64" | sort -u; done | tr '\n' '/' | sed 's|/$||')
-            echo "  - $lib_name: ARCH MISMATCH (target: $target_arch, found: $found_archs)"
-        else
-            echo "  - $lib_name: NOT FOUND"
-        fi
+    done
+
+    # If we get here, valid library was not found
+    if [ -n "$found_any_arch" ]; then
+        echo "  - $lib_name: ARCH MISMATCH (target: $target_arch, found: $found_any_arch in checked paths)"
     else
-        # Special handling for libraw: try broader search
-        if [ "$brew_pkg" == "libraw" ]; then
-            # Try searching everywhere in /opt/homebrew
-            local found_dylib=$(find /opt/homebrew -name "libraw.dylib" -type f 2>/dev/null | head -1)
-            if [ -z "$found_dylib" ]; then
-                found_dylib=$(find /usr/local -name "libraw.dylib" -type f 2>/dev/null | head -1)
-            fi
-            
-            if [ -n "$found_dylib" ] && dylib_matches_arch "$found_dylib" "$target_arch"; then
-                cp "$found_dylib" "$dest_dir/" 2>/dev/null
-                echo "  - $lib_name: OK ($target_arch) [from: $(dirname $found_dylib)]"
-                return 0
-            elif [ -n "$found_dylib" ]; then
-                local found_arch=$(file "$found_dylib" 2>/dev/null | grep -o "x86_64\|arm64" | head -1)
-                echo "  - $lib_name: ARCH MISMATCH (target: $target_arch, found: $found_arch)"
-            else
-                echo "  - $lib_name: NOT FOUND"
-            fi
-        else
-            echo "  - $lib_name: NOT FOUND"
-        fi
+        echo "  - $lib_name: NOT FOUND (checked: $checked_paths)"
     fi
     return 1
 }
