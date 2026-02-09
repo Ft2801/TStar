@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "core/Version.h"
+#include "core/Logger.h"
 #include "widgets/CustomMdiSubWindow.h"
 #include "dialogs/GHSDialog.h"
 #include "Icons.h"
@@ -1129,50 +1130,8 @@ void MainWindow::createNewImageWindow(const ImageBuffer& buffer, const QString& 
     });
     
     // Connect Signals
-    connect(viewer, &ImageViewer::pointPicked, [this, viewer](const QPointF& p){
-        GHSDialog* ghs = findChild<GHSDialog*>();
-        if (ghs && ghs->isVisible()) {
-             int x = (int)p.x();
-             int y = (int)p.y();
-             float val = 0.0f;
-             if (viewer->getBuffer().channels() == 3) {
-                 float r = viewer->getBuffer().getPixelValue(x, y, 0);
-                 float g = viewer->getBuffer().getPixelValue(x, y, 1);
-                 float b = viewer->getBuffer().getPixelValue(x, y, 2);
-                 val = 0.2126f * r + 0.7152f * g + 0.0722f * b;
-             } else {
-                 val = viewer->getBuffer().getPixelValue(x, y, 0);
-             }
-             val = std::max(0.0f, std::min(1.0f, val));
-             
-             ghs->setSymmetryPoint(val);
-             log(QString("Picked SP: %1").arg(val));
-        }
-    });
-    connect(viewer, &ImageViewer::rectSelected, [this, viewer](const QRectF& r){
-        GHSDialog* ghs = findChild<GHSDialog*>();
-        if (ghs && ghs->isVisible()) {
-             int x = (int)r.x();
-             int y = (int)r.y();
-             int w = (int)r.width();
-             int h = (int)r.height();
-             float val = 0.0f;
-             
-             if (viewer->getBuffer().channels() == 3) {
-                 float rMean = viewer->getBuffer().getAreaMean(x, y, w, h, 0);
-                 float gMean = viewer->getBuffer().getAreaMean(x, y, w, h, 1);
-                 float bMean = viewer->getBuffer().getAreaMean(x, y, w, h, 2);
-                 val = 0.2126f * rMean + 0.7152f * gMean + 0.0722f * bMean;
-             } else {
-                 val = viewer->getBuffer().getAreaMean(x, y, w, h, 0);
-             }
-             
-             val = std::max(0.0f, std::min(1.0f, val));
-             
-             ghs->setSymmetryPoint(val);
-             log(QString("Picked SP (Mean): %1").arg(val));
-        }
-    });
+
+
     
     connect(viewer, &ImageViewer::viewChanged, this, &MainWindow::propagateViewChange);
     connect(viewer, &ImageViewer::requestNewView, this, [this](const ImageBuffer& img, const QString& title){
@@ -1893,6 +1852,22 @@ void MainWindow::openSCNRDialog() {
 
 // Replaces MainWindow::log
 void MainWindow::log(const QString& msg, LogType type, bool autoShow) {
+    // 1. Log to File System immediately
+    Logger::Level level = Logger::Info;
+    QString prefix = "";
+    
+    switch (type) {
+        case Log_Info:    level = Logger::Info; break;
+        case Log_Success: level = Logger::Info; prefix = "[SUCCESS] "; break;
+        case Log_Warning: level = Logger::Warning; break;
+        case Log_Error:   level = Logger::Error; break;
+        case Log_Action:  level = Logger::Info; prefix = "[ACTION] "; break;
+    }
+    
+    // Log plain text version to file
+    Logger::log(level, prefix + msg, "Console");
+
+    // 2. Log to UI
     if (!m_sidebar) return;
     
     QString color = "white";

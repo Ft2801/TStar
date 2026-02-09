@@ -2400,17 +2400,26 @@ void ImageBuffer::cropRotated(float cx, float cy, float w, float h, float angleD
 }
 
 float ImageBuffer::getPixelValue(int x, int y, int c) const {
+    ReadLock lock(this);
+    if (m_data.empty()) return 0.0f; // SWAP SAFETY
     if (x < 0 || x >= m_width || y < 0 || y >= m_height || c < 0 || c >= m_channels) return 0.0f;
     return m_data[(static_cast<size_t>(y) * m_width + x) * m_channels + c];
 }
 
 float ImageBuffer::getPixelFlat(size_t index, int c) const {
-    if (m_data.empty()) return 0.0f;
-    if (m_channels == 1) return m_data[index];
-    return m_data[index * m_channels + c];
+    ReadLock lock(this);
+    if (m_data.empty()) return 0.0f; // SWAP SAFETY
+    if (m_channels == 1) {
+        if (index >= m_data.size()) return 0.0f;
+        return m_data[index];
+    }
+    size_t idx = index * m_channels + c;
+    if (idx >= m_data.size()) return 0.0f;
+    return m_data[idx];
 }
 
 float ImageBuffer::getChannelMedian(int channelIndex) const {
+    ReadLock lock(this);
     if (m_data.empty()) return 0.0f;
     
     // Create view of channel data
@@ -2425,23 +2434,25 @@ float ImageBuffer::getChannelMedian(int channelIndex) const {
 }
 
 float ImageBuffer::getAreaMean(int x, int y, int w, int h, int c) const {
-    if (x < 0) x = 0;
-    if (y < 0) y = 0;
-    if (x + w > m_width) w = m_width - x;
-    if (y + h > m_height) h = m_height - y;
-    if (w <= 0 || h <= 0) return 0.0f;
-    if (m_data.empty()) {
-        // Critical safety check
-        return 0.0f;
-    }
+    ReadLock lock(this);
+    // 1. Intersect requested rect with image bounds
+    int x0 = std::max(0, x);
+    int y0 = std::max(0, y);
+    int x1 = std::min(m_width, x + w);
+    int y1 = std::min(m_height, y + h);
     
+    // 2. Check for empty intersection
+    if (x1 <= x0 || y1 <= y0) return 0.0f;
+    
+    if (m_data.empty()) return 0.0f;
+    
+    // 3. Compute mean over the valid intersection
     double sum = 0.0;
-    long count = static_cast<long>(w) * h;
+    long count = static_cast<long>(x1 - x0) * (y1 - y0);
     
-    // Flattened loop for simpler OpenMP reduction
     #pragma omp parallel for reduction(+:sum)
-    for (int iy = y; iy < y + h; ++iy) {
-        for (int ix = x; ix < x + w; ++ix) {
+    for (int iy = y0; iy < y1; ++iy) {
+        for (int ix = x0; ix < x1; ++ix) {
              size_t idx = (static_cast<size_t>(iy) * m_width + ix) * m_channels + c;
              sum += m_data[idx];
         }
@@ -2450,6 +2461,7 @@ float ImageBuffer::getAreaMean(int x, int y, int w, int h, int c) const {
 }
 
 void ImageBuffer::computeClippingStats(long& lowClip, long& highClip) const {
+    ReadLock lock(this);
     lowClip = 0;
     highClip = 0;
     
@@ -2469,6 +2481,7 @@ void ImageBuffer::computeClippingStats(long& lowClip, long& highClip) const {
 }
 
 std::vector<std::vector<int>> ImageBuffer::computeHistogram(int bins) const {
+    ReadLock lock(this);
     if (m_data.empty() || bins <= 0) return {};
     
     int numThreads = omp_get_max_threads();

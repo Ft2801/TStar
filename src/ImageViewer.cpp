@@ -12,6 +12,7 @@
 #include <QDropEvent>
 #include <QMimeData>
 #include "ImageBufferDelta.h"
+#include "core/Logger.h"
 
 
 ImageViewer::ImageViewer(QWidget* parent) : QGraphicsView(parent) {
@@ -517,7 +518,9 @@ void ImageViewer::mouseReleaseEvent(QMouseEvent* event) {
     if (m_interactionMode == Mode_Selection && m_drawing) {
         m_drawing = false;
         if (m_queryRectItem && !m_queryRectItem->rect().isEmpty()) {
-            emit rectSelected(m_queryRectItem->rect());
+            // Log raw rect
+            QRectF r = m_queryRectItem->rect();
+            emit rectSelected(r);
         }
         return;
     }

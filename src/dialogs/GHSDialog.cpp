@@ -1,7 +1,8 @@
 #include "GHSDialog.h"
 #include "widgets/HistogramWidget.h"
 #include "algos/GHSAlgo.h"
-#include "../ImageViewer.h" 
+#include "../ImageViewer.h"
+#include <QDebug> 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGridLayout>
@@ -678,10 +679,12 @@ void GHSDialog::setTarget(ImageViewer* viewer) {
             onPreviewTrigger();
         });
 
+        // SAFETY: Handle Viewer Destruction
         connect(m_activeViewer, &ImageViewer::destroyed, this, [this](QObject* obj){
-            if (m_activeViewer == obj) {
-                m_activeViewer = nullptr;
-                // No need to setTarget(nullptr) here as it might try to use the destroyed object
+            if (obj == m_activeViewer) {
+               m_activeViewer = nullptr; 
+               if (m_previewTimer) m_previewTimer->stop();
+               m_previewPending = false;
             }
         });
         
@@ -692,21 +695,36 @@ void GHSDialog::setTarget(ImageViewer* viewer) {
         }
         
         connect(m_activeViewer, &ImageViewer::rectSelected, this, [this](QRectF r){
-             r = r.normalized();
-             if (r.isEmpty()) return;
-             QRect rect = r.toRect();
-             float val = 0.0f;
-             if (m_originalBuffer.channels() == 3) {
-                 float sumMeans = 0.0f;
-                 int activeCount = 0;
-                 if (m_redBtn->isChecked()) { sumMeans += m_originalBuffer.getAreaMean(rect.x(), rect.y(), rect.width(), rect.height(), 0); activeCount++; }
-                 if (m_greenBtn->isChecked()) { sumMeans += m_originalBuffer.getAreaMean(rect.x(), rect.y(), rect.width(), rect.height(), 1); activeCount++; }
-                 if (m_blueBtn->isChecked()) { sumMeans += m_originalBuffer.getAreaMean(rect.x(), rect.y(), rect.width(), rect.height(), 2); activeCount++; }
-                 val = (activeCount > 0) ? (sumMeans / activeCount) : 0.0f;
-             } else {
-                 val = m_originalBuffer.getAreaMean(rect.x(), rect.y(), rect.width(), rect.height(), 0);
-             }
-             setSymmetryPoint(static_cast<double>(val));
+            try {
+                 if (!m_activeViewer) return; // Safety check
+                 
+                 r = r.normalized();
+                 if (r.isEmpty()) return;
+                 QRect rect = r.toRect();
+                 
+                 // Validate rect against buffer dimensions
+                 if (rect.right() < 0 || rect.bottom() < 0 || 
+                     rect.left() >= m_originalBuffer.width() || rect.top() >= m_originalBuffer.height()) {
+                     return; // Completely outside
+                 }
+                 
+                 float val = 0.0f;
+                 if (m_originalBuffer.channels() == 3) {
+                     float sumMeans = 0.0f;
+                     int activeCount = 0;
+                     if (m_redBtn->isChecked()) { sumMeans += m_originalBuffer.getAreaMean(rect.x(), rect.y(), rect.width(), rect.height(), 0); activeCount++; }
+                     if (m_greenBtn->isChecked()) { sumMeans += m_originalBuffer.getAreaMean(rect.x(), rect.y(), rect.width(), rect.height(), 1); activeCount++; }
+                     if (m_blueBtn->isChecked()) { sumMeans += m_originalBuffer.getAreaMean(rect.x(), rect.y(), rect.width(), rect.height(), 2); activeCount++; }
+                     val = (activeCount > 0) ? (sumMeans / activeCount) : 0.0f;
+                 } else {
+                     val = m_originalBuffer.getAreaMean(rect.x(), rect.y(), rect.width(), rect.height(), 0);
+                 }
+                 setSymmetryPoint(static_cast<double>(val));
+            } catch (const std::exception& e) {
+                qWarning() << "GHSDialog selection error:" << e.what();
+            } catch (...) {
+                qWarning() << "GHSDialog selection error: unknown exception";
+            }
         });
         
         // Sync State

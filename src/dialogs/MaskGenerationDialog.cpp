@@ -129,8 +129,8 @@ void MaskGenerationDialog::setupUI() {
     // Update label and preview during drag (now fast due to downsampling)
     connect(m_blurSlider, &QSlider::valueChanged, [this](int v){ 
         m_blurLabel->setText(QString::number(v)); 
-        updateLivePreview();
     });
+    connect(m_blurSlider, &QSlider::sliderReleased, this, &MaskGenerationDialog::updateLivePreview);
     controls->addWidget(m_blurSlider);
     controls->addWidget(m_blurLabel);
     
@@ -149,8 +149,8 @@ void MaskGenerationDialog::setupUI() {
         rangeGrid->addWidget(lblInfo, row, 2);
         connect(s, &QSlider::valueChanged, [this, max, lblInfo](int v){
             lblInfo->setText(QString::number((double)v/max, 'f', 2));
-            updateLivePreview();
         });
+        connect(s, &QSlider::sliderReleased, this, &MaskGenerationDialog::updateLivePreview);
         return s;
     };
     
@@ -168,8 +168,8 @@ void MaskGenerationDialog::setupUI() {
     rangeGrid->addWidget(m_smoothLbl, 3, 2);
     connect(m_smoothSl, &QSlider::valueChanged, [this](int v){
         m_smoothLbl->setText(QString("%1 px").arg(v));
-        updateLivePreview();
     });
+    connect(m_smoothSl, &QSlider::sliderReleased, this, &MaskGenerationDialog::updateLivePreview);
     
     m_linkCb = new QCheckBox(tr("Link Limits"));
     rangeGrid->addWidget(m_linkCb, 0, 3);
@@ -249,10 +249,9 @@ void MaskGenerationDialog::setupUI() {
 
     previewLayout->addWidget(new QLabel(tr("Size:")));
     m_previewSizeCombo = new QComboBox();
+    m_previewSizeCombo->addItem("512px", 512);
     m_previewSizeCombo->addItem("1024px", 1024);
-    m_previewSizeCombo->addItem("2048px", 2048);
-    m_previewSizeCombo->addItem(tr("Full"), 0);
-    m_previewSizeCombo->setCurrentIndex(0); // Default 1024
+    m_previewSizeCombo->setCurrentIndex(1); // Default 1024
     
     connect(m_previewSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](){
         int dim = m_previewSizeCombo->currentData().toInt();
@@ -381,6 +380,10 @@ MaskLayer MaskGenerationDialog::getGeneratedMask(int requestedW, int requestedH)
             float scale = (float)targetW / m_sourceImage.width();
             smooth = std::max(0, (int)(smooth * scale));
         }
+        
+        // Convert radius to sigma for GaussianBlur
+        // Sigma ~ Radius / 3.0 gives a visual match to "pixels"
+        float smoothSigma = (smooth > 0) ? smooth / 3.0f : 0.0f;
 
         finalMask.resize(base.size());
         
@@ -404,9 +407,9 @@ MaskLayer MaskGenerationDialog::getGeneratedMask(int requestedW, int requestedH)
         }
         
         // Blur
-        if (smooth > 0) {
+        if (smoothSigma > 0) {
             cv::Mat mat(targetH, targetW, CV_32FC1, finalMask.data());
-            cv::GaussianBlur(mat, mat, cv::Size(0,0), smooth);
+            cv::GaussianBlur(mat, mat, cv::Size(0,0), smoothSigma);
         }
         
         // Invert
@@ -440,9 +443,11 @@ MaskLayer MaskGenerationDialog::getGeneratedMask(int requestedW, int requestedH)
         blur = std::max(0, (int)(blur * scale));
     }
     
-    if (blur > 0 && finalMask.size() > 0) {
+    float blurSigma = (blur > 0) ? blur / 3.0f : 0.0f;
+    
+    if (blurSigma > 0 && finalMask.size() > 0) {
         cv::Mat m(targetH, targetW, CV_32FC1, finalMask.data());
-        cv::GaussianBlur(m, m, cv::Size(0,0), blur);
+        cv::GaussianBlur(m, m, cv::Size(0,0), blurSigma);
     }
     
     MaskLayer layer;
@@ -615,8 +620,9 @@ std::vector<float> MaskGenerationDialog::generateRangeMask([[maybe_unused]] cons
     
     // Blur
     if (smooth > 0) {
+        float sigma = smooth / 3.0f;
         cv::Mat mat(m_sourceImage.height(), m_sourceImage.width(), CV_32FC1, m.data());
-        cv::GaussianBlur(mat, mat, cv::Size(0,0), smooth);
+        cv::GaussianBlur(mat, mat, cv::Size(0,0), sigma);
     }
     
     // Invert

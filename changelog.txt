@@ -1,6 +1,10 @@
 TStar Changelog
 ===============
 
+Version 1.5.11
+--------------
+- Some minor bugfixes across the app
+
 Version 1.5.10
 --------------
 - Fixed a crash when trying to display stretch a b/w image

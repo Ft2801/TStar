@@ -3,7 +3,7 @@
 #include "DialogBase.h"
 #include "../ImageViewer.h"
 #include "../core/RobustStatistics.h"
-#include "../core/Logger.h" // Added for persistent logging
+#include "../core/RobustStatistics.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QMessageBox>
@@ -15,7 +15,6 @@
 BackgroundNeutralizationDialog::BackgroundNeutralizationDialog(QWidget* parent)
     : DialogBase(parent, tr("Background Neutralization"), 350, 150)
 {
-    Logger::info(QString("BackgroundNeutralizationDialog Created: %1").arg((quintptr)this), "BackgroundNeutralization");
     
     // Interaction Control: Initially disabled until focused
     m_interactionEnabled = false;
@@ -34,7 +33,6 @@ void BackgroundNeutralizationDialog::setInteractionEnabled(bool enabled) {
 }
 
 BackgroundNeutralizationDialog::~BackgroundNeutralizationDialog() {
-    Logger::info(QString("BackgroundNeutralizationDialog Destroyed: %1").arg((quintptr)this), "BackgroundNeutralization");
     setSelectionMode(false);
 }
 
@@ -90,25 +88,27 @@ void BackgroundNeutralizationDialog::setViewer(ImageViewer* viewer) {
 }
 
 void BackgroundNeutralizationDialog::onRectSelected(const QRectF& r) {
-    // Safety checks to prevent potential crashes
-    if (!m_statusLabel || !m_btnApply) {
-        Logger::error("BackgroundNeutralizationDialog::onRectSelected - Critical: UI members invalid", "BackgroundNeutralization");
-        return;
-    }
-    
-    Logger::info(QString("onRectSelected: %1 %2 %3 %4").arg(r.x()).arg(r.y()).arg(r.width()).arg(r.height()), "BackgroundNeutralization");
-
-    m_selection = r.toRect();
-    if (m_selection.width() >= 2 && m_selection.height() >= 2) {
-        m_hasSelection = true;
-        m_statusLabel->setText(tr("Selection: %1x%2 at %3,%4")
-            .arg(m_selection.width()).arg(m_selection.height())
-            .arg(m_selection.x()).arg(m_selection.y()));
-        m_btnApply->setEnabled(true);
-    } else {
-        m_hasSelection = false;
-        m_statusLabel->setText(tr("Selection too small."));
-        m_btnApply->setEnabled(false);
+    try {
+        // Safety checks to prevent potential crashes
+        if (!m_statusLabel || !m_btnApply) {
+            return;
+        }
+        m_selection = r.toRect();
+        if (m_selection.width() >= 2 && m_selection.height() >= 2) {
+            m_hasSelection = true;
+            m_statusLabel->setText(tr("Selection: %1x%2 at %3,%4")
+                .arg(m_selection.width()).arg(m_selection.height())
+                .arg(m_selection.x()).arg(m_selection.y()));
+            m_btnApply->setEnabled(true);
+        } else {
+            m_hasSelection = false;
+            m_statusLabel->setText(tr("Selection too small."));
+            m_btnApply->setEnabled(false);
+        }
+    } catch (const std::exception& e) {
+             qWarning() << "BackgroundNeutralization selection error:" << e.what();
+    } catch (...) {
+             qWarning() << "BackgroundNeutralization selection error: unknown";
     }
 }
 
@@ -132,7 +132,12 @@ void BackgroundNeutralizationDialog::neutralizeBackground(ImageBuffer& img, cons
     int w = img.width();
     int h = img.height();
     int ch = img.channels();
+    
+    // Lock for writing before accessing data reference
+    ImageBuffer::WriteLock lock(&img);
     std::vector<float>& data = img.data();
+    if (data.empty()) return; // SWAP SAFETY
+
 
     // 1. Extract sample data
     std::vector<float> sample[3];
