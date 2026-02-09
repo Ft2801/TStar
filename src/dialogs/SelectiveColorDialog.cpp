@@ -47,7 +47,8 @@ SelectiveColorDialog::SelectiveColorDialog(QWidget* parent)
     }
     
     setupUi();
-    onReset();
+    // Defer heavy preview computation until after fade-in animation (300ms)
+    QTimer::singleShot(300, this, &SelectiveColorDialog::onReset);
 
     if (parentWidget()) {
         move(parentWidget()->window()->geometry().center() - rect().center());

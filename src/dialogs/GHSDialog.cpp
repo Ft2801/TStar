@@ -731,8 +731,8 @@ void GHSDialog::setTarget(ImageViewer* viewer) {
         m_originalBuffer = m_activeViewer->getBuffer();
         setHistogramData(m_originalBuffer.computeHistogram(65536), m_originalBuffer.channels());
         
-        // Trigger Preview (with current params on new image)
-        onPreviewTrigger();
+        // Defer preview until dialog is fully shown to avoid fade-in lag
+        QTimer::singleShot(300, this, &GHSDialog::onPreviewTrigger);
         
     } else {
         // Reset/Clear UI

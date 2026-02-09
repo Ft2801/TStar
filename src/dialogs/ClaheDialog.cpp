@@ -31,7 +31,8 @@ ClaheDialog::ClaheDialog(QWidget* parent)
     }
     
     setupUi();
-    onReset(); // Default values
+    // Defer heavy preview computation until after fade-in animation (300ms)
+    QTimer::singleShot(300, this, &ClaheDialog::onReset);
 
 }
 

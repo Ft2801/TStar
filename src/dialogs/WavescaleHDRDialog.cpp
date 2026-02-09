@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <QGroupBox>
 #include <cmath>
+#include <QTimer>
 #include <algorithm>
 #include <QShowEvent>
 
@@ -261,10 +262,11 @@ WavescaleHDRDialog::WavescaleHDRDialog(QWidget* parent, ImageViewer* targetViewe
     m_viewer->setBuffer(m_originalBuffer, tr("Original"), false);
     m_viewer->setModified(false);  // Prevent "unsaved changes" dialog
     
-    // Deferred initial mask update (after dialog is fully constructed and shown)
-    QTimer::singleShot(50, this, &WavescaleHDRDialog::updateQuickMask);
+    // Defer initial mask update (after dialog is fully constructed and shown)
+    QTimer::singleShot(300, this, &WavescaleHDRDialog::updateQuickMask);
     
-    startPreview();
+    // Defer preview until dialog is fully shown to avoid fade-in lag (wait for 500ms animation)
+    QTimer::singleShot(300, this, &WavescaleHDRDialog::startPreview);
 
 }
 
@@ -304,7 +306,6 @@ void WavescaleHDRDialog::setViewer(ImageViewer* v) {
         }
         
         updateQuickMask();
-        startPreview();
     }
 }
 

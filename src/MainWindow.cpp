@@ -896,6 +896,7 @@ MainWindow::MainWindow(QWidget *parent)
     mainToolbar->addWidget(viewBtn);
     mainToolbar->addSeparator();
 
+    // --- Settings Button ---
     QToolButton* settingsBtn = new QToolButton(this);
 
     settingsBtn->setText(tr("Settings"));
@@ -919,6 +920,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(settingsBtn, &QToolButton::clicked, this, &MainWindow::onSettingsAction);
     
     mainToolbar->addWidget(settingsBtn);
+    mainToolbar->addSeparator();
 
     // Help Button
     QToolButton* helpBtn = new QToolButton(this);

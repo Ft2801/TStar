@@ -9,12 +9,14 @@
 #include <QGraphicsPixmapItem>
 #include <QPixmap>
 #include <QPushButton>
+#include <QTimer>
 
 AberrationInspectorDialog::AberrationInspectorDialog(const ImageBuffer& img, QWidget* parent)
     : DialogBase(parent, "Aberration Inspector", 400, 400), m_source(img), m_panelSize(200)
 {
     setupUi();
-    updatePanels();
+    // Defer heavy panel update until after fade-in animation (300ms)
+    QTimer::singleShot(300, this, &AberrationInspectorDialog::updatePanels);
 }
 
 AberrationInspectorDialog::~AberrationInspectorDialog() {}
