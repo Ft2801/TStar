@@ -290,14 +290,23 @@ public:
     // Thread Safety: Lock/Unlock for multi-threaded access
     // Usage: buffer.lockRead(); /* read data */ buffer.unlock();
     // Or:    buffer.lockWrite(); /* modify data */ buffer.unlock();
-    void lockRead() const { if (!m_mutex) m_mutex = std::make_unique<QReadWriteLock>(); m_mutex->lockForRead(); }
-    void lockWrite() { if (!m_mutex) m_mutex = std::make_unique<QReadWriteLock>(); m_mutex->lockForWrite(); }
+    void lockRead() const { if (!m_mutex) m_mutex = std::make_unique<QReadWriteLock>(QReadWriteLock::Recursive); m_mutex->lockForRead(); }
+    void lockWrite() { if (!m_mutex) m_mutex = std::make_unique<QReadWriteLock>(QReadWriteLock::Recursive); m_mutex->lockForWrite(); }
     void unlock() const { if (m_mutex) m_mutex->unlock(); }
     
     // RAII Helper for automatic lock management
+    // These ensure data is swapped-in before any access to m_data.
     class ReadLock {
     public:
-        explicit ReadLock(const ImageBuffer* buf) : m_buf(buf) { if (m_buf) m_buf->lockRead(); }
+        explicit ReadLock(const ImageBuffer* buf) : m_buf(buf) {
+            if (m_buf) {
+                // Swap-in BEFORE acquiring read lock (forceSwapIn needs write lock)
+                if (m_buf->m_isSwapped) {
+                    const_cast<ImageBuffer*>(m_buf)->forceSwapIn();
+                }
+                m_buf->lockRead();
+            }
+        }
         ~ReadLock() { if (m_buf) m_buf->unlock(); }
         ReadLock(const ReadLock&) = delete;
         ReadLock& operator=(const ReadLock&) = delete;
@@ -307,7 +316,15 @@ public:
     
     class WriteLock {
     public:
-        explicit WriteLock(ImageBuffer* buf) : m_buf(buf) { if (m_buf) m_buf->lockWrite(); }
+        explicit WriteLock(ImageBuffer* buf) : m_buf(buf) {
+            if (m_buf) {
+                m_buf->lockWrite();
+                // Swap-in AFTER acquiring write lock (we already hold it, call doSwapIn directly)
+                if (m_buf->m_isSwapped) {
+                    m_buf->doSwapIn();
+                }
+            }
+        }
         ~WriteLock() { if (m_buf) m_buf->unlock(); }
         WriteLock(const WriteLock&) = delete;
         WriteLock& operator=(const WriteLock&) = delete;

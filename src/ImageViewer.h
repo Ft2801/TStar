@@ -9,7 +9,9 @@
 #include <QPolygonF>
 #include <QScrollBar> // Added
 #include "ImageBuffer.h"
+#include <functional> // Added for callbacks
 #include <memory>
+
 
 class ImageHistoryManager;  // Forward declaration
 
@@ -61,6 +63,10 @@ public:
     // Pick Mode
     void setPickMode(bool active);
     void setRectQueryMode(bool active); // For Area Mean
+    
+    // Callback Support (Bypassing MOC)
+    using RegionCallback = std::function<void(QRectF)>;
+    void setRegionSelectedCallback(RegionCallback cb) { m_regionCallback = cb; }
 
     enum InteractionMode {
         Mode_PanZoom,   // Default: Drag=Pan, Wheel=Zoom
@@ -95,7 +101,7 @@ public:
     
 signals:
     void pointPicked(QPointF p); // Scene coordinates (pixels)
-    void rectSelected(QRectF r);
+    // void regionSelected(QRectF r); // REMOVED to bypass MOC crash
     void samplesMoved(const std::vector<QPointF>& points); // Emitted when samples are dragged
     void requestNewView(const ImageBuffer& img, const QString& title);
     void bufferChanged(); // buffer content updated (e.g. undo/redo)
@@ -170,6 +176,9 @@ private:
     QPointF m_startPoint;
     QPointF m_endPoint;
     bool m_drawing = false;
+    bool m_previewActive = false;
+    
+    RegionCallback m_regionCallback;
     bool m_pickMode = false;
     bool m_rectQueryMode = false;
     QGraphicsRectItem* m_queryRectItem = nullptr;

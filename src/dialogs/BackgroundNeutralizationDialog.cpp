@@ -66,11 +66,14 @@ void BackgroundNeutralizationDialog::setSelectionMode(bool active) {
     if (m_activeViewer) {
         if (active) {
             m_activeViewer->setInteractionMode(ImageViewer::Mode_Selection);
-            connect(m_activeViewer, &ImageViewer::rectSelected, this, &BackgroundNeutralizationDialog::onRectSelected, Qt::UniqueConnection);
+            m_activeViewer->setRegionSelectedCallback([this](QRectF r) { this->onRectSelected(r); });
         } else {
-            m_activeViewer->setInteractionMode(ImageViewer::Mode_PanZoom);
-            m_activeViewer->clearSelection();
-            disconnect(m_activeViewer, &ImageViewer::rectSelected, this, &BackgroundNeutralizationDialog::onRectSelected);
+            qDebug() << "[BackgroundNeutralization::setSelectionMode] Disabling. Viewer:" << m_activeViewer << "Visible?" << (m_activeViewer ? m_activeViewer->isVisible() : false);
+            if (m_activeViewer) {
+                 m_activeViewer->setInteractionMode(ImageViewer::Mode_PanZoom);
+                 m_activeViewer->clearSelection();
+                 m_activeViewer->setRegionSelectedCallback(nullptr);
+            }
         }
     }
 }
@@ -88,6 +91,7 @@ void BackgroundNeutralizationDialog::setViewer(ImageViewer* viewer) {
 }
 
 void BackgroundNeutralizationDialog::onRectSelected(const QRectF& r) {
+    qDebug() << "[BackgroundNeutralizationDialog::onRectSelected] Received rect:" << r;
     try {
         // Safety checks to prevent potential crashes
         if (!m_statusLabel || !m_btnApply) {

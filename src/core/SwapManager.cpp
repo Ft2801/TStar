@@ -57,20 +57,30 @@ void SwapManager::checkMemoryPressure() {
     
     if (usage < m_maxRamUsagePercent) return;
     
+    qDebug() << "[SwapManager] RAM pressure detected:" << usage << "% (threshold:" << m_maxRamUsagePercent << "%)";
+    
     // RAM is high! Find candidates to swap.
     // Strategy: Sort buffers by Last Access Time (LRU)
     
     QMutexLocker lock(&m_listMutex);
     
+    qDebug() << "[SwapManager] Registered buffers:" << m_buffers.size();
+    
     // Copy list to sort
     std::vector<ImageBuffer*> candidates;
-    for (ImageBuffer* buf : m_buffers) {
+    for (int i = 0; i < m_buffers.size(); ++i) {
+        ImageBuffer* buf = m_buffers[i];
+        qDebug() << "[SwapManager] Buffer" << i << ":" << (void*)buf << "name:" << buf->name() 
+                 << "swapped:" << buf->isSwapped() << "canSwap:" << buf->canSwap();
         if (!buf->isSwapped() && buf->canSwap()) {
              candidates.push_back(buf);
         }
     }
     
-    if (candidates.empty()) return;
+    if (candidates.empty()) {
+        qDebug() << "[SwapManager] No swap candidates.";
+        return;
+    }
     
     // Sort: Smallest timestamp (oldest) first
     std::sort(candidates.begin(), candidates.end(), [](ImageBuffer* a, ImageBuffer* b){
@@ -82,6 +92,7 @@ void SwapManager::checkMemoryPressure() {
     // Let's swap the oldest one.
     
     for (ImageBuffer* buf : candidates) {
+        qDebug() << "[SwapManager] Attempting swap out:" << buf->name() << (void*)buf;
         if (buf->trySwapOut()) {
             qInfo() << "[SwapManager] Swapped out:" << buf->name() << "due to RAM pressure:" << usage << "%";
             // Check pressure again? If we cleared big chunk, maybe stop.

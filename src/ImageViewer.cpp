@@ -13,6 +13,7 @@
 #include <QMimeData>
 #include "ImageBufferDelta.h"
 #include "core/Logger.h"
+#include <QTimer>
 
 
 ImageViewer::ImageViewer(QWidget* parent) : QGraphicsView(parent) {
@@ -58,6 +59,7 @@ ImageViewer::ImageViewer(QWidget* parent) : QGraphicsView(parent) {
 }
 
 ImageViewer::~ImageViewer() {
+    qDebug() << "[ImageViewer::~ImageViewer] Destroying viewer:" << this;
     if (m_isLinked) emit unlinked();
 }
 
@@ -520,7 +522,15 @@ void ImageViewer::mouseReleaseEvent(QMouseEvent* event) {
         if (m_queryRectItem && !m_queryRectItem->rect().isEmpty()) {
             // Log raw rect
             QRectF r = m_queryRectItem->rect();
-            emit rectSelected(r);
+            qDebug() << "[ImageViewer::rectSelected] Triggering callback for rect:" << r;
+            // Post to event loop to avoid synchronous crash (and use callback)
+            QRectF rCopy = r;
+            QTimer::singleShot(0, this, [this, rCopy]() {
+                 if (m_regionCallback) {
+                     m_regionCallback(rCopy);
+                 }
+            });
+            qDebug() << "[ImageViewer::mouseReleaseEvent] Timer scheduled.";
         }
         return;
     }
@@ -803,3 +813,5 @@ void ImageViewer::setModified(bool modified) {
     m_isModified = modified;
     emit modifiedChanged(m_isModified);
 }
+
+

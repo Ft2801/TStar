@@ -236,6 +236,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
     
     connect(m_mdiArea, &QMdiArea::subWindowActivated, [this](QMdiSubWindow *window) {
+        qDebug() << "[MainWindow] subWindowActivated: " << (window ? "Valid Window" : "NULL");
         if (m_isUpdating) return;
         m_isUpdating = true;
         
@@ -822,7 +823,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // --- Stacking Menu ---
     QToolButton* stackBtn = new QToolButton(this);
-    stackBtn->setText(tr("Stacking (Beta)"));
+    stackBtn->setText(tr("Stacking"));
     stackBtn->setPopupMode(QToolButton::InstantPopup);
     stackBtn->setToolButtonStyle(Qt::ToolButtonTextOnly);
     stackBtn->setStyleSheet(processBtn->styleSheet());

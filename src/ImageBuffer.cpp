@@ -27,11 +27,11 @@
 #include "io/FitsLoader.h"
 #include <opencv2/opencv.hpp>
 
-ImageBuffer::ImageBuffer() : m_mutex(std::make_unique<QReadWriteLock>()) {}
+ImageBuffer::ImageBuffer() : m_mutex(std::make_unique<QReadWriteLock>(QReadWriteLock::Recursive)) {}
 
 ImageBuffer::ImageBuffer(int width, int height, int channels) 
     : m_width(width), m_height(height), m_channels(channels),
-      m_mutex(std::make_unique<QReadWriteLock>())
+      m_mutex(std::make_unique<QReadWriteLock>(QReadWriteLock::Recursive))
 {
     m_data.resize(static_cast<size_t>(width) * height * channels, 0.0f);
     m_lastAccess = QDateTime::currentMSecsSinceEpoch();
@@ -42,7 +42,7 @@ ImageBuffer::ImageBuffer(const ImageBuffer& other)
     : m_width(other.m_width), m_height(other.m_height), m_channels(other.m_channels),
       m_data(other.m_data), m_meta(other.m_meta), m_name(other.m_name),
       m_modified(other.m_modified), m_mask(other.m_mask), m_hasMask(other.m_hasMask),
-      m_mutex(std::make_unique<QReadWriteLock>()),
+      m_mutex(std::make_unique<QReadWriteLock>(QReadWriteLock::Recursive)),
       m_lastAccess(QDateTime::currentMSecsSinceEpoch())
 {
     // Do not copy swap state - new buffer starts effectively loaded
@@ -71,7 +71,7 @@ ImageBuffer& ImageBuffer::operator=(const ImageBuffer& other) {
         m_mask = other.m_mask;
         m_hasMask = other.m_hasMask;
         // Keep existing mutex or create new one
-        if (!m_mutex) m_mutex = std::make_unique<QReadWriteLock>();
+        if (!m_mutex) m_mutex = std::make_unique<QReadWriteLock>(QReadWriteLock::Recursive);
     }
     return *this;
 }
@@ -162,23 +162,29 @@ bool ImageBuffer::canSwap() const {
 bool ImageBuffer::trySwapOut() {
     if (!canSwap()) return false;
     
+    qDebug() << "[ImageBuffer::trySwapOut]" << m_name << (void*)this << "attempting lock...";
     // Attempt to lock for WRITE. If fails, someone is using it.
     if (m_mutex->tryLockForWrite()) {
         // Double check
         if (!m_isSwapped && !m_data.empty()) {
+            qDebug() << "[ImageBuffer::trySwapOut]" << m_name << "swapping out" << m_data.size() << "floats";
             doSwapOut();
             m_mutex->unlock();
             return true;
         }
         m_mutex->unlock();
+    } else {
+        qDebug() << "[ImageBuffer::trySwapOut]" << m_name << "lock failed (in use)";
     }
     return false;
 }
 
 void ImageBuffer::forceSwapIn() {
     // Blocking swap-in
+    qDebug() << "[ImageBuffer::forceSwapIn]" << m_name << (void*)this << "swapped:" << m_isSwapped;
     m_mutex->lockForWrite();
     if (m_isSwapped) {
+        qDebug() << "[ImageBuffer::forceSwapIn]" << m_name << "loading from swap file:" << m_swapFile;
         doSwapIn();
     }
     m_mutex->unlock();
@@ -2434,7 +2440,9 @@ float ImageBuffer::getChannelMedian(int channelIndex) const {
 }
 
 float ImageBuffer::getAreaMean(int x, int y, int w, int h, int c) const {
+    qDebug() << "[ImageBuffer::getAreaMean] Request:" << x << y << w << h << "ch:" << c << "buf:" << m_name << (void*)this;
     ReadLock lock(this);
+    qDebug() << "[ImageBuffer::getAreaMean] Lock acquired. Data size:" << m_data.size() << "Width:" << m_width << "Height:" << m_height;
     // 1. Intersect requested rect with image bounds
     int x0 = std::max(0, x);
     int y0 = std::max(0, y);

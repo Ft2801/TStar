@@ -46,7 +46,7 @@ void GHSDialog::reject() {
     // Restore original if we have an active viewer and were previewing
     if (m_activeViewer) {
         // Disconnect first
-        disconnect(m_activeViewer, &ImageViewer::rectSelected, this, nullptr);
+        m_activeViewer->setRegionSelectedCallback(nullptr);
         disconnect(m_activeViewer, &ImageViewer::destroyed, this, nullptr);
         disconnect(m_activeViewer, &ImageViewer::bufferChanged, this, nullptr);
         
@@ -642,18 +642,24 @@ void GHSDialog::onApply() {
 
 // === Context Switching ===
 void GHSDialog::setTarget(ImageViewer* viewer) {
+    qDebug() << "[GHSDialog::setTarget] New:" << viewer << "Old:" << m_activeViewer;
     if (m_activeViewer == viewer) return;
     
     // Disconnect and Restore old
     if (m_activeViewer) {
         // DISCONNECT FIRST to prevent signals (especially bufferChanged) during restoration
-        disconnect(m_activeViewer, &ImageViewer::rectSelected, this, nullptr);
+        m_activeViewer->setRegionSelectedCallback(nullptr);
         disconnect(m_activeViewer, &ImageViewer::destroyed, this, nullptr);
         disconnect(m_activeViewer, &ImageViewer::bufferChanged, this, nullptr);
 
         // Restore previous viewer to its clean state (remove preview)
         m_selfUpdating = true;
-        m_activeViewer->setBuffer(m_originalBuffer, m_activeViewer->windowTitle(), true);
+        qDebug() << "[GHSDialog::setTarget] Restoring buffer on Old Viewer. Visible?" << m_activeViewer->isVisible();
+        if (m_activeViewer->isVisible()) { // Tentative fix/check
+            m_activeViewer->setBuffer(m_originalBuffer, m_activeViewer->windowTitle(), true);
+        } else {
+             qDebug() << "[GHSDialog::setTarget] Skipping restore because viewer is not visible.";
+        }
         
         // Reset Interaction Mode
         m_activeViewer->setInteractionMode(ImageViewer::Mode_PanZoom);
@@ -694,7 +700,8 @@ void GHSDialog::setTarget(ImageViewer* viewer) {
             m_activeViewer->setCursor(Qt::CrossCursor);
         }
         
-        connect(m_activeViewer, &ImageViewer::rectSelected, this, [this](QRectF r){
+        m_activeViewer->setRegionSelectedCallback([this](QRectF r){
+            qDebug() << "[GHSDialog] rectSelected lambda called for rect:" << r;
             try {
                  if (!m_activeViewer) return; // Safety check
                  
