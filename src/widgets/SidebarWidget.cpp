@@ -26,7 +26,7 @@ SidebarWidget::SidebarWidget(QWidget* parent) : QWidget(parent) {
     // 1. Tab Strip (Left)
     m_tabContainer = new QWidget(this);
     m_tabContainer->setFixedWidth(32); // Narrow strip
-    m_tabContainer->setStyleSheet("background-color: rgba(43, 43, 43, 128); border-right: 1px solid #3a3a3a;");
+    m_tabContainer->setStyleSheet("background-color: #252525; border-right: 1px solid #1a1a1a;");
     
     m_tabLayout = new QVBoxLayout(m_tabContainer);
     m_tabLayout->setContentsMargins(2, 5, 2, 5);

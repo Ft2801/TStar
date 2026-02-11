@@ -266,5 +266,9 @@ protected:
 
 private:
     bool m_isUpdating = false;
+    
+    // Pixel Info
+    class QLabel* m_pixelInfoLabel = nullptr;
+    void updatePixelInfo(const QString& info);
 };
  #endif // MAINWINDOW_H

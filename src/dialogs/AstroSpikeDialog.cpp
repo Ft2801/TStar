@@ -17,250 +17,261 @@
 #include <QDebug>
 #include <QTimer>
 #include <algorithm>
+#include <QSettings>
 
-// =============================================================================
-// UTILS
-// =============================================================================
-
-namespace {
-    AstroSpike::Star floodFillStar(const QVector<float>& lumData, const QVector<uint8_t>& rgbData,
-                                  int width, int height, int startX, int startY, int threshold,
-                                  QVector<bool>& checked) {
-        
-        double sumX = 0;
-        double sumY = 0;
-        double sumLum = 0;
-        double sumR = 0, sumG = 0, sumB = 0, sumColorWeight = 0;
-        
-        int pixelCount = 0;
-        int idx = startY * width + startX;
-        float maxLum = lumData[idx];
-        
-        QVector<int> stack;
-        stack.reserve(1024);
-        stack.push_back(idx);
-        
-        int maxPixels = 1000 + (int)((maxLum / 255.0f) * 50000);
-        float minLumRatio = 0.20f;
-        float pathMinLum = maxLum;
-        
-        while (!stack.isEmpty() && pixelCount < maxPixels) {
-            int currIdx = stack.takeLast();
-            int cx = currIdx % width;
-            int cy = currIdx / width;
-            
-            if (checked[currIdx]) continue;
-            
-            float l = lumData[currIdx];
-            
-            if (l > threshold) {
-                if (maxLum > 0 && l < (maxLum * minLumRatio)) continue;
-                
-                checked[currIdx] = true;
-                if (l < pathMinLum) pathMinLum = l;
-                
-                sumX += cx * l;
-                sumY += cy * l;
-                sumLum += l;
-                
-                float r = rgbData[currIdx * 3 + 0];
-                float g = rgbData[currIdx * 3 + 1];
-                float b = rgbData[currIdx * 3 + 2];
-                
-                float maxRGB = std::max({r, g, b});
-                float minRGB = std::min({r, g, b});
-                float sat = (maxRGB > 0) ? (maxRGB - minRGB) / 255.0f : 0;
-                
-                float colorWeight = 0.0f;
-                if (r > 245 && g > 245 && b > 245) colorWeight = 0.01f;
-                else colorWeight = (l / 255.0f) + sat * 2.0f;
-                
-                sumR += r * colorWeight;
-                sumG += g * colorWeight;
-                sumB += b * colorWeight;
-                sumColorWeight += colorWeight;
-                
-                pixelCount++;
-                
-                // Neighbors
-                const int neighborOffsets[4] = {1, -1, width, -width}; // Right, Left, Down, Up
-                const int neighborX[4] = {cx + 1, cx - 1, cx, cx};
-                
-                for (int i = 0; i < 4; ++i) {
-                    int nx = neighborX[i];
-                    if (nx >= 0 && nx < width) { // X check
-                        int nIdx = currIdx + neighborOffsets[i];
-                         // Boundary check for Y is implicit via array bounds, but let's be safe
-                        if (nIdx >= 0 && nIdx < width * height) {
-                             float nl = lumData[nIdx];
-                             float valleyTolerance = std::max(10.0f, pathMinLum * 0.15f);
-                             if (nl <= pathMinLum + valleyTolerance) {
-                                 stack.push_back(nIdx);
-                             }
-                        }
-                    }
-                }
-            }
-        }
-        
-        if (pixelCount == 0) return {};
-        
-        // Simple circularity check via radius
-        float calcRadius = std::sqrt(pixelCount / M_PI);
-        
-        // Simple rejection of very elongated shapes could be added here similar to python
-        
-        float avgR = 255, avgG = 255, avgB = 255;
-        if (sumColorWeight > 0) {
-            avgR = sumR / sumColorWeight;
-            avgG = sumG / sumColorWeight;
-            avgB = sumB / sumColorWeight;
-        }
-        
-        AstroSpike::Star s;
-        s.x = (float)(sumX / sumLum);
-        s.y = (float)(sumY / sumLum);
-        s.brightness = maxLum / 255.0f;
-        s.radius = calcRadius;
-        s.color = QColor((int)avgR, (int)avgG, (int)avgB);
-        return s;
-    }
-}
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 // =============================================================================
 // STAR DETECTION THREAD
 // =============================================================================
 
-StarDetectionThread::StarDetectionThread(const ImageBuffer& buffer, float threshold, QObject* parent)
-    : QThread(parent), m_threshold(threshold)
+StarDetectionThread::StarDetectionThread(const ImageBuffer& buffer, QObject* parent)
+    : QThread(parent)
 {
-    // Copy data
-    m_bufferImage = buffer.getDisplayImage(ImageBuffer::Display_Linear);
-    if (!m_bufferImage.isNull()) {
-        m_width = m_bufferImage.width();
-        m_height = m_bufferImage.height();
+    // Convert QImage to cv::Mat (thread-safe copy)
+    QImage img = buffer.getDisplayImage(ImageBuffer::Display_Linear);
+    if (img.isNull()) return;
+    
+    m_width = img.width();
+    m_height = img.height();
+    
+    // Build 8-bit BGR and grayscale matrices from the QImage
+    m_rgbMat = cv::Mat(m_height, m_width, CV_8UC3);
+    m_grayMat = cv::Mat(m_height, m_width, CV_8UC1);
+    
+    int depth = img.depth() / 8; // bytes per pixel
+    
+    for (int y = 0; y < m_height; ++y) {
+        const uint8_t* line = img.constScanLine(y);
+        uint8_t* bgrRow = m_rgbMat.ptr<uint8_t>(y);
+        uint8_t* grayRow = m_grayMat.ptr<uint8_t>(y);
         
-        // Populate Lum and RGB
-        int total = m_width * m_height;
-        m_lumData.resize(total);
-        m_rgbData.resize(total * 3);
-        
-        // Assuming Format_RGB888 or Format_ARGB32 (4 bytes)
-        // Let's iterate safely using scanlines
-        int depth = m_bufferImage.depth() / 8;
-        
-        for (int y = 0; y < m_height; ++y) {
-            const uint8_t* line = m_bufferImage.scanLine(y);
-            for (int x = 0; x < m_width; ++x) {
-                int idx = y * m_width + x;
-                uint8_t r = 0, g = 0, b = 0;
-                
-                if (depth == 4) {
-                    b = line[x*4]; g = line[x*4+1]; r = line[x*4+2];
-                } else if (depth == 3) {
-                    r = line[x*3]; g = line[x*3+1]; b = line[x*3+2];
-                }
-                
-                m_lumData[idx] = 0.2126f * r + 0.7152f * g + 0.0722f * b;
-                m_rgbData[idx*3+0] = r;
-                m_rgbData[idx*3+1] = g;
-                m_rgbData[idx*3+2] = b;
+        for (int x = 0; x < m_width; ++x) {
+            uint8_t r = 0, g = 0, b = 0;
+            if (depth == 4) {  // ARGB32
+                b = line[x*4]; g = line[x*4+1]; r = line[x*4+2];
+            } else if (depth == 3) {  // RGB888
+                r = line[x*3]; g = line[x*3+1]; b = line[x*3+2];
             }
+            bgrRow[x*3+0] = b;
+            bgrRow[x*3+1] = g;
+            bgrRow[x*3+2] = r;
+            // ITU-R BT.709 luminance
+            grayRow[x] = (uint8_t)(0.2126f * r + 0.7152f * g + 0.0722f * b);
         }
     }
 }
 
 void StarDetectionThread::run() {
-    if (m_lumData.isEmpty()) return;
+    if (m_grayMat.empty()) return;
     
-    // Map threshold 1-100 to 140-240 (roughly)
-    float internalThreshold = 140 + (m_threshold - 1) * (240 - 140) / 99.0f;
+    // --- Pre-processing: Gaussian blur to reduce noise ---
+    cv::Mat blurred;
+    cv::GaussianBlur(m_grayMat, blurred, cv::Size(3, 3), 0);
     
-    // 1. Find Peaks
-    // Using a stride for speed
-    int stride = 4;
-    QVector<QPoint> peaks;
+    // --- Multi-level threshold detection ---
+    // Scan from HIGHEST to LOWEST threshold so brightest stars are found first.
+    // This prevents dim noise blobs from claiming star positions before bright stars.
+    const int threshLevels[] = {230, 200, 160, 120, 80, 60, 40, 20};
+    const int numLevels = 8;
     
-    for (int y = 0; y < m_height; y += stride) {
-        for (int x = 0; x < m_width; x += stride) {
-            int idx = y * m_width + x;
-            if (m_lumData[idx] > internalThreshold) {
-                // Local max search
-                int cx = x, cy = y;
-                float cLum = m_lumData[idx];
-                
-                for (int iter = 0; iter < 10; ++iter) {
-                    bool changed = false;
-                    float bestLum = cLum;
-                    int bestX = cx, bestY = cy;
-                    
-                    for (int dy = -1; dy <= 1; ++dy) {
-                        for (int dx = -1; dx <= 1; ++dx) {
-                            int nx = cx + dx;
-                            int ny = cy + dy;
-                            if (nx >= 0 && nx < m_width && ny >= 0 && ny < m_height) {
-                                float val = m_lumData[ny * m_width + nx];
-                                if (val > bestLum) {
-                                    bestLum = val;
-                                    bestX = nx;
-                                    bestY = ny;
-                                    changed = true;
-                                }
-                            }
-                        }
+    // Area limits: real astronomical stars range from single pixels to large blobs
+    // after stretching. Match the UI's maxStarSize (up to 500 radius → area ~785k).
+    const double minArea = 2.0;
+    const double maxArea = 80000.0; // Covers radius up to ~160px
+    
+    // Use a "visited" mask to avoid detecting the same star at multiple threshold levels
+    cv::Mat visited = cv::Mat::zeros(m_height, m_width, CV_8UC1);
+    
+    QVector<AstroSpike::Star> allDetected;
+    
+    for (int lvl = 0; lvl < numLevels; ++lvl) {
+        cv::Mat binary;
+        cv::threshold(blurred, binary, threshLevels[lvl], 255, cv::THRESH_BINARY);
+        
+        std::vector<std::vector<cv::Point>> contours;
+        cv::findContours(binary, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+        
+        int numContours = (int)contours.size();
+        
+        // Process contours in parallel
+        std::vector<AstroSpike::Star> levelStars(numContours);
+        std::vector<bool> valid(numContours, false);
+        
+#ifdef _OPENMP
+        int numThreads = std::max(1, omp_get_max_threads() - 1);
+        #pragma omp parallel for num_threads(numThreads) schedule(dynamic, 64)
+#endif
+        for (int i = 0; i < numContours; ++i) {
+            const auto& contour = contours[i];
+            double area = cv::contourArea(contour);
+            
+            if (area < minArea || area > maxArea) continue;
+            
+            // Circularity check: reject very elongated or irregular shapes
+            double perimeter = cv::arcLength(contour, true);
+            if (perimeter <= 0) continue;
+            double circularity = 4.0 * CV_PI * area / (perimeter * perimeter);
+            if (circularity < 0.25) continue;
+            
+            // Find actual brightest pixel within this contour's bounding rect
+            // This avoids the centroid-averaging issue when nearby stars merge
+            cv::Rect bbox = cv::boundingRect(contour);
+            int bx0 = std::max(0, bbox.x);
+            int by0 = std::max(0, bbox.y);
+            int bx1 = std::min(m_width - 1, bbox.x + bbox.width - 1);
+            int by1 = std::min(m_height - 1, bbox.y + bbox.height - 1);
+            
+            // Find peak luminance position
+            float peakLum = 0;
+            int icx = (bx0 + bx1) / 2, icy = (by0 + by1) / 2;
+            int peakX = icx, peakY = icy;
+            float cx = 0, cy = 0;
+            for (int py = by0; py <= by1; ++py) {
+                const uint8_t* grayRow = m_grayMat.ptr<uint8_t>(py);
+                for (int px = bx0; px <= bx1; ++px) {
+                    if (grayRow[px] > peakLum) {
+                        peakLum = grayRow[px];
+                        peakX = px;
+                        peakY = py;
                     }
-                    if (!changed) break;
-                    cx = bestX; cy = bestY; cLum = bestLum;
-                }
-                
-                if (cLum > internalThreshold) {
-                    peaks.append(QPoint(cx, cy));
                 }
             }
+            
+            // Refine centroid: intensity-weighted average in a tight window around peak
+            float refinedCx = 0, refinedCy = 0, totalW = 0;
+            int refineR = 2; // Small window to stay on the star core
+            int ry0 = std::max(0, peakY - refineR);
+            int ry1 = std::min(m_height - 1, peakY + refineR);
+            int rx0 = std::max(0, peakX - refineR);
+            int rx1 = std::min(m_width - 1, peakX + refineR);
+            for (int py = ry0; py <= ry1; ++py) {
+                const uint8_t* grayRow = m_grayMat.ptr<uint8_t>(py);
+                for (int px = rx0; px <= rx1; ++px) {
+                    float w = grayRow[px] * grayRow[px]; // Squared weight for tighter peak
+                    refinedCx += px * w;
+                    refinedCy += py * w;
+                    totalW += w;
+                }
+            }
+            if (totalW > 0) {
+                cx = refinedCx / totalW;
+                cy = refinedCy / totalW;
+            } else {
+                cx = (float)peakX;
+                cy = (float)peakY;
+            }
+            
+            icx = std::max(0, std::min((int)std::round(cx), m_width - 1));
+            icy = std::max(0, std::min((int)std::round(cy), m_height - 1));
+            
+            // Skip if this refined location was already detected
+            if (visited.at<uint8_t>(icy, icx) != 0) continue;
+            
+            // Radius from area
+            float radius = (float)std::sqrt(area / CV_PI);
+            
+            // Color: sample from the bright core around the peak (tight window)
+            int colorR = std::max(1, (int)std::ceil(radius * 0.5f));
+            float sumR = 0, sumG = 0, sumB = 0;
+            float sumWeight = 0;
+            
+            int cy0 = std::max(0, icy - colorR);
+            int cy1 = std::min(m_height - 1, icy + colorR);
+            int cx0 = std::max(0, icx - colorR);
+            int cx1 = std::min(m_width - 1, icx + colorR);
+            
+            for (int py = cy0; py <= cy1; ++py) {
+                const uint8_t* grayRow = m_grayMat.ptr<uint8_t>(py);
+                const uint8_t* bgrRow = m_rgbMat.ptr<uint8_t>(py);
+                for (int px = cx0; px <= cx1; ++px) {
+                    float lum = grayRow[px];
+                    // Only sample from bright pixels for better color accuracy
+                    if (lum < peakLum * 0.5f) continue;
+                    
+                    float w = lum * lum; // Squared weight emphasizes bright core
+                    sumB += bgrRow[px*3+0] * w;
+                    sumG += bgrRow[px*3+1] * w;
+                    sumR += bgrRow[px*3+2] * w;
+                    sumWeight += w;
+                }
+            }
+            
+            float avgR = 255, avgG = 255, avgB = 255;
+            if (sumWeight > 0) {
+                avgR = sumR / sumWeight;
+                avgG = sumG / sumWeight;
+                avgB = sumB / sumWeight;
+            }
+            
+            AstroSpike::Star s;
+            s.x = cx;
+            s.y = cy;
+            s.brightness = peakLum / 255.0f;
+            s.radius = radius;
+            s.color = QColor((int)std::min(255.0f, avgR),
+                             (int)std::min(255.0f, avgG),
+                             (int)std::min(255.0f, avgB));
+            
+            levelStars[i] = s;
+            valid[i] = true;
         }
-    }
-    
-    // Unique peaks
-    std::sort(peaks.begin(), peaks.end(), [](const QPoint& a, const QPoint& b){
-        if (a.y() != b.y()) return a.y() < b.y();
-        return a.x() < b.x();
-    });
-    peaks.erase(std::unique(peaks.begin(), peaks.end()), peaks.end());
-    
-    // 2. Flood Fill
-    QVector<bool> checked(m_width * m_height, false);
-    QVector<AstroSpike::Star> stars;
-    
-    for (const QPoint& p : peaks) {
-        if (checked[p.y() * m_width + p.x()]) continue;
         
-        AstroSpike::Star s = floodFillStar(m_lumData, m_rgbData, m_width, m_height, 
-                                           p.x(), p.y(), (int)internalThreshold, checked);
-        if (s.radius > 0) {
-            stars.append(s);
+        // Collect valid results from this level and mark visited
+        for (int i = 0; i < numContours; ++i) {
+            if (!valid[i]) continue;
+            
+            const auto& s = levelStars[i];
+            int icx = std::max(0, std::min((int)std::round(s.x), m_width - 1));
+            int icy = std::max(0, std::min((int)std::round(s.y), m_height - 1));
+            
+            // Mark a small region as visited to prevent duplicates across levels
+            // Reduced to 0.6 * radius to allow close companions (de-blending)
+            int markR = std::max(1, (int)std::ceil(s.radius * 0.6f));
+            int my0 = std::max(0, icy - markR);
+            int my1 = std::min(m_height - 1, icy + markR);
+            int mx0 = std::max(0, icx - markR);
+            int mx1 = std::min(m_width - 1, icx + markR);
+            for (int py = my0; py <= my1; ++py) {
+                uint8_t* row = visited.ptr<uint8_t>(py);
+                for (int px = mx0; px <= mx1; ++px) {
+                    row[px] = 255;
+                }
+            }
+            
+            allDetected.append(s);
         }
     }
     
-    // 3. Merge Close Stars
-    std::sort(stars.begin(), stars.end(), [](const AstroSpike::Star& a, const AstroSpike::Star& b){
-        return a.radius > b.radius;
+    qDebug() << "[AstroSpike] Detected" << allDetected.size() << "raw star candidates";
+    
+    // --- Sort by brightness descending ---
+    std::sort(allDetected.begin(), allDetected.end(), [](const AstroSpike::Star& a, const AstroSpike::Star& b) {
+        return a.brightness > b.brightness;
     });
     
+    // --- Merge close stars (keep brightest) ---
     QVector<AstroSpike::Star> merged;
-    for (const auto& s : stars) {
-        bool isMerged = false;
+    merged.reserve(allDetected.size());
+    for (const auto& s : allDetected) {
+        bool isDuplicate = false;
         for (const auto& existing : merged) {
             float dx = s.x - existing.x;
             float dy = s.y - existing.y;
-            float dist = std::sqrt(dx*dx + dy*dy);
-            
-            if (dist < (existing.radius + s.radius) * 0.5f) {
-                isMerged = true;
+            float distSq = dx*dx + dy*dy;
+            // Radius sum * 0.7 allows significant overlap (visual doubles) but merges identicals
+            float mergeR = (existing.radius + s.radius) * 0.7f;
+            if (distSq < mergeR * mergeR) {
+                isDuplicate = true;
                 break;
             }
         }
-        if (!isMerged) merged.append(s);
+        if (!isDuplicate) merged.append(s);
     }
+    
+    qDebug() << "[AstroSpike] After merge:" << merged.size() << "unique stars";
     
     emit detectionComplete(merged);
 }
@@ -276,18 +287,62 @@ AstroSpikeCanvas::AstroSpikeCanvas(QWidget* parent) : QWidget(parent) {
 
 void AstroSpikeCanvas::setImage(const QImage& img) {
     m_image = img;
+    updateSpikePreview();
     fitToView();
     update();
 }
 
 void AstroSpikeCanvas::setStars(const QVector<AstroSpike::Star>& stars) {
     m_stars = stars;
+    updateSpikePreview();
     update();
 }
 
 void AstroSpikeCanvas::setConfig(const AstroSpike::Config& config) {
     m_config = config;
+    updateSpikePreview();
     update();
+}
+
+void AstroSpikeCanvas::updateSpikePreview() {
+    if (m_image.isNull()) {
+        m_spikePreview = QImage();
+        return;
+    }
+    
+    QSize targetSize = m_image.size();
+    float scale = 1.0f;
+    
+    const int MAX_PREVIEW_DIM = 2048;
+    if (targetSize.width() > MAX_PREVIEW_DIM || targetSize.height() > MAX_PREVIEW_DIM) {
+        scale = (float)MAX_PREVIEW_DIM / std::max(targetSize.width(), targetSize.height());
+        targetSize = targetSize * scale;
+    }
+    
+    // Reuse buffer if possible
+    if (m_spikePreview.size() != targetSize || m_spikePreview.format() != QImage::Format_ARGB32_Premultiplied) {
+        m_spikePreview = QImage(targetSize, QImage::Format_ARGB32_Premultiplied);
+    }
+    
+    m_spikePreview.fill(Qt::transparent);
+    
+    if (!m_stars.isEmpty()) {
+        QPainter p(&m_spikePreview);
+        // Scale rendering context
+        if (scale != 1.0f) p.scale(scale, scale);
+        
+        render(p, 1.0f, QPointF(0, 0));
+        p.end(); 
+        
+        // Apply 1px Blur (scaled if needed)
+        // Use at least 0.5 sigma to avoid artifacts
+        float sigma = std::max(0.5f, 1.0f * scale);
+        
+        cv::Mat spikeMat(m_spikePreview.height(), m_spikePreview.width(), CV_8UC4,
+                         m_spikePreview.bits(), m_spikePreview.bytesPerLine());
+                         
+        cv::GaussianBlur(spikeMat, spikeMat, cv::Size(0, 0), sigma, sigma);
+    }
 }
 
 void AstroSpikeCanvas::setToolMode(AstroSpike::ToolMode mode) {
@@ -302,12 +357,25 @@ void AstroSpikeCanvas::setToolMode(AstroSpike::ToolMode mode) {
 
 
 void AstroSpikeCanvas::zoomIn() {
-    m_zoom *= 1.2f;
-    update();
+    zoomToPoint(QPointF(width() / 2.0, height() / 2.0), 1.2f);
 }
 
 void AstroSpikeCanvas::zoomOut() {
-    m_zoom /= 1.2f;
+    zoomToPoint(QPointF(width() / 2.0, height() / 2.0), 1.0f / 1.2f);
+}
+
+void AstroSpikeCanvas::zoomToPoint(QPointF widgetPos, float factor) {
+    // Image point under cursor before zoom
+    float cx = width() / 2.0f + m_panOffset.x();
+    float cy = height() / 2.0f + m_panOffset.y();
+    QPointF imgPt = (widgetPos - QPointF(cx, cy)) / m_zoom;
+    
+    m_zoom *= factor;
+    
+    // Adjust pan so same image point stays under cursor
+    QPointF newScreenPt = imgPt * m_zoom + QPointF(cx, cy);
+    m_panOffset += (widgetPos - newScreenPt);
+    
     update();
 }
 
@@ -329,6 +397,7 @@ void AstroSpikeDialog::setViewer(ImageViewer* v) {
     
     // Clear and Re-Run detection for new image
     m_canvas->setStars({});
+    m_allStars.clear();
     m_history.clear();
     m_historyIndex = 0;
     updateHistoryButtons();
@@ -371,12 +440,14 @@ void AstroSpikeCanvas::paintEvent([[maybe_unused]] QPaintEvent* event) {
     
     p.drawImage(destRect, m_image);
     
-    // Draw Spikes
-    // Calculate offset for render
-    float offsetX = cx - drawW/2;
-    float offsetY = cy - drawH/2;
-    
-    render(p, m_zoom, QPointF(offsetX, offsetY));
+    // Draw Cached Spikes (if valid)
+    if (!m_spikePreview.isNull() && !m_stars.isEmpty()) {
+        p.setCompositionMode(QPainter::CompositionMode_Screen);
+        // Draw the full-res preview scaled to the destination rect
+        // This ensures pixelation matches zooming into the actual image
+        p.drawImage(destRect, m_spikePreview);
+        p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    }
     
     // Draw Tool Cursor
     if (m_toolMode != AstroSpike::ToolMode::None && rect().contains(mapFromGlobal(QCursor::pos()))) {
@@ -535,13 +606,6 @@ void AstroSpikeCanvas::render(QPainter& p, float scale, const QPointF& offset) {
                 
                 QLinearGradient grad(rayStart, rayEnd);
                 grad.setColorAt(0, color);
-                
-                float fadePoint = qBound(0.0f, m_config.sharpness, 0.99f);
-                if (fadePoint > 0) {
-                    QColor cMid = color;
-                    cMid.setAlphaF(std::min(1.0f, m_config.intensity * 0.8f));
-                    grad.setColorAt(fadePoint, cMid);
-                }
                 QColor endC = color;
                 endC.setAlpha(0);
                 grad.setColorAt(1, endC);
@@ -679,8 +743,8 @@ void AstroSpikeCanvas::mouseReleaseEvent([[maybe_unused]] QMouseEvent* event) {
 }
 
 void AstroSpikeCanvas::wheelEvent(QWheelEvent* event) {
-    if (event->angleDelta().y() > 0) zoomIn();
-    else zoomOut();
+    float factor = event->angleDelta().y() > 0 ? 1.2f : (1.0f / 1.2f);
+    zoomToPoint(event->position(), factor);
 }
 
 // Event Filter to block scroll on sliders
@@ -733,16 +797,13 @@ void AstroSpikeCanvas::handleTool(const QPointF& imgPos) {
 // =============================================================================
 
 AstroSpikeDialog::AstroSpikeDialog(ImageViewer* viewer, QWidget* parent)
-    : DialogBase(parent, "AstroSpike", 1000, 600), m_viewer(viewer)
+    : DialogBase(parent, "AstroSpike", 1300, 700), m_viewer(viewer)
 {
-    resize(1800, 1200); // Increased size as requested
+    setWindowFlags(windowFlags() | Qt::Dialog | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+    setModal(true);
     
     // Setup UI
     setupUI();
-    
-    // Install event filter for scroll blocking
-    // We'll filter events on the application level or locally.
-    // Simpler: filter on sliders.
     
     // Initial Config
     m_canvas->setConfig(m_config);
@@ -771,14 +832,13 @@ bool AstroSpikeDialog::eventFilter(QObject* obj, QEvent* event) {
 
 AstroSpikeDialog::~AstroSpikeDialog() {
     if (m_thread) {
-        m_thread->quit();
         m_thread->wait();
+        m_thread = nullptr;
     }
 }
 
 void AstroSpikeDialog::closeEvent(QCloseEvent* event) {
     if (m_thread && m_thread->isRunning()) {
-        m_thread->quit();
         m_thread->wait();
     }
     QDialog::closeEvent(event);
@@ -796,20 +856,54 @@ void AstroSpikeDialog::runDetection() {
     if (!m_viewer) return;
     if (m_thread && m_thread->isRunning()) return;
     
-    m_statusLabel->setText(tr("Detecting stars..."));
+    m_statusLabel->setText(tr("Detecting all stars..."));
     
-    if (m_thread) delete m_thread;
-    m_thread = new StarDetectionThread(m_viewer->getBuffer(), m_config.threshold, this);
+    // Previous thread (if any) is handled by deleteLater; just null our pointer
+    m_thread = new StarDetectionThread(m_viewer->getBuffer(), this);
     connect(m_thread, &StarDetectionThread::detectionComplete, this, &AstroSpikeDialog::onStarsDetected);
+    connect(m_thread, &QThread::finished, m_thread, &QObject::deleteLater);
     m_thread->start();
 }
 
 void AstroSpikeDialog::onStarsDetected(const QVector<AstroSpike::Star>& stars) {
-    m_statusLabel->setText(tr("Found %1 stars").arg(stars.size()));
-    m_canvas->setStars(stars);
-    // Reset history
+    // Cache the full pre-computed star list (sorted by brightness descending)
+    m_allStars = stars;
+    m_thread = nullptr; // Will be deleted by deleteLater
+    
+    m_statusLabel->setText(tr("Detected %1 total stars. Filtering...").arg(stars.size()));
+    
+    // Apply current threshold filter
+    filterStarsByThreshold();
+}
+
+void AstroSpikeDialog::filterStarsByThreshold() {
+    if (m_allStars.isEmpty()) return;
+    
+    // Map threshold slider (1-100) to internal brightness cutoff
+    // Slider 1 -> internal 35 (low cutoff, many stars)
+    // Slider 100 -> internal 100 (high cutoff, only brightest)
+    float internalThresh = 35.0f + (m_config.threshold - 1.0f) * (65.0f / 99.0f);
+    float cutoff = (internalThresh - 1.0f) / 99.0f; // 0.34 to 1.0
+    
+    // Since m_allStars is already sorted by brightness descending,
+    // we can use a simple linear scan and stop early
+    QVector<AstroSpike::Star> filtered;
+    filtered.reserve(m_allStars.size());
+    
+    for (const auto& s : m_allStars) {
+        if (s.brightness >= cutoff) {
+            filtered.append(s);
+        }
+        // Since sorted by brightness desc, once we go below cutoff, all subsequent are too dim
+        // BUT stars might not be perfectly monotonic after merge, so do full scan
+    }
+    
+    m_statusLabel->setText(tr("%1 stars (of %2 total)").arg(filtered.size()).arg(m_allStars.size()));
+    m_canvas->setStars(filtered);
+    
+    // Reset history with filtered result
     m_history.clear();
-    m_history.append(stars);
+    m_history.append(filtered);
     m_historyIndex = 0;
     updateHistoryButtons();
 }
@@ -895,9 +989,11 @@ void AstroSpikeDialog::setupUI() {
     
     QSlider* sldSize = new QSlider(Qt::Horizontal);
     sldSize->setFixedWidth(80);
-    sldSize->setRange(1, 100);
+    sldSize->setRange(1, 50);
     sldSize->setValue(4);
     sldSize->installEventFilter(this);
+    // connect(sldSize, &QSlider::sliderPressed, [this](){ m_canvas->setPreviewQuality(true); });
+    // connect(sldSize, &QSlider::sliderReleased, [this](){ m_canvas->setPreviewQuality(false); });
     QLabel* lSizeVal = new QLabel("4", this);
     lSizeVal->setFixedWidth(25);
     
@@ -918,6 +1014,8 @@ void AstroSpikeDialog::setupUI() {
     sldErase->setRange(5, 200);
     sldErase->setValue(20);
     sldErase->installEventFilter(this);
+    // connect(sldErase, &QSlider::sliderPressed, [this](){ m_canvas->setPreviewQuality(true); });
+    // connect(sldErase, &QSlider::sliderReleased, [this](){ m_canvas->setPreviewQuality(false); });
     QLabel* lEraseVal = new QLabel("20", this);
     lEraseVal->setFixedWidth(25);
     
@@ -931,6 +1029,33 @@ void AstroSpikeDialog::setupUI() {
     topLayout->addWidget(m_statusLabel);
     topLayout->addStretch();
     
+    // Zoom buttons
+    QPushButton* btnZoomIn = new QPushButton(tr("+"), this);
+    btnZoomIn->setFixedSize(28, 28);
+    btnZoomIn->setToolTip(tr("Zoom In"));
+    connect(btnZoomIn, &QPushButton::clicked, [this](){ m_canvas->zoomIn(); });
+    topLayout->addWidget(btnZoomIn);
+    
+    QPushButton* btnZoomOut = new QPushButton(tr("−"), this);
+    btnZoomOut->setFixedSize(28, 28);
+    btnZoomOut->setToolTip(tr("Zoom Out"));
+    connect(btnZoomOut, &QPushButton::clicked, [this](){ m_canvas->zoomOut(); });
+    topLayout->addWidget(btnZoomOut);
+    
+    QPushButton* btnFit = new QPushButton(tr("Fit"), this);
+    btnFit->setFixedSize(40, 28);
+    btnFit->setToolTip(tr("Fit to Screen"));
+    connect(btnFit, &QPushButton::clicked, [this](){ m_canvas->fitToView(); });
+    topLayout->addWidget(btnFit);
+    
+    topLayout->addSpacing(10);
+    
+    // Reset button in toolbar
+    QPushButton* btnReset = new QPushButton(tr("Reset"), this);
+    btnReset->setToolTip(tr("Reset to Defaults"));
+    connect(btnReset, &QPushButton::clicked, [this](){ resetConfig(); });
+    topLayout->addWidget(btnReset);
+    
     root->addWidget(topBar);
     
     // Content
@@ -940,6 +1065,8 @@ void AstroSpikeDialog::setupUI() {
     
     // Canvas
     m_canvas = new AstroSpikeCanvas(this);
+    m_canvas->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_canvas->setMinimumSize(100, 100); // Allow shrinking
     connect(m_canvas, &AstroSpikeCanvas::starsUpdated, this, &AstroSpikeDialog::onCanvasStarsUpdated);
     contentLayout->addWidget(m_canvas, 1);
     
@@ -963,19 +1090,17 @@ void AstroSpikeDialog::setupUI() {
     copyright->setAlignment(Qt::AlignRight);
     copyright->setStyleSheet("color: #888; font-size: 10px; padding: 3px 10px; background: #1e1e1e; border-top: 1px solid #333;");
     root->addWidget(copyright);
+    
+    // Force window to respect layout's minimum size (prevent cutting)
+    root->setSizeConstraint(QLayout::SetMinimumSize);
 }
 
 void AstroSpikeDialog::setupControls(QVBoxLayout* layout) {
     // Detection
     QGroupBox* grpDetect = new QGroupBox(tr("Detection"));
     QVBoxLayout* lDetect = new QVBoxLayout(grpDetect);
-    // Threshold triggers re-detection
-    QWidget* sldThreshold = createSlider(tr("Threshold"), 1, 100, 1, m_config.threshold, &m_config.threshold, "");
-    QSlider* actualSlider = sldThreshold->findChild<QSlider*>(); 
-    connect(actualSlider, &QSlider::sliderReleased, [this](){
-        runDetection();
-    });
-    lDetect->addWidget(sldThreshold);
+    // Threshold now filters the pre-computed star list instantly (no re-detection)
+    lDetect->addWidget(createSlider(tr("Threshold"), 1, 100, 1, m_config.threshold, &m_config.threshold, ""));
     lDetect->addWidget(createSlider(tr("Amount %"), 0, 100, 1, m_config.starAmount, &m_config.starAmount, "%"));
     lDetect->addWidget(createSlider(tr("Min Size"), 0, 100, 1, m_config.minStarSize, &m_config.minStarSize, ""));
     lDetect->addWidget(createSlider(tr("Max Size"), 10, 500, 5, m_config.maxStarSize, &m_config.maxStarSize, ""));
@@ -990,8 +1115,7 @@ void AstroSpikeDialog::setupControls(QVBoxLayout* layout) {
     lGeo->addWidget(createSlider(tr("Angle"), 0, 180, 1, m_config.angle, &m_config.angle, "deg"));
     lGeo->addWidget(createSlider(tr("Thickness"), 0.1, 5.0, 0.1, m_config.spikeWidth, &m_config.spikeWidth, ""));
     lGeo->addWidget(createSlider(tr("Global Scale"), 0.1, 5.0, 0.1, m_config.globalScale, &m_config.globalScale, "x"));
-    lGeo->addWidget(createSlider(tr("Sharpness"), 0.0, 0.99, 0.05, m_config.sharpness, &m_config.sharpness, ""));
-    lGeo->addWidget(createSlider(tr("Intensity"), 0, 2.0, 0.1, m_config.intensity, &m_config.intensity, ""));
+    lGeo->addWidget(createSlider(tr("Intensity"), 0, 1.0, 0.05, m_config.intensity, &m_config.intensity, ""));
     layout->addWidget(grpGeo);
 
     // Appearance
@@ -1038,7 +1162,7 @@ void AstroSpikeDialog::setupControls(QVBoxLayout* layout) {
     // Soft Flare
     QGroupBox* grpFlare = new QGroupBox(tr("Flare"));
     QVBoxLayout* lFlare = new QVBoxLayout(grpFlare);
-    lFlare->addWidget(createSlider(tr("Intensity"), 0, 3.0, 0.1, m_config.softFlareIntensity, &m_config.softFlareIntensity, ""));
+    lFlare->addWidget(createSlider(tr("Intensity"), 0, 1.0, 0.05, m_config.softFlareIntensity, &m_config.softFlareIntensity, ""));
     lFlare->addWidget(createSlider(tr("Size"), 1, 50, 1, m_config.softFlareSize, &m_config.softFlareSize, ""));
     layout->addWidget(grpFlare);
 }
@@ -1064,6 +1188,10 @@ QWidget* AstroSpikeDialog::createSlider(const QString& label, float min, float m
     // Install event filter to block scroll
     slider->installEventFilter(this);
     
+    // Performance optimization: low quality during drag - REMOVED
+    // connect(slider, &QSlider::sliderPressed, [this](){ m_canvas->setPreviewQuality(true); });
+    // connect(slider, &QSlider::sliderReleased, [this](){ m_canvas->setPreviewQuality(false); });
+    
     connect(slider, &QSlider::valueChanged, [=](int v){
         float fVal = min + v * step;
         lblVal->setText(QString::number(fVal, 'f', 1) + unit);
@@ -1080,6 +1208,8 @@ QWidget* AstroSpikeDialog::createSlider(const QString& label, float min, float m
 
 void AstroSpikeDialog::onConfigChanged() {
     m_canvas->setConfig(m_config);
+    // Re-filter stars when threshold (or any config) changes — instant, no recompute
+    filterStarsByThreshold();
 }
 
 // Force rebuild
@@ -1089,6 +1219,21 @@ void AstroSpikeDialog::setToolMode(AstroSpike::ToolMode mode) {
 
 void AstroSpikeDialog::resetConfig() {
     m_config = AstroSpike::Config();
+    
+    // Rebuild UI to reflect defaults
+    if (m_controlsScroll) {
+        QWidget* w = new QWidget();
+        QVBoxLayout* l = new QVBoxLayout(w);
+        setupControls(l);
+        l->addStretch();
+        
+        // Use takeWidget() to safely remove ownership before deleting
+        QWidget* old = m_controlsScroll->takeWidget();
+        if (old) old->deleteLater();
+        
+        m_controlsScroll->setWidget(w);
+    }
+    
     onConfigChanged();
 }
 
@@ -1101,8 +1246,23 @@ void AstroSpikeDialog::applyToDocument() {
         fullImg = fullImg.convertToFormat(QImage::Format_ARGB32);
     }
     
+    // Render spikes to offscreen layer, blur, then composite
+    QImage spikeLayer(fullImg.size(), QImage::Format_ARGB32_Premultiplied);
+    spikeLayer.fill(Qt::transparent);
+    {
+        QPainter sp(&spikeLayer);
+        m_canvas->render(sp, 1.0f, QPointF(0, 0));
+    }
+    
+    // Apply Gaussian blur for softer spikes
+    cv::Mat spikeMat(spikeLayer.height(), spikeLayer.width(), CV_8UC4,
+                     spikeLayer.bits(), spikeLayer.bytesPerLine());
+    cv::GaussianBlur(spikeMat, spikeMat, cv::Size(3, 3), 1.0, 1.0);
+    
+    // Composite over original
     QPainter p(&fullImg);
-    m_canvas->render(p, 1.0f, QPointF(0, 0));
+    p.setCompositionMode(QPainter::CompositionMode_Screen);
+    p.drawImage(0, 0, spikeLayer);
     p.end();
 
     m_viewer->pushUndo();

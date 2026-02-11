@@ -497,6 +497,8 @@ set(TSTAR_SOURCES
     src/widgets/AnnotationOverlay.h
     src/widgets/SimplePlotWidget.cpp
     src/widgets/SimplePlotWidget.h
+    src/widgets/ResourceMonitorWidget.cpp
+    src/widgets/ResourceMonitorWidget.h
     
     # Algorithms
     src/algos/AbeMath.cpp
@@ -863,8 +865,8 @@ if(APPLE)
     find_package(ZLIB REQUIRED)
     target_link_libraries(TStar PRIVATE ZLIB::ZLIB)
 else()
-    # Windows: zlib and winsock
-    target_link_libraries(TStar PRIVATE z ws2_32)
+    # Windows: zlib and winsock + PDH/DXGI for resource monitor
+    target_link_libraries(TStar PRIVATE z ws2_32 pdh dxguid)
 endif()
 
 # Optional compression libraries

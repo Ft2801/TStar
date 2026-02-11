@@ -109,6 +109,8 @@
 #include <QDropEvent>
 #include <QMimeData>
 
+#include "widgets/ResourceMonitorWidget.h"
+
 #include <QThreadPool>
 #include "../core/ThreadState.h"
 
@@ -159,7 +161,92 @@ MainWindow::MainWindow(QWidget *parent)
     mainLayout->addWidget(m_sidebar);
     
     // 2. MDI Area (Right)
-    m_mdiArea = new QMdiArea(this);
+    // Custom MDI Area for Background Painting
+    class TStarMdiArea : public QMdiArea {
+    public:
+        explicit TStarMdiArea(QWidget* parent = nullptr) : QMdiArea(parent) {}
+    protected:
+        void paintEvent(QPaintEvent* event) override {
+            // 1. Fill Base Background
+            QPainter p(viewport());
+            p.fillRect(event->rect(), QColor(30, 30, 30)); // #1E1E1E
+
+            // 2. Center Grid (Rotated 45 degrees, 400px square)
+            p.save();
+            p.setRenderHint(QPainter::Antialiasing);
+            
+            int w = width();
+            int h = height();
+            int cx = w / 2;
+            int cy = h / 2;
+            int side = 400;
+            int half = side / 2;
+            
+            p.translate(cx, cy);
+            p.rotate(45);
+            
+            // Define the square area
+            QRect squareRect(-half, -half, side, side);
+            
+            p.setClipRect(squareRect);
+            
+            // Draw Grid lines inside the square
+            QColor gridColor(40, 40, 40); // #282828
+            QPen gridPen(gridColor);
+            gridPen.setWidthF(3.0);
+            p.setPen(gridPen);
+            
+            int step = 50;
+            
+            // Draw vertical lines (relative to rotated system)
+            for (int x = -half; x <= half; x += step) {
+                p.drawLine(x, -half, x, half);
+            }
+            
+            // Draw horizontal lines (relative to rotated system)
+            for (int y = -half; y <= half; y += step) {
+                p.drawLine(-half, y, half, y);
+            }
+            
+            p.restore();
+            
+            // 3. Bottom Right Text "TStar"
+            p.save();
+            p.setRenderHint(QPainter::TextAntialiasing);
+            
+            QString text = "TStar";
+            // Try to find a script font
+            QFont font("Segoe Script", 48, QFont::Bold); // Windows standard script
+            if (!QFontInfo(font).exactMatch()) {
+                font = QFont("Brush Script MT", 48, QFont::Normal, true); // Fallback: italic=true
+            }
+            if (!QFontInfo(font).exactMatch()) {
+                font = QFont(font.family(), 48, QFont::Normal, true); // Generic Italic
+            }
+            
+            p.setFont(font);
+            p.setPen(QColor(51, 51, 51)); // Same 5% lighter color
+            
+            QFontMetrics fm(font);
+            int tw = fm.horizontalAdvance(text);
+            // int th = fm.height(); // Unused
+            
+            // Position: Bottom Right with padding
+            int px = w - tw - 30;
+            int py = h - 20; // Baseline
+            
+            p.drawText(px, py, text);
+            p.restore();
+
+            // 4. Draw Subwindows (handled by QMdiArea basic painting if we don't call base?)
+            
+            QMdiArea::paintEvent(event); 
+        }
+    };
+    
+    m_mdiArea = new TStarMdiArea(this);
+    m_mdiArea->setBackground(Qt::NoBrush); // Disable default brush so our paintEvent dominates
+    
     m_mdiArea->setActivationOrder(QMdiArea::ActivationHistoryOrder);
     m_mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     m_mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -167,6 +254,19 @@ MainWindow::MainWindow(QWidget *parent)
     // Prevent new windows from inheriting maximized state from active window
     m_mdiArea->setOption(QMdiArea::DontMaximizeSubWindowOnActivation, true);
     mainLayout->addWidget(m_mdiArea);
+    
+    // 3. Resource Monitor (Status Bar, bottom-right)
+    auto* resMonitor = new ResourceMonitorWidget(this);
+    statusBar()->addPermanentWidget(resMonitor);
+    statusBar()->setSizeGripEnabled(true);
+    statusBar()->setStyleSheet(
+        "QStatusBar { background: #1a1a1a; color: #aaa; border-top: 1px solid #333; padding: 2px; }"
+    );
+
+    // Pixel Info Label (Left of Status Bar)
+    m_pixelInfoLabel = new QLabel(this);
+    m_pixelInfoLabel->setStyleSheet("color: #ccc; font-family: Consolas; padding-left: 10px;");
+    statusBar()->addWidget(m_pixelInfoLabel);
 
     // Sidebar is now overlay, not in layout
     m_sidebar->setParent(this);
@@ -440,12 +540,10 @@ MainWindow::MainWindow(QWidget *parent)
     // Timer is now created in the constructor - removed duplicate here
 
 
-    // Menu
-    menuBar()->setVisible(false);
-    
-    // Standalone Actions (used later for toolbar/shortcuts)
-    // Actions removed - not used in current implementation
-    
+    // Menu Style
+    menuBar()->setStyleSheet("QMenuBar { background-color: #252525; color: #ccc; } QMenuBar::item:selected { background: #444; }");
+    menuBar()->setVisible(false); 
+
     m_stretchCombo = new QComboBox();
     m_stretchCombo->setFixedWidth(120);
     m_stretchCombo->addItem(tr("Linear"), ImageBuffer::Display_Linear);
@@ -497,6 +595,10 @@ MainWindow::MainWindow(QWidget *parent)
     QToolBar* mainToolbar = addToolBar(tr("Main Toolbar"));
     mainToolbar->setMovable(false);
     mainToolbar->setIconSize(QSize(24, 24));
+    mainToolbar->setStyleSheet(
+        "QToolBar { background-color: #252525; border-bottom: 1px solid #1a1a1a; spacing: 5px; } "
+        "QToolBar::separator { background: transparent; width: 5px; border: none; }"
+    );
     mainToolbar->setToolButtonStyle(Qt::ToolButtonIconOnly); // Icons only
     
     // Icon Maker (handles SVG or File)
@@ -524,7 +626,8 @@ MainWindow::MainWindow(QWidget *parent)
     addBtn(tr("Open"), "images/open.png", &MainWindow::openFile)->setShortcut(QKeySequence::Open);
     addBtn(tr("Save"), "images/save.png", &MainWindow::saveFile)->setShortcut(QKeySequence::Save);
     
-    mainToolbar->addSeparator();
+    // Spacer
+    { QWidget* s = new QWidget(this); s->setFixedWidth(2); mainToolbar->addWidget(s); }
 
     // 2. Undo / Redo (SVG)
     m_undoAction = mainToolbar->addAction(makeIcon(Icons::UNDO), tr("Undo"));
@@ -539,7 +642,8 @@ MainWindow::MainWindow(QWidget *parent)
     // m_redoAction->setEnabled(false);
     connect(m_redoAction, &QAction::triggered, this, &MainWindow::redo);
     
-    mainToolbar->addSeparator();
+    // Spacer
+    { QWidget* s = new QWidget(this); s->setFixedWidth(2); mainToolbar->addWidget(s); }
     
     // 3. Zoom / Fit (SVG)
     addBtn(tr("Zoom In"), Icons::ZOOM_IN, [this](){ if(currentViewer()) currentViewer()->zoomIn(); })->setShortcut(QKeySequence::ZoomIn);
@@ -547,7 +651,8 @@ MainWindow::MainWindow(QWidget *parent)
     addBtn(tr("Fit to Screen"), Icons::FIT_SCREEN, [this](){ if(currentViewer()) currentViewer()->fitToWindow(); })->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_0));
     addBtn(tr("1:1"), Icons::ZOOM_100, [this](){ if(currentViewer()) currentViewer()->zoom1to1(); })->setToolTip(tr("Zoom 100%"));
     
-    mainToolbar->addSeparator();
+    // Spacer
+    { QWidget* s = new QWidget(this); s->setFixedWidth(2); mainToolbar->addWidget(s); }
 
     // 4. Geometry (SVG)
     addBtn(tr("Rotate Left"), Icons::ROTATE_LEFT, [this](){ applyGeometry(tr("Rotate CCW"), [](ImageBuffer& b){ b.rotate270(); }); });
@@ -556,17 +661,17 @@ MainWindow::MainWindow(QWidget *parent)
     addBtn(tr("Flip Vert"), Icons::FLIP_VERT, [this](){ applyGeometry(tr("Mirror V"), [](ImageBuffer& b){ b.mirrorY(); }); });
     addBtn(tr("Crop / Rotate"), Icons::CROP, &MainWindow::cropTool);
     
-    mainToolbar->addSeparator();
+    // Spacer
+    { QWidget* s = new QWidget(this); s->setFixedWidth(2); mainToolbar->addWidget(s); }
     
     // 5. Tools (Files)
     
     // Add Display Stretch Controls
-    mainToolbar->addSeparator();
     mainToolbar->addWidget(m_stretchCombo);
     
     // Spacer
     QWidget* spacer = new QWidget(this);
-    spacer->setFixedWidth(8);
+    spacer->setFixedWidth(5);
     mainToolbar->addWidget(spacer);
     
     // Replace Action with CheckBox
@@ -589,7 +694,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Spacer
     QWidget* s1 = new QWidget(this);
-    s1->setFixedWidth(6);
+    s1->setFixedWidth(5);
     mainToolbar->addWidget(s1);
 
     m_invertBtn = new QToolButton(this);
@@ -606,7 +711,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Spacer
     QWidget* s2 = new QWidget(this);
-    s2->setFixedWidth(6);
+    s2->setFixedWidth(5);
     mainToolbar->addWidget(s2);
 
     m_falseColorBtn = new QToolButton(this);
@@ -624,7 +729,7 @@ MainWindow::MainWindow(QWidget *parent)
     
     // Spacer
     QWidget* s3 = new QWidget(this);
-    s3->setFixedWidth(6);
+    s3->setFixedWidth(5);
     mainToolbar->addWidget(s3);
     
     // 6. Process Menu (Categorized Tools)
@@ -1133,6 +1238,7 @@ void MainWindow::createNewImageWindow(const ImageBuffer& buffer, const QString& 
     });
     
     // Connect Signals
+    connect(viewer, &ImageViewer::pixelInfoUpdated, this, &MainWindow::updatePixelInfo);
 
 
     
@@ -1774,42 +1880,9 @@ void MainWindow::openAstroSpikeDialog() {
         return;
     }
 
-    if (m_astroSpikeDlg) {
-        log(tr("Activating AstroSpike Tool..."), Log_Action, true);
-        
-        // Find if it has a subwindow parent to maximize
-        QWidget* p = m_astroSpikeDlg->parentWidget();
-        while (p && !qobject_cast<CustomMdiSubWindow*>(p)) p = p->parentWidget();
-        
-        if (auto sub = qobject_cast<CustomMdiSubWindow*>(p)) {
-            sub->showMaximized();
-            sub->raise();
-            sub->activateWindow();
-        } else {
-            m_astroSpikeDlg->showMaximized();
-            m_astroSpikeDlg->raise();
-            m_astroSpikeDlg->activateWindow();
-        }
-        return;
-    }
-
     log(tr("Opening AstroSpike Tool..."), Log_Info, true);
-    m_astroSpikeDlg = new AstroSpikeDialog(viewer, this); 
-    
-    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, m_astroSpikeDlg, tr("AstroSpike"));
-    
-    // Requested size: 1000x600
-    sub->resize(1000, 600);
-    
-    // Center logic
-    if (m_mdiArea) {
-        int viewW = m_mdiArea->viewport()->width();
-        int viewH = m_mdiArea->viewport()->height();
-        int x = (viewW - 1000) / 2;
-        int y = (viewH - 600) / 2;
-        sub->move(std::max(0, x), std::max(0, y));
-    }
+    AstroSpikeDialog dlg(viewer, this);
+    dlg.exec();
 }
 
 void MainWindow::openSCNRDialog() {
@@ -3609,5 +3682,11 @@ void MainWindow::openScriptDialog() {
         
         // Log result after dialog closes
         log(tr("Script dialog closed."), Log_Info);
+    }
+}
+
+void MainWindow::updatePixelInfo(const QString& info) {
+    if (m_pixelInfoLabel) {
+         m_pixelInfoLabel->setText(info);
     }
 }

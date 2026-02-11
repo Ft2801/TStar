@@ -12,6 +12,8 @@
 #include <QMutex>
 #include <QPointer>
 #include "../ImageBuffer.h"
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
 
 // Forward certs
 class QLabel;
@@ -41,7 +43,7 @@ namespace AstroSpike {
 
     struct Config {
         // Detection
-        float threshold = 100.0f; // 1-100 UI range
+        float threshold = 80.0f; // 1-100 UI range
         float starAmount = 100.0f; // %
         float minStarSize = 0.0f;
         float maxStarSize = 100.0f;
@@ -53,19 +55,18 @@ namespace AstroSpike {
         float angle = 45.0f;
         float intensity = 1.0f;
         float spikeWidth = 1.0f;
-        float sharpness = 0.5f;
 
         // Appearance
         float colorSaturation = 1.0f;
         float hueShift = 0.0f;
 
         // Secondary Spikes
-        float secondaryIntensity = 0.5f;
+        float secondaryIntensity = 0.3f;
         float secondaryLength = 120.0f;
         float secondaryOffset = 45.0f;
 
         // Soft Flare
-        float softFlareIntensity = 3.0f;
+        float softFlareIntensity = 1.0f;
         float softFlareSize = 15.0f;
 
         // Halo
@@ -81,7 +82,7 @@ namespace AstroSpike {
         bool rainbowSpikes = true;
         float rainbowIntensity = 0.8f;
         float rainbowFrequency = 1.0f;
-        double rainbowLength = 0.8f; // Changed to double to match Python precision usage potentially? No, float is fine usually.
+        double rainbowLength = 0.8f;
     };
 }
 
@@ -98,11 +99,12 @@ public:
     // Explicit size setters
     void setStarInputRadius(float r) { m_brushRadius = r; update(); }
     void setEraserInputSize(float s) { m_eraserSize = s; update(); }
-
+    
     const QVector<AstroSpike::Star>& getStars() const { return m_stars; }
 
     void zoomIn();
     void zoomOut();
+    void zoomToPoint(QPointF widgetPos, float factor);
     void fitToView();
 
     void render(QPainter& p, float scale, const QPointF& offset);
@@ -139,26 +141,27 @@ private:
     float m_eraserSize = 20.0f;
     
     QImage m_glowSprite; // Cached glow sprite
+    
+    // Cached preview of spikes at standardized resolution
+    QImage m_spikePreview;
+    void updateSpikePreview();
 };
 
-// Detection Thread
+// Detection Thread — detects ALL stars at the lowest threshold using OpenCV
 class StarDetectionThread : public QThread {
     Q_OBJECT
 public:
-    StarDetectionThread(const ImageBuffer& buffer, float threshold, QObject* parent = nullptr);
+    StarDetectionThread(const ImageBuffer& buffer, QObject* parent = nullptr);
     void run() override;
 
 signals:
     void detectionComplete(const QVector<AstroSpike::Star>& stars);
 
 private:
-    QImage m_bufferImage; // Using QImage for pixel access in thread for simplicity, or copy buffer data
-    float m_threshold;
-    int m_width;
-    int m_height;
-    // We need a copy of data to avoid race conditions if main thread touches buffer
-    QVector<float> m_lumData; 
-    QVector<uint8_t> m_rgbData;
+    int m_width = 0;
+    int m_height = 0;
+    cv::Mat m_grayMat;  // 8-bit grayscale for thresholding
+    cv::Mat m_rgbMat;   // 8-bit BGR for color extraction
 };
 
 // Main Dialog
@@ -181,6 +184,7 @@ private slots:
     void runDetection();
     void onStarsDetected(const QVector<AstroSpike::Star>& stars);
     void onCanvasStarsUpdated(const QVector<AstroSpike::Star>& stars);
+    void filterStarsByThreshold();
     
     // Tools
     void setToolMode(AstroSpike::ToolMode mode);
@@ -202,6 +206,9 @@ private:
     AstroSpikeCanvas* m_canvas;
     StarDetectionThread* m_thread = nullptr;
     QBasicTimer m_detectTimer;
+    
+    // Pre-computed full star list (sorted by brightness descending)
+    QVector<AstroSpike::Star> m_allStars;
     
     // Controls
     QScrollArea* m_controlsScroll;

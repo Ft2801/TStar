@@ -112,6 +112,7 @@ signals:
     void viewChanged(float scale, float hVal, float vVal);
     void unlinked();
     void modifiedChanged(bool modified);
+    void pixelInfoUpdated(const QString& info); // New
     
 public slots:
     void syncView(float scale, float hVal, float vVal);

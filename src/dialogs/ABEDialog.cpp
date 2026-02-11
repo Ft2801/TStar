@@ -13,6 +13,7 @@
 #include <QIcon>
 #include <QLabel>
 #include <QProgressDialog>
+#include <cfloat>
 
 ABEDialog::ABEDialog(QWidget* parent, ImageViewer* viewer, const ImageBuffer& buffer, [[maybe_unused]] bool initialStretch)
     : DialogBase(parent, tr("Auto Background Extraction")), m_viewer(viewer), m_applied(false)
@@ -270,6 +271,9 @@ void ABEDialog::generateModel(ImageBuffer& output) {
     qDebug() << "[ABE] Allocating totalBg: size_t cast to avoid int overflow...";
     std::vector<float> totalBg((size_t)w * h * channels, 0.0f);
     qDebug() << "[ABE] totalBg allocated, size =" << totalBg.size();
+    
+    // Store min background level per channel (for normalization)
+    std::vector<float> bgMins(channels, FLT_MAX);
 
     // 3. Generate Common Sample Points (Luminance)
 
@@ -374,6 +378,7 @@ void ABEDialog::generateModel(ImageBuffer& output) {
 
          
          // Bilinear Upscale 'smallBg' to 'totalBg' channel c
+         float chMin = FLT_MAX; // Track min for this channel
          for(int y=0; y<h; ++y) {
              for(int x=0; x<w; ++x) {
                  float sx = (float)x / ds;
@@ -414,29 +419,34 @@ void ABEDialog::generateModel(ImageBuffer& output) {
                  if (dstIdx >= totalBg.size()) continue;
                  
                  totalBg[dstIdx] = val;
+                 if (val < chMin) chMin = val;
              }
              // Progress every 500 rows
              if (y % 500 == 0) {
 
              }
          }
+         
+         // Store min for this channel (for normalization)
+         bgMins[c] = chMin;
 
          QApplication::processEvents(); // Keep UI responsive
     }
     
     // Apply Substraction (Correction)
     emit progressMsg(tr("Applying correction..."));
-    // Apply Substraction (Correction)
-    emit progressMsg(tr("Applying correction..."));
+    
     bool showBg = m_checkShowBG->isChecked();
     bool normalize = m_checkNormalize->isChecked();
     
-    // Calculate Unified Median (Global Background Level) if preserving color
-    float globalMedian = 0.0f;
-    if (!normalize) {
-        for(float m : origMedians) globalMedian += m;
-        globalMedian /= (float)channels;
-    }
+    // Calculate Unified Min (Global Background Level)
+    float globalBgMin = 0.0f;
+    for(float m : bgMins) globalBgMin += m;
+    globalBgMin /= (float)channels;
+    
+    // Let's use the minimum of all channels as the common target.
+    float targetFloor = FLT_MAX;
+    for(float m : bgMins) if(m < targetFloor) targetFloor = m;
     
     std::vector<float>& outData = output.data(); // Ref to modify
     
@@ -448,9 +458,15 @@ void ABEDialog::generateModel(ImageBuffer& output) {
             outData[i] = totalBg[i];
         } else {
             // Norm: 
-            // If Normalize (Destructive): Src - BG + OwnMedian
-            // If Preserve (PCC Safe):     Src - BG + GlobalMedian
-            float shift = normalize ? origMedians[c] : globalMedian;
+            // If Normalize (Destructive): Src - BG + TargetFloor (Neutral darkest gray)
+            // If Preserve (PCC Safe):     Src - BG + ChannelMin (Preserve color overlap)
+            
+            float shift = 0.0f;
+            if (normalize) {
+                shift = targetFloor; 
+            } else {
+                shift = bgMins[c];
+            }
             
             outData[i] = outData[i] - totalBg[i] + shift;
             

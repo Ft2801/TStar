@@ -1,6 +1,15 @@
 TStar Changelog
 ===============
 
+Version 1.6.0
+-------------
+- AstroSpike tool update: now uses OpenCV for maximum quality and performance
+- Added system resources monitor
+- Added coordinate/RGB display on mouse over
+- Updated ABE tool, now keeps the darkest background value
+- Updated background with grid and app name
+- Darker overall theme
+
 Version 1.5.12
 --------------
 - Other small bugfixes

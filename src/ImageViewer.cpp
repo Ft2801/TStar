@@ -31,6 +31,8 @@ ImageViewer::ImageViewer(QWidget* parent) : QGraphicsView(parent) {
     setBackgroundBrush(QBrush(QColor(30, 30, 30)));
     setFrameShape(QFrame::NoFrame);
     setAlignment(Qt::AlignCenter); // Center the image as requested
+    setMouseTracking(true); // Enable mouse tracking for pixel info
+    
     
     // Zoom at Mouse Cursor
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -482,6 +484,32 @@ void ImageViewer::mouseMoveEvent(QMouseEvent* event) {
          m_currentLassoPoly << scenePos;
          m_currentLassoItem->setPolygon(m_currentLassoPoly);
          return;
+    }
+    
+    // Pixel Info
+    int ix = std::floor(scenePos.x());
+    int iy = std::floor(scenePos.y());
+    
+    if (ix >= 0 && ix < m_buffer.width() && iy >= 0 && iy < m_buffer.height()) {
+        QString info;
+        if (m_buffer.channels() == 3) {
+            float r = m_buffer.value(ix, iy, 0);
+            float g = m_buffer.value(ix, iy, 1);
+            float b = m_buffer.value(ix, iy, 2);
+            info = QString("x:%1 y:%2  R:%3 G:%4 B:%5")
+                .arg(ix).arg(iy)
+                .arg(r, 0, 'f', 4)
+                .arg(g, 0, 'f', 4)
+                .arg(b, 0, 'f', 4);
+        } else {
+             float k = m_buffer.value(ix, iy, 0);
+             info = QString("x:%1 y:%2  K:%3")
+                .arg(ix).arg(iy)
+                .arg(k, 0, 'f', 4);
+        }
+        emit pixelInfoUpdated(info);
+    } else {
+        emit pixelInfoUpdated("");
     }
     
     QGraphicsView::mouseMoveEvent(event);
