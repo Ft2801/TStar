@@ -19,7 +19,7 @@
 #include <QUuid>
 
 MaskGenerationDialog::MaskGenerationDialog(const ImageBuffer& image, QWidget* parent) 
-    : DialogBase(parent, "Mask Generation", 1024, 800), m_sourceImage(image) 
+    : DialogBase(parent, tr("Mask Generation"), 1024, 800), m_sourceImage(image) 
 {
     setWindowFlag(Qt::Window); // Allow minimize/maximize
     

@@ -12,7 +12,7 @@
 #include <QTimer>
 
 AberrationInspectorDialog::AberrationInspectorDialog(const ImageBuffer& img, QWidget* parent)
-    : DialogBase(parent, "Aberration Inspector", 400, 400), m_source(img), m_panelSize(200)
+    : DialogBase(parent, tr("Aberration Inspector"), 400, 400), m_source(img), m_panelSize(200)
 {
     setupUi();
     // Defer heavy panel update until after fade-in animation (300ms)

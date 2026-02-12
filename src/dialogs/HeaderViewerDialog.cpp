@@ -55,7 +55,7 @@ public:
 };
 
 HeaderViewerDialog::HeaderViewerDialog(const ImageBuffer::Metadata& meta, QWidget* parent) 
-    : DialogBase(parent, "FITS Header", 800, 600), m_meta(meta)
+    : DialogBase(parent, tr("FITS Header"), 800, 600), m_meta(meta)
 {
     setupUI();
 

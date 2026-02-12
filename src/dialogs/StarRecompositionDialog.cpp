@@ -12,7 +12,7 @@
 #include <QIcon>
 
 StarRecompositionDialog::StarRecompositionDialog(QWidget* parent)
-    : DialogBase(parent, "Star Recomposition", 500, 400)
+    : DialogBase(parent, tr("Star Recomposition"), 500, 400)
 {
     createUI();
     populateCombos();

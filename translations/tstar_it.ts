@@ -114,6 +114,10 @@
     <context>
         <name>AberrationInspectorDialog</name>
         <message>
+            <source>Aberration Inspector</source>
+            <translation type="finished">Ispettore Aberrazioni</translation>
+        </message>
+        <message>
             <source>Close</source>
             <translation type="finished">Chiudi</translation>
         </message>
@@ -125,6 +129,10 @@
     <context>
         <name>AboutDialog</name>
         <message>
+            <source>About TStar</source>
+            <translation type="finished">Informazioni su TStar</translation>
+        </message>
+        <message>
             <source>Build:</source>
             <translation type="finished">Build:</translation>
         </message>
@@ -133,12 +141,28 @@
             <translation type="finished">Copyright © 2026</translation>
         </message>
         <message>
+            <source>GitHub profile</source>
+            <translation type="finished">profilo GitHub</translation>
+        </message>
+        <message>
             <source>TStar is a professional astrophotography image processing application.</source>
             <translation type="finished">TStar è un'applicazione professionale per l'elaborazione di immagini astrofotografiche.</translation>
         </message>
         <message>
             <source>Written by Fabio Tempera</source>
             <translation type="finished">Scritto da Fabio Tempera</translation>
+        </message>
+        <message>
+            <source>astronomy website</source>
+            <translation type="finished">sito di astronomia</translation>
+        </message>
+        <message>
+            <source>link to my </source>
+            <translation type="finished">link al mio </translation>
+        </message>
+        <message>
+            <source>portfolio</source>
+            <translation type="finished">portfolio</translation>
         </message>
     </context>
     <context>
@@ -279,6 +303,10 @@
     <context>
         <name>ApplyMaskDialog</name>
         <message>
+            <source>Apply Mask</source>
+            <translation type="finished">Applica Maschera</translation>
+        </message>
+        <message>
             <source>Available Masks:</source>
             <translation type="finished">Maschere Disponibili:</translation>
         </message>
@@ -308,6 +336,10 @@
         <message>
             <source>Apply</source>
             <translation type="finished">Applica</translation>
+        </message>
+        <message>
+            <source>Arcsinh Stretch</source>
+            <translation type="finished">Arcsinh Stretch</translation>
         </message>
         <message>
             <source>Black Point:</source>
@@ -365,6 +397,14 @@
     <context>
         <name>AstroSpikeDialog</name>
         <message>
+            <source>%1 stars (of %2 total)</source>
+            <translation type="finished">%1 stelle (di %2 totali)</translation>
+        </message>
+        <message>
+            <source>+</source>
+            <translation type="finished">+</translation>
+        </message>
+        <message>
             <source>Add Star</source>
             <translation type="finished">Aggiungi Stella</translation>
         </message>
@@ -385,12 +425,20 @@
             <translation type="finished">Applica</translation>
         </message>
         <message>
+            <source>AstroSpike</source>
+            <translation type="finished">AstroSpike</translation>
+        </message>
+        <message>
             <source>Blur</source>
             <translation type="finished">Sfocatura</translation>
         </message>
         <message>
-            <source>Detecting stars...</source>
-            <translation type="finished">Rilevamento stelle...</translation>
+            <source>Detected %1 total stars. Filtering...</source>
+            <translation type="finished">Rilevate %1 stelle totali. Filtraggio...</translation>
+        </message>
+        <message>
+            <source>Detecting all stars...</source>
+            <translation type="finished">Rilevamento di tutte le stelle...</translation>
         </message>
         <message>
             <source>Detection</source>
@@ -413,12 +461,16 @@
             <translation type="finished">Gomma</translation>
         </message>
         <message>
-            <source>Flare</source>
-            <translation type="finished">Bagliore</translation>
+            <source>Fit</source>
+            <translation type="finished">Adatta</translation>
         </message>
         <message>
-            <source>Found %1 stars</source>
-            <translation type="finished">Trovate %1 stelle</translation>
+            <source>Fit to Screen</source>
+            <translation type="finished">Adatta allo Schermo</translation>
+        </message>
+        <message>
+            <source>Flare</source>
+            <translation type="finished">Bagliore</translation>
         </message>
         <message>
             <source>Frequency</source>
@@ -481,6 +533,14 @@
             <translation type="finished">Ripeti</translation>
         </message>
         <message>
+            <source>Reset</source>
+            <translation type="finished">Reimposta</translation>
+        </message>
+        <message>
+            <source>Reset to Defaults</source>
+            <translation type="finished">Ripristina Predefiniti</translation>
+        </message>
+        <message>
             <source>Saturation</source>
             <translation type="finished">Saturazione</translation>
         </message>
@@ -499,10 +559,6 @@
         <message>
             <source>Secondary Spikes</source>
             <translation type="finished">Spikes Secondari</translation>
-        </message>
-        <message>
-            <source>Sharpness</source>
-            <translation type="finished">Nitidezza</translation>
         </message>
         <message>
             <source>Size</source>
@@ -533,8 +589,20 @@
             <translation type="finished">Larghezza</translation>
         </message>
         <message>
+            <source>Zoom In</source>
+            <translation type="finished">Zoom Avanti</translation>
+        </message>
+        <message>
+            <source>Zoom Out</source>
+            <translation type="finished">Zoom Indietro</translation>
+        </message>
+        <message>
             <source>© 2026 Fabio Tempera</source>
             <translation type="finished">© 2026 Fabio Tempera</translation>
+        </message>
+        <message>
+            <source>−</source>
+            <translation type="finished">−</translation>
         </message>
     </context>
     <context>
@@ -596,6 +664,10 @@
         <message>
             <source>Cancel</source>
             <translation type="finished">Annulla</translation>
+        </message>
+        <message>
+            <source>Channel Combination</source>
+            <translation type="finished">Combinazione Canali</translation>
         </message>
         <message>
             <source>Error</source>
@@ -1008,6 +1080,10 @@
             <translation type="finished">Denoise Colore: 0.50</translation>
         </message>
         <message>
+            <source>Cosmic Clarity</source>
+            <translation type="finished">Cosmic Clarity</translation>
+        </message>
+        <message>
             <source>Denoise</source>
             <translation type="finished">Denoise</translation>
         </message>
@@ -1143,6 +1219,10 @@
             <translation type="finished">Disegna prima un rettangolo di ritaglio.</translation>
         </message>
         <message>
+            <source>Rotate &amp; Crop Tool</source>
+            <translation type="finished">Strumento Ruota e Ritaglia</translation>
+        </message>
+        <message>
             <source>Rotation (deg):</source>
             <translation type="finished">Rotazione (deg):</translation>
         </message>
@@ -1160,6 +1240,10 @@
         <message>
             <source>Cancel</source>
             <translation type="finished">Annulla</translation>
+        </message>
+        <message>
+            <source>Curves Transformation</source>
+            <translation type="finished">Trasformazione Curve</translation>
         </message>
         <message>
             <source>Grid</source>
@@ -1481,6 +1565,10 @@
             <translation type="finished">Generalized Hyperbolic Stretching</translation>
         </message>
         <message>
+            <source>Generalized Hyperbolic Stretch (GHT)</source>
+            <translation type="finished">Generalized Hyperbolic Stretching (GHT)</translation>
+        </message>
+        <message>
             <source>Global rescale</source>
             <translation type="finished">Ridimensionamento globale</translation>
         </message>
@@ -1675,6 +1763,10 @@
             <translation type="finished">Denoise</translation>
         </message>
         <message>
+            <source>GraXpert</source>
+            <translation type="finished">GraXpert</translation>
+        </message>
+        <message>
             <source>Latest (auto)</source>
             <translation type="finished">Ultimo (auto)</translation>
         </message>
@@ -1730,6 +1822,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>File saved.</source>
             <translation type="finished">File salvato.</translation>
+        </message>
+        <message>
+            <source>Header Editor</source>
+            <translation type="finished">Editor Header</translation>
         </message>
         <message>
             <source>KEYWORD</source>
@@ -1788,6 +1884,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Comment</source>
             <translation type="finished">Commento</translation>
+        </message>
+        <message>
+            <source>FITS Header</source>
+            <translation type="finished">Header FITS</translation>
         </message>
         <message>
             <source>FITS/XISF Header: %1</source>
@@ -2191,6 +2291,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Grid Size:</source>
             <translation type="finished">Dimensione Griglia:</translation>
+        </message>
+        <message>
+            <source>Help &amp; Tutorial</source>
+            <translation type="finished">Aiuto e Tutorial</translation>
         </message>
         <message>
             <source>Histogram Transformation</source>
@@ -2652,6 +2756,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Luci:</translation>
         </message>
         <message>
+            <source>Histogram Transformation</source>
+            <translation type="finished">Trasformazione Istogramma</translation>
+        </message>
+        <message>
             <source>Low: %1%</source>
             <translation type="finished">Bassi: %1%</translation>
         </message>
@@ -2696,6 +2804,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
     </context>
     <context>
         <name>LivePreviewDialog</name>
+        <message>
+            <source>Live Mask Preview</source>
+            <translation type="finished">Anteprima Maschera Live</translation>
+        </message>
         <message>
             <source>No mask data</source>
             <translation type="finished">Nessun dato maschera</translation>
@@ -2768,10 +2880,6 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Info</translation>
         </message>
         <message>
-            <source>Activating AstroSpike Tool...</source>
-            <translation type="finished">Attivazione Strumento AstroSpike...</translation>
-        </message>
-        <message>
             <source>Activating Curves Tool...</source>
             <translation type="finished">Attivazione Strumento Curve...</translation>
         </message>
@@ -2821,7 +2929,7 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
         <message>
             <source>Arcsinh Stretch</source>
-            <translation type="finished">Arcsinh Stretching</translation>
+            <translation type="finished">Arcsinh Stretch</translation>
         </message>
         <message>
             <source>Arcsinh Stretch Applied to %1</source>
@@ -2830,10 +2938,6 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Are you sure you want to exit?</source>
             <translation type="finished">Sei sicuro di voler uscire?</translation>
-        </message>
-        <message>
-            <source>AstroSpike</source>
-            <translation type="finished">AstroSpike</translation>
         </message>
         <message>
             <source>AstroSpike (Diffraction Spikes)</source>
@@ -3677,6 +3781,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Impostazioni applicate. Display aggiornato.</translation>
         </message>
         <message>
+            <source>Shortcuts</source>
+            <translation type="finished">Scorciatoie</translation>
+        </message>
+        <message>
             <source>Show Overlay</source>
             <translation type="finished">Mostra Sovrapposizione</translation>
         </message>
@@ -3685,8 +3793,8 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Radice Quadrata</translation>
         </message>
         <message>
-            <source>Stacking (Beta)</source>
-            <translation type="finished">Stacking (Beta)</translation>
+            <source>Stacking</source>
+            <translation type="finished">Media (Stacking)</translation>
         </message>
         <message>
             <source>Stacking...</source>
@@ -3784,6 +3892,26 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <source>Zoom Out</source>
             <translation type="finished">Zoom Indietro</translation>
         </message>
+        <message>
+            <source>create a new view</source>
+            <translation type="finished">crea una nuova vista</translation>
+        </message>
+        <message>
+            <source>fit to screen</source>
+            <translation type="finished">adatta allo schermo</translation>
+        </message>
+        <message>
+            <source>open image</source>
+            <translation type="finished">apri immagine</translation>
+        </message>
+        <message>
+            <source>save image</source>
+            <translation type="finished">salva immagine</translation>
+        </message>
+        <message>
+            <source>undo / redo</source>
+            <translation type="finished">annulla / ripristina</translation>
+        </message>
     </context>
     <context>
         <name>MaskGenerationDialog</name>
@@ -3856,10 +3984,6 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Mano Libera</translation>
         </message>
         <message>
-            <source>Full</source>
-            <translation type="finished">Completo</translation>
-        </message>
-        <message>
             <source>Fuzziness</source>
             <translation type="finished">Sfumatura (Fuzziness)</translation>
         </message>
@@ -3898,6 +4022,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Lower Limit</source>
             <translation type="finished">Limite Inferiore</translation>
+        </message>
+        <message>
+            <source>Mask Generation</source>
+            <translation type="finished">Generazione Maschera</translation>
         </message>
         <message>
             <source>Mask Type:</source>
@@ -4197,6 +4325,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>R/G Distribution</source>
             <translation type="finished">Distribuzione R/G</translation>
+        </message>
+        <message>
+            <source>Star Distribution (PCC Analysis)</source>
+            <translation type="finished">Distribuzione Stelle (Analisi PCC)</translation>
         </message>
     </context>
     <context>
@@ -4837,6 +4969,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Rimozione Aberrazioni Completa.</translation>
         </message>
         <message>
+            <source>Aberration Remover</source>
+            <translation type="finished">Rimozione Aberrazioni</translation>
+        </message>
+        <message>
             <source>Aborted by user.</source>
             <translation type="finished">Annullato dall'utente.</translation>
         </message>
@@ -5344,6 +5480,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <source>Protection Method:</source>
             <translation type="finished">Metodo Protezione:</translation>
         </message>
+        <message>
+            <source>SCNR (Remove Green Noise)</source>
+            <translation type="finished">SCNR (Rimuovi Rumore Verde)</translation>
+        </message>
     </context>
     <context>
         <name>SaturationDialog</name>
@@ -5370,6 +5510,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Cancel</source>
             <translation type="finished">Annulla</translation>
+        </message>
+        <message>
+            <source>Color Saturation</source>
+            <translation type="finished">Saturazione Colore</translation>
         </message>
         <message>
             <source>Cyans</source>
@@ -5800,6 +5944,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Select StarNet++ Executable</source>
             <translation type="finished">Seleziona Eseguibile StarNet++</translation>
+        </message>
+        <message>
+            <source>Settings</source>
+            <translation type="finished">Impostazioni</translation>
         </message>
         <message>
             <source>StarNet Executable:</source>
@@ -6668,6 +6816,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Mostra Distribuzione HFR</translation>
         </message>
         <message>
+            <source>Star Analysis</source>
+            <translation type="finished">Analisi Stelle</translation>
+        </message>
+        <message>
             <source>Star Analysis: Found %1 stars</source>
             <translation type="finished">Analisi Stelle: Trovate %1 stelle</translation>
         </message>
@@ -6866,6 +7018,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Le viste selezionate contengono dati di immagine non validi.</translation>
         </message>
         <message>
+            <source>Star Recomposition</source>
+            <translation type="finished">Ricomposizione Stelle</translation>
+        </message>
+        <message>
             <source>Starless View:</source>
             <translation type="finished">Vista Senza Stelle:</translation>
         </message>
@@ -6895,6 +7051,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Remove Green via SCNR (Optional)</source>
             <translation type="finished">Rimuovi Verde via SCNR (Opzionale)</translation>
+        </message>
+        <message>
+            <source>Star Stretch</source>
+            <translation type="finished">Star Stretch</translation>
         </message>
         <message>
             <source>Star Stretch applied.</source>
@@ -7012,6 +7172,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Parametri Statistici</translation>
         </message>
         <message>
+            <source>Statistical Stretch</source>
+            <translation type="finished">Statistical Stretch</translation>
+        </message>
+        <message>
             <source>Statistical Stretch applied (M=%1, BP=%2σ)</source>
             <translation type="finished">Statistical Stretch applicato (M=%1, BP=%2σ)</translation>
         </message>
@@ -7094,6 +7258,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Pronto per l'installazione</translation>
         </message>
         <message>
+            <source>Update Available: v%1</source>
+            <translation type="finished">Aggiornamento disponibile: v%1</translation>
+        </message>
+        <message>
             <source>Update Failed</source>
             <translation type="finished">Aggiornamento fallito</translation>
         </message>
@@ -7163,6 +7331,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Update Preview</source>
             <translation type="finished">Aggiorna Anteprima</translation>
+        </message>
+        <message>
+            <source>Wavescale HDR</source>
+            <translation type="finished">Wavescale HDR</translation>
         </message>
         <message>
             <source>© 2026 SetiAstro</source>

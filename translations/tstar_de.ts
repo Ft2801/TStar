@@ -114,6 +114,10 @@
     <context>
         <name>AberrationInspectorDialog</name>
         <message>
+            <source>Aberration Inspector</source>
+            <translation type="finished">Aberrationsinspektor</translation>
+        </message>
+        <message>
             <source>Close</source>
             <translation type="finished">Schließen</translation>
         </message>
@@ -125,6 +129,10 @@
     <context>
         <name>AboutDialog</name>
         <message>
+            <source>About TStar</source>
+            <translation type="finished">Über TStar</translation>
+        </message>
+        <message>
             <source>Build:</source>
             <translation type="finished">Build:</translation>
         </message>
@@ -133,12 +141,28 @@
             <translation type="finished">Copyright © 2026</translation>
         </message>
         <message>
+            <source>GitHub profile</source>
+            <translation type="finished">GitHub-Profil</translation>
+        </message>
+        <message>
             <source>TStar is a professional astrophotography image processing application.</source>
             <translation type="finished">TStar ist eine professionelle Anwendung zur Bildverarbeitung in der Astrofotografie.</translation>
         </message>
         <message>
             <source>Written by Fabio Tempera</source>
             <translation type="finished">Geschrieben von Fabio Tempera</translation>
+        </message>
+        <message>
+            <source>astronomy website</source>
+            <translation type="finished">Astronomie-Website</translation>
+        </message>
+        <message>
+            <source>link to my </source>
+            <translation type="finished">Link zu meinem </translation>
+        </message>
+        <message>
+            <source>portfolio</source>
+            <translation type="finished">Portfolio</translation>
         </message>
     </context>
     <context>
@@ -279,6 +303,10 @@
     <context>
         <name>ApplyMaskDialog</name>
         <message>
+            <source>Apply Mask</source>
+            <translation type="finished">Maske anwenden</translation>
+        </message>
+        <message>
             <source>Available Masks:</source>
             <translation type="finished">Verfügbare Masken:</translation>
         </message>
@@ -308,6 +336,10 @@
         <message>
             <source>Apply</source>
             <translation type="finished">Anwenden</translation>
+        </message>
+        <message>
+            <source>Arcsinh Stretch</source>
+            <translation type="finished">Arcsinh Stretch</translation>
         </message>
         <message>
             <source>Black Point:</source>
@@ -365,6 +397,14 @@
     <context>
         <name>AstroSpikeDialog</name>
         <message>
+            <source>%1 stars (of %2 total)</source>
+            <translation type="finished">%1 Sterne (von %2 insgesamt)</translation>
+        </message>
+        <message>
+            <source>+</source>
+            <translation type="finished">+</translation>
+        </message>
+        <message>
             <source>Add Star</source>
             <translation type="finished">Stern hinzufügen</translation>
         </message>
@@ -385,12 +425,20 @@
             <translation type="finished">Anwenden</translation>
         </message>
         <message>
+            <source>AstroSpike</source>
+            <translation type="finished">AstroSpike</translation>
+        </message>
+        <message>
             <source>Blur</source>
             <translation type="finished">Unschärfe</translation>
         </message>
         <message>
-            <source>Detecting stars...</source>
-            <translation type="finished">Erkenne Sterne...</translation>
+            <source>Detected %1 total stars. Filtering...</source>
+            <translation type="finished">%1 Sterne insgesamt erkannt. Filterung...</translation>
+        </message>
+        <message>
+            <source>Detecting all stars...</source>
+            <translation type="finished">Alle Sterne werden erkannt...</translation>
         </message>
         <message>
             <source>Detection</source>
@@ -413,12 +461,16 @@
             <translation type="finished">Radiergummi</translation>
         </message>
         <message>
-            <source>Flare</source>
-            <translation type="finished">Streulicht</translation>
+            <source>Fit</source>
+            <translation type="finished">Anpassen</translation>
         </message>
         <message>
-            <source>Found %1 stars</source>
-            <translation type="finished">%1 Sterne gefunden</translation>
+            <source>Fit to Screen</source>
+            <translation type="finished">An Bildschirm anpassen</translation>
+        </message>
+        <message>
+            <source>Flare</source>
+            <translation type="finished">Streulicht</translation>
         </message>
         <message>
             <source>Frequency</source>
@@ -481,6 +533,14 @@
             <translation type="finished">Wiederholen</translation>
         </message>
         <message>
+            <source>Reset</source>
+            <translation type="finished">Zurücksetzen</translation>
+        </message>
+        <message>
+            <source>Reset to Defaults</source>
+            <translation type="finished">Auf Standardwerte zurücksetzen</translation>
+        </message>
+        <message>
             <source>Saturation</source>
             <translation type="finished">Sättigung</translation>
         </message>
@@ -499,10 +559,6 @@
         <message>
             <source>Secondary Spikes</source>
             <translation type="finished">Sekundäre Spikes</translation>
-        </message>
-        <message>
-            <source>Sharpness</source>
-            <translation type="finished">Schärfe</translation>
         </message>
         <message>
             <source>Size</source>
@@ -533,8 +589,20 @@
             <translation type="finished">Breite</translation>
         </message>
         <message>
+            <source>Zoom In</source>
+            <translation type="finished">Hereinzoomen</translation>
+        </message>
+        <message>
+            <source>Zoom Out</source>
+            <translation type="finished">Herauszoomen</translation>
+        </message>
+        <message>
             <source>© 2026 Fabio Tempera</source>
             <translation type="finished">© 2026 Fabio Tempera</translation>
+        </message>
+        <message>
+            <source>−</source>
+            <translation type="finished">−</translation>
         </message>
     </context>
     <context>
@@ -596,6 +664,10 @@
         <message>
             <source>Cancel</source>
             <translation type="finished">Abbrechen</translation>
+        </message>
+        <message>
+            <source>Channel Combination</source>
+            <translation type="finished">Kanalkombination</translation>
         </message>
         <message>
             <source>Error</source>
@@ -1008,6 +1080,10 @@
             <translation type="finished">Farbentrauschen: 0.50</translation>
         </message>
         <message>
+            <source>Cosmic Clarity</source>
+            <translation type="finished">Cosmic Clarity</translation>
+        </message>
+        <message>
             <source>Denoise</source>
             <translation type="finished">Entrauschen</translation>
         </message>
@@ -1143,6 +1219,10 @@
             <translation type="finished">Bitte zuerst ein Zuschneiderechteck zeichnen.</translation>
         </message>
         <message>
+            <source>Rotate &amp; Crop Tool</source>
+            <translation type="finished">Drehen &amp; Zuschneiden Werkzeug</translation>
+        </message>
+        <message>
             <source>Rotation (deg):</source>
             <translation type="finished">Rotation (Grad):</translation>
         </message>
@@ -1160,6 +1240,10 @@
         <message>
             <source>Cancel</source>
             <translation type="finished">Abbrechen</translation>
+        </message>
+        <message>
+            <source>Curves Transformation</source>
+            <translation type="finished">Kurventransformation</translation>
         </message>
         <message>
             <source>Grid</source>
@@ -1481,6 +1565,10 @@
             <translation type="finished">Generalized Hyperbolic Stretching</translation>
         </message>
         <message>
+            <source>Generalized Hyperbolic Stretch (GHT)</source>
+            <translation type="finished">Generalized Hyperbolic Stretching (GHT)</translation>
+        </message>
+        <message>
             <source>Global rescale</source>
             <translation type="finished">Globale Neuskalierung</translation>
         </message>
@@ -1675,6 +1763,10 @@
             <translation type="finished">Entrauschen</translation>
         </message>
         <message>
+            <source>GraXpert</source>
+            <translation type="finished">GraXpert</translation>
+        </message>
+        <message>
             <source>Latest (auto)</source>
             <translation type="finished">Neuestes (auto)</translation>
         </message>
@@ -1730,6 +1822,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>File saved.</source>
             <translation type="finished">Datei gespeichert.</translation>
+        </message>
+        <message>
+            <source>Header Editor</source>
+            <translation type="finished">Header-Editor</translation>
         </message>
         <message>
             <source>KEYWORD</source>
@@ -1788,6 +1884,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Comment</source>
             <translation type="finished">Kommentar</translation>
+        </message>
+        <message>
+            <source>FITS Header</source>
+            <translation type="finished">FITS-Header</translation>
         </message>
         <message>
             <source>FITS/XISF Header: %1</source>
@@ -1918,7 +2018,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>AstroSpike</source>
-            <translation type="finished">AstroSpikes</translation>
+            <translation type="finished">AstroSpike</translation>
         </message>
         <message>
             <source>Auto Background Extraction (ABE)</source>
@@ -2191,6 +2291,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Grid Size:</source>
             <translation type="finished">Rastergröße:</translation>
+        </message>
+        <message>
+            <source>Help &amp; Tutorial</source>
+            <translation type="finished">Hilfe und Tutorial</translation>
         </message>
         <message>
             <source>Histogram Transformation</source>
@@ -2652,6 +2756,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Lichter:</translation>
         </message>
         <message>
+            <source>Histogram Transformation</source>
+            <translation type="finished">Histogramm-Transformation</translation>
+        </message>
+        <message>
             <source>Low: %1%</source>
             <translation type="finished">Tief: %1%</translation>
         </message>
@@ -2696,6 +2804,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
     </context>
     <context>
         <name>LivePreviewDialog</name>
+        <message>
+            <source>Live Mask Preview</source>
+            <translation type="finished">Live-Maskenvorschau</translation>
+        </message>
         <message>
             <source>No mask data</source>
             <translation type="finished">Keine Maskendaten</translation>
@@ -2761,15 +2873,11 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>Aberration Remover</source>
-            <translation type="finished">Aberrationsentferner</translation>
+            <translation type="finished">Aberrations-Entferner</translation>
         </message>
         <message>
             <source>About</source>
             <translation type="finished">Über</translation>
-        </message>
-        <message>
-            <source>Activating AstroSpike Tool...</source>
-            <translation type="finished">Aktiviere AstroSpike-Werkzeug...</translation>
         </message>
         <message>
             <source>Activating Curves Tool...</source>
@@ -2821,7 +2929,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>Arcsinh Stretch</source>
-            <translation type="finished">Arcsinh Stretching</translation>
+            <translation type="finished">Arcsinh Stretch</translation>
         </message>
         <message>
             <source>Arcsinh Stretch Applied to %1</source>
@@ -2830,10 +2938,6 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Are you sure you want to exit?</source>
             <translation type="finished">Sind Sie sicher, dass Sie beenden möchten?</translation>
-        </message>
-        <message>
-            <source>AstroSpike</source>
-            <translation type="finished">AstroSpikes</translation>
         </message>
         <message>
             <source>AstroSpike (Diffraction Spikes)</source>
@@ -3677,6 +3781,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Einstellungen angewendet. Anzeige aktualisiert.</translation>
         </message>
         <message>
+            <source>Shortcuts</source>
+            <translation type="finished">Tastenkombinationen</translation>
+        </message>
+        <message>
             <source>Show Overlay</source>
             <translation type="finished">Überlagerung anzeigen</translation>
         </message>
@@ -3685,8 +3793,8 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Quadratwurzel</translation>
         </message>
         <message>
-            <source>Stacking (Beta)</source>
-            <translation type="finished">Stacking (Beta)</translation>
+            <source>Stacking</source>
+            <translation type="finished">Stacking</translation>
         </message>
         <message>
             <source>Stacking...</source>
@@ -3784,6 +3892,26 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <source>Zoom Out</source>
             <translation type="finished">Herauszoomen</translation>
         </message>
+        <message>
+            <source>create a new view</source>
+            <translation type="finished">Neue Ansicht erstellen</translation>
+        </message>
+        <message>
+            <source>fit to screen</source>
+            <translation type="finished">An Bildschirm anpassen</translation>
+        </message>
+        <message>
+            <source>open image</source>
+            <translation type="finished">Bild öffnen</translation>
+        </message>
+        <message>
+            <source>save image</source>
+            <translation type="finished">Bild speichern</translation>
+        </message>
+        <message>
+            <source>undo / redo</source>
+            <translation type="finished">Rückgängig / Wiederholen</translation>
+        </message>
     </context>
     <context>
         <name>MaskGenerationDialog</name>
@@ -3856,10 +3984,6 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Freihand</translation>
         </message>
         <message>
-            <source>Full</source>
-            <translation type="finished">Vollständig</translation>
-        </message>
-        <message>
             <source>Fuzziness</source>
             <translation type="finished">Unschärfe (Fuzziness)</translation>
         </message>
@@ -3898,6 +4022,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Lower Limit</source>
             <translation type="finished">Untergrenze</translation>
+        </message>
+        <message>
+            <source>Mask Generation</source>
+            <translation type="finished">Maskengenerierung</translation>
         </message>
         <message>
             <source>Mask Type:</source>
@@ -4197,6 +4325,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>R/G Distribution</source>
             <translation type="finished">R/G Verteilung</translation>
+        </message>
+        <message>
+            <source>Star Distribution (PCC Analysis)</source>
+            <translation type="finished">Sternverteilung (PCC)</translation>
         </message>
     </context>
     <context>
@@ -4837,6 +4969,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Aberrationsentfernung Abgeschlossen.</translation>
         </message>
         <message>
+            <source>Aberration Remover</source>
+            <translation type="finished">Aberrations-Entferner</translation>
+        </message>
+        <message>
             <source>Aborted by user.</source>
             <translation type="finished">Vom Benutzer abgebrochen.</translation>
         </message>
@@ -5344,6 +5480,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <source>Protection Method:</source>
             <translation type="finished">Schutzmethode:</translation>
         </message>
+        <message>
+            <source>SCNR (Remove Green Noise)</source>
+            <translation type="finished">SCNR (Grünes Rauschen entfernen)</translation>
+        </message>
     </context>
     <context>
         <name>SaturationDialog</name>
@@ -5370,6 +5510,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Cancel</source>
             <translation type="finished">Abbrechen</translation>
+        </message>
+        <message>
+            <source>Color Saturation</source>
+            <translation type="finished">Farbsättigung</translation>
         </message>
         <message>
             <source>Cyans</source>
@@ -5800,6 +5944,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Select StarNet++ Executable</source>
             <translation type="finished">StarNet++ ausführbare Datei wählen</translation>
+        </message>
+        <message>
+            <source>Settings</source>
+            <translation type="finished">Einstellungen</translation>
         </message>
         <message>
             <source>StarNet Executable:</source>
@@ -6668,6 +6816,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">HFR-Verteilung anzeigen</translation>
         </message>
         <message>
+            <source>Star Analysis</source>
+            <translation type="finished">Sternanalyse</translation>
+        </message>
+        <message>
             <source>Star Analysis: Found %1 stars</source>
             <translation type="finished">Sternanalyse: %1 Sterne gefunden</translation>
         </message>
@@ -6866,6 +7018,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Die ausgewählten Ansichten enthalten ungültige Bilddaten.</translation>
         </message>
         <message>
+            <source>Star Recomposition</source>
+            <translation type="finished">Stern-Rekombination</translation>
+        </message>
+        <message>
             <source>Starless View:</source>
             <translation type="finished">Sternlose Ansicht:</translation>
         </message>
@@ -6895,6 +7051,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Remove Green via SCNR (Optional)</source>
             <translation type="finished">Grün entfernen via SCNR (Optional)</translation>
+        </message>
+        <message>
+            <source>Star Stretch</source>
+            <translation type="finished">Star Stretch</translation>
         </message>
         <message>
             <source>Star Stretch applied.</source>
@@ -7012,6 +7172,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Statistische Parameter</translation>
         </message>
         <message>
+            <source>Statistical Stretch</source>
+            <translation type="finished">Statistisches Stretching</translation>
+        </message>
+        <message>
             <source>Statistical Stretch applied (M=%1, BP=%2σ)</source>
             <translation type="finished">Statistical Stretch angewendet (M=%1, BP=%2σ)</translation>
         </message>
@@ -7094,6 +7258,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Bereit zur Installation</translation>
         </message>
         <message>
+            <source>Update Available: v%1</source>
+            <translation type="finished">Update verfügbar: v%1</translation>
+        </message>
+        <message>
             <source>Update Failed</source>
             <translation type="finished">Update fehlgeschlagen</translation>
         </message>
@@ -7163,6 +7331,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Update Preview</source>
             <translation type="finished">Vorschau aktualisieren</translation>
+        </message>
+        <message>
+            <source>Wavescale HDR</source>
+            <translation type="finished">Wavescale HDR</translation>
         </message>
         <message>
             <source>© 2026 SetiAstro</source>

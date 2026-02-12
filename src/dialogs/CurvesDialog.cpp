@@ -372,7 +372,7 @@ void CurvesGraph::mouseReleaseEvent([[maybe_unused]] QMouseEvent* event) {
 // --- CurvesDialog ---
 
 CurvesDialog::CurvesDialog(ImageViewer* viewer, QWidget* parent) 
-    : DialogBase(parent, "Curves Transformation", 700, 450), m_viewer(viewer)
+    : DialogBase(parent, tr("Curves Transformation"), 700, 450), m_viewer(viewer)
 {
     setMinimumWidth(500);
     

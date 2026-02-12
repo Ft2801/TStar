@@ -18,7 +18,7 @@ static bool detectGpuAvailable() {
     return hasCuda || hasDirectML;
 }
 
-GraXpertDialog::GraXpertDialog(QWidget* parent) : DialogBase(parent, "GraXpert", 350, 250) {
+GraXpertDialog::GraXpertDialog(QWidget* parent) : DialogBase(parent, tr("GraXpert"), 350, 250) {
     setWindowIcon(QIcon(":/images/Logo.png"));
 
 

@@ -77,10 +77,8 @@ void StarDetectionThread::run() {
     const int threshLevels[] = {230, 200, 160, 120, 80, 60, 40, 20};
     const int numLevels = 8;
     
-    // Area limits: real astronomical stars range from single pixels to large blobs
-    // after stretching. Match the UI's maxStarSize (up to 500 radius → area ~785k).
     const double minArea = 2.0;
-    const double maxArea = 80000.0; // Covers radius up to ~160px
+    const double maxArea = 20000.0; 
     
     // Use a "visited" mask to avoid detecting the same star at multiple threshold levels
     cv::Mat visited = cv::Mat::zeros(m_height, m_width, CV_8UC1);
@@ -115,6 +113,21 @@ void StarDetectionThread::run() {
             if (perimeter <= 0) continue;
             double circularity = 4.0 * CV_PI * area / (perimeter * perimeter);
             if (circularity < 0.25) continue;
+
+            // Ovality/Elongation Check to reject nebulosity stripes
+            if (contour.size() >= 5) {
+                cv::RotatedRect minRect = cv::fitEllipse(contour);
+                float w = minRect.size.width;
+                float h = minRect.size.height;
+                float shortAxis = std::min(w, h);
+                float longAxis = std::max(w, h);
+                
+                // Aspect ratio check: < 0.6 means very oval/streak/nebula
+                if (longAxis > 0) {
+                    float ratio = shortAxis / longAxis;
+                    if (ratio < 0.6f) continue;
+                }
+            }
             
             // Find actual brightest pixel within this contour's bounding rect
             // This avoids the centroid-averaging issue when nearby stars merge
@@ -797,7 +810,7 @@ void AstroSpikeCanvas::handleTool(const QPointF& imgPos) {
 // =============================================================================
 
 AstroSpikeDialog::AstroSpikeDialog(ImageViewer* viewer, QWidget* parent)
-    : DialogBase(parent, "AstroSpike", 1300, 700), m_viewer(viewer)
+    : DialogBase(parent, tr("AstroSpike"), 1300, 700), m_viewer(viewer)
 {
     setWindowFlags(windowFlags() | Qt::Dialog | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
     setModal(true);
@@ -1103,7 +1116,7 @@ void AstroSpikeDialog::setupControls(QVBoxLayout* layout) {
     lDetect->addWidget(createSlider(tr("Threshold"), 1, 100, 1, m_config.threshold, &m_config.threshold, ""));
     lDetect->addWidget(createSlider(tr("Amount %"), 0, 100, 1, m_config.starAmount, &m_config.starAmount, "%"));
     lDetect->addWidget(createSlider(tr("Min Size"), 0, 100, 1, m_config.minStarSize, &m_config.minStarSize, ""));
-    lDetect->addWidget(createSlider(tr("Max Size"), 10, 500, 5, m_config.maxStarSize, &m_config.maxStarSize, ""));
+    lDetect->addWidget(createSlider(tr("Max Size"), 10, 200, 1, m_config.maxStarSize, &m_config.maxStarSize, ""));
     layout->addWidget(grpDetect);
     
     // Geometry
@@ -1187,10 +1200,6 @@ QWidget* AstroSpikeDialog::createSlider(const QString& label, float min, float m
     
     // Install event filter to block scroll
     slider->installEventFilter(this);
-    
-    // Performance optimization: low quality during drag - REMOVED
-    // connect(slider, &QSlider::sliderPressed, [this](){ m_canvas->setPreviewQuality(true); });
-    // connect(slider, &QSlider::sliderReleased, [this](){ m_canvas->setPreviewQuality(false); });
     
     connect(slider, &QSlider::valueChanged, [=](int v){
         float fVal = min + v * step;

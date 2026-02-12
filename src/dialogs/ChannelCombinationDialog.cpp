@@ -6,7 +6,7 @@
 #include <QIcon>
 
 ChannelCombinationDialog::ChannelCombinationDialog(const std::vector<ChannelSource>& availableSources, QWidget* parent)
-    : DialogBase(parent, "Channel Combination", 400, 200), m_sources(availableSources)
+    : DialogBase(parent, tr("Channel Combination"), 400, 200), m_sources(availableSources)
 {
     setWindowIcon(QIcon(":/images/Logo.png"));
 

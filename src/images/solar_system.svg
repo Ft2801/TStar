@@ -1,0 +1,72 @@
+<svg width="500" height="500" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sfondo rimosso: l'immagine è trasparente -->
+
+  <!-- Gruppo centrale traslato al centro del canvas (300,300) -->
+  <g transform="translate(300, 300)">
+    
+    <!-- ORBITE (Grigio molto scuro) -->
+    <g fill="none" stroke="#333333" stroke-width="1.5">
+      <circle r="40" />  <!-- Mercurio -->
+      <circle r="65" />  <!-- Venere -->
+      <circle r="90" />  <!-- Terra -->
+      <circle r="115" /> <!-- Marte -->
+      <circle r="155" /> <!-- Giove -->
+      <circle r="195" /> <!-- Saturno -->
+      <circle r="235" /> <!-- Urano -->
+      <circle r="270" /> <!-- Nettuno -->
+    </g>
+
+    <!-- IL SOLE (Grigio medio-scuro) -->
+    <circle cx="0" cy="0" r="18" fill="#555555" />
+
+    <!-- PIANETI (Grigi scuri variati) -->
+
+    <!-- Mercurio: Grigio scuro -->
+    <g transform="rotate(220)">
+      <circle cx="40" cy="0" r="2.5" fill="#404040" />
+    </g>
+
+    <!-- Venere: Grigio scuro -->
+    <g transform="rotate(45)">
+      <circle cx="65" cy="0" r="4" fill="#484848" />
+    </g>
+
+    <!-- Terra: Grigio scuro + Luna quasi nera -->
+    <g transform="rotate(140)">
+      <circle cx="90" cy="0" r="4.2" fill="#444444" />
+      <circle cx="96" cy="2" r="1.2" fill="#444444" /> <!-- Luna -->
+    </g>
+
+    <!-- Marte: Grigio scuro -->
+    <g transform="rotate(300)">
+      <circle cx="115" cy="0" r="3" fill="#444444" />
+    </g>
+
+    <!-- Giove: Grigio medio-scuro -->
+    <g transform="rotate(80)">
+      <circle cx="155" cy="0" r="10" fill="#444444" />
+    </g>
+
+    <!-- Saturno: Pianeta + Anello scuro -->
+    <g transform="rotate(350)">
+      <g transform="translate(195, 0) rotate(-20)"> 
+        <!-- Parte posteriore anello -->
+        <path d="M-14 0 A 14 4 0 0 1 14 0" fill="none" stroke="#383838" stroke-width="2" />
+        <!-- Pianeta -->
+        <circle cx="0" cy="0" r="7" fill="#484848" />
+        <!-- Parte anteriore anello -->
+        <path d="M-14 0 A 14 4 0 0 0 14 0" fill="none" stroke="#505050" stroke-width="2" /> 
+      </g>
+    </g>
+
+    <!-- Urano: Grigio scuro -->
+    <g transform="rotate(190)">
+      <circle cx="235" cy="0" r="6" fill="#454545" />
+    </g>
+
+    <!-- Nettuno: Grigio scuro -->
+    <g transform="rotate(260)">
+      <circle cx="270" cy="0" r="5.8" fill="#404040" />
+    </g>
+  </g>
+</svg>

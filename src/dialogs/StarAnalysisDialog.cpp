@@ -176,7 +176,7 @@ void StarAnalysisWorker::run() {
 // ------ Dialog ------
  
 StarAnalysisDialog::StarAnalysisDialog(QWidget* parent, ImageViewer* viewer)
-    : DialogBase(parent, "Star Analysis", 600, 500), m_viewer(viewer)
+    : DialogBase(parent, tr("Star Analysis"), 600, 500), m_viewer(viewer)
 {
     
     m_worker = new StarAnalysisWorker(this);

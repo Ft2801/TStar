@@ -27,6 +27,7 @@
 #include <cmath> // for std::abs
 #include <QSet>
 #include <exception>
+#include <QStandardPaths>
 
 #include <QFormLayout>
 #include <QDialogButtonBox>
@@ -124,6 +125,12 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowOpacity(0.0); // Start invisible for fade-in
     setAcceptDrops(true);  // Enable drag and drop
     
+    // Set default home directory to Desktop
+    QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    if (!desktopPath.isEmpty()) {
+        QDir::setCurrent(desktopPath);
+    }
+    
     // === Setup UI ===
     QWidget* cwPtr = new QWidget(this);
     setCentralWidget(cwPtr);
@@ -171,7 +178,7 @@ MainWindow::MainWindow(QWidget *parent)
             QPainter p(viewport());
             p.fillRect(event->rect(), QColor(30, 30, 30)); // #1E1E1E
 
-            // 2. Center Grid (Rotated 45 degrees, 400px square)
+            // 2. Center Solar System SVG (500x500)
             p.save();
             p.setRenderHint(QPainter::Antialiasing);
             
@@ -179,35 +186,14 @@ MainWindow::MainWindow(QWidget *parent)
             int h = height();
             int cx = w / 2;
             int cy = h / 2;
-            int side = 400;
+            int side = 600;
             int half = side / 2;
             
-            p.translate(cx, cy);
-            p.rotate(45);
-            
-            // Define the square area
-            QRect squareRect(-half, -half, side, side);
-            
-            p.setClipRect(squareRect);
-            
-            // Draw Grid lines inside the square
-            QColor gridColor(40, 40, 40); // #282828
-            QPen gridPen(gridColor);
-            gridPen.setWidthF(3.0);
-            p.setPen(gridPen);
-            
-            int step = 50;
-            
-            // Draw vertical lines (relative to rotated system)
-            for (int x = -half; x <= half; x += step) {
-                p.drawLine(x, -half, x, half);
+            QSvgRenderer renderer(QString(":/images/solar_system.svg"));
+            if (renderer.isValid()) {
+                QRectF targetRect(cx - half, cy - half, side, side);
+                renderer.render(&p, targetRect);
             }
-            
-            // Draw horizontal lines (relative to rotated system)
-            for (int y = -half; y <= half; y += step) {
-                p.drawLine(-half, y, half, y);
-            }
-            
             p.restore();
             
             // 3. Bottom Right Text "TStar"
@@ -254,6 +240,23 @@ MainWindow::MainWindow(QWidget *parent)
     // Prevent new windows from inheriting maximized state from active window
     m_mdiArea->setOption(QMdiArea::DontMaximizeSubWindowOnActivation, true);
     mainLayout->addWidget(m_mdiArea);
+    
+    // Shortcut Overlay (Top-Left)
+    QLabel* shortcutOverlay = new QLabel(m_mdiArea);
+    shortcutOverlay->setTextFormat(Qt::RichText);
+    shortcutOverlay->setText(
+        "<div style='color: #888; font-family: Segoe UI, sans-serif; font-size: 14px; line-height: 1.4;'>"
+        "<b>" + tr("Shortcuts") + "</b><br/>"
+        "<span style='color: #666;'>Ctrl+O:</span> " + tr("open image") + "<br/>"
+        "<span style='color: #666;'>Ctrl+S:</span> " + tr("save image") + "<br/>"
+        "<span style='color: #666;'>Shift + drag on a view:</span> " + tr("create a new view") + "<br/>"
+        "<span style='color: #666;'>Ctrl+Z / Ctrl+Shift+Z:</span> " + tr("undo / redo") + "<br/>"
+        "<span style='color: #666;'>Ctrl+0:</span> " + tr("fit to screen") +
+        "</div>"
+    );
+    shortcutOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
+    shortcutOverlay->move(25, 15);
+    shortcutOverlay->adjustSize();
     
     // 3. Resource Monitor (Status Bar, bottom-right)
     auto* resMonitor = new ResourceMonitorWidget(this);

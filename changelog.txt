@@ -7,8 +7,10 @@ Version 1.6.0
 - Added system resources monitor
 - Added coordinate/RGB display on mouse over
 - Updated ABE tool, now keeps the darkest background value
-- Updated background with grid and app name
+- Updated background with shortcuts, an illustration and app name
 - Darker overall theme
+- Added personal links in the info section
+- Added some missing translations
 
 Version 1.5.12
 --------------

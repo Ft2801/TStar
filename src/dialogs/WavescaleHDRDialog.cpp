@@ -210,7 +210,7 @@ void WavescaleHDRWorker::run() {
 // ------ Dialog ------
  
 WavescaleHDRDialog::WavescaleHDRDialog(QWidget* parent, ImageViewer* targetViewer)
-    : DialogBase(parent, "Wavescale HDR", 1000, 700), m_targetViewer(targetViewer)
+    : DialogBase(parent, tr("Wavescale HDR"), 1000, 700), m_targetViewer(targetViewer)
 {
     
     // Copy for preview

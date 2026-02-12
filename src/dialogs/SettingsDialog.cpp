@@ -10,7 +10,7 @@
 #include <QGroupBox>
 #include <QCheckBox>
 
-SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, "Settings", 500, 400) {
+SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, tr("Settings"), 500, 400) {
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     

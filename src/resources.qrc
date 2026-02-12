@@ -2,5 +2,6 @@
 <RCC version="1.0">
     <qresource prefix="/">
         <file>images/Logo.png</file>
+        <file>images/solar_system.svg</file>
     </qresource>
 </RCC>

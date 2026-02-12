@@ -5,7 +5,7 @@
 #include <QScreen>
 #include <QGuiApplication>
 
-HelpDialog::HelpDialog(QWidget *parent) : DialogBase(parent, "Help & Tutorial", 800, 600)
+HelpDialog::HelpDialog(QWidget *parent) : DialogBase(parent, tr("Help & Tutorial"), 800, 600)
 {
     setWindowIcon(QIcon(":/images/Logo.png"));
     setupUI();

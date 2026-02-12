@@ -299,24 +299,58 @@ bool ImageBuffer::loadRegion(const QString& filePath, int x, int y, int w, int h
 }
 
 bool ImageBuffer::loadStandard(const QString& filePath) {
-    QImage img(filePath);
-    if (img.isNull()) return false;
-
-    img = img.convertToFormat(QImage::Format_RGB888);
+    // Use OpenCV for standard formats (JPG, PNG, etc.)
+    std::string stdPath = filePath.toStdString();
+    cv::Mat img = cv::imread(stdPath, cv::IMREAD_UNCHANGED);
     
-    m_width = img.width();
-    m_height = img.height();
-    m_channels = 3;
-    m_data.resize(m_width * m_height * 3);
+    if (img.empty()) return false;
 
-    for (int y = 0; y < m_height; ++y) {
-        const uchar* line = img.constScanLine(y);
-        for (int x = 0; x < m_width; ++x) {
-            m_data[(y * m_width + x) * 3 + 0] = static_cast<float>(line[x*3+0]) / 255.0f;
-            m_data[(y * m_width + x) * 3 + 1] = static_cast<float>(line[x*3+1]) / 255.0f;
-            m_data[(y * m_width + x) * 3 + 2] = static_cast<float>(line[x*3+2]) / 255.0f;
+    int w = img.cols;
+    int h = img.rows;
+    int ch = img.channels();
+    
+    // Normalize channel count to 3 (RGB)
+    if (ch == 1) {
+        cv::cvtColor(img, img, cv::COLOR_GRAY2BGR);
+        ch = 3;
+    } else if (ch == 4) {
+        cv::cvtColor(img, img, cv::COLOR_BGRA2BGR);
+        ch = 3;
+    } else if (ch != 3) {
+        // Fallback for weird channel counts
+        return false;
+    }
+    
+    // Convert to float32 and normalize to [0,1]
+    cv::Mat floatMat;
+    double scale = 1.0;
+    
+    switch (img.depth()) {
+        case CV_8U:  scale = 1.0 / 255.0; break;
+        case CV_16U: scale = 1.0 / 65535.0; break;
+        case CV_32F: scale = 1.0; break;
+        default:     scale = 1.0 / 255.0; break; // Assume 8-bit for others
+    }
+    
+    img.convertTo(floatMat, CV_32FC3, scale);
+    
+    m_width = w;
+    m_height = h;
+    m_channels = 3;
+    m_data.resize(static_cast<size_t>(w) * h * 3);
+
+    // Copy and BGR -> RGB
+    for (int y = 0; y < h; ++y) {
+        const float* row = floatMat.ptr<float>(y);
+        for (int x = 0; x < w; ++x) {
+            size_t dstIdx = (static_cast<size_t>(y) * w + x) * 3;
+            size_t srcIdx = x * 3;
+            m_data[dstIdx + 0] = row[srcIdx + 2]; // R
+            m_data[dstIdx + 1] = row[srcIdx + 1]; // G
+            m_data[dstIdx + 2] = row[srcIdx + 0]; // B
         }
     }
+    
     return true;
 }
 

@@ -6,7 +6,7 @@
 #include <cmath>
 
 SaturationDialog::SaturationDialog(QWidget* parent, ImageViewer* viewer) 
-    : DialogBase(parent, "Color Saturation", 350, 400), m_viewer(nullptr), m_buffer(nullptr) {
+    : DialogBase(parent, tr("Color Saturation"), 350, 400), m_viewer(nullptr), m_buffer(nullptr) {
     setupUI();
     
     if (viewer) {

@@ -4,7 +4,7 @@
 #include <QCoreApplication>
 
 AboutDialog::AboutDialog(QWidget* parent, const QString& version, const QString& buildTimestamp)
-    : DialogBase(parent, "About TStar", 450, 250)
+    : DialogBase(parent, tr("About TStar"), 450, 250)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(20, 15, 20, 15); // Reduced margins
@@ -19,6 +19,15 @@ AboutDialog::AboutDialog(QWidget* parent, const QString& version, const QString&
     QStringList aboutLines;
     aboutLines << QString("<h2>TStar %1</h2>").arg(v);
     aboutLines << QString("<p>%1</p>").arg(tr("Written by Fabio Tempera"));
+    
+    QString linkStyle = "color: #4da6ff; text-decoration: none;";
+    aboutLines << QString("<p>%1 <a href='https://github.com/ft2801' style='%2'>%3</a></p>")
+                    .arg(tr("link to my ")).arg(linkStyle).arg(tr("GitHub profile"));
+    aboutLines << QString("<p>%1 <a href='https://ft2801.github.io/Portfolio' style='%2'>%3</a></p>")
+                    .arg(tr("link to my ")).arg(linkStyle).arg(tr("portfolio"));
+    aboutLines << QString("<p>%1 <a href='https://ft2801.github.io/FT-Astrophotography' style='%2'>%3</a></p>")
+                    .arg(tr("link to my ")).arg(linkStyle).arg(tr("astronomy website"));
+
     aboutLines << QString("<p>%1</p>").arg(tr("Copyright © 2026")); 
     
     if (!bt.isEmpty()) {

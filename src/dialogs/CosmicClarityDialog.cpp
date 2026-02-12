@@ -17,7 +17,7 @@ static bool detectGpuAvailable() {
     return hasCuda || hasDirectML;
 }
 
-CosmicClarityDialog::CosmicClarityDialog(QWidget* parent) : DialogBase(parent, "Cosmic Clarity", 500, 500) {
+CosmicClarityDialog::CosmicClarityDialog(QWidget* parent) : DialogBase(parent, tr("Cosmic Clarity"), 500, 500) {
     setWindowIcon(QIcon(":/images/Logo.png"));
 
 

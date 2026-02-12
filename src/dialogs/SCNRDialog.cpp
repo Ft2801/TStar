@@ -7,7 +7,7 @@
 #include <QPointer>
 #include "../ImageViewer.h"
 
-SCNRDialog::SCNRDialog(QWidget* parent) : DialogBase(parent, "SCNR (Remove Green Noise)", 350, 200) {
+SCNRDialog::SCNRDialog(QWidget* parent) : DialogBase(parent, tr("SCNR (Remove Green Noise)"), 350, 200) {
     setModal(false);
     setWindowModality(Qt::NonModal);
     setWindowIcon(QIcon(":/images/Logo.png"));

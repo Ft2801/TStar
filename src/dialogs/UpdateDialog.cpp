@@ -18,7 +18,7 @@
 #include <QDebug>
 
 UpdateDialog::UpdateDialog(QWidget* parent, const QString& version, const QString& changelog, const QString& downloadUrl) 
-    : DialogBase(parent, "Update Available: v" + version, 500, 400), m_downloadUrl(downloadUrl), m_nam(nullptr), m_reply(nullptr), m_file(nullptr)
+    : DialogBase(parent, tr("Update Available: v%1").arg(version), 500, 400), m_downloadUrl(downloadUrl), m_nam(nullptr), m_reply(nullptr), m_file(nullptr)
 {
     setWindowIcon(QIcon(":/images/Logo.png"));
     

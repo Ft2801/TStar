@@ -5,7 +5,7 @@
 #include <cmath>
 
 PCCDistributionDialog::PCCDistributionDialog(const PCCResult& result, QWidget* parent)
-    : DialogBase(parent, "Star Distribution (PCC Analysis)", 800, 400), m_result(result) 
+    : DialogBase(parent, tr("Star Distribution (PCC Analysis)"), 800, 400), m_result(result) 
 {
     // Preferred size already handled by DialogBase
 }

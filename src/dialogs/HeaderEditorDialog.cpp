@@ -8,7 +8,7 @@
 #include <QGroupBox>
 
 HeaderEditorDialog::HeaderEditorDialog(ImageViewer* viewer, QWidget* parent) 
-    : DialogBase(parent, "Header Editor", 700, 600), m_viewer(viewer) {
+    : DialogBase(parent, tr("Header Editor"), 700, 600), m_viewer(viewer) {
     if (viewer) {
         m_meta = viewer->getBuffer().metadata();
         setWindowTitle(tr("FITS Header Editor - %1").arg(viewer->windowTitle()));

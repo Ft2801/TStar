@@ -208,6 +208,61 @@ TRANSLATIONS = {
 
     "Checking GitHub...": {'it': 'Controllo GitHub...', 'es': 'Comprobando GitHub...', 'fr': 'Vérification GitHub...', 'de': 'Prüfe GitHub...'},
 
+    "link to my ": {'it': 'link al mio ', 'es': 'enlace a mi ', 'fr': 'lien vers mon ', 'de': 'Link zu meinem '},
+
+    "GitHub profile": {'it': 'profilo GitHub', 'es': 'perfil GitHub', 'fr': 'profil GitHub', 'de': 'GitHub-Profil'},
+
+    "portfolio": {'it': 'portfolio', 'es': 'portfolio', 'fr': 'portfolio', 'de': 'Portfolio'},
+
+    "astronomy website": {'it': 'sito di astronomia', 'es': 'sitio de astronomía', 'fr': "site d'astronomie", 'de': 'Astronomie-Website'},
+
+    "open image": {'it': 'apri immagine', 'es': 'abrir imagen', 'fr': "ouvrir l'image", 'de': 'Bild öffnen'},
+
+    "save image": {'it': 'salva immagine', 'es': 'guardar immagine', 'fr': "enregistrer l'image", 'de': 'Bild speichern'},
+
+    "create a new view": {'it': 'crea una nuova vista', 'es': 'crear una nueva vista', 'fr': 'créer une nouvelle vue', 'de': 'Neue Ansicht erstellen'},
+
+    "undo / redo": {'it': 'annulla / ripristina', 'es': 'deshacer / rehacer', 'fr': 'annuler / rétablir', 'de': 'Rückgängig / Wiederholen'},
+
+    "fit to screen": {'it': 'adatta allo schermo', 'es': 'ajustar a la pantalla', 'fr': "adapter à l'écran", 'de': 'An Bildschirm anpassen'},
+
+    "Shortcuts": {'it': 'Scorciatoie', 'es': 'Atajos', 'fr': 'Raccourcis', 'de': 'Tastenkombinationen'},
+
+    "%1 stars (of %2 total)": {'it': '%1 stelle (di %2 totali)', 'es': '%1 estrellas (de %2 total)', 'fr': '%1 étoiles (sur %2 au total)', 'de': '%1 Sterne (von %2 insgesamt)'},
+    "+": {'it': '+', 'es': '+', 'fr': '+', 'de': '+'},
+    "Detected %1 total stars. Filtering...": {'it': 'Rilevate %1 stelle totali. Filtraggio...', 'es': 'Detectadas %1 estrellas totales. Filtrando...', 'fr': 'Détection de %1 étoiles au total. Filtrage...', 'de': '%1 Sterne insgesamt erkannt. Filterung...'},
+    "Detecting all stars...": {'it': 'Rilevamento di tutte le stelle...', 'es': 'Detectando todas las estrellas...', 'fr': 'Détection de toutes les étoiles...', 'de': 'Alle Sterne werden erkannt...'},
+    "Reset to Defaults": {'it': 'Ripristina Predefiniti', 'es': 'Restablecer valores predeterminados', 'fr': 'Réinitialiser aux valeurs par défaut', 'de': 'Auf Standardwerte zurücksetzen'},
+    "−": {'it': '−', 'es': '−', 'fr': '−', 'de': '−'},
+    "Stacking": {'it': 'Media (Stacking)', 'es': 'Apilado', 'fr': 'Empilement', 'de': 'Stacking'},
+
+    "About TStar": {'it': 'Informazioni su TStar', 'es': 'Acerca de TStar', 'fr': 'À propos de TStar', 'de': 'Über TStar'},
+    "Help & Tutorial": {'it': 'Aiuto e Tutorial', 'es': 'Ayuda y Tutoriales', 'fr': 'Aide et Tutoriels', 'de': 'Hilfe und Tutorial'},
+    "Wavescale HDR": {'it': 'Wavescale HDR', 'es': 'Wavescale HDR', 'fr': 'Wavescale HDR', 'de': 'Wavescale HDR'},
+    "Statistical Stretch": {'it': 'Statistical Stretch', 'es': 'Statistical Stretch', 'fr': 'Statistical Stretch', 'de': 'Statistical Stretch'},
+    "Star Stretch": {'it': 'Star Stretch', 'es': 'Star Stretch', 'fr': 'Star Stretch', 'de': 'Star Stretch'},
+    "Star Recomposition": {'it': 'Ricombinazione Stelle', 'es': 'Recomposición de Estrellas', 'fr': 'Recomposition des Étoiles', 'de': 'Stern-Rekombination'},
+    "Star Analysis": {'it': 'Analisi Stelle', 'es': 'Análisis de Estrellas', 'fr': 'Analyse des Étoiles', 'de': 'Stern-Analyse'},
+    "SCNR (Remove Green Noise)": {'it': 'SCNR (Rimozione Rumore Verde)', 'es': 'SCNR (Eliminar Ruido Verde)', 'fr': 'SCNR (Suppression du Bruit Vert)', 'de': 'SCNR (Grünrauschen entfernen)'},
+    "Color Saturation": {'it': 'Saturazione Colore', 'es': 'Saturación de Color', 'fr': 'Saturation des Couleurs', 'de': 'Farbsättigung'},
+    "Aberration Remover": {'it': 'Rimozione Aberrazioni', 'es': 'Eliminación de Aberraciones', 'fr': 'Correction des Aberrations', 'de': 'Aberrations-Entferner'},
+    "Star Distribution (PCC Analysis)": {'it': 'Distribuzione Stelle (Analisi PCC)', 'es': 'Distribución de Estrellas (Análisis PCC)', 'fr': 'Distribution des Étoiles (Analyse PCC)', 'de': 'Sternverteilung (PCC-Analyse)'},
+    "Mask Generation": {'it': 'Generazione Maschera', 'es': 'Generación de Máscara', 'fr': 'Génération de Masque', 'de': 'Maskengenerierung'},
+    "Live Mask Preview": {'it': 'Anteprima Live Maschera', 'es': 'Previsualizzazione Máscara en Vivo', 'fr': 'Aperçu du Masque en Direct', 'de': 'Live-Maskenvorschau'},
+    "Histogram Transformation": {'it': 'Trasformazione Istogramma', 'es': 'Transformación de Histograma', 'fr': 'Transformation d\'Histogramme', 'de': 'Histogramm-Transformation'},
+    "FITS Header": {'it': 'Header FITS', 'es': 'Encabezado FITS', 'fr': 'En-tête FITS', 'de': 'FITS-Header'},
+    "Header Editor": {'it': 'Editor Header', 'es': 'Editor de Encabezado', 'fr': 'Éditeur d\'En-tête', 'de': 'Header-Editor'},
+    "GraXpert": {'it': 'GraXpert', 'es': 'GraXpert', 'fr': 'GraXpert', 'de': 'GraXpert'},
+    "Generalized Hyperbolic Stretch (GHT)": {'it': 'Generalized Hyperbolic Stretch (GHT)', 'es': 'Generalized Hyperbolic Stretch (GHT)', 'fr': 'Generalized Hyperbolic Stretch (GHT)', 'de': 'Generalized Hyperbolic Stretch (GHT)'},
+    "Curves Transformation": {'it': 'Trasformazione Curve', 'es': 'Transformación de Curvas', 'fr': 'Transformation de Courbes', 'de': 'Kurventransformation'},
+    "Rotate & Crop Tool": {'it': 'Strumento Ruota e Ritaglia', 'es': 'Herramienta Rotar y Recortar', 'fr': 'Outil de Rotation et Recadrage', 'de': 'Drehen und Zuschneiden'},
+    "Cosmic Clarity": {'it': 'Cosmic Clarity', 'es': 'Cosmic Clarity', 'fr': 'Cosmic Clarity', 'de': 'Cosmic Clarity'},
+    "AstroSpike": {'it': 'AstroSpike', 'es': 'AstroSpike', 'fr': 'AstroSpike', 'de': 'AstroSpike'},
+    "Arcsinh Stretch": {'it': 'Arcsinh Stretch', 'es': 'Arcsinh Stretch', 'fr': 'Arcsinh Stretch', 'de': 'Arcsinh Stretch'},
+    "Apply Mask": {'it': 'Applica Maschera', 'es': 'Aplicar Máscara', 'fr': 'Appliquer Masque', 'de': 'Maske anwenden'},
+    "Aberration Inspector": {'it': 'Ispezione Aberrazioni', 'es': 'Inspector de Aberraciones', 'fr': 'Inspecteur d\'Aberrations', 'de': 'Aberrations-Inspektor'},
+    "Update Available: v%1": {'it': 'Aggiornamento Disponibile: v%1', 'es': 'Actualización disponible: v%1', 'fr': 'Mise à jour disponible : v%1', 'de': 'Update verfügbar: v%1'},
+
     "Chrominance": {'it': 'Crominanza', 'es': 'Crominancia', 'fr': 'Chrominance', 'de': 'Chrominanz'},
 
     "Clear Selections": {'it': 'Pulisci Selezioni', 'es': 'Limpiar Selecciones', 'fr': 'Effacer Sélections', 'de': 'Auswahl löschen'},

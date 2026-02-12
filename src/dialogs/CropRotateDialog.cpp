@@ -10,7 +10,7 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 
-CropRotateDialog::CropRotateDialog(QWidget* parent) : DialogBase(parent, "Rotate & Crop Tool", 300, 200) {
+CropRotateDialog::CropRotateDialog(QWidget* parent) : DialogBase(parent, tr("Rotate & Crop Tool"), 300, 200) {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     
     // Rotation Controls

@@ -38,7 +38,7 @@ static QString detectBestProvider() {
     return "CPU";
 }
 
-RARDialog::RARDialog(QWidget* parent) : DialogBase(parent, "Aberration Remover", 400, 300) {
+RARDialog::RARDialog(QWidget* parent) : DialogBase(parent, tr("Aberration Remover"), 400, 300) {
     QSettings s;
 
     QVBoxLayout* layout = new QVBoxLayout(this);

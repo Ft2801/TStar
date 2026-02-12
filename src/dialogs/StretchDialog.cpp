@@ -8,7 +8,7 @@
 
 #include "../ImageViewer.h"
 
-StretchDialog::StretchDialog(QWidget* parent) : DialogBase(parent, "Statistical Stretch", 600, 400) {
+StretchDialog::StretchDialog(QWidget* parent) : DialogBase(parent, tr("Statistical Stretch"), 600, 400) {
     setMinimumWidth(450);
     setupUI();
     setupConnections();
