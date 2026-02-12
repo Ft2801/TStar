@@ -3048,6 +3048,22 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Ritaglia / Ruota</translation>
         </message>
         <message>
+            <source>Ctrl+0:</source>
+            <translation type="finished">Ctrl+0:</translation>
+        </message>
+        <message>
+            <source>Ctrl+O:</source>
+            <translation type="finished">Ctrl+O:</translation>
+        </message>
+        <message>
+            <source>Ctrl+S:</source>
+            <translation type="finished">Ctrl+S:</translation>
+        </message>
+        <message>
+            <source>Ctrl+Z / Ctrl+Shift+Z:</source>
+            <translation type="finished">Ctrl+Z / Ctrl+Shift+Z:</translation>
+        </message>
+        <message>
             <source>Curves Transformation</source>
             <translation type="finished">Trasformazione Curve</translation>
         </message>
@@ -3779,6 +3795,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Settings applied. Display refreshed.</source>
             <translation type="finished">Impostazioni applicate. Display aggiornato.</translation>
+        </message>
+        <message>
+            <source>Shift + draw a selection:</source>
+            <translation type="finished">Shift + disegna una selezione:</translation>
         </message>
         <message>
             <source>Shortcuts</source>

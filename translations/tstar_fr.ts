@@ -3048,6 +3048,22 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Rogner / Pivoter</translation>
         </message>
         <message>
+            <source>Ctrl+0:</source>
+            <translation type="finished">Ctrl+0:</translation>
+        </message>
+        <message>
+            <source>Ctrl+O:</source>
+            <translation type="finished">Ctrl+O:</translation>
+        </message>
+        <message>
+            <source>Ctrl+S:</source>
+            <translation type="finished">Ctrl+S:</translation>
+        </message>
+        <message>
+            <source>Ctrl+Z / Ctrl+Shift+Z:</source>
+            <translation type="finished">Ctrl+Z / Ctrl+Shift+Z:</translation>
+        </message>
+        <message>
             <source>Curves Transformation</source>
             <translation type="finished">Transformation Courbes</translation>
         </message>
@@ -3779,6 +3795,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Settings applied. Display refreshed.</source>
             <translation type="finished">Paramètres appliqués. Affichage actualisé.</translation>
+        </message>
+        <message>
+            <source>Shift + draw a selection:</source>
+            <translation type="finished">Shift + dessiner une sélection:</translation>
         </message>
         <message>
             <source>Shortcuts</source>

@@ -247,11 +247,11 @@ MainWindow::MainWindow(QWidget *parent)
     shortcutOverlay->setText(
         "<div style='color: #888; font-family: Segoe UI, sans-serif; font-size: 14px; line-height: 1.4;'>"
         "<b>" + tr("Shortcuts") + "</b><br/>"
-        "<span style='color: #666;'>Ctrl+O:</span> " + tr("open image") + "<br/>"
-        "<span style='color: #666;'>Ctrl+S:</span> " + tr("save image") + "<br/>"
-        "<span style='color: #666;'>Shift + drag on a view:</span> " + tr("create a new view") + "<br/>"
-        "<span style='color: #666;'>Ctrl+Z / Ctrl+Shift+Z:</span> " + tr("undo / redo") + "<br/>"
-        "<span style='color: #666;'>Ctrl+0:</span> " + tr("fit to screen") +
+        "<span style='color: #888; font-weight: bold;'>" + tr("Ctrl+O:") + "</span> " + tr("open image") + "<br/>"
+        "<span style='color: #888; font-weight: bold;'>" + tr("Ctrl+S:") + "</span> " + tr("save image") + "<br/>"
+        "<span style='color: #888; font-weight: bold;'>" + tr("Shift + draw a selection:") + "</span> " + tr("create a new view") + "<br/>"
+        "<span style='color: #888; font-weight: bold;'>" + tr("Ctrl+Z / Ctrl+Shift+Z:") + "</span> " + tr("undo / redo") + "<br/>"
+        "<span style='color: #888; font-weight: bold;'>" + tr("Ctrl+0:") + "</span> " + tr("fit to screen") +
         "</div>"
     );
     shortcutOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);

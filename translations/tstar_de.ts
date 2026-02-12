@@ -3048,6 +3048,22 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Zuschneiden / Drehen</translation>
         </message>
         <message>
+            <source>Ctrl+0:</source>
+            <translation type="finished">Strg+0:</translation>
+        </message>
+        <message>
+            <source>Ctrl+O:</source>
+            <translation type="finished">Strg+O:</translation>
+        </message>
+        <message>
+            <source>Ctrl+S:</source>
+            <translation type="finished">Strg+S:</translation>
+        </message>
+        <message>
+            <source>Ctrl+Z / Ctrl+Shift+Z:</source>
+            <translation type="finished">Strg+Z / Strg+Shift+Z:</translation>
+        </message>
+        <message>
             <source>Curves Transformation</source>
             <translation type="finished">Kurventransformation</translation>
         </message>
@@ -3779,6 +3795,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Settings applied. Display refreshed.</source>
             <translation type="finished">Einstellungen angewendet. Anzeige aktualisiert.</translation>
+        </message>
+        <message>
+            <source>Shift + draw a selection:</source>
+            <translation type="finished">Shift + Auswahl zeichnen:</translation>
         </message>
         <message>
             <source>Shortcuts</source>

@@ -3046,6 +3046,22 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Ctrl+0:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Ctrl+O:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Ctrl+S:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Ctrl+Z / Ctrl+Shift+Z:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Curves Transformation</source>
             <translation type="unfinished" />
         </message>
@@ -3775,6 +3791,10 @@
         </message>
         <message>
             <source>Settings applied. Display refreshed.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Shift + draw a selection:</source>
             <translation type="unfinished" />
         </message>
         <message>

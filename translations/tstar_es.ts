@@ -3048,6 +3048,22 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Recortar / Rotar</translation>
         </message>
         <message>
+            <source>Ctrl+0:</source>
+            <translation type="finished">Ctrl+0:</translation>
+        </message>
+        <message>
+            <source>Ctrl+O:</source>
+            <translation type="finished">Ctrl+O:</translation>
+        </message>
+        <message>
+            <source>Ctrl+S:</source>
+            <translation type="finished">Ctrl+S:</translation>
+        </message>
+        <message>
+            <source>Ctrl+Z / Ctrl+Shift+Z:</source>
+            <translation type="finished">Ctrl+Z / Ctrl+Shift+Z:</translation>
+        </message>
+        <message>
             <source>Curves Transformation</source>
             <translation type="finished">Transformación Curvas</translation>
         </message>
@@ -3779,6 +3795,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Settings applied. Display refreshed.</source>
             <translation type="finished">Ajustes aplicados. Pantalla actualizada.</translation>
+        </message>
+        <message>
+            <source>Shift + draw a selection:</source>
+            <translation type="finished">Shift + dibujar una selección:</translation>
         </message>
         <message>
             <source>Shortcuts</source>

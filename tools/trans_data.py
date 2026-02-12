@@ -227,6 +227,12 @@ TRANSLATIONS = {
     "fit to screen": {'it': 'adatta allo schermo', 'es': 'ajustar a la pantalla', 'fr': "adapter à l'écran", 'de': 'An Bildschirm anpassen'},
 
     "Shortcuts": {'it': 'Scorciatoie', 'es': 'Atajos', 'fr': 'Raccourcis', 'de': 'Tastenkombinationen'},
+    "Ctrl+O:": {'it': 'Ctrl+O:', 'es': 'Ctrl+O:', 'fr': 'Ctrl+O:', 'de': 'Strg+O:'},
+    "Ctrl+S:": {'it': 'Ctrl+S:', 'es': 'Ctrl+S:', 'fr': 'Ctrl+S:', 'de': 'Strg+S:'},
+    "Shift + draw a selection:": {'it': 'Shift + disegna una selezione:', 'es': 'Shift + dibujar una selección:', 'fr': 'Shift + dessiner une sélection:', 'de': 'Shift + Auswahl zeichnen:'},
+    "create a new view": {'it': 'crea una nuova vista', 'es': 'crear una nueva vista', 'fr': 'créer une nouvelle vue', 'de': 'Neue Ansicht erstellen'},
+    "Ctrl+Z / Ctrl+Shift+Z:": {'it': 'Ctrl+Z / Ctrl+Shift+Z:', 'es': 'Ctrl+Z / Ctrl+Shift+Z:', 'fr': 'Ctrl+Z / Ctrl+Shift+Z:', 'de': 'Strg+Z / Strg+Shift+Z:'},
+    "Ctrl+0:": {'it': 'Ctrl+0:', 'es': 'Ctrl+0:', 'fr': 'Ctrl+0:', 'de': 'Strg+0:'},
 
     "%1 stars (of %2 total)": {'it': '%1 stelle (di %2 totali)', 'es': '%1 estrellas (de %2 total)', 'fr': '%1 étoiles (sur %2 au total)', 'de': '%1 Sterne (von %2 insgesamt)'},
     "+": {'it': '+', 'es': '+', 'fr': '+', 'de': '+'},
