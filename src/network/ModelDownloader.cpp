@@ -27,7 +27,7 @@
 // For robustness we implement a minimal ZIP reader using Qt's built-in
 // support or delegate to platform tools.
 
-// Download URLs (same as saspro)
+// Download URLs
 static const QString PRIMARY_GDRIVE =
     "https://drive.google.com/file/d/1d0wQr8Oau9UH3IalMW5anC0_oddxBjh3/view?usp=drive_link";
 static const QString BACKUP_GDRIVE =

@@ -720,32 +720,10 @@ RejectionResult RejectionAlgorithms::biweightClipping(
             if (std::abs(shift) > 1e-5 * scale) converged = false;
         }
         
-        // Update Scale (simplified MAD update or just keep initial MAD?)
-        // Standard Biweight often just uses MAD or iterates scale too.
-        // For rejection purposes, fixing scale at MAD is often "robust enough" and safer.
-        // Let's stick to initial MAD for u-calculation to prevent run-away collapse, 
-        // effectively implementing "Biweight Location" rejection.
-        
         if (converged) break;
     }
     
     // 3. Reject pixels with zero weight (u >= 1)
-    // Actually, Biweight is soft-weighting, but for "Clipping" we need hard rejection.
-    // We reject points that are statistically far from the biweight center.
-    // Typically: deviations > tuningConstant * scale?
-    // Or just u >= 1.0? (Which is deviation > C * MAD) (e.g. > 6 * MAD).
-    // 6*MAD is huge. Usually for rejection we use sigma-limits.
-    // So we use the robust Center and Scale (MAD) to apply Sigma Clipping.
-    
-    // Better approach matching "Winsorized":
-    // Use Biweight Center and Biweight Midvariance (or MAD) as robust estimations of Mean and Sigma.
-    // Then reject based on SigmaLow/High provided? 
-    // Wait, the signature of this function takes "tuningConstant" which replaces sigmaLow/High?
-    // Let's assume the user wants standard Biweight Rejection which is hard-cutoff at u=1.
-    
-    // HOWEVER, typical implementation in stacking software:
-    // "Biweight" usually means "Compute Biweight Center, use it as the value".
-    // "Biweight Clipping" usually means "Reject pixels that would have 0 weight".
     
     double limit = C * scale; 
     

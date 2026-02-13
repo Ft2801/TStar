@@ -4146,10 +4146,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Extrayendo modelos…</translation>
         </message>
         <message>
-            <source>Extracting… %1</source>
-            <translation type="finished">Extrayendo… %1</translation>
-        </message>
-        <message>
             <source>Extraction complete.</source>
             <translation type="finished">Extracción completada.</translation>
         </message>
@@ -4198,8 +4194,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Modelos descargados e instalados con éxito.</translation>
         </message>
         <message>
-            <source>Models were downloaded but verification failed. The ZIP may not contain the expected model files.</source>
-            <translation type="finished">Los modelos se descargaron pero la verificación falló. El ZIP puede no contener los archivos esperados.</translation>
+            <source>Models extraction completed but verification failed - expected file 'deep_sharp_stellar_AI4.pth' not found. Files extracted: %1</source>
+            <translation type="unfinished" />
         </message>
         <message>
             <source>Primary failed. Trying backup (Google Drive)…</source>

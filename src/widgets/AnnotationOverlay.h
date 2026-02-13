@@ -98,7 +98,7 @@ signals:
     void aboutToAddAnnotation();    // Fires BEFORE annotation is added (for undo)
     void annotationAdded(const Annotation& ann);  // Fires AFTER annotation is added
     void textInputRequested(const QPointF& imagePos);  // User clicked in text mode
-    void requestCatalogQuery();  // Emitted when user wants to query catalogs
+    void requestCatalogQuery(); 
 
 protected:
     void paintEvent(QPaintEvent* event) override;

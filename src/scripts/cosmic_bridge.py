@@ -25,9 +25,9 @@ except ImportError:
     ort = None  # only needed for 'process' command
 
 
-# ============================================================================
-#  Color-space helpers  (BT.601 YCbCr, same as saspro)
-# ============================================================================
+# ======================================
+#  Color-space helpers  (BT.601 YCbCr)
+# ======================================
 _M_RGB2YCBCR = np.array([
     [ 0.299,      0.587,      0.114    ],
     [-0.168736,  -0.331264,   0.5      ],
@@ -50,7 +50,7 @@ def extract_luminance(rgb):
 
 def merge_luminance(y, cb, cr):
     """Y (H,W), Cb (H,W), Cr (H,W) -> RGB (H,W,3).  Cb/Cr were offset +0.5.
-    Clips each component to [0,1] BEFORE reconstruction (saspro exact)."""
+    Clips each component to [0,1] BEFORE reconstruction."""
     y = np.asarray(y, dtype=np.float32)
     cb = np.asarray(cb, dtype=np.float32)
     cr = np.asarray(cr, dtype=np.float32)
@@ -98,7 +98,7 @@ def split_chunks(plane2d, chunk=CHUNK, overlap=OVERLAP):
 
 
 def stitch_chunks(chunks, shape, border=16):
-    """Stitch overlapping chunks with border-ignore weights (SASPRO EXACT)."""
+    """Stitch overlapping chunks with border-ignore weights."""
     H, W = shape[0], shape[1]
     stitched = np.zeros((H, W), dtype=np.float32)
     weights  = np.zeros((H, W), dtype=np.float32)
@@ -150,7 +150,7 @@ def split_chunks_rgb(img3, chunk=CHUNK, overlap=OVERLAP):
 
 
 def stitch_chunks_rgb(chunks, shape, border=16):
-    """Stitch overlapping RGB chunks with border-ignore weights (SASPRO EXACT)."""
+    """Stitch overlapping RGB chunks with border-ignore weights."""
     H, W, C = shape
     stitched = np.zeros((H, W, C), dtype=np.float32)
     weights  = np.zeros((H, W, 1), dtype=np.float32)
@@ -212,7 +212,7 @@ def _pick_io(session):
 
 def _infer_2d(session, chunk2d, psf01=None):
     """Run model on a 2-D plane.  Input tiled to (1,3,Hp,Wp). Returns 2-D."""
-    # Match Saspro: Use _pad2d_to_multiple logic (reflect, mult=16)
+    # Use _pad2d_to_multiple logic (reflect, mult=16)
     chunk_p, h0, w0 = pad_to_mult(chunk2d.astype(np.float32), mult=16)
     
     # (Hp,Wp) -> (1,1,Hp,Wp) -> (1,3,Hp,Wp)
@@ -228,7 +228,7 @@ def _infer_2d(session, chunk2d, psf01=None):
         feeds[psf_name] = np.array([[0.5]], dtype=np.float32)
 
     out = session.run([out_name], feeds)[0]
-    # (1,3,Hp,Wp) -> channel 0  (same as saspro)
+    # (1,3,Hp,Wp) -> channel 0 
     if out.ndim == 4:
         y = out[0, 0]
     elif out.ndim == 3:
@@ -244,7 +244,7 @@ def _infer_2d(session, chunk2d, psf01=None):
 
 def _infer_rgb(session, chunk_hwc):
     """Run model on an RGB chunk (H,W,3). Returns (H,W,3)."""
-    # Match Saspro: pad each channel (H,W,3) to multiple of 16
+    # Pad each channel (H,W,3) to multiple of 16
     chunk_p, h0, w0 = pad_to_mult(chunk_hwc.astype(np.float32), mult=16)
     
     # (Hp,Wp,3) -> (3,Hp,Wp) -> (1,3,Hp,Wp)
@@ -270,7 +270,7 @@ def blend(orig, processed, amount):
 
 
 def stretch_image_unlinked_rgb(image_rgb, target_median=0.25):
-    """Apply MTF stretch per-channel (saspro exact formula with safe-guards).
+    """Apply MTF stretch per-channel.
     Returns (stretched, orig_min, orig_meds) for later unstretch.
     """
     x = image_rgb.astype(np.float32, copy=True)
@@ -291,7 +291,7 @@ def stretch_image_unlinked_rgb(image_rgb, target_median=0.25):
         orig_meds.append(m0)
         
         if m0 != 0.0:
-            # CRITICAL: use np.where() safe-guard like saspro denoise_engine
+            # CRITICAL: use np.where() safe-guard
             # If |denom| < 1e-12, keep original value (don't divide)
             denom = m0 * (t + plane - 1.0) - t * plane
             res = np.where(np.abs(denom) > 1e-12, ((m0 - 1.0) * t * plane) / denom, plane)
@@ -305,7 +305,7 @@ def stretch_image_unlinked_rgb(image_rgb, target_median=0.25):
 
 
 def unstretch_image_unlinked_rgb(image_rgb, orig_meds, orig_min, was_mono):
-    """Inverse of stretch_image_unlinked_rgb with safe-guards (saspro exact)."""
+    """Inverse of stretch_image_unlinked_rgb with safe-guards."""
     y = image_rgb.astype(np.float32, copy=True)
     t = float(0.25)  # target_median
     
@@ -339,7 +339,7 @@ def unstretch_image_unlinked_rgb(image_rgb, orig_meds, orig_min, was_mono):
 
 
 def encode_psf(psf_radius, lo=1.0, hi=8.0):
-    """Encode PSF radius [1..8] to [0..1] via log2, matching saspro."""
+    """Encode PSF radius [1..8] to [0..1] via log2."""
     return float(np.clip(
         (math.log2(psf_radius) - math.log2(lo)) / (math.log2(hi) - math.log2(lo)),
         0.0, 1.0
@@ -349,7 +349,6 @@ def encode_psf(psf_radius, lo=1.0, hi=8.0):
 def _is_triplicated_mono(rgb_image, eps=1e-7):
     """Check if an RGB image is actually mono (all channels equal).
     This detects when a mono image was tripled for processing.
-    Matches saspro denoise_engine._is_triplicated_mono()
     """
     if rgb_image.ndim != 3 or rgb_image.shape[2] != 3:
         return False
@@ -408,7 +407,7 @@ def process(params_file, raw_in, raw_out):
     else:
         stretch_threshold = 0.08  # Standard for sharpen/both
     
-    # Saspro alignment: Check stretch metric on ORIGINAL image first (global median)
+    # Check stretch metric on ORIGINAL image first (global median)
     metric_val = float(np.median(img - np.min(img)))
     stretch_needed = (metric_val < stretch_threshold)
     print(f"[Bridge] Stretch metric={metric_val:.6f} needed={stretch_needed}", flush=True)
@@ -445,7 +444,7 @@ def process(params_file, raw_in, raw_out):
         orig_min = None
         orig_meds = None
 
-    # Apply Border (Saspro: padded with median values)
+    # Apply Border
     if was_mono:
         # stretched_core is 2D from above
         med_val = float(np.median(stretched_core))
@@ -574,7 +573,7 @@ def process(params_file, raw_in, raw_out):
         dn_color    = float(params.get('denoise_color', 0.5))
         dn_mode     = params.get('denoise_mode', 'full')
         
-        # CRITICAL FIX: Re-detect if input is actually mono (matches saspro denoise_engine)
+        # CRITICAL FIX: Re-detect if input is actually mono
         # This catches cases where sharpen tripled it but it's still logically mono
         detected_mono = was_mono if mode == 'denoise' else _is_triplicated_mono(result)
         
@@ -614,7 +613,7 @@ def process(params_file, raw_in, raw_out):
             else:
                 print(f"[Bridge] WARNING: denoise mono model not found", flush=True)
         else:
-            # RGB Denoise Logic (matches saspro orchestration)
+            # RGB Denoise Logic
             # 1. Always denoise Luma with MONO model
             y_in, cb_in, cr_in = extract_luminance(result)
             y_denoised = y_in 
@@ -646,7 +645,7 @@ def process(params_file, raw_in, raw_out):
                     total = sum(1 for _ in split_chunks_rgb(result))
                     for idx, (ch, i, j) in enumerate(split_chunks_rgb(result), start=1):
                         y = _infer_rgb(sess_color, ch)
-                        # Saspro Logic: Do NOT blend RGB here. Get pure model output.
+                        # Do NOT blend RGB here. Get pure model output.
                         # We will extract chroma from this pure output and blend ONLY chroma later.
                         out_chunks.append((y, i, j))
                         if _every(idx, total, interval=10):
@@ -659,7 +658,7 @@ def process(params_file, raw_in, raw_out):
                     # Extract Chroma from the Denoised RGB
                     _, cb_den, cr_den = extract_luminance(rgb_denoised)
                     
-                    # Saspro Logic: Blend Chroma Channels Only
+                    # Blend Chroma Channels Only
                     # cb_final = (1-color_strength)*cb + color_strength*cbd
                     print(f"[Bridge] Blending Chroma channels with strength={dn_color:.2f}", flush=True)
                     cb_out = blend(cb_in, cb_den, dn_color)
@@ -678,7 +677,7 @@ def process(params_file, raw_in, raw_out):
         if os.path.exists(model_path):
             print(f"[Bridge] SuperRes {scale}x", flush=True)
             sess = ort.InferenceSession(model_path, sess_options=sess_opts, providers=providers)
-            # Process each channel separately (same as saspro)
+            # Process each channel separately
             out_channels = []
             for ch_idx in range(3):
                 plane = result[..., ch_idx]

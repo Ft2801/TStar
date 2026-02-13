@@ -402,7 +402,7 @@ bool StackingEngine::computeNormalization(StackingArgs& args) {
         args.progress(msg, pct);
         emit progressChanged(msg, pct);
         
-        // Log explicitly (throttled if needed, but user wants visibility)
+        // Log explicitly
         int current = static_cast<int>(pct * totalImages + 0.5);
         if (current > 0 && current <= totalImages) {
              // args.log is thread-safe (emits signal)

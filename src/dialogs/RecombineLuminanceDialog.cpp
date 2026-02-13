@@ -37,7 +37,6 @@ RecombineLuminanceDialog::RecombineLuminanceDialog(QWidget* parent) : DialogBase
     m_methodCombo->addItem(tr("Rec. 601"), (int)ChannelOps::LumaMethod::REC601);
     m_methodCombo->addItem(tr("Rec. 2020"), (int)ChannelOps::LumaMethod::REC2020);
     m_methodCombo->addItem(tr("Custom / Sensor"), (int)ChannelOps::LumaMethod::CUSTOM);
-    // Note: Recombine typically uses linear weightings. AVERAGE/MAX/MEDIAN are less common for "Color" component extraction but valid if user wants that basis.
     m_methodCombo->addItem(tr("Average"), (int)ChannelOps::LumaMethod::AVERAGE);
     methodLayout->addWidget(m_methodCombo);
     mainLayout->addLayout(methodLayout);

@@ -2471,7 +2471,7 @@ TRANSLATIONS = {
     "Registered %1 of %2 images successfully": {'it': 'Allineate %1 di %2 immagini con successo', 'es': 'Registradas %1 de %2 imágenes con éxito', 'fr': 'Alignement réussi pour %1 sur %2 images', 'de': '%1 von %2 Bildern erfolgreich registriert'},
     "Registering frames...": {'it': 'Allineamento frame...', 'es': 'Registrando tomas...', 'fr': 'Alignement des images...', 'de': 'Registriere Frames...'},
     "Registering image %1/%2": {'it': 'Allineamento immagine %1/%2', 'es': 'Registrando imagen %1/%2', 'fr': 'Alignement image %1/%2', 'de': 'Registriere Bild %1/%2'},
-    "Registration (Star Alignment)...": {'it': 'Allineamento (Stelle)...', 'es': 'Registro (Alineación Estelar)...', 'fr': 'Alignement (Étoiles)...', 'de': 'Registrierung (Sternausrichtung)...'},
+    "Registration (Star Alignment)...": {'it': 'Registrazione (allineamento stelle)...', 'es': 'Registro (Alineación Estelar)...', 'fr': 'Alignement (Étoiles)...', 'de': 'Registrierung (Sternausrichtung)...'},
     "Registration Parameters": {'it': 'Parametri Allineamento', 'es': 'Parámetros de Registro', 'fr': 'Paramètres d\'alignement', 'de': 'Registrierungsparameter'},
     "Registration complete": {'it': 'Allineamento completato', 'es': 'Registro completado', 'fr': 'Alignement terminé', 'de': 'Registrierung abgeschlossen'},
     "Rejection maps saved as %1_low.fit / %1_high.fit": {'it': 'Mappe di scarto salvate come %1_low.fit / %1_high.fit', 'es': 'Mapas de rechazo guardados como %1_low.fit / %1_high.fit', 'fr': 'Cartes de rejet enregistrées sous %1_low.fit / %1_high.fit', 'de': 'Rejection-Maps gespeichert als %1_low.fit / %1_high.fit'},

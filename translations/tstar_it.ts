@@ -3653,7 +3653,7 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
         <message>
             <source>Registration (Star Alignment)...</source>
-            <translation type="finished">Allineamento (Stelle)...</translation>
+            <translation type="finished">Registrazione (allineamento stelle)...</translation>
         </message>
         <message>
             <source>Remove Mask</source>
@@ -4146,10 +4146,6 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Estrazione modelli…</translation>
         </message>
         <message>
-            <source>Extracting… %1</source>
-            <translation type="finished">Estrazione… %1</translation>
-        </message>
-        <message>
             <source>Extraction complete.</source>
             <translation type="finished">Estrazione completata.</translation>
         </message>
@@ -4198,8 +4194,8 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Modelli scaricati e installati con successo.</translation>
         </message>
         <message>
-            <source>Models were downloaded but verification failed. The ZIP may not contain the expected model files.</source>
-            <translation type="finished">I modelli sono stati scaricati ma la verifica è fallita. Lo ZIP potrebbe non contenere i file attesi.</translation>
+            <source>Models extraction completed but verification failed - expected file 'deep_sharp_stellar_AI4.pth' not found. Files extracted: %1</source>
+            <translation type="unfinished" />
         </message>
         <message>
             <source>Primary failed. Trying backup (Google Drive)…</source>

@@ -4143,10 +4143,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Extracting… %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Extraction complete.</source>
             <translation type="unfinished" />
         </message>
@@ -4195,7 +4191,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Models were downloaded but verification failed. The ZIP may not contain the expected model files.</source>
+            <source>Models extraction completed but verification failed - expected file 'deep_sharp_stellar_AI4.pth' not found. Files extracted: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
