@@ -1,5 +1,6 @@
 #include "CosmicClarityRunner.h"
 #include "ImageBuffer.h"
+#include "network/ModelDownloader.h"
 #include <QSettings>
 #include <QProcess>
 #include <QFileInfo>
@@ -13,6 +14,9 @@
 #include <QStandardPaths>
 #include <QWaitCondition>
 #include <QMutex>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QOverload>
 
 // ============================================================================
 // CosmicClarityWorker Implementation
@@ -21,68 +25,37 @@
 CosmicClarityWorker::CosmicClarityWorker(QObject* parent) 
     : QObject(parent) {}
 
-QString CosmicClarityWorker::getCosmicFolder() {
-    QSettings s;
-    return s.value("paths/cosmic_clarity").toString();
-}
-
-QString CosmicClarityWorker::getExecutableName(CosmicClarityParams::Mode mode) {
-    if (mode == CosmicClarityParams::Mode_SuperRes) {
-#ifdef Q_OS_WIN
-        return "setiastrocosmicclarity_superres.exe";
-#else
-        return "setiastrocosmicclarity_superres";
-#endif
-    }
-    
-    bool isWin = false;
-#ifdef Q_OS_WIN
-    isWin = true;
-#endif
-
-    if (mode == CosmicClarityParams::Mode_Denoise) {
-        return isWin ? "SetiAstroCosmicClarity_denoise.exe" : "SetiAstroCosmicClarity_denoise";
-    }
-    
-    // Sharpen / Both modes use main executable
-    return isWin ? "SetiAstroCosmicClarity.exe" : "SetiAstroCosmicClarity";
-}
-
 void CosmicClarityWorker::process(const ImageBuffer& input, const CosmicClarityParams& params) {
     QString errorMsg;
     ImageBuffer output;
-    
+
     // Validate input
     if (input.data().empty()) {
         emit finished(output, "Input buffer is empty");
         return;
     }
-    
-    QString root = getCosmicFolder();
-    if (root.isEmpty() || !QDir(root).exists()) {
-        emit finished(output, "Cosmic Clarity folder not configured or not found. Please set it in Settings.");
+
+    // Use downloaded models directory instead of external executable folder
+    QString modelsRoot = ModelDownloader::cosmicClarityRoot();
+    if (modelsRoot.isEmpty() || !QDir(modelsRoot).exists()) {
+        emit finished(output, "Cosmic Clarity models not found. Please download them in Settings.");
         return;
     }
     m_stop = false;
 
-    QDir rootDir(root);
-    QDir inputDir(rootDir.filePath("input"));
-    QDir outputDir(rootDir.filePath("output"));
+    QDir modelsDir(modelsRoot);
+    QDir tempDir(modelsDir.filePath("temp_io"));
+    if (!tempDir.exists()) tempDir.mkpath(".");
 
     auto purge = [](QDir& d) {
         if (!d.exists()) return;
-        QFileInfoList list = d.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-        for (const auto& fi : list) QFile::remove(fi.absoluteFilePath());
+        for (const auto& fi : d.entryInfoList(QDir::Files | QDir::NoDotAndDotDot))
+            QFile::remove(fi.absoluteFilePath());
     };
+    purge(tempDir);
 
-    if (!inputDir.exists()) inputDir.mkpath(".");
-    if (!outputDir.exists()) outputDir.mkpath(".");
-    purge(inputDir);
-    purge(outputDir);
-
-    // Verify Python availability
+    // Find Python
     QString pythonExe;
-    
 #if defined(Q_OS_MAC)
     QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
     QString devPython = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
@@ -91,313 +64,180 @@ void CosmicClarityWorker::process(const ImageBuffer& input, const CosmicClarityP
     QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
 #endif
     QString foundPython = QStandardPaths::findExecutable("python3");
-    if (QFile::exists(bundledPython)) {
-        pythonExe = bundledPython;
-    } else if (QFile::exists(devPython)) {
-        pythonExe = devPython;
-    } else if (!foundPython.isEmpty()) {
-        pythonExe = foundPython;
-    } else {
-        pythonExe = "python3";
-    }
+    if (QFile::exists(bundledPython))       pythonExe = bundledPython;
+    else if (QFile::exists(devPython))      pythonExe = devPython;
+    else if (!foundPython.isEmpty())        pythonExe = foundPython;
+    else                                    pythonExe = "python3";
 
-    QProcess pythonCheck;
-    pythonCheck.start(pythonExe, QStringList() << "--version");
-    if (!pythonCheck.waitForFinished(5000)) {
-        emit finished(output, "Python version check timed out.");
-        return;
-    }
-    
-    if (pythonCheck.exitCode() != 0) {
-        emit finished(output, "Python interpreter failed to run (bundled python might be broken).");
-        return;
+    // Quick Python check
+    {
+        QProcess chk;
+        chk.start(pythonExe, QStringList() << "--version");
+        if (!chk.waitForFinished(5000) || chk.exitCode() != 0) {
+            emit finished(output, "Python interpreter not working.");
+            return;
+        }
     }
 
     // Find bridge script
-    QString bridgeScriptPath = QCoreApplication::applicationDirPath() + "/scripts/cosmic_bridge.py";
-    if (!QFile::exists(bridgeScriptPath)) {
-        bridgeScriptPath = QCoreApplication::applicationDirPath() + "/../Resources/scripts/cosmic_bridge.py";
-    }
-    if (!QFile::exists(bridgeScriptPath)) {
-        bridgeScriptPath = QCoreApplication::applicationDirPath() + "/../src/scripts/cosmic_bridge.py";
-    }
-    
-    if (!QFile::exists(bridgeScriptPath)) {
-        emit finished(output, "Bridge script not found.");
+    QString bridge = QCoreApplication::applicationDirPath() + "/scripts/cosmic_bridge.py";
+    if (!QFile::exists(bridge))
+        bridge = QCoreApplication::applicationDirPath() + "/../Resources/scripts/cosmic_bridge.py";
+    if (!QFile::exists(bridge))
+        bridge = QCoreApplication::applicationDirPath() + "/../src/scripts/cosmic_bridge.py";
+    if (!QFile::exists(bridge)) {
+        emit finished(output, "Bridge script (cosmic_bridge.py) not found.");
         return;
     }
 
-    // Helper to run process with cancellation and timeout
-    auto runProcess = [&](QProcess& p, int timeoutMs = 600000) -> bool {
-        p.start();
-        if (!p.waitForStarted()) {
-            errorMsg = "Failed to start process: " + p.program();
-            return false;
-        }
-        
-        // Wait loop with cancellation support
-        int elapsed = 0;
-        int interval = 100;
-        while (!p.waitForFinished(interval)) {
-            if (m_stop) {
-                p.kill();
-                p.waitForFinished();
-                errorMsg = "Process cancelled by user.";
-                return false;
-            }
-            elapsed += interval;
-            if (elapsed > timeoutMs) {
-                p.kill();
-                errorMsg = "Process timed out.";
-                return false;
-            }
-        }
-        
-        if (p.exitCode() != 0) {
-            QString errOut = p.readAllStandardError();
-            if (errOut.isEmpty()) errOut = p.readAllStandardOutput();
-            errorMsg = "Process failed: " + errOut;
-            return false;
-        }
-        return true;
-    };
+    // ---- Build parameters JSON ----
+    QJsonObject json;
+    if (params.mode == CosmicClarityParams::Mode_Sharpen)   json["mode"] = "sharpen";
+    else if (params.mode == CosmicClarityParams::Mode_Denoise)  json["mode"] = "denoise";
+    else if (params.mode == CosmicClarityParams::Mode_Both)     json["mode"] = "both";
+    else if (params.mode == CosmicClarityParams::Mode_SuperRes) json["mode"] = "superres";
 
-    // 1. Write Input to Raw Float
-    QString rawInputFile = inputDir.filePath("input.raw");
+    json["use_gpu"]         = params.useGpu;
+    json["sharpen_mode"]    = params.sharpenMode;
+    json["stellar_amount"]  = params.stellarAmount;
+    json["nonstellar_amount"] = params.nonStellarAmount;
+    json["nonstellar_psf"]  = params.nonStellarPSF;
+    json["auto_psf"]        = params.autoPSF;
+    json["separate_channels_sharpen"] = params.separateChannelsSharpen;
+
+    json["denoise_luma"]    = params.denoiseLum;
+    json["denoise_color"]   = params.denoiseColor;
+    json["denoise_mode"]    = params.denoiseMode;
+    json["separate_channels_denoise"] = params.separateChannelsDenoise;
+
+    int scale = 2;
+    if (params.scaleFactor.contains("3")) scale = 3;
+    if (params.scaleFactor.contains("4")) scale = 4;
+    json["scale"]    = scale;
+    json["width"]    = input.width();
+    json["height"]   = input.height();
+    json["channels"] = input.channels();
+    json["models_dir"] = modelsRoot;
+
+    QString paramsFile = tempDir.filePath("params.json");
     {
-        QFile raw(rawInputFile);
-        if (!raw.open(QIODevice::WriteOnly)) {
-            emit finished(output, "Failed to write raw input.");
+        QFile f(paramsFile);
+        if (!f.open(QIODevice::WriteOnly)) {
+            emit finished(output, "Failed to write params.json");
             return;
         }
-        raw.write((const char*)input.data().data(), input.data().size() * sizeof(float));
-        raw.close();
+        f.write(QJsonDocument(json).toJson());
+        f.close();
     }
 
-    // 2. Convert Raw to TIFF using Bridge
-    QString savedTiff = inputDir.filePath("image.tif");
+    // ---- Write raw input ----
+    QString rawIn = tempDir.filePath("input.raw");
     {
-        QStringList args;
-        args << bridgeScriptPath << "save" << savedTiff 
-             << QString::number(input.width()) << QString::number(input.height()) << QString::number(input.channels())
-             << rawInputFile;
-        
-        QProcess p;
-        p.setProgram(pythonExe);
-        p.setArguments(args);
-        
-        if (!runProcess(p, 60000)) {
-            emit finished(output, errorMsg);
+        QFile f(rawIn);
+        if (!f.open(QIODevice::WriteOnly)) {
+            emit finished(output, "Failed to write input.raw");
             return;
         }
-    }
-    emit processOutput("Input staged via Python Bridge: " + savedTiff);
-
-    // Determine Steps
-    struct Step {
-        CosmicClarityParams::Mode toolMode;
-        QString suffix;
-    };
-    QVector<Step> steps;
-
-    if (params.mode == CosmicClarityParams::Mode_SuperRes) {
-        QString sf = params.scaleFactor;
-        steps.append({CosmicClarityParams::Mode_SuperRes, "_upscaled" + sf.replace("x","")}); 
-    } else if (params.mode == CosmicClarityParams::Mode_Both) {
-        steps.append({CosmicClarityParams::Mode_Sharpen, "_sharpened"});
-        steps.append({CosmicClarityParams::Mode_Denoise, "_denoised"});
-    } else if (params.mode == CosmicClarityParams::Mode_Sharpen) {
-        steps.append({CosmicClarityParams::Mode_Sharpen, "_sharpened"});
-    } else if (params.mode == CosmicClarityParams::Mode_Denoise) {
-        steps.append({CosmicClarityParams::Mode_Denoise, "_denoised"});
+        f.write(reinterpret_cast<const char*>(input.data().data()),
+                input.data().size() * sizeof(float));
+        f.close();
     }
 
-    QString currentInputFile = savedTiff;
-    QString baseName = "image";
+    QString rawOut = tempDir.filePath("output.raw");
 
-    // Execute Steps
-    for (int i = 0; i < steps.size(); ++i) {
-        Step s = steps[i];
-        QString exeName = getExecutableName(s.toolMode);
-        QString exePath = rootDir.filePath(exeName);
-        
-        QStringList args;
-        if (s.toolMode == CosmicClarityParams::Mode_Sharpen) {
-            args << "--sharpening_mode" << params.sharpenMode;
-            args << "--stellar_amount" << QString::number(params.stellarAmount, 'f', 2);
-            args << "--nonstellar_strength" << QString::number(params.nonStellarPSF, 'f', 1);
-            args << "--nonstellar_amount" << QString::number(params.nonStellarAmount, 'f', 2);
-            if (params.separateChannelsSharpen) args << "--sharpen_channels_separately";
-            if (params.autoPSF) args << "--auto_detect_psf";
-        }
-        else if (s.toolMode == CosmicClarityParams::Mode_Denoise) {
-            args << "--denoise_strength" << QString::number(params.denoiseLum, 'f', 2);
-            args << "--color_denoise_strength" << QString::number(params.denoiseColor, 'f', 2);
-            args << "--denoise_mode" << params.denoiseMode;
-            if (params.separateChannelsDenoise) args << "--separate_channels";
-        }
-        else if (s.toolMode == CosmicClarityParams::Mode_SuperRes) {
-            int scale = 2;
-            if (params.scaleFactor.contains("3")) scale = 3;
-            if (params.scaleFactor.contains("4")) scale = 4;
-            args << "--input" << currentInputFile;
-            args << "--output_dir" << outputDir.absolutePath();
-            args << "--scale" << QString::number(scale);
-            args << "--model_dir" << root;
-        }
+    // ---- Launch bridge: process ----
+    emit processOutput("Launching Cosmic Clarity (ONNX)...");
 
-        if (s.toolMode != CosmicClarityParams::Mode_SuperRes && !params.useGpu) {
-            args << "--disable_gpu";
-        }
-
-        emit processOutput("Running: " + exeName);
-
-        QProcess process;
-        process.setProgram(exePath);
-        process.setArguments(args);
-        process.setWorkingDirectory(root);
-        
-        connect(&process, &QProcess::readyReadStandardOutput, [&process, this](){
-            QString txt = process.readAllStandardOutput();
-            if (!txt.isEmpty()) emit processOutput(txt.trimmed());
-        });
-        connect(&process, &QProcess::readyReadStandardError, [&process, this](){
-            QString txt = process.readAllStandardError();
-            if (!txt.isEmpty()) {
-                QString trimmed = txt.trimmed();
-                if (trimmed.contains("INFO") || trimmed.contains("Progress")) {
-                    emit processOutput(trimmed);
-                } else {
-                    emit processOutput("LOG: " + trimmed);
-                }
-            }
-        });
-
-        if (!runProcess(process, 600000)) {
-            purge(inputDir); 
-            purge(outputDir);
-            emit finished(output, errorMsg);
-            return;
-        }
-
-        // Determine Output
-        QString expectedOutput;
-        if (s.toolMode == CosmicClarityParams::Mode_SuperRes) {
-            int scale = 2;
-            if (params.scaleFactor.contains("3")) scale = 3;
-            if (params.scaleFactor.contains("4")) scale = 4;
-            QString suffix = QString("_upscaled%1").arg(scale);
-            QStringList filters; filters << baseName + suffix + ".*";
-            QFileInfoList found = outputDir.entryInfoList(filters, QDir::Files);
-            if (found.isEmpty()) { 
-                purge(inputDir); purge(outputDir);
-                emit finished(output, "SuperRes output not found.");
-                return;
-            }
-            expectedOutput = found.first().absoluteFilePath();
-        } else {
-            expectedOutput = outputDir.filePath(baseName + s.suffix + ".tif");
-            if (!QFile::exists(expectedOutput)) {
-                QStringList filters; filters << baseName + s.suffix + ".*";
-                QFileInfoList found = outputDir.entryInfoList(filters, QDir::Files);
-                if (!found.isEmpty()) expectedOutput = found.first().absoluteFilePath();
-                else { 
-                    purge(inputDir); purge(outputDir);
-                    emit finished(output, "Output file not found: " + baseName + s.suffix);
-                    return;
-                }
-            }
-        }
-
-        if (i < steps.size() - 1) {
-            // Chain: Rename output to input/image.tif
-            QFile::remove(savedTiff);
-            QFile::rename(expectedOutput, savedTiff);
-            emit processOutput("Chaining...");
-        } else {
-            // Load Results via Bridge
-            QString rawResult = outputDir.filePath("result.raw");
-            QStringList args;
-            args << bridgeScriptPath << "load" << expectedOutput << rawResult;
-            
-            QProcess p;
-            p.setProgram(pythonExe);
-            p.setArguments(args);
-            
-            if (!runProcess(p, 60000)) {
-                purge(inputDir); purge(outputDir);
-                emit finished(output, errorMsg);
-                return;
-            }
-            
-            QString outData = p.readAllStandardOutput().trimmed();
-            emit processOutput("Bridge Output:\n" + outData);
-
-            if (outData.contains("Error")) {
-                purge(inputDir); purge(outputDir);
-                emit finished(output, "Bridge error: " + outData);
-                return;
-            }
-
-            // Find the line starting with RESULT:
-            QString resultLine;
-            QStringList lines = outData.split('\n');
-            for (const QString& line : lines) {
-                if (line.trimmed().startsWith("RESULT:")) {
-                    resultLine = line.trimmed();
-                    break;
-                }
-            }
-
-            if (resultLine.isEmpty()) {
-                purge(inputDir); purge(outputDir);
-                emit finished(output, "Bridge failed to provide result marker: " + outData);
-                return;
-            }
-
-            QStringList parts = resultLine.mid(7).trimmed().split(QRegularExpression("\\s+"));
-            if (parts.size() < 3) {
-                purge(inputDir); purge(outputDir);
-                emit finished(output, "Bridge failed to parse dimensions: " + resultLine);
-                return;
-            }
-            
-            int w = parts[0].toInt();
-            int h = parts[1].toInt();
-            int c = parts[2].toInt();
-
-            if (w <= 0 || h <= 0) {
-                purge(inputDir); purge(outputDir);
-                emit finished(output, "Bridge returned invalid dimensions: " + resultLine);
-                return;
-            }
-            
-            QFile rawRes(rawResult);
-            if (rawRes.open(QIODevice::ReadOnly)) {
-                QByteArray blob = rawRes.readAll();
-                std::vector<float> data(blob.size()/4);
-                memcpy(data.data(), blob.constData(), blob.size());
-                
-                output.setData(w, h, c, data);
-                output.setMetadata(input.metadata());
-                emit processOutput(QString("Loaded via Bridge: %1x%2 %3ch").arg(w).arg(h).arg(c));
-            } else {
-                purge(inputDir); purge(outputDir);
-                emit finished(output, "Failed to read raw result.");
-                return;
-            }
-             
-            // Cleanup
-            QFile::remove(expectedOutput);
-            QFile::remove(rawResult);
-        }
-    }
+    QProcess proc;
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert("PYTHONUNBUFFERED", "1");  // Force Python line buffering in subprocess
+    proc.setProcessEnvironment(env);
     
-    QFile::remove(rawInputFile);
-    QFile::remove(savedTiff);
-    purge(inputDir);
-    purge(outputDir);
+    proc.setProgram(pythonExe);
+    proc.setArguments(QStringList() << bridge << "process" << paramsFile << rawIn << rawOut);
+    proc.setProcessChannelMode(QProcess::MergedChannels);
 
+    // Real-time stdout relay
+    connect(&proc, &QProcess::readyReadStandardOutput, [&proc, this]() {
+        QString txt = QString::fromUtf8(proc.readAllStandardOutput()).trimmed();
+        if (!txt.isEmpty()) emit processOutput(txt);
+    });
+
+    proc.start();
+    if (!proc.waitForStarted(10000)) {
+        emit finished(output, "Failed to start Python process.");
+        return;
+    }
+
+    // Poll for completion with cancel + timeout support
+    int elapsed = 0;
+    const int interval = 200;
+    const int timeoutMs = 20 * 60 * 1000;  // 20 min
+    while (!proc.waitForFinished(interval)) {
+        if (m_stop) {
+            proc.kill();
+            proc.waitForFinished(3000);
+            emit finished(output, "Cancelled.");
+            return;
+        }
+        elapsed += interval;
+        if (elapsed > timeoutMs) {
+            proc.kill();
+            proc.waitForFinished(3000);
+            emit finished(output, "Timed out.");
+            return;
+        }
+    }
+
+    // Grab any remaining output
+    {
+        QString tail = QString::fromUtf8(proc.readAllStandardOutput()).trimmed();
+        if (!tail.isEmpty()) emit processOutput(tail);
+    }
+
+    if (proc.exitCode() != 0) {
+        QString err = QString::fromUtf8(proc.readAllStandardError()).trimmed();
+        if (err.isEmpty()) err = "bridge exited with code " + QString::number(proc.exitCode());
+        emit finished(output, "Python error: " + err);
+        return;
+    }
+
+    // ---- Read result raw ----
+    if (!QFile::exists(rawOut)) {
+        emit finished(output, "Result file not found.");
+        return;
+    }
+
+    int outW = input.width();
+    int outH = input.height();
+    int outC = input.channels();
+    if (params.mode == CosmicClarityParams::Mode_SuperRes) {
+        outW *= scale;
+        outH *= scale;
+    }
+
+    QFile rawRes(rawOut);
+    if (!rawRes.open(QIODevice::ReadOnly)) {
+        emit finished(output, "Failed to read output.raw");
+        return;
+    }
+    qint64 expected = (qint64)outW * outH * outC * sizeof(float);
+    if (rawRes.size() != expected) {
+        emit finished(output, QString("Size mismatch: expected %1 got %2").arg(expected).arg(rawRes.size()));
+        return;
+    }
+    QByteArray blob = rawRes.readAll();
+    rawRes.close();
+
+    std::vector<float> data(blob.size() / sizeof(float));
+    memcpy(data.data(), blob.constData(), blob.size());
+    output.setData(outW, outH, outC, data);
+    output.setMetadata(input.metadata());
+
+    // Cleanup temp
+    purge(tempDir);
+
+    emit processOutput(QString("Done: %1x%2 %3ch").arg(outW).arg(outH).arg(outC));
     emit finished(output, "");  // Success
 }
 

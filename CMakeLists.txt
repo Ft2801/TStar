@@ -570,6 +570,8 @@ set(TSTAR_SOURCES
     # Network
     src/network/UpdateChecker.cpp
     src/network/UpdateChecker.h
+    src/network/ModelDownloader.cpp
+    src/network/ModelDownloader.h
     
     # Dialogs
     src/dialogs/UpdateDialog.cpp

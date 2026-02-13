@@ -27,7 +27,8 @@ int main(int argc, char *argv[])
 
     // Initialize logging system BEFORE QApplication
     // This ensures we capture any early errors
-    QCoreApplication::setOrganizationName("FabioTempera");
+    QCoreApplication::setOrganizationName("TStar");
+    QCoreApplication::setOrganizationDomain("tstar.app");
     QCoreApplication::setApplicationName("TStar");
     
     TStarApplication app(argc, argv);
@@ -59,7 +60,7 @@ int main(int argc, char *argv[])
     SplashScreen* splash = new SplashScreen(logoPath);
     
     // --- Load Translations ---
-    QSettings settings("FabioTempera", "TStar");
+    QSettings settings;
     QString lang = settings.value("general/language", "System").toString();
     
     QTranslator* translator = new QTranslator(&app);

@@ -49,8 +49,10 @@ $PythonExe = Join-Path $PYTHON_DIR "python.exe"
 & $PythonExe $GetPip --no-warn-script-location
 
 # 6. Install Dependencies
-Write-Host "Installing Libraries: numpy, tifffile, imagecodecs, astropy, onnxruntime..."
-& $PythonExe -m pip install numpy tifffile imagecodecs astropy onnxruntime --no-warn-script-location
+# NOTE: using onnxruntime-directml to support AMD/Intel/NVIDIA GPUs on Windows via DirectML.
+# Standard onnxruntime only supports CPU (and CUDA if specifically configured/built).
+Write-Host "Installing Libraries: numpy, tifffile, imagecodecs, astropy, onnxruntime-directml..."
+& $PythonExe -m pip install numpy tifffile imagecodecs astropy onnxruntime-directml --no-warn-script-location
 
 # Cleanup
 Remove-Item $GetPip -Force

@@ -47,8 +47,6 @@ signals:
     void processOutput(const QString& text);
 
 private:
-    QString getCosmicFolder();
-    QString getExecutableName(CosmicClarityParams::Mode mode);
     std::atomic<bool> m_stop{false};
 };
 

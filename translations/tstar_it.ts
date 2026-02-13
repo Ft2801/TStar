@@ -3048,20 +3048,20 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Ritaglia / Ruota</translation>
         </message>
         <message>
-            <source>Ctrl+0:</source>
-            <translation type="finished">Ctrl+0:</translation>
+            <source>Ctrl+0: fit to screen</source>
+            <translation type="finished">Ctrl+0: adatta allo schermo</translation>
         </message>
         <message>
-            <source>Ctrl+O:</source>
-            <translation type="finished">Ctrl+O:</translation>
+            <source>Ctrl+O: open image</source>
+            <translation type="finished">Ctrl+O: apri immagine</translation>
         </message>
         <message>
-            <source>Ctrl+S:</source>
-            <translation type="finished">Ctrl+S:</translation>
+            <source>Ctrl+S: save image</source>
+            <translation type="finished">Ctrl+S: salva immagine</translation>
         </message>
         <message>
-            <source>Ctrl+Z / Ctrl+Shift+Z:</source>
-            <translation type="finished">Ctrl+Z / Ctrl+Shift+Z:</translation>
+            <source>Ctrl+Z / Ctrl+Shift+Z: undo / redo</source>
+            <translation type="finished">Ctrl+Z / Ctrl+Maiusc+Z: annulla / ripeti</translation>
         </message>
         <message>
             <source>Curves Transformation</source>
@@ -3797,8 +3797,8 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Impostazioni applicate. Display aggiornato.</translation>
         </message>
         <message>
-            <source>Shift + draw a selection:</source>
-            <translation type="finished">Shift + disegna una selezione:</translation>
+            <source>Shift + draw a selection: create a new view</source>
+            <translation type="finished">Shift + disegna una selezione: crea una nuova vista</translation>
         </message>
         <message>
             <source>Shortcuts</source>
@@ -3814,7 +3814,7 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
         <message>
             <source>Stacking</source>
-            <translation type="finished">Media (Stacking)</translation>
+            <translation type="finished">Stacking</translation>
         </message>
         <message>
             <source>Stacking...</source>
@@ -3911,26 +3911,6 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Zoom Out</source>
             <translation type="finished">Zoom Indietro</translation>
-        </message>
-        <message>
-            <source>create a new view</source>
-            <translation type="finished">crea una nuova vista</translation>
-        </message>
-        <message>
-            <source>fit to screen</source>
-            <translation type="finished">adatta allo schermo</translation>
-        </message>
-        <message>
-            <source>open image</source>
-            <translation type="finished">apri immagine</translation>
-        </message>
-        <message>
-            <source>save image</source>
-            <translation type="finished">salva immagine</translation>
-        </message>
-        <message>
-            <source>undo / redo</source>
-            <translation type="finished">annulla / ripristina</translation>
         </message>
     </context>
     <context>
@@ -4121,6 +4101,109 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Master %1 dimensions (%2x%3) don't match target (%4x%5)</source>
             <translation type="finished">Dimensioni Master %1 (%2x%3) non corrispondono al target (%4x%5)</translation>
+        </message>
+    </context>
+    <context>
+        <name>ModelDownloader</name>
+        <message>
+            <source>All download sources failed. Please check your internet connection.</source>
+            <translation type="finished">Tutte le sorgenti di download sono fallite. Controlla la tua connessione internet.</translation>
+        </message>
+        <message>
+            <source>Connecting to GitHub mirror…</source>
+            <translation type="finished">Connessione al mirror GitHub…</translation>
+        </message>
+        <message>
+            <source>Connecting to Google Drive…</source>
+            <translation type="finished">Connessione a Google Drive…</translation>
+        </message>
+        <message>
+            <source>Download cancelled.</source>
+            <translation type="finished">Download annullato.</translation>
+        </message>
+        <message>
+            <source>Download complete.</source>
+            <translation type="finished">Download completato.</translation>
+        </message>
+        <message>
+            <source>Downloading from primary (Google Drive)…</source>
+            <translation type="finished">Download dalla sorgente primaria (Google Drive)…</translation>
+        </message>
+        <message>
+            <source>Downloading… %1 MB</source>
+            <translation type="finished">Download in corso… %1 MB</translation>
+        </message>
+        <message>
+            <source>Downloading… %1%</source>
+            <translation type="finished">Download in corso… %1%</translation>
+        </message>
+        <message>
+            <source>Downloading… 0%</source>
+            <translation type="finished">Download… 0%</translation>
+        </message>
+        <message>
+            <source>Extracting models…</source>
+            <translation type="finished">Estrazione modelli…</translation>
+        </message>
+        <message>
+            <source>Extracting… %1</source>
+            <translation type="finished">Estrazione… %1</translation>
+        </message>
+        <message>
+            <source>Extraction complete.</source>
+            <translation type="finished">Estrazione completata.</translation>
+        </message>
+        <message>
+            <source>Extraction failed: %1</source>
+            <translation type="finished">Estrazione fallita: %1</translation>
+        </message>
+        <message>
+            <source>Extraction timed out.</source>
+            <translation type="finished">Tempo scaduto per l'estrazione.</translation>
+        </message>
+        <message>
+            <source>Failed to extract models ZIP.</source>
+            <translation type="finished">Impossibile estrarre lo ZIP dei modelli.</translation>
+        </message>
+        <message>
+            <source>Finalizing installation…</source>
+            <translation type="finished">Finalizzazione installazione…</translation>
+        </message>
+        <message>
+            <source>GitHub mirror download failed or timed out.</source>
+            <translation type="finished">Download da mirror GitHub fallito o timeout.</translation>
+        </message>
+        <message>
+            <source>Google Drive confirmation failed, trying GitHub mirror…</source>
+            <translation type="finished">Conferma Google Drive fallita, provo mirror GitHub…</translation>
+        </message>
+        <message>
+            <source>Google Drive failed. Trying GitHub mirror…</source>
+            <translation type="finished">Google Drive è fallito. Provo il mirror di GitHub…</translation>
+        </message>
+        <message>
+            <source>Google Drive form parsing failed, trying GitHub mirror…</source>
+            <translation type="finished">Parsing modulo Google Drive fallito, provo mirror GitHub…</translation>
+        </message>
+        <message>
+            <source>Google Drive interstitial detected — confirming…</source>
+            <translation type="finished">Interstiziale Google Drive rilevato — conferma…</translation>
+        </message>
+        <message>
+            <source>Installing models…</source>
+            <translation type="finished">Installazione modelli…</translation>
+        </message>
+        <message>
+            <source>Models downloaded and installed successfully.</source>
+            <translation type="finished">Modelli scaricati e installati con successo.</translation>
+        </message>
+        <message>
+            <source>Models were downloaded but verification failed. The ZIP may not contain the expected model files.</source>
+            <translation type="finished">I modelli sono stati scaricati ma la verifica è fallita. Lo ZIP potrebbe non contenere i file attesi.</translation>
+        </message>
+        <message>
+            <source>Primary failed. Trying backup (Google Drive)…</source>
+            <translation type="finished">Sorgente primaria fallita. Provo il backup (Google Drive)…</translation>
         </message>
     </context>
     <context>
@@ -5914,20 +5997,44 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Sfoglia...</translation>
         </message>
         <message>
+            <source>Cancel</source>
+            <translation type="finished">Annulla</translation>
+        </message>
+        <message>
             <source>Check for updates on startup</source>
             <translation type="finished">Controlla aggiornamenti all'avvio</translation>
         </message>
         <message>
-            <source>Cosmic Clarity Folder:</source>
-            <translation type="finished">Cosmic Clarity Folder:</translation>
+            <source>Cosmic Clarity models</source>
+            <translation type="finished">Modelli Cosmic Clarity</translation>
+        </message>
+        <message>
+            <source>Cosmic Clarity models: installed</source>
+            <translation type="finished">Modelli Cosmic Clarity: installati</translation>
+        </message>
+        <message>
+            <source>Cosmic Clarity models: not installed</source>
+            <translation type="finished">Modelli Cosmic Clarity: non installati</translation>
         </message>
         <message>
             <source>Display</source>
             <translation type="finished">Visualizzazione</translation>
         </message>
         <message>
+            <source>Download latest Cosmic Clarity models</source>
+            <translation type="finished">Scarica ultimi modelli cosmic clarity</translation>
+        </message>
+        <message>
+            <source>Downloading Cosmic Clarity models...</source>
+            <translation type="finished">Download modelli Cosmic Clarity...</translation>
+        </message>
+        <message>
             <source>Executables (*.exe);;All Files (*)</source>
             <translation type="finished">Eseguibili (*.exe);;Tutti i file (*)</translation>
+        </message>
+        <message>
+            <source>Failed to download models: %1</source>
+            <translation type="finished">Download modelli fallito: %1</translation>
         </message>
         <message>
             <source>General</source>
@@ -5942,6 +6049,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Lingua:</translation>
         </message>
         <message>
+            <source>Models downloaded and installed successfully.</source>
+            <translation type="finished">Modelli scaricati e installati con successo.</translation>
+        </message>
+        <message>
             <source>Paths and Integrations</source>
             <translation type="finished">Percorsi e Integrazioni</translation>
         </message>
@@ -5950,12 +6061,12 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Riavvia l'applicazione affinché le modifiche alla lingua abbiano effetto.</translation>
         </message>
         <message>
-            <source>Restart Required</source>
-            <translation type="finished">Riavvio Richiesto</translation>
+            <source>Preparing…</source>
+            <translation type="finished">Preparazione…</translation>
         </message>
         <message>
-            <source>Select Cosmic Clarity Folder</source>
-            <translation type="finished">Seleziona Cartella Cosmic Clarity</translation>
+            <source>Restart Required</source>
+            <translation type="finished">Riavvio Richiesto</translation>
         </message>
         <message>
             <source>Select GraXpert Executable</source>

@@ -23,6 +23,7 @@
 #include <QIcon>
 #include <QCoreApplication>
 #include <QLibrary>
+#include <QCloseEvent>
 
 // Helper to detect best GPU provider
 static QString detectBestProvider() {
@@ -122,9 +123,28 @@ RARDialog::RARDialog(QWidget* parent) : DialogBase(parent, tr("Aberration Remove
     layout->addLayout(btnLayout);
 }
 
+void RARDialog::saveSettings() {
+    QSettings s;
+    if (!m_editModelPath->text().isEmpty()) {
+        s.setValue("RAR/lastModel", m_editModelPath->text());
+    }
+    s.setValue("RAR/lastProvider", m_comboProvider->currentText());
+    s.setValue("RAR/patchSize", m_spinPatch->value());
+    s.setValue("RAR/overlap", m_spinOverlap->value());
+    s.sync(); // Ensure settings are written to disk
+}
+
+void RARDialog::closeEvent(QCloseEvent* event) {
+    saveSettings();
+    DialogBase::closeEvent(event);
+}
+
 void RARDialog::onBrowseModel() {
     QString path = QFileDialog::getOpenFileName(this, tr("Select ONNX Model"), "", tr("ONNX Models (*.onnx)"));
-    if (!path.isEmpty()) m_editModelPath->setText(path);
+    if (!path.isEmpty()) {
+        m_editModelPath->setText(path);
+        saveSettings();
+    }
 }
 
 void RARDialog::onDownloadModel() {
@@ -200,6 +220,8 @@ void RARDialog::onDownloadModel() {
                 f.write(dlReply->readAll());
                 f.close();
                 m_editModelPath->setText(destPath);
+                QSettings s;
+                s.setValue("RAR/lastModel", destPath);
                 m_lblStatus->setText(tr("Download Complete."));
                 QMessageBox::information(this, tr("Success"), tr("Model downloaded to:\n%1").arg(destPath));
             } else {
@@ -219,9 +241,7 @@ void RARDialog::onRun() {
          return;
     }
     
-    QSettings s;
-    s.setValue("RAR/lastModel", m_editModelPath->text());
-    s.setValue("RAR/lastProvider", m_comboProvider->currentText());
+    saveSettings();
 
     RARParams params;
     params.modelPath = m_editModelPath->text();

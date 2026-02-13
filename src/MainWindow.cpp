@@ -215,13 +215,44 @@ MainWindow::MainWindow(QWidget *parent)
             
             QFontMetrics fm(font);
             int tw = fm.horizontalAdvance(text);
-            // int th = fm.height(); // Unused
             
             // Position: Bottom Right with padding
             int px = w - tw - 30;
             int py = h - 20; // Baseline
             
             p.drawText(px, py, text);
+            p.restore();
+
+            // 3b. Top-Left Shortcuts (same layer as painting, below widget overlays)
+            p.save();
+            p.setFont(QFont("Segoe UI, sans-serif", 14));
+            p.setPen(QColor(136, 136, 136)); // #888
+            int sx = 25, sy = 35;
+            int lineHeight = 18;
+            
+            // "Shortcuts" title
+            QFont titleFont("Segoe UI, sans-serif", 14);
+            titleFont.setBold(true);
+            p.setFont(titleFont);
+            p.drawText(sx, sy, QCoreApplication::translate("MainWindow", "Shortcuts"));
+            sy += lineHeight;
+            
+            // Keyboard shortcuts list - Pre-composed for proper lupdate extraction
+            p.setFont(QFont("Segoe UI, sans-serif", 12));
+            p.setPen(QColor(136, 136, 136));
+            
+            // Pre-compose shortcuts as translatable constants
+            QString sc1 = QCoreApplication::translate("MainWindow", "Ctrl+O: open image");
+            QString sc2 = QCoreApplication::translate("MainWindow", "Ctrl+S: save image");
+            QString sc3 = QCoreApplication::translate("MainWindow", "Shift + draw a selection: create a new view");
+            QString sc4 = QCoreApplication::translate("MainWindow", "Ctrl+Z / Ctrl+Shift+Z: undo / redo");
+            QString sc5 = QCoreApplication::translate("MainWindow", "Ctrl+0: fit to screen");
+            
+            QStringList shortcuts = { sc1, sc2, sc3, sc4, sc5 };
+            for (const auto& sc : shortcuts) {
+                p.drawText(sx, sy, sc);
+                sy += lineHeight;
+            }
             p.restore();
 
             // 4. Draw Subwindows (handled by QMdiArea basic painting if we don't call base?)
@@ -241,22 +272,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_mdiArea->setOption(QMdiArea::DontMaximizeSubWindowOnActivation, true);
     mainLayout->addWidget(m_mdiArea);
     
-    // Shortcut Overlay (Top-Left)
-    QLabel* shortcutOverlay = new QLabel(m_mdiArea);
-    shortcutOverlay->setTextFormat(Qt::RichText);
-    shortcutOverlay->setText(
-        "<div style='color: #888; font-family: Segoe UI, sans-serif; font-size: 14px; line-height: 1.4;'>"
-        "<b>" + tr("Shortcuts") + "</b><br/>"
-        "<span style='color: #888; font-weight: bold;'>" + tr("Ctrl+O:") + "</span> " + tr("open image") + "<br/>"
-        "<span style='color: #888; font-weight: bold;'>" + tr("Ctrl+S:") + "</span> " + tr("save image") + "<br/>"
-        "<span style='color: #888; font-weight: bold;'>" + tr("Shift + draw a selection:") + "</span> " + tr("create a new view") + "<br/>"
-        "<span style='color: #888; font-weight: bold;'>" + tr("Ctrl+Z / Ctrl+Shift+Z:") + "</span> " + tr("undo / redo") + "<br/>"
-        "<span style='color: #888; font-weight: bold;'>" + tr("Ctrl+0:") + "</span> " + tr("fit to screen") +
-        "</div>"
-    );
-    shortcutOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
-    shortcutOverlay->move(25, 15);
-    shortcutOverlay->adjustSize();
+    // NOTE: Shortcuts are now drawn in TStarMdiArea::paintEvent() at the same layer as TStar text and SVG
+    // Removed QLabel overlay to fix z-order issues
     
     // 3. Resource Monitor (Status Bar, bottom-right)
     auto* resMonitor = new ResourceMonitorWidget(this);
@@ -298,9 +315,6 @@ MainWindow::MainWindow(QWidget *parent)
     // -- Header Panel --
     m_headerPanel = new HeaderPanel();
     m_sidebar->addPanel(tr("Header"), ":/images/header_icon.png", m_headerPanel);
-
-    // Tools move to Toolbar "Process" menu. 
-    // Console and Header remain in Sidebar.
 
     // === TIMER SETUP IN CONSTRUCTOR ===
     m_tempConsoleTimer = new QTimer(this);

@@ -230,6 +230,8 @@ TRANSLATIONS = {
     "Ctrl+O:": {'it': 'Ctrl+O:', 'es': 'Ctrl+O:', 'fr': 'Ctrl+O:', 'de': 'Strg+O:'},
     "Ctrl+S:": {'it': 'Ctrl+S:', 'es': 'Ctrl+S:', 'fr': 'Ctrl+S:', 'de': 'Strg+S:'},
     "Shift + draw a selection:": {'it': 'Shift + disegna una selezione:', 'es': 'Shift + dibujar una selección:', 'fr': 'Shift + dessiner une sélection:', 'de': 'Shift + Auswahl zeichnen:'},
+
+    "Shift + draw a selection: create a new view": {'it': 'Shift + disegna una selezione: crea una nuova vista', 'es': 'Shift + dibujar una selección: crear una nueva vista', 'fr': 'Shift + dessiner une sélection: créer une nouvelle vue', 'de': 'Shift + Auswahl zeichnen: Neue Ansicht erstellen'},
     "create a new view": {'it': 'crea una nuova vista', 'es': 'crear una nueva vista', 'fr': 'créer une nouvelle vue', 'de': 'Neue Ansicht erstellen'},
     "Ctrl+Z / Ctrl+Shift+Z:": {'it': 'Ctrl+Z / Ctrl+Shift+Z:', 'es': 'Ctrl+Z / Ctrl+Shift+Z:', 'fr': 'Ctrl+Z / Ctrl+Shift+Z:', 'de': 'Strg+Z / Strg+Shift+Z:'},
     "Ctrl+0:": {'it': 'Ctrl+0:', 'es': 'Ctrl+0:', 'fr': 'Ctrl+0:', 'de': 'Strg+0:'},
@@ -240,7 +242,7 @@ TRANSLATIONS = {
     "Detecting all stars...": {'it': 'Rilevamento di tutte le stelle...', 'es': 'Detectando todas las estrellas...', 'fr': 'Détection de toutes les étoiles...', 'de': 'Alle Sterne werden erkannt...'},
     "Reset to Defaults": {'it': 'Ripristina Predefiniti', 'es': 'Restablecer valores predeterminados', 'fr': 'Réinitialiser aux valeurs par défaut', 'de': 'Auf Standardwerte zurücksetzen'},
     "−": {'it': '−', 'es': '−', 'fr': '−', 'de': '−'},
-    "Stacking": {'it': 'Media (Stacking)', 'es': 'Apilado', 'fr': 'Empilement', 'de': 'Stacking'},
+    "Stacking": {'it': 'Stacking', 'es': 'Apilado', 'fr': 'Empilement', 'de': 'Stacking'},
 
     "About TStar": {'it': 'Informazioni su TStar', 'es': 'Acerca de TStar', 'fr': 'À propos de TStar', 'de': 'Über TStar'},
     "Help & Tutorial": {'it': 'Aiuto e Tutorial', 'es': 'Ayuda y Tutoriales', 'fr': 'Aide et Tutoriels', 'de': 'Hilfe und Tutorial'},
@@ -370,6 +372,14 @@ TRANSLATIONS = {
     "Could not save model file.": {'it': 'Impossibile salvare file modello.', 'es': 'No se pudo guardar archivo modelo.', 'fr': 'Impossible de sauvegarder fichier modèle.', 'de': 'Konnte Modelldatei nicht speichern.'},
 
     "Could not seek to IFD.": {'it': 'Impossibile raggiungere IFD.', 'es': 'No se pudo buscar IFD.', 'fr': "Impossible d'atteindre IFD.", 'de': 'Konnte IFD nicht suchen.'},
+
+    "Ctrl+0: fit to screen": {'it': 'Ctrl+0: adatta allo schermo', 'es': 'Ctrl+0: ajustar a la pantalla', 'fr': "Ctrl+0: adapter à l'écran", 'de': 'Ctrl+0: An Bildschirm anpassen'},
+
+    "Ctrl+O: open image": {'it': 'Ctrl+O: apri immagine', 'es': 'Ctrl+O: abrir imagen', 'fr': 'Ctrl+O: ouvrir image', 'de': 'Ctrl+O: Bild öffnen'},
+
+    "Ctrl+S: save image": {'it': 'Ctrl+S: salva immagine', 'es': 'Ctrl+S: guardar imagen', 'fr': 'Ctrl+S: enregistrer image', 'de': 'Ctrl+S: Bild speichern'},
+
+    "Ctrl+Z / Ctrl+Shift+Z: undo / redo": {'it': 'Ctrl+Z / Ctrl+Maiusc+Z: annulla / ripeti', 'es': 'Ctrl+Z / Ctrl+Mayus+Z: deshacer / rehacer', 'fr': 'Ctrl+Z / Ctrl+Maj+Z: annuler / refaire', 'de': 'Ctrl+Z / Ctrl+Umschalt+Z: rückgängig / wiederherstellen'},
 
     "Create Mask...": {'it': 'Crea Maschera...', 'es': 'Crear Máscara...', 'fr': 'Créer un Masque...', 'de': 'Maske erstellen...'},
 
@@ -2629,4 +2639,40 @@ TRANSLATIONS = {
     "The selected directory is not empty.\\nCreate project structure anyway?": {'it': 'La cartella selezionata non è vuota.\\nCreare comunque la struttura del progetto?', 'es': 'El directorio seleccionado no está vacío.\\n¿Crear estructura del proyecto de todos modos?', 'fr': 'Le dossier sélectionné n\'est pas vide.\\nCréer la structure du projet quand même ?', 'de': 'Das gewählte Verzeichnis ist nicht leer.\\nProjektstruktur trotzdem erstellen?'},
     "<span style='color:red'> ✗ Failed</span>": {'it': "<span style='color:red'> ✗ Fallito</span>", 'es': "<span style='color:red'> ✗ Fallido</span>", 'fr': "<span style='color:red'> ✗ Échec</span>", 'de': "<span style='color:red'> ✗ Fehlgeschlagen</span>"},
     "File open failed: %1": {'it': 'Apertura file fallita: %1', 'es': 'Fallo apertura archivo: %1', 'fr': 'Échec ouverture fichier : %1', 'de': 'Dateiöffnung fehlgeschlagen: %1'},
+
+    "Cosmic Clarity models": {'it': 'Modelli Cosmic Clarity', 'es': 'Modelos Cosmic Clarity', 'fr': 'Modèles Cosmic Clarity', 'de': 'Cosmic Clarity modelle'},
+    "Download latest Cosmic Clarity models": {'it': 'Scarica ultimi modelli cosmic clarity', 'es': 'Descargar últimos modelos Cosmic Clarity', 'fr': 'Télécharger les derniers modèles Cosmic Clarity', 'de': 'Neueste Cosmic Clarity modelle herunterladen'},
+    "Cosmic Clarity models: installed": {'it': 'Modelli Cosmic Clarity: installati', 'es': 'Modelos Cosmic Clarity: instalados', 'fr': 'Modèles Cosmic Clarity : installés', 'de': 'Cosmic Clarity modelle: installiert'},
+    "Cosmic Clarity models: not installed": {'it': 'Modelli Cosmic Clarity: non installati', 'es': 'Modelos Cosmic Clarity: no instalados', 'fr': 'Modèles Cosmic Clarity : non installés', 'de': 'Cosmic Clarity modelle: nicht installiert'},
+    "Downloading Cosmic Clarity models...": {'it': 'Download modelli Cosmic Clarity...', 'es': 'Descargando modelos Cosmic Clarity...', 'fr': 'Téléchargement des Modèles Cosmic Clarity...', 'de': 'Cosmic Clarity modelle werden heruntergeladen...'},
+    "Models downloaded and installed successfully.": {'it': 'Modelli scaricati e installati con successo.', 'es': 'Modelos descargados e instalados con éxito.', 'fr': 'Modèles téléchargés et installés avec succès.', 'de': 'Modelle erfolgreich heruntergeladen und installiert.'},
+    "Failed to download models: %1": {'it': 'Download modelli fallito: %1', 'es': 'Fallo al descargar modelos: %1', 'fr': 'Échec du téléchargement des modèles : %1', 'de': 'Herunterladen der modelle fehlgeschlagen: %1'},
+
+    "All download sources failed. Please check your internet connection.": {'it': 'Tutte le sorgenti di download sono fallite. Controlla la tua connessione internet.', 'es': 'Todas las fuentes de descarga fallaron. Por favor, comprueba tu conexión a internet.', 'fr': 'Toutes les sources de téléchargement ont échoué. Veuillez vérifier votre connexion internet.', 'de': 'Alle Download-Quellen sind fehlgeschlagen. Bitte überprüfen Sie Ihre Internetverbindung.'},
+    "Connecting to GitHub mirror…": {'it': 'Connessione al mirror GitHub…', 'es': 'Conectando con el mirror de GitHub…', 'fr': 'Connexion au miroir GitHub…', 'de': 'Verbindung zum GitHub-Mirror wird hergestellt…'},
+    "Connecting to Google Drive…": {'it': 'Connessione a Google Drive…', 'es': 'Conectando con Google Drive…', 'fr': 'Connexion à Google Drive…', 'de': 'Verbindung zu Google Drive wird hergestellt…'},
+    "Download cancelled.": {'it': 'Download annullato.', 'es': 'Descarga cancelada.', 'fr': 'Téléchargement annulé.', 'de': 'Download abgebrochen.'},
+    "Download complete.": {'it': 'Download completato.', 'es': 'Descarga completada.', 'fr': 'Téléchargement terminé.', 'de': 'Download abgeschlossen.'},
+    "Downloading from primary (Google Drive)…": {'it': 'Download dalla sorgente primaria (Google Drive)…', 'es': 'Descargando de la fuente primaria (Google Drive)…', 'fr': 'Téléchargement depuis la source primaire (Google Drive)…', 'de': 'Download von der primären Quelle (Google Drive)…'},
+    "Downloading… %1 MB": {'it': 'Download in corso… %1 MB', 'es': 'Descargando… %1 MB', 'fr': 'Téléchargement… %1 Mo', 'de': 'Download… %1 MB'},
+    "Downloading… 0%": {'it': 'Download… 0%', 'es': 'Descargando… 0%', 'fr': 'Téléchargement… 0%', 'de': 'Download… 0%'},
+    "Downloading… %1%": {'it': 'Download in corso… %1%', 'es': 'Descargando… %1%', 'fr': 'Téléchargement… %1%', 'de': 'Download… %1%'},
+    "Extracting… %1": {'it': 'Estrazione… %1', 'es': 'Extrayendo… %1', 'fr': 'Extraction… %1', 'de': 'Extraktion… %1'},
+    "Extracting models…": {'it': 'Estrazione modelli…', 'es': 'Extrayendo modelos…', 'fr': 'Extraction des modèles…', 'de': 'Modelle werden extrahiert…'},
+    "Extraction complete.": {'it': 'Estrazione completata.', 'es': 'Extracción completada.', 'fr': 'Extraction terminée.', 'de': 'Extraktion abgeschlossen.'},
+    "Extraction failed: %1": {'it': 'Estrazione fallita: %1', 'es': 'Extracción fallida: %1', 'fr': "Échec de l'extraction : %1", 'de': 'Extraktion fehlgeschlagen: %1'},
+    "Extraction timed out.": {'it': "Tempo scaduto per l'estrazione.", 'es': 'Tiempo de extracción agotado.', 'fr': "Délai d'extraction dépassé.", 'de': 'Zeitüberschreitung bei der Extraktion.'},
+    "Finalizing installation…": {'it': 'Finalizzazione installazione…', 'es': 'Finalizando la instalación…', 'fr': 'Finalisation de l\'installation…', 'de': 'Installation wird abgeschlossen…'},
+    "Failed to extract models ZIP.": {'it': 'Impossibile estrarre lo ZIP dei modelli.', 'es': 'Fallo al extraer el ZIP de los modelos.', 'fr': "Échec de l'extraction du ZIP des modèles.", 'de': 'Modell-ZIP konnte nicht extrahiert werden.'},
+    "GitHub mirror download failed or timed out.": {'it': 'Download da mirror GitHub fallito o timeout.', 'es': 'Descarga del mirror GitHub falló o tiempo agotado.', 'fr': 'Téléchargement du miroir GitHub échoué ou délai dépassé.', 'de': 'Download vom GitHub-Mirror fehlgeschlagen oder Zeitüberschreitung.'},
+    "Google Drive confirmation failed, trying GitHub mirror…": {'it': 'Conferma Google Drive fallita, provo mirror GitHub…', 'es': 'Confirmación de Google Drive falló, probando mirror GitHub…', 'fr': 'Confirmation Google Drive échouée, essai du miroir GitHub…', 'de': 'Google Drive Bestätigung fehlgeschlagen, GitHub-Mirror wird versucht…'},
+    "Google Drive form parsing failed, trying GitHub mirror…": {'it': 'Parsing modulo Google Drive fallito, provo mirror GitHub…', 'es': 'Análisis del formulario de Google Drive falló, probando mirror GitHub…', 'fr': 'Analyse du formulaire Google Drive échouée, essai du miroir GitHub…', 'de': 'Google Drive Formularanalyse fehlgeschlagen, GitHub-Mirror wird versucht…'},
+    "Google Drive failed. Trying GitHub mirror…": {'it': 'Google Drive è fallito. Provo il mirror di GitHub…', 'es': 'Fallo en Google Drive. Probando el mirror de GitHub…', 'fr': 'Échec de Google Drive. Essai du miroir GitHub…', 'de': 'Google Drive fehlgeschlagen. GitHub-Mirror wird versucht…'},
+    "Google Drive interstitial detected — confirming…": {'it': 'Interstiziale Google Drive rilevato — conferma…', 'es': 'Intersticial de Google Drive detectado — confirmando…', 'fr': 'Interstitiel Google Drive détecté — confirmation…', 'de': 'Google Drive Interstitial erkannt — Bestätigung…'},
+    "Google Drive interstitial detected — confirming download…": {'it': 'Interstiziale Google Drive rilevato — conferma download…', 'es': 'Intersticial de Google Drive detectado — confirmando descarga…', 'fr': 'Interstitiel Google Drive détecté — confirmation du téléchargement…', 'de': 'Google Drive Interstitial erkannt — Download wird bestätigt…'},
+    "HTTP download failed: %1": {'it': 'Download HTTP fallito: %1', 'es': 'Fallo en la descarga HTTP: %1', 'fr': 'Échec du téléchargement HTTP : %1', 'de': 'HTTP-Download fehlgeschlagen: %1'},
+    "Installing models…": {'it': 'Installazione modelli…', 'es': 'Instalando modelos…', 'fr': 'Installation des modèles…', 'de': 'Modelle werden installiert…'},
+    "Models were downloaded but verification failed. The ZIP may not contain the expected model files.": {'it': 'I modelli sono stati scaricati ma la verifica è fallita. Lo ZIP potrebbe non contenere i file attesi.', 'es': 'Los modelos se descargaron pero la verificación falló. El ZIP puede no contener los archivos esperados.', 'fr': 'Les modèles ont été téléchargés mais la vérification a échoué. Le ZIP peut ne pas contenir les fichiers attendus.', 'de': 'Modelle wurden heruntergeladen, aber die Überprüfung ist fehlgeschlagen. Das ZIP enthält möglicherweise nicht die erwarteten Dateien.'},
+    "Primary failed. Trying backup (Google Drive)…": {'it': 'Sorgente primaria fallita. Provo il backup (Google Drive)…', 'es': 'Fallo en la fuente primaria. Probando el backup (Google Drive)…', 'fr': 'La source primaire a échoué. Essai de la sauvegarde (Google Drive)…', 'de': 'Primäre Quelle fehlgeschlagen. Backup (Google Drive) wird versucht…'},
+    "Preparing…": {'it': 'Preparazione…', 'es': 'Preparando…', 'fr': 'Préparation…', 'de': 'Vorbereitung…'},
 }

@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QFileDialog>
 #include <QComboBox>
+#include <QPushButton>
 
 #include "DialogBase.h"
 
@@ -17,23 +18,26 @@ public:
 
 public slots:
     void pickGraXpertPath();
-    void pickCosmicClarityPath();
     void pickStarNetPath();
+    // void pickCosmicClarityEnginePath(); // Removed
+    void downloadModels();
     void saveSettings();
 
 signals:
     void settingsChanged();
 
 private:
+    void refreshModelsStatus();
+
     QSettings m_settings;
     QLineEdit* m_graxpertPath;
-    QLineEdit* m_cosmicClarityPath;
     QLineEdit* m_starnetPath;
+    // QLineEdit* m_cosmicClarityEnginePath; // Removed
     QComboBox* m_langCombo;
     class QCheckBox* m_checkUpdates;
     class QCheckBox* m_24bitStfCheck;
+    QPushButton* m_btnDownloadModels;
+    QLabel* m_lblModelsStatus;
 };
 
 #endif // SETTINGSDIALOG_H
-
-

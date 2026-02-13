@@ -8,6 +8,9 @@ Version 1.6.0
 - Added coordinate/RGB display on mouse over
 - Updated ABE tool, now keeps the darkest background value
 - Updated background with shortcuts, an illustration and app name
+- New version of Cosmic Clarity available
+- Now you can directly download Cosmic Clarity models from the settings dialog
+- Integrated AMD/Intel GPUs now correctly work when using AI models
 - Darker overall theme
 - Added personal links in the info section
 - Added some missing translations

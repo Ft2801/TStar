@@ -3048,20 +3048,20 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Rogner / Pivoter</translation>
         </message>
         <message>
-            <source>Ctrl+0:</source>
-            <translation type="finished">Ctrl+0:</translation>
+            <source>Ctrl+0: fit to screen</source>
+            <translation type="finished">Ctrl+0: adapter à l'écran</translation>
         </message>
         <message>
-            <source>Ctrl+O:</source>
-            <translation type="finished">Ctrl+O:</translation>
+            <source>Ctrl+O: open image</source>
+            <translation type="finished">Ctrl+O: ouvrir image</translation>
         </message>
         <message>
-            <source>Ctrl+S:</source>
-            <translation type="finished">Ctrl+S:</translation>
+            <source>Ctrl+S: save image</source>
+            <translation type="finished">Ctrl+S: enregistrer image</translation>
         </message>
         <message>
-            <source>Ctrl+Z / Ctrl+Shift+Z:</source>
-            <translation type="finished">Ctrl+Z / Ctrl+Shift+Z:</translation>
+            <source>Ctrl+Z / Ctrl+Shift+Z: undo / redo</source>
+            <translation type="finished">Ctrl+Z / Ctrl+Maj+Z: annuler / refaire</translation>
         </message>
         <message>
             <source>Curves Transformation</source>
@@ -3797,8 +3797,8 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Paramètres appliqués. Affichage actualisé.</translation>
         </message>
         <message>
-            <source>Shift + draw a selection:</source>
-            <translation type="finished">Shift + dessiner une sélection:</translation>
+            <source>Shift + draw a selection: create a new view</source>
+            <translation type="finished">Shift + dessiner une sélection: créer une nouvelle vue</translation>
         </message>
         <message>
             <source>Shortcuts</source>
@@ -3911,26 +3911,6 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Zoom Out</source>
             <translation type="finished">Zoom Arrière</translation>
-        </message>
-        <message>
-            <source>create a new view</source>
-            <translation type="finished">créer une nouvelle vue</translation>
-        </message>
-        <message>
-            <source>fit to screen</source>
-            <translation type="finished">adapter à l'écran</translation>
-        </message>
-        <message>
-            <source>open image</source>
-            <translation type="finished">ouvrir l'image</translation>
-        </message>
-        <message>
-            <source>save image</source>
-            <translation type="finished">enregistrer l'image</translation>
-        </message>
-        <message>
-            <source>undo / redo</source>
-            <translation type="finished">annuler / rétablir</translation>
         </message>
     </context>
     <context>
@@ -4121,6 +4101,109 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Master %1 dimensions (%2x%3) don't match target (%4x%5)</source>
             <translation type="finished">Dimensions Master %1 (%2x%3) ne correspondent pas à la cible (%4x%5)</translation>
+        </message>
+    </context>
+    <context>
+        <name>ModelDownloader</name>
+        <message>
+            <source>All download sources failed. Please check your internet connection.</source>
+            <translation type="finished">Toutes les sources de téléchargement ont échoué. Veuillez vérifier votre connexion internet.</translation>
+        </message>
+        <message>
+            <source>Connecting to GitHub mirror…</source>
+            <translation type="finished">Connexion au miroir GitHub…</translation>
+        </message>
+        <message>
+            <source>Connecting to Google Drive…</source>
+            <translation type="finished">Connexion à Google Drive…</translation>
+        </message>
+        <message>
+            <source>Download cancelled.</source>
+            <translation type="finished">Téléchargement annulé.</translation>
+        </message>
+        <message>
+            <source>Download complete.</source>
+            <translation type="finished">Téléchargement terminé.</translation>
+        </message>
+        <message>
+            <source>Downloading from primary (Google Drive)…</source>
+            <translation type="finished">Téléchargement depuis la source primaire (Google Drive)…</translation>
+        </message>
+        <message>
+            <source>Downloading… %1 MB</source>
+            <translation type="finished">Téléchargement… %1 Mo</translation>
+        </message>
+        <message>
+            <source>Downloading… %1%</source>
+            <translation type="finished">Téléchargement… %1%</translation>
+        </message>
+        <message>
+            <source>Downloading… 0%</source>
+            <translation type="finished">Téléchargement… 0%</translation>
+        </message>
+        <message>
+            <source>Extracting models…</source>
+            <translation type="finished">Extraction des modèles…</translation>
+        </message>
+        <message>
+            <source>Extracting… %1</source>
+            <translation type="finished">Extraction… %1</translation>
+        </message>
+        <message>
+            <source>Extraction complete.</source>
+            <translation type="finished">Extraction terminée.</translation>
+        </message>
+        <message>
+            <source>Extraction failed: %1</source>
+            <translation type="finished">Échec de l'extraction : %1</translation>
+        </message>
+        <message>
+            <source>Extraction timed out.</source>
+            <translation type="finished">Délai d'extraction dépassé.</translation>
+        </message>
+        <message>
+            <source>Failed to extract models ZIP.</source>
+            <translation type="finished">Échec de l'extraction du ZIP des modèles.</translation>
+        </message>
+        <message>
+            <source>Finalizing installation…</source>
+            <translation type="finished">Finalisation de l'installation…</translation>
+        </message>
+        <message>
+            <source>GitHub mirror download failed or timed out.</source>
+            <translation type="finished">Téléchargement du miroir GitHub échoué ou délai dépassé.</translation>
+        </message>
+        <message>
+            <source>Google Drive confirmation failed, trying GitHub mirror…</source>
+            <translation type="finished">Confirmation Google Drive échouée, essai du miroir GitHub…</translation>
+        </message>
+        <message>
+            <source>Google Drive failed. Trying GitHub mirror…</source>
+            <translation type="finished">Échec de Google Drive. Essai du miroir GitHub…</translation>
+        </message>
+        <message>
+            <source>Google Drive form parsing failed, trying GitHub mirror…</source>
+            <translation type="finished">Analyse du formulaire Google Drive échouée, essai du miroir GitHub…</translation>
+        </message>
+        <message>
+            <source>Google Drive interstitial detected — confirming…</source>
+            <translation type="finished">Interstitiel Google Drive détecté — confirmation…</translation>
+        </message>
+        <message>
+            <source>Installing models…</source>
+            <translation type="finished">Installation des modèles…</translation>
+        </message>
+        <message>
+            <source>Models downloaded and installed successfully.</source>
+            <translation type="finished">Modèles téléchargés et installés avec succès.</translation>
+        </message>
+        <message>
+            <source>Models were downloaded but verification failed. The ZIP may not contain the expected model files.</source>
+            <translation type="finished">Les modèles ont été téléchargés mais la vérification a échoué. Le ZIP peut ne pas contenir les fichiers attendus.</translation>
+        </message>
+        <message>
+            <source>Primary failed. Trying backup (Google Drive)…</source>
+            <translation type="finished">La source primaire a échoué. Essai de la sauvegarde (Google Drive)…</translation>
         </message>
     </context>
     <context>
@@ -5914,20 +5997,44 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Parcourir...</translation>
         </message>
         <message>
+            <source>Cancel</source>
+            <translation type="finished">Annuler</translation>
+        </message>
+        <message>
             <source>Check for updates on startup</source>
             <translation type="finished">Vérifier les mises à jour au démarrage</translation>
         </message>
         <message>
-            <source>Cosmic Clarity Folder:</source>
-            <translation type="finished">Cosmic Clarity Folder :</translation>
+            <source>Cosmic Clarity models</source>
+            <translation type="finished">Modèles Cosmic Clarity</translation>
+        </message>
+        <message>
+            <source>Cosmic Clarity models: installed</source>
+            <translation type="finished">Modèles Cosmic Clarity : installés</translation>
+        </message>
+        <message>
+            <source>Cosmic Clarity models: not installed</source>
+            <translation type="finished">Modèles Cosmic Clarity : non installés</translation>
         </message>
         <message>
             <source>Display</source>
             <translation type="finished">Affichage</translation>
         </message>
         <message>
+            <source>Download latest Cosmic Clarity models</source>
+            <translation type="finished">Télécharger les derniers modèles Cosmic Clarity</translation>
+        </message>
+        <message>
+            <source>Downloading Cosmic Clarity models...</source>
+            <translation type="finished">Téléchargement des Modèles Cosmic Clarity...</translation>
+        </message>
+        <message>
             <source>Executables (*.exe);;All Files (*)</source>
             <translation type="finished">Exécutables (*.exe);;Tous les fichiers (*)</translation>
+        </message>
+        <message>
+            <source>Failed to download models: %1</source>
+            <translation type="finished">Échec du téléchargement des modèles : %1</translation>
         </message>
         <message>
             <source>General</source>
@@ -5942,6 +6049,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Langue :</translation>
         </message>
         <message>
+            <source>Models downloaded and installed successfully.</source>
+            <translation type="finished">Modèles téléchargés et installés avec succès.</translation>
+        </message>
+        <message>
             <source>Paths and Integrations</source>
             <translation type="finished">Chemins et Intégrations</translation>
         </message>
@@ -5950,12 +6061,12 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Veuillez redémarrer l'application pour que les changements de langue prennent effet.</translation>
         </message>
         <message>
-            <source>Restart Required</source>
-            <translation type="finished">Redémarrage Requis</translation>
+            <source>Preparing…</source>
+            <translation type="finished">Préparation…</translation>
         </message>
         <message>
-            <source>Select Cosmic Clarity Folder</source>
-            <translation type="finished">Sélectionner Dossier Cosmic Clarity</translation>
+            <source>Restart Required</source>
+            <translation type="finished">Redémarrage Requis</translation>
         </message>
         <message>
             <source>Select GraXpert Executable</source>

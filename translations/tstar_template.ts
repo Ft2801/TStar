@@ -3046,19 +3046,19 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Ctrl+0:</source>
+            <source>Ctrl+0: fit to screen</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Ctrl+O:</source>
+            <source>Ctrl+O: open image</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Ctrl+S:</source>
+            <source>Ctrl+S: save image</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Ctrl+Z / Ctrl+Shift+Z:</source>
+            <source>Ctrl+Z / Ctrl+Shift+Z: undo / redo</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3794,7 +3794,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Shift + draw a selection:</source>
+            <source>Shift + draw a selection: create a new view</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3907,26 +3907,6 @@
         </message>
         <message>
             <source>Zoom Out</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>create a new view</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>fit to screen</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>open image</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>save image</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>undo / redo</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -4117,6 +4097,109 @@
         <name>MasterFrames</name>
         <message>
             <source>Master %1 dimensions (%2x%3) don't match target (%4x%5)</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>ModelDownloader</name>
+        <message>
+            <source>All download sources failed. Please check your internet connection.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Connecting to GitHub mirror…</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Connecting to Google Drive…</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Download cancelled.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Download complete.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Downloading from primary (Google Drive)…</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Downloading… %1 MB</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Downloading… %1%</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Downloading… 0%</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Extracting models…</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Extracting… %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Extraction complete.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Extraction failed: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Extraction timed out.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to extract models ZIP.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Finalizing installation…</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>GitHub mirror download failed or timed out.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Google Drive confirmation failed, trying GitHub mirror…</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Google Drive failed. Trying GitHub mirror…</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Google Drive form parsing failed, trying GitHub mirror…</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Google Drive interstitial detected — confirming…</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Installing models…</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Models downloaded and installed successfully.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Models were downloaded but verification failed. The ZIP may not contain the expected model files.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Primary failed. Trying backup (Google Drive)…</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -5911,11 +5994,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Check for updates on startup</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Cosmic Clarity Folder:</source>
+            <source>Cosmic Clarity models</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cosmic Clarity models: installed</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cosmic Clarity models: not installed</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5923,7 +6018,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Download latest Cosmic Clarity models</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Downloading Cosmic Clarity models...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Executables (*.exe);;All Files (*)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to download models: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5939,6 +6046,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Models downloaded and installed successfully.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Paths and Integrations</source>
             <translation type="unfinished" />
         </message>
@@ -5947,11 +6058,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Restart Required</source>
+            <source>Preparing…</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Select Cosmic Clarity Folder</source>
+            <source>Restart Required</source>
             <translation type="unfinished" />
         </message>
         <message>

@@ -23,7 +23,12 @@ private slots:
     void onDownloadModel();
     void onRun();
 
+protected:
+    void closeEvent(QCloseEvent* event) override;
+
 private:
+    void saveSettings();
+    
     QLineEdit* m_editModelPath;
     QSpinBox* m_spinPatch;
     QSpinBox* m_spinOverlap;
