@@ -11,6 +11,7 @@
 #include <QDateTime>
 #include <QApplication>
 #include <algorithm>
+#include <QSettings>
 
 //=============================================================================
 // CONSTRUCTOR / DESTRUCTOR
@@ -493,12 +494,17 @@ void StackingDialog::setupOutputGroup() {
     
     m_browseBtn = new QPushButton(tr("Browse..."), this);
     connect(m_browseBtn, &QPushButton::clicked, this, [this]() {
+        QSettings settings("TStar", "TStar");
+        QString initialDir = settings.value("Stacking/OutputFolder", QDir::currentPath()).toString();
+        
         QString path = QFileDialog::getSaveFileName(this,
             tr("Save Stacked Image"),
-            m_outputPath->text().isEmpty() ? "result_stacked.fit" : m_outputPath->text(),
+            m_outputPath->text().isEmpty() ? (initialDir + "/result_stacked.fit") : m_outputPath->text(),
             tr("FITS Files (*.fit *.fits);;All Files (*)"));
+            
         if (!path.isEmpty()) {
             m_outputPath->setText(path);
+            settings.setValue("Stacking/OutputFolder", QFileInfo(path).absolutePath());
         }
     });
     layout->addWidget(m_browseBtn);
@@ -540,12 +546,18 @@ void StackingDialog::setupProgressGroup() {
 //=============================================================================
 
 void StackingDialog::onLoadSequence() {
+    QSettings settings("TStar", "TStar");
+    QString initialDir = settings.value("Stacking/InputFolder", QDir::currentPath()).toString();
+
     QString dir = QFileDialog::getExistingDirectory(this,
         tr("Select Image Folder"),
-        QString(),
-        QFileDialog::ShowDirsOnly);
+        initialDir,
+        QFileDialog::ShowDirsOnly | QFileDialog::DontUseNativeDialog); // DontUseNativeDialog sometimes helps with directory locking, but regular is fine too.
     
     if (dir.isEmpty()) return;
+    
+    // Save the directory for next time
+    settings.setValue("Stacking/InputFolder", dir);
     
     m_sequence = std::make_unique<Stacking::ImageSequence>();
     
@@ -575,12 +587,20 @@ void StackingDialog::onLoadSequence() {
 }
 
 void StackingDialog::onAddFiles() {
+    QSettings settings("TStar", "TStar");
+    QString initialDir = settings.value("Stacking/InputFolder", QDir::currentPath()).toString();
+
     QStringList files = QFileDialog::getOpenFileNames(this,
         tr("Select Image Files"),
-        QString(),
+        initialDir,
         tr("FITS Files (*.fit *.fits *.fts);;TIFF Files (*.tif *.tiff);;All Files (*)"));
     
     if (files.isEmpty()) return;
+    
+    // Save directory of first file
+    if (!files.isEmpty()) {
+        settings.setValue("Stacking/InputFolder", QFileInfo(files.first()).absolutePath());
+    }
     
     if (!m_sequence) {
         m_sequence = std::make_unique<Stacking::ImageSequence>();

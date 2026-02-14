@@ -1,6 +1,10 @@
 TStar Changelog
 ===============
 
+Version 1.6.1
+-------------
+- Now every section remembers its own last working directory at restart
+
 Version 1.6.0
 -------------
 - AstroSpike tool update: now uses OpenCV for maximum quality and performance

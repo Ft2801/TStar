@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QApplication>
+#include <QSettings>
 
 RegistrationDialog::RegistrationDialog(MainWindow* parent)
     : QDialog(parent)
@@ -120,8 +121,14 @@ void RegistrationDialog::setupUI() {
     
     QPushButton* browseDirBtn = new QPushButton(tr("..."), this);
     connect(browseDirBtn, &QPushButton::clicked, this, [this](){
-        QString dir = QFileDialog::getExistingDirectory(this, tr("Select Output Directory"), m_outputDir->text());
-        if (!dir.isEmpty()) m_outputDir->setText(dir);
+        QSettings settings("TStar", "TStar");
+        QString initialDir = settings.value("Registration/OutputFolder", m_outputDir->text()).toString();
+        
+        QString dir = QFileDialog::getExistingDirectory(this, tr("Select Output Directory"), initialDir);
+        if (!dir.isEmpty()) {
+            m_outputDir->setText(dir);
+            settings.setValue("Registration/OutputFolder", dir);
+        }
     });
     paramLayout->addWidget(browseDirBtn, 3, 3);
     
@@ -160,10 +167,16 @@ void RegistrationDialog::setupUI() {
 }
 
 void RegistrationDialog::onLoadSequence() {
+    QSettings settings("TStar", "TStar");
+    QString initialDir = settings.value("Registration/InputFolder", QDir::currentPath()).toString();
+
     QString dir = QFileDialog::getExistingDirectory(this,
-        tr("Select Image Folder"));
+        tr("Select Image Folder"),
+        initialDir);
     
     if (dir.isEmpty()) return;
+    
+    settings.setValue("Registration/InputFolder", dir);
     
     m_sequence = std::make_unique<Stacking::ImageSequence>();
     

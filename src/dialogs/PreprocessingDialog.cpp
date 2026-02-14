@@ -14,6 +14,7 @@
 #include <QMessageBox>
 #include <QLabel>
 #include <QApplication>
+#include <QSettings>
 
 //=============================================================================
 // CONSTRUCTOR / DESTRUCTOR
@@ -305,9 +306,13 @@ void PreprocessingDialog::setupLightsGroup() {
     QPushButton* browseBtn = new QPushButton(tr("..."), this);
     browseBtn->setMaximumWidth(30);
     connect(browseBtn, &QPushButton::clicked, this, [this]() {
-        QString dir = QFileDialog::getExistingDirectory(this, tr("Select Output Directory"));
+        QSettings settings("TStar", "TStar");
+        QString initialDir = settings.value("Preprocessing/OutputFolder", QDir::currentPath()).toString();
+        
+        QString dir = QFileDialog::getExistingDirectory(this, tr("Select Output Directory"), initialDir);
         if (!dir.isEmpty()) {
             m_outputDir->setText(dir);
+            settings.setValue("Preprocessing/OutputFolder", dir);
         }
     });
     dirRow->addWidget(browseBtn);
@@ -345,59 +350,85 @@ void PreprocessingDialog::setupProgressGroup() {
 //=============================================================================
 
 void PreprocessingDialog::onSelectBias() {
+    QSettings settings("TStar", "TStar");
+    QString initialDir = settings.value("Preprocessing/InputFolder", QDir::currentPath()).toString();
+    
     QString file = QFileDialog::getOpenFileName(this,
         tr("Select Master Bias"),
-        QString(),
+        initialDir,
         tr("FITS Files (*.fit *.fits);;All Files (*)"));
     if (!file.isEmpty()) {
         m_biasPath->setText(file);
+        settings.setValue("Preprocessing/InputFolder", QFileInfo(file).absolutePath());
     }
 }
 
 void PreprocessingDialog::onSelectDark() {
+    QSettings settings("TStar", "TStar");
+    QString initialDir = settings.value("Preprocessing/InputFolder", QDir::currentPath()).toString();
+    
     QString file = QFileDialog::getOpenFileName(this,
         tr("Select Master Dark"),
-        QString(),
+        initialDir,
         tr("FITS Files (*.fit *.fits);;All Files (*)"));
     if (!file.isEmpty()) {
         m_darkPath->setText(file);
+        settings.setValue("Preprocessing/InputFolder", QFileInfo(file).absolutePath());
     }
 }
 
 void PreprocessingDialog::onSelectFlat() {
+    QSettings settings("TStar", "TStar");
+    QString initialDir = settings.value("Preprocessing/InputFolder", QDir::currentPath()).toString();
+
     QString file = QFileDialog::getOpenFileName(this,
         tr("Select Master Flat"),
-        QString(),
+        initialDir,
         tr("FITS Files (*.fit *.fits);;All Files (*)"));
     if (!file.isEmpty()) {
         m_flatPath->setText(file);
+        settings.setValue("Preprocessing/InputFolder", QFileInfo(file).absolutePath());
     }
 }
 
 void PreprocessingDialog::onSelectDarkFlat() {
+    QSettings settings("TStar", "TStar");
+    QString initialDir = settings.value("Preprocessing/InputFolder", QDir::currentPath()).toString();
+
     QString file = QFileDialog::getOpenFileName(this,
         tr("Select Dark for Flat"),
-        QString(),
+        initialDir,
         tr("FITS Files (*.fit *.fits);;All Files (*)"));
     if (!file.isEmpty()) {
         m_darkFlatPath->setText(file);
+        settings.setValue("Preprocessing/InputFolder", QFileInfo(file).absolutePath());
     }
 }
 
 void PreprocessingDialog::onCreateMasterBias() {
+    QSettings settings("TStar", "TStar");
+    QString initialDir = settings.value("Preprocessing/InputFolder", QDir::currentPath()).toString();
+
     QStringList files = QFileDialog::getOpenFileNames(this,
         tr("Select Bias Frames"),
-        QString(),
+        initialDir,
         tr("FITS Files (*.fit *.fits);;All Files (*)"));
     
     if (files.isEmpty()) return;
     
+    // Update Input Folder
+    QString inputDir = QFileInfo(files.first()).absolutePath();
+    settings.setValue("Preprocessing/InputFolder", inputDir);
+    
     QString output = QFileDialog::getSaveFileName(this,
         tr("Save Master Bias"),
-        "master_bias.fit",
+        initialDir + "/master_bias.fit",
         tr("FITS Files (*.fit)"));
     
     if (output.isEmpty()) return;
+    
+    // Update Input Folder (often we save master where inputs are)
+    settings.setValue("Preprocessing/InputFolder", QFileInfo(output).absolutePath());
     
     m_logText->append(tr("Creating master bias from %1 frames...").arg(files.size()));
     
@@ -422,19 +453,25 @@ void PreprocessingDialog::onCreateMasterBias() {
 }
 
 void PreprocessingDialog::onCreateMasterDark() {
+    QSettings settings("TStar", "TStar");
+    QString initialDir = settings.value("Preprocessing/InputFolder", QDir::currentPath()).toString();
+
     QStringList files = QFileDialog::getOpenFileNames(this,
         tr("Select Dark Frames"),
-        QString(),
+        initialDir,
         tr("FITS Files (*.fit *.fits);;All Files (*)"));
     
     if (files.isEmpty()) return;
     
+    settings.setValue("Preprocessing/InputFolder", QFileInfo(files.first()).absolutePath());
+    
     QString output = QFileDialog::getSaveFileName(this,
         tr("Save Master Dark"),
-        "master_dark.fit",
+        initialDir + "/master_dark.fit",
         tr("FITS Files (*.fit)"));
     
     if (output.isEmpty()) return;
+    settings.setValue("Preprocessing/InputFolder", QFileInfo(output).absolutePath());
     
     m_logText->append(tr("Creating master dark from %1 frames...").arg(files.size()));
     
@@ -460,19 +497,25 @@ void PreprocessingDialog::onCreateMasterDark() {
 }
 
 void PreprocessingDialog::onCreateMasterFlat() {
+    QSettings settings("TStar", "TStar");
+    QString initialDir = settings.value("Preprocessing/InputFolder", QDir::currentPath()).toString();
+
     QStringList files = QFileDialog::getOpenFileNames(this,
         tr("Select Flat Frames"),
-        QString(),
+        initialDir,
         tr("FITS Files (*.fit *.fits);;All Files (*)"));
     
     if (files.isEmpty()) return;
     
+    settings.setValue("Preprocessing/InputFolder", QFileInfo(files.first()).absolutePath());
+    
     QString output = QFileDialog::getSaveFileName(this,
         tr("Save Master Flat"),
-        "master_flat.fit",
+        initialDir + "/master_flat.fit",
         tr("FITS Files (*.fit)"));
     
     if (output.isEmpty()) return;
+    settings.setValue("Preprocessing/InputFolder", QFileInfo(output).absolutePath());
     
     m_logText->append(tr("Creating master flat from %1 frames...").arg(files.size()));
     
@@ -499,10 +542,17 @@ void PreprocessingDialog::onCreateMasterFlat() {
 }
 
 void PreprocessingDialog::onAddLights() {
+    QSettings settings("TStar", "TStar");
+    QString initialDir = settings.value("Preprocessing/InputFolder", QDir::currentPath()).toString();
+
     QStringList files = QFileDialog::getOpenFileNames(this,
         tr("Select Light Frames"),
-        QString(),
+        initialDir,
         tr("FITS Files (*.fit *.fits);;All Files (*)"));
+    
+    if (!files.isEmpty()) {
+        settings.setValue("Preprocessing/InputFolder", QFileInfo(files.first()).absolutePath());
+    }
     
     for (const QString& file : files) {
         if (!m_lightFiles.contains(file)) {

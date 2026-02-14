@@ -12,6 +12,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QApplication>
+#include <QSettings>
 #include <QDateTime>
 #include <QElapsedTimer>
 #include <QtConcurrent>
@@ -136,13 +137,20 @@ void ConversionDialog::setupUI() {
 }
 
 void ConversionDialog::onAddFiles() {
+    QSettings settings("TStar", "TStar");
+    QString initialDir = settings.value("Conversion/InputFolder", QDir::currentPath()).toString();
+
     QStringList files = QFileDialog::getOpenFileNames(this,
         tr("Select RAW Files"),
-        QString(),
+        initialDir,
         tr("RAW Files (*.cr2 *.CR2 *.nef *.NEF *.arw *.ARW *.dng *.DNG "
            "*.orf *.ORF *.rw2 *.RW2 *.raf *.RAF *.pef *.PEF);;"
            "TIFF Files (*.tif *.tiff *.TIF *.TIFF);;"
            "All Files (*)"));
+
+    if (!files.isEmpty()) {
+        settings.setValue("Conversion/InputFolder", QFileInfo(files.first()).absolutePath());
+    }
     
     for (const QString& file : files) {
         // Check if already in list
@@ -175,12 +183,17 @@ void ConversionDialog::onClearList() {
 }
 
 void ConversionDialog::onBrowseOutput() {
+    QSettings settings("TStar", "TStar");
+    QString initialDir = settings.value("Conversion/OutputFolder", 
+        m_outputDir->text().isEmpty() ? QDir::currentPath() : m_outputDir->text()).toString();
+
     QString dir = QFileDialog::getExistingDirectory(this,
         tr("Select Output Directory"),
-        m_outputDir->text());
+        initialDir);
     
     if (!dir.isEmpty()) {
         m_outputDir->setText(dir);
+        settings.setValue("Conversion/OutputFolder", dir);
     }
 }
 

@@ -27,7 +27,10 @@
 #include <cmath> // for std::abs
 #include <QSet>
 #include <exception>
+#include <QSet>
+#include <exception>
 #include <QStandardPaths>
+#include <QSettings>
 
 #include <QFormLayout>
 #include <QDialogButtonBox>
@@ -125,10 +128,17 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowOpacity(0.0); // Start invisible for fade-in
     setAcceptDrops(true);  // Enable drag and drop
     
-    // Set default home directory to Desktop
-    QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-    if (!desktopPath.isEmpty()) {
-        QDir::setCurrent(desktopPath);
+    // Set default home directory from Settings, or fallback to Desktop
+    QSettings settings("TStar", "TStar");
+    QString lastDir = settings.value("General/LastWorkingDir").toString();
+    
+    if (!lastDir.isEmpty() && QDir(lastDir).exists()) {
+        QDir::setCurrent(lastDir);
+    } else {
+        QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+        if (!desktopPath.isEmpty()) {
+            QDir::setCurrent(desktopPath);
+        }
     }
     
     // === Setup UI ===
@@ -2866,6 +2876,10 @@ void MainWindow::closeEvent(QCloseEvent* event) {
         QMainWindow::closeEvent(event);
         return;
     }
+    
+    // Save settings
+    QSettings settings("TStar", "TStar");
+    settings.setValue("General/LastWorkingDir", QDir::currentPath());
     
     event->ignore();
     startFadeOut();
