@@ -9,6 +9,8 @@
 #include <QCheckBox>
 #include <QDoubleSpinBox>
 #include <QMouseEvent>
+#include <QWheelEvent>
+#include <QTimer>
 #include <QScrollBar>
 #include <QMessageBox>
 #include <QComboBox>
@@ -413,7 +415,7 @@ CorrectionBrushDialog::CorrectionBrushDialog(QWidget* parent) : DialogBase(paren
     form->addRow(tr("Method:"), m_methodCombo);
     
     m_autoStretchCheck = new QCheckBox(tr("Auto-stretch preview"));
-    m_autoStretchCheck->setChecked(true);
+    m_autoStretchCheck->setChecked(false);
     m_linkedCheck = new QCheckBox(tr("Linked channels"));
     m_linkedCheck->setChecked(true);
     m_targetMedianSpin = new QDoubleSpinBox();
@@ -452,7 +454,8 @@ CorrectionBrushDialog::CorrectionBrushDialog(QWidget* parent) : DialogBase(paren
     connect(m_targetMedianSpin, &QDoubleSpinBox::valueChanged, this, &CorrectionBrushDialog::updateDisplay);
     
     updateDisplay();
-    onFit();
+    // Defer fit until the dialog is fully laid out and visible
+    QTimer::singleShot(0, this, &CorrectionBrushDialog::onFit);
 
 }
 
@@ -487,6 +490,14 @@ bool CorrectionBrushDialog::eventFilter(QObject* src, QEvent* ev) {
                  m_lastPanPos = me->pos();
                  return true;
              }
+        } else if (ev->type() == QEvent::Wheel) {
+            QWheelEvent* we = static_cast<QWheelEvent*>(ev);
+            float factor = (we->angleDelta().y() > 0) ? 1.15f : (1.0f / 1.15f);
+            float newZoom = std::clamp(m_zoom * factor, 0.05f, 8.0f);
+            float actualFactor = newZoom / m_zoom;
+            m_zoom = newZoom;
+            m_view->scale(actualFactor, actualFactor);
+            return true;
         } else if (ev->type() == QEvent::Leave) {
              m_cursorItem->setVisible(false);
         } else if (ev->type() == QEvent::MouseButtonPress) {
@@ -562,6 +573,10 @@ void CorrectionBrushDialog::updateDisplay() {
     
     QImage qimg = m_currentImage.getDisplayImage(mode, m_linkedCheck->isChecked());
     m_pixItem->setPixmap(QPixmap::fromImage(qimg));
+    // Lock scene rect to the pixmap bounds so the cursor ellipse item
+    // moving outside never expands the scene, which would cause the
+    // view to auto-scroll and make the image appear to drift.
+    m_scene->setSceneRect(m_pixItem->boundingRect());
 }
 
 void CorrectionBrushDialog::onZoomIn() { setZoom(m_zoom * 1.25f); }
@@ -583,6 +598,7 @@ void CorrectionBrushDialog::onApply() {
     if (MainWindowCallbacks* mw = getCallbacks()) {
         ImageViewer* v = mw->getCurrentViewer();
         if (v) {
+            v->pushUndo(); // Save undo state before modifying the document
             v->setBuffer(m_currentImage, v->getBuffer().name(), true);
             accept();
         }

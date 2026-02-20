@@ -12,7 +12,7 @@
 #include <QIcon>
 
 StarRecompositionDialog::StarRecompositionDialog(QWidget* parent)
-    : DialogBase(parent, tr("Star Recomposition"), 500, 400)
+    : DialogBase(parent, tr("Star Recomposition"), 700, 500)
 {
     createUI();
     populateCombos();
@@ -232,6 +232,8 @@ void StarRecompositionDialog::onUpdatePreview() {
         // without auto-stretch interfering.
         m_previewViewer->setBuffer(result, "Preview", true); 
         m_previewViewer->setDisplayState(ImageBuffer::Display_Linear, false);
+        // Auto-fit the preview to the container
+        m_previewViewer->fitToWindow();
     }
 }
 

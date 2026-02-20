@@ -1,6 +1,11 @@
 TStar Changelog
 ===============
 
+Version 1.6.2
+-------------
+- Small display stretch artifacts in very bright areas fixed
+- Other small bugfixes
+
 Version 1.6.1
 -------------
 - Now every section remembers its own last working directory at restart

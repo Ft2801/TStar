@@ -17,6 +17,13 @@ namespace SimdOps {
         }
     }
 
+// NaN-safe clamp to [0,1]: NaN comparisons return false, so !(v>=0) catches NaN.
+static inline float safeClamp01(float v) {
+    if (!(v >= 0.0f)) return 0.0f;
+    if (v > 1.0f) return 1.0f;
+    return v;
+}
+
     static float mtf_scalar(float m, float x) {
         if (x <= 0) return 0;
         if (x >= 1) return 1;
@@ -30,12 +37,14 @@ namespace SimdOps {
             float vals[3];
             for (int c = 0; c < 3; ++c) {
                 float v = src[i * 3 + c];
+                // Sanitize NaN/Inf/out-of-range BEFORE stretch
+                v = safeClamp01(v);
                 // Shadow / Highlight Normalize
                 v = (v - params.shadow[c]) * params.invRange[c];
                 // MTF
-                v = mtf_scalar(params.midtones[c], std::clamp(v, 0.0f, 1.0f));
+                v = mtf_scalar(params.midtones[c], safeClamp01(v));
                 if (inverted) v = 1.0f - v;
-                vals[c] = std::clamp(v, 0.0f, 1.0f);
+                vals[c] = safeClamp01(v);
             }
             dst[i * 3 + 0] = static_cast<uint8_t>(vals[0] * 255.0f + 0.5f);
             dst[i * 3 + 1] = static_cast<uint8_t>(vals[1] * 255.0f + 0.5f);
@@ -127,6 +136,20 @@ namespace SimdOps {
             __m256 v2 = _mm256_loadu_ps(ptr + 8);
             __m256 v3 = _mm256_loadu_ps(ptr + 16);
 
+            // Sanitize NaN/Inf: replace with 0 before any processing
+            // _CMP_ORD_Q: true if both operands are ordered (i.e., neither is NaN)
+            __m256 ord1 = _mm256_cmp_ps(v1, v1, _CMP_ORD_Q);
+            __m256 ord2 = _mm256_cmp_ps(v2, v2, _CMP_ORD_Q);
+            __m256 ord3 = _mm256_cmp_ps(v3, v3, _CMP_ORD_Q);
+            v1 = _mm256_and_ps(v1, ord1);  // NaN lanes become 0
+            v2 = _mm256_and_ps(v2, ord2);
+            v3 = _mm256_and_ps(v3, ord3);
+
+            // Clamp to [0, 1] (handles Inf and out-of-range)
+            v1 = _mm256_max_ps(vZero, _mm256_min_ps(vOne, v1));
+            v2 = _mm256_max_ps(vZero, _mm256_min_ps(vOne, v2));
+            v3 = _mm256_max_ps(vZero, _mm256_min_ps(vOne, v3));
+
             // 1. Normalize x = (v - c0) * norm
             v1 = _mm256_mul_ps(_mm256_sub_ps(v1, c0_1), n_1);
             v2 = _mm256_mul_ps(_mm256_sub_ps(v2, c0_2), n_2);
@@ -173,36 +196,15 @@ namespace SimdOps {
             __m256i i2 = _mm256_cvtps_epi32(v2);
             __m256i i3 = _mm256_cvtps_epi32(v3);
 
-            // Pack: This is annoying with AVX2 (lanes are split)
-            // Strategy: Store individually or use shuffle.
-            // Since destination is byte array, maybe scalar store is fine?
-            // Or _mm256_storeu_si256 then pack?
-            // Packing 32-bit ints to 8-bit ints requires permutes.
-            // Simple robust fallback for store: extract.
-            
-            // Actually, just storing aligned then casting is slow.
-            // Let's dump to stack array then copy? No, direct store loop.
-            // But wait, we can't efficiently store 3 YMMs into 24 bytes in one go easily.
-            // The scatter instruction is AVX512.
-            // Best is to store to temp aligned buffer, then do the uint8_t cast loop, or scalar implementation for the store part.
-            // Optimize:
-            // _mm_packus_epi32 packs 32-bit to 16-bit.
-            // _mm_packus_epi16 packs 16-bit to 8-bit.
-            // But we have 3 registers. 
-            // Given I/O is usually bottleneck, let's just do a scalar write-out of the results from the registers?
-            // No, getting data out of YMM is slow.
-            // Better to store to a temporary float array on stack and then cast?
-            // Actually, `cvtps_epi32` gives 32-bit integers.
-            // Let's store those 32-bit ints to a temp array of 24 ints, then loop cast.
-            // Still faster than doing the divs in scalar.
-
             alignas(32) int32_t tempI[24];
             _mm256_store_si256((__m256i*)tempI, i1);
             _mm256_store_si256((__m256i*)(tempI + 8), i2);
             _mm256_store_si256((__m256i*)(tempI + 16), i3);
 
             for(int k=0; k<24; ++k) {
-                dPtr[k] = (uint8_t)tempI[k]; 
+                // Clamp to [0,255]: cvtps_epi32 rounds 255.5 → 256 which wraps to 0 as uint8_t,
+                // causing color artifacts (yellow/cyan/magenta) in highlight areas.
+                dPtr[k] = static_cast<uint8_t>(std::min(std::max(tempI[k], 0), 255));
             }
         }
 

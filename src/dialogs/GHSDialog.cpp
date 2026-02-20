@@ -111,7 +111,7 @@ void GHSDialog::setupUI() {
     // === Histogram Scroll Area ===
     m_scrollArea = new QScrollArea();
     m_scrollArea->setWidgetResizable(true); // Allow widget to be smaller than area, but we will force size when zoomed
-    m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
     // Style the scrollbar to be thin and rounded
     m_scrollArea->setStyleSheet(
@@ -903,6 +903,8 @@ void GHSDialog::onZoomChanged() {
     } else {
         if (m_scrollArea) m_scrollArea->setWidgetResizable(false);
         m_histWidget->setFixedWidth(newWidth);
+        // Always keep the left side (shadows) in view when zooming
+        if (m_scrollArea) m_scrollArea->horizontalScrollBar()->setValue(0);
     }
     
     updateHistogram();

@@ -451,6 +451,14 @@ bool ImageBuffer::saveXISF(const QString& filePath, BitDepth depth, QString* err
 // Constants for LUT
 static const int LUT_SIZE = 65536;
 
+// Safe Clamp: handles NaN, Inf, and out-of-range values.
+// NaN comparisons always return false, so !(v >= 0.0f) catches NaN and negatives.
+static inline float safeClamp01(float v) {
+    if (!(v >= 0.0f)) return 0.0f;  // NaN or negative → 0
+    if (v > 1.0f) return 1.0f;       // Above range → 1
+    return v;
+}
+
 // Statistics Helper
 struct ChStats { float median; float mad; };
 
@@ -852,12 +860,14 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
                     if (c < m_channels) v[c] = srcPtr[srcIdx + c];
                     else v[c] = 0; // Should not happen if ch=3
                     
+                    // Sanitize NaN/Inf/OOB before stretch
+                    v[c] = safeClamp01(v[c]);
                     // Normalize
                     v[c] = (v[c] - params[c].shadow) * params[c].norm;
                     // MTF
-                    v[c] = mtf_func(params[c].midtone, std::clamp(v[c], 0.0f, 1.0f));
+                    v[c] = mtf_func(params[c].midtone, safeClamp01(v[c]));
                     if (inverted) v[c] = 1.0f - v[c];
-                    v[c] = std::clamp(v[c], 0.0f, 1.0f);
+                    v[c] = safeClamp01(v[c]);
                 }
                 
                 r_out = v[0]; g_out = v[1]; b_out = v[2];
@@ -1077,7 +1087,7 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
         int srcY = y * stepY;
         if (srcY >= m_height) srcY = m_height - 1;
         
-        int srcIdxBase = srcY * m_width * m_channels;
+        size_t srcIdxBase = (size_t)srcY * m_width * m_channels;
         
         for (int x = 0; x < outW; ++x) {
             int srcX = x * stepX;
@@ -1100,8 +1110,8 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
             if (m_channels == 1) {
                 size_t idx = srcIdxBase + srcX;
                 if (idx >= m_data.size()) continue;
-                float v = m_data[idx];
-                int iVal = static_cast<int>(std::max(0.0f, std::min(1.0f, v)) * (LUT_SIZE - 1));
+                float v = safeClamp01(m_data[idx]);
+                int iVal = static_cast<int>(v * (LUT_SIZE - 1));
                 float out = luts[0][iVal];
                 
                 // Blend with original if mask active on preview
@@ -1112,15 +1122,15 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
                 if (inverted) out = 1.0f - out;
                 r_out = g_out = b_out = out;
             } else {
-                int base = srcIdxBase + srcX * m_channels;
-                if (base + 2 >= static_cast<int>(m_data.size())) continue;
-                float r = m_data[base+0];
-                float g = m_data[base+1];
-                float b = m_data[base+2];
+                size_t base = srcIdxBase + (size_t)srcX * m_channels;
+                if (base + 2 >= m_data.size()) continue;
+                float r = safeClamp01(m_data[base+0]);
+                float g = safeClamp01(m_data[base+1]);
+                float b = safeClamp01(m_data[base+2]);
                 
-                int ir = static_cast<int>(std::max(0.0f, std::min(1.0f, r)) * (LUT_SIZE - 1));
-                int ig = static_cast<int>(std::max(0.0f, std::min(1.0f, g)) * (LUT_SIZE - 1));
-                int ib = static_cast<int>(std::max(0.0f, std::min(1.0f, b)) * (LUT_SIZE - 1));
+                int ir = static_cast<int>(r * (LUT_SIZE - 1));
+                int ig = static_cast<int>(g * (LUT_SIZE - 1));
+                int ib = static_cast<int>(b * (LUT_SIZE - 1));
                 
                 r_out = luts[0][ir];
                 g_out = luts[1][ig];

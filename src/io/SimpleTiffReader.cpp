@@ -332,7 +332,7 @@ bool SimpleTiffReader::readFloat32(const QString& path, int& width, int& height,
                         
                         if (destIdx < rawData.size()) rawData[destIdx] = f;
                         
-                        if (std::isnan(f)) { nanCount++; }
+                        if (std::isnan(f)) { nanCount++; if (destIdx < rawData.size()) rawData[destIdx] = 0.0f; }
                         else {
                             if (f < dMin) dMin = f;
                             if (f > dMax) dMax = f;
