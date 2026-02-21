@@ -81,7 +81,7 @@ void ImageViewer::setPreviewLUT(const std::vector<std::vector<float>>& luts) {
     m_previewLUT = luts;
     // Use full resolution preview - no downsampling
     const std::vector<std::vector<float>>* pLut = m_previewLUT.empty() ? nullptr : &m_previewLUT;
-    QImage img = m_buffer.getDisplayImage(m_displayMode, m_displayLinked, pLut, 0, 0, m_showMaskOverlay, m_displayInverted, m_displayFalseColor);
+    QImage img = m_buffer.getDisplayImage(m_displayMode, m_displayLinked, pLut, 0, 0, m_showMaskOverlay, m_displayInverted, m_displayFalseColor, m_autoStretchMedian);
     setImage(img, true); // PRESERVE VIEW
 }
 
@@ -111,6 +111,12 @@ void ImageViewer::clearPreviewLUT() {
 void ImageViewer::setDisplayState(ImageBuffer::DisplayMode mode, bool linked) {
     m_displayMode = mode;
     m_displayLinked = linked;
+    refreshDisplay(true);
+}
+
+void ImageViewer::setAutoStretchMedian(float median) {
+    if (qFuzzyCompare(m_autoStretchMedian, median)) return;
+    m_autoStretchMedian = median;
     refreshDisplay(true);
 }
 
@@ -170,7 +176,7 @@ void ImageViewer::setBuffer(const ImageBuffer& buffer, const QString& name, bool
     m_buffer = buffer;
     
     // Use current stored display state with all parameters
-    QImage img = m_buffer.getDisplayImage(m_displayMode, m_displayLinked, nullptr, 0, 0, m_showMaskOverlay, m_displayInverted, m_displayFalseColor);
+    QImage img = m_buffer.getDisplayImage(m_displayMode, m_displayLinked, nullptr, 0, 0, m_showMaskOverlay, m_displayInverted, m_displayFalseColor, m_autoStretchMedian);
     if (!name.isEmpty()) setWindowTitle(name);
     
     setImage(img, preserveView);
@@ -180,7 +186,7 @@ void ImageViewer::setBuffer(const ImageBuffer& buffer, const QString& name, bool
 
 void ImageViewer::refreshDisplay(bool preserveView) {
     const std::vector<std::vector<float>>* pLut = m_previewLUT.empty() ? nullptr : &m_previewLUT;
-    QImage img = m_buffer.getDisplayImage(m_displayMode, m_displayLinked, pLut, 0, 0, m_showMaskOverlay, m_displayInverted, m_displayFalseColor);
+    QImage img = m_buffer.getDisplayImage(m_displayMode, m_displayLinked, pLut, 0, 0, m_showMaskOverlay, m_displayInverted, m_displayFalseColor, m_autoStretchMedian);
     setImage(img, preserveView);
 }
 
@@ -726,14 +732,14 @@ void ImageViewer::undo() {
             m_redoStack.push_back(m_buffer);
             m_buffer = m_undoStack.back();
             m_undoStack.pop_back();
-            setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), true);
+            refreshDisplay(true);
         }
     } else if (!m_undoStack.empty()) {
         // Legacy fallback
         m_redoStack.push_back(m_buffer);
         m_buffer = m_undoStack.back();
         m_undoStack.pop_back();
-        setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), true);
+        refreshDisplay(true);
     }
     
     if (m_buffer.width() != oldW || m_buffer.height() != oldH) {
@@ -755,14 +761,14 @@ void ImageViewer::redo() {
             m_undoStack.push_back(m_buffer);
             m_buffer = m_redoStack.back();
             m_redoStack.pop_back();
-            setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), true);
+            refreshDisplay(true);
         }
     } else if (!m_redoStack.empty()) {
         // Legacy fallback
         m_undoStack.push_back(m_buffer);
         m_buffer = m_redoStack.back();
         m_redoStack.pop_back();
-        setImage(m_buffer.getDisplayImage(m_displayMode, m_displayLinked), true);
+        refreshDisplay(true);
     }
     
     if (m_buffer.width() != oldW || m_buffer.height() != oldH) {

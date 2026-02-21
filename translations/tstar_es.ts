@@ -3853,6 +3853,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">TStar está actualizado.</translation>
         </message>
         <message>
+            <source>Target Median for Auto Stretch</source>
+            <translation type="finished">Mediana Objetivo para Auto Stretch</translation>
+        </message>
+        <message>
             <source>Tile Images</source>
             <translation type="finished">Mosaico de Imágenes</translation>
         </message>
@@ -4195,7 +4199,7 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         </message>
         <message>
             <source>Models extraction completed but verification failed - expected file 'deep_sharp_stellar_AI4.pth' not found. Files extracted: %1</source>
-            <translation type="unfinished" />
+            <translation type="finished">Extracción de modelos completada pero verificación fallida - archivo esperado 'deep_sharp_stellar_AI4.pth' no encontrado. Archivos extraídos: %1</translation>
         </message>
         <message>
             <source>Primary failed. Trying backup (Google Drive)…</source>

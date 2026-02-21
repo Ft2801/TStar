@@ -393,6 +393,11 @@ MainWindow::MainWindow(QWidget *parent)
             m_headerPanel->setMetadata(v->getBuffer().metadata());
         } else if (!window) {
             m_headerPanel->clear();
+            // Reset AutoStretch median combo to default when no view is active
+            if (m_autoStretchMedianCombo) {
+                QSignalBlocker b(m_autoStretchMedianCombo);
+                m_autoStretchMedianCombo->setCurrentIndex(3); // 0.25 default
+            }
         }
 
         // 2. Handle Saturation Tool Retargeting
@@ -465,6 +470,12 @@ MainWindow::MainWindow(QWidget *parent)
                         int idx = m_stretchCombo->findData(static_cast<int>(v->getDisplayMode()));
                         if (idx >= 0) m_stretchCombo->setCurrentIndex(idx);
                         m_displayMode = v->getDisplayMode();
+                    }
+                    if (m_autoStretchMedianCombo) {
+                        QSignalBlocker b(m_autoStretchMedianCombo);
+                        int idx = m_autoStretchMedianCombo->findData(v->getAutoStretchMedian());
+                        if (idx >= 0) m_autoStretchMedianCombo->setCurrentIndex(idx);
+                        else m_autoStretchMedianCombo->setCurrentIndex(3); // fallback to 0.25
                     }
                     if (m_linkChannelsBtn) {
                         QSignalBlocker b(m_linkChannelsBtn);
@@ -612,6 +623,45 @@ MainWindow::MainWindow(QWidget *parent)
         log(tr("Display Mode changed to: %1").arg(m_stretchCombo->currentText()), Log_Info);
         updateDisplay();
     });
+
+    // Auto Stretch Target Median combo
+    m_autoStretchMedianCombo = new QComboBox();
+    m_autoStretchMedianCombo->setFixedWidth(45);
+    m_autoStretchMedianCombo->addItem("0.10", 0.10f);
+    m_autoStretchMedianCombo->addItem("0.15", 0.15f);
+    m_autoStretchMedianCombo->addItem("0.20", 0.20f);
+    m_autoStretchMedianCombo->addItem("0.25", 0.25f);
+    m_autoStretchMedianCombo->addItem("0.30", 0.30f);
+    m_autoStretchMedianCombo->addItem("0.35", 0.35f);
+    m_autoStretchMedianCombo->setCurrentIndex(3); // default 0.25
+    m_autoStretchMedianCombo->setToolTip(tr("Target Median for Auto Stretch"));
+    m_autoStretchMedianCombo->setStyleSheet(
+        "QComboBox { "
+        "   background-color: #333; "
+        "   color: #e0e0e0; "
+        "   border: 1px solid #555; "
+        "   border-radius: 4px; "
+        "   padding: 4px 10px; "
+        "} "
+        "QComboBox:hover { "
+        "   background-color: #444; "
+        "   border-color: #666; "
+        "} "
+        "QComboBox::drop-down { "
+        "   width: 0px; "
+        "} "
+        "QComboBox QAbstractItemView { "
+        "   background-color: #333; "
+        "   color: #e0e0e0; "
+        "   selection-background-color: #555; "
+        "}"
+    );
+    connect(m_autoStretchMedianCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]([[maybe_unused]] int index){
+        float median = m_autoStretchMedianCombo->currentData().toFloat();
+        if (auto v = currentViewer()) {
+            v->setAutoStretchMedian(median);
+        }
+    });
     
     m_linkViewsAction = new QAction(tr("Link Views"), this);
     m_linkViewsAction->setCheckable(true);
@@ -693,6 +743,10 @@ MainWindow::MainWindow(QWidget *parent)
     
     // 5. Tools (Files)
     
+    // Add AutoStretch median selector (before display mode combo)
+    mainToolbar->addWidget(m_autoStretchMedianCombo);
+    { QWidget* s = new QWidget(this); s->setFixedWidth(3); mainToolbar->addWidget(s); }
+
     // Add Display Stretch Controls
     mainToolbar->addWidget(m_stretchCombo);
     
@@ -1577,7 +1631,7 @@ void MainWindow::saveFile() {
     // --- BURN ANNOTATIONS LOGIC ---
     if (burnBox->isChecked() && m_annotatorDlg) {
          // Render the display image (what user sees)
-         QImage displayImg = v->getBuffer().getDisplayImage(v->getDisplayMode(), v->isDisplayLinked());
+         QImage displayImg = v->getBuffer().getDisplayImage(v->getDisplayMode(), v->isDisplayLinked(), nullptr, 0, 0, false, v->isDisplayInverted(), v->isDisplayFalseColor(), v->getAutoStretchMedian());
          
          QPainter p(&displayImg);
          m_annotatorDlg->renderAnnotations(p, QRectF(displayImg.rect()));
@@ -2494,7 +2548,7 @@ void MainWindow::applyCurves(const SplineData& spline, const bool channels[3]) {
         
         buf.applySpline(spline, channels);
         
-        QImage newImg = buf.getDisplayImage(m_curvesTarget->getDisplayMode(), m_curvesTarget->isLinked());
+        QImage newImg = buf.getDisplayImage(m_curvesTarget->getDisplayMode(), m_curvesTarget->isLinked(), nullptr, 0, 0, false, false, false, m_curvesTarget->getAutoStretchMedian());
         m_curvesTarget->setImage(newImg, true);
         
         log(tr("Curves applied to %1.").arg(m_curvesTarget->windowTitle()), Log_Success, true);

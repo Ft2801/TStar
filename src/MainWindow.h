@@ -230,6 +230,7 @@ private:
 
     // UI Elements
     class QComboBox* m_stretchCombo;
+    class QComboBox* m_autoStretchMedianCombo;
     class QToolButton* m_linkChannelsBtn;
     class QToolButton* m_invertBtn;
     class QToolButton* m_falseColorBtn;

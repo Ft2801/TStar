@@ -3,6 +3,7 @@ TStar Changelog
 
 Version 1.6.2
 -------------
+- Now you can select the target median for display stretch
 - Small display stretch artifacts in very bright areas fixed
 - Other small bugfixes
 

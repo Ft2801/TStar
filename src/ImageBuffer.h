@@ -77,7 +77,8 @@ public:
     // Display
     // Replaces the boolean autostretch with mode and link option
     // Optional overrideLUT: if provided (size 3x65536), it is used instead of internal logic.
-    QImage getDisplayImage(DisplayMode mode = Display_Linear, bool linked = true, const std::vector<std::vector<float>>* overrideLUT = nullptr, int maxWidth = 0, int maxHeight = 0, bool showMask = false, bool inverted = false, bool falseColor = false) const; 
+    // autoStretchTargetMedian: target median brightness for AutoStretch mode (default 0.25)
+    QImage getDisplayImage(DisplayMode mode = Display_Linear, bool linked = true, const std::vector<std::vector<float>>* overrideLUT = nullptr, int maxWidth = 0, int maxHeight = 0, bool showMask = false, bool inverted = false, bool falseColor = false, float autoStretchTargetMedian = 0.25f) const; 
 
     // Mask Support
     void setMask(const MaskLayer& mask);

@@ -3850,6 +3850,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Target Median for Auto Stretch</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Tile Images</source>
             <translation type="unfinished" />
         </message>

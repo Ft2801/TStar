@@ -721,7 +721,7 @@ struct StandardSTFParams {
     return result;
 }
 
-QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::vector<std::vector<float>>* overrideLUT, int maxWidth, int maxHeight, bool showMask, bool inverted, bool falseColor) const {
+QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::vector<std::vector<float>>* overrideLUT, int maxWidth, int maxHeight, bool showMask, bool inverted, bool falseColor, float autoStretchTargetMedian) const {
     ReadLock lock(this);  // Thread-safe read access
     
     if (m_data.empty()) return QImage();
@@ -760,7 +760,7 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
         std::vector<ChStats> stats(m_channels);
         for (int c = 0; c < m_channels; ++c) stats[c] = computeStats(m_data, m_width, m_height, m_channels, c);
         
-        const float targetBG = 0.25f;
+        const float targetBG = autoStretchTargetMedian;
         const float shadowClip = -2.8f; 
 
         if (linked && m_channels == 3) {
@@ -908,7 +908,7 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
     } else if (mode == Display_AutoStretch) {
         std::vector<ChStats> stats(m_channels);
         for (int c = 0; c < m_channels; ++c) stats[c] = computeStats(m_data, m_width, m_height, m_channels, c);
-        const float targetBG = 0.25f;
+        const float targetBG = autoStretchTargetMedian;
         const float shadowClip = -2.8f; 
         
         if (linked && m_channels == 3) {

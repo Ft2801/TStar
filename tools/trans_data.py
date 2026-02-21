@@ -1773,7 +1773,9 @@ TRANSLATIONS = {
 
     "Burn annotations into image (permanent)": {'it': "Imprimi annotazioni nell'immagine (permanente)", 'es': "Grabar anotaciones (permanente)", 'fr': "Graver annotations (permanent)", 'de': "Anmerkungen einbrennen (permanent)"},
 
+    "Target Median for Auto Stretch": {'it': "Mediana Target per Auto Stretch", 'es': "Mediana Objetivo para Auto Stretch", 'fr': "Médiane Cible pour Auto Stretch", 'de': "Ziel-Median für Auto-Stretch"},
 
+    "Models extraction completed but verification failed - expected file 'deep_sharp_stellar_AI4.pth' not found. Files extracted: %1": {'it': "Estrazione modelli completata ma verifica fallita - file atteso 'deep_sharp_stellar_AI4.pth' non trovato. File estratti: %1", 'es': "Extracción de modelos completada pero verificación fallida - archivo esperado 'deep_sharp_stellar_AI4.pth' no encontrado. Archivos extraídos: %1", 'fr': "Extraction des modèles terminée mais vérification échouée - fichier attendu 'deep_sharp_stellar_AI4.pth' introuvable. Fichiers extraits : %1", 'de': "Modellauszug abgeschlossen, aber Verifizierung fehlgeschlagen - erwartete Datei 'deep_sharp_stellar_AI4.pth' nicht gefunden. Extrahierte Dateien: %1"},
 
     "Refresh": {'it': "Aggiorna", 'es': "Actualizar", 'fr': "Actualiser", 'de': "Aktualisieren"},
 

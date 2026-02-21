@@ -87,7 +87,9 @@ public:
     bool isDisplayLinked() const { return m_displayLinked; }
     bool isDisplayInverted() const { return m_displayInverted; }
     bool isDisplayFalseColor() const { return m_displayFalseColor; }
+    float getAutoStretchMedian() const { return m_autoStretchMedian; }
     void setDisplayState(ImageBuffer::DisplayMode mode, bool linked);
+    void setAutoStretchMedian(float median);
     void setInverted(bool inverted);
     void setFalseColor(bool falseColor);
     QImage getCurrentDisplayImage() const { return m_displayImage; }
@@ -210,6 +212,7 @@ private:
     bool m_displayLinked = true;
     bool m_displayInverted = false;
     bool m_displayFalseColor = false;
+    float m_autoStretchMedian = 0.25f;  // Target median for AutoStretch display
     bool m_isModified = false;
     bool m_showMaskOverlay = true;
 };
