@@ -5,9 +5,7 @@
 #include "../ImageBuffer.h"
 
 struct StarRecompositionParams {
-    enum BlendMode { Screen, Add };
-    BlendMode mode = Screen;
-    float ratio = 1.0f;
+    ImageBuffer::GHSParams ghs;
 };
 
 class StarRecompositionRunner : public QObject {

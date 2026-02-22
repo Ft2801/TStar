@@ -49,82 +49,42 @@ SplineData CurvesGraph::getSpline() const {
 
 void CurvesGraph::setHistogram(const std::vector<std::vector<int>>& hist) {
     m_hist = hist;
-    updateResampledBins();
+    updatePaths();
     update();
 }
 
 void CurvesGraph::resizeEvent(QResizeEvent* event) {
     QWidget::resizeEvent(event);
-    updateResampledBins();
+    updatePaths();
 }
 
-void CurvesGraph::updateResampledBins() {
+void CurvesGraph::updatePaths() {
     int w = width();
-    if (w <= 0 || m_hist.empty()) return;
+    int h = height();
+    if (w <= 0 || h <= 0 || m_hist.empty()) return;
     
     int channels = m_hist.size();
+    m_lastW = w;
     
-    // Box blur helper
-    auto boxBlur = [](std::vector<float>& data, int radius) {
-        if (data.empty() || radius <= 0) return;
-        int n = data.size();
-        std::vector<float> temp(n);
-        for (int i = 0; i < n; ++i) {
-            float sum = 0;
-            int count = 0;
-            for (int j = -radius; j <= radius; ++j) {
-                int idx = i + j;
-                if (idx >= 0 && idx < n) {
-                    sum += data[idx];
-                    count++;
-                }
-            }
-            temp[i] = (count > 0) ? sum / count : 0;
-        }
-        data = std::move(temp);
-    };
-    
-    // Memory Optimization: Only reallocate if size changes
-    if (w != m_lastW || m_resampledBins.size() != (size_t)channels) {
-        m_resampledBins.assign(channels, std::vector<float>(w, 0.0f));
-        m_channelMaxVals.assign(channels, 0.0f);
-        m_lastW = w;
-    } else {
-        // Reuse existing vectors, just zero them out
-        for(auto& vec : m_resampledBins) {
-            std::fill(vec.begin(), vec.end(), 0.0f);
-        }
-        std::fill(m_channelMaxVals.begin(), m_channelMaxVals.end(), 0.0f);
-    }
-    
+    m_resampledBins.clear();
+    m_maxVal = 0;
+
+    int numBins = m_hist[0].size();
+    m_resampledBins.assign(channels, std::vector<float>(w, 0.0f));
+    float binsPerPx = (float)numBins / (float)w;
+
     for (int c = 0; c < channels; ++c) {
-        const auto& bins = m_hist[c];
-        int numBins = bins.size();
-        if (numBins == 0) continue;
-        
-        float binsPerPx = (float)numBins / (float)w;
         int binIdx = 0;
-        
         for (int px = 0; px < w; ++px) {
-            float sum = 0;
-            // Accumulate bins that fall into this pixel column
-            while (binIdx < numBins && (float)binIdx / binsPerPx <= (float)px + 0.5f) {
-                sum += (float)bins[binIdx];
+            double sum = 0;
+            while (binIdx < numBins && ((float)binIdx / binsPerPx) <= ((float)px + 0.5f)) {
+                sum += (double)m_hist[c][binIdx];
                 binIdx++;
             }
-            if (m_logScale && sum > 0) sum = std::log(sum); 
-            m_resampledBins[c][px] = sum;
+            if (m_logScale && sum > 0) sum = std::log(sum);
+            m_resampledBins[c][px] = (float)sum;
+            if (m_resampledBins[c][px] > m_maxVal) m_maxVal = m_resampledBins[c][px];
         }
-        
-        // Apply smoothing to eliminate spikes
-        boxBlur(m_resampledBins[c], 4); 
-        
-        // Recalculate max after blur
-        float maxVal = 0;
-        for (int px = 0; px < w; ++px) {
-            if (m_resampledBins[c][px] > maxVal) maxVal = m_resampledBins[c][px];
-        }
-        m_channelMaxVals[c] = maxVal;
     }
 }
 
@@ -136,7 +96,7 @@ void CurvesGraph::setChannelMode(int mode) {
 void CurvesGraph::setLogScale(bool enabled) {
     if (m_logScale == enabled) return;
     m_logScale = enabled;
-    updateResampledBins();
+    updatePaths();
     update();
 }
 
@@ -178,36 +138,29 @@ void CurvesGraph::paintEvent(QPaintEvent*) {
     p.drawLine(0, h, w, 0); 
     
     // Histogram
-    if (!m_resampledBins.empty()) {
+    if (!m_resampledBins.empty() && m_maxVal > 0) {
         QColor colors[3] = { QColor(255, 80, 80), QColor(80, 255, 80), QColor(80, 80, 255) };
         p.setCompositionMode(QPainter::CompositionMode_Screen);
 
-        auto drawCh = [&](int c) {
-            if (c >= (int)m_resampledBins.size()) return;
-            // Channel toggle check
-            if (m_channelMode != -1 && c != m_channelMode) { 
-                // But wait, m_channelMode is not used in this class logic for visibility?
-                // The dialog handles the 'ch' check for recalculation.
-                // However, let's assume if the bin data is 0, it's hidden.
-            }
-            
-            const auto& displayBins = m_resampledBins[c];
-            float channelMax = m_channelMaxVals[c];
-            if (channelMax <= 0) return;
-
-            QColor color = colors[c % 3];
-            color.setAlpha(60);
-            
+        for (int c = 0; c < (int)m_resampledBins.size(); ++c) {
             QPainterPath path;
+            QPainterPath linePath;
             path.moveTo(0, h);
+            
+            bool first = true;
             for (int px = 0; px < w; ++px) {
-                float val = (px < (int)displayBins.size()) ? displayBins[px] : 0.0f;
-                float py = h - (val / channelMax * h);
+                double normH = m_resampledBins[c][px] / m_maxVal;
+                float py = h - (normH * h);
                 path.lineTo(px, py);
+                if (first) { linePath.moveTo(px, py); first = false; }
+                else { linePath.lineTo(px, py); }
             }
             path.lineTo(w, h);
             path.closeSubpath();
 
+            QColor color = colors[c % 3];
+            color.setAlpha(60);
+            
             p.setPen(Qt::NoPen);
             p.setBrush(color);
             p.drawPath(path);
@@ -215,23 +168,8 @@ void CurvesGraph::paintEvent(QPaintEvent*) {
             color.setAlpha(200);
             p.setPen(QPen(color, 1.2));
             p.setBrush(Qt::NoBrush);
-            
-            // Draw line on top
-            QPainterPath linePath;
-            bool first = true;
-            for (int px = 0; px < w; ++px) {
-                float val = (px < (int)displayBins.size()) ? displayBins[px] : 0.0f;
-                float py = h - (val / channelMax * h);
-                if (first) { linePath.moveTo(px, py); first = false; }
-                else { linePath.lineTo(px, py); }
-            }
             p.drawPath(linePath);
-        };
-        
-        // Draw RGB Histograms
-        drawCh(0); // R
-        drawCh(1); // G
-        drawCh(2); // B
+        }
         
         p.setCompositionMode(QPainter::CompositionMode_SourceOver);
     }
@@ -429,6 +367,7 @@ CurvesDialog::CurvesDialog(ImageViewer* viewer, QWidget* parent)
          m_graph->setHistogram(m_origHist);
     }
     m_graph->installEventFilter(this);
+    connect(m_graph, &CurvesGraph::curvesChanged, this, [this](){ onCurvesChanged(false); });
     connect(m_graph, &CurvesGraph::mouseHover, this, [this](double x, double y){
         m_statsLabel->setText(tr("Point: x=%1, y=%2").arg(x, 0, 'f', 3).arg(y, 0, 'f', 3));
     });
@@ -473,25 +412,9 @@ CurvesDialog::CurvesDialog(ImageViewer* viewer, QWidget* parent)
 
 CurvesDialog::~CurvesDialog() {}
 
-// Helper to downsample histogram
-static std::vector<std::vector<int>> downsampleHist(const std::vector<std::vector<int>>& src, int targetBins) {
-    if (src.empty()) return {};
-    int srcBins = src[0].size();
-    if (srcBins <= targetBins) return src;
-    
-    std::vector<std::vector<int>> dst(src.size(), std::vector<int>(targetBins, 0));
-    for(size_t c=0; c<src.size(); ++c) {
-        for(int i=0; i<srcBins; ++i) {
-             int tIdx = (i * (targetBins - 1)) / (srcBins - 1);
-             dst[c][tIdx] += src[c][i];
-        }
-    }
-    return dst;
-}
-
 void CurvesDialog::setInputHistogram(const std::vector<std::vector<int>>& hist) {
     m_origHist = hist;
-    m_uiHist = downsampleHist(m_origHist, 1024);
+    m_uiHist = m_origHist;
     onCurvesChanged(false); 
 }
 
@@ -507,7 +430,7 @@ void CurvesDialog::setViewer(ImageViewer* viewer) {
     
     if (m_viewer && m_viewer->getBuffer().isValid()) {
          m_origHist = m_viewer->getBuffer().computeHistogram(65536);
-         m_uiHist = downsampleHist(m_origHist, 1024);
+         m_uiHist = m_origHist;
          m_graph->setHistogram(m_uiHist); // Initial show
     } else {
          m_origHist.clear();
@@ -616,7 +539,6 @@ void CurvesDialog::onCurvesChanged(bool isFinal) {
     // 1. Real-time Histogram Update (High Quality)
     if (!m_origHist.empty()) {
         const int HIST_SIZE = 65536;
-        const int UI_BINS = 1024;
         
         // 1. Build Transform LUT (65536 -> 65536)
         std::vector<int> transformLUT(HIST_SIZE);
@@ -653,10 +575,8 @@ void CurvesDialog::onCurvesChanged(bool isFinal) {
             }
         }
         
-        // 3. Downsample for UI (1024 bins)
-        // This "binning" step acts as an antialias filter, smoothing the "comb" gaps
-        m_uiHist = downsampleHist(highResTransformed, UI_BINS);
-        m_graph->setHistogram(m_uiHist);
+        // 3. Update Graph directly
+        m_graph->setHistogram(highResTransformed);
     }
     
     // 2. Image Preview Update 

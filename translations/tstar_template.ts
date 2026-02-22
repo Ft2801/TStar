@@ -1297,7 +1297,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>This view is currently in use by the '%1' tool. Please close the tool or select different views before closing this image.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Unsaved Changes</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>View in use</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -2783,6 +2791,10 @@
         </message>
         <message>
             <source>Shadows:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Zoom:</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -7094,15 +7106,11 @@
     <context>
         <name>StarRecompositionDialog</name>
         <message>
-            <source>Add</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Apply</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Blend Mode:</source>
+            <source>ArcSinh Stretch</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -7110,11 +7118,59 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Clip</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Color Blending:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Color Method:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Even Weighted Luminance</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to process image: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Fit</source>
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Generalized Hyperbolic Stretch</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Global Rescale</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Human Weighted Luminance</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Invalid Images</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Inverse ArcSinh</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Inverse GHS</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Local Intensity (B):</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -7130,15 +7186,19 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Processing Error</source>
+            <source>RGB (Independent)</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Ratio:</source>
+            <source>RGB Blend</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Screen</source>
+            <source>Rescale</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Saturation</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -7154,7 +7214,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Stars Stretch Parameters</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Stars-Only View:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stretch Factor (D):</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stretch Mode:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Symmetry Point (SP):</source>
             <translation type="unfinished" />
         </message>
     </context>

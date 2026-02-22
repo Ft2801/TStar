@@ -1,8 +1,11 @@
 #include "CustomMdiSubWindow.h"
 #include "ImageViewer.h"
+#include "MainWindowCallbacks.h"
 #include "Icons.h"
 #include "core/DpiHelper.h"
 #include <QStyle>
+#include <QMenu>
+#include <QScreen>
 #include <QDebug>
 #include <QDrag>
 #include <QMimeData>
@@ -1251,12 +1254,31 @@ bool CustomMdiSubWindow::canClose() {
     
     // Check for unsaved changes if this window contains an ImageViewer
     ImageViewer* v = viewer();
-    if (v && v->isModified()) {
-        int ret = QMessageBox::question(this, tr("Unsaved Changes"),
-            tr("The image '%1' has unsaved changes. Do you want to close it?").arg(windowTitle()),
-            QMessageBox::Yes | QMessageBox::No);
-        if (ret == QMessageBox::No) {
-            return false;
+    if (v) {
+        // Find MainWindowCallbacks by traversing up the parent hierarchy
+        MainWindowCallbacks* mw = nullptr;
+        QWidget* p = this;
+        while (p) {
+            mw = dynamic_cast<MainWindowCallbacks*>(p);
+            if (mw) break;
+            p = p->parentWidget();
+        }
+
+        if (mw) {
+            QString toolName;
+            if (mw->isViewerInUse(v, &toolName)) {
+                QMessageBox::warning(this, tr("View in use"), tr("This view is currently in use by the '%1' tool. Please close the tool or select different views before closing this image.").arg(toolName));
+                return false;
+            }
+        }
+        
+        if (v->isModified()) {
+            int ret = QMessageBox::question(this, tr("Unsaved Changes"),
+                tr("The image '%1' has unsaved changes. Do you want to close it?").arg(windowTitle()),
+                QMessageBox::Yes | QMessageBox::No);
+            if (ret == QMessageBox::No) {
+                return false;
+            }
         }
     }
     return true;

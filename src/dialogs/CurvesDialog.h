@@ -45,14 +45,14 @@ protected:
 
 private:
     void sortPoints();
-    void updateResampledBins();
+    void updatePaths();
 
     std::vector<std::vector<int>> m_hist;
     std::vector<SplinePoint> m_points;
     
     // Caching
     std::vector<std::vector<float>> m_resampledBins;
-    std::vector<float> m_channelMaxVals;
+    double m_maxVal = 0;
     int m_lastW = 0;
 
     int m_channelMode = 0; 

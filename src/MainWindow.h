@@ -63,6 +63,7 @@ public:
     ImageViewer* getCurrentViewer() override;
     void createResultWindow(const ImageBuffer& buffer, const QString& title) override;
     void logMessage(const QString& message, int severity, bool showPopup = false) override;
+    bool isViewerInUse(class ImageViewer* viewer, QString* toolName = nullptr) const override;
     
     // Helper to check if tool is already open and activate it
     bool activateTool(const QString& title);

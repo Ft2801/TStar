@@ -41,6 +41,7 @@ private slots:
     void onAutoStretch();
     void onReset();
     void onApply();
+    void onZoomChanged();
 
 private:
     void setupUI();
@@ -62,6 +63,13 @@ private:
     
     // UI elements
     HistogramWidget* m_histogram;
+    class QScrollArea* m_scrollArea;
+    class QScrollBar* m_histScrollBar;
+    QToolButton* m_zoomInBtn;
+    QToolButton* m_zoomOutBtn;
+    QToolButton* m_zoomResetBtn;
+    QLabel* m_zoomLabel;
+    
     QSlider* m_shadowsSlider;
     QSlider* m_midtonesSlider;
     QSlider* m_highlightsSlider;
@@ -83,6 +91,7 @@ private:
     bool m_doRed = true;
     bool m_doGreen = true;
     bool m_doBlue = true;
+    int m_zoomLevel = 1;
     
     // Caching for performance
     std::vector<std::vector<int>> m_baseHist;

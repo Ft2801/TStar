@@ -17,6 +17,9 @@ public:
     explicit StarRecompositionDialog(QWidget* parent = nullptr);
 
     void setViewer(ImageViewer* v);
+    
+    // Check if the given viewer is currently selected in either combobox
+    bool isUsingViewer(ImageViewer* v) const;
 
 private slots:
     void onRefreshViews();
@@ -31,9 +34,20 @@ private:
     
     QComboBox* m_cmbStarless;
     QComboBox* m_cmbStars;
-    QComboBox* m_cmbMode;
-    QSlider* m_sliderRatio;
-    QLabel* m_lblRatio;
+
+    // Advanced Stretch parameters
+    QComboBox* m_cmbStretchMode;
+    QComboBox* m_cmbColorMode;
+    QComboBox* m_cmbClipMode;
+    
+    QSlider* m_sliderD;
+    class QDoubleSpinBox* m_spinD;
+
+    QSlider* m_sliderB;
+    class QDoubleSpinBox* m_spinB;
+
+    QSlider* m_sliderSP;
+    class QDoubleSpinBox* m_spinSP;
     
     // Preview Logic
     ImageViewer* m_previewViewer;

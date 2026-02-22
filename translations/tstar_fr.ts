@@ -1297,8 +1297,16 @@
             <translation type="finished">L'image '%1' a des modifs non enregistrées. Fermer ?</translation>
         </message>
         <message>
+            <source>This view is currently in use by the '%1' tool. Please close the tool or select different views before closing this image.</source>
+            <translation type="finished">Cette vue est actuellement en cours d'utilisation par l'outil "%1". Fermez l'outil ou sélectionnez des vues différentes avant de fermer cette image.</translation>
+        </message>
+        <message>
             <source>Unsaved Changes</source>
             <translation type="finished">Modifications Non Enregistrées</translation>
+        </message>
+        <message>
+            <source>View in use</source>
+            <translation type="finished">Vista en cours d'utilisation</translation>
         </message>
     </context>
     <context>
@@ -2786,6 +2794,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Shadows:</source>
             <translation type="finished">Ombres :</translation>
+        </message>
+        <message>
+            <source>Zoom:</source>
+            <translation type="finished">Zoom :</translation>
         </message>
     </context>
     <context>
@@ -7097,28 +7109,72 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
     <context>
         <name>StarRecompositionDialog</name>
         <message>
-            <source>Add</source>
-            <translation type="finished">Ajouter</translation>
-        </message>
-        <message>
             <source>Apply</source>
             <translation type="finished">Appliquer</translation>
         </message>
         <message>
-            <source>Blend Mode:</source>
-            <translation type="finished">Mode Fusion :</translation>
+            <source>ArcSinh Stretch</source>
+            <translation type="finished">ArcSinh Stretching</translation>
         </message>
         <message>
             <source>Cancel</source>
             <translation type="finished">Annuler</translation>
         </message>
         <message>
+            <source>Clip</source>
+            <translation type="finished">Ecrêter</translation>
+        </message>
+        <message>
+            <source>Color Blending:</source>
+            <translation type="finished">Fusion de Couleur:</translation>
+        </message>
+        <message>
+            <source>Color Method:</source>
+            <translation type="finished">Méthode de Couleur:</translation>
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="finished">Erreur</translation>
+        </message>
+        <message>
+            <source>Even Weighted Luminance</source>
+            <translation type="finished">Luminance pondérée paire</translation>
+        </message>
+        <message>
+            <source>Failed to process image: %1</source>
+            <translation type="finished">Impossible de traiter l'image : %1</translation>
+        </message>
+        <message>
             <source>Fit</source>
             <translation type="finished">Ajuster</translation>
         </message>
         <message>
+            <source>Generalized Hyperbolic Stretch</source>
+            <translation type="finished">Generalized Hyperbolic Stretching</translation>
+        </message>
+        <message>
+            <source>Global Rescale</source>
+            <translation type="finished">Rescalage global</translation>
+        </message>
+        <message>
+            <source>Human Weighted Luminance</source>
+            <translation type="finished">Luminance Pondérée Humaine</translation>
+        </message>
+        <message>
             <source>Invalid Images</source>
             <translation type="finished">Images non valides</translation>
+        </message>
+        <message>
+            <source>Inverse ArcSinh</source>
+            <translation type="finished">ArcSinh Inverse</translation>
+        </message>
+        <message>
+            <source>Inverse GHS</source>
+            <translation type="finished">GHS Inverse</translation>
+        </message>
+        <message>
+            <source>Local Intensity (B):</source>
+            <translation type="finished">Intensité Locale (B):</translation>
         </message>
         <message>
             <source>No Image</source>
@@ -7133,16 +7189,20 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Aperçu :</translation>
         </message>
         <message>
-            <source>Processing Error</source>
-            <translation type="finished">Erreur Traitement</translation>
+            <source>RGB (Independent)</source>
+            <translation type="finished">RGB (Indépendant)</translation>
         </message>
         <message>
-            <source>Ratio:</source>
-            <translation type="finished">Ratio :</translation>
+            <source>RGB Blend</source>
+            <translation type="finished">Mélange RGB</translation>
         </message>
         <message>
-            <source>Screen</source>
-            <translation type="finished">Écran</translation>
+            <source>Rescale</source>
+            <translation type="finished">Redimensionner</translation>
+        </message>
+        <message>
+            <source>Saturation</source>
+            <translation type="finished">Saturation</translation>
         </message>
         <message>
             <source>Selected views contain invalid image data.</source>
@@ -7157,8 +7217,24 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Vue Sans Étoiles :</translation>
         </message>
         <message>
+            <source>Stars Stretch Parameters</source>
+            <translation type="finished">Paramètres de stretch des étoiles</translation>
+        </message>
+        <message>
             <source>Stars-Only View:</source>
             <translation type="finished">Vue Étoiles Seules :</translation>
+        </message>
+        <message>
+            <source>Stretch Factor (D):</source>
+            <translation type="finished">Facteur de stretch (D):</translation>
+        </message>
+        <message>
+            <source>Stretch Mode:</source>
+            <translation type="finished">Mode Stretching:</translation>
+        </message>
+        <message>
+            <source>Symmetry Point (SP):</source>
+            <translation type="finished">Point de symétrie (SP):</translation>
         </message>
     </context>
     <context>

@@ -1968,16 +1968,18 @@ void ImageBuffer::applyGHS(const GHSParams& params) {
         else if (m_channels == 3 && (params.colorMode == GHS_WeightedLuminance || params.colorMode == GHS_EvenWeightedLuminance)) {
             // Luminance-based Modes
             size_t idx = i * 3;
-            float f[3] = { m_data[idx], m_data[idx+1], m_data[idx+2] };
-            float f_clipped[3];
-            for(int c=0; c<3; ++c) f_clipped[c] = std::max(0.0f, std::min(1.0f, f[c]));
+            float f[3] = { 
+                std::max(0.0f, std::min(1.0f, m_data[idx])), 
+                std::max(0.0f, std::min(1.0f, m_data[idx+1])), 
+                std::max(0.0f, std::min(1.0f, m_data[idx+2])) 
+            };
 
             float sf[3];
             float tf[3] = {0,0,0}; 
 
-            float fbar = (active_channels[0] ? factor_red * f_clipped[0] : 0) + 
-                         (active_channels[1] ? factor_green * f_clipped[1] : 0) + 
-                         (active_channels[2] ? factor_blue * f_clipped[2] : 0);
+            float fbar = (active_channels[0] ? factor_red * f[0] : 0) + 
+                         (active_channels[1] ? factor_green * f[1] : 0) + 
+                         (active_channels[2] ? factor_blue * f[2] : 0);
             
             // Direct call for sfbar
             float sfbar = (fbar == 0.0f) ? 0.0f : GHSAlgo::compute(std::min(1.0f, std::max(0.0f, fbar)), algoParams, cp);
@@ -1987,29 +1989,28 @@ void ImageBuffer::applyGHS(const GHSParams& params) {
             
             if (params.clipMode == GHS_ClipRGBBlend) {
                 for(int c=0; c<3; ++c) {
-                    float xc = std::max(0.0f, std::min(1.0f, f[c]));
-                    tf[c] = active_channels[c] ? ((xc == 0.0f) ? 0.0f : GHSAlgo::compute(xc, algoParams, cp)) : 0.0f;
+                    tf[c] = active_channels[c] ? ((f[c] == 0.0f) ? 0.0f : GHSAlgo::compute(f[c], algoParams, cp)) : 0.0f;
                 }
             }
             
             // Apply Clip Modes
             if (params.clipMode == GHS_ClipRGBBlend) {
                  rgbblend_func(&f[0], &f[1], &f[2], sf[0], sf[1], sf[2], tf[0], tf[1], tf[2], active_channels, m_CB);
-                 for(int c=0; c<3; ++c) m_data[idx+c] = active_channels[c] ? f[c] : m_data[idx+c];
+                 for(int c=0; c<3; ++c) m_data[idx+c] = active_channels[c] ? f[c] : f[c];
             } else if (params.clipMode == GHS_Rescale) {
                 float maxval = std::max({sf[0], sf[1], sf[2]});
                 if (maxval > 1.0f) {
                     float invmax = 1.0f / maxval;
                     sf[0] *= invmax; sf[1] *= invmax; sf[2] *= invmax;
                 }
-                for(int c=0; c<3; ++c) m_data[idx+c] = active_channels[c] ? sf[c] : m_data[idx+c];
+                for(int c=0; c<3; ++c) m_data[idx+c] = active_channels[c] ? sf[c] : f[c];
             } else if (params.clipMode == GHS_RescaleGlobal) {
                  float maxval = std::max({sf[0], sf[1], sf[2]});
                  if (maxval > local_global_max) local_global_max = maxval;
-                 for(int c=0; c<3; ++c) m_data[idx+c] = active_channels[c] ? sf[c] : m_data[idx+c];
+                 for(int c=0; c<3; ++c) m_data[idx+c] = active_channels[c] ? sf[c] : f[c];
             } else {
                 for(int c=0; c<3; ++c) {
-                    m_data[idx+c] = active_channels[c] ? std::max(0.0f, std::min(1.0f, sf[c])) : m_data[idx+c];
+                    m_data[idx+c] = active_channels[c] ? std::max(0.0f, std::min(1.0f, sf[c])) : f[c];
                 }
             }
         }

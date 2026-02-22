@@ -37,6 +37,12 @@ public:
     
     // End long operation (hide progress bar, enable UI)
     virtual void endLongProcess() = 0;
+    
+    // Check if the viewer is currently actively retained by a tool dialog
+    virtual bool isViewerInUse(class ImageViewer* vi, QString* toolName = nullptr) const { 
+        (void)vi; (void)toolName; 
+        return false; 
+    }
 };
 
 #endif // MAINWINDOW_CALLBACKS_H

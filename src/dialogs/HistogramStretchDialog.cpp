@@ -75,14 +75,62 @@ void HistogramStretchDialog::setupUI() {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(10);
     
-    // --- Histogram Display ---
+    // --- Histogram Toolbar (Zoom) ---
+    QHBoxLayout* histoToolbar = new QHBoxLayout();
+    histoToolbar->addWidget(new QLabel(tr("Zoom:")));
+    
+    m_zoomOutBtn = new QToolButton();
+    m_zoomOutBtn->setText("-");
+    m_zoomOutBtn->setFixedWidth(24);
+    histoToolbar->addWidget(m_zoomOutBtn);
+    
+    m_zoomLabel = new QLabel("1x");
+    m_zoomLabel->setMinimumWidth(35);
+    m_zoomLabel->setAlignment(Qt::AlignCenter);
+    histoToolbar->addWidget(m_zoomLabel);
+    
+    m_zoomInBtn = new QToolButton();
+    m_zoomInBtn->setText("+");
+    m_zoomInBtn->setFixedWidth(24);
+    histoToolbar->addWidget(m_zoomInBtn);
+    
+    m_zoomResetBtn = new QToolButton();
+    m_zoomResetBtn->setText("1:1");
+    histoToolbar->addWidget(m_zoomResetBtn);
+    
+    histoToolbar->addStretch();
+    mainLayout->addLayout(histoToolbar);
+
+    // --- Histogram Scroll Area ---
+    #include <QScrollArea>
+    #include <QScrollBar>
+    m_scrollArea = new QScrollArea();
+    m_scrollArea->setWidgetResizable(true);
+    m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_scrollArea->setStyleSheet("QScrollArea { border: none; background: #1a1a1a; }");
+
     m_histogram = new HistogramWidget();
-    m_histogram->setMinimumHeight(180);
-    if (m_backup.isValid()) {
-        m_baseHist = m_backup.computeHistogram(65536);
-        m_histogram->setData(m_baseHist, m_backup.channels());
+    m_histogram->setMinimumHeight(150);
+    if (m_baseHist.empty() && m_backup.isValid()) {
+         m_baseHist = m_backup.computeHistogram(65536);
     }
-    mainLayout->addWidget(m_histogram);
+    m_histogram->setData(m_baseHist, m_backup.channels());
+    
+    m_scrollArea->setWidget(m_histogram);
+    mainLayout->addWidget(m_scrollArea, 1);
+
+    // Separate Horizontal ScrollBar below the scroll area
+    m_histScrollBar = new QScrollBar(Qt::Horizontal);
+    m_histScrollBar->setVisible(false);
+    m_histScrollBar->setFixedHeight(10);
+    m_histScrollBar->setStyleSheet(
+        "QScrollBar:horizontal { border: none; background: #2b2b2b; height: 10px; margin: 0px; border-radius: 5px; }"
+        "QScrollBar::handle:horizontal { background: #555; min-width: 20px; border-radius: 5px; }"
+        "QScrollBar::handle:horizontal:hover { background: #666; }"
+        "QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal { width: 0px; }"
+    );
+    mainLayout->addWidget(m_histScrollBar);
     
     // --- Channel Toggles (Curves-style) ---
     QHBoxLayout* channelLayout = new QHBoxLayout();
@@ -219,6 +267,25 @@ void HistogramStretchDialog::setupUI() {
     connect(resetBtn, &QPushButton::clicked, this, &HistogramStretchDialog::onReset);
     connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
     connect(applyBtn, &QPushButton::clicked, this, &HistogramStretchDialog::onApply);
+
+    // Zoom connections
+    connect(m_zoomInBtn, &QToolButton::clicked, [this](){
+        if (m_zoomLevel < 10) { m_zoomLevel++; m_zoomLabel->setText(QString("%1x").arg(m_zoomLevel)); onZoomChanged(); }
+    });
+    connect(m_zoomOutBtn, &QToolButton::clicked, [this](){
+        if (m_zoomLevel > 1) { m_zoomLevel--; m_zoomLabel->setText(QString("%1x").arg(m_zoomLevel)); onZoomChanged(); }
+    });
+    connect(m_zoomResetBtn, &QToolButton::clicked, [this](){
+        m_zoomLevel = 1; m_zoomLabel->setText("1x"); onZoomChanged();
+    });
+
+    // Sync scrollbar
+    connect(m_histScrollBar, &QScrollBar::valueChanged, [this](int v){
+        m_scrollArea->horizontalScrollBar()->setValue(v);
+    });
+    connect(m_scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged, [this](int min, int max){
+        m_histScrollBar->setRange(min, max);
+    });
 }
 
 void HistogramStretchDialog::onShadowsChanged() {
@@ -627,4 +694,24 @@ float HistogramStretchDialog::computeMAD(const float* data, size_t n, float medi
     }
     std::nth_element(deviations.begin(), deviations.begin() + n/2, deviations.end());
     return deviations[n/2];
+}
+
+void HistogramStretchDialog::onZoomChanged() {
+    int baseWidth = m_scrollArea->viewport()->width();
+    if (baseWidth < 100) baseWidth = 400;
+    int newWidth = baseWidth * m_zoomLevel;
+
+    if (m_zoomLevel == 1) {
+        m_scrollArea->setWidgetResizable(true);
+        m_histogram->setMinimumWidth(0);
+        m_histogram->setMaximumWidth(16777215);
+        m_histScrollBar->setVisible(false);
+    } else {
+        m_scrollArea->setWidgetResizable(true); // Keep resizable to allow dynamic height adjustment!
+        m_histogram->setMinimumWidth(newWidth);
+        m_histogram->setMaximumWidth(newWidth); // Lock width explicitly
+        m_histScrollBar->setVisible(true);
+        m_scrollArea->horizontalScrollBar()->setValue(0);
+    }
+    updateHistogramOnly();
 }

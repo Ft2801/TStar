@@ -121,6 +121,7 @@ private:
     QToolButton* m_curveBtn;
     QCheckBox* m_previewCheck;
     QScrollArea* m_scrollArea;
+    class QScrollBar* m_histScrollBar;
     
     // State
     std::vector<std::vector<int>> m_origBins;

@@ -2277,6 +2277,14 @@ void MainWindow::openPerfectPaletteDialog() {
     setupToolSubwindow(nullptr, dlg, tr("Perfect Palette"));
 }
 
+bool MainWindow::isViewerInUse(ImageViewer* viewer, QString* toolName) const {
+    if (m_starRecompDlg && m_starRecompDlg->isUsingViewer(viewer)) {
+        if (toolName) *toolName = "Star Recomposition";
+        return true;
+    }
+    return false;
+}
+
 void MainWindow::applyGeometry(const QString& op) {
     if (auto v = currentViewer()) {
         // NOTE: Flip and rotate should NOT be saved to undo/redo stack

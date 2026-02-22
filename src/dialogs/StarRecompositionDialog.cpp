@@ -11,9 +11,13 @@
 #include <QPushButton>
 #include <QIcon>
 
+#include <QDoubleSpinBox>
+#include <QGroupBox>
+
 StarRecompositionDialog::StarRecompositionDialog(QWidget* parent)
-    : DialogBase(parent, tr("Star Recomposition"), 700, 500)
+    : DialogBase(parent, tr("Star Recomposition"), 900, 500)
 {
+    setModal(true);
     createUI();
     populateCombos();
     setMinimumWidth(400);
@@ -64,36 +68,70 @@ void StarRecompositionDialog::createUI() {
     );
     grid->addWidget(m_cmbStars, 1, 1);
     
-    // Blend Mode
-    grid->addWidget(new QLabel(tr("Blend Mode:")), 2, 0);
-    m_cmbMode = new QComboBox();
-    m_cmbMode->addItem(tr("Screen"), StarRecompositionParams::Screen);
-    m_cmbMode->addItem(tr("Add"), StarRecompositionParams::Add);
-    m_cmbMode->setStyleSheet(
-        "QComboBox { color: white; background-color: #2a2a2a; border: 1px solid #555; padding: 2px; border-radius: 3px; }"
-        "QComboBox:focus { border: 2px solid #4a9eff; }"
-        "QComboBox::drop-down { border: none; }"
-        "QComboBox::down-arrow { image: url(:/images/dropdown.png); }"
-        "QComboBox QAbstractItemView { color: white; background-color: #2a2a2a; outline: none; }"
-        "QComboBox QAbstractItemView::item { padding: 3px; margin: 0px; }"
-        "QComboBox QAbstractItemView::item:hover { background-color: #4a7ba7 !important; color: white; }"
-        "QComboBox QAbstractItemView::item:selected { background-color: #4a7ba7; color: white; }"
-    );
-    grid->addWidget(m_cmbMode, 2, 1);
+    // --- Advanced Stretch Controls for Stars ---
+    QGroupBox *stretchGroup = new QGroupBox(tr("Stars Stretch Parameters"));
+    QGridLayout *sg = new QGridLayout(stretchGroup);
+    
+    // Stretch Mode
+    sg->addWidget(new QLabel(tr("Stretch Mode:")), 0, 0);
+    m_cmbStretchMode = new QComboBox();
+    m_cmbStretchMode->addItem(tr("Generalized Hyperbolic Stretch"), ImageBuffer::GHS_GeneralizedHyperbolic);
+    m_cmbStretchMode->addItem(tr("Inverse GHS"), ImageBuffer::GHS_InverseGeneralizedHyperbolic);
+    m_cmbStretchMode->addItem(tr("ArcSinh Stretch"), ImageBuffer::GHS_ArcSinh);
+    m_cmbStretchMode->addItem(tr("Inverse ArcSinh"), ImageBuffer::GHS_InverseArcSinh);
+    m_cmbStretchMode->setStyleSheet(m_cmbStarless->styleSheet());
+    sg->addWidget(m_cmbStretchMode, 0, 1, 1, 2);
+
+    // Color Mode
+    sg->addWidget(new QLabel(tr("Color Method:")), 1, 0);
+    m_cmbColorMode = new QComboBox();
+    m_cmbColorMode->addItem(tr("RGB (Independent)"), ImageBuffer::GHS_Independent);
+    m_cmbColorMode->addItem(tr("Human Weighted Luminance"), ImageBuffer::GHS_WeightedLuminance);
+    m_cmbColorMode->addItem(tr("Even Weighted Luminance"), ImageBuffer::GHS_EvenWeightedLuminance);
+    m_cmbColorMode->addItem(tr("Saturation"), ImageBuffer::GHS_Saturation);
+    m_cmbColorMode->setStyleSheet(m_cmbStarless->styleSheet());
+    sg->addWidget(m_cmbColorMode, 1, 1, 1, 2);
+
+    // Clip / Blending Mode
+    sg->addWidget(new QLabel(tr("Color Blending:")), 2, 0);
+    m_cmbClipMode = new QComboBox();
+    m_cmbClipMode->addItem(tr("Clip"), ImageBuffer::GHS_Clip);
+    m_cmbClipMode->addItem(tr("Rescale"), ImageBuffer::GHS_Rescale);
+    m_cmbClipMode->addItem(tr("RGB Blend"), ImageBuffer::GHS_ClipRGBBlend);
+    m_cmbClipMode->addItem(tr("Global Rescale"), ImageBuffer::GHS_RescaleGlobal);
+    m_cmbClipMode->setStyleSheet(m_cmbStarless->styleSheet());
+    sg->addWidget(m_cmbClipMode, 2, 1, 1, 2);
+
+    // Helper macro for creating slider row
+    auto addSlider = [&](QGridLayout* g, int row, const QString& label, QSlider*& slider, QDoubleSpinBox*& spin, double min, double max, double step, double def) {
+        g->addWidget(new QLabel(label), row, 0);
+        slider = new QSlider(Qt::Horizontal);
+        slider->setRange(min * 100, max * 100);
+        slider->setValue(def * 100);
+        spin = new QDoubleSpinBox();
+        spin->setRange(min, max);
+        spin->setSingleStep(step);
+        spin->setValue(def);
+        spin->setDecimals(3);
+        g->addWidget(slider, row, 1);
+        g->addWidget(spin, row, 2);
+
+        connect(slider, &QSlider::valueChanged, this, [spin, this](int v){ 
+            spin->blockSignals(true); spin->setValue(v / 100.0); spin->blockSignals(false); 
+            onUpdatePreview();
+        });
+        connect(spin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [slider, this](double v){
+            slider->blockSignals(true); slider->setValue(std::round(v * 100)); slider->blockSignals(false); 
+            onUpdatePreview();
+        });
+    };
+
+    addSlider(sg, 3, tr("Stretch Factor (D):"), m_sliderD, m_spinD, 0.0, 10.0, 0.01, 0.0);
+    addSlider(sg, 4, tr("Local Intensity (B):"), m_sliderB, m_spinB, 0.0, 15.0, 0.01, 0.0);
+    addSlider(sg, 5, tr("Symmetry Point (SP):"), m_sliderSP, m_spinSP, 0.0, 1.0, 0.001, 0.0);
     
     ctrlLayout->addLayout(grid);
-    
-    // Blend Ratio
-    QHBoxLayout* ratioLayout = new QHBoxLayout();
-    ratioLayout->addWidget(new QLabel(tr("Ratio:")));
-    m_sliderRatio = new QSlider(Qt::Horizontal);
-    m_sliderRatio->setRange(0, 100);
-    m_sliderRatio->setValue(100);
-    m_lblRatio = new QLabel("1.00");
-    m_lblRatio->setFixedWidth(30);
-    ratioLayout->addWidget(m_sliderRatio);
-    ratioLayout->addWidget(m_lblRatio);
-    ctrlLayout->addLayout(ratioLayout);
+    ctrlLayout->addWidget(stretchGroup);
     
     // Buttons
     QHBoxLayout* btnLayout = new QHBoxLayout();
@@ -134,22 +172,34 @@ void StarRecompositionDialog::createUI() {
     
     connect(m_btnFit, &QPushButton::clicked, m_previewViewer, &ImageViewer::fitToWindow);
 
-    connect(m_sliderRatio, &QSlider::valueChanged, this, [this](int val){
-        m_lblRatio->setText(QString::number(val / 100.0, 'f', 2));
-        onUpdatePreview();
-    });
-    
     connect(m_cmbStarless, &QComboBox::currentIndexChanged, this, [this](int){ onUpdatePreview(); });
     connect(m_cmbStars, &QComboBox::currentIndexChanged, this, [this](int){ onUpdatePreview(); });
-    connect(m_cmbMode, &QComboBox::currentIndexChanged, this, [this](int){ onUpdatePreview(); });
+    
+    connect(m_cmbStretchMode, &QComboBox::currentIndexChanged, this, [this](int){ onUpdatePreview(); });
+    connect(m_cmbColorMode, &QComboBox::currentIndexChanged, this, [this](int){ onUpdatePreview(); });
+    connect(m_cmbClipMode, &QComboBox::currentIndexChanged, this, [this](int){ onUpdatePreview(); });
 }
 
 void StarRecompositionDialog::populateCombos() {
+    // Store current selections before clearing
+    ImageViewer* currSll = (ImageViewer*)m_cmbStarless->currentData().value<void*>();
+    ImageViewer* currStr = (ImageViewer*)m_cmbStars->currentData().value<void*>();
+
+    m_cmbStarless->blockSignals(true);
+    m_cmbStars->blockSignals(true);
+
     m_cmbStarless->clear();
     m_cmbStars->clear();
     
     MainWindowCallbacks* mw = getCallbacks();
-    if (!mw) return;
+    if (!mw) {
+        m_cmbStarless->blockSignals(false);
+        m_cmbStars->blockSignals(false);
+        return;
+    }
+    
+    int sllIdx = -1;
+    int strIdx = -1;
     
     QList<ImageViewer*> viewers = mw->getCurrentViewer()->window()->findChildren<ImageViewer*>();
     for (ImageViewer* v : viewers) {
@@ -159,7 +209,17 @@ void StarRecompositionDialog::populateCombos() {
         
         m_cmbStarless->addItem(title, QVariant::fromValue((void*)v));
         m_cmbStars->addItem(title, QVariant::fromValue((void*)v));
+        
+        if (v == currSll) sllIdx = m_cmbStarless->count() - 1;
+        if (v == currStr) strIdx = m_cmbStars->count() - 1;
     }
+    
+    // Restore selections if the viewers still exist
+    if (sllIdx >= 0) m_cmbStarless->setCurrentIndex(sllIdx);
+    if (strIdx >= 0) m_cmbStars->setCurrentIndex(strIdx);
+    
+    m_cmbStarless->blockSignals(false);
+    m_cmbStars->blockSignals(false);
 }
 
 void StarRecompositionDialog::onRefreshViews() {
@@ -222,8 +282,23 @@ void StarRecompositionDialog::onUpdatePreview() {
     // Run Runner logic
     ImageBuffer result;
     StarRecompositionParams params;
-    params.mode = (StarRecompositionParams::BlendMode)m_cmbMode->currentData().toInt();
-    params.ratio = m_sliderRatio->value() / 100.0f;
+    
+    // Build GHS Params from UI
+    ImageBuffer::GHSParams ghs;
+    ghs.mode = (ImageBuffer::GHSMode)m_cmbStretchMode->currentData().toInt();
+    ghs.colorMode = (ImageBuffer::GHSColorMode)m_cmbColorMode->currentData().toInt();
+    ghs.clipMode = (ImageBuffer::GHSClipMode)m_cmbClipMode->currentData().toInt();
+    ghs.D = m_spinD->value();
+    ghs.B = m_spinB->value();
+    ghs.SP = m_spinSP->value();
+    
+    // Inverse flags
+    ghs.inverse = (ghs.mode == ImageBuffer::GHS_InverseGeneralizedHyperbolic || ghs.mode == ImageBuffer::GHS_InverseArcSinh);
+    
+    // We only process stars, not strictly log scale for this specific blend UI
+    ghs.applyLog = false;
+    
+    params.ghs = ghs;
     
     QString err;
     if (m_runner.run(bufSll, bufStr, result, params, &err)) {
@@ -253,17 +328,36 @@ void StarRecompositionDialog::onApply() {
     }
     
     StarRecompositionParams params;
-    params.mode = (StarRecompositionParams::BlendMode)m_cmbMode->currentData().toInt();
-    params.ratio = m_sliderRatio->value() / 100.0f;
+    ImageBuffer::GHSParams ghs;
+    ghs.mode = (ImageBuffer::GHSMode)m_cmbStretchMode->currentData().toInt();
+    ghs.colorMode = (ImageBuffer::GHSColorMode)m_cmbColorMode->currentData().toInt();
+    ghs.clipMode = (ImageBuffer::GHSClipMode)m_cmbClipMode->currentData().toInt();
+    ghs.D = m_spinD->value();
+    ghs.B = m_spinB->value();
+    ghs.SP = m_spinSP->value();
+    ghs.inverse = (ghs.mode == ImageBuffer::GHS_InverseGeneralizedHyperbolic || ghs.mode == ImageBuffer::GHS_InverseArcSinh);
+    ghs.applyLog = false;
+    
+    params.ghs = ghs;
     
     ImageBuffer result;
     QString err;
     if (m_runner.run(starlessViewer->getBuffer(), starsViewer->getBuffer(), result, params, &err)) {
-    if (MainWindowCallbacks* mw = getCallbacks()) {
-        mw->createResultWindow(result, "Stars_Recomposed");
+        // Create a new image view for the result instead of modifying the starless image
+        MainWindowCallbacks* mw = getCallbacks();
+        if (mw) {
+            QString newName = m_cmbStarless->currentText() + "_recomposed";
+            mw->createResultWindow(result, newName);
+        }
         accept();
-    }
     } else {
-        QMessageBox::critical(this, tr("Processing Error"), err);
+        QMessageBox::critical(this, tr("Error"), tr("Failed to process image: %1").arg(err));
     }
+}
+
+bool StarRecompositionDialog::isUsingViewer(ImageViewer* v) const {
+    if (!v) return false;
+    ImageViewer* sll = m_cmbStarless ? (ImageViewer*)m_cmbStarless->currentData().value<void*>() : nullptr;
+    ImageViewer* str = m_cmbStars ? (ImageViewer*)m_cmbStars->currentData().value<void*>() : nullptr;
+    return (v == sll || v == str);
 }

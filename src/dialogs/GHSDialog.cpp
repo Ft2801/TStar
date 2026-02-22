@@ -130,6 +130,29 @@ void GHSDialog::setupUI() {
     m_scrollArea->setWidget(m_histWidget);
     mainLayout->addWidget(m_scrollArea, 1); // Give it stretch factor
 
+    // Separate Horizontal ScrollBar below the scroll area
+    m_histScrollBar = new QScrollBar(Qt::Horizontal);
+    m_histScrollBar->setVisible(false);
+    m_histScrollBar->setFixedHeight(10);
+    m_histScrollBar->setStyleSheet(
+        "QScrollBar:horizontal { border: none; background: #2b2b2b; height: 10px; margin: 0px; border-radius: 5px; }"
+        "QScrollBar::handle:horizontal { background: #555; min-width: 20px; border-radius: 5px; }"
+        "QScrollBar::handle:horizontal:hover { background: #666; }"
+        "QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal { width: 0px; }"
+    );
+    mainLayout->addWidget(m_histScrollBar);
+
+    // Sync scrollbar with scroll area
+    connect(m_histScrollBar, &QScrollBar::valueChanged, [this](int v){
+        m_scrollArea->horizontalScrollBar()->setValue(v);
+    });
+    connect(m_scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged, [this](int min, int max){
+        m_histScrollBar->setRange(min, max);
+    });
+    connect(m_scrollArea->horizontalScrollBar(), &QScrollBar::valueChanged, [this](int v){
+        m_histScrollBar->setValue(v);
+    });
+
     // Add Undo/Redo Shortcuts to Dialog
     // (Managed globally by MainWindow)
 
@@ -900,9 +923,12 @@ void GHSDialog::onZoomChanged() {
         if (m_scrollArea) m_scrollArea->setWidgetResizable(true);
         m_histWidget->setMinimumWidth(0);
         m_histWidget->setMaximumWidth(16777215);
+        m_histScrollBar->setVisible(false);
     } else {
-        if (m_scrollArea) m_scrollArea->setWidgetResizable(false);
-        m_histWidget->setFixedWidth(newWidth);
+        if (m_scrollArea) m_scrollArea->setWidgetResizable(true); // Keep resizable to allow dynamic height adjustment!
+        m_histWidget->setMinimumWidth(newWidth);
+        m_histWidget->setMaximumWidth(newWidth); // Lock width explicitly
+        m_histScrollBar->setVisible(true);
         // Always keep the left side (shadows) in view when zooming
         if (m_scrollArea) m_scrollArea->horizontalScrollBar()->setValue(0);
     }

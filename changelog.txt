@@ -1,6 +1,11 @@
 TStar Changelog
 ===============
 
+Version 1.6.3
+-------------
+- New histogram visualization in ght, curves and histogram transformation tools
+- New star recomposition tool interface
+
 Version 1.6.2
 -------------
 - Now you can select the target median for display stretch

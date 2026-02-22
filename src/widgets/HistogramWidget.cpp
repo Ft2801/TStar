@@ -72,28 +72,9 @@ void HistogramWidget::resizeEvent(QResizeEvent* event) {
 
 void HistogramWidget::updateResampledBins() {
     int w = width();
-    if (w <= 0) return;
+    int h = height();
+    if (w <= 0 || h <= 0) return;
     m_lastW = w;
-
-    // Box blur helper - smooths an array
-    auto boxBlur = [](std::vector<float>& data, int radius) {
-        if (data.empty() || radius <= 0) return;
-        int n = data.size();
-        std::vector<float> temp(n);
-        for (int i = 0; i < n; ++i) {
-            float sum = 0;
-            int count = 0;
-            for (int j = -radius; j <= radius; ++j) {
-                int idx = i + j;
-                if (idx >= 0 && idx < n) {
-                    sum += data[idx];
-                    count++;
-                }
-            }
-            temp[i] = (count > 0) ? sum / count : 0;
-        }
-        data = std::move(temp);
-    };
 
     auto resample = [&](const std::vector<std::vector<int>>& src, int channels, 
                         std::vector<std::vector<float>>& dst, double& maxValOut) {
@@ -109,19 +90,12 @@ void HistogramWidget::updateResampledBins() {
             int binIdx = 0;
             for (int px = 0; px < w; ++px) {
                 double sum = 0;
-                while (binIdx < numBins && (float)binIdx / binsPerPx <= (float)px + 0.5f) {
+                while (binIdx < numBins && ((float)binIdx / binsPerPx) <= ((float)px + 0.5f)) {
                     sum += (double)src[c][binIdx];
                     binIdx++;
                 }
                 if (m_logScale && sum > 0) sum = std::log(sum); 
                 dst[c][px] = (float)sum;
-            }
-            
-            // Apply smoothing to remove spikes
-            boxBlur(dst[c], 4); 
-            
-            // Recalculate max after blur
-            for (int px = 0; px < w; ++px) {
                 if (dst[c][px] > maxValOut) maxValOut = dst[c][px];
             }
         }
@@ -169,13 +143,16 @@ void HistogramWidget::paintEvent(QPaintEvent *) {
         painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
         QColor ghostColor(100, 100, 100, 120);
         for (int c = 0; c < (int)m_resampledGhostBins.size(); ++c) {
-            QPolygonF poly;
+            QPainterPath ghostPath;
+            bool first = true;
             for (int px = 0; px < w; ++px) {
-                double normH = (double)m_resampledGhostBins[c][px] / m_ghostMaxVal;
-                poly << QPointF(px, h - (normH * h));
+                double normH = m_resampledGhostBins[c][px] / m_ghostMaxVal;
+                float py = h - (normH * h);
+                if (first) { ghostPath.moveTo(px, py); first = false; }
+                else { ghostPath.lineTo(px, py); }
             }
             painter.setPen(QPen(ghostColor, 1, Qt::DotLine));
-            painter.drawPolyline(poly);
+            painter.drawPath(ghostPath);
         }
     }
 
@@ -187,10 +164,16 @@ void HistogramWidget::paintEvent(QPaintEvent *) {
         
         for (int c = 0; c < (int)m_resampledBins.size(); ++c) {
             QPainterPath path;
+            QPainterPath linePath;
             path.moveTo(0, h);
+            
+            bool first = true;
             for (int px = 0; px < w; ++px) {
                 double normH = m_resampledBins[c][px] / m_maxVal;
-                path.lineTo(px, h - (normH * h));
+                float py = h - (normH * h);
+                path.lineTo(px, py);
+                if (first) { linePath.moveTo(px, py); first = false; }
+                else { linePath.lineTo(px, py); }
             }
             path.lineTo(w, h);
             path.closeSubpath();
@@ -204,13 +187,6 @@ void HistogramWidget::paintEvent(QPaintEvent *) {
             col.setAlpha(200);
             painter.setPen(QPen(col, 1.2));
             painter.setBrush(Qt::NoBrush);
-            // Draw only the top line of the path for the "wave" look
-            QPainterPath linePath;
-            linePath.moveTo(0, h - (m_resampledBins[c][0] / m_maxVal * h));
-            for (int px = 1; px < w; ++px) {
-                double normH = m_resampledBins[c][px] / m_maxVal;
-                linePath.lineTo(px, h - (normH * h));
-            }
             painter.drawPath(linePath);
         }
     }
