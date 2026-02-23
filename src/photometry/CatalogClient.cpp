@@ -5,17 +5,35 @@
 #include <QUrlQuery>
 #include <QXmlStreamReader>
 #include <QDebug>
+#include <QTimer>
+
+// VizieR mirror servers (fallback chain for robustness)
+static const QStringList VIZIER_MIRRORS = {
+    "http://vizier.u-strasbg.fr/viz-bin/votable",      // Primary (France)
+    "http://vizier.cds.unistra.fr/viz-bin/votable",    // Mirror (France, alt. domain)
+    "http://vizier.iucaa.in/viz-bin/votable",          // Mirror (India)
+    "http://vizier.nao.ac.jp/viz-bin/votable",         // Mirror (Japan)
+};
 
 CatalogClient::CatalogClient(QObject* parent) : QObject(parent) {
     m_manager = new QNetworkAccessManager(this);
+    m_currentMirrorIndex = 0;
 }
 
 void CatalogClient::queryAPASS(double ra, double dec, double radiusDeg) {
+    m_lastQueryRa = ra;
+    m_lastQueryDec = dec;
+    m_lastQueryRadius = radiusDeg;
+    m_lastQueryType = "APASS";
+    if (m_currentMirrorIndex >= VIZIER_MIRRORS.size()) {
+        m_currentMirrorIndex = 0;  // Reset to primary mirror on fresh query
+    }
+    
     // VizieR Cone Search for APASS (II/336)
     // VizieR Cone Search (II/336) uses arcminutes for radius (-c.rm)
     
-    QString baseUrl = "http://vizier.u-strasbg.fr/viz-bin/votable";
-    QUrl url(baseUrl);
+    QString baseUrl = VIZIER_MIRRORS[m_currentMirrorIndex];  // Use current mirror
+    QUrl url(baseUrl + "/viz-bin/votable");
     QUrlQuery query;
     query.addQueryItem("-source", "II/336/apass9"); 
     query.addQueryItem("-c", QString("%1 %2").arg(ra).arg(dec));
@@ -26,6 +44,20 @@ void CatalogClient::queryAPASS(double ra, double dec, double radiusDeg) {
     
     QNetworkRequest req(url);
     QNetworkReply* reply = m_manager->get(req);
+    
+    // Timeout mechanism - 30 seconds per attempt
+    QTimer::singleShot(30000, reply, [this, reply]() {
+        if (reply->isRunning()) {
+            reply->abort();
+            retryWithNextMirror();
+        }
+    });
+    
+    // Error handlers - network failures trigger retry
+    connect(reply, &QNetworkReply::errorOccurred,
+            this, &CatalogClient::retryWithNextMirror);
+    
+    // Success handler
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         onReply(reply);
     });
@@ -33,7 +65,14 @@ void CatalogClient::queryAPASS(double ra, double dec, double radiusDeg) {
 
 void CatalogClient::queryGaiaDR3(double ra, double dec, double radiusDeg) {
     // VizieR Cone Search for Gaia DR3 (I/355/gaiadr3)
-    QString baseUrl = "http://vizier.u-strasbg.fr/viz-bin/votable";
+    // Save query parameters for retry on next mirror
+    m_lastQueryRa = ra;
+    m_lastQueryDec = dec;
+    m_lastQueryRadius = radiusDeg;
+    m_lastQueryType = "GAIA";
+    m_currentMirrorIndex = 0;
+    
+    QString baseUrl = VIZIER_MIRRORS[0];
     QUrl url(baseUrl);
     QUrlQuery query;
     query.addQueryItem("-source", "I/355/gaiadr3"); 
@@ -42,15 +81,29 @@ void CatalogClient::queryGaiaDR3(double ra, double dec, double radiusDeg) {
     // Request basic astrometry + photometry + parameters
     // Note: 'Teff' is the standardized column name in VizieR for Effective Temperature or teff_gspphot
     query.addQueryItem("-out", "RA_ICRS,DE_ICRS,Gmag,BPmag,RPmag,Teff");
-    query.addQueryItem("-out.max", "2000"); // Limit to brighter stars usually
-    query.addQueryItem("-out.add", "_r"); // sort by distance
-    // Filter by Gmag to avoid downloading faint noise (limit to mag 16 for PCC)
-    query.addQueryItem("Gmag", "<16");
+    // 3000 stars: better coverage for both plate solving and PCC,
+    // especially in sparse fields (galactic poles) where mag 16 is insufficient.
+    query.addQueryItem("-out.max", "3000");
+    query.addQueryItem("-out.add", "_r"); // sort by distance from center
+    // Gmag < 17: extra magnitude depth vs <16 for sparse high-galactic-latitude fields.
+    query.addQueryItem("Gmag", "<17");
     
     url.setQuery(query);
     
     QNetworkRequest req(url);
+    req.setHeader(QNetworkRequest::UserAgentHeader, "TStar-CatalogClient");
     QNetworkReply* reply = m_manager->get(req);
+    
+    // Timeout: VizieR queries should respond within 30 seconds
+    QTimer::singleShot(30000, reply, [this, reply]() {
+        if (reply->isRunning()) {
+            reply->abort();
+            retryWithNextMirror();
+        }
+    });
+    
+    connect(reply, &QNetworkReply::errorOccurred,
+            this, &CatalogClient::retryWithNextMirror);
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         onReply(reply);
     });
@@ -59,11 +112,23 @@ void CatalogClient::queryGaiaDR3(double ra, double dec, double radiusDeg) {
 void CatalogClient::onReply(QNetworkReply* reply) {
     reply->deleteLater();
     if (reply->error()) {
-        emit errorOccurred(reply->errorString());
+        retryWithNextMirror();
         return;
     }
     
     QByteArray data = reply->readAll();
+    
+    // Detect HTML error pages (VizieR returns HTML for errors, not XML)
+    QString dataStr = QString::fromUtf8(data);
+    if (dataStr.toLower().contains("<html") || 
+        dataStr.toLower().contains("<!doctype") ||
+        dataStr.contains("Error 500") ||
+        dataStr.contains("Bad Request")) {
+        qWarning() << "VizieR returned HTML error page, retrying next mirror...";
+        retryWithNextMirror();
+        return;
+    }
+    
     std::vector<CatalogStar> stars;
     QXmlStreamReader xml(data);
     
@@ -161,14 +226,37 @@ void CatalogClient::onReply(QNetworkReply* reply) {
     }
     
     if (xml.hasError()) {
-        emit errorOccurred(tr("XML Parse Error: %1").arg(xml.errorString()));
+        qWarning() << "XML Parse Error:" << xml.errorString() << "- trying next mirror";
+        retryWithNextMirror();
         return;
     }
     
     if (stars.empty()) {
-        if (idxRA == -1) emit errorOccurred(tr("Parser failed to find RA column."));
-        else emit errorOccurred(tr("No stars found in region."));
+        // No stars found - still a valid response, emit empty set
+        // Don't retry on empty results (mirror is working, just no data in region)
+        qWarning() << "No stars found in region - catalog query succeeded but returned 0 stars";
+        emit catalogReady(stars);
     } else {
         emit catalogReady(stars);
+    }
+}
+
+void CatalogClient::retryWithNextMirror() {
+    m_currentMirrorIndex++;
+    
+    if (m_currentMirrorIndex >= VIZIER_MIRRORS.size()) {
+        emit errorOccurred(
+            tr("All VizieR mirrors failed. Network connectivity issue?\n"
+               "Tried: %1").arg(VIZIER_MIRRORS.join(", ")));
+        return;
+    }
+    
+    qWarning() << "VizieR mirror retry:" << m_currentMirrorIndex 
+               << "switching to" << VIZIER_MIRRORS[m_currentMirrorIndex];
+    
+    if (m_lastQueryType == "GAIA") {
+        queryGaiaDR3(m_lastQueryRa, m_lastQueryDec, m_lastQueryRadius);
+    } else if (m_lastQueryType == "APASS") {
+        queryAPASS(m_lastQueryRa, m_lastQueryDec, m_lastQueryRadius);
     }
 }

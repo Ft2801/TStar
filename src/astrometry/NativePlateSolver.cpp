@@ -110,6 +110,22 @@ void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars) {
     bool solved = matcher.solve(imgMatchStars, projCatStars, trans, 
                                 minScale, maxScale);
     
+    // TRANS sanity check: for a pure rotation matrix |x10|≈|y01| and |y10|≈|x01|.
+    // Wide-field images with TAN projection distortion can have asymmetric TRANS,
+    // so we only warn (not reject) when skew is detected.
+    if (solved) {
+        double scale = std::sqrt(trans.x10 * trans.x10 + trans.y10 * trans.y10);
+        if (scale > 0) {
+            double var1 = std::abs(std::abs(trans.x10) - std::abs(trans.y01));
+            double var2 = std::abs(std::abs(trans.y10) - std::abs(trans.x01));
+            double tolerance = 0.15 * scale;
+            if (var1 > tolerance || var2 > tolerance) {
+                emit logMessage(tr("TRANS sanity warning: possible skew in transform (var1=%1 var2=%2 tol=%3). Proceeding anyway.")
+                                .arg(var1, 0, 'f', 3).arg(var2, 0, 'f', 3).arg(tolerance, 0, 'f', 3));
+            }
+        }
+    }
+
     NativeSolveResult res;
     res.success = solved;
     res.transform = trans;

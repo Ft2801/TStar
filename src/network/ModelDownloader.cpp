@@ -304,7 +304,7 @@ bool ModelDownloaderWorker::downloadHttp(const QString& url, const QString& dest
     bool timedOut = false;
     connect(&timeout, &QTimer::timeout, [&](){ timedOut = true; loop.quit(); });
     connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    timeout.start(60000); // 60 sec timeout for GitHub
+    timeout.start(600000); // 10 min timeout for GitHub
     loop.exec();
     timeout.stop();
     

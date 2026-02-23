@@ -27,9 +27,14 @@ signals:
 
 private slots:
     void onReply(QNetworkReply* reply);
+    void retryWithNextMirror();
 
 private:
     QNetworkAccessManager* m_manager;
+    int m_currentMirrorIndex;
+    double m_lastQueryRa, m_lastQueryDec, m_lastQueryRadius;
+    QString m_lastQueryType; // "GAIA" or "APASS"
+
 };
 
 #endif // CATALOGCLIENT_H

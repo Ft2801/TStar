@@ -157,7 +157,8 @@ bool TriangleMatcher::solve(const std::vector<MatchStar>& imgStars,
     // Copy votes to temp to destructively find max
     auto tempVotes = votes;
     
-    int required_pairs = 10;
+    // Minimum 6 pairs for a valid linear transform.
+    int required_pairs = 6;
     for(int k=0; k<std::min(nA, nB); ++k) {
         int maxv = 0;
         int max_i = -1, max_j = -1;

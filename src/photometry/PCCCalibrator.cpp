@@ -184,8 +184,9 @@ static float robust_mean(std::vector<float>& data) {
 void PCCCalibrator::pixelToWorld(double x, double y, double& ra, double& dec) {
     // Standard FITS TAN (Gnomonic) Projection
     // 1. Pixel to Intermediate World Coordinates (deg)
-    double u = x - m_crpix1;
-    double v = y - m_crpix2;
+    // FITS CRPIX is 1-indexed: offset = pixel - (crpix - 1) = pixel - crpix + 1
+    double u = x - m_crpix1 + 1.0;
+    double v = y - m_crpix2 + 1.0;
     
     if (m_useSip) {
         double f_uv = calculateSIP(u, v, m_sipA, m_sipOrderA);
@@ -267,12 +268,14 @@ PCCResult PCCCalibrator::calibrate(const std::vector<DetectedStar>& starsR,
             for (const auto& cat : catalog) {
                 // Pre-filter with larger box to be safe
                 if (std::abs(cat.dec - dec) > matchRadiusDeg) continue;
-                // Handle RA wrap-around check roughly
+                // Handle RA wrap-around with cos(dec) correction for proper on-sky angular distance
                 double dRA = std::abs(cat.ra - ra);
                 if (dRA > 180.0) dRA = 360.0 - dRA;
-                if (dRA > matchRadiusDeg) continue; 
-                
-                double dist = std::sqrt(std::pow(dRA, 2) + std::pow(cat.dec - dec, 2));
+                double cosDec = std::cos(dec * DEG2RAD);
+                double dRA_sky = dRA * cosDec;  // Project RA difference onto sphere
+                if (dRA_sky > matchRadiusDeg) continue;
+
+                double dist = std::sqrt(dRA_sky * dRA_sky + (cat.dec - dec) * (cat.dec - dec));
                 if (dist < matchRadiusDeg) {
                     // Get catalog RGB from B-V temperature
                     float Tr, Tg, Tb;
@@ -366,14 +369,32 @@ void PCCCalibrator::worldToPixel(double ra, double dec, double& x, double& y) {
         double g_uv = calculateSIP(u, v, m_sipBP, m_sipOrderBP);
         u += f_uv;
         v += g_uv;
-    } else if (m_useSip) {
-        // We have forward SIP but no inverse. Iterative solution required?
-        // For now, assume AP/BP are usually provided with A/B in XISF.
-        // If not, the match will be approximate (linear guess), which might still work if distortion is small.
+    } else if (m_useSip && (!m_sipA.empty() || !m_sipB.empty())) {
+        // No inverse SIP coefficients (AP/BP) but we have forward (A/B).
+        // Use fixed-point iteration to invert: find (u0, v0) such that
+        // u0 + SIP(u0, v0) ≈ u and v0 + SIP(u0, v0) ≈ v
+        // This is more accurate than ignoring the distortion (which would cause systematic errors).
+        double u0 = u, v0 = v;
+        for (int iter = 0; iter < 10; ++iter) {
+            double du = calculateSIP(u0, v0, m_sipA, m_sipOrderA);
+            double dv = calculateSIP(u0, v0, m_sipB, m_sipOrderB);
+            double u_new = u - du;
+            double v_new = v - dv;
+            
+            // Check convergence (pixel-level precision sufficient)
+            if (std::abs(u_new - u0) < 1e-6 && std::abs(v_new - v0) < 1e-6) break;
+            
+            u0 = u_new;
+            v0 = v_new;
+        }
+        u = u0;
+        v = v0;
     }
     
-    x = u + m_crpix1;
-    y = v + m_crpix2;
+    // FITS CRPIX is 1-indexed: pixel = crpix + u - 1
+    // Consistent with pixelToWorld (+1 correction above)
+    x = u + m_crpix1 - 1.0;
+    y = v + m_crpix2 - 1.0;
 }
 
 // NEW: Standard PCC using aperture photometry
@@ -472,13 +493,14 @@ PCCResult PCCCalibrator::calibrateWithAperture(const ImageBuffer& image,
     
     if (!fitRG || !fitBG) return {false, 1.0, 1.0, 1.0};
     
-    // Standard White Reference (G2V assumes WhiteRatio = 1.0)
-    // KR = 1.0 / (Intercept + Slope * 1.0)
-    // Map Catalog colors (D65 based) to Image colors.
-    // Factor K = 1.0 / ImageRatio_White.
-    
-    double Wr = 1.0;
-    double Wb = 1.0;
+    // G2V Solar white reference (T≈5778K) using our Planckian locus color model.
+    // After calibration a G2V star appears balanced.
+    // Wr=1.0/Tg and Wb=Tb/Tg where Tr,Tg,Tb are from temp_to_rgb(5778K).
+    // Using Wr=1.0 incorrectly assumes R=G=B for the sun, which is wrong.
+    float wr_r, wr_g, wr_b;
+    temp_to_rgb(5778.0f, wr_r, wr_g, wr_b);
+    double Wr = (wr_g > 1e-6f) ? static_cast<double>(wr_r / wr_g) : 1.0;  // G2V R/G ≈ 1.13
+    double Wb = (wr_g > 1e-6f) ? static_cast<double>(wr_b / wr_g) : 1.0;  // G2V B/G ≈ 0.93
     
     double pred_rg = iceptRG + slopeRG * Wr;
     double pred_bg = iceptBG + slopeBG * Wb;
