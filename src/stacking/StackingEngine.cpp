@@ -1056,13 +1056,19 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
                         }
                         
                         // Normalization
+                        //   ADDITIVE / ADDITIVE_SCALING:    pixel * pscale - poffset
+                        //   MULTIPLICATIVE / MULT_SCALING:  pixel * pscale * pmul
                         if (val != 0.0f && args.params.hasNormalization() && c < 3) {
                              const auto& coeff = allCoeffs[c][frame];
                              switch (args.params.normalization) {
-                                case NormalizationMethod::Additive: val -= coeff.offset; break;
-                                case NormalizationMethod::Multiplicative: val *= coeff.mul; break;
-                                case NormalizationMethod::AdditiveScaling: val = val * coeff.scale - coeff.offset; break;
-                                case NormalizationMethod::MultiplicativeScaling: val = val * coeff.mul * coeff.scale; break;
+                                case NormalizationMethod::Additive:
+                                case NormalizationMethod::AdditiveScaling:
+                                    val = static_cast<float>(val * coeff.scale - coeff.offset);
+                                    break;
+                                case NormalizationMethod::Multiplicative:
+                                case NormalizationMethod::MultiplicativeScaling:
+                                    val = static_cast<float>(val * coeff.scale * coeff.mul);
+                                    break;
                                 default: break;
                              }
                         }

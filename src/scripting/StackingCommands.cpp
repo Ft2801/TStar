@@ -551,8 +551,54 @@ bool StackingCommands::cmdRegister(const ScriptCommand& cmd) {
                            checkBuf.metadata().xisfProperties.contains("BayerPattern"));
                            
              if (isCFA) {
-                 if (s_runner) s_runner->logMessage("Auto-Debayering CFA images in-place for correct registration...", "cyan");
-                 // ... (existing code)
+                 if (s_runner) s_runner->logMessage(QString("Auto-Debayering %1 CFA images in-place for registration...").arg(fullPaths.size()), "cyan");
+                 
+                 // Resolve Bayer pattern from first image
+                 QString bpStr = checkBuf.metadata().bayerPattern;
+                 if (bpStr.isEmpty()) bpStr = checkBuf.metadata().xisfProperties.value("BayerPattern").toString();
+                 
+                 Preprocessing::BayerPattern bayerPat = Preprocessing::BayerPattern::RGGB;
+                 if (bpStr.contains("BGGR", Qt::CaseInsensitive)) bayerPat = Preprocessing::BayerPattern::BGGR;
+                 else if (bpStr.contains("GRBG", Qt::CaseInsensitive)) bayerPat = Preprocessing::BayerPattern::GRBG;
+                 else if (bpStr.contains("GBRG", Qt::CaseInsensitive)) bayerPat = Preprocessing::BayerPattern::GBRG;
+                 
+                 // Debayer each image in-place (overwrite the file with RGB version)
+                 int debayerOK = 0;
+                 for (const QString& path : fullPaths) {
+                     if (s_runner && s_runner->isCancelled()) break;
+                     
+                     ImageBuffer img;
+                     if (!Stacking::FitsIO::read(path, img)) {
+                         if (s_runner) s_runner->logMessage(QString("Failed to read %1 for debayer").arg(QFileInfo(path).fileName()), "salmon");
+                         continue;
+                     }
+                     
+                     if (img.channels() != 1) {
+                         debayerOK++; // Already debayered
+                         continue;
+                     }
+                     
+                     ImageBuffer debayered;
+                     if (Preprocessing::Debayer::bilinear(img, debayered, bayerPat)) {
+                         // Preserve metadata, clear CFA info
+                         debayered.setMetadata(img.metadata());
+                         debayered.metadata().isMono = false;
+                         debayered.metadata().bayerPattern.clear();
+                         // Remove BAYERPAT from headers
+                         auto& headers = debayered.metadata().rawHeaders;
+                         headers.erase(std::remove_if(headers.begin(), headers.end(),
+                             [](const auto& h) { return h.key == "BAYERPAT"; }), headers.end());
+                         
+                         if (Stacking::FitsIO::write(path, debayered, 32)) {
+                             debayerOK++;
+                         } else {
+                             if (s_runner) s_runner->logMessage(QString("Failed to write debayered %1").arg(QFileInfo(path).fileName()), "salmon");
+                         }
+                     } else {
+                         if (s_runner) s_runner->logMessage(QString("Debayer failed for %1").arg(QFileInfo(path).fileName()), "salmon");
+                     }
+                 }
+                 if (s_runner) s_runner->logMessage(QString("Auto-Debayer complete: %1/%2 images").arg(debayerOK).arg(fullPaths.size()), "green");
              } else {
                  if (s_runner) {
                      QString reason = QString("Channels=%1").arg(checkBuf.channels());
@@ -952,104 +998,55 @@ bool StackingCommands::cmdLinearMatch(const ScriptCommand& cmd) {
 
 bool StackingCommands::cmdPixelMath(const ScriptCommand& cmd) {
     if (!s_currentImage || !s_currentImage->isValid()) return false;
-    
+
     QString expression = cmd.args[0];
-    // Remove quotes if present
-    if (expression.startsWith("\"") && expression.endsWith("\"")) {
+    if (expression.startsWith("\"") && expression.endsWith("\""))
         expression = expression.mid(1, expression.length() - 2);
-    }
-    
+
     Stacking::PixelMath pm;
-    
-    // Scan expression for variables ($name$) and load them
-    // Regex would be good, but manual parsing is safer without QRegularExpression dependency
-    // Pattern: $token$
+
+    // Pre-load all $varName$ variables referenced in the expression.
+    // Variables are resolved as file paths relative to the working directory,
+    // with an implicit ".fit" extension appended if the bare path does not exist.
+    // Images are owned by loadedVars and remain valid for the duration of evaluate().
+    QMap<QString, std::shared_ptr<ImageBuffer>> loadedVars;
+
     int pos = 0;
     while ((pos = expression.indexOf('$', pos)) != -1) {
-        int end = expression.indexOf('$', pos + 1);
-        if (end != -1) {
-            QString varName = expression.mid(pos + 1, end - pos - 1);
-            // Try to load varName using resolvePath + .fit extension or exact match
-            // The script uses $starReduction$ referring to starReduction.fit
+        const int end = expression.indexOf('$', pos + 1);
+        if (end == -1) break;
+
+        const QString varName = expression.mid(pos + 1, end - pos - 1);
+        if (!varName.isEmpty() && !loadedVars.contains(varName)) {
             QString path = resolvePath(varName);
-            if (!QFileInfo::exists(path) && !path.endsWith(".fit")) path += ".fit";
-            
-            if (QFileInfo::exists(path)) {
-                // We need to manage lifecycle of these loaded images.
-                // For this command, we can just load them into temporary pointers managed by a list?
-                // Or PixelMath could own them?
-                // Let's make PixelMath own them? No, PixelMath takes raw pointers.
-                // We'll trust the user has RAM.
-                // NOTE: This implementation leaks if we don't track them.
-                // Let's use a static map in StackingCommands just for the duration?
-                // Better: locally scope them.
-                // But we don't know how many unique vars.
-                // Store transiently in local list.
-                // These images are scoped to the command execution, which is the correct lifecycle
-                // preventing global state leaks.
-                // Unlike a global cache, this ensures memory is freed immediately after PixelMath completes.
+            if (!QFileInfo::exists(path))
+                path += ".fit";
+
+            auto img = std::make_shared<ImageBuffer>();
+            if (Stacking::FitsIO::read(path, *img)) {
+                loadedVars[varName] = img;
+                // Register under both the bare name and the $name$ form so that
+                // either tokenizer convention used by PixelMath is satisfied.
+                pm.setVariable(varName, img.get());
+                pm.setVariable("$" + varName + "$", img.get());
+            } else {
+                if (s_runner)
+                    s_runner->logMessage(QString("PixelMath: could not load variable '%1' from '%2'")
+                                             .arg(varName, path), "orange");
             }
         }
         pos = end + 1;
     }
-    
-    // For TStar implementation, we assume variables are file paths relative to CWD.
-    // We need a way to resolve variables inside PM.
-    // PM asks for variable "starReduction".
-    // We set variable "starReduction" to an image loaded from disk.
-    
-    // Better approach: Pre-load ALL variables mentioned.
-    // Hack: Just bind loaded images.
-    QMap<QString, std::shared_ptr<ImageBuffer>> loadedVars;
-    
-    // Parse expression for $names$ again
-    pos = 0;
-    while ((pos = expression.indexOf('$', pos)) != -1) {
-        int end = expression.indexOf('$', pos + 1);
-        if (end != -1) {
-             QString varName = expression.mid(pos + 1, end - pos - 1); // e.g., starReduction
-             QString fullVar = "$" + varName + "$"; // $starReduction$
-             
-             QString safeName = varName; 
-             // Load if not loaded
-             if (!loadedVars.contains(safeName)) {
-                 QString path = resolvePath(safeName); 
-                 if (!QFileInfo::exists(path)) path += ".fit";
-                 
-                 auto img = std::make_shared<ImageBuffer>();
-                 if (Stacking::FitsIO::read(path, *img)) {
-                     loadedVars[safeName] = img;
-                     pm.setVariable(safeName, img.get());
-                 }
-             }
-             
-             // Rewrite expression: replace $varName$ with varName
-             // Actually, tokenize handles $ specially? 
-             // My tokenizer in PixelMath treats $ as part of variable name? "c.isLetter() || c == '$'"
-             // So token will be "starReduction" (without $ if tokenizer logic is 'while letter').
-             // Wait, tokenizer logic:
-             // `while ... c == '$'` -> stores "$name$".
-             // So the token value IS "$name$".
-             // So setVariable must use keys like "$starReduction$".
-             
-             if (loadedVars.contains(safeName)) {
-                pm.setVariable(fullVar, loadedVars[safeName].get());
-             }
-        }
-        pos = end + 1;
-    }
-    
-    // Set variables
-    // PM engine expects variable names to match tokens.
-    
+
     ImageBuffer result;
     if (pm.evaluate(expression, result)) {
         *s_currentImage = std::move(result);
         return true;
-    } else {
-        if (s_runner) s_runner->setVariable("last_error", pm.lastError());
-        return false;
     }
+
+    if (s_runner)
+        s_runner->logMessage(QString("PixelMath error: %1").arg(pm.lastError()), "red");
+    return false;
 }
 
 
@@ -1447,11 +1444,26 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd) {
 #ifdef HAVE_LIBRAW
                 libraw_data_t *lr = libraw_init(0);
                 if (lr) {
+                    // Suppress LibRaw's default "data corrupted at X" stderr messages.
+                    // These are non-fatal decompression warnings that clutter the log.
+                    struct NoOpHandler {
+                        static void callback(void*, const char*, const INT64) {}
+                    };
+                    libraw_set_dataerror_handler(lr, NoOpHandler::callback, nullptr);
+                    
                     // Optimized RAW path: Only debayer if explicitly requested
                     bool wantDebayer = cmd.hasOption("debayer");
                     
-                    if (libraw_open_file(lr, inputPath.toLocal8Bit().constData()) == LIBRAW_SUCCESS) {
-                        if (libraw_unpack(lr) == LIBRAW_SUCCESS) {
+                    int openRet = libraw_open_file(lr, inputPath.toLocal8Bit().constData());
+                    if (openRet == LIBRAW_SUCCESS) {
+                        int unpackRet = libraw_unpack(lr);
+                        // Accept LIBRAW_DATA_ERROR as non-fatal — the raw_image
+                        // data is still populated; only a few pixels may be affected.
+                        if (unpackRet == LIBRAW_SUCCESS || unpackRet == LIBRAW_DATA_ERROR) {
+                            if (unpackRet == LIBRAW_DATA_ERROR) {
+                                std::lock_guard<std::mutex> lock(logMutex);
+                                if (s_runner) s_runner->logMessage(QString("Warning: minor data error in %1 (non-fatal, continuing)").arg(file), "orange");
+                            }
                             if (wantDebayer) {
                                 // High quality debayering path (Slow)
                                 lr->params.output_bps = 16;
@@ -1484,45 +1496,47 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd) {
                                 }
                             } else {
                                 // Fast CFA path (Best for Stacking)
-                                // Extract the raw bayer data without processing
-                                libraw_decoder_info_t info;
-                                libraw_get_decoder_info(lr, &info);
+                                // Extract raw Bayer data WITHOUT any processing.
+                                // Calibration (bias/dark/flat) handles the rest.
                                 
-                                int w = lr->rawdata.sizes.raw_width;
-                                // We want the visible part usually
-                                int left = lr->rawdata.sizes.left_margin;
-                                int top = lr->rawdata.sizes.top_margin;
-                                int vw = lr->rawdata.sizes.width;
-                                int vh = lr->rawdata.sizes.height;
+                                // Check for raw data availability
+                                if (lr->rawdata.raw_image == nullptr &&
+                                    (lr->rawdata.color3_image || lr->rawdata.color4_image)) {
+                                    // DNG-from-Lightroom or other non-standard format
+                                    std::lock_guard<std::mutex> lock(logMutex);
+                                    if (s_runner) s_runner->logMessage(QString("Cannot open %1 in CFA mode: no RAW data available").arg(file), "red");
+                                    libraw_close(lr);
+                                    failedCount.fetchAndAddRelaxed(1);
+                                    return;
+                                }
+                                
+                                // raw_width from sizes, margins from rawdata.sizes,
+                                // visible area from sizes.iwidth/iheight
+                                const int raw_width = lr->sizes.raw_width;
+                                const int left = lr->rawdata.sizes.left_margin;
+                                const int top_m = lr->rawdata.sizes.top_margin;
+                                const int vw = lr->sizes.iwidth;
+                                const int vh = lr->sizes.iheight;
                                 
                                 threadBuffer.resize(vw, vh, 1);
                                 float* dst = threadBuffer.data().data();
-                                unsigned short* src = (unsigned short*)lr->rawdata.raw_alloc; 
-                                if (!src) src = lr->rawdata.raw_image;
+                                
+                                unsigned short* src = lr->rawdata.raw_image;
                                 
                                 if (src) {
-                                    float black = (float)lr->color.black;
                                     float maximum = (float)lr->color.maximum;
-                                    float range = maximum - black;
-                                    if (range <= 0.0f) range = 65535.0f;
-
-                                    float mul[4];
-                                    for (int i = 0; i < 4; ++i) mul[i] = lr->color.cam_mul[i];
-                                    float g_norm = mul[1]; 
-                                    if (g_norm <= 0.0f && mul[3] > 0.0f) g_norm = mul[3];
-                                    if (g_norm <= 0.0f) g_norm = 1.0f;
-                                    for (int i = 0; i < 4; ++i) mul[i] /= g_norm;
+                                    if (maximum <= 0.0f) maximum = 65535.0f;
 
                                     unsigned int f = lr->idata.filters;
 
+                                    // Copy raw Bayer data — NO black subtraction, NO WB.
+                                    // Normalize by sensor maximum only.
+                                    int offset = raw_width * top_m + left;
                                     #pragma omp parallel for
                                     for (int y = 0; y < vh; ++y) {
-                                        int row = y + top;
                                         for (int x = 0; x < vw; ++x) {
-                                            int col = x + left;
-                                            int c = (f >> ((((row) << 1) & 14) + (col & 1)) * 2) & 3;
-                                            float val = (float)src[row * w + col];
-                                            dst[y * vw + x] = std::max(0.0f, (val - black) * mul[c & 3] / range);
+                                            float val = (float)src[offset + x + (raw_width * y)];
+                                            dst[y * vw + x] = val / maximum;
                                         }
                                     }
                                     loaded = true;
@@ -1530,7 +1544,8 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd) {
                                 // Set CFA info in metadata
                                 threadBuffer.metadata().isMono = true;
                                 
-                                // Detect Bayer Pattern from LibRaw
+                                // Detect Bayer Pattern from LibRaw filters
+                                // (f already declared above from idata.filters)
                                 QString bayerPat = "RGGB";
                                 if (f == 0x94949494) bayerPat = "RGGB";
                                 else if (f == 0x16161616) bayerPat = "BGGR";
@@ -1538,34 +1553,30 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd) {
                                 else if (f == 0x49494949) bayerPat = "GBRG";
                                 
                                 // Adjust for crop/margins (Critical for correct color)
-                                // If left margin is odd, flip horizontal (RGGB -> GRBG)
-                                // If top margin is odd, flip vertical (RGGB -> GBRG)
+                                // If left margin is odd, flip horizontal
+                                // If top margin is odd, flip vertical
                                 if (left % 2 != 0) {
                                     if (bayerPat == "RGGB") bayerPat = "GRBG";
                                     else if (bayerPat == "BGGR") bayerPat = "GBRG";
                                     else if (bayerPat == "GRBG") bayerPat = "RGGB";
                                     else if (bayerPat == "GBRG") bayerPat = "BGGR";
                                 }
-                                if (top % 2 != 0) {
+                                if (top_m % 2 != 0) {
                                     if (bayerPat == "RGGB") bayerPat = "GBRG";
                                     else if (bayerPat == "BGGR") bayerPat = "GRBG";
                                     else if (bayerPat == "GRBG") bayerPat = "BGGR";
                                     else if (bayerPat == "GBRG") bayerPat = "RGGB";
                                 }
-                                else {
-                                    // Fallback using cdesc if non-standard 2x2
-                                    // Common sensors are covered above.
-                                    // Log warning?
-                                }
                                 threadBuffer.metadata().xisfProperties["BayerPattern"] = bayerPat;
-                                threadBuffer.metadata().bayerPattern = bayerPat; // Set member for internal checks
-                                threadBuffer.metadata().rawHeaders.push_back({"BAYERPAT", bayerPat, "Bayer Pattern"}); // Write to FITS header
-                            }
-                        }
-                    }
-                }
+                                threadBuffer.metadata().bayerPattern = bayerPat;
+                                threadBuffer.metadata().rawHeaders.push_back({"BAYERPAT", bayerPat, "Bayer Pattern"});
+                                threadBuffer.metadata().rawHeaders.push_back({"ROWORDER", "TOP-DOWN", "Row order of image data"});
+                            } // closes if (src)
+                        } // closes else: CFA path
+                    } // closes if (unpackRet == LIBRAW_SUCCESS || LIBRAW_DATA_ERROR)
+                } // closes if (openRet == LIBRAW_SUCCESS)
                     libraw_close(lr);
-                }
+                } // closes if (lr)
 #endif
             }
             

@@ -366,7 +366,8 @@ void PreprocessingEngine::applyCosmeticCorrection(ImageBuffer& image,
             const QPoint& pt = m_deviantPixels[i];
             int x = pt.x();
             int y = pt.y();
-            if (x < 1 || y < 1 || x >= w - 1 || y >= h - 1) continue;
+            // CFA path uses ±2 offsets, so boundary must protect ±2
+            if (x < 2 || y < 2 || x >= w - 2 || y >= h - 2) continue;
 
             for (int c = 0; c < channels; ++c) {
                 float* layerData = data + c * w * h;
@@ -507,11 +508,15 @@ bool PreprocessingEngine::debayer(ImageBuffer& image) {
         // We must copy it from the input before replacing the input.
         output.setMetadata(image.metadata());
         
-        // Update logic: It is now RGB, so BayerPattern is technically None.
-        // However, keeping the history is useful.
-        // But for consistency:
+        // Now it is RGB — clear CFA-related metadata to prevent
+        // downstream code from treating it as CFA again.
         output.metadata().isMono = false;
-        // output.metadata().bayerPattern = ""; // Optional: Clear it?
+        output.metadata().bayerPattern.clear();
+        output.metadata().xisfProperties.remove("BayerPattern");
+        // Remove BAYERPAT from raw headers to prevent re-debayering
+        auto& headers = output.metadata().rawHeaders;
+        headers.erase(std::remove_if(headers.begin(), headers.end(),
+            [](const auto& h) { return h.key == "BAYERPAT"; }), headers.end());
         
         image = std::move(output);
         return true;

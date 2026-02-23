@@ -385,6 +385,17 @@ QString MasterFrames::validateCompatibility(const ImageBuffer& target) const {
                    .arg(data.stats.width).arg(data.stats.height)
                    .arg(targetWidth).arg(targetHeight);
         }
+        
+        // Also validate channel count — a 3-channel master applied to
+        // 1-channel CFA data (or vice versa) would produce garbage.
+        int masterChannels = data.buffer->channels();
+        int targetChannels = target.channels();
+        if (masterChannels != targetChannels) {
+            return QObject::tr("Master %1 channels (%2) don't match target (%3). "
+                               "Ensure masters and lights have the same format.")
+                   .arg(typeName)
+                   .arg(masterChannels).arg(targetChannels);
+        }
     }
     
     return QString();  // Compatible

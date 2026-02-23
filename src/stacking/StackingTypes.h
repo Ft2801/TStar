@@ -55,8 +55,7 @@ enum class NormalizationMethod {
     Additive,              ///< Additive normalization (matching medians)
     Multiplicative,        ///< Multiplicative normalization (matching medians)
     AdditiveScaling,       ///< Additive + Scaling (matching median + dispersion)
-    MultiplicativeScaling, ///< Multiplicative + Scaling
-    GradientRemoval        ///< Polynomial Gradient removal
+    MultiplicativeScaling  ///< Multiplicative + Scaling
 };
 
 /**

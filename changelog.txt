@@ -5,6 +5,7 @@ Version 1.6.4
 -------------
 - Update to the add/recombine luminance tool
 - Added a more robust algorithm for plate solving and color calibration
+- improvements to the stacking suite
 - New small tool: align channels
 - Minor bugfixes
 

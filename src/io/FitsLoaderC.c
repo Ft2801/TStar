@@ -93,7 +93,6 @@ int fitsload_single_c(const char* filepath, FitsImage_C* out_img) {
     int hdu_type, naxis, bitpix;
     long naxes[3] = {1, 1, 1};
     char bayer_pattern[16] = {0};
-    float* bayer_data = NULL;
 
     // Open FITS file (cfitsio native)
     fits_open_file(&fptr, filepath, READONLY, &status);
@@ -135,39 +134,10 @@ int fitsload_single_c(const char* filepath, FitsImage_C* out_img) {
     // Allocate and read image data
     size_t total_pixels = (size_t)width * height;
     
-    if (channels == 1 && strlen(bayer_pattern) > 0) {
-        // Mono Bayer CFA - read and debayer
-        bayer_data = (float*)malloc(total_pixels * sizeof(float));
-        if (!bayer_data) {
-            strcpy(g_error_msg, "Memory allocation failed for Bayer data");
-            fits_close_file(fptr, &status);
-            return -1;
-        }
-
-        // Read Bayer plane
-        long fpixel[3] = {1, 1, 1};
-        fits_read_pix(fptr, TFLOAT, fpixel, total_pixels, NULL, bayer_data, NULL, &status);
-        
-        if (status) {
-            strcpy(g_error_msg, "Failed to read FITS image data");
-            free(bayer_data);
-            fits_close_file(fptr, &status);
-            return -1;
-        }
-
-        // Debayer
-        float* rgb = debayer_nn_c(bayer_data, width, height, bayer_pattern);
-        free(bayer_data);
-        
-        if (!rgb) {
-            fits_close_file(fptr, &status);
-            return -1;
-        }
-
-        out_img->data = rgb;
-        out_img->channels = 3;
-    } else {
-        // Already RGB or Mono
+    // Always read raw data as-is. Do NOT auto-debayer CFA images.
+    // Debayering is handled explicitly by the preprocessing pipeline
+    // after calibration (bias/dark/flat)
+    {
         size_t total_size = total_pixels * channels * sizeof(float);
         out_img->data = (float*)malloc(total_size);
         if (!out_img->data) {
@@ -187,6 +157,13 @@ int fitsload_single_c(const char* filepath, FitsImage_C* out_img) {
         }
 
         out_img->channels = channels;
+        
+        // Store Bayer pattern for downstream use (but do NOT debayer here)
+        if (strlen(bayer_pattern) > 0) {
+            // Remove any trailing quote from sscanf
+            char* q = strchr(bayer_pattern, '\'');
+            if (q) *q = '\0';
+        }
     }
 
     out_img->managed = 1;  // We allocated this

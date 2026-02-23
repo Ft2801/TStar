@@ -90,9 +90,9 @@ inline float statsFloatMad(float* data, int n, float median, float* scratch) {
     for (int i = 0; i < n; ++i) {
         scratch[i] = std::abs(data[i] - median);
     }
-    
-    // MAD = median of absolute deviations * 1.4826
-    return quickMedianFloat(scratch, n) * 1.4826f;
+
+    // MAD = median of absolute deviations (raw, NOT scaled by 1.4826).
+    return quickMedianFloat(scratch, n);
 }
 
 //=============================================================================
@@ -408,6 +408,115 @@ inline int applyRejection(
                 float pmin = w_stack[0], pmax = w_stack[N - crej[0] - crej[1] - 1];
                 for (pixel = 0, output = 0; pixel < N; pixel++) {
                     if (stack[pixel] >= pmin && stack[pixel] <= pmax) {
+                        if (pixel != output) stack[output] = stack[pixel];
+                        output++;
+                    }
+                }
+                N = output;
+            }
+            break;
+            
+        case Rejection::Biweight:
+            // Biweight estimator with tuning constant (default 6)
+            {
+                if (!w_stack) break;
+                float C = sigHigh > 0 ? sigHigh : 6.0f;
+                
+                // Initial robust center/scale from median & MAD
+                float* scratch = w_stack;
+                std::memcpy(scratch, stack, N * sizeof(float));
+                float med = quickMedianFloat(scratch, N);
+                
+                for (int i = 0; i < N; ++i)
+                    scratch[i] = std::abs(stack[i] - med);
+                float mad = quickMedianFloat(scratch, N);
+                
+                if (mad < 1e-9f) {
+                    // All identical
+                    return N;
+                }
+                
+                double center = med;
+                double scale = mad;
+                const int MAX_ITER = 5;
+                
+                // Iterate to refine center
+                for (int iter = 0; iter < MAX_ITER; ++iter) {
+                    double num = 0.0, den = 0.0;
+                    for (int i = 0; i < N; ++i) {
+                        double u = (stack[i] - center) / (C * scale);
+                        if (std::abs(u) < 1.0) {
+                            double w = (1.0 - u*u);
+                            w = w * w;
+                            num += (stack[i] - center) * w;
+                            den += w;
+                        }
+                    }
+                    if (den > 1e-9) {
+                        double shift = num / den;
+                        center += shift;
+                        if (std::abs(shift) <= 1e-5 * scale) break;
+                    }
+                }
+                
+                // Reject pixels with |pixel - center| >= C * scale
+                double limit = C * scale;
+                for (int i = 0; i < N; ++i) {
+                    double dist = std::abs(stack[i] - center);
+                    if (dist >= limit) {
+                        rejected[i] = (stack[i] < center) ? -1 : 1;
+                        if (stack[i] < center) crej[0]++;
+                        else crej[1]++;
+                    }
+                }
+                
+                // Compact
+                for (pixel = 0, output = 0; pixel < N; pixel++) {
+                    if (!rejected[pixel]) {
+                        if (pixel != output) stack[output] = stack[pixel];
+                        output++;
+                    }
+                }
+                N = output;
+            }
+            break;
+            
+        case Rejection::ModifiedZScore:
+            // Modified Z-Score: M_i = 0.6745 * (x_i - median) / MAD
+            // Reject if M_i > threshold (default 3.5)
+            {
+                if (!w_stack) break;
+                float threshold = sigHigh > 0 ? sigHigh : 3.5f;
+                
+                // Median
+                float* scratch = w_stack;
+                std::memcpy(scratch, stack, N * sizeof(float));
+                float med = quickMedianFloat(scratch, N);
+                
+                // MAD
+                for (int i = 0; i < N; ++i)
+                    scratch[i] = std::abs(stack[i] - med);
+                float mad = quickMedianFloat(scratch, N);
+                
+                if (mad < 1e-9f) {
+                    return N;
+                }
+                
+                // Modified Z-Score: 0.6745 = 1 / 1.4826 (inverse transformation)
+                float limit = threshold * (mad / 0.6745f);
+                
+                for (int i = 0; i < N; ++i) {
+                    float dev = std::abs(stack[i] - med);
+                    if (dev > limit) {
+                        rejected[i] = (stack[i] < med) ? -1 : 1;
+                        if (stack[i] < med) crej[0]++;
+                        else crej[1]++;
+                    }
+                }
+                
+                // Compact
+                for (pixel = 0, output = 0; pixel < N; pixel++) {
+                    if (!rejected[pixel]) {
                         if (pixel != output) stack[output] = stack[pixel];
                         output++;
                     }

@@ -2,6 +2,7 @@
 #include "Weighting.h"
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 namespace Stacking {
 
@@ -16,26 +17,114 @@ bool Weighting::computeWeights(const ImageSequence& sequence,
     if (!sequence.isValid()) {
         return false;
     }
-    
+
     int nbImages = sequence.count();
     int nbChannels = sequence.channels();
-    
+
     if (type == WeightingType::None) {
-        // All weights = 1
         weights.assign(nbImages * nbChannels, 1.0);
         return true;
     }
-    
+
     weights.resize(nbImages * nbChannels);
-    
+
+    // -------------------------------------------------------------------------
+    // WeightedFWHM
+    //   w = (1/fwhm² − 1/fwhmmax²) / (1/fwhmmin² − 1/fwhmmax²)
+    //   No scale factor (fwhm is a geometric measure, independent of normalization).
+    //   Two-pass: first scan for min/max, then compute weights.
+    // -------------------------------------------------------------------------
+    if (type == WeightingType::WeightedFWHM) {
+        double fwhmmin = std::numeric_limits<double>::max();
+        double fwhmmax = -std::numeric_limits<double>::max();
+        for (int i = 0; i < nbImages; ++i) {
+            double fwhm = sequence.image(i).quality.weightedFwhm;
+            if (fwhm > 0.0) {
+                if (fwhm < fwhmmin) fwhmmin = fwhm;
+                if (fwhm > fwhmmax) fwhmmax = fwhm;
+            }
+        }
+        if (fwhmmin >= fwhmmax || fwhmmin <= 0.0) {
+            // All images identical or no valid data — equal weights
+            weights.assign(nbImages * nbChannels, 1.0);
+            return true;
+        }
+        double invfwhmax2 = 1.0 / (fwhmmax * fwhmmax);
+        double invdenom   = 1.0 / (1.0 / (fwhmmin * fwhmmin) - invfwhmax2);
+
+        for (int i = 0; i < nbImages; ++i) {
+            double fwhm = sequence.image(i).quality.weightedFwhm;
+            double w = (fwhm > 0.0) ? (1.0 / (fwhm * fwhm) - invfwhmax2) * invdenom
+                                     : 0.0;
+            for (int c = 0; c < nbChannels; ++c)
+                weights[c * nbImages + i] = w;
+        }
+
+        // Normalize per channel (weights /= mean → mean weight = 1)
+        for (int c = 0; c < nbChannels; ++c) {
+            double* cw = &weights[c * nbImages];
+            double sum = 0.0;
+            for (int i = 0; i < nbImages; ++i) sum += cw[i];
+            if (sum > 0.0) {
+                double invMean = static_cast<double>(nbImages) / sum;
+                for (int i = 0; i < nbImages; ++i) cw[i] *= invMean;
+            }
+        }
+        return true;
+    }
+
+    // -------------------------------------------------------------------------
+    // StarCount
+    //   w = ((nstars − starmin) / (starmax − starmin))²
+    //   Equal weights when starmax == starmin.
+    //   Two-pass: first scan for min/max, then compute weights.
+    // -------------------------------------------------------------------------
+    if (type == WeightingType::StarCount) {
+        int starmin = std::numeric_limits<int>::max();
+        int starmax = 0;
+        for (int i = 0; i < nbImages; ++i) {
+            int ns = sequence.image(i).quality.starCount;
+            if (ns < starmin) starmin = ns;
+            if (ns > starmax) starmax = ns;
+        }
+        if (starmin < 0) starmin = 0;
+
+        if (starmax == starmin) {
+            weights.assign(nbImages * nbChannels, 1.0);
+            return true;
+        }
+        double invdenom = 1.0 / static_cast<double>(starmax - starmin);
+
+        for (int i = 0; i < nbImages; ++i) {
+            double frac = (sequence.image(i).quality.starCount - starmin) * invdenom;
+            double w = frac * frac;   // quadratic
+            for (int c = 0; c < nbChannels; ++c)
+                weights[c * nbImages + i] = w;
+        }
+
+        for (int c = 0; c < nbChannels; ++c) {
+            double* cw = &weights[c * nbImages];
+            double sum = 0.0;
+            for (int i = 0; i < nbImages; ++i) sum += cw[i];
+            if (sum > 0.0) {
+                double invMean = static_cast<double>(nbImages) / sum;
+                for (int i = 0; i < nbImages; ++i) cw[i] *= invMean;
+            }
+        }
+        return true;
+    }
+
+    // -------------------------------------------------------------------------
+    // All other weight types (Noise, Roundness, Quality)
+    // -------------------------------------------------------------------------
     for (int i = 0; i < nbImages; ++i) {
         const auto& img = sequence.image(i);
-        
+
         for (int c = 0; c < nbChannels; ++c) {
             double weight = 1.0;
             int layer = (nbChannels == 1) ? -1 : c;
-            
-            // Get scale factor from normalization
+
+            // Scale factor from normalization (used only for Noise)
             double scale = 1.0;
             if (layer >= 0 && layer < 3) {
                 scale = coefficients.pscale[layer][i];
@@ -45,60 +134,46 @@ bool Weighting::computeWeights(const ImageSequence& sequence,
             if (scale <= 0.0) scale = 1.0;
 
             switch (type) {
-                case WeightingType::StarCount:
-                    weight = static_cast<double>(img.quality.starCount);
-                    if (weight < 1.0) weight = 1.0;
-                    break;
-                    
-                case WeightingType::WeightedFWHM:
-                    if (img.quality.fwhm > 0.1) {
-                        weight = 1.0 / (img.quality.fwhm * img.quality.fwhm * scale * scale);
-                    } else {
-                        weight = 1.0;
-                    }
-                    break;
-                    
+                // Noise: w = 1 / (noise² × scale²)
                 case WeightingType::Noise:
                     if (img.quality.noise > 0.0) {
                         double sigma = img.quality.noise;
                         weight = 1.0 / (sigma * sigma * scale * scale);
-                    } else {
-                        weight = 1.0;
                     }
                     break;
-                    
+
                 case WeightingType::Roundness:
-                    weight = img.quality.roundness;
-                    if (weight < 0.1) weight = 0.1;
+                    weight = std::max(0.1, img.quality.roundness);
                     break;
-                    
+
                 case WeightingType::Quality:
-                    weight = img.quality.quality;
-                    if (weight < 0.01) weight = 0.01;
+                    weight = std::max(0.01, img.quality.quality);
                     break;
-                    
+
+                // StackCount: weight by prior stack count
+                case WeightingType::StackCount:
+                    weight = std::max(1.0, (double)img.stackCount);
+                    break;
+
                 default:
-                    weight = 1.0;
                     break;
             }
-            
+
             weights[c * nbImages + i] = weight;
         }
     }
-    
-    // Normalize weights per channel
+
+    // Normalize weights per channel (mean weight = 1)
     for (int c = 0; c < nbChannels; ++c) {
         double* chanWeights = &weights[c * nbImages];
-        // Compute mean for this channel
         double sum = 0.0;
         for (int i = 0; i < nbImages; ++i) sum += chanWeights[i];
-        
         if (sum > 0.0) {
             double invMean = static_cast<double>(nbImages) / sum;
             for (int i = 0; i < nbImages; ++i) chanWeights[i] *= invMean;
         }
     }
-    
+
     return true;
 }
 

@@ -155,10 +155,12 @@ void StackingDialog::setupSequenceGroup() {
             this, &StackingDialog::onTableSelectionChanged);
     connect(m_imageTable, &QTableWidget::cellDoubleClicked,
             this, &StackingDialog::onTableItemDoubleClicked);
-    connect(m_imageTable, &QTableWidget::cellDoubleClicked,
-            this, &StackingDialog::onTableItemDoubleClicked);
-    connect(m_imageTable, &QTableWidget::cellDoubleClicked,
-            this, &StackingDialog::onTableItemDoubleClicked);
+    
+    // Filter combo/value: apply filtering when changed
+    connect(m_filterCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this](int) { updateTable(); updateSummary(); });
+    connect(m_filterValue, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            this, [this](double) { updateTable(); updateSummary(); });
 }
 
 void StackingDialog::setupCometTab() {
@@ -386,6 +388,7 @@ void StackingDialog::setupParametersGroup() {
     m_weightingCombo->addItem(tr("Noise"), static_cast<int>(Stacking::WeightingType::Noise));
     m_weightingCombo->addItem(tr("Roundness"), static_cast<int>(Stacking::WeightingType::Roundness));
     m_weightingCombo->addItem(tr("Quality"), static_cast<int>(Stacking::WeightingType::Quality));
+    m_weightingCombo->addItem(tr("Stack Count"), static_cast<int>(Stacking::WeightingType::StackCount));
     m_weightingCombo->setCurrentIndex(3); // Noise default (matches Scripts)
     layout->addWidget(m_weightingCombo, row++, 1);
 
@@ -836,7 +839,6 @@ void StackingDialog::updateParameterVisibility() {
     // Normalization for Mean/Median
     bool showNorm = (method == Stacking::Method::Mean || 
                      method == Stacking::Method::Median);
-    m_normCombo->setEnabled(showNorm);
     m_normCombo->setEnabled(showNorm);
     m_weightingCombo->setEnabled(showNorm);
     

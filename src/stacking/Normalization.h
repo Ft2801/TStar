@@ -129,16 +129,7 @@ private:
         ProgressCallback progressCallback
     );
 
-    /**
-     * @brief Compute gradient normalization (LSQ Plane Fit)
-     */
-    static bool computeGradientNormalization(
-        const ImageSequence& sequence,
-        const StackingParams& params,
-        NormCoefficients& coefficients,
-        ProgressCallback progressCallback
-    );
-    
+
     /**
      * @brief Find overlapping region between two images
      */

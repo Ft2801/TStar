@@ -264,8 +264,8 @@ RejectionResult RejectionAlgorithms::madClipping(
         float median = Statistics::quickMedian(work.data(), work.size());
         double mad = Statistics::mad(work.data(), work.size(), median);
         
-        // MAD is scaled to be comparable to sigma for normal distribution
-        double sigma = 1.4826 * mad;
+        // Raw MAD — do NOT scale by 1.4826.
+        double sigma = mad;
         
         // Check each pixel
         for (int i = 0; i < n; ++i) {
@@ -495,59 +495,60 @@ RejectionResult RejectionAlgorithms::linearFitClipping(
         result.keptCount = n;
         return result;
     }
-    
-    // X values for fit (indices)
-    std::vector<float> x(n);
-    for (int i = 0; i < n; ++i) x[i] = static_cast<float>(i);
-    
+
     bool changed = true;
-    int totalRejected = 0;
     int currentN = n;
     
     while (changed && currentN > 3) {
         changed = false;
         
-        // Gather valid points
-        std::vector<float> validY;
-        std::vector<float> validX;
+        // Gather valid points — sort by value (rank-based x)
+        std::vector<std::pair<float,int>> validPairs;  // (value, original_index)
+        validPairs.reserve(currentN);
         for(int i=0; i<n; ++i) {
-            if(rejected[i]==0) {
-                validY.push_back(stack[i]);
-                validX.push_back(x[i]);
-            }
+            if(rejected[i]==0) validPairs.push_back({stack[i], i});
         }
+        std::sort(validPairs.begin(), validPairs.end());
         
-        // Fit line
-        float a, b;
-        Statistics::linearFit(validX.data(), validY.data(), validX.size(), a, b);
+        int N = static_cast<int>(validPairs.size());
+        // x[j] = j (rank of sorted pixel)
+        // Pre-compute means for OLS
+        float m_x = (N - 1) * 0.5f;
+        float m_y = 0.0f;
+        for (int j = 0; j < N; ++j) m_y += validPairs[j].first;
+        m_y /= N;
         
-        // Compute sigma of residuals
+        float ssxy = 0.0f, ssxx = 0.0f;
+        for (int j = 0; j < N; ++j) {
+            float dx = j - m_x;
+            ssxy += dx * (validPairs[j].first - m_y);
+            ssxx += dx * dx;
+        }
+        float a = (ssxx > 0.0f) ? ssxy / ssxx : 0.0f;
+        float b = m_y - a * m_x;
+        
+        // Sigma = MAE (Mean Absolute Error)
         float sigma = 0.0f;
-        for (size_t i = 0; i < validY.size(); ++i) {
-            sigma += std::abs(validY[i] - (a * validX[i] + b));
-        }
-        sigma /= validY.size();
+        for (int j = 0; j < N; ++j)
+            sigma += std::abs(validPairs[j].first - (a * j + b));
+        sigma /= N;
         
-        // Check each pixel
-        for (int i = 0; i < n; ++i) {
-            if (rejected[i] != 0) continue;
-            
+        // Check each pixel at its rank position j vs predicted a*j + b
+        for (int j = 0; j < N; ++j) {
             if (currentN <= 3) break;
             
-            float expected = a * i + b;
-            float deviation = stack[i] - expected;
+            int origIdx = validPairs[j].second;
+            float deviation = validPairs[j].first - (a * j + b);
             
             if (deviation < -sigmaLow * sigma) {
-                rejected[i] = -1;
+                rejected[origIdx] = -1;
                 result.lowRejected++;
-                totalRejected++;
                 changed = true;
                 currentN--;
             }
             else if (deviation > sigmaHigh * sigma) {
-                rejected[i] = 1;
+                rejected[origIdx] = 1;
                 result.highRejected++;
-                totalRejected++;
                 changed = true;
                 currentN--;
             }
@@ -619,19 +620,15 @@ RejectionResult RejectionAlgorithms::gesdtClipping(
         // Check against critical value
         bool isOutlier = checkGValue(gStat, criticalValues[iter]);
         
-        // Store candidate
-        float value = wStack[maxIndexLocal];
-        int originalIdx = indices[maxIndexLocal];
-        
-        outliers.push_back({value, originalIdx});
-        
         if (!isOutlier) {
-            // Mark all subsequent as not outliers (invalid)
-             for (int j = iter + 1; j < maxOutliers; ++j) {
-                outliers.push_back({0.0f, -1});  
-            }
+            // Grubbs statistic does not exceed critical value — stop
             break;
         }
+        
+        // Store confirmed outlier
+        float value = wStack[maxIndexLocal];
+        int originalIdx = indices[maxIndexLocal];
+        outliers.push_back({value, originalIdx});
         
         // Optimization: Swap with end and decrement size instead of erasing
         // This keeps the loop O(K*N) instead of O(K*N^2)
@@ -924,17 +921,8 @@ void RejectionAlgorithms::confirmGesdtOutliers(
     std::vector<int>& rejected,
     RejectionResult& result)
 {
-    int lastConfirmed = -1;
-    for (int i = numOutliers - 1; i >= 0; --i) {
-        if (outliers[i].second >= 0) {
-            lastConfirmed = i;
-            break;
-        }
-    }
-    
-    if (lastConfirmed < 0) return;
-    
-    for (int i = 0; i <= lastConfirmed; ++i) {
+    // All entries in outliers are confirmed (non-outlier entries are no longer pushed)
+    for (int i = 0; i < numOutliers; ++i) {
         float value = outliers[i].first;
         int idx = outliers[i].second;
         
