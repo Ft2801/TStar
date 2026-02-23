@@ -89,6 +89,9 @@ jobs:
           brew link --overwrite gsl || true
           brew install cfitsio
           brew link --overwrite cfitsio || true
+          # OpenBLAS: required by libopencv_core at runtime (must be bundled in .app)
+          brew install openblas
+          brew link --overwrite openblas || true
           
           echo ">>> Installing compression libraries..."
           brew install lz4
@@ -436,6 +439,8 @@ jobs:
           # OpenCV: build without OpenVINO to avoid binary bloat and external dependencies
           arch -x86_64 bash -c "brew install opencv --without-openvino 2>/dev/null || brew install opencv || true"
           arch -x86_64 bash -c "brew install gsl cfitsio || true"
+          # OpenBLAS: required by libopencv_core at runtime (must be bundled in .app)
+          arch -x86_64 bash -c "brew install openblas || true"
           
           echo ">>> Installing Python (x86_64)..."
           arch -x86_64 bash -c "brew install python@3.12"

@@ -139,6 +139,8 @@ copy_dylib "libomp" "libomp" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libbrotlicommon" "brotli" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libbrotlidec" "brotli" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libraw" "libraw" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+# OpenBLAS: transitive dependency of libopencv_core - must be bundled explicitly
+copy_dylib "libopenblas.0" "openblas" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 
 # OpenCV (only required modules - dnn and video excluded to avoid external dependencies)
 OPENCV_PREFIX=$(brew --prefix opencv 2>/dev/null || echo "")

@@ -216,9 +216,8 @@ ImageBuffer ChannelOps::computeLuminance(const ImageBuffer& src, LumaMethod meth
 }
 
 bool ChannelOps::recombineLuminance(ImageBuffer& target, const ImageBuffer& sourceL, 
-                                   LumaMethod method, 
-                                   float blend, float softKnee,
-                                   const std::vector<float>& customWeights)
+                                   ColorSpaceMode csMode,
+                                   float blend)
 {
     if (!target.isValid() || !sourceL.isValid()) return false;
     if (sourceL.channels() != 1) return false;
@@ -235,51 +234,185 @@ bool ChannelOps::recombineLuminance(ImageBuffer& target, const ImageBuffer& sour
     int c = target.channels();
     if (c < 3) return false;
     
-    float wr, wg, wb;
-    if (method == LumaMethod::REC601 || method == LumaMethod::REC2020 || 
-        method == LumaMethod::REC709 || method == LumaMethod::CUSTOM || method == LumaMethod::AVERAGE) {
-        wr = getLumaWeightR(method, customWeights);
-        wg = getLumaWeightG(method, customWeights);
-        wb = getLumaWeightB(method, customWeights);
-    } else {
-        // Fallback for non-linear methods (Max/Median/SNR) - Use Rec709 as the "Linear Basis" for recombination scaling
-        wr = 0.2126f; wg = 0.7152f; wb = 0.0722f;
-    }
-    
     float* rgb = target.data().data();
     const float* L = sourceL.data().data();
-    const float eps = 1e-6f;
+    
+    // Find max value of luminance source for normalization
+    float lumMax = 0.0f;
+    for (int i = 0; i < w * h; ++i) {
+        if (L[i] > lumMax) lumMax = L[i];
+    }
+    if (lumMax < 1e-12f) lumMax = 1.0f; // Avoid division by zero
     
     for (int i = 0; i < w * h; ++i) {
         float r = rgb[i*c+0];
         float g = rgb[i*c+1];
         float b = rgb[i*c+2];
         
-        // Current Y (Linear Estimate)
-        float Y = r*wr + g*wg + b*wb; 
+        // Normalized luminance value from source
+        float newL = L[i] / lumMax;
         
-        // Target L
-        float newL = L[i];
+        float nr, ng, nb;
         
-        // Scale factor
-        float s = newL / (Y + eps);
-        
-        // Soft knee (compression of extreme highlights)
-        if (softKnee > 0.0f) {
-            float k = std::clamp(softKnee, 0.0f, 1.0f);
-            s = s / (1.0f + k * (s - 1.0f));
-        }
-        
-        // Apply
-        float nr = r * s;
-        float ng = g * s;
-        float nb = b * s;
-        
-        // Blend
-        if (blend < 1.0f && blend >= 0.0f) {
-            nr = r * (1.0f - blend) + nr * blend;
-            ng = g * (1.0f - blend) + ng * blend;
-            nb = b * (1.0f - blend) + nb * blend;
+        switch (csMode) {
+            case ColorSpaceMode::HSL: {
+                // RGB to HSL
+                float maxC = std::max({r, g, b});
+                float minC = std::min({r, g, b});
+                float vm = maxC - minC;
+                float hl = 0.0f, sl = 0.0f, ll = (maxC + minC) * 0.5f;
+                
+                if (vm > 0.0f) {
+                    sl = (ll <= 0.5f) ? (vm / (maxC + minC)) : (vm / (2.0f - maxC - minC));
+                    
+                    float r2 = (maxC - r) / vm;
+                    float g2 = (maxC - g) / vm;
+                    float b2 = (maxC - b) / vm;
+                    
+                    if (r == maxC)
+                        hl = (g == minC) ? 5.0f + b2 : 1.0f - g2;
+                    else if (g == maxC)
+                        hl = (b == minC) ? 1.0f + r2 : 3.0f - b2;
+                    else
+                        hl = (r == minC) ? 3.0f + g2 : 5.0f - r2;
+                    hl /= 6.0f;
+                }
+                
+                // Replace lightness with new luminance
+                float newll = newL;
+                if (blend < 1.0f) {
+                    newll = ll * (1.0f - blend) + newL * blend;
+                }
+                
+                // HSL to RGB
+                float v = (newll <= 0.5f) ? (newll * (1.0f + sl)) : (newll + sl - newll * sl);
+                if (v <= 0.0f) {
+                    nr = ng = nb = 0.0f;
+                } else {
+                    float m = newll + newll - v;
+                    float sv = (v - m) / v;
+                    float h6 = hl * 6.0f;
+                    if (h6 >= 6.0f) h6 -= 6.0f;
+                    int sextant = (int)h6;
+                    float fract = h6 - sextant;
+                    float vsf = v * sv * fract;
+                    float mid1 = m + vsf;
+                    float mid2 = v - vsf;
+                    
+                    switch (sextant) {
+                        case 0: nr = v;    ng = mid1; nb = m;    break;
+                        case 1: nr = mid2; ng = v;    nb = m;    break;
+                        case 2: nr = m;    ng = v;    nb = mid1; break;
+                        case 3: nr = m;    ng = mid2; nb = v;    break;
+                        case 4: nr = mid1; ng = m;    nb = v;    break;
+                        case 5: nr = v;    ng = m;    nb = mid2; break;
+                        default: nr = r; ng = g; nb = b; break;
+                    }
+                }
+                break;
+            }
+            
+            case ColorSpaceMode::HSV: {
+                // RGB to HSV
+                float maxC = std::max({r, g, b});
+                float minC = std::min({r, g, b});
+                float vm = maxC - minC;
+                float hv = 0.0f, sv = 0.0f, vv = maxC;
+                
+                if (maxC > 0.0f) {
+                    sv = vm / maxC;
+                }
+                
+                if (vm > 0.0f) {
+                    if (r == maxC)
+                        hv = (g - b) / vm;
+                    else if (g == maxC)
+                        hv = 2.0f + (b - r) / vm;
+                    else
+                        hv = 4.0f + (r - g) / vm;
+                    hv /= 6.0f;
+                    if (hv < 0.0f) hv += 1.0f;
+                }
+                
+                // Replace value with new luminance
+                float newvv = newL;
+                if (blend < 1.0f) {
+                    newvv = vv * (1.0f - blend) + newL * blend;
+                }
+                
+                // HSV to RGB
+                if (sv <= 0.0f) {
+                    nr = ng = nb = newvv;
+                } else {
+                    float h6 = hv * 6.0f;
+                    if (h6 >= 6.0f) h6 -= 6.0f;
+                    int sector = (int)h6;
+                    float fract = h6 - sector;
+                    float p = newvv * (1.0f - sv);
+                    float q = newvv * (1.0f - sv * fract);
+                    float t = newvv * (1.0f - sv * (1.0f - fract));
+                    
+                    switch (sector) {
+                        case 0: nr = newvv; ng = t;     nb = p;     break;
+                        case 1: nr = q;     ng = newvv; nb = p;     break;
+                        case 2: nr = p;     ng = newvv; nb = t;     break;
+                        case 3: nr = p;     ng = q;     nb = newvv; break;
+                        case 4: nr = t;     ng = p;     nb = newvv; break;
+                        case 5: nr = newvv; ng = p;     nb = q;     break;
+                        default: nr = r; ng = g; nb = b; break;
+                    }
+                }
+                break;
+            }
+            
+            case ColorSpaceMode::CIELAB: {
+                // RGB to XYZ (sRGB D65)
+                float X = r * 0.4124564f + g * 0.3575761f + b * 0.1804375f;
+                float Y = r * 0.2126729f + g * 0.7151522f + b * 0.0721750f;
+                float Z = r * 0.0193339f + g * 0.1191920f + b * 0.9503041f;
+                
+                // XYZ to Lab (D65 white point)
+                const float Xn = 0.95047f, Yn = 1.0f, Zn = 1.08883f;
+                auto labF = [](float t) -> float {
+                    return (t > 0.008856f) ? std::cbrt(t) : (7.787f * t + 16.0f / 116.0f);
+                };
+                float fx = labF(X / Xn);
+                float fy = labF(Y / Yn);
+                float fz = labF(Z / Zn);
+                
+                // float Lstar = 116.0f * fy - 16.0f;  // not needed, we replace it
+                float astar = 500.0f * (fx - fy);
+                float bstar = 200.0f * (fy - fz);
+                
+                // Replace L* with new luminance (scaled to 0-100 range)
+                float newLstar = newL * 100.0f;
+                if (blend < 1.0f) {
+                    float origLstar = 116.0f * fy - 16.0f;
+                    newLstar = origLstar * (1.0f - blend) + newLstar * blend;
+                }
+                
+                // Lab to XYZ
+                auto labFInv = [](float t) -> float {
+                    return (t > 0.206893f) ? (t * t * t) : ((t - 16.0f / 116.0f) / 7.787f);
+                };
+                float fy2 = (newLstar + 16.0f) / 116.0f;
+                float fx2 = astar / 500.0f + fy2;
+                float fz2 = fy2 - bstar / 200.0f;
+                
+                float X2 = Xn * labFInv(fx2);
+                float Y2 = Yn * labFInv(fy2);
+                float Z2 = Zn * labFInv(fz2);
+                
+                // XYZ to RGB (sRGB D65)
+                nr =  3.2404542f * X2 - 1.5371385f * Y2 - 0.4985314f * Z2;
+                ng = -0.9692660f * X2 + 1.8760108f * Y2 + 0.0415560f * Z2;
+                nb =  0.0556434f * X2 - 0.2040259f * Y2 + 1.0572252f * Z2;
+                break;
+            }
+            
+            default:
+                nr = r; ng = g; nb = b;
+                break;
         }
         
         rgb[i*c+0] = std::clamp(nr, 0.0f, 1.0f);

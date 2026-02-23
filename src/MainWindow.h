@@ -41,6 +41,7 @@ class HeaderPanel;
 class AstroSpikeDialog;
 class DebayerDialog;
 class ContinuumSubtractionDialog;
+class AlignChannelsDialog;
 class AnnotationToolDialog;
 struct Annotation;
 
@@ -105,6 +106,7 @@ private slots:
     void openHeaderEditorDialog();
     void openDebayerDialog();
     void openContinuumSubtractionDialog();
+    void openAlignChannelsDialog();
     void openImageAnnotatorDialog();
     
     void openExtractLuminanceDialog();
@@ -217,6 +219,7 @@ private:
     QPointer<class AstroSpikeDialog> m_astroSpikeDlg;
     QPointer<class DebayerDialog> m_debayerDlg;
     QPointer<class ContinuumSubtractionDialog> m_continuumDlg;
+    QPointer<class AlignChannelsDialog> m_alignChannelsDlg;
     QPointer<class AnnotationToolDialog> m_annotatorDlg;
     QPointer<class SettingsDialog> m_settingsDlg;
     

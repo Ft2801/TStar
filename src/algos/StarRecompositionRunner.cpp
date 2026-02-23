@@ -30,7 +30,7 @@ bool StarRecompositionRunner::run(const ImageBuffer& starless, const ImageBuffer
     const float* strData = stretchedStars.data().data();
     float* outData = output.data().data();
 
-    // Siril's implementation always uses Screen: A + B - A*B
+    // Screen: A + B - A*B
     for (size_t i = 0; i < numPixels; ++i) {
         for (int ch = 0; ch < outC; ++ch) {
             float sll = 0.0f;

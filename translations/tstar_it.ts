@@ -166,6 +166,97 @@
         </message>
     </context>
     <context>
+        <name>AlignChannelsDialog</name>
+        <message>
+            <source>Align</source>
+            <translation type="finished">Allinea</translation>
+        </message>
+        <message>
+            <source>Align Channels</source>
+            <translation type="finished">Allinea Canali</translation>
+        </message>
+        <message>
+            <source>Aligning image %1 / %2...</source>
+            <translation type="finished">Allineamento immagine %1 / %2...</translation>
+        </message>
+        <message>
+            <source>Allow Rotation</source>
+            <translation type="finished">Consenti rotazione</translation>
+        </message>
+        <message>
+            <source>Allow Scale</source>
+            <translation type="finished">Consenti scala</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Chiudi</translation>
+        </message>
+        <message>
+            <source>Completed with errors: %1/%2 images aligned.</source>
+            <translation type="finished">Completato con errori: %1/%2 immagini allineate.</translation>
+        </message>
+        <message>
+            <source>Completed: %1/%2 images aligned successfully.</source>
+            <translation type="finished">Completato: %1/%2 immagini allineate con successo.</translation>
+        </message>
+        <message>
+            <source>Detection Threshold (σ):</source>
+            <translation type="finished">Soglia rilevamento (σ):</translation>
+        </message>
+        <message>
+            <source>Image %1: aligned (shift=%2,%3  rot=%4°  %5 stars)</source>
+            <translation type="finished">Immagine %1: allineata (shift=%2,%3  rot=%4°  %5 stelle)</translation>
+        </message>
+        <message>
+            <source>Image %1: registration failed — %2</source>
+            <translation type="finished">Immagine %1: registrazione fallita — %2</translation>
+        </message>
+        <message>
+            <source>Image 1:</source>
+            <translation type="finished">Immagine 1:</translation>
+        </message>
+        <message>
+            <source>Image 2:</source>
+            <translation type="finished">Immagine 2:</translation>
+        </message>
+        <message>
+            <source>Image 3:</source>
+            <translation type="finished">Immagine 3:</translation>
+        </message>
+        <message>
+            <source>Images to Align</source>
+            <translation type="finished">Immagini da Allineare</translation>
+        </message>
+        <message>
+            <source>Reference Image</source>
+            <translation type="finished">Immagine di Riferimento</translation>
+        </message>
+        <message>
+            <source>Reference:</source>
+            <translation type="finished">Riferimento:</translation>
+        </message>
+        <message>
+            <source>Refresh List</source>
+            <translation type="finished">Aggiorna Lista</translation>
+        </message>
+        <message>
+            <source>Registration Parameters</source>
+            <translation type="finished">Parametri di Registrazione</translation>
+        </message>
+        <message>
+            <source>Select a valid reference image.</source>
+            <translation type="finished">Seleziona un'immagine di riferimento valida.</translation>
+        </message>
+        <message>
+            <source>Select at least one image to align different from the reference.</source>
+            <translation type="finished">Seleziona almeno un'immagine da allineare diversa dal riferimento.</translation>
+        </message>
+        <message>
+            <source>The reference image is empty.</source>
+            <translation type="finished">L'immagine di riferimento è vuota.</translation>
+        </message>
+    </context>
+    <context>
         <name>AnnotationToolDialog</name>
         <message>
             <source>Add Text Label</source>
@@ -2912,6 +3003,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Vista Attiva Cambiata: %1</translation>
         </message>
         <message>
+            <source>Align Channels</source>
+            <translation type="finished">Allinea Canali</translation>
+        </message>
+        <message>
             <source>All Supported (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;</source>
             <translation type="finished">Tutti i Supportati (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;</translation>
         </message>
@@ -3446,6 +3541,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Opening Aberration Remover...</source>
             <translation type="finished">Apertura Rimozione Aberrazioni...</translation>
+        </message>
+        <message>
+            <source>Opening Align Channels...</source>
+            <translation type="finished">Apertura Allinea Canali...</translation>
         </message>
         <message>
             <source>Opening Arcsinh Stretch Tool...</source>
@@ -5247,76 +5346,76 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Applica</translation>
         </message>
         <message>
-            <source>Average</source>
-            <translation type="finished">Media</translation>
-        </message>
-        <message>
             <source>Blend:</source>
             <translation type="finished">Fusione:</translation>
+        </message>
+        <message>
+            <source>CIE L*a*b*</source>
+            <translation type="finished">CIE L*a*b*</translation>
         </message>
         <message>
             <source>Close</source>
             <translation type="finished">Chiudi</translation>
         </message>
         <message>
-            <source>Custom / Sensor</source>
-            <translation type="finished">Personalizzato / Sensore</translation>
-        </message>
-        <message>
-            <source>Custom RGB Weights</source>
-            <translation type="finished">Pesi RGB Personalizzati</translation>
+            <source>Color Space:</source>
+            <translation type="finished">Spazio Colore:</translation>
         </message>
         <message>
             <source>Error</source>
             <translation type="finished">Errore</translation>
         </message>
         <message>
-            <source>Highlight Protection (Soft Knee):</source>
-            <translation type="finished">Protezione Alte Luci (Soft Knee):</translation>
+            <source>HSL (Hue-Saturation-Lightness)</source>
+            <translation type="finished">HSL (Tonalità-Saturazione-Luminosità)</translation>
+        </message>
+        <message>
+            <source>HSV (Hue-Saturation-Value)</source>
+            <translation type="finished">HSV (Tonalità-Saturazione-Valore)</translation>
+        </message>
+        <message>
+            <source>Invalid Source</source>
+            <translation type="finished">Fonte Non Valida</translation>
+        </message>
+        <message>
+            <source>Invalid Target</source>
+            <translation type="finished">Destinazione Non Valida</translation>
         </message>
         <message>
             <source>Luminance Source:</source>
             <translation type="finished">Sorgente Luminanza:</translation>
         </message>
         <message>
-            <source>Method:</source>
-            <translation type="finished">Metodo:</translation>
+            <source>Luminance recombination completed.</source>
+            <translation type="finished">Ricombinazione della luminanza completata.</translation>
         </message>
         <message>
             <source>No Source</source>
             <translation type="finished">Nessuna Sorgente</translation>
         </message>
         <message>
-            <source>Parameters</source>
-            <translation type="finished">Parametri</translation>
-        </message>
-        <message>
             <source>Please select a source luminance image.</source>
             <translation type="finished">Seleziona un'immagine sorgente di luminanza.</translation>
         </message>
         <message>
-            <source>Rec. 2020</source>
-            <translation type="finished">Rec. 2020</translation>
-        </message>
-        <message>
-            <source>Rec. 601</source>
-            <translation type="finished">Rec. 601</translation>
-        </message>
-        <message>
-            <source>Rec. 709 (Standard)</source>
-            <translation type="finished">Rec. 709 (Standard)</translation>
-        </message>
-        <message>
-            <source>Recombination failed. Typically specific to size mismatch or invalid source image.</source>
-            <translation type="finished">Ricombinazione fallita. Solitamente dovuto a discrepanza di dimensioni o immagine sorgente non valida.</translation>
+            <source>Recombination failed. Check that image dimensions match and the source is a valid luminance image.</source>
+            <translation type="finished">Ricombinazione fallita. Verifica che le dimensioni delle immagini corrispondano e che la sorgente sia un'immagine di luminanza valida.</translation>
         </message>
         <message>
             <source>Recombine Luminance</source>
             <translation type="finished">Ricombina Luminanza</translation>
         </message>
         <message>
-            <source>Recombining...</source>
-            <translation type="finished">Ricombinazione in corso...</translation>
+            <source>Recombining luminance...</source>
+            <translation type="finished">Ricombinazione della luminanza in corso...</translation>
+        </message>
+        <message>
+            <source>The source image must be a single-channel (mono) luminance image.</source>
+            <translation type="finished">L'immagine sorgente deve essere un'immagine di luminanza a canale singolo (mono).</translation>
+        </message>
+        <message>
+            <source>The target image must be a color (RGB) image.</source>
+            <translation type="finished">L'immagine di destinazione deve essere un'immagine a colori (RGB).</translation>
         </message>
     </context>
     <context>
@@ -5430,7 +5529,7 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
         <message>
             <source>Allow Rotation</source>
-            <translation type="finished">Consenti Rotazione</translation>
+            <translation type="finished">Consenti rotazione</translation>
         </message>
         <message>
             <source>Auto</source>
@@ -5526,7 +5625,7 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
         <message>
             <source>Registration Parameters</source>
-            <translation type="finished">Parametri Allineamento</translation>
+            <translation type="finished">Parametri di Registrazione</translation>
         </message>
         <message>
             <source>Select Image Folder</source>

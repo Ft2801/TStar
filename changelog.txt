@@ -1,6 +1,12 @@
 TStar Changelog
 ===============
 
+Version 1.6.4
+-------------
+- Update to the add/recombine luminance tool
+- New small tool: align channels
+- Minor bugfixes
+
 Version 1.6.3
 -------------
 - New histogram visualization in ght, curves and histogram transformation tools

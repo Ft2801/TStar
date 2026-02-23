@@ -92,6 +92,7 @@
 #include "dialogs/AstroSpikeDialog.h"
 #include "dialogs/DebayerDialog.h"
 #include "dialogs/ContinuumSubtractionDialog.h"
+#include "dialogs/AlignChannelsDialog.h"
 #include "dialogs/AnnotationToolDialog.h"
 #include "widgets/AnnotationOverlay.h"
 #include "widgets/SidebarWidget.h"
@@ -940,6 +941,9 @@ MainWindow::MainWindow(QWidget *parent)
         if (activateTool(tr("Combine Channels"))) return;
         combineChannels();
     });
+    addMenuAction(chanMenu, tr("Align Channels"), "", [this](){
+        openAlignChannelsDialog();
+    });    
     addMenuAction(chanMenu, tr("Star Recomposition"), "", [this](){
         openStarRecompositionDialog();
     });
@@ -3326,6 +3330,24 @@ void MainWindow::openContinuumSubtractionDialog() {
     centerToolWindow(sub);
 }
 
+void MainWindow::openAlignChannelsDialog() {
+    if (m_alignChannelsDlg) {
+        m_alignChannelsDlg->raise();
+        m_alignChannelsDlg->activateWindow();
+        m_alignChannelsDlg->refreshImageList();
+        return;
+    }
+
+    m_alignChannelsDlg = new AlignChannelsDialog(this);
+    log(tr("Opening Align Channels..."), Log_Action, true);
+    m_alignChannelsDlg->setAttribute(Qt::WA_DeleteOnClose);
+    connect(m_alignChannelsDlg, &QDialog::destroyed, this, [this]() { m_alignChannelsDlg = nullptr; });
+
+    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, m_alignChannelsDlg, tr("Align Channels"));
+    sub->resize(450, 450);
+    centerToolWindow(sub);
+}
+
 void MainWindow::openImageAnnotatorDialog() {
     ImageViewer* v = currentViewer();
     if (!v || !v->getBuffer().isValid()) {
@@ -3534,7 +3556,7 @@ void MainWindow::openRecombineLuminanceDialog() {
     
     CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
     setupToolSubwindow(sub, dlg, tr("Recombine Luminance"));
-    sub->resize(450, 400);
+    sub->resize(450, 200);
     centerToolWindow(sub);
     
     connect(dlg, &QDialog::accepted, this, [this](){

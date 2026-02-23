@@ -25,18 +25,28 @@ public:
         CUSTOM
     };
 
+    // Color space used for luminance recombination
+    enum class ColorSpaceMode {
+        HSL,    // Hue-Saturation-Lightness (default)
+        HSV,    // Hue-Saturation-Value
+        CIELAB  // CIE L*a*b*
+    };
+
     // Extended computeLuminance with support for Custom weights and SNR
     static ImageBuffer computeLuminance(const ImageBuffer& src, LumaMethod method = LumaMethod::REC709, 
                                         const std::vector<float>& customWeights = {}, 
                                         const std::vector<float>& customNoiseSigma = {});
 
-    // Recombine luminance into target image (L_new / L_old * RGB)
+    // Recombine luminance into target image using color space conversion.
+    // Converts each pixel RGB -> color space, replaces lightness/value with sourceL, converts back.
+    // This preserves hue and saturation while replacing only the luminance component.
     // target: RGB image to modify
     // sourceL: New luminance (mono)
+    // csMode: Color space for the conversion (HSL, HSV, or CIELab)
+    // blend: Blend factor 0..1 (0 = no change, 1 = full replacement)
     static bool recombineLuminance(ImageBuffer& target, const ImageBuffer& sourceL, 
-                                   LumaMethod method = LumaMethod::REC709, 
-                                   float blend = 1.0f, float softKnee = 0.0f,
-                                   const std::vector<float>& customWeights = {});
+                                   ColorSpaceMode csMode = ColorSpaceMode::HSL,
+                                   float blend = 1.0f);
 
     // Helper to estimate noise sigma per channel (for SNR weighting)
     static std::vector<float> estimateNoiseSigma(const ImageBuffer& src);

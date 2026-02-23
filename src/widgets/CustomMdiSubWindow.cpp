@@ -187,24 +187,20 @@ void LinkStrip::paintEvent(QPaintEvent *) {
 
 void LinkStrip::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
-        if (m_linked) {
-            emit linkToggled(); // Request unlink
-        } else {
-            m_dragStartPos = event->pos();
-        }
+        m_dragStartPos = event->pos();
+        m_dragging = false;
     }
 }
 
 void LinkStrip::mouseMoveEvent(QMouseEvent *event) {
     if (!(event->buttons() & Qt::LeftButton)) return;
-    if (m_linked) return; // No dragging if already linked (click to unlink)
-    
     if ((event->pos() - m_dragStartPos).manhattanLength() < QApplication::startDragDistance()) return;
-    
+
+    m_dragging = true;
+
     QDrag *drag = new QDrag(this);
     QMimeData *mimeData = new QMimeData();
-    // Link mode always true for LinkStrip
-    
+
     QWidget* widget = this;
     while(widget && !widget->inherits("CustomMdiSubWindow")) {
         widget = widget->parentWidget();
@@ -220,6 +216,14 @@ void LinkStrip::mouseMoveEvent(QMouseEvent *event) {
         drag->setPixmap(pix);
         drag->exec(Qt::LinkAction);
     }
+    m_dragging = false;
+}
+
+void LinkStrip::mouseReleaseEvent(QMouseEvent *event) {
+    if (event->button() == Qt::LeftButton && !m_dragging && m_linked) {
+        emit linkToggled(); // Unlink only on pure click (no drag occurred)
+    }
+    m_dragging = false;
 }
 
 void LinkStrip::dragEnterEvent(QDragEnterEvent *event) {
@@ -597,47 +601,49 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
     
     m_linkStrip = new LinkStrip(leftStrip);
     connect(m_linkStrip, &LinkStrip::linkToggled, [this](){
-        // Unlink implementation - must disconnect signal/slots and update both viewers
+        // Unlink this viewer from the group:
+        // 1. Disconnect it from every other linked viewer (both directions).
+        // 2. Mark it as unlinked.
+        // 3. For each remaining viewer in the group, mark it unlinked too
+        //    if it has no more linked partners.
         ImageViewer* v = m_contentArea->findChild<ImageViewer*>();
         if (v && v->isLinked()) {
-            // Find all other linked viewers in the MDI area and disconnect them
             if (QMdiArea* area = mdiArea()) {
+                // Collect all OTHER currently-linked viewers
+                QVector<QPair<ImageViewer*, CustomMdiSubWindow*>> others;
                 for (QMdiSubWindow* sub : area->subWindowList()) {
                     if (sub == this) continue;
-                    
                     CustomMdiSubWindow* otherWin = qobject_cast<CustomMdiSubWindow*>(sub);
                     if (!otherWin) continue;
-                    
-                    ImageViewer* otherViewer = otherWin->findChild<ImageViewer*>();
-                    if (otherViewer && otherViewer->isLinked()) {
-                        // Disconnect bidirectional view synchronization
-                        disconnect(v, &ImageViewer::viewChanged, otherViewer, &ImageViewer::syncView);
-                        disconnect(otherViewer, &ImageViewer::viewChanged, v, &ImageViewer::syncView);
-                        
-                        // Check if this viewer has any other links remaining
-                        bool otherHasMoreLinks = false;
-                        for (QMdiSubWindow* checkSub : area->subWindowList()) {
-                            if (checkSub == sub || checkSub == this) continue;
-                            ImageViewer* checkViewer = checkSub->findChild<ImageViewer*>();
-                            if (checkViewer && checkViewer->isLinked()) {
-                                // Check if otherViewer is still connected to checkViewer
-                                // by testing if they share viewChanged connections
-                                otherHasMoreLinks = true;
-                                break;
-                            }
-                        }
-                        
-                        if (!otherHasMoreLinks) {
-                            otherViewer->setLinked(false);
-                            if (otherWin->m_linkStrip) {
-                                otherWin->m_linkStrip->setLinked(false);
-                            }
-                        }
+                    ImageViewer* ov = otherWin->viewer();
+                    if (ov && ov->isLinked())
+                        others.append({ov, otherWin});
+                }
+
+                // Disconnect v from every other linked viewer
+                for (auto& p : others) {
+                    disconnect(v,       &ImageViewer::viewChanged, p.first, &ImageViewer::syncView);
+                    disconnect(p.first, &ImageViewer::viewChanged, v,       &ImageViewer::syncView);
+                }
+
+                // Mark v as unlinked
+                v->setLinked(false);   // also emits unlinked → strip auto-updated
+
+                // For each remaining viewer: if it's now isolated (no other linked
+                // peer exists besides itself), mark it unlinked too
+                for (auto& p : others) {
+                    bool hasPeer = false;
+                    for (auto& q : others) {
+                        if (q.first != p.first && q.first->isLinked()) { hasPeer = true; break; }
+                    }
+                    if (!hasPeer) {
+                        p.first->setLinked(false);
+                        if (p.second->m_linkStrip) p.second->m_linkStrip->setLinked(false);
                     }
                 }
+            } else {
+                v->setLinked(false);
             }
-            
-            v->setLinked(false);
         }
         m_linkStrip->setLinked(false);
     });
@@ -1150,77 +1156,120 @@ void CustomMdiSubWindow::handleDrop(QDropEvent* event) {
                 ImageViewer* targetPtr = this->findChild<ImageViewer*>(); 
                 
                 if (sourcePtr && targetPtr) {
-                    // Connect bidirectional view synchronization
-                    // These will auto-disconnect when either receiver is destroyed
-                    connect(sourcePtr, &ImageViewer::viewChanged, targetPtr, &ImageViewer::syncView, Qt::UniqueConnection);
-                    connect(targetPtr, &ImageViewer::viewChanged, sourcePtr, &ImageViewer::syncView, Qt::UniqueConnection);
-                    
-                    targetPtr->syncView(sourcePtr->getScale(), sourcePtr->getHBarLoc(), sourcePtr->getVBarLoc());
-                    sourcePtr->setLinked(true);
-                    targetPtr->setLinked(true);
-                    
-                    // Update LinkStrip Status
-                    if (sourceWin->m_linkStrip) sourceWin->m_linkStrip->setLinked(true);
-                    if (m_linkStrip) m_linkStrip->setLinked(true);
-                    
-                    // When one viewer is destroyed, update the other's linked state
-                    // Only set linked=false if there are no other linked viewers remaining
-                    QPointer<ImageViewer> targetSafe = targetPtr;
-                    QPointer<CustomMdiSubWindow> targetWin = this;
-                    QPointer<ImageViewer> sourceSafe = sourcePtr;
-                    
-                    connect(sourcePtr, &QObject::destroyed, [targetSafe, targetWin, sourceSafe](){
-                        if (targetSafe) {
-                            // Check if target still has other linked viewers
-                            bool hasOtherLinks = false;
-                            if (targetWin) {
-                                QMdiArea* mdiArea = targetWin->mdiArea();
-                                if (mdiArea) {
-                                    for (QMdiSubWindow* sub : mdiArea->subWindowList()) {
-                                        ImageViewer* otherViewer = sub->findChild<ImageViewer*>();
-                                        if (otherViewer && otherViewer != targetSafe && otherViewer != sourceSafe && otherViewer->isLinked()) {
-                                            hasOtherLinks = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            if (!hasOtherLinks) {
-                                targetSafe->setLinked(false);
-                                if (targetWin && targetWin->m_linkStrip) {
-                                    targetWin->m_linkStrip->setLinked(false);
-                                }
-                            }
+                    // -------------------------------------------------------
+                    // Build the complete linked group:
+                    // • Always include source and target (even if already linked).
+                    // • Scan the entire MDI area and add every viewer that is
+                    //   currently linked (those belong to the same or another
+                    //   existing group that we're about to merge into one).
+                    // -------------------------------------------------------
+                    struct Member { ImageViewer* viewer; CustomMdiSubWindow* win; };
+                    QVector<Member> group;
+                    group.append({sourcePtr, sourceWin});
+                    group.append({targetPtr, this});
+
+                    if (QMdiArea* area = mdiArea()) {
+                        for (QMdiSubWindow* sub : area->subWindowList()) {
+                            if (sub == sourceWin || sub == this) continue;
+                            CustomMdiSubWindow* csw = qobject_cast<CustomMdiSubWindow*>(sub);
+                            if (!csw) continue;
+                            ImageViewer* v = csw->viewer();
+                            if (v && v->isLinked())
+                                group.append({v, csw});
                         }
-                    });
-                    
+                    }
+
+                    // -------------------------------------------------------
+                    // Full N×N mesh: connect EVERY pair bidirectionally.
+                    // Qt::UniqueConnection is a no-op when the same pair was
+                    // already connected, so this is safe to call repeatedly.
+                    // -------------------------------------------------------
+                    for (int i = 0; i < group.size(); ++i) {
+                        for (int j = i + 1; j < group.size(); ++j) {
+                            connect(group[i].viewer, &ImageViewer::viewChanged,
+                                    group[j].viewer, &ImageViewer::syncView,
+                                    Qt::UniqueConnection);
+                            connect(group[j].viewer, &ImageViewer::viewChanged,
+                                    group[i].viewer, &ImageViewer::syncView,
+                                    Qt::UniqueConnection);
+                        }
+                    }
+
+                    // -------------------------------------------------------
+                    // Sync all members to source's current position.
+                    // -------------------------------------------------------
+                    float srcScale = sourcePtr->getScale();
+                    float srcH     = sourcePtr->getHBarLoc();
+                    float srcV     = sourcePtr->getVBarLoc();
+                    for (int i = 1; i < group.size(); ++i)
+                        group[i].viewer->syncView(srcScale, srcH, srcV);
+
+                    // -------------------------------------------------------
+                    // Mark every member as linked and show the green strip.
+                    // -------------------------------------------------------
+                    for (auto& m : group) {
+                        m.viewer->setLinked(true);
+                        if (m.win->m_linkStrip) m.win->m_linkStrip->setLinked(true);
+                    }
+
+                    // -------------------------------------------------------
+                    // Destruction handlers: for every NEWLY connected pair
+                    // (i,j), register lambdas so that when one member is
+                    // destroyed the other is updated if it has no more links.
+                    //
+                    // We only register for pairs that include the SOURCE
+                    // (group[0]) because the other pairs (between existing
+                    // group members) already had their handlers registered
+                    // during previous drops.
+                    // -------------------------------------------------------
                     QPointer<CustomMdiSubWindow> sourceWinSafe = sourceWin;
-                    connect(targetPtr, &QObject::destroyed, [sourceSafe, sourceWinSafe, targetSafe](){
-                        if (sourceSafe) {
-                            // Check if source still has other linked viewers
-                            bool hasOtherLinks = false;
-                            if (sourceWinSafe) {
-                                QMdiArea* mdiArea = sourceWinSafe->mdiArea();
-                                if (mdiArea) {
-                                    for (QMdiSubWindow* sub : mdiArea->subWindowList()) {
-                                        ImageViewer* otherViewer = sub->findChild<ImageViewer*>();
-                                        if (otherViewer && otherViewer != sourceSafe && otherViewer != targetSafe && otherViewer->isLinked()) {
-                                            hasOtherLinks = true;
-                                            break;
-                                        }
+                    for (int i = 1; i < group.size(); ++i) {
+                        QPointer<ImageViewer>        partnerSafe    = group[i].viewer;
+                        QPointer<CustomMdiSubWindow> partnerWinSafe = group[i].win;
+                        QPointer<ImageViewer>        srcSafe        = sourcePtr;
+
+                        // When source is destroyed  → clear partner if isolated
+                        connect(sourcePtr, &QObject::destroyed,
+                                [partnerSafe, partnerWinSafe, srcSafe]() {
+                            if (!partnerSafe) return;
+                            QMdiArea* area = partnerWinSafe ? partnerWinSafe->mdiArea() : nullptr;
+                            bool hasOthers = false;
+                            if (area) {
+                                for (QMdiSubWindow* sub : area->subWindowList()) {
+                                    ImageViewer* v = sub->findChild<ImageViewer*>();
+                                    if (v && v != partnerSafe && v != srcSafe && v->isLinked()) {
+                                        hasOthers = true; break;
                                     }
                                 }
                             }
-                            
-                            if (!hasOtherLinks) {
-                                sourceSafe->setLinked(false);
-                                if (sourceWinSafe && sourceWinSafe->m_linkStrip) {
-                                    sourceWinSafe->m_linkStrip->setLinked(false);
+                            if (!hasOthers) {
+                                partnerSafe->setLinked(false);
+                                if (partnerWinSafe && partnerWinSafe->m_linkStrip)
+                                    partnerWinSafe->m_linkStrip->setLinked(false);
+                            }
+                        });
+
+                        // When partner is destroyed → clear source if isolated
+                        connect(group[i].viewer, &QObject::destroyed,
+                                [srcSafe, sourceWinSafe, partnerSafe]() {
+                            if (!srcSafe) return;
+                            QMdiArea* area = sourceWinSafe ? sourceWinSafe->mdiArea() : nullptr;
+                            bool hasOthers = false;
+                            if (area) {
+                                for (QMdiSubWindow* sub : area->subWindowList()) {
+                                    ImageViewer* v = sub->findChild<ImageViewer*>();
+                                    if (v && v != srcSafe && v != partnerSafe && v->isLinked()) {
+                                        hasOthers = true; break;
+                                    }
                                 }
                             }
-                        }
-                    });
+                            if (!hasOthers) {
+                                srcSafe->setLinked(false);
+                                if (sourceWinSafe && sourceWinSafe->m_linkStrip)
+                                    sourceWinSafe->m_linkStrip->setLinked(false);
+                            }
+                        });
+                    }
                 }
             }
         }

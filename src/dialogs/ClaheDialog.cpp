@@ -211,6 +211,8 @@ void ClaheDialog::onApply() {
             original = buffer;
         }
         
+        viewer->pushUndo(); // Save state before applying
+        
         // Re-run logic on full image
         createPreview(buffer, clip, grid);
         buffer = m_previewImage;

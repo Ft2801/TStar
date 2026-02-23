@@ -649,6 +649,8 @@ set(TSTAR_SOURCES
     src/dialogs/DebayerDialog.h
     src/dialogs/ContinuumSubtractionDialog.cpp
     src/dialogs/ContinuumSubtractionDialog.h
+    src/dialogs/AlignChannelsDialog.cpp
+    src/dialogs/AlignChannelsDialog.h
     src/dialogs/AnnotationToolDialog.cpp
     src/dialogs/AnnotationToolDialog.h
     src/dialogs/HelpDialog.cpp

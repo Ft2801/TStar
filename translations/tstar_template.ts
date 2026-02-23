@@ -166,6 +166,97 @@
         </message>
     </context>
     <context>
+        <name>AlignChannelsDialog</name>
+        <message>
+            <source>Align</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Align Channels</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Aligning image %1 / %2...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Allow Rotation</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Allow Scale</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Completed with errors: %1/%2 images aligned.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Completed: %1/%2 images aligned successfully.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Detection Threshold (σ):</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image %1: aligned (shift=%2,%3  rot=%4°  %5 stars)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image %1: registration failed — %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image 1:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image 2:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image 3:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Images to Align</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reference Image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reference:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Refresh List</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Registration Parameters</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select a valid reference image.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select at least one image to align different from the reference.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>The reference image is empty.</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>AnnotationToolDialog</name>
         <message>
             <source>Add Text Label</source>
@@ -2910,6 +3001,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Align Channels</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>All Supported (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;</source>
             <translation type="unfinished" />
         </message>
@@ -3443,6 +3538,10 @@
         </message>
         <message>
             <source>Opening Aberration Remover...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening Align Channels...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5244,11 +5343,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Average</source>
+            <source>Blend:</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Blend:</source>
+            <source>CIE L*a*b*</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5256,11 +5355,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Custom / Sensor</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Custom RGB Weights</source>
+            <source>Color Space:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5268,7 +5363,19 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Highlight Protection (Soft Knee):</source>
+            <source>HSL (Hue-Saturation-Lightness)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>HSV (Hue-Saturation-Value)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Invalid Source</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Invalid Target</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5276,7 +5383,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Method:</source>
+            <source>Luminance recombination completed.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5284,27 +5391,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Parameters</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Please select a source luminance image.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Rec. 2020</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rec. 601</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Rec. 709 (Standard)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Recombination failed. Typically specific to size mismatch or invalid source image.</source>
+            <source>Recombination failed. Check that image dimensions match and the source is a valid luminance image.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5312,7 +5403,15 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Recombining...</source>
+            <source>Recombining luminance...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>The source image must be a single-channel (mono) luminance image.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>The target image must be a color (RGB) image.</source>
             <translation type="unfinished" />
         </message>
     </context>

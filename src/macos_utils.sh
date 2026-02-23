@@ -182,15 +182,27 @@ copy_dylib_with_dependencies() {
             # Try to find and copy from Homebrew
             local found=0
             for brew_path in /opt/homebrew /usr/local; do
+                # 1. Check standard lib dir
                 if [ -f "$brew_path/lib/$dep_basename" ]; then
                     if dylib_matches_arch "$brew_path/lib/$dep_basename" "$target_arch"; then
                         cp "$brew_path/lib/$dep_basename" "$dest_dir/" 2>/dev/null && found=1
-                        # Recursively copy its dependencies
                         if [ $found -eq 1 ]; then
                             copy_dylib_with_dependencies "$dest_dir/$dep_basename" "$dest_dir" "$target_arch" "$processed_dylibs" || true
                         fi
                     fi
                     break
+                fi
+                # 2. Search opt/*/lib/ (covers openblas, openvino, etc. that Homebrew doesn't symlink to lib/)
+                if [ $found -eq 0 ] && [ -d "$brew_path/opt" ]; then
+                    local opt_match=$(find -L "$brew_path/opt" -maxdepth 3 -name "$dep_basename" 2>/dev/null | head -1)
+                    if [ -n "$opt_match" ]; then
+                        if dylib_matches_arch "$opt_match" "$target_arch"; then
+                            cp "$opt_match" "$dest_dir/" 2>/dev/null && found=1
+                            if [ $found -eq 1 ]; then
+                                copy_dylib_with_dependencies "$dest_dir/$dep_basename" "$dest_dir" "$target_arch" "$processed_dylibs" || true
+                            fi
+                        fi
+                    fi
                 fi
             done
             
