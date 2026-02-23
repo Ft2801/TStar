@@ -870,14 +870,14 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
     
     args.log(tr("Using %1 parallel blocks of max %2 rows each")
              .arg(blocks.size()).arg(largestBlockHeight), "neutral");
-    
     int poolSize = nbThreads;
     size_t pixelsPerBlock = static_cast<size_t>(outputWidth) * largestBlockHeight;
     
     std::vector<StackDataBlock> dataPool(poolSize);
+    bool useFeathering = (args.params.featherDistance > 0);
     for (int i = 0; i < poolSize; ++i) {
         if (!dataPool[i].allocate(nbImages, pixelsPerBlock, channels,
-                                   args.params.rejection, true, false)) { // Force hasMask=true for feathering
+                                   args.params.rejection, useFeathering, false)) { // Force hasMask if feathering is enabled
             args.log("Error: Failed to allocate data pool", "red");
             return StackResult::AllocError;
         }
@@ -886,8 +886,7 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
     args.log(tr("Allocated %1 data blocks, each ~%2 MB")
              .arg(poolSize).arg((nbImages * pixelsPerBlock * sizeof(float)) / (1024*1024)), "neutral");
     
-    float featherDist = 40.0f; // Could be args.params.featherDist
-    bool useFeathering = true; // Always enable for smooth edges
+    float featherDist = static_cast<float>(args.params.featherDistance);
     
     // ===== PRE-CALCULATE NORMALIZATION COEFFICIENTS =====
     struct NormCoeffs { double offset; double mul; double scale; };
