@@ -728,21 +728,6 @@
         </message>
     </context>
     <context>
-        <name>CatalogClient</name>
-        <message>
-            <source>No stars found in region.</source>
-            <translation type="finished">Aucune étoile trouvée dans région.</translation>
-        </message>
-        <message>
-            <source>Parser failed to find RA column.</source>
-            <translation type="finished">Échec trouver colonne RA.</translation>
-        </message>
-        <message>
-            <source>XML Parse Error: %1</source>
-            <translation type="finished">Erreur Analyse XML : %1</translation>
-        </message>
-    </context>
-    <context>
         <name>ChannelCombinationDialog</name>
         <message>
             <source>Apply</source>
@@ -4368,6 +4353,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Démarrage Solver Natif. Centre: %1, %2 Rayon: %3 deg</translation>
         </message>
         <message>
+            <source>TRANS sanity warning: possible skew in transform (var1=%1 var2=%2 tol=%3). Proceeding anyway.</source>
+            <translation type="finished">Avertissement de sanité TRANS: biais possible dans la transformation (var1=%1 var2=%2 tol=%3). Procédant quand même.</translation>
+        </message>
+        <message>
             <source>WCS Computation failed (Singular Matrix)</source>
             <translation type="finished">Calcul WCS échoué (Matrice Singulière)</translation>
         </message>
@@ -6735,6 +6724,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Sigma-Median</source>
             <translation type="finished">Sigma-Médiane</translation>
+        </message>
+        <message>
+            <source>Stack Count</source>
+            <translation type="finished">Nombre de Piles</translation>
         </message>
         <message>
             <source>Stacking Parameters</source>

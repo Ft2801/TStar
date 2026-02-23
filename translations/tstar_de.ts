@@ -728,21 +728,6 @@
         </message>
     </context>
     <context>
-        <name>CatalogClient</name>
-        <message>
-            <source>No stars found in region.</source>
-            <translation type="finished">Keine Sterne in Region gefunden.</translation>
-        </message>
-        <message>
-            <source>Parser failed to find RA column.</source>
-            <translation type="finished">Parser hat RA-Spalte nicht gefunden.</translation>
-        </message>
-        <message>
-            <source>XML Parse Error: %1</source>
-            <translation type="finished">XML Analysefehler: %1</translation>
-        </message>
-    </context>
-    <context>
         <name>ChannelCombinationDialog</name>
         <message>
             <source>Apply</source>
@@ -4368,6 +4353,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Starte Native Solver. Zentrum: %1, %2 Radius: %3 deg</translation>
         </message>
         <message>
+            <source>TRANS sanity warning: possible skew in transform (var1=%1 var2=%2 tol=%3). Proceeding anyway.</source>
+            <translation type="finished">TRANS-Konsistenzwarnung: Mögliche Verzerrung in der Transformation (var1=%1 var2=%2 tol=%3). Trotzdem fortfahren.</translation>
+        </message>
+        <message>
             <source>WCS Computation failed (Singular Matrix)</source>
             <translation type="finished">WCS-Berechnung fehlgeschlagen (Singuläre Matrix)</translation>
         </message>
@@ -5415,7 +5404,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>The target image must be a color (RGB) image.</source>
-            <translation type="finished">Das Zielbild muss ein Farbbild (RGB) sein.</translation>
+            <translation type="finished">Das Zielbild muss un Farbbild (RGB) sein.</translation>
         </message>
     </context>
     <context>
@@ -6735,6 +6724,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Sigma-Median</source>
             <translation type="finished">Sigma-Median</translation>
+        </message>
+        <message>
+            <source>Stack Count</source>
+            <translation type="finished">Stack-Anzahl</translation>
         </message>
         <message>
             <source>Stacking Parameters</source>

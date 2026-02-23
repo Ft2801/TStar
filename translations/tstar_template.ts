@@ -728,21 +728,6 @@
         </message>
     </context>
     <context>
-        <name>CatalogClient</name>
-        <message>
-            <source>No stars found in region.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Parser failed to find RA column.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>XML Parse Error: %1</source>
-            <translation type="unfinished" />
-        </message>
-    </context>
-    <context>
         <name>ChannelCombinationDialog</name>
         <message>
             <source>Apply</source>
@@ -4365,6 +4350,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>TRANS sanity warning: possible skew in transform (var1=%1 var2=%2 tol=%3). Proceeding anyway.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>WCS Computation failed (Singular Matrix)</source>
             <translation type="unfinished" />
         </message>
@@ -6731,6 +6720,10 @@
         </message>
         <message>
             <source>Sigma-Median</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stack Count</source>
             <translation type="unfinished" />
         </message>
         <message>
