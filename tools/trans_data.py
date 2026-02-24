@@ -2766,5 +2766,19 @@ TRANSLATIONS = {
     "All Files (*)": {'it': 'Tutti i file (*)', 'es': 'Todos los archivos (*)', 'fr': 'Tous les fichiers (*)', 'de': 'Alle Dateien (*)'},
 
     "Images (*.png *.jpg *.jpeg);;": {'it': 'Immagini (*.png *.jpg *.jpeg);;', 'es': 'Imágenes (*.png *.jpg *.jpeg);;', 'fr': 'Images (*.png *.jpg *.jpeg);;', 'de': 'Bilder (*.png *.jpg *.jpeg);;'},
+
+    "Image %1: %2 stars detected, %3 matched, shift=(%4, %5), rot=%6 deg": {'it': 'Immagine %1: %2 stelle rilevate, %3 corrispondenti, shift=(%4, %5), rot=%6 deg', 'es': 'Imagen %1: %2 estrellas detectadas, %3 coincidentes, shift=(%4, %5), rot=%6 deg', 'fr': 'Image %1: %2 étoiles détectées, %3 correspondantes, shift=(%4, %5), rot=%6 deg', 'de': 'Bild %1: %2 Sterne erkannt, %3 gefunden, shift=(%4, %5), rot=%6 deg'},
+
+    "Image %1: registration FAILED - %2": {'it': 'Immagine %1: registrazione FALLITA - %2', 'es': 'Imagen %1: registro FALLIDO - %2', 'fr': 'Image %1: enregistrement ÉCHOUÉ - %2', 'de': 'Bild %1: Registrierung FEHLGESCHLAGEN - %2'},
+
+    "Registering image %1/%2...": {'it': 'Registrazione immagine %1/%2...', 'es': 'Registrando imagen %1/%2...', 'fr': "Enregistrement de l'image %1/%2...", 'de': 'Registriere Bild %1/%2...'},
+
+    "Allocated %1 per-thread rejection scratch blocks (stackRGB only, no pixel buffers)": {'it': 'Allocati %1 blocchi di scarto temporaneo per thread (solo stackRGB, nessun buffer pixel)', 'es': 'Asignados %1 bloques temporales de rechazo por thread (solo stackRGB, sin búferes de píxel)', 'fr': 'Alloués %1 blocs de rejet temporaires par thread (stackRGB uniquement, aucun tampon pixel)', 'de': 'Zugewiesen %1 Ausschuss-Scratch-Blöcke pro Thread (nur stackRGB, keine Pixelpuffer)'},
+
+    "Error: Failed to preload image %1": {'it': 'Errore: Caricamento immagine %1 fallito', 'es': 'Error: Error al precargar imagen %1', 'fr': 'Erreur: Impossible de précharger l\'image %1', 'de': 'Fehler: Bild %1 konnte nicht vorab geladen werden'},
+
+    "Preload complete.": {'it': 'Precaricamento completato.', 'es': 'Precarga completada.', 'fr': 'Préchargement terminé.', 'de': 'Vorladen abgeschlossen.'},
+
+    "Preloading %1 registered images into RAM...": {'it': 'Precaricamento di %1 immagini registrate in RAM...', 'es': 'Precargando %1 imágenes registradas en RAM...', 'fr': 'Préchargement de %1 images enregistrées en RAM...', 'de': 'Lädt %1 registrierte Bilder in RAM...'},
     
 }

@@ -5487,15 +5487,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Image %1: registration failed - %2</source>
+            <source>Image %1: %2 stars detected, %3 matched, shift=(%4, %5), rot=%6 deg</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Image %1: shift=(%2, %3), rot=%4 deg, %5 matched</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Matching stars (%1 vs %2)...</source>
+            <source>Image %1: registration FAILED - %2</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5519,7 +5515,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Registering image %1/%2</source>
+            <source>Registering image %1/%2...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -6842,7 +6838,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Allocated %1 data blocks, each ~%2 MB</source>
+            <source>Allocated %1 per-thread rejection scratch blocks (stackRGB only, no pixel buffers)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -6882,6 +6878,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Error: Failed to preload image %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Error: File not found: %1</source>
             <translation type="unfinished" />
         </message>
@@ -6911,6 +6911,14 @@
         </message>
         <message>
             <source>Normalizing output...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preload complete.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preloading %1 registered images into RAM...</source>
             <translation type="unfinished" />
         </message>
         <message>

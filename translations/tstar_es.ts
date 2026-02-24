@@ -5490,16 +5490,12 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Fallo al cargar imagen de referencia</translation>
         </message>
         <message>
-            <source>Image %1: registration failed - %2</source>
-            <translation type="finished">Imagen %1: registro fallido - %2</translation>
+            <source>Image %1: %2 stars detected, %3 matched, shift=(%4, %5), rot=%6 deg</source>
+            <translation type="finished">Imagen %1: %2 estrellas detectadas, %3 coincidentes, shift=(%4, %5), rot=%6 deg</translation>
         </message>
         <message>
-            <source>Image %1: shift=(%2, %3), rot=%4 deg, %5 matched</source>
-            <translation type="finished">Imagen %1: despl=(%2, %3), rot=%4 deg, %5 coinc</translation>
-        </message>
-        <message>
-            <source>Matching stars (%1 vs %2)...</source>
-            <translation type="finished">Coincidiendo estrellas (%1 vs %2)...</translation>
+            <source>Image %1: registration FAILED - %2</source>
+            <translation type="finished">Imagen %1: registro FALLIDO - %2</translation>
         </message>
         <message>
             <source>No stars detected</source>
@@ -5522,8 +5518,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Referencia: %1 estrellas detectadas</translation>
         </message>
         <message>
-            <source>Registering image %1/%2</source>
-            <translation type="finished">Registrando imagen %1/%2</translation>
+            <source>Registering image %1/%2...</source>
+            <translation type="finished">Registrando imagen %1/%2...</translation>
         </message>
         <message>
             <source>Registration complete</source>
@@ -6845,8 +6841,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">, rechazo: %1 (%2%)</translation>
         </message>
         <message>
-            <source>Allocated %1 data blocks, each ~%2 MB</source>
-            <translation type="finished">Asignados %1 bloques de datos, cada uno ~%2 MB</translation>
+            <source>Allocated %1 per-thread rejection scratch blocks (stackRGB only, no pixel buffers)</source>
+            <translation type="finished">Asignados %1 bloques temporales de rechazo por thread (solo stackRGB, sin búferes de píxel)</translation>
         </message>
         <message>
             <source>Auto-detected Bayer pattern: %1</source>
@@ -6885,6 +6881,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Ecualizando canales RGB...</translation>
         </message>
         <message>
+            <source>Error: Failed to preload image %1</source>
+            <translation type="finished">Error: Error al precargar imagen %1</translation>
+        </message>
+        <message>
             <source>Error: File not found: %1</source>
             <translation type="finished">Error: Archivo no encontrado: %1</translation>
         </message>
@@ -6915,6 +6915,14 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Normalizing output...</source>
             <translation type="finished">Normalizando salida...</translation>
+        </message>
+        <message>
+            <source>Preload complete.</source>
+            <translation type="finished">Precarga completada.</translation>
+        </message>
+        <message>
+            <source>Preloading %1 registered images into RAM...</source>
+            <translation type="finished">Precargando %1 imágenes registradas en RAM...</translation>
         </message>
         <message>
             <source>Preparing Comet Alignment...</source>
