@@ -117,6 +117,42 @@
             <source>Aberration Inspector</source>
             <translation type="finished">Aberrationsprüfer</translation>
         </message>
+        <message>
+            <source>Bottom</source>
+            <translation type="finished">Unten</translation>
+        </message>
+        <message>
+            <source>Bottom-Left</source>
+            <translation type="finished">Unten-Links</translation>
+        </message>
+        <message>
+            <source>Bottom-Right</source>
+            <translation type="finished">Unten-Rechts</translation>
+        </message>
+        <message>
+            <source>Center</source>
+            <translation type="finished">Mitte</translation>
+        </message>
+        <message>
+            <source>Left</source>
+            <translation type="finished">Links</translation>
+        </message>
+        <message>
+            <source>Right</source>
+            <translation type="finished">Rechts</translation>
+        </message>
+        <message>
+            <source>Top</source>
+            <translation type="finished">Oben</translation>
+        </message>
+        <message>
+            <source>Top-Left</source>
+            <translation type="finished">Oben-Links</translation>
+        </message>
+        <message>
+            <source>Top-Right</source>
+            <translation type="finished">Oben-Rechts</translation>
+        </message>
     </context>
     <context>
         <name>AboutDialog</name>

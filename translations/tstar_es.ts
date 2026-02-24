@@ -117,6 +117,42 @@
             <source>Aberration Inspector</source>
             <translation type="finished">Inspector de Aberración</translation>
         </message>
+        <message>
+            <source>Bottom</source>
+            <translation type="finished">Abajo</translation>
+        </message>
+        <message>
+            <source>Bottom-Left</source>
+            <translation type="finished">Abajo-Izquierda</translation>
+        </message>
+        <message>
+            <source>Bottom-Right</source>
+            <translation type="finished">Abajo-Derecha</translation>
+        </message>
+        <message>
+            <source>Center</source>
+            <translation type="finished">Centro</translation>
+        </message>
+        <message>
+            <source>Left</source>
+            <translation type="finished">Izquierda</translation>
+        </message>
+        <message>
+            <source>Right</source>
+            <translation type="finished">Derecha</translation>
+        </message>
+        <message>
+            <source>Top</source>
+            <translation type="finished">Arriba</translation>
+        </message>
+        <message>
+            <source>Top-Left</source>
+            <translation type="finished">Arriba-Izquierda</translation>
+        </message>
+        <message>
+            <source>Top-Right</source>
+            <translation type="finished">Arriba-Derecha</translation>
+        </message>
     </context>
     <context>
         <name>AboutDialog</name>

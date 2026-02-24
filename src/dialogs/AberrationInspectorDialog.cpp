@@ -37,10 +37,10 @@ void AberrationInspectorDialog::setupUi() {
     grid->setSpacing(3);
 
     // Labels for the 9 positions
-    static const char* const kNames[9] = {
-        "Top-Left", "Top", "Top-Right",
-        "Left",     "Center", "Right",
-        "Bottom-Left", "Bottom", "Bottom-Right"
+    const QString kNames[9] = {
+        tr("Top-Left"), tr("Top"), tr("Top-Right"),
+        tr("Left"),     tr("Center"), tr("Right"),
+        tr("Bottom-Left"), tr("Bottom"), tr("Bottom-Right")
     };
 
     for (int i = 0; i < 9; ++i) {
@@ -54,7 +54,7 @@ void AberrationInspectorDialog::setupUi() {
         cellLayout->setSpacing(0);
 
         // Small position label
-        QLabel* posLabel = new QLabel(tr(kNames[i]), cell);
+        QLabel* posLabel = new QLabel(kNames[i], cell);
         posLabel->setAlignment(Qt::AlignCenter);
         posLabel->setStyleSheet("color: #888; font-size: 9px; padding: 1px;");
         posLabel->setFixedHeight(14);

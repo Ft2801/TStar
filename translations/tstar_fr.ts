@@ -117,6 +117,42 @@
             <source>Aberration Inspector</source>
             <translation type="finished">Inspecteur d'Aberration</translation>
         </message>
+        <message>
+            <source>Bottom</source>
+            <translation type="finished">Bas</translation>
+        </message>
+        <message>
+            <source>Bottom-Left</source>
+            <translation type="finished">Bas-Gauche</translation>
+        </message>
+        <message>
+            <source>Bottom-Right</source>
+            <translation type="finished">Bas-Droite</translation>
+        </message>
+        <message>
+            <source>Center</source>
+            <translation type="finished">Centre</translation>
+        </message>
+        <message>
+            <source>Left</source>
+            <translation type="finished">Gauche</translation>
+        </message>
+        <message>
+            <source>Right</source>
+            <translation type="finished">Droite</translation>
+        </message>
+        <message>
+            <source>Top</source>
+            <translation type="finished">Haut</translation>
+        </message>
+        <message>
+            <source>Top-Left</source>
+            <translation type="finished">Haut-Gauche</translation>
+        </message>
+        <message>
+            <source>Top-Right</source>
+            <translation type="finished">Haut-Droite</translation>
+        </message>
     </context>
     <context>
         <name>AboutDialog</name>
