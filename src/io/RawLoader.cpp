@@ -76,7 +76,7 @@ static QString deduceBayerPattern(libraw_data_t* lr)
     return pattern;
 }
 
-// Approximate sensor pixel pitch from the camera format code (same as siril).
+// Approximate sensor pixel pitch from the camera format code
 static float estimatePixelPitch(libraw_data_t* lr)
 {
     float sWidth = 0.0f;

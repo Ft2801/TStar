@@ -13,7 +13,7 @@
 // Replicate Reference logic for vote counting and iterative fitting.
 
 TriangleMatcher::TriangleMatcher() {
-    m_maxStars = 75; // Increased for better robustness (from 40)
+    m_maxStars = 20;
 }
 
 // Helper to sort stars by mag
@@ -377,8 +377,8 @@ bool TriangleMatcher::iterativeFit(const std::vector<MatchStar>& listA,
     std::vector<int> idxB = votesB;
     int nr = idxA.size();
     
-    int max_iter = 10;
-    double halt_sigma = 0.5; // Pixel tolerance
+    int max_iter = 5;
+    double halt_sigma = 0.1;
     
     for(int iter=0; iter<max_iter; ++iter) {
         if (nr < 6) return false; // Need min points
@@ -408,14 +408,14 @@ bool TriangleMatcher::iterativeFit(const std::vector<MatchStar>& listA,
         
         // Find sigma (approx percentile)
         // Standard uses AT_MATCH_PERCENTILE (usually 0.5 or 0.68)
-        double sigma2 = sorted_dist2[(int)(nr * 0.68)]; 
+        double sigma2 = sorted_dist2[std::max(0, (int)(nr * 0.35))];
         
         if (sigma2 <= halt_sigma*halt_sigma) break; // Good enough
         
         // Filter outliers
         int new_nr = 0;
         int nb = 0;
-        double threshold = 9.0 * sigma2; // 3 sigma squared
+        double threshold = 10.0 * sigma2;
         
         for(int i=0; i<nr; ++i) {
             if (dist2[i] <= threshold) {

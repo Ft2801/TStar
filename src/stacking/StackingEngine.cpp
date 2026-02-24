@@ -567,11 +567,14 @@ bool StackingEngine::getShiftedPixel(const ImageBuffer& buffer,
 
 float StackingEngine::getInterpolatedPixel(const ImageBuffer& buffer, 
                                           double x, double y, int channel) {
-    // Bicubic Interpolation with Edge Clamping (Replication) to prevent Black Lines
-    // Instead of failing for coords near 0 or width, we replicate the edge pixel.
+    // Bicubic Interpolation with Edge Clamping to prevent black borders.
+    // Pixels near edges use clamped coordinates instead of returning 0.
     
     int width = buffer.width();
     int height = buffer.height();
+
+    // Reject pixels clearly out of bounds (more than 1 pixel outside)
+    if (x < -1.0 || x >= width || y < -1.0 || y >= height) return -1.0f;
 
     int x0 = static_cast<int>(std::floor(x));
     int y0 = static_cast<int>(std::floor(y));
@@ -588,33 +591,25 @@ float StackingEngine::getInterpolatedPixel(const ImageBuffer& buffer,
     float w2 = -1.5f*t3 + 2.0f*t2 + 0.5f*t;
     float w3 = 0.5f*t3 - 0.5f*t2;
     
-#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
-    // SSE Optimization for x86/x64
-    __m128 mw = _mm_set_ps(w3, w2, w1, w0);
-    
     float arr[4];
-    
+
     for (int j = 0; j < 4; ++j) {
-        int py = y0 - 1 + j;
-        if (py < 0 || py >= height) return 0.0f;
-    }
-    for (int i = 0; i < 4; ++i) {
-        int px = x0 - 1 + i;
-        if (px < 0 || px >= width) return 0.0f;
-    }
-    
-    for (int j = 0; j < 4; ++j) {
-        float r[4];
-        int py = y0 - 1 + j;
+        int py = std::clamp(y0 - 1 + j, 0, height - 1);
         
-        for(int i=0; i<4; ++i) {
-             int px = x0 - 1 + i;
-             // No clamping needed, we verified bounds above
-             r[i] = buffer.value(px, py, channel);
-        }
+        int px0 = std::clamp(x0 - 1, 0, width - 1);
+        int px1 = std::clamp(x0,     0, width - 1);
+        int px2 = std::clamp(x0 + 1, 0, width - 1);
+        int px3 = std::clamp(x0 + 2, 0, width - 1);
         
-        // SSE optimization (unchanged)
-        __m128 mr = _mm_loadu_ps(r);
+        float r0 = buffer.value(px0, py, channel);
+        float r1 = buffer.value(px1, py, channel);
+        float r2 = buffer.value(px2, py, channel);
+        float r3 = buffer.value(px3, py, channel);
+        
+#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
+        __m128 mw = _mm_set_ps(w3, w2, w1, w0);
+        float rv[4] = {r0, r1, r2, r3};
+        __m128 mr = _mm_loadu_ps(rv);
         __m128 mprod = _mm_mul_ps(mr, mw);
         
         __m128 shuf = _mm_shuffle_ps(mprod, mprod, _MM_SHUFFLE(3, 3, 1, 1));
@@ -622,45 +617,10 @@ float StackingEngine::getInterpolatedPixel(const ImageBuffer& buffer,
         __m128 shuf2 = _mm_movehl_ps(shuf, sums);
         sums = _mm_add_ss(sums, shuf2);
         _mm_store_ss(&arr[j], sums);
-    }
 #else
-    // Scalar Implementation for ARM64/Generic
-    float arr[4];
-    
-    // Bounds check
-    for (int j = 0; j < 4; ++j) {
-        int py = y0 - 1 + j;
-        if (py < 0 || py >= height) return 0.0f;
-    }
-    for (int i = 0; i < 4; ++i) {
-        int px = x0 - 1 + i;
-        if (px < 0 || px >= width) return 0.0f;
-    }
-
-    // Scalar dot product
-    // w0 corresponds to lowest index in _mm_set_ps but that loads in reverse order?
-    // _mm_set_ps(e3, e2, e1, e0) -> [e0, e1, e2, e3] (little endian/LSB first)
-    // w0 is the weight for t^0 term? 
-    // Looking at coefficients:
-    // w0, w1, w2, w3 are the weights for the 4 sample points.
-    // _mm_set_ps(w3, w2, w1, w0) creates vector [w0, w1, w2, w3]
-    // r array is [r0, r1, r2, r3]
-    // dot product is r0*w0 + r1*w1 + r2*w2 + r3*w3
-    
-    for (int j = 0; j < 4; ++j) {
-        int py = y0 - 1 + j;
-        float sum = 0.0f;
-        
-        // Unrolling explicitly for clarity matching the SSE logic
-        float r0 = buffer.value(x0 - 1, py, channel);
-        float r1 = buffer.value(x0,     py, channel);
-        float r2 = buffer.value(x0 + 1, py, channel);
-        float r3 = buffer.value(x0 + 2, py, channel);
-        
-        sum = r0 * w0 + r1 * w1 + r2 * w2 + r3 * w3;
-        arr[j] = sum;
-    }
+        arr[j] = r0 * w0 + r1 * w1 + r2 * w2 + r3 * w3;
 #endif
+    }
     
     float res = cubicHermite(arr[0], arr[1], arr[2], arr[3], dy);
 
@@ -790,8 +750,9 @@ StackResult StackingEngine::stackSum(StackingArgs& args) {
 //=============================================================================
 
 static int64_t computeMaxRowsInMemory(int width, int height, int channels, int nbImages) {
-    // Use approximately 2GB max (configurable in future)
-    constexpr int64_t maxMemoryMB = 2048;
+    // Use up to 4GB — halves block count vs 2GB, cutting I/O reads by 2×.
+    // Actual peak usage ≈ nbThreads × rowsPerBlock × width × nbImages × ch × 4 bytes.
+    constexpr int64_t maxMemoryMB = 4096;
     constexpr int64_t bytesPerMB = 1024 * 1024;
     
     // Linked Rejection: We process R,G,B rows simultaneously.
@@ -871,20 +832,66 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
     args.log(tr("Using %1 parallel blocks of max %2 rows each")
              .arg(blocks.size()).arg(largestBlockHeight), "neutral");
     int poolSize = nbThreads;
-    size_t pixelsPerBlock = static_cast<size_t>(outputWidth) * largestBlockHeight;
+    // No per-frame pixel buffer: images are preloaded into RAM.
+    // pixelsPerBlock=0 → blockDataSize=0, so allocate() only reserves the tiny
+    // stackRGB/rejection scratch arrays (a few KB per thread).
+    size_t pixelsPerBlock = 0;
     
     std::vector<StackDataBlock> dataPool(poolSize);
     bool useFeathering = (args.params.featherDistance > 0);
     for (int i = 0; i < poolSize; ++i) {
         if (!dataPool[i].allocate(nbImages, pixelsPerBlock, channels,
-                                   args.params.rejection, useFeathering, false)) { // Force hasMask if feathering is enabled
+                                   args.params.rejection, useFeathering, false)) {
             args.log("Error: Failed to allocate data pool", "red");
             return StackResult::AllocError;
         }
     }
     
-    args.log(tr("Allocated %1 data blocks, each ~%2 MB")
-             .arg(poolSize).arg((nbImages * pixelsPerBlock * sizeof(float)) / (1024*1024)), "neutral");
+    args.log(tr("Allocated %1 per-thread rejection scratch blocks (stackRGB only, no pixel buffers)")
+             .arg(poolSize), "neutral");
+    
+    // =====================================================================
+    // PRELOAD ALL REGISTERED IMAGES INTO RAM
+    // =====================================================================
+    // Replaces 112+ partial readImageRegion() disk seeks with 14 sequential
+    // full-image reads.  Net RAM cost is the same as the old pix[] buffers
+    // (~4 GB for 14 × 290 MB images) while I/O drops by ~8×.
+    // =====================================================================
+    using Preprocessing::BayerPattern;
+    args.log(tr("Preloading %1 registered images into RAM...").arg(nbImages), "neutral");
+    std::vector<ImageBuffer> preloadedImages(nbImages);
+    for (int frame = 0; frame < nbImages; ++frame) {
+        int imgIdx = args.imageIndices[frame];
+        if (!args.sequence->readImage(imgIdx, preloadedImages[frame])) {
+            args.log(tr("Error: Failed to preload image %1").arg(imgIdx), "salmon");
+            return StackResult::SequenceError;
+        }
+        // Debayer at preload time so the block loop sees fully-demosaiced data.
+        if (args.params.debayer && args.params.bayerPattern != BayerPattern::None) {
+            ImageBuffer debayered;
+            bool ok = false;
+            if (args.params.debayerMethod == Preprocessing::DebayerAlgorithm::Bilinear) {
+                ok = Preprocessing::Debayer::bilinear(preloadedImages[frame], debayered, args.params.bayerPattern);
+            } else {
+                ok = Preprocessing::Debayer::vng(preloadedImages[frame], debayered, args.params.bayerPattern);
+            }
+            if (ok) preloadedImages[frame] = std::move(debayered);
+        }
+    }
+    args.log(tr("Preload complete."), "neutral");
+    
+    // Cache per-frame registration shifts so they are not re-fetched per pixel.
+    struct FrameShift { double sx, sy; int iw, ih; };
+    std::vector<FrameShift> frameShifts(nbImages);
+    for (int frame = 0; frame < nbImages; ++frame) {
+        int imgIdx = args.imageIndices[frame];
+        const auto& imgInfo = args.sequence->image(imgIdx);
+        double scale = args.params.upscaleAtStacking ? 2.0 : 1.0;
+        frameShifts[frame].sx = imgInfo.registration.shiftX * scale - offsetX;
+        frameShifts[frame].sy = imgInfo.registration.shiftY * scale - offsetY;
+        frameShifts[frame].iw = preloadedImages[frame].width();
+        frameShifts[frame].ih = preloadedImages[frame].height();
+    }
     
     float featherDist = static_cast<float>(args.params.featherDistance);
     
@@ -968,215 +975,153 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
         
         long blockRejLow = 0, blockRejHigh = 0;
         
-        // Loop FRAMES
-        for (int frame = 0; frame < nbImages; ++frame) {
-            if (m_cancelled || args.isCancelled()) break;
-            
-            int imgIdx = args.imageIndices[frame];
-            const auto& imgInfo = args.sequence->image(imgIdx);
-            
-            // Calculate sub-pixel shifts
-            double scale = args.params.upscaleAtStacking ? 2.0 : 1.0;
-            double shiftX = imgInfo.registration.shiftX * scale - offsetX;
-            double shiftY = imgInfo.registration.shiftY * scale - offsetY;
-            
-            // Determine required Source Region (ROI)
-            int limitWidth = outputWidth; 
-            int srcX_min = static_cast<int>(std::floor(0.0 - shiftX));
-            int srcX_max = static_cast<int>(std::ceil((limitWidth - 1.0) - shiftX));
-            int srcY_min = static_cast<int>(std::floor((double)block.startRow - shiftY));
-            int srcY_max = static_cast<int>(std::ceil((double)block.endRow - shiftY));
-            
-            int margin = 5;
-            int roiX = srcX_min - margin;
-            int roiY = srcY_min - margin;
-            int roiW = (srcX_max - srcX_min) + 2 * margin;
-            int roiH = (srcY_max - srcY_min) + 2 * margin;
-            
-            // Read Region
-            ImageBuffer rawRegion;
-            int effectiveX = std::max(0, roiX);
-            int effectiveY = std::max(0, roiY);
-            
-            bool readSuccess = false;
-            #ifdef _OPENMP
-            #pragma omp critical (io_read)
-            #endif
-            {
-                readSuccess = args.sequence->readImageRegion(imgIdx, rawRegion, roiX, roiY, roiW, roiH);
-            }
-
-            if (!readSuccess) {
-               // Zero fill on failure
-               size_t blockSize = static_cast<size_t>(block.height) * outputWidth * channels * sizeof(float);
-               std::memset(data.pix[frame], 0, blockSize);
-               continue;
-            }
-            
-            // DEBAYER Processing
-            ImageBuffer* sourceBuf = &rawRegion;
-            ImageBuffer debayerBuf;
-            using Preprocessing::BayerPattern;
-            BayerPattern pattern = args.params.bayerPattern;
-            
-            if (args.params.debayer && pattern != BayerPattern::None) {
-                BayerPattern cropPattern = Preprocessing::Debayer::getPatternForCrop(pattern, effectiveX, effectiveY);
-                bool debayerOk = false;
-                if (args.params.debayerMethod == Preprocessing::DebayerAlgorithm::Bilinear) {
-                    debayerOk = Preprocessing::Debayer::bilinear(rawRegion, debayerBuf, cropPattern);
-                } else {
-                    debayerOk = Preprocessing::Debayer::vng(rawRegion, debayerBuf, cropPattern);
-                }
-                if (debayerOk) sourceBuf = &debayerBuf;
-            }
-            
-            // Normalize & Interpolate ALL Channels
-            int sourceChannels = sourceBuf->channels();
-            
-            for (int y = 0; y < block.height; ++y) {
-                double destGlobalY = block.startRow + y;
-                
-                for (int x = 0; x < outputWidth; ++x) {
-                    double srcGlobalX = x - shiftX;
-                    double srcGlobalY = destGlobalY - shiftY;
-                    double bufX = srcGlobalX - effectiveX;
-                    double bufY = srcGlobalY - effectiveY;
-                    
-                    bool inBounds = (srcGlobalX >= 0.0 && srcGlobalX < static_cast<double>(imgInfo.width) - 0.001 &&
-                                     srcGlobalY >= 0.0 && srcGlobalY < static_cast<double>(imgInfo.height) - 0.001);
-
-                    for(int c=0; c<channels; ++c) {
-                        float val = 0.0f;
-                        if (inBounds) {
-                             int readCh = (c < sourceChannels) ? c : 0; // Mono->RGB or 1:1
-                             val = interpolateBicubic(sourceBuf->data().data(), 
-                                                           sourceBuf->width(), sourceBuf->height(), 
-                                                           bufX, bufY, readCh, sourceChannels);
-                        }
-                        
-                        // Normalization
-                        //   ADDITIVE / ADDITIVE_SCALING:    pixel * pscale - poffset
-                        //   MULTIPLICATIVE / MULT_SCALING:  pixel * pscale * pmul
-                        if (val != 0.0f && args.params.hasNormalization() && c < 3) {
-                             const auto& coeff = allCoeffs[c][frame];
-                             switch (args.params.normalization) {
-                                case NormalizationMethod::Additive:
-                                case NormalizationMethod::AdditiveScaling:
-                                    val = static_cast<float>(val * coeff.scale - coeff.offset);
-                                    break;
-                                case NormalizationMethod::Multiplicative:
-                                case NormalizationMethod::MultiplicativeScaling:
-                                    val = static_cast<float>(val * coeff.scale * coeff.mul);
-                                    break;
-                                default: break;
-                             }
-                        }
-                        
-                        // Store in Interleaved Buffer
-                        size_t destIdx = (static_cast<size_t>(y) * outputWidth + x) * channels + c;
-                        data.pix[frame][destIdx] = val;
-                    }
-
-                    // Compute Feathering Mask
-                    // Distance from edges in Original Image Coordinates
-                    // Coords: bufX, bufY relative to effective region. 
-                    // Need distance to 0,0 and width,height of SOURCE image.
-                    // srcGlobalX, srcGlobalY are coords in source image.
-                    if (useFeathering && data.maskPix && data.maskPix[frame]) {
-                         float weight = 0.0f;
-                         if (inBounds) {
-                             float dL = static_cast<float>(srcGlobalX);
-                             float dT = static_cast<float>(srcGlobalY);
-                             float dR = static_cast<float>(imgInfo.width - 1.0 - srcGlobalX);
-                             float dB = static_cast<float>(imgInfo.height - 1.0 - srcGlobalY);
-                             
-                             float minDist = std::min({dL, dT, dR, dB});
-                             if (minDist < 0.0f) minDist = 0.0f;
-                             
-                             if (minDist >= featherDist) {
-                                 weight = 1.0f;
-                             } else {
-                                 // Cubic ramp: x * x * (3 - 2 * x)
-                                 float t = minDist / featherDist;
-                                 weight = t * t * (3.0f - 2.0f * t);
-                             }
-                         }
-                         // Store single channel mask (interleaved not needed for 1 channel mask but consistent indexing simplifes)
-                         // Our maskPix is just 1 value per pixel (float array)
-                         size_t maskIdx = (static_cast<size_t>(y) * outputWidth + x);
-                         data.maskPix[frame][maskIdx] = weight;
-                    }
-                }
-            }
-        }
-        
         if (m_cancelled || args.isCancelled()) {
             failed = true;
             continue;
         }
         
-        // ===== PIXEL STACKING =====
+        // ===== PIXEL STACKING (single pass, reads from preloaded RAM images) =====
+        // No I/O here — preloadedImages[] already holds every registered frame.
+        // Border exclusion uses Siril's exact strategy:
+        //   (1) Hard geometric out-of-bounds → skip frame immediately.
+        //   (2) For pre-warped r_ files: warpPerspective(BORDER_CONSTANT=0) + mask
+        //       zeroing marks out-of-bounds pixels with 0.0f in ALL channels.
+        //       We replicate Siril's apply_rejection_float() per-pixel:
+        //         "if (stack[frame] != 0.f) { stack[kept++] = stack[frame]; }"
+        //       → skip frames where r==g==b==0.0f (mono: v==0.0f).
         for (int y = 0; y < block.height; ++y) {
-            size_t outRowIdx = static_cast<size_t>(block.startRow + y) * outputWidth;
-            size_t lineIdx = static_cast<size_t>(y) * outputWidth;
+            int globalY = block.startRow + y;
+            size_t outRowIdx = static_cast<size_t>(globalY) * outputWidth;
             
             for (int x = 0; x < outputWidth; ++x) {
-                // 1. Fill Stacks (Extract from interleaved)
+                // Fill stackRGB[c][effectiveFrames] directly from preloaded images.
+                int effectiveFrames = 0;
                 for (int frame = 0; frame < nbImages; ++frame) {
-                    size_t pixelIdx = (lineIdx + x) * channels;
-                    if (channels == 3) {
-                        data.stackRGB[0][frame] = data.pix[frame][pixelIdx + 0];
-                        data.stackRGB[1][frame] = data.pix[frame][pixelIdx + 1];
-                        data.stackRGB[2][frame] = data.pix[frame][pixelIdx + 2];
-                    } else {
-                        data.stack[frame] = data.pix[frame][pixelIdx];
-                    }
+                    if (m_cancelled || args.isCancelled()) break;
                     
-                    // Fill Mask Stack 
-                    if (useFeathering && data.maskPix && data.maskPix[frame]) {
-                         size_t maskIdx = (lineIdx + x);
-                         if (data.mstack) data.mstack[frame] = data.maskPix[frame][maskIdx];
+                    const FrameShift& fs = frameShifts[frame];
+                    // Source coordinates in this frame's image space.
+                    // For pre-warped r_ files fs.sx==fs.sy==0, so srcX==x, srcGY==globalY.
+                    // For sequences with live registration these will be non-zero.
+                    double srcX  = x       - fs.sx;
+                    double srcGY = globalY - fs.sy;
+                    
+                    // Hard geometric out-of-bounds: skip immediately.
+                    if (srcX  < 0.0 || srcX  >= static_cast<double>(fs.iw) ||
+                        srcGY < 0.0 || srcGY >= static_cast<double>(fs.ih)) continue;
+                    
+                    const ImageBuffer& img = preloadedImages[frame];
+                    const float* imgBase = img.data().data();
+                    int iw = img.width(), ih = img.height(), ich = img.channels();
+                    
+                    // Integer vs sub-pixel fetch.
+                    // Pre-registered r_ files always use integer coordinates (shift=0)
+                    // so the branch predictor will practically never take the bicubic path.
+                    double fx = srcX  - std::floor(srcX);
+                    double fy = srcGY - std::floor(srcGY);
+                    bool intCoords = (fx < 1e-6 && fy < 1e-6);
+                    
+                    if (channels == 3) {
+                        float r, g, b;
+                        if (intCoords) {
+                            int ix = static_cast<int>(srcX);
+                            int iy = static_cast<int>(srcGY);
+                            // Guard for exact-edge case (srcX == iw after truncation)
+                            if (ix >= iw || iy >= ih) continue;
+                            const float* px = imgBase + (static_cast<size_t>(iy) * iw + ix) * ich;
+                            r = px[0];
+                            g = (ich > 1) ? px[1] : px[0];
+                            b = (ich > 2) ? px[2] : px[0];
+                        } else {
+                            r = interpolateBicubic(imgBase, iw, ih, srcX, srcGY, 0, ich);
+                            g = (ich > 1) ? interpolateBicubic(imgBase, iw, ih, srcX, srcGY, 1, ich) : r;
+                            b = (ich > 2) ? interpolateBicubic(imgBase, iw, ih, srcX, srcGY, 2, ich) : r;
+                        }
+                        // === SIRIL-EQUIVALENT ZERO EXCLUSION ===
+                        // Pre-warped r_ files: warpPerspective(BORDER_CONSTANT=0) + mask zeroing
+                        // set ALL channels to exactly 0.0f for pixels outside the source frame.
+                        // This matches Siril's apply_rejection_float():
+                        //   "if (stack[frame] != 0.f) { stack[kept++] = stack[frame]; }"
+                        // Each channel is tested independently; for geometrically-warped images
+                        // all three channels are zero simultaneously at the same border pixels.
+                        if (r == 0.0f && g == 0.0f && b == 0.0f) continue;
+                        
+                        // Normalization (guard: skip if channel still 0 after warp ringing)
+                        if (args.params.hasNormalization()) {
+                            auto applyNorm = [&](float& v, int c) {
+                                if (v != 0.0f) {
+                                    const auto& coeff = allCoeffs[c][frame];
+                                    switch (args.params.normalization) {
+                                        case NormalizationMethod::Additive:
+                                        case NormalizationMethod::AdditiveScaling:
+                                            v = static_cast<float>(v * coeff.scale - coeff.offset); break;
+                                        case NormalizationMethod::Multiplicative:
+                                        case NormalizationMethod::MultiplicativeScaling:
+                                            v = static_cast<float>(v * coeff.scale * coeff.mul); break;
+                                        default: break;
+                                    }
+                                }
+                            };
+                            applyNorm(r, 0); applyNorm(g, 1); applyNorm(b, 2);
+                        }
+                        data.stackRGB[0][effectiveFrames] = r;
+                        data.stackRGB[1][effectiveFrames] = g;
+                        data.stackRGB[2][effectiveFrames] = b;
+                    } else {
+                        float v;
+                        if (intCoords) {
+                            int ix = static_cast<int>(srcX);
+                            int iy = static_cast<int>(srcGY);
+                            if (ix >= iw || iy >= ih) continue;
+                            v = imgBase[(static_cast<size_t>(iy) * iw + ix) * ich];
+                        } else {
+                            v = interpolateBicubic(imgBase, iw, ih, srcX, srcGY, 0, ich);
+                        }
+                        // Siril-equivalent zero exclusion for mono pre-warped images
+                        if (v == 0.0f) continue;
+                        if (args.params.hasNormalization()) {
+                            const auto& coeff = allCoeffs[0][frame];
+                            switch (args.params.normalization) {
+                                case NormalizationMethod::Additive:
+                                case NormalizationMethod::AdditiveScaling:
+                                    v = static_cast<float>(v * coeff.scale - coeff.offset); break;
+                                case NormalizationMethod::Multiplicative:
+                                case NormalizationMethod::MultiplicativeScaling:
+                                    v = static_cast<float>(v * coeff.scale * coeff.mul); break;
+                                default: break;
+                            }
+                        }
+                        data.stack[effectiveFrames] = v;
                     }
+                    // Feathering mask: distance of pixel from its source frame border.
+                    // Zero-excluded frames are not reached here, so mstack stays consistent.
+                    if (useFeathering && data.mstack) {
+                        float dL = static_cast<float>(srcX);
+                        float dT = static_cast<float>(srcGY);
+                        float dR = static_cast<float>(fs.iw - 1.0 - srcX);
+                        float dB = static_cast<float>(fs.ih - 1.0 - srcGY);
+                        float minDist = std::min({dL, dT, dR, dB});
+                        if (minDist < 0.0f) minDist = 0.0f;
+                        float weight = (minDist >= featherDist) ? 1.0f :
+                            [&]{ float t = minDist / featherDist; return t * t * (3.0f - 2.0f * t); }();
+                        data.mstack[effectiveFrames] = weight;
+                    }
+                    effectiveFrames++;
                 }
-                
-                // 2. Rejection
-                int keptPixels = nbImages;
-                if (args.params.hasRejection()) {
+
+                // 2. Rejection (operates on effectiveFrames valid pixels only)
+                int keptPixels = effectiveFrames;
+                if (effectiveFrames > 0 && args.params.hasRejection()) {
                     int rej[2] = {0,0};
                     if (channels == 3) {
-                         // Calls our new Linked Rejection
-                         keptPixels = applyRejectionLinked(data, nbImages, args.params.rejection,
+                         keptPixels = applyRejectionLinked(data, effectiveFrames, args.params.rejection,
                                                            args.params.sigmaLow, args.params.sigmaHigh, pGesdt, rej);
                     } else {
-                         // Legacy Mono
-                         keptPixels = applyRejection(data, nbImages, args.params.rejection,
+                         keptPixels = applyRejection(data, effectiveFrames, args.params.rejection,
                                                      args.params.sigmaLow, args.params.sigmaHigh, pGesdt, rej);
                     }
                     blockRejLow += rej[0];
                     blockRejHigh += rej[1];
-                } else {
-                    // No rejection: remove zeros
-                    if (channels == 3) {
-                        int k=0;
-                        for(int f=0; f<nbImages; ++f) {
-                            if(data.stackRGB[0][f] != 0 && data.stackRGB[1][f] != 0 && data.stackRGB[2][f] != 0) {
-                                if(f!=k) {
-                                    for(int c=0; c<3; ++c) data.stackRGB[c][k] = data.stackRGB[c][f];
-                                }
-                                k++;
-                            }
-                        }
-                        keptPixels = k;
-                    } else {
-                        int k=0;
-                        for(int f=0; f<nbImages; ++f) {
-                            if(data.stack[f] != 0) {
-                                if(f!=k) data.stack[k] = data.stack[f];
-                                k++;
-                            }
-                        }
-                        keptPixels = k;
-                    }
                 }
                 
                 // 3. Compute Result (using optimized C functions)

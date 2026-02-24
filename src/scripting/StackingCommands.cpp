@@ -606,7 +606,8 @@ bool StackingCommands::cmdRegister(const ScriptCommand& cmd) {
                      if (bp.isEmpty()) bp = checkBuf.metadata().xisfProperties.value("BayerPattern").toString();
                      reason += QString(", Pattern='%1'").arg(bp);
                      
-                     s_runner->logMessage(QString("Auto-Debayer SKIPPED for %1 (%2). Assuming RGB or Mono.").arg(QFileInfo(fullPaths.first()).fileName(), reason), "neutral");
+                     // Images are already RGB (debayered during calibration) or mono — nothing to do.
+                    s_runner->logMessage(QString("Images are already RGB/Mono (%1) — debayer not needed.").arg(reason), "neutral");
                  }
              }
         }

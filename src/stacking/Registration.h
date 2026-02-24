@@ -50,14 +50,14 @@ struct RegistrationParams {
     // Star detection
     float detectionThreshold = 4.0f;  ///< Detection sigma
     int minStars = 20;                ///< Minimum stars required
-    int maxStars = 100;               ///< Maximum stars to use
+    int maxStars = 2000;              ///< Maximum stars to use
     float minFWHM = 1.0f;             ///< Minimum FWHM filter
     float maxFWHM = 20.0f;            ///< Maximum FWHM filter
     float minRoundness = 0.3f;        ///< Minimum roundness
     
     // Matching
     float matchTolerance = 0.002f;    ///< Triangle matching tolerance
-    int minMatches = 6;               ///< Minimum triangle matches
+    int minMatches = 4;               ///< Minimum triangle matches
     
     // Transform type
     bool allowRotation = true;

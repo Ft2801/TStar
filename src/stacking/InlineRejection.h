@@ -781,10 +781,24 @@ inline int applyRejectionLinked(
             for(int f=0; f<N; ++f) {
                 bool anyRej = (rejected[0][f] != 0) || (rejected[1][f] != 0) || (rejected[2][f] != 0);
                 if (anyRej) {
-                    rejected[0][f] = 1;
-                    rejected[1][f] = 1;
-                    rejected[2][f] = 1;
-                    crej[0]++; 
+                    // Determine direction: check which direction was dominant
+                    int lowVotes = 0, highVotes = 0;
+                    for(int c=0; c<3; ++c) {
+                        if (rejected[c][f] < 0) lowVotes++;
+                        else if (rejected[c][f] > 0) highVotes++;
+                    }
+                    
+                    // Mark all channels as rejected
+                    for(int c=0; c<3; ++c) {
+                        rejected[c][f] = 1;
+                    }
+                    
+                    // Count correct direction for statistics
+                    if (lowVotes >= highVotes) {
+                        crej[0]++;  // Low rejection
+                    } else {
+                        crej[1]++;  // High rejection
+                    }
                 }
             }
             
