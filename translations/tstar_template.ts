@@ -117,14 +117,6 @@
             <source>Aberration Inspector</source>
             <translation type="unfinished" />
         </message>
-        <message>
-            <source>Close</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Panel Size:</source>
-            <translation type="unfinished" />
-        </message>
     </context>
     <context>
         <name>AboutDialog</name>
@@ -2910,6 +2902,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>%1: RAW support not available (compiled without LibRaw).</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>%1: RAW support not available.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>16-bit</source>
             <translation type="unfinished" />
         </message>
@@ -2990,7 +2990,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>All Supported (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;</source>
+            <source>All Files (*)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3230,6 +3230,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Failed to load RAW %1: %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Failed to load XISF image %1: %2</source>
             <translation type="unfinished" />
         </message>
@@ -3338,7 +3342,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Images (*.png *.jpg *.jpeg)</source>
+            <source>Images (*.png *.jpg *.jpeg);;</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3503,6 +3507,14 @@
         </message>
         <message>
             <source>Opened PCC Distribution Tool</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opened RAW: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opened RAW: %1 (Bayer pattern: %2) – use Debayer to convert to colour.</source>
             <translation type="unfinished" />
         </message>
         <message>

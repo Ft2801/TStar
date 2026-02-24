@@ -1,44 +1,28 @@
 #ifndef ABERRATIONINSPECTORDIALOG_H
 #define ABERRATIONINSPECTORDIALOG_H
 
-#include <QDialog>
-#include <vector>
+#include <array>
 #include "../ImageBuffer.h"
-
-class QGraphicsScene;
-class QGraphicsView;
-class QSpinBox;
-class QLabel;
-
 #include "DialogBase.h"
+
+class QLabel;
 
 class AberrationInspectorDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit AberrationInspectorDialog(const ImageBuffer& img, QWidget* parent = nullptr);
-    ~AberrationInspectorDialog();
-    
-    void setSource(const ImageBuffer& img);
 
-private slots:
-    void updatePanels();
+    void setSource(const ImageBuffer& img);
 
 private:
     void setupUi();
-    ImageBuffer cropPanel(int x, int y, int w, int h);
-    
-    // 3x3 Grid of Views
-    struct Panel {
-        QGraphicsScene* scene;
-        QGraphicsView* view;
-    };
-    std::vector<Panel> m_panels; // 9 panels
-    
+    void updatePanels();
+
+    // Returns a QImage cropped (size x size) centred on (cx, cy), clamped to bounds.
+    QImage cropToQImage(int cx, int cy, int size);
+
     ImageBuffer m_source;
-    
-    // Controls
-    QSpinBox* m_sizeSpin;
-    int m_panelSize;
+    std::array<QLabel*, 9> m_panels; // TL TC TR / ML MC MR / BL BC BR
 };
 
 #endif // ABERRATIONINSPECTORDIALOG_H

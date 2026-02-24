@@ -115,15 +115,7 @@
         <name>AberrationInspectorDialog</name>
         <message>
             <source>Aberration Inspector</source>
-            <translation type="finished">Aberrationsinspektor</translation>
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="finished">Schließen</translation>
-        </message>
-        <message>
-            <source>Panel Size:</source>
-            <translation type="finished">Panelgröße:</translation>
+            <translation type="finished">Aberrationsprüfer</translation>
         </message>
     </context>
     <context>
@@ -2022,7 +2014,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>Aberration Inspector</source>
-            <translation type="finished">Aberrationsinspektor</translation>
+            <translation type="finished">Aberrationsprüfer</translation>
         </message>
         <message>
             <source>Aberration Remover (RAR)</source>
@@ -2912,6 +2904,14 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished"> (Neuoskaliert)</translation>
         </message>
         <message>
+            <source>%1: RAW support not available (compiled without LibRaw).</source>
+            <translation type="finished">%1: RAW-Unterstützung nicht verfügbar (kompiliert ohne LibRaw).</translation>
+        </message>
+        <message>
+            <source>%1: RAW support not available.</source>
+            <translation type="finished">%1: RAW-Unterstützung nicht verfügbar.</translation>
+        </message>
+        <message>
             <source>16-bit</source>
             <translation type="finished">16-Bit</translation>
         </message>
@@ -2953,7 +2953,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>Aberration Inspector</source>
-            <translation type="finished">Aberrationsinspektor</translation>
+            <translation type="finished">Aberrationsprüfer</translation>
         </message>
         <message>
             <source>Aberration Inspector (9-Points)</source>
@@ -2992,8 +2992,8 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Kanäle ausrichten</translation>
         </message>
         <message>
-            <source>All Supported (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;</source>
-            <translation type="finished">Alle unterstützten Formate (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;</translation>
+            <source>All Files (*)</source>
+            <translation type="finished">Alle Dateien (*)</translation>
         </message>
         <message>
             <source>Annotation Tool</source>
@@ -3109,7 +3109,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>Convert RAW to FITS...</source>
-            <translation type="finished">Konvertiere RAW zu FITS...</translation>
+            <translation type="finished">RAW zu FITS konvertieren...</translation>
         </message>
         <message>
             <source>Correction Brush</source>
@@ -3232,6 +3232,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Laden von %1 fehlgeschlagen: %2</translation>
         </message>
         <message>
+            <source>Failed to load RAW %1: %2</source>
+            <translation type="finished">Fehler beim Laden von RAW %1: %2</translation>
+        </message>
+        <message>
             <source>Failed to load XISF image %1: %2</source>
             <translation type="finished">Laden von XISF-Bild %1 fehlgeschlagen: %2</translation>
         </message>
@@ -3340,8 +3344,8 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Bild muss mindestens 3 Kanäle zum Extrahieren haben.</translation>
         </message>
         <message>
-            <source>Images (*.png *.jpg *.jpeg)</source>
-            <translation type="finished">Bilder (*.png *.jpg *.jpeg)</translation>
+            <source>Images (*.png *.jpg *.jpeg);;</source>
+            <translation type="finished">Bilder (*.png *.jpg *.jpeg);;</translation>
         </message>
         <message>
             <source>Info</source>
@@ -3506,6 +3510,14 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Opened PCC Distribution Tool</source>
             <translation type="finished">PCC Verteilungswerkzeug geöffnet</translation>
+        </message>
+        <message>
+            <source>Opened RAW: %1</source>
+            <translation type="finished">RAW geöffnet: %1</translation>
+        </message>
+        <message>
+            <source>Opened RAW: %1 (Bayer pattern: %2) – use Debayer to convert to colour.</source>
+            <translation type="finished">RAW geöffnet: %1 (Bayer-Muster: %2) – verwende Debayer zum Konvertieren in Farbe.</translation>
         </message>
         <message>
             <source>Opened Wavescale HDR Tool.</source>

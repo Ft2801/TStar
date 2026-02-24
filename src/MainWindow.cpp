@@ -43,6 +43,7 @@
 #include "dialogs/CurvesDialog.h"
 #include "io/FitsLoader.h"
 #include "io/SimpleTiffReader.h"
+#include "io/RawLoader.h"
 #include "dialogs/StretchDialog.h"
 #include "dialogs/ABEDialog.h"
 #include "dialogs/SCNRDialog.h"
@@ -1430,20 +1431,30 @@ void MainWindow::propagateViewChange(float scale, float hVal, float vVal) {
 #include "io/XISFReader.h"
 
 void MainWindow::openFile() {
-    QString filter = tr("All Supported (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;") +
-                     tr("FITS Files (*.fits *.fit);;") +
-                     tr("XISF Files (*.xisf);;") +
-                     tr("TIFF Files (*.tiff *.tif);;") +
-                     tr("Images (*.png *.jpg *.jpeg)");
+    QString filter =
+        tr("All Supported (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf "
+           "*.cr2 *.cr3 *.crw *.nef *.nrw *.arw *.dng *.orf *.rw2 *.raf "
+           "*.pef *.raw *.mrw *.srw *.erf *.mef *.mos *.x3f);;") +
+        tr("FITS Files (*.fits *.fit);;") +
+        tr("XISF Files (*.xisf);;") +
+        tr("TIFF Files (*.tiff *.tif);;") +
+        tr("Images (*.png *.jpg *.jpeg);;") +
+#ifdef HAVE_LIBRAW
+        tr("RAW Camera Files (*.cr2 *.cr3 *.crw *.nef *.nrw *.arw *.dng "
+           "*.orf *.ori *.rw2 *.raf *.pef *.ptx *.raw *.rwl *.mrw *.srw "
+           "*.erf *.mef *.mos *.x3f *.3fr *.fff *.gpr *.kdc *.k25 *.mdc "
+           "*.ari *.obm *.r3d *.bay *.cap *.iiq *.eip *.srw2);;") +
+#endif
+        tr("All Files (*)");
     QStringList paths = QFileDialog::getOpenFileNames(this, tr("Open Image(s)"), "", filter);
-    
+
     if (paths.isEmpty()) return;
 
     for (const QString& path : paths) {
         QFileInfo fi(path);
         QString ext = fi.suffix().toLower();
         QString errorMsg;
-        
+
         // --- FITS / FIT ---
         if (ext == "fits" || ext == "fit") {
             // List extensions first
@@ -1546,6 +1557,30 @@ void MainWindow::openFile() {
                  log(tr("Failed to load %1: %2").arg(fi.fileName()).arg(errorMsg), Log_Error);
              }
         } 
+        // --- RAW Camera Files ---
+        else if (RawLoader::isSupportedExtension(ext)) {
+#ifdef HAVE_LIBRAW
+            ImageBuffer buf;
+            QString rawErr;
+            if (RawLoader::load(path, buf, &rawErr)) {
+                buf.setName(fi.fileName());
+                createNewImageWindow(buf, fi.fileName());
+                // Inform the user about debayering if applicable
+                if (!buf.metadata().bayerPattern.isEmpty() &&
+                    buf.metadata().bayerPattern != "XTRANS") {
+                    log(tr("Opened RAW: %1 (Bayer pattern: %2) – use Debayer to convert to colour.")
+                            .arg(fi.fileName()).arg(buf.metadata().bayerPattern),
+                        Log_Success, true);
+                } else {
+                    log(tr("Opened RAW: %1").arg(fi.fileName()), Log_Success, true);
+                }
+            } else {
+                log(tr("Failed to load RAW %1: %2").arg(fi.fileName()).arg(rawErr), Log_Error);
+            }
+#else
+            log(tr("%1: RAW support not available (compiled without LibRaw).").arg(fi.fileName()), Log_Error);
+#endif
+        }
         else {
             ImageBuffer buf;
             if (buf.loadStandard(path)) {
@@ -3395,6 +3430,12 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
                 event->acceptProposedAction();
                 return;
             }
+            // Also accept RAW camera files
+            QString ext = QFileInfo(url.toLocalFile()).suffix().toLower();
+            if (RawLoader::isSupportedExtension(ext)) {
+                event->acceptProposedAction();
+                return;
+            }
         }
     }
     event->ignore();
@@ -3513,6 +3554,29 @@ void MainWindow::dropEvent(QDropEvent* event) {
                 } else {
                     log(tr("Failed to load %1").arg(fi.fileName()), Log_Error, true);
                 }
+            }
+            // RAW Camera Files
+            else if (RawLoader::isSupportedExtension(ext)) {
+#ifdef HAVE_LIBRAW
+                ImageBuffer buf;
+                QString rawErr;
+                if (RawLoader::load(path, buf, &rawErr)) {
+                    buf.setName(fi.fileName());
+                    createNewImageWindow(buf, fi.fileName());
+                    if (!buf.metadata().bayerPattern.isEmpty() &&
+                        buf.metadata().bayerPattern != "XTRANS") {
+                        log(tr("Opened RAW: %1 (Bayer pattern: %2) – use Debayer to convert to colour.")
+                                .arg(fi.fileName()).arg(buf.metadata().bayerPattern),
+                            Log_Success, true);
+                    } else {
+                        log(tr("Opened RAW: %1").arg(fi.fileName()), Log_Success, true);
+                    }
+                } else {
+                    log(tr("Failed to load RAW %1: %2").arg(fi.fileName()).arg(rawErr), Log_Error, true);
+                }
+#else
+                log(tr("%1: RAW support not available.").arg(fi.fileName()), Log_Error, true);
+#endif
             }
             
             showConsoleTemporarily(2000);

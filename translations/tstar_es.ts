@@ -115,15 +115,7 @@
         <name>AberrationInspectorDialog</name>
         <message>
             <source>Aberration Inspector</source>
-            <translation type="finished">Inspector de Aberraciones</translation>
-        </message>
-        <message>
-            <source>Close</source>
-            <translation type="finished">Cerrar</translation>
-        </message>
-        <message>
-            <source>Panel Size:</source>
-            <translation type="finished">Tamaño del Panel:</translation>
+            <translation type="finished">Inspector de Aberración</translation>
         </message>
     </context>
     <context>
@@ -2022,7 +2014,7 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         </message>
         <message>
             <source>Aberration Inspector</source>
-            <translation type="finished">Inspector de Aberraciones</translation>
+            <translation type="finished">Inspector de Aberración</translation>
         </message>
         <message>
             <source>Aberration Remover (RAR)</source>
@@ -2912,6 +2904,14 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished"> (Reescalado)</translation>
         </message>
         <message>
+            <source>%1: RAW support not available (compiled without LibRaw).</source>
+            <translation type="finished">%1: Soporte RAW no disponible (compilado sin LibRaw).</translation>
+        </message>
+        <message>
+            <source>%1: RAW support not available.</source>
+            <translation type="finished">%1: Soporte RAW no disponible.</translation>
+        </message>
+        <message>
             <source>16-bit</source>
             <translation type="finished">16-bit</translation>
         </message>
@@ -2953,7 +2953,7 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         </message>
         <message>
             <source>Aberration Inspector</source>
-            <translation type="finished">Inspector de Aberraciones</translation>
+            <translation type="finished">Inspector de Aberración</translation>
         </message>
         <message>
             <source>Aberration Inspector (9-Points)</source>
@@ -2992,8 +2992,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Alinear Canales</translation>
         </message>
         <message>
-            <source>All Supported (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;</source>
-            <translation type="finished">Tutti i Supportati (*.fits *.fit *.tiff *.tif *.png *.jpg *.jpeg *.xisf);;</translation>
+            <source>All Files (*)</source>
+            <translation type="finished">Todos los archivos (*)</translation>
         </message>
         <message>
             <source>Annotation Tool</source>
@@ -3232,6 +3232,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Error al cargar %1: %2</translation>
         </message>
         <message>
+            <source>Failed to load RAW %1: %2</source>
+            <translation type="finished">Error al cargar RAW %1: %2</translation>
+        </message>
+        <message>
             <source>Failed to load XISF image %1: %2</source>
             <translation type="finished">Fallo al cargar imagen XISF %1: %2</translation>
         </message>
@@ -3340,8 +3344,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">La imagen debe tener al menos 3 canales para extraer.</translation>
         </message>
         <message>
-            <source>Images (*.png *.jpg *.jpeg)</source>
-            <translation type="finished">Imágenes (*.png *.jpg *.jpeg)</translation>
+            <source>Images (*.png *.jpg *.jpeg);;</source>
+            <translation type="finished">Imágenes (*.png *.jpg *.jpeg);;</translation>
         </message>
         <message>
             <source>Info</source>
@@ -3506,6 +3510,14 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Opened PCC Distribution Tool</source>
             <translation type="finished">Herramienta Distribución PCC abierta</translation>
+        </message>
+        <message>
+            <source>Opened RAW: %1</source>
+            <translation type="finished">RAW abierto: %1</translation>
+        </message>
+        <message>
+            <source>Opened RAW: %1 (Bayer pattern: %2) – use Debayer to convert to colour.</source>
+            <translation type="finished">RAW abierto: %1 (patrón Bayer: %2) – usa Debayer para convertir a color.</translation>
         </message>
         <message>
             <source>Opened Wavescale HDR Tool.</source>

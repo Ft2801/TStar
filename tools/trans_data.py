@@ -2728,5 +2728,43 @@ TRANSLATIONS = {
     "TRANS sanity warning: possible skew in transform (var1=%1 var2=%2 tol=%3). Proceeding anyway.": {'it': 'Avvertenza TRANS sanità: possibile skew nella trasformazione (var1=%1 var2=%2 tol=%3). Procedendo comunque.', 'es': 'Advertencia de sanidad TRANS: posible sesgo en la transformación (var1=%1 var2=%2 tol=%3). Procediendo de todas formas.', 'fr': 'Avertissement de sanité TRANS: biais possible dans la transformation (var1=%1 var2=%2 tol=%3). Procédant quand même.', 'de': 'TRANS-Konsistenzwarnung: Mögliche Verzerrung in der Transformation (var1=%1 var2=%2 tol=%3). Trotzdem fortfahren.'},
 
     "Stack Count": {'it': 'Conteggio Stack', 'es': 'Conteo de Apilado', 'fr': 'Nombre de Piles', 'de': 'Stack-Anzahl'},
+
+    "Aberration Inspector": {'it': 'Ispettore di Aberrazione', 'es': 'Inspector de Aberración', 'fr': 'Inspecteur d\'Aberration', 'de': 'Aberrationsprüfer'},
+
+    "Top-Left": {'it': 'Alto-Sinistra', 'es': 'Arriba-Izquierda', 'fr': 'Haut-Gauche', 'de': 'Oben-Links'},
+
+    "Top": {'it': 'Alto', 'es': 'Arriba', 'fr': 'Haut', 'de': 'Oben'},
+
+    "Top-Right": {'it': 'Alto-Destra', 'es': 'Arriba-Derecha', 'fr': 'Haut-Droite', 'de': 'Oben-Rechts'},
+
+    "Left": {'it': 'Sinistra', 'es': 'Izquierda', 'fr': 'Gauche', 'de': 'Links'},
+
+    "Center": {'it': 'Centro', 'es': 'Centro', 'fr': 'Centre', 'de': 'Mitte'},
+
+    "Right": {'it': 'Destra', 'es': 'Derecha', 'fr': 'Droite', 'de': 'Rechts'},
+
+    "Bottom-Left": {'it': 'Basso-Sinistra', 'es': 'Abajo-Izquierda', 'fr': 'Bas-Gauche', 'de': 'Unten-Links'},
+
+    "Bottom": {'it': 'Basso', 'es': 'Abajo', 'fr': 'Bas', 'de': 'Unten'},
+
+    "Bottom-Right": {'it': 'Basso-Destra', 'es': 'Abajo-Derecha', 'fr': 'Bas-Droite', 'de': 'Unten-Rechts'},
+
+    "Opened RAW: %1 (Bayer pattern: %2) – use Debayer to convert to colour.": {'it': 'File RAW aperto: %1 (pattern Bayer: %2) – usa Debayer per convertire a colore.', 'es': 'RAW abierto: %1 (patrón Bayer: %2) – usa Debayer para convertir a color.', 'fr': 'RAW ouvert : %1 (motif Bayer : %2) – utilisez Debayer pour convertir en couleur.', 'de': 'RAW geöffnet: %1 (Bayer-Muster: %2) – verwende Debayer zum Konvertieren in Farbe.'},
+
+    "Opened RAW: %1": {'it': 'File RAW aperto: %1', 'es': 'RAW abierto: %1', 'fr': 'RAW ouvert : %1', 'de': 'RAW geöffnet: %1'},
+
+    "Failed to load RAW %1: %2": {'it': 'Errore nel caricamento del file RAW %1: %2', 'es': 'Error al cargar RAW %1: %2', 'fr': 'Erreur lors du chargement du RAW %1: %2', 'de': 'Fehler beim Laden von RAW %1: %2'},
+
+    "%1: RAW support not available (compiled without LibRaw).": {'it': '%1: Supporto RAW non disponibile (compilato senza LibRaw).', 'es': '%1: Soporte RAW no disponible (compilado sin LibRaw).', 'fr': '%1 : Prise en charge RAW non disponible (compilée sans LibRaw).', 'de': '%1: RAW-Unterstützung nicht verfügbar (kompiliert ohne LibRaw).'},
+
+    "RAW Camera Files (*.cr2 *.cr3 *.crw *.nef *.nrw *.arw *.dng *.orf *.ori *.rw2 *.raf *.pef *.ptx *.raw *.rwl *.mrw *.srw *.erf *.mef *.mos *.x3f *.3fr *.fff *.gpr *.kdc *.k25 *.mdc *.ari *.obm *.r3d *.bay *.cap *.iiq *.eip *.srw2)": {'it': 'File RAW Fotocamera (*.cr2 *.cr3 *.crw *.nef *.nrw *.arw *.dng *.orf *.ori *.rw2 *.raf *.pef *.ptx *.raw *.rwl *.mrw *.srw *.erf *.mef *.mos *.x3f *.3fr *.fff *.gpr *.kdc *.k25 *.mdc *.ari *.obm *.r3d *.bay *.cap *.iiq *.eip *.srw2)', 'es': 'Archivos RAW de Cámara (*.cr2 *.cr3 *.crw *.nef *.nrw *.arw *.dng *.orf *.ori *.rw2 *.raf *.pef *.ptx *.raw *.rwl *.mrw *.srw *.erf *.mef *.mos *.x3f *.3fr *.fff *.gpr *.kdc *.k25 *.mdc *.ari *.obm *.r3d *.bay *.cap *.iiq *.eip *.srw2)', 'fr': 'Fichiers RAW Caméra (*.cr2 *.cr3 *.crw *.nef *.nrw *.arw *.dng *.orf *.ori *.rw2 *.raf *.pef *.ptx *.raw *.rwl *.mrw *.srw *.erf *.mef *.mos *.x3f *.3fr *.fff *.gpr *.kdc *.k25 *.mdc *.ari *.obm *.r3d *.bay *.cap *.iiq *.eip *.srw2)', 'de': 'Kamera-RAW-Dateien (*.cr2 *.cr3 *.crw *.nef *.nrw *.arw *.dng *.orf *.ori *.rw2 *.raf *.pef *.ptx *.raw *.rwl *.mrw *.srw *.erf *.mef *.mos *.x3f *.3fr *.fff *.gpr *.kdc *.k25 *.mdc *.ari *.obm *.r3d *.bay *.cap *.iiq *.eip *.srw2)'},
+
+    "Convert RAW to FITS...": {'it': 'Converti RAW in FITS...', 'es': 'Convertir RAW a FITS...', 'fr': 'Convertir RAW en FITS...', 'de': 'RAW zu FITS konvertieren...'},
+
+    "%1: RAW support not available.": {'it': '%1: Supporto RAW non disponibile.', 'es': '%1: Soporte RAW no disponible.', 'fr': '%1 : Prise en charge RAW non disponible.', 'de': '%1: RAW-Unterstützung nicht verfügbar.'},
+
+    "All Files (*)": {'it': 'Tutti i file (*)', 'es': 'Todos los archivos (*)', 'fr': 'Tous les fichiers (*)', 'de': 'Alle Dateien (*)'},
+
+    "Images (*.png *.jpg *.jpeg);;": {'it': 'Immagini (*.png *.jpg *.jpeg);;', 'es': 'Imágenes (*.png *.jpg *.jpeg);;', 'fr': 'Images (*.png *.jpg *.jpeg);;', 'de': 'Bilder (*.png *.jpg *.jpeg);;'},
     
 }

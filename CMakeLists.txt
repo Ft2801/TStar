@@ -480,6 +480,8 @@ set(TSTAR_SOURCES
     src/io/FitsHeaderUtils.h
     src/io/SERFile.cpp
     src/io/SERFile.h
+    src/io/RawLoader.cpp
+    src/io/RawLoader.h
 
     
     # Widgets
