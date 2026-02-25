@@ -165,14 +165,54 @@ void StarDetectionThread::run() {
             const int peakY = y;
             x += r; // the for-loop's ++x brings us to peakX+r+1 next iteration
 
+            // ── Saturated plateau correction ──
+            // A large saturated star has a flat plateau where all pixels share the
+            // same value. The local-max tie-break always selects the top-left corner
+            // of the plateau, NOT the center. Siril's peaker detects this by checking
+            // that all 8 direct neighbours are within 10 grey-levels of the peak (flat
+            // plateau), then scans right and down from the corner to measure the full
+            // extent and moves the working center to the midpoint.
+            //
+            // hasSaturated condition (adapted from Siril SAT_DETECTION_RANGE = 0.10):
+            //   • pixel >= 240  (close to 8-bit clip)
+            //   • all 8 neighbours are within 10 counts of peak  (truly flat plateau)
+            float minhigh8 = 255.f;
+            for (int dy = -1; dy <= 1; ++dy)
+                for (int dx = -1; dx <= 1; ++dx) {
+                    if (dx == 0 && dy == 0) continue;
+                    float nv = (float)blurred.ptr<uint8_t>(peakY + dy)[peakX + dx];
+                    if (nv < minhigh8) minhigh8 = nv;
+                }
+            bool hasSaturated = (pixel >= 240.f) && ((pixel - minhigh8) <= 10.f);
+
+            int pCx = peakX, pCy = peakY;
+            int plateauExtR = 0, plateauExtD = 0; // plateau half-extents, used later for probeR
+            if (hasSaturated) {
+                // Scan right along blurred image to find right edge of plateau
+                const float satFloor = pixel - 10.f;
+                while (pCx + plateauExtR + 1 < nx &&
+                       (float)blurred.ptr<uint8_t>(pCy)[pCx + plateauExtR + 1] >= satFloor)
+                    ++plateauExtR;
+                // Scan down along blurred image to find bottom edge of plateau
+                while (pCy + plateauExtD + 1 < ny &&
+                       (float)blurred.ptr<uint8_t>(pCy + plateauExtD + 1)[pCx] >= satFloor)
+                    ++plateauExtD;
+                // Re-center at midpoint of the plateau bounding box
+                pCx = std::min(peakX + plateauExtR / 2, nx - 1);
+                pCy = std::min(peakY + plateauExtD / 2, ny - 1);
+                // Skip x past the full plateau width so the outer loop
+                // doesn't re-detect the same plateau at x+r+1, x+2r+1 …
+                if (plateauExtR > r) x += (plateauExtR - r); // x is already peakX+r
+            }
+
             // --- Centroid refinement on the unblurred image ---
-            // Use a slightly larger window (r=3) and squared weights to stay
-            // on the star core
+            // Centered on pCx/pCy: for saturated stars that is the plateau midpoint;
+            // for normal stars it equals peakX/peakY — behaviour is identical.
             const int refineR = 3;
-            const int py0 = std::max(0,      peakY - refineR);
-            const int py1 = std::min(ny - 1, peakY + refineR);
-            const int px0 = std::max(0,      peakX - refineR);
-            const int px1 = std::min(nx - 1, peakX + refineR);
+            const int py0 = std::max(0,      pCy - refineR);
+            const int py1 = std::min(ny - 1, pCy + refineR);
+            const int px0 = std::max(0,      pCx - refineR);
+            const int px1 = std::min(nx - 1, pCx + refineR);
 
             float refinedCx = 0.f, refinedCy = 0.f, totalW = 0.f;
             float peakVal = 0.f;
@@ -187,18 +227,17 @@ void StarDetectionThread::run() {
                     if (val > peakVal) peakVal = val;
                 }
             }
-            const float cx = (totalW > 0.f) ? refinedCx / totalW : (float)peakX;
-            const float cy = (totalW > 0.f) ? refinedCy / totalW : (float)peakY;
+            const float cx = (totalW > 0.f) ? refinedCx / totalW : (float)pCx;
+            const float cy = (totalW > 0.f) ? refinedCy / totalW : (float)pCy;
             const int icx = std::max(0, std::min((int)std::round(cx), nx - 1));
             const int icy = std::max(0, std::min((int)std::round(cy), ny - 1));
 
             // --- Local background estimate ---
-            // Sample the blurred image at 8 compass directions at radius 10px.
-            // Take the median of those 8 probes as the local sky floor around this star.
-            // This correctly handles bright nebula regions: a star sitting on a bright
-            // nebula floor (e.g., Orion center) gets a local_bg reflecting that floor,
-            // so the FWHM scan terminates at the actual star edge, not at the global sky.
-            const int probeR = 10;
+            // Sample the blurred image at 8 compass directions.
+            // For normal stars probeR=10 is fine; for saturated stars the plateau may
+            // extend tens of pixels from the center, so we must probe beyond it.
+            // plateauExtR/D are 0 for non-saturated stars → probeR stays 10.
+            const int probeR = std::max(10, std::max(plateauExtR, plateauExtD) + 8);
             float probes[8];
             const int pdx[] = { probeR, probeR, 0, -probeR, -probeR, -probeR,  0,  probeR };
             const int pdy[] = {      0,  probeR, probeR,   probeR,       0, -probeR, -probeR, -probeR };
@@ -216,10 +255,11 @@ void StarDetectionThread::run() {
             // half its local-background-relative amplitude.
             // Using localBg instead of global bg fixes the "enormous star on nebula"
             // problem: the scan now stops at the true star/nebula boundary.
-            // Hard cap at 15px: a realistic star FWHM on a display-resolution image
-            // is 2–10px; anything larger is almost certainly nebula being misread.
+            // Cap raised to 40px: saturated stars have a flat plateau that may extend
+            // 10–20px from the center before the PSF wings begin, so a 15px cap would
+            // always return the capped value and give the wrong radius.
             const float halfMax = localBg + (peakVal - localBg) * 0.5f;
-            const int   maxScan = 15;
+            const int   maxScan = 40;
 
             // Returns the fractional half-width in the given direction
             auto scanHalfWidth = [&](int dx, int dy) -> float {
@@ -599,7 +639,30 @@ void AstroSpikeCanvas::render(QPainter& p, float scale, const QPointF& offset) {
         
         float sx = star.x * scale + offset.x();
         float sy = star.y * scale + offset.y();
-        
+
+        // --- Artificial star ---
+        // Soft disk strictly contained within the detected star radius.
+        // The gradient runs from full-bright at the centre to fully transparent
+        // at the boundary — the blur goes INWARD, nothing spills outside coreR.
+        {
+            float coreR = star.radius * m_config.globalScale * scale;
+            if (coreR >= 1.0f) {
+                QColor sc = getStarColor(star, m_config.hueShift, m_config.colorSaturation, m_config.intensity);
+                QColor edge = sc;
+                edge.setAlphaF(0.0);
+
+                QRadialGradient rg(QPointF(sx, sy), coreR);
+                rg.setColorAt(0.0, sc);    // full brightness at centre
+                rg.setColorAt(1.0, edge);  // fully transparent at the star boundary
+
+                p.setOpacity(1.0);
+                p.setPen(Qt::NoPen);
+                p.setBrush(QBrush(rg));
+                p.drawEllipse(QPointF(sx, sy), coreR, coreR);
+                p.setBrush(Qt::NoBrush);
+            }
+        }
+
         if (m_config.softFlareIntensity > 0) {
              float glowR = (star.radius * m_config.softFlareSize * 0.4f + (star.radius * 2)) * scale;
              if (glowR > 2) {
