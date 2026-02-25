@@ -66,216 +66,255 @@ StarDetectionThread::StarDetectionThread(const ImageBuffer& buffer, QObject* par
 
 void StarDetectionThread::run() {
     if (m_grayMat.empty()) return;
-    
-    // --- Pre-processing: Gaussian blur to reduce noise ---
-    cv::Mat blurred;
-    cv::GaussianBlur(m_grayMat, blurred, cv::Size(3, 3), 0);
-    
-    // --- Multi-level threshold detection ---
-    // Scan from HIGHEST to LOWEST threshold so brightest stars are found first.
-    // This prevents dim noise blobs from claiming star positions before bright stars.
-    const int threshLevels[] = {230, 200, 160, 120, 80, 60, 40, 20};
-    const int numLevels = 8;
-    
-    const double minArea = 2.0;
-    const double maxArea = 20000.0; 
-    
-    // Use a "visited" mask to avoid detecting the same star at multiple threshold levels
-    cv::Mat visited = cv::Mat::zeros(m_height, m_width, CV_8UC1);
-    
-    QVector<AstroSpike::Star> allDetected;
-    
-    for (int lvl = 0; lvl < numLevels; ++lvl) {
-        cv::Mat binary;
-        cv::threshold(blurred, binary, threshLevels[lvl], 255, cv::THRESH_BINARY);
-        
-        std::vector<std::vector<cv::Point>> contours;
-        cv::findContours(binary, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-        
-        int numContours = (int)contours.size();
-        
-        // Process contours in parallel
-        std::vector<AstroSpike::Star> levelStars(numContours);
-        std::vector<bool> valid(numContours, false);
-        
-#ifdef _OPENMP
-        int numThreads = std::max(1, omp_get_max_threads() - 1);
-        #pragma omp parallel for num_threads(numThreads) schedule(dynamic, 64)
-#endif
-        for (int i = 0; i < numContours; ++i) {
-            const auto& contour = contours[i];
-            double area = cv::contourArea(contour);
-            
-            if (area < minArea || area > maxArea) continue;
-            
-            // Circularity check: reject very elongated or irregular shapes
-            double perimeter = cv::arcLength(contour, true);
-            if (perimeter <= 0) continue;
-            double circularity = 4.0 * CV_PI * area / (perimeter * perimeter);
-            if (circularity < 0.25) continue;
 
-            // Ovality/Elongation Check to reject nebulosity stripes
-            if (contour.size() >= 5) {
-                cv::RotatedRect minRect = cv::fitEllipse(contour);
-                float w = minRect.size.width;
-                float h = minRect.size.height;
-                float shortAxis = std::min(w, h);
-                float longAxis = std::max(w, h);
-                
-                // Aspect ratio check: < 0.6 means very oval/streak/nebula
-                if (longAxis > 0) {
-                    float ratio = shortAxis / longAxis;
-                    if (ratio < 0.6f) continue;
-                }
-            }
-            
-            // Find actual brightest pixel within this contour's bounding rect
-            // This avoids the centroid-averaging issue when nearby stars merge
-            cv::Rect bbox = cv::boundingRect(contour);
-            int bx0 = std::max(0, bbox.x);
-            int by0 = std::max(0, bbox.y);
-            int bx1 = std::min(m_width - 1, bbox.x + bbox.width - 1);
-            int by1 = std::min(m_height - 1, bbox.y + bbox.height - 1);
-            
-            // Find peak luminance position
-            float peakLum = 0;
-            int icx = (bx0 + bx1) / 2, icy = (by0 + by1) / 2;
-            int peakX = icx, peakY = icy;
-            float cx = 0, cy = 0;
-            for (int py = by0; py <= by1; ++py) {
-                const uint8_t* grayRow = m_grayMat.ptr<uint8_t>(py);
-                for (int px = bx0; px <= bx1; ++px) {
-                    if (grayRow[px] > peakLum) {
-                        peakLum = grayRow[px];
-                        peakX = px;
-                        peakY = py;
+    const int nx = m_width;
+    const int ny = m_height;
+
+    // --- Pre-processing: Gaussian blur (sigma=1.5) to reduce noise before peak detection ---
+    cv::Mat blurred;
+    cv::GaussianBlur(m_grayMat, blurred, cv::Size(0, 0), 1.5);
+
+    // --- Robust background estimation via 8-bit histogram ---
+    // Using meanStdDev on the whole image fails for astrophotos: the bright stars
+    // inflate stddev to ~40-60, pushing threshold = mean + 5*σ above 254 (the cap),
+    // so nothing is ever detected.  The correct approach (mirroring Siril) is:
+    //   bg    = median of the image (50th percentile) → robust against star outliers
+    //   noise = stddev computed only on pixels near the background (below the median)
+    //
+    // We build a 256-bin histogram in O(N) and derive both quantities from it.
+    int hist[256] = {};
+    for (int y2 = 0; y2 < ny; ++y2) {
+        const uint8_t* brow = blurred.ptr<uint8_t>(y2);
+        for (int x2 = 0; x2 < nx; ++x2)
+            ++hist[(int)brow[x2]];
+    }
+    const int totalPix = nx * ny;
+
+    // Median: first value v such that cumulative count >= 50% of total
+    int cumH = 0, bgInt = 0;
+    for (int v = 0; v < 256; ++v) {
+        cumH += hist[v];
+        if (cumH * 2 >= totalPix) { bgInt = v; break; }
+    }
+    const double bg = (double)bgInt;
+
+    // Noise: stddev of pixels in the range [max(0, bgInt-30), bgInt].
+    // Using only the dark side of the distribution excludes star pixels entirely.
+    // (Siril similarly uses bgnoise computed after sigma-clipping the bright tail.)
+    double sumN = 0.0, sumSqN = 0.0;
+    int    countN = 0;
+    const int noiseHalfRange = std::min(bgInt, 30);
+    for (int v = bgInt - noiseHalfRange; v <= bgInt; ++v) {
+        sumN   += (double)v * hist[v];
+        sumSqN += (double)(v * v) * hist[v];
+        countN += hist[v];
+    }
+    const double meanN   = (countN > 0) ? sumN / countN : bg;
+    const double varN    = (countN > 1) ? (sumSqN / countN - meanN * meanN) : 1.0;
+    const double bgnoise = std::sqrt(std::max(varN, 1.0));
+
+    // threshold = bg + 5 * bgnoise  (same multiplier as Siril's default sigma=1 → 5*bgnoise)
+    // Hard floor: at least bg+3 to avoid firing on flat areas.
+    // Hard ceiling: 250 so we always catch stars even in bright frames.
+    const float threshold = (float)std::min(std::max(bg + 5.0 * bgnoise, bg + 3.0), 250.0);
+
+    qDebug() << "[AstroSpike] bg=" << bg << " noise=" << bgnoise
+             << " adaptive threshold=" << threshold;
+
+    // --- Local-maximum scan (DAOFIND) ---
+    // For each pixel above threshold, verify it is the strict local maximum
+    // among all neighbors within radius r.  No contours, no blobs — each star
+    // produces exactly one candidate regardless of brightness.
+    //
+    // Key improvement over the old contour approach:
+    //   • stars cannot merge into one blob (each peak is independent)
+    //   • the detected position is always the true brightness peak
+    //   • radius is measured from the actual PSF profile (FWHM), not from
+    //     the threshold-dependent contour area — so spike length is consistent
+    //     for all stars independent of where the threshold cuts their profile.
+
+    const int r = 3;   // local-max neighborhood radius (7×7 box)
+    QVector<AstroSpike::Star> allDetected;
+
+    for (int y = r; y < ny - r; ++y) {
+        const uint8_t* row = blurred.ptr<uint8_t>(y);
+        for (int x = r; x < nx - r; ++x) {
+            const float pixel = (float)row[x];
+            if (pixel <= threshold) continue;
+
+            // Check strict local maximum in the r-neighbourhood.
+            // Tie-breaking: the pixel with the smallest (x,y) index wins,
+            bool isMax = true;
+            for (int dy = -r; dy <= r && isMax; ++dy) {
+                const uint8_t* nrow = blurred.ptr<uint8_t>(y + dy);
+                for (int dx = -r; dx <= r && isMax; ++dx) {
+                    if (dx == 0 && dy == 0) continue;
+                    const uint8_t neighbor = nrow[x + dx];
+                    if (neighbor > pixel) {
+                        isMax = false;
+                    } else if (neighbor == pixel && (dx < 0 || (dx == 0 && dy < 0))) {
+                        isMax = false; // tie: lower-index pixel wins
                     }
                 }
             }
-            
-            // Refine centroid: intensity-weighted average in a tight window around peak
-            float refinedCx = 0, refinedCy = 0, totalW = 0;
-            int refineR = 2; // Small window to stay on the star core
-            int ry0 = std::max(0, peakY - refineR);
-            int ry1 = std::min(m_height - 1, peakY + refineR);
-            int rx0 = std::max(0, peakX - refineR);
-            int rx1 = std::min(m_width - 1, peakX + refineR);
-            for (int py = ry0; py <= ry1; ++py) {
-                const uint8_t* grayRow = m_grayMat.ptr<uint8_t>(py);
-                for (int px = rx0; px <= rx1; ++px) {
-                    float w = grayRow[px] * grayRow[px]; // Squared weight for tighter peak
+            if (!isMax) continue;
+
+            // Remember peak column then skip the next r columns —
+            // no other local max can exist within r pixels of this one.
+            const int peakX = x;
+            const int peakY = y;
+            x += r; // the for-loop's ++x brings us to peakX+r+1 next iteration
+
+            // --- Centroid refinement on the unblurred image ---
+            // Use a slightly larger window (r=3) and squared weights to stay
+            // on the star core
+            const int refineR = 3;
+            const int py0 = std::max(0,      peakY - refineR);
+            const int py1 = std::min(ny - 1, peakY + refineR);
+            const int px0 = std::max(0,      peakX - refineR);
+            const int px1 = std::min(nx - 1, peakX + refineR);
+
+            float refinedCx = 0.f, refinedCy = 0.f, totalW = 0.f;
+            float peakVal = 0.f;
+            for (int py = py0; py <= py1; ++py) {
+                const uint8_t* gRow = m_grayMat.ptr<uint8_t>(py);
+                for (int px = px0; px <= px1; ++px) {
+                    const float val = (float)gRow[px];
+                    const float w   = val * val; // squared weight → tight centroid
                     refinedCx += px * w;
                     refinedCy += py * w;
-                    totalW += w;
+                    totalW    += w;
+                    if (val > peakVal) peakVal = val;
                 }
             }
-            if (totalW > 0) {
-                cx = refinedCx / totalW;
-                cy = refinedCy / totalW;
-            } else {
-                cx = (float)peakX;
-                cy = (float)peakY;
+            const float cx = (totalW > 0.f) ? refinedCx / totalW : (float)peakX;
+            const float cy = (totalW > 0.f) ? refinedCy / totalW : (float)peakY;
+            const int icx = std::max(0, std::min((int)std::round(cx), nx - 1));
+            const int icy = std::max(0, std::min((int)std::round(cy), ny - 1));
+
+            // --- Local background estimate ---
+            // Sample the blurred image at 8 compass directions at radius 10px.
+            // Take the median of those 8 probes as the local sky floor around this star.
+            // This correctly handles bright nebula regions: a star sitting on a bright
+            // nebula floor (e.g., Orion center) gets a local_bg reflecting that floor,
+            // so the FWHM scan terminates at the actual star edge, not at the global sky.
+            const int probeR = 10;
+            float probes[8];
+            const int pdx[] = { probeR, probeR, 0, -probeR, -probeR, -probeR,  0,  probeR };
+            const int pdy[] = {      0,  probeR, probeR,   probeR,       0, -probeR, -probeR, -probeR };
+            for (int p = 0; p < 8; ++p) {
+                const int spx = std::max(0, std::min(icx + pdx[p], nx - 1));
+                const int spy = std::max(0, std::min(icy + pdy[p], ny - 1));
+                probes[p] = (float)blurred.ptr<uint8_t>(spy)[spx];
             }
-            
-            icx = std::max(0, std::min((int)std::round(cx), m_width - 1));
-            icy = std::max(0, std::min((int)std::round(cy), m_height - 1));
-            
-            // Skip if this refined location was already detected
-            if (visited.at<uint8_t>(icy, icx) != 0) continue;
-            
-            // Radius from area
-            float radius = (float)std::sqrt(area / CV_PI);
-            
-            // Color: sample from the bright core around the peak (tight window)
-            int colorR = std::max(1, (int)std::ceil(radius * 0.5f));
-            float sumR = 0, sumG = 0, sumB = 0;
-            float sumWeight = 0;
-            
-            int cy0 = std::max(0, icy - colorR);
-            int cy1 = std::min(m_height - 1, icy + colorR);
-            int cx0 = std::max(0, icx - colorR);
-            int cx1 = std::min(m_width - 1, icx + colorR);
-            
+            // Median of 8 values — sort 8 floats is negligible cost
+            std::sort(probes, probes + 8);
+            const float localBg = (probes[3] + probes[4]) * 0.5f;  // true median of 8
+
+            // --- FWHM-based radius ---
+            // Scan outward along the four cardinal axes until the profile drops to
+            // half its local-background-relative amplitude.
+            // Using localBg instead of global bg fixes the "enormous star on nebula"
+            // problem: the scan now stops at the true star/nebula boundary.
+            // Hard cap at 15px: a realistic star FWHM on a display-resolution image
+            // is 2–10px; anything larger is almost certainly nebula being misread.
+            const float halfMax = localBg + (peakVal - localBg) * 0.5f;
+            const int   maxScan = 15;
+
+            // Returns the fractional half-width in the given direction
+            auto scanHalfWidth = [&](int dx, int dy) -> float {
+                for (int step = 1; step <= maxScan; ++step) {
+                    const int spx = icx + dx * step;
+                    const int spy = icy + dy * step;
+                    if (spx < 0 || spx >= nx || spy < 0 || spy >= ny)
+                        return (float)step;
+                    const float val = (float)m_grayMat.ptr<uint8_t>(spy)[spx];
+                    if (val < halfMax) {
+                        // Sub-pixel interpolation between this step and the previous
+                        const float prevVal = (float)m_grayMat.ptr<uint8_t>(spy - dy)[spx - dx];
+                        const float denom   = prevVal - val;
+                        return (float)(step - 1) + (denom > 0.f ? (prevVal - halfMax) / denom : 0.5f);
+                    }
+                }
+                return (float)maxScan;
+            };
+
+            const float hwR = scanHalfWidth( 1,  0);
+            const float hwL = scanHalfWidth(-1,  0);
+            const float hwD = scanHalfWidth( 0,  1);
+            const float hwU = scanHalfWidth( 0, -1);
+            float fwhmRadius = (hwR + hwL + hwD + hwU) * 0.25f; // average half-width at half-max
+            fwhmRadius = std::max(fwhmRadius, 0.5f);
+
+            // --- Color sampling from the bright core ---
+            const int colorR = std::max(1, (int)std::ceil(fwhmRadius));
+            float sumR = 0.f, sumG = 0.f, sumB = 0.f, sumWeight = 0.f;
+            const int cy0 = std::max(0,      icy - colorR);
+            const int cy1 = std::min(ny - 1, icy + colorR);
+            const int cx0 = std::max(0,      icx - colorR);
+            const int cx1 = std::min(nx - 1, icx + colorR);
             for (int py = cy0; py <= cy1; ++py) {
-                const uint8_t* grayRow = m_grayMat.ptr<uint8_t>(py);
+                const uint8_t* gRow   = m_grayMat.ptr<uint8_t>(py);
                 const uint8_t* bgrRow = m_rgbMat.ptr<uint8_t>(py);
                 for (int px = cx0; px <= cx1; ++px) {
-                    float lum = grayRow[px];
-                    // Only sample from bright pixels for better color accuracy
-                    if (lum < peakLum * 0.5f) continue;
-                    
-                    float w = lum * lum; // Squared weight emphasizes bright core
-                    sumB += bgrRow[px*3+0] * w;
-                    sumG += bgrRow[px*3+1] * w;
-                    sumR += bgrRow[px*3+2] * w;
+                    const float lum = (float)gRow[px];
+                    if (lum < peakVal * 0.5f) continue; // only bright core pixels
+                    const float w = lum * lum;
+                    sumB      += bgrRow[px*3+0] * w;
+                    sumG      += bgrRow[px*3+1] * w;
+                    sumR      += bgrRow[px*3+2] * w;
                     sumWeight += w;
                 }
             }
-            
-            float avgR = 255, avgG = 255, avgB = 255;
-            if (sumWeight > 0) {
-                avgR = sumR / sumWeight;
-                avgG = sumG / sumWeight;
-                avgB = sumB / sumWeight;
-            }
-            
+            const float avgR = (sumWeight > 0.f) ? sumR / sumWeight : 255.f;
+            const float avgG = (sumWeight > 0.f) ? sumG / sumWeight : 255.f;
+            const float avgB = (sumWeight > 0.f) ? sumB / sumWeight : 255.f;
+
+            // --- Brightness: normalize above LOCAL background ---
+            // Using localBg (not global bg) means a star on bright nebula is judged
+            // by how much it stands out from its immediate surroundings, not from
+            // the sky median.  This makes the threshold slider meaningful even in
+            // crowded/bright zones: a dim star on nebula gets a low brightness score
+            // and is filtered out at high slider values, as the user expects.
+            const float localDynRange = 255.f - localBg;
+            const float brightness = (localDynRange > 0.f)
+                ? std::max(0.f, std::min(1.f, (peakVal - localBg) / localDynRange))
+                : 1.f;
+
             AstroSpike::Star s;
-            s.x = cx;
-            s.y = cy;
-            s.brightness = peakLum / 255.0f;
-            s.radius = radius;
-            s.color = QColor((int)std::min(255.0f, avgR),
-                             (int)std::min(255.0f, avgG),
-                             (int)std::min(255.0f, avgB));
-            
-            levelStars[i] = s;
-            valid[i] = true;
-        }
-        
-        // Collect valid results from this level and mark visited
-        for (int i = 0; i < numContours; ++i) {
-            if (!valid[i]) continue;
-            
-            const auto& s = levelStars[i];
-            int icx = std::max(0, std::min((int)std::round(s.x), m_width - 1));
-            int icy = std::max(0, std::min((int)std::round(s.y), m_height - 1));
-            
-            // Mark a small region as visited to prevent duplicates across levels
-            // Reduced to 0.6 * radius to allow close companions (de-blending)
-            int markR = std::max(1, (int)std::ceil(s.radius * 0.6f));
-            int my0 = std::max(0, icy - markR);
-            int my1 = std::min(m_height - 1, icy + markR);
-            int mx0 = std::max(0, icx - markR);
-            int mx1 = std::min(m_width - 1, icx + markR);
-            for (int py = my0; py <= my1; ++py) {
-                uint8_t* row = visited.ptr<uint8_t>(py);
-                for (int px = mx0; px <= mx1; ++px) {
-                    row[px] = 255;
-                }
-            }
-            
+            s.x          = cx;
+            s.y          = cy;
+            s.brightness = brightness;
+            s.radius     = fwhmRadius;
+            s.color      = QColor((int)std::min(255.f, avgR),
+                                  (int)std::min(255.f, avgG),
+                                  (int)std::min(255.f, avgB));
             allDetected.append(s);
         }
     }
-    
+
     qDebug() << "[AstroSpike] Detected" << allDetected.size() << "raw star candidates";
-    
+
     // --- Sort by brightness descending ---
     std::sort(allDetected.begin(), allDetected.end(), [](const AstroSpike::Star& a, const AstroSpike::Star& b) {
         return a.brightness > b.brightness;
     });
-    
+
     // --- Merge close stars (keep brightest) ---
+    // The local max scan already prevents duplicates within radius r, but stars
+    // separated by r+1 .. 2r pixels can both pass as independent maxima.
+    // Post-merge collapses genuine same-star detections.
     QVector<AstroSpike::Star> merged;
     merged.reserve(allDetected.size());
     for (const auto& s : allDetected) {
         bool isDuplicate = false;
         for (const auto& existing : merged) {
-            float dx = s.x - existing.x;
-            float dy = s.y - existing.y;
-            float distSq = dx*dx + dy*dy;
-            // Radius sum * 0.7 allows significant overlap (visual doubles) but merges identicals
-            float mergeR = (existing.radius + s.radius) * 0.7f;
+            const float dx    = s.x - existing.x;
+            const float dy    = s.y - existing.y;
+            const float distSq = dx*dx + dy*dy;
+            // Use FWHM radii for merge distance: if centers are closer than the
+            // sum of their half-widths they're likely the same source.
+            const float mergeR = (existing.radius + s.radius) * 0.9f;
             if (distSq < mergeR * mergeR) {
                 isDuplicate = true;
                 break;
@@ -283,9 +322,9 @@ void StarDetectionThread::run() {
         }
         if (!isDuplicate) merged.append(s);
     }
-    
+
     qDebug() << "[AstroSpike] After merge:" << merged.size() << "unique stars";
-    
+
     emit detectionComplete(merged);
 }
 
@@ -882,27 +921,23 @@ void AstroSpikeDialog::onStarsDetected(const QVector<AstroSpike::Star>& stars) {
     // Cache the full pre-computed star list (sorted by brightness descending)
     m_allStars = stars;
     m_thread = nullptr; // Will be deleted by deleteLater
-    
-    m_statusLabel->setText(tr("Detected %1 total stars. Filtering...").arg(stars.size()));
-    
-    // Apply current threshold filter
+
+    // Apply current threshold filter (updates the label too)
     filterStarsByThreshold();
 }
 
 void AstroSpikeDialog::filterStarsByThreshold() {
-    if (m_allStars.isEmpty()) return;
-    
-    // Map threshold slider (1-100) to internal brightness cutoff
-    // Slider 1 -> internal 35 (low cutoff, many stars)
-    // Slider 100 -> internal 100 (high cutoff, only brightest)
-    float internalThresh = 35.0f + (m_config.threshold - 1.0f) * (65.0f / 99.0f);
-    float cutoff = (internalThresh - 1.0f) / 99.0f; // 0.34 to 1.0
-    
-    // Since m_allStars is already sorted by brightness descending,
-    // we can use a simple linear scan and stop early
+    // Brightness is now background-normalized: 0 = just at detection threshold, 1 = saturated.
+    // Map slider (1-100) linearly to cutoff range [0.0, 0.92]:
+    //   Slider 1  → 0.00  (show every detected star)
+    //   Slider 80 → 0.73  (default: only stars clearly above background)
+    //   Slider 100 → 0.92 (only the very brightest stars)
+    const float cutoff = std::max(0.f, (m_config.threshold - 1.0f) / 99.0f * 0.92f);
+
     QVector<AstroSpike::Star> filtered;
+
     filtered.reserve(m_allStars.size());
-    
+
     for (const auto& s : m_allStars) {
         if (s.brightness >= cutoff) {
             filtered.append(s);

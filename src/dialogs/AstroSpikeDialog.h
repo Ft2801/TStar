@@ -66,7 +66,7 @@ namespace AstroSpike {
         float secondaryOffset = 45.0f;
 
         // Soft Flare
-        float softFlareIntensity = 1.0f;
+        float softFlareIntensity = 0.5f;
         float softFlareSize = 15.0f;
 
         // Halo

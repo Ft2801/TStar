@@ -5,6 +5,7 @@ Version 1.6.4
 -------------
 - Update to the add/recombine luminance tool
 - Updated the aberration inspection tool
+- Updated star finder algorithm in AstroSpike
 - Added a more robust algorithm for plate solving and color calibration
 - improvements to the stacking suite
 - Now you can open raw camera files in the app

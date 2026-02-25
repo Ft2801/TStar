@@ -982,11 +982,10 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
         
         // ===== PIXEL STACKING (single pass, reads from preloaded RAM images) =====
         // No I/O here — preloadedImages[] already holds every registered frame.
-        // Border exclusion uses Siril's exact strategy:
+        // Border exclusion:
         //   (1) Hard geometric out-of-bounds → skip frame immediately.
         //   (2) For pre-warped r_ files: warpPerspective(BORDER_CONSTANT=0) + mask
         //       zeroing marks out-of-bounds pixels with 0.0f in ALL channels.
-        //       We replicate Siril's apply_rejection_float() per-pixel:
         //         "if (stack[frame] != 0.f) { stack[kept++] = stack[frame]; }"
         //       → skip frames where r==g==b==0.0f (mono: v==0.0f).
         for (int y = 0; y < block.height; ++y) {
@@ -1037,10 +1036,9 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
                             g = (ich > 1) ? interpolateBicubic(imgBase, iw, ih, srcX, srcGY, 1, ich) : r;
                             b = (ich > 2) ? interpolateBicubic(imgBase, iw, ih, srcX, srcGY, 2, ich) : r;
                         }
-                        // === SIRIL-EQUIVALENT ZERO EXCLUSION ===
+                        // === ZERO EXCLUSION ===
                         // Pre-warped r_ files: warpPerspective(BORDER_CONSTANT=0) + mask zeroing
                         // set ALL channels to exactly 0.0f for pixels outside the source frame.
-                        // This matches Siril's apply_rejection_float():
                         //   "if (stack[frame] != 0.f) { stack[kept++] = stack[frame]; }"
                         // Each channel is tested independently; for geometrically-warped images
                         // all three channels are zero simultaneously at the same border pixels.
@@ -1077,7 +1075,6 @@ StackResult StackingEngine::stackMean(StackingArgs& args) {
                         } else {
                             v = interpolateBicubic(imgBase, iw, ih, srcX, srcGY, 0, ich);
                         }
-                        // Siril-equivalent zero exclusion for mono pre-warped images
                         if (v == 0.0f) continue;
                         if (args.params.hasNormalization()) {
                             const auto& coeff = allCoeffs[0][frame];
