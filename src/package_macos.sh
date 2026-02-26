@@ -247,8 +247,8 @@ EXECUTABLE="$DIST_DIR/Contents/MacOS/TStar"
 
 # 1. Recursive copy of missing dependencies
 echo "  - Recursively collecting dependencies..."
-# Loop multiple times to handle deep chains
-for i in {1..2}; do
+# Loop multiple times to handle deep chains (3 passes for safety)
+for i in {1..3}; do
     for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
         if [ -f "$dylib" ]; then
             copy_dylib_with_dependencies "$dylib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
@@ -271,38 +271,73 @@ if [ -f "$EXECUTABLE" ]; then
     fix_executable_deps "$EXECUTABLE" "$FRAMEWORKS_DIR"
 fi
 
+# 4. Final sweep: rewrite ALL remaining Homebrew absolute paths
+echo "  - Final sweep: rewriting any remaining Homebrew paths..."
+rewrite_homebrew_paths "$EXECUTABLE"
+for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
+    if [ -f "$dylib" ]; then
+        rewrite_homebrew_paths "$dylib"
+    fi
+done
+
 # --- Verify bundled dylibs dependencies ---
 echo ""
 echo "[STEP 9.1] Verifying bundled dependencies..."
 
 MISSING_DEPS=0
+HOMEBREW_REFS=0
 
-
-# Final verification
-echo "  - Checking for remaining missing dependencies..."
+# Check all bundled dylibs
+echo "  - Checking for unresolved @rpath references..."
 for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
     if [ -f "$dylib" ]; then
-        # Get all dependencies with @rpath reference
-        UNRESOLVED=$(otool -L "$dylib" 2>/dev/null | grep "@rpath" | grep -v "^$dylib:" | grep -v "@rpath/Qt" | grep -v "@rpath/lib" || true)
+        # Check @rpath references that can't be resolved
+        UNRESOLVED=$(otool -L "$dylib" 2>/dev/null | grep "@rpath" | grep -v "^$dylib:" | grep -v "@rpath/Qt" || true)
         if [ -n "$UNRESOLVED" ]; then
             while IFS= read -r dep_line; do
                 DEP_NAME=$(echo "$dep_line" | awk '{print $1}' | sed 's|@rpath/||')
                 if [ -n "$DEP_NAME" ] && [ "$DEP_NAME" != "@rpath" ]; then
                     if [ ! -f "$FRAMEWORKS_DIR/$DEP_NAME" ]; then
-                        echo "  [WARNING] Unresolved: $dylib -> $DEP_NAME"
+                        echo "  [WARNING] Unresolved @rpath: $(basename "$dylib") -> $DEP_NAME"
                         MISSING_DEPS=$((MISSING_DEPS + 1))
                     fi
                 fi
             done <<< "$UNRESOLVED"
         fi
+        
+        # Check for absolute Homebrew paths that slipped through
+        BREW_REFS=$(otool -L "$dylib" 2>/dev/null | grep -v "^$dylib:" | awk '{print $1}' | grep -E "^(/opt/homebrew|/usr/local/(Cellar|opt|lib))" || true)
+        if [ -n "$BREW_REFS" ]; then
+            while IFS= read -r brew_ref; do
+                echo "  [WARNING] Absolute Homebrew path in $(basename "$dylib"): $brew_ref"
+                HOMEBREW_REFS=$((HOMEBREW_REFS + 1))
+            done <<< "$BREW_REFS"
+        fi
     fi
 done
 
+# Also check the executable
+if [ -f "$EXECUTABLE" ]; then
+    EXEC_BREW_REFS=$(otool -L "$EXECUTABLE" 2>/dev/null | grep -v "^$EXECUTABLE:" | awk '{print $1}' | grep -E "^(/opt/homebrew|/usr/local/(Cellar|opt|lib))" || true)
+    if [ -n "$EXEC_BREW_REFS" ]; then
+        while IFS= read -r brew_ref; do
+            echo "  [WARNING] Absolute Homebrew path in TStar executable: $brew_ref"
+            HOMEBREW_REFS=$((HOMEBREW_REFS + 1))
+        done <<< "$EXEC_BREW_REFS"
+    fi
+fi
+
 if [ $MISSING_DEPS -gt 0 ]; then
-    echo "  [WARNING] Found $MISSING_DEPS unresolved dependencies"
-    echo "           Some AI features may not work. Check logs above."
+    echo "  [WARNING] Found $MISSING_DEPS unresolved @rpath dependencies"
 else
-    echo "  - All bundled dylib dependencies resolved"
+    echo "  - All @rpath dylib dependencies resolved"
+fi
+
+if [ $HOMEBREW_REFS -gt 0 ]; then
+    echo "  [WARNING] Found $HOMEBREW_REFS absolute Homebrew path(s) remaining!"
+    echo "           App may NOT work on systems without Homebrew."
+else
+    echo "  - No absolute Homebrew paths detected (portable)"
 fi
 
 # --- Check for critical libraries ---

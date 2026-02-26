@@ -766,6 +766,10 @@ if(APPLE)
         MACOSX_BUNDLE_BUNDLE_VERSION "${TSTAR_VERSION}"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${TSTAR_VERSION}"
         MACOSX_BUNDLE_GUI_IDENTIFIER "com.fabiotempera.tstar"
+        # RPATH: ensure the executable finds dylibs in Contents/Frameworks/
+        INSTALL_RPATH "@executable_path/../Frameworks"
+        BUILD_WITH_INSTALL_RPATH TRUE
+        MACOSX_RPATH TRUE
     )
     
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/Info.plist")

@@ -8,6 +8,7 @@ Version 1.7.0
 - New tool: multiscale decomposition
 - New tool: narrowband normalization
 - New tool: narrowband to rgb stars
+- Small fixes in the macos installations
 
 Version 1.6.4
 -------------

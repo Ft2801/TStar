@@ -166,50 +166,77 @@ copy_dylib_with_dependencies() {
             continue
         fi
         
-        # Skip frameworks
+        # Skip Qt frameworks (handled by macdeployqt)
         if echo "$dep" | grep -q "\.framework"; then
             continue
         fi
         
-        # Handle @rpath references
+        # Resolve @rpath references: extract the basename and search for it
+        local dep_basename
         if echo "$dep" | grep -q "@rpath"; then
-            continue  # Will be handled by install_name_tool
+            dep_basename=$(echo "$dep" | sed 's|@rpath/||')
+        else
+            dep_basename=$(basename "$dep")
         fi
         
         # Check if already bundled
-        local dep_basename=$(basename "$dep")
-        if [ ! -f "$dest_dir/$dep_basename" ]; then
-            # Try to find and copy from Homebrew
-            local found=0
-            for brew_path in /opt/homebrew /usr/local; do
-                # 1. Check standard lib dir
-                if [ -f "$brew_path/lib/$dep_basename" ]; then
-                    if dylib_matches_arch "$brew_path/lib/$dep_basename" "$target_arch"; then
-                        cp "$brew_path/lib/$dep_basename" "$dest_dir/" 2>/dev/null && found=1
+        if [ -f "$dest_dir/$dep_basename" ]; then
+            continue
+        fi
+        
+        # Try to find and copy from Homebrew
+        local found=0
+        for brew_path in /opt/homebrew /usr/local; do
+            # 1. Check standard lib dir
+            if [ -f "$brew_path/lib/$dep_basename" ]; then
+                if dylib_matches_arch "$brew_path/lib/$dep_basename" "$target_arch"; then
+                    cp -L "$brew_path/lib/$dep_basename" "$dest_dir/" 2>/dev/null && found=1
+                    if [ $found -eq 1 ]; then
+                        copy_dylib_with_dependencies "$dest_dir/$dep_basename" "$dest_dir" "$target_arch" "$processed_dylibs" || true
+                    fi
+                fi
+                break
+            fi
+            # 2. Search opt/*/lib/ (covers openblas, etc. that Homebrew doesn't symlink)
+            if [ $found -eq 0 ] && [ -d "$brew_path/opt" ]; then
+                local opt_match=$(find -L "$brew_path/opt" -maxdepth 3 -name "$dep_basename" 2>/dev/null | head -1)
+                if [ -n "$opt_match" ]; then
+                    if dylib_matches_arch "$opt_match" "$target_arch"; then
+                        cp -L "$opt_match" "$dest_dir/" 2>/dev/null && found=1
                         if [ $found -eq 1 ]; then
                             copy_dylib_with_dependencies "$dest_dir/$dep_basename" "$dest_dir" "$target_arch" "$processed_dylibs" || true
                         fi
                     fi
-                    break
                 fi
-                # 2. Search opt/*/lib/ (covers openblas, openvino, etc. that Homebrew doesn't symlink to lib/)
-                if [ $found -eq 0 ] && [ -d "$brew_path/opt" ]; then
-                    local opt_match=$(find -L "$brew_path/opt" -maxdepth 3 -name "$dep_basename" 2>/dev/null | head -1)
-                    if [ -n "$opt_match" ]; then
-                        if dylib_matches_arch "$opt_match" "$target_arch"; then
-                            cp "$opt_match" "$dest_dir/" 2>/dev/null && found=1
-                            if [ $found -eq 1 ]; then
-                                copy_dylib_with_dependencies "$dest_dir/$dep_basename" "$dest_dir" "$target_arch" "$processed_dylibs" || true
-                            fi
+            fi
+            # 3. Search Cellar directly for versioned paths
+            if [ $found -eq 0 ] && [ -d "$brew_path/Cellar" ]; then
+                local cellar_match=$(find -L "$brew_path/Cellar" -maxdepth 5 -name "$dep_basename" 2>/dev/null | head -1)
+                if [ -n "$cellar_match" ]; then
+                    if dylib_matches_arch "$cellar_match" "$target_arch"; then
+                        cp -L "$cellar_match" "$dest_dir/" 2>/dev/null && found=1
+                        if [ $found -eq 1 ]; then
+                            copy_dylib_with_dependencies "$dest_dir/$dep_basename" "$dest_dir" "$target_arch" "$processed_dylibs" || true
                         fi
                     fi
                 fi
-            done
-            
-            if [ $found -eq 0 ] && ! echo "$dep" | grep -qE "libSystem\.B|libobjc\.A|libstdc|libc\+\+"; then
-                # Only warn if it's not a system library we expect to be unavailable
-                true  # Silent skip for now
             fi
+        done
+        
+        # Also try the original absolute path directly (if it's not @rpath)
+        if [ $found -eq 0 ] && ! echo "$dep" | grep -q "@rpath"; then
+            if [ -f "$dep" ]; then
+                if dylib_matches_arch "$dep" "$target_arch"; then
+                    cp -L "$dep" "$dest_dir/" 2>/dev/null && found=1
+                    if [ $found -eq 1 ]; then
+                        copy_dylib_with_dependencies "$dest_dir/$dep_basename" "$dest_dir" "$target_arch" "$processed_dylibs" || true
+                    fi
+                fi
+            fi
+        fi
+        
+        if [ $found -eq 0 ] && ! echo "$dep" | grep -qE "libSystem\.B|libobjc\.A|libstdc|libc\+\+"; then
+            true  # Silent skip for system libs
         fi
     done
 }
@@ -350,13 +377,25 @@ fix_dylib_id_and_deps() {
     local deps=$(otool -L "$dylib_path" 2>/dev/null | grep -v "^$dylib_path:" | awk '{print $1}')
     
     for dep in $deps; do
+        # Skip system paths and already-correct references
+        if echo "$dep" | grep -qE "^(/usr/lib|/System)"; then
+            continue
+        fi
+        if echo "$dep" | grep -q "@executable_path"; then
+            continue
+        fi
+        
         local dep_name=$(basename "$dep")
         
-        # If this dependency exists in our frameworks dir, repoint to @rpath
+        # Rewrite if the dep exists in Frameworks OR if it's an absolute
+        # Homebrew/Cellar path (which will break without Homebrew)
         if [ -f "$frameworks_dir/$dep_name" ]; then
             if [ "$dep" != "@rpath/$dep_name" ]; then
                 install_name_tool -change "$dep" "@rpath/$dep_name" "$dylib_path" 2>/dev/null || true
             fi
+        elif echo "$dep" | grep -qE "^(/opt/homebrew|/usr/local/(Cellar|opt|lib))"; then
+            # Absolute Homebrew path that will fail on user machines — rewrite to @rpath
+            install_name_tool -change "$dep" "@rpath/$dep_name" "$dylib_path" 2>/dev/null || true
         fi
     done
 }
@@ -375,16 +414,56 @@ fix_executable_deps() {
     local deps=$(otool -L "$exec_path" 2>/dev/null | grep -v "^$exec_path:" | awk '{print $1}')
     
     for dep in $deps; do
+        # Skip system paths
+        if echo "$dep" | grep -qE "^(/usr/lib|/System)"; then
+            continue
+        fi
+        if echo "$dep" | grep -q "@executable_path"; then
+            continue
+        fi
+        
         local dep_name=$(basename "$dep")
         
-        # If this dependency exists in our frameworks dir, repoint to @rpath
+        # Rewrite if bundled OR if it's an absolute Homebrew path
         if [ -f "$frameworks_dir/$dep_name" ]; then
             if [ "$dep" != "@rpath/$dep_name" ]; then
                 install_name_tool -change "$dep" "@rpath/$dep_name" "$exec_path" 2>/dev/null || true
                 echo "    - Repointed $dep_name to bundled version"
             fi
+        elif echo "$dep" | grep -qE "^(/opt/homebrew|/usr/local/(Cellar|opt|lib))"; then
+            install_name_tool -change "$dep" "@rpath/$dep_name" "$exec_path" 2>/dev/null || true
+            echo "    - Repointed $dep_name (Homebrew absolute path) to @rpath"
         fi
     done
+}
+
+# --- Rewrite ALL Homebrew Absolute Paths ---
+# Final sweep: scans a binary and rewrites every remaining /opt/homebrew/ or
+# /usr/local/Cellar|opt|lib reference to @rpath/basename.
+# This is the safety net that catches anything the targeted functions missed.
+rewrite_homebrew_paths() {
+    local binary_path="$1"
+    
+    if [ ! -f "$binary_path" ]; then
+        return
+    fi
+    
+    chmod +w "$binary_path" 2>/dev/null || true
+    
+    local deps=$(otool -L "$binary_path" 2>/dev/null | grep -v "^$binary_path:" | awk '{print $1}')
+    local rewrote=0
+    
+    for dep in $deps; do
+        if echo "$dep" | grep -qE "^(/opt/homebrew|/usr/local/(Cellar|opt|lib))"; then
+            local dep_name=$(basename "$dep")
+            install_name_tool -change "$dep" "@rpath/$dep_name" "$binary_path" 2>/dev/null || true
+            rewrote=$((rewrote + 1))
+        fi
+    done
+    
+    if [ $rewrote -gt 0 ]; then
+        echo "    - Rewrote $rewrote Homebrew path(s) in $(basename "$binary_path")"
+    fi
 }
 
 # --- Python Detection ---
