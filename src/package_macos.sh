@@ -130,6 +130,12 @@ FRAMEWORKS_DIR="$DIST_DIR/Contents/Frameworks"
 ensure_dir "$FRAMEWORKS_DIR"
 
 # Copy required dylibs using shared function (pass architecture)
+# CRITICAL: ZLIB is required by CMakeLists.txt (find_package(ZLIB REQUIRED))
+copy_dylib "libz.dylib" "zlib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
+copy_dylib "libz" "zlib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libz.1.dylib" "zlib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+
+# Core dependencies
 copy_dylib "libgsl" "gsl" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libgslcblas" "gsl" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libcfitsio" "cfitsio" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
@@ -139,6 +145,32 @@ copy_dylib "libomp" "libomp" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libbrotlicommon" "brotli" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libbrotlidec" "brotli" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libraw" "libraw" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libmd4c" "md4c" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+
+# OpenBLAS: transitive dependency of libopencv_core - must be bundled explicitly
+copy_dylib "libopenblas.0" "openblas" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
+copy_dylib "libopenblas" "openblas" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+
+# Image format libraries required by OpenCV and Qt
+# These are critical for image loading/saving in Qt and OpenCV pipelines
+copy_dylib "libpng16" "libpng" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
+copy_dylib "libpng" "libpng" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libjpeg" "jpeg" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
+copy_dylib "libjpeg.9" "libjpeg-turbo" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libtiff" "libtiff" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libtiff.6" "libtiff" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libwebp" "libwebp" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libwebpdemux" "libwebp" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+
+# Font and text rendering (required by Qt and OpenCV for text rendering)
+copy_dylib "libfreetype" "freetype" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libharfbuzz" "harfbuzz" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+
+# Additional OpenCV dependencies
+copy_dylib "liblapack" "lapack" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libjasper" "jasper" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libraw" "libraw" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libmd4c" "md4c" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 # OpenBLAS: transitive dependency of libopencv_core - must be bundled explicitly
 copy_dylib "libopenblas.0" "openblas" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 
@@ -352,6 +384,42 @@ if [ ! -f "$FRAMEWORKS_DIR/libraw.dylib" ]; then
 else
     echo "  - libraw.dylib: OK"
 fi
+
+if [ ! -f "$FRAMEWORKS_DIR/libmd4c.0.dylib" ]; then
+    echo "  [ERROR] libmd4c.0.dylib NOT FOUND in bundle!"
+    echo "         Qt markdown support will NOT work!"
+    echo "         Make sure: brew install md4c"
+    ERROR_COUNT=$((ERROR_COUNT + 1))
+else
+    echo "  - libmd4c.0.dylib: OK"
+fi
+
+# Check for ZLIB (CRITICAL - required by CMakeLists.txt)
+ZLIB_FOUND=0
+for zlib_name in libz.dylib libz.1.dylib libz libz.1; do
+    if [ -f "$FRAMEWORKS_DIR/$zlib_name" ]; then
+        ZLIB_FOUND=1
+        break
+    fi
+done
+
+if [ $ZLIB_FOUND -eq 0 ]; then
+    echo "  [CRITICAL ERROR] ZLIB NOT FOUND in bundle!"
+    echo "                   App will NOT work without ZLIB!"
+    echo "                   Make sure: brew install zlib"
+    ERROR_COUNT=$((ERROR_COUNT + 1))
+else
+    echo "  - ZLIB: OK"
+fi
+
+# Check for critical image format libraries
+for imglib in libpng libjpeg libtiff libwebp; do
+    if find "$FRAMEWORKS_DIR" -name "$imglib*" 2>/dev/null | head -1 | grep -q .; then
+        echo "  - $imglib: OK"
+    else
+        echo "  [WARNING] $imglib NOT FOUND - some image formats may fail"
+    fi
+done
 
 # --- Ad-hoc Code Signing ---
 echo ""

@@ -33,7 +33,7 @@ GHSDialog::GHSDialog(QWidget *parent) : DialogBase(parent, tr("Generalized Hyper
 GHSDialog::~GHSDialog() {
     // Cleanup on destruction if not already handled by reject()
     if (m_activeViewer && !m_applied) {
-        m_activeViewer->setBuffer(m_originalBuffer, m_activeViewer->windowTitle(), true);
+        m_activeViewer->setBuffer(m_bufferAtOpening, m_activeViewer->windowTitle(), true);
     }
     // Always reset interaction mode to prevent lingering selection cursor
     if (m_activeViewer) {
@@ -51,7 +51,7 @@ void GHSDialog::reject() {
         disconnect(m_activeViewer, &ImageViewer::bufferChanged, this, nullptr);
         
         m_selfUpdating = true;
-        m_activeViewer->setBuffer(m_originalBuffer, m_activeViewer->windowTitle(), true);
+        m_activeViewer->setBuffer(m_bufferAtOpening, m_activeViewer->windowTitle(), true);
         
         // Reset Interaction
         m_activeViewer->setInteractionMode(ImageViewer::Mode_PanZoom);
@@ -312,9 +312,8 @@ void GHSDialog::setupUI() {
     // HP: High Protection - range: 0-1, default 1
     makeSliderRow(4, tr("Highlight (HP):"), m_hpSpin, m_hpSlider, 0.0, 1.0, 1.0, 0.001, 4);
     
-    // BP: Black Point - range: 0-0.2, default 0
-    // Increased precision as requested 
-    makeSliderRow(5, tr("Black Point (BP):"), m_bpSpin, m_bpSlider, 0.0, 0.2, 0.0, 0.0001, 5);
+    // BP: Black Point - range: 0-0.3, default 0
+    makeSliderRow(5, tr("Black Point (BP):"), m_bpSpin, m_bpSlider, 0.0, 0.3, 0.0, 0.0001, 5);
     
     mainLayout->addWidget(paramsGroup);
     
@@ -351,7 +350,6 @@ void GHSDialog::setupUI() {
     QHBoxLayout *btnLayout = new QHBoxLayout();
     QPushButton *resetBtn = new QPushButton(tr("Reset"));
     QPushButton *applyBtn = new QPushButton(tr("Apply"));
-    QPushButton *closeBtn = new QPushButton(tr("Close"));
     
     applyBtn->setStyleSheet("QPushButton { background-color: #3a7d44; }");
     
@@ -362,13 +360,11 @@ void GHSDialog::setupUI() {
     btnLayout->addWidget(copyLabel);
     
     btnLayout->addStretch();
-    btnLayout->addWidget(closeBtn);
     btnLayout->addWidget(applyBtn);
     mainLayout->addLayout(btnLayout);
     
     connect(resetBtn, &QPushButton::clicked, this, &GHSDialog::onReset);
     connect(applyBtn, &QPushButton::clicked, this, &GHSDialog::onApply);
-    connect(closeBtn, &QPushButton::clicked, this, &QDialog::reject);
 
     // Initialize Throttle Timer
     m_previewTimer = new QTimer(this);
@@ -424,12 +420,7 @@ void GHSDialog::connectSignals() {
     syncSliderSpin(m_bSlider, m_bSpin, -5.0, 15.0, 10000);
     syncSliderSpin(m_lpSlider, m_lpSpin, 0.0, 1.0, 10000);
     syncSliderSpin(m_hpSlider, m_hpSpin, 0.0, 1.0, 10000);
-    syncSliderSpin(m_bpSlider, m_bpSpin, 0.0, 0.2, 10000);
-    
-    // BP Special: Enforce real-time update during drag (it's fast and critical for visual feedback)
-    connect(m_bpSlider, &QSlider::valueChanged, this, [this](int){
-        if(m_previewCheck->isChecked()) onPreviewTrigger();
-    });
+    syncSliderSpin(m_bpSlider, m_bpSpin, 0.0, 0.3, 10000);
     
     // SP special (0-1 range)
     connect(m_spSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [this](double d){
@@ -658,7 +649,7 @@ void GHSDialog::onApply() {
     resetIntensity();
     
     // Re-compute Histogram
-    setHistogramData(m_originalBuffer.computeHistogram(), m_originalBuffer.channels());
+    setHistogramData(m_originalBuffer.computeHistogram(65536), m_originalBuffer.channels());
     
     emit applied(tr("GHS Transformation applied to %1").arg(m_activeViewer->windowTitle()));
 }
@@ -702,7 +693,7 @@ void GHSDialog::setTarget(ImageViewer* viewer) {
             // External Update Detected (e.g. Undo/Redo)
             // Re-sync base state
             m_originalBuffer = m_activeViewer->getBuffer();
-            setHistogramData(m_originalBuffer.computeHistogram(), m_originalBuffer.channels());
+            setHistogramData(m_originalBuffer.computeHistogram(65536), m_originalBuffer.channels());
             
             // Re-trigger preview (applies current params to NEW base)
             onPreviewTrigger();
@@ -759,6 +750,7 @@ void GHSDialog::setTarget(ImageViewer* viewer) {
         
         // Sync State
         m_originalBuffer = m_activeViewer->getBuffer();
+        m_bufferAtOpening = m_originalBuffer;  // Save the clean state for cancel/reject
         setHistogramData(m_originalBuffer.computeHistogram(65536), m_originalBuffer.channels());
         
         // Defer preview until dialog is fully shown to avoid fade-in lag
@@ -876,8 +868,9 @@ void GHSDialog::onPreviewTrigger() {
     
     if (m_activeViewer) {
         // Internal Apply Preview
-        // Identity Check: Must account for BP if we allow BP in GHS mode
+        // Identity Check: Must account for D, B, BP if we allow them in GHS mode
         bool isIdentity = (std::abs(params.D) < 1e-6 && 
+                          std::abs(params.B) < 1e-6 && 
                           std::abs(params.BP) < 1e-6 && 
                           params.mode == ImageBuffer::GHS_GeneralizedHyperbolic);
         if (isIdentity) {
@@ -1019,6 +1012,22 @@ void GHSDialog::updateHistogram() {
     if (displayBins.empty()) {
         displayBins = transformedBins;
         displayChannels = m_channels;
+    }
+
+    // Compute clipping stats from transformed bins
+    long lowClip = 0, highClip = 0, totalPixels = 0;
+    for (int c = 0; c < m_channels && c < (int)transformedBins.size(); ++c) {
+        if (!showChannels[c]) continue;
+        lowClip += transformedBins[c][0];
+        highClip += transformedBins[c][histSize - 1];
+        for (int count : transformedBins[c]) {
+            totalPixels += count;
+        }
+    }
+    if (totalPixels > 0) {
+        setClippingStats((100.0f * lowClip) / totalPixels, (100.0f * highClip) / totalPixels);
+    } else {
+        setClippingStats(0, 0);
     }
 
     m_histWidget->setData(displayBins, displayChannels);

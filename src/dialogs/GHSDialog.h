@@ -135,7 +135,8 @@ private:
     bool m_previewPending;
     
     // Active Context
-    ImageBuffer m_originalBuffer; // Setup on target switch or apply
+    ImageBuffer m_bufferAtOpening;      // Saved when dialog is opened (used for cancel/reject)
+    ImageBuffer m_originalBuffer;       // Current working buffer (modified by apply)
     QPointer<ImageViewer> m_activeViewer;
     bool m_selfUpdating = false; // Guard against recursive buffer updates
     bool m_interactionEnabled = false;

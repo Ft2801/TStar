@@ -1833,10 +1833,6 @@
             <translation type="finished">Schnittmodus:</translation>
         </message>
         <message>
-            <source>Close</source>
-            <translation type="finished">Schließen</translation>
-        </message>
-        <message>
             <source>Curve</source>
             <translation type="finished">Kurve</translation>
         </message>
@@ -3652,6 +3648,18 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Spiegeln V</translation>
         </message>
         <message>
+            <source>Multiscale Decomposition</source>
+            <translation type="finished">Multiskalare Zerlegung</translation>
+        </message>
+        <message>
+            <source>NB → RGB Stars</source>
+            <translation type="finished">NB → RGB Sterne</translation>
+        </message>
+        <message>
+            <source>Narrowband Normalization</source>
+            <translation type="finished">Schmalbandnormalisierung</translation>
+        </message>
+        <message>
             <source>Need at least 2 images to tile.</source>
             <translation type="finished">Mindestens 2 Bilder zum Anordnen erforderlich.</translation>
         </message>
@@ -3814,6 +3822,18 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Opening Histogram Transformation...</source>
             <translation type="finished">Öffne Histogrammtransformation...</translation>
+        </message>
+        <message>
+            <source>Opening Multiscale Decomposition...</source>
+            <translation type="finished">Öffnen der multiskalaren Zerlegung...</translation>
+        </message>
+        <message>
+            <source>Opening NB → RGB Stars...</source>
+            <translation type="finished">Öffnen NB → RGB Sterne...</translation>
+        </message>
+        <message>
+            <source>Opening Narrowband Normalization...</source>
+            <translation type="finished">Öffnen der Schmalbandnormalisierung...</translation>
         </message>
         <message>
             <source>Opening New Project Dialog...</source>
@@ -4528,6 +4548,695 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Primary failed. Trying backup (Google Drive)…</source>
             <translation type="finished">Primäre Quelle fehlgeschlagen. Backup (Google Drive) wird versucht…</translation>
+        </message>
+    </context>
+    <context>
+        <name>MultiscaleDecompDialog</name>
+        <message>
+            <source>Amount:</source>
+            <translation type="finished">Menge:</translation>
+        </message>
+        <message>
+            <source>Amt</source>
+            <translation type="finished">Betrag</translation>
+        </message>
+        <message>
+            <source>Apply to Image</source>
+            <translation type="finished">Auf Bild anwenden</translation>
+        </message>
+        <message>
+            <source>Base sigma:</source>
+            <translation type="finished">Basis-Sigma:</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Schließen</translation>
+        </message>
+        <message>
+            <source>Denoise:</source>
+            <translation type="finished">Entrauschen:</translation>
+        </message>
+        <message>
+            <source>Detail Layer %1</source>
+            <translation type="finished">Detailschicht %1</translation>
+        </message>
+        <message>
+            <source>Final</source>
+            <translation type="finished">Endgültig</translation>
+        </message>
+        <message>
+            <source>Fit</source>
+            <translation type="finished">Anpassen</translation>
+        </message>
+        <message>
+            <source>Gain</source>
+            <translation type="finished">Gewinn</translation>
+        </message>
+        <message>
+            <source>Gain:</source>
+            <translation type="finished">Gewinn:</translation>
+        </message>
+        <message>
+            <source>Global</source>
+            <translation type="finished">Global</translation>
+        </message>
+        <message>
+            <source>Layer</source>
+            <translation type="finished">Schicht</translation>
+        </message>
+        <message>
+            <source>Layer preview:</source>
+            <translation type="finished">Schichtvorschau:</translation>
+        </message>
+        <message>
+            <source>Layer: %1 / %2</source>
+            <translation type="finished">Schicht: %1 / %2</translation>
+        </message>
+        <message>
+            <source>Layer: R (Residual)</source>
+            <translation type="finished">Schicht: R (Rest)</translation>
+        </message>
+        <message>
+            <source>Layer: —</source>
+            <translation type="finished">Schicht: —</translation>
+        </message>
+        <message>
+            <source>Layers</source>
+            <translation type="finished">Schichten</translation>
+        </message>
+        <message>
+            <source>Layers:</source>
+            <translation type="finished">Schichten:</translation>
+        </message>
+        <message>
+            <source>Linear</source>
+            <translation type="finished">Linear</translation>
+        </message>
+        <message>
+            <source>Linked RGB</source>
+            <translation type="finished">Verknüpftes RGB</translation>
+        </message>
+        <message>
+            <source>Mode:</source>
+            <translation type="finished">Modus:</translation>
+        </message>
+        <message>
+            <source>Multiscale Decomposition</source>
+            <translation type="finished">Multiskalare Zerlegung</translation>
+        </message>
+        <message>
+            <source>Multiscale Detail %1</source>
+            <translation type="finished">Multiskalare Details %1</translation>
+        </message>
+        <message>
+            <source>Multiscale Residual</source>
+            <translation type="finished">Multiskalarer Rest</translation>
+        </message>
+        <message>
+            <source>Multiscale Result</source>
+            <translation type="finished">Multiskalares Ergebnis</translation>
+        </message>
+        <message>
+            <source>NR</source>
+            <translation type="finished">NR</translation>
+        </message>
+        <message>
+            <source>No image loaded.</source>
+            <translation type="finished">Kein Bild geladen.</translation>
+        </message>
+        <message>
+            <source>On</source>
+            <translation type="finished">An</translation>
+        </message>
+        <message>
+            <source>R (Residual)</source>
+            <translation type="finished">R (Rest)</translation>
+        </message>
+        <message>
+            <source>Scale</source>
+            <translation type="finished">Skala</translation>
+        </message>
+        <message>
+            <source>Selected Layer</source>
+            <translation type="finished">Ausgewählte Schicht</translation>
+        </message>
+        <message>
+            <source>Send to New Image</source>
+            <translation type="finished">An neues Bild senden</translation>
+        </message>
+        <message>
+            <source>Split Layers</source>
+            <translation type="finished">Schichten aufteilen</translation>
+        </message>
+        <message>
+            <source>Thr (σ)</source>
+            <translation type="finished">Schw. (σ)</translation>
+        </message>
+        <message>
+            <source>Threshold (σ):</source>
+            <translation type="finished">Schwellenwert (σ):</translation>
+        </message>
+        <message>
+            <source>Type</source>
+            <translation type="finished">Typ</translation>
+        </message>
+    </context>
+    <context>
+        <name>NBtoRGBStarsDialog</name>
+        <message>
+            <source>%1 loaded from file.</source>
+            <translation type="finished">%1 aus Datei geladen.</translation>
+        </message>
+        <message>
+            <source>%1 loaded.</source>
+            <translation type="finished">%1 geladen.</translation>
+        </message>
+        <message>
+            <source>Channel dimensions don't match.</source>
+            <translation type="finished">Kanaldimensionen stimmen nicht überein.</translation>
+        </message>
+        <message>
+            <source>Clear Inputs</source>
+            <translation type="finished">Eingaben löschen</translation>
+        </message>
+        <message>
+            <source>Cleared.</source>
+            <translation type="finished">Gelöscht.</translation>
+        </message>
+        <message>
+            <source>Combine Error</source>
+            <translation type="finished">Kombinationsfehler</translation>
+        </message>
+        <message>
+            <source>Could not load %1: %2</source>
+            <translation type="finished">%1 konnte nicht geladen werden: %2</translation>
+        </message>
+        <message>
+            <source>Enable star stretch</source>
+            <translation type="finished">Sterndehnung aktivieren</translation>
+        </message>
+        <message>
+            <source>Failed to combine channels.</source>
+            <translation type="finished">Kanäle konnten nicht kombiniert werden.</translation>
+        </message>
+        <message>
+            <source>Fit</source>
+            <translation type="finished">Anpassen</translation>
+        </message>
+        <message>
+            <source>From File</source>
+            <translation type="finished">Von Datei</translation>
+        </message>
+        <message>
+            <source>From Open View</source>
+            <translation type="finished">Aus offener Ansicht</translation>
+        </message>
+        <message>
+            <source>From View (%1x%2)</source>
+            <translation type="finished">Aus Ansicht (%1x%2)</translation>
+        </message>
+        <message>
+            <source>Ha:OIII ratio = %1</source>
+            <translation type="finished">Ha:OIII-Verhältnis = %1</translation>
+        </message>
+        <message>
+            <source>Ha:OIII ratio = 0.30</source>
+            <translation type="finished">Ha:OIII-Verhältnis = 0,30</translation>
+        </message>
+        <message>
+            <source>Images (*.png *.tif *.tiff *.fits *.fit *.xisf)</source>
+            <translation type="finished">Bilder (*.png *.tif *.tiff *.fits *.fit *.xisf)</translation>
+        </message>
+        <message>
+            <source>Load %1</source>
+            <translation type="finished">Lade %1</translation>
+        </message>
+        <message>
+            <source>Load Error</source>
+            <translation type="finished">Ladefehler</translation>
+        </message>
+        <message>
+            <source>Load Ha / OIII / (optional SII) and/or OSC stars.</source>
+            <translation type="finished">Ha / OIII / (optional SII) und/oder OSC-Sterne laden.</translation>
+        </message>
+        <message>
+            <source>Load Ha...</source>
+            <translation type="finished">Ha laden...</translation>
+        </message>
+        <message>
+            <source>Load OIII...</source>
+            <translation type="finished">OIII laden...</translation>
+        </message>
+        <message>
+            <source>Load OSC stars (optional)...</source>
+            <translation type="finished">OSC-Sterne laden (optional)...</translation>
+        </message>
+        <message>
+            <source>Load OSC, or Ha+OIII (SII optional).</source>
+            <translation type="finished">OSC oder Ha+OIII laden (SII optional).</translation>
+        </message>
+        <message>
+            <source>Load SII (optional)...</source>
+            <translation type="finished">SII laden (optional)...</translation>
+        </message>
+        <message>
+            <source>Missing Images</source>
+            <translation type="finished">Fehlende Bilder</translation>
+        </message>
+        <message>
+            <source>NB \u2192 RGB Stars</source>
+            <translation type="finished">NB \u2192 RGB Sterne</translation>
+        </message>
+        <message>
+            <source>NB → RGB Stars</source>
+            <translation type="finished">NB → RGB Sterne</translation>
+        </message>
+        <message>
+            <source>NB→RGB Stars</source>
+            <translation type="finished">NB→RGB Sterne</translation>
+        </message>
+        <message>
+            <source>No %1 loaded.</source>
+            <translation type="finished">Keine %1 geladen.</translation>
+        </message>
+        <message>
+            <source>No Ha loaded.</source>
+            <translation type="finished">Kein Ha geladen.</translation>
+        </message>
+        <message>
+            <source>No Image</source>
+            <translation type="finished">Kein Bild</translation>
+        </message>
+        <message>
+            <source>No OIII loaded.</source>
+            <translation type="finished">Kein OIII geladen.</translation>
+        </message>
+        <message>
+            <source>No OSC stars loaded.</source>
+            <translation type="finished">Keine OSC-Sterne geladen.</translation>
+        </message>
+        <message>
+            <source>No SII loaded.</source>
+            <translation type="finished">Kein SII geladen.</translation>
+        </message>
+        <message>
+            <source>No active image view found.</source>
+            <translation type="finished">Keine aktive Bildansicht gefunden.</translation>
+        </message>
+        <message>
+            <source>Preview Combine</source>
+            <translation type="finished">Kombinationsvorschau</translation>
+        </message>
+        <message>
+            <source>Preview updated.</source>
+            <translation type="finished">Vorschau aktualisiert.</translation>
+        </message>
+        <message>
+            <source>Push Final to New View</source>
+            <translation type="finished">Endversion zu neuer Ansicht schieben</translation>
+        </message>
+        <message>
+            <source>Saturation = %1x</source>
+            <translation type="finished">Sättigung = %1x</translation>
+        </message>
+        <message>
+            <source>Saturation = 1.00x</source>
+            <translation type="finished">Sättigung = 1,00x</translation>
+        </message>
+        <message>
+            <source>Select %1 File</source>
+            <translation type="finished">Datei %1 auswählen</translation>
+        </message>
+        <message>
+            <source>Size Mismatch</source>
+            <translation type="finished">Größenabweichung</translation>
+        </message>
+        <message>
+            <source>Source:</source>
+            <translation type="finished">Quelle:</translation>
+        </message>
+        <message>
+            <source>Stretch factor = %1</source>
+            <translation type="finished">Dehnungsfaktor = %1</translation>
+        </message>
+        <message>
+            <source>Stretch factor = 5.00</source>
+            <translation type="finished">Dehnungsfaktor = 5,00</translation>
+        </message>
+        <message>
+            <source>Tune ratio and preview; push to a new view.</source>
+            <translation type="finished">Verhältnis abstimmen und Vorschau anzeigen; in neue Ansicht schieben.</translation>
+        </message>
+    </context>
+    <context>
+        <name>NarrowbandNormalizationDialog</name>
+        <message>
+            <source>%1 loaded from file.</source>
+            <translation type="finished">%1 aus Datei geladen.</translation>
+        </message>
+        <message>
+            <source>%1 loaded.</source>
+            <translation type="finished">%1 geladen.</translation>
+        </message>
+        <message>
+            <source>Actions</source>
+            <translation type="finished">Maßnahmen</translation>
+        </message>
+        <message>
+            <source>Add</source>
+            <translation type="finished">Hinzufügen</translation>
+        </message>
+        <message>
+            <source>Apply to Current View</source>
+            <translation type="finished">Auf aktuelle Ansicht anwenden</translation>
+        </message>
+        <message>
+            <source>Blackpoint\n(Min → Med):</source>
+            <translation type="finished">Schwarzpunkt\n(Min → Med):</translation>
+        </message>
+        <message>
+            <source>Blend Mode:</source>
+            <translation type="finished">Mischmodus:</translation>
+        </message>
+        <message>
+            <source>Brightness:</source>
+            <translation type="finished">Helligkeit:</translation>
+        </message>
+        <message>
+            <source>Channel dimensions don't match previously loaded channels.</source>
+            <translation type="finished">Kanaldimensionen stimmen nicht mit zuvor geladenen Kanälen überein.</translation>
+        </message>
+        <message>
+            <source>Channel dimensions don't match.</source>
+            <translation type="finished">Kanaldimensionen stimmen nicht überein.</translation>
+        </message>
+        <message>
+            <source>Clear</source>
+            <translation type="finished">Löschen</translation>
+        </message>
+        <message>
+            <source>Cleared.</source>
+            <translation type="finished">Gelöscht.</translation>
+        </message>
+        <message>
+            <source>Computing...</source>
+            <translation type="finished">Berechnung läuft...</translation>
+        </message>
+        <message>
+            <source>Could not load %1: %2</source>
+            <translation type="finished">%1 konnte nicht geladen werden: %2</translation>
+        </message>
+        <message>
+            <source>Done.</source>
+            <translation type="finished">Fertig.</translation>
+        </message>
+        <message>
+            <source>Extracted from View (%1x%2)</source>
+            <translation type="finished">Aus Ansicht extrahiert (%1x%2)</translation>
+        </message>
+        <message>
+            <source>Fit</source>
+            <translation type="finished">Anpassen</translation>
+        </message>
+        <message>
+            <source>From %1 import</source>
+            <translation type="finished">Aus %1 importieren</translation>
+        </message>
+        <message>
+            <source>From File</source>
+            <translation type="finished">Von Datei</translation>
+        </message>
+        <message>
+            <source>From OSC1 G+B</source>
+            <translation type="finished">Aus OSC1 G+B</translation>
+        </message>
+        <message>
+            <source>From OSC1 R</source>
+            <translation type="finished">Aus OSC1 R</translation>
+        </message>
+        <message>
+            <source>From OSC2 G+B</source>
+            <translation type="finished">Aus OSC2 G+B</translation>
+        </message>
+        <message>
+            <source>From OSC2 R</source>
+            <translation type="finished">Aus OSC2 R</translation>
+        </message>
+        <message>
+            <source>From Open View</source>
+            <translation type="finished">Aus offener Ansicht</translation>
+        </message>
+        <message>
+            <source>From View (%1x%2)</source>
+            <translation type="finished">Aus Ansicht (%1x%2)</translation>
+        </message>
+        <message>
+            <source>HL Recover:</source>
+            <translation type="finished">HL-Wiederherstellung:</translation>
+        </message>
+        <message>
+            <source>HL Reduction:</source>
+            <translation type="finished">HL-Reduktion:</translation>
+        </message>
+        <message>
+            <source>Ha (2)</source>
+            <translation type="finished">Ha (2)</translation>
+        </message>
+        <message>
+            <source>Ha Blend:</source>
+            <translation type="finished">Ha-Mischung:</translation>
+        </message>
+        <message>
+            <source>Images (*.png *.tif *.tiff *.fits *.fit *.xisf)</source>
+            <translation type="finished">Bilder (*.png *.tif *.tiff *.fits *.fit *.xisf)</translation>
+        </message>
+        <message>
+            <source>Import mapped RGB view</source>
+            <translation type="finished">Zugeordnete RGB-Ansicht importieren</translation>
+        </message>
+        <message>
+            <source>Import requires an RGB mapped composite (3-channel).</source>
+            <translation type="finished">Der Import erfordert ein zugeordnetes RGB-Komposit (3-Kanal).</translation>
+        </message>
+        <message>
+            <source>Imported %1 view → channels split.</source>
+            <translation type="finished">%1-Ansicht importiert → Kanäle aufgeteilt.</translation>
+        </message>
+        <message>
+            <source>Lightness:</source>
+            <translation type="finished">Helligkeit:</translation>
+        </message>
+        <message>
+            <source>Linear (Mode=0)</source>
+            <translation type="finished">Linear (Modus=0)</translation>
+        </message>
+        <message>
+            <source>Linear Dodge</source>
+            <translation type="finished">Lineares Abwedeln</translation>
+        </message>
+        <message>
+            <source>Load %1</source>
+            <translation type="finished">Lade %1</translation>
+        </message>
+        <message>
+            <source>Load %1 to preview %2.</source>
+            <translation type="finished">%1 laden, um %2 in der Vorschau anzuzeigen.</translation>
+        </message>
+        <message>
+            <source>Load Error</source>
+            <translation type="finished">Ladefehler</translation>
+        </message>
+        <message>
+            <source>Load HOO View...</source>
+            <translation type="finished">HOO-Ansicht laden...</translation>
+        </message>
+        <message>
+            <source>Load HOS View...</source>
+            <translation type="finished">HOS-Ansicht laden...</translation>
+        </message>
+        <message>
+            <source>Load HSO View...</source>
+            <translation type="finished">HSO-Ansicht laden...</translation>
+        </message>
+        <message>
+            <source>Load Ha + OIII to preview HOO.</source>
+            <translation type="finished">Ha + OIII laden, um HOO in der Vorschau anzuzeigen.</translation>
+        </message>
+        <message>
+            <source>Load Ha...</source>
+            <translation type="finished">Ha laden...</translation>
+        </message>
+        <message>
+            <source>Load OIII...</source>
+            <translation type="finished">OIII laden...</translation>
+        </message>
+        <message>
+            <source>Load OSC1 (Ha/OIII)...</source>
+            <translation type="finished">OSC1 laden (Ha/OIII)...</translation>
+        </message>
+        <message>
+            <source>Load OSC2 (SII/OIII)...</source>
+            <translation type="finished">OSC2 laden (SII/OIII)...</translation>
+        </message>
+        <message>
+            <source>Load SHO View...</source>
+            <translation type="finished">SHO-Ansicht laden...</translation>
+        </message>
+        <message>
+            <source>Load SII...</source>
+            <translation type="finished">SII laden...</translation>
+        </message>
+        <message>
+            <source>Load channels</source>
+            <translation type="finished">Kanäle laden</translation>
+        </message>
+        <message>
+            <source>Mode:</source>
+            <translation type="finished">Modus:</translation>
+        </message>
+        <message>
+            <source>NB Normalized</source>
+            <translation type="finished">NB normalisiert</translation>
+        </message>
+        <message>
+            <source>Narrowband Normalization</source>
+            <translation type="finished">Schmalbandnormalisierung</translation>
+        </message>
+        <message>
+            <source>Narrowband channels</source>
+            <translation type="finished">Schmalbandkanäle</translation>
+        </message>
+        <message>
+            <source>No %1 loaded.</source>
+            <translation type="finished">Keine %1 geladen.</translation>
+        </message>
+        <message>
+            <source>No Ha loaded.</source>
+            <translation type="finished">Kein Ha geladen.</translation>
+        </message>
+        <message>
+            <source>No Image</source>
+            <translation type="finished">Kein Bild</translation>
+        </message>
+        <message>
+            <source>No OIII loaded.</source>
+            <translation type="finished">Kein OIII geladen.</translation>
+        </message>
+        <message>
+            <source>No OSC1 loaded.</source>
+            <translation type="finished">Kein OSC1 geladen.</translation>
+        </message>
+        <message>
+            <source>No OSC2 loaded.</source>
+            <translation type="finished">Kein OSC2 geladen.</translation>
+        </message>
+        <message>
+            <source>No SII loaded.</source>
+            <translation type="finished">Kein SII geladen.</translation>
+        </message>
+        <message>
+            <source>No active image to apply to.</source>
+            <translation type="finished">Kein aktives Bild zum Anwenden.</translation>
+        </message>
+        <message>
+            <source>No active image view found.</source>
+            <translation type="finished">Keine aktive Bildansicht gefunden.</translation>
+        </message>
+        <message>
+            <source>Non-linear (Mode=1)</source>
+            <translation type="finished">Nichtlinear (Modus=1)</translation>
+        </message>
+        <message>
+            <source>Normal</source>
+            <translation type="finished">Normal</translation>
+        </message>
+        <message>
+            <source>Normalization</source>
+            <translation type="finished">Normalisierung</translation>
+        </message>
+        <message>
+            <source>Normalization failed.</source>
+            <translation type="finished">Normalisierung fehlgeschlagen.</translation>
+        </message>
+        <message>
+            <source>Not RGB</source>
+            <translation type="finished">Nicht RGB</translation>
+        </message>
+        <message>
+            <source>OIII (3)</source>
+            <translation type="finished">OIII (3)</translation>
+        </message>
+        <message>
+            <source>OIII (4)</source>
+            <translation type="finished">OIII (4)</translation>
+        </message>
+        <message>
+            <source>OIII Boost:</source>
+            <translation type="finished">OIII-Boost:</translation>
+        </message>
+        <message>
+            <source>OSC extractions</source>
+            <translation type="finished">OSC-Extraktionen</translation>
+        </message>
+        <message>
+            <source>OSC requires an RGB image.</source>
+            <translation type="finished">OSC erfordert ein RGB-Bild.</translation>
+        </message>
+        <message>
+            <source>Off (0)</source>
+            <translation type="finished">Aus (0)</translation>
+        </message>
+        <message>
+            <source>Original (1)</source>
+            <translation type="finished">Original (1)</translation>
+        </message>
+        <message>
+            <source>Preview</source>
+            <translation type="finished">Vorschau</translation>
+        </message>
+        <message>
+            <source>Push as New View</source>
+            <translation type="finished">Als neue Ansicht schieben</translation>
+        </message>
+        <message>
+            <source>SCNR (reduce green cast)</source>
+            <translation type="finished">SCNR (grünen Farbstich reduzieren)</translation>
+        </message>
+        <message>
+            <source>SII (3)</source>
+            <translation type="finished">SII (3)</translation>
+        </message>
+        <message>
+            <source>SII Boost:</source>
+            <translation type="finished">SII-Boost:</translation>
+        </message>
+        <message>
+            <source>Scenario:</source>
+            <translation type="finished">Szenario:</translation>
+        </message>
+        <message>
+            <source>Screen</source>
+            <translation type="finished">Bildschirm</translation>
+        </message>
+        <message>
+            <source>Select %1 File</source>
+            <translation type="finished">Datei %1 auswählen</translation>
+        </message>
+        <message>
+            <source>Select an RGB mapped view first.</source>
+            <translation type="finished">Wählen Sie zuerst eine zugeordnete RGB-Ansicht aus.</translation>
+        </message>
+        <message>
+            <source>Size Mismatch</source>
+            <translation type="finished">Größenabweichung</translation>
+        </message>
+        <message>
+            <source>Source:</source>
+            <translation type="finished">Quelle:</translation>
+        </message>
+        <message>
+            <source>Updating preview...</source>
+            <translation type="finished">Vorschau wird aktualisiert...</translation>
         </message>
     </context>
     <context>

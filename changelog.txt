@@ -9,6 +9,7 @@ Version 1.7.0
 - New tool: narrowband normalization
 - New tool: narrowband to rgb stars
 - Small fixes in the macos installations
+- Other minor bugfixes
 
 Version 1.6.4
 -------------

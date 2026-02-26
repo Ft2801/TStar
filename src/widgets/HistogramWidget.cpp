@@ -10,26 +10,23 @@ HistogramWidget::HistogramWidget(QWidget *parent) : QWidget(parent) {
     setMinimumHeight(150);
 }
 
-#include <QResizeEvent>
-
 void HistogramWidget::setData(const std::vector<std::vector<int>>& bins, int channels) {
     m_bins = bins;
     m_channels = channels;
-    updateResampledBins();
+    m_cachedWidth = -1;  // Invalidate cache when data changes
     update();
 }
 
 void HistogramWidget::setGhostData(const std::vector<std::vector<int>>& bins, int channels) {
     m_ghostBins = bins;
     m_ghostChannels = channels;
-    updateResampledBins();
+    m_cachedWidth = -1;  // Invalidate cache when data changes
     update();
 }
 
 void HistogramWidget::setLogScale(bool enabled) {
     if (m_logScale == enabled) return;
     m_logScale = enabled;
-    updateResampledBins();
     update();
 }
 
@@ -57,52 +54,53 @@ void HistogramWidget::setTransformCurve(const std::vector<float>& lut) {
 void HistogramWidget::clear() {
     m_bins.clear();
     m_ghostBins.clear();
-    m_resampledBins.clear();
-    m_resampledGhostBins.clear();
     m_channels = 0;
     m_ghostChannels = 0;
     m_lut.clear();
     update();
 }
 
-void HistogramWidget::resizeEvent(QResizeEvent* event) {
-    QWidget::resizeEvent(event);
-    updateResampledBins();
-}
-
-void HistogramWidget::updateResampledBins() {
-    int w = width();
-    int h = height();
-    if (w <= 0 || h <= 0) return;
-    m_lastW = w;
-
-    auto resample = [&](const std::vector<std::vector<int>>& src, int channels, 
-                        std::vector<std::vector<float>>& dst, double& maxValOut) {
-        dst.clear();
-        maxValOut = 0;
-        if (src.empty() || channels <= 0) return;
-        
-        int numBins = src[0].size();
-        dst.assign(channels, std::vector<float>(w, 0.0f));
-        float binsPerPx = (float)numBins / (float)w;
-
-        for (int c = 0; c < channels && c < (int)src.size(); ++c) {
-            int binIdx = 0;
-            for (int px = 0; px < w; ++px) {
-                double sum = 0;
-                while (binIdx < numBins && ((float)binIdx / binsPerPx) <= ((float)px + 0.5f)) {
-                    sum += (double)src[c][binIdx];
-                    binIdx++;
-                }
-                if (m_logScale && sum > 0) sum = std::log(sum); 
-                dst[c][px] = (float)sum;
-                if (dst[c][px] > maxValOut) maxValOut = dst[c][px];
+// Helper function to compute aggregated histogram values for display width
+static void computeDisplayHistogram(const std::vector<std::vector<int>>& srcBins,
+                                     int srcChannels,
+                                     int displayWidth,
+                                     std::vector<std::vector<float>>& dst,
+                                     double& maxVal,
+                                     bool logScale) {
+    dst.clear();
+    maxVal = 0.0;
+    
+    if (srcBins.empty() || srcChannels <= 0 || displayWidth <= 0) {
+        return;
+    }
+    
+    int numBins = srcBins[0].size();
+    if (numBins == 0) return;
+    
+    dst.assign(srcChannels, std::vector<float>(displayWidth, 0.0f));
+    
+    // bins_per_px = how many source bins correspond to 1 pixel width
+    float binsPerPx = (float)numBins / (float)displayWidth;
+    
+    for (int c = 0; c < srcChannels && c < (int)srcBins.size(); ++c) {
+        int binIdx = 0;
+        for (int px = 0; px < displayWidth; ++px) {
+            double sum = 0.0;
+            // Accumulate all source bins that contribute to this pixel
+            while (binIdx < numBins && (float)binIdx / binsPerPx <= (float)px + 0.5f) {
+                sum += (double)srcBins[c][binIdx];
+                binIdx++;
+            }
+            // Apply log scale if requested
+            if (logScale && sum > 0.0) {
+                sum = std::log(sum);
+            }
+            dst[c][px] = (float)sum;
+            if (dst[c][px] > maxVal) {
+                maxVal = dst[c][px];
             }
         }
-    };
-
-    resample(m_bins, m_channels, m_resampledBins, m_maxVal);
-    resample(m_ghostBins, m_ghostChannels, m_resampledGhostBins, m_ghostMaxVal);
+    }
 }
 
 void HistogramWidget::paintEvent(QPaintEvent *) {
@@ -112,9 +110,8 @@ void HistogramWidget::paintEvent(QPaintEvent *) {
     int w = width();
     int h = height();
     
-    // Check if we need to resample due to size change (fallback)
-    if (w != m_lastW) updateResampledBins();
-
+    if (w <= 0 || h <= 0) return;
+    
     // Dark background
     painter.fillRect(rect(), QColor(20, 20, 20));
     
@@ -131,49 +128,58 @@ void HistogramWidget::paintEvent(QPaintEvent *) {
         }
         painter.setPen(QPen(QColor(40, 40, 40), 1, Qt::DotLine));
         for (float x = 0.125f; x < 1.0f; x += 0.125f) {
-            if (std::abs(fmod(x, 0.25f)) > 0.01f) {
+            if (std::abs(std::fmod(x, 0.25f)) > 0.01f) {
                 int px = static_cast<int>(x * w);
                 painter.drawLine(px, 0, px, h);
             }
         }
     }
     
-    // Draw Ghost Histogram
-    if (!m_resampledGhostBins.empty() && m_ghostMaxVal > 0) {
-        painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    // Recompute display histograms only if width changed
+    if (w != m_cachedWidth) {
+        m_cachedWidth = w;
+        // Compute ghost histogram
+        computeDisplayHistogram(m_ghostBins, m_ghostChannels, w, m_cachedDisplayGhostBins, m_cachedGhostMaxVal, m_logScale);
+        // Compute main histogram
+        computeDisplayHistogram(m_bins, m_channels, w, m_cachedDisplayBins, m_cachedMaxVal, m_logScale);
+    }
+    
+    // Draw cached ghost histogram
+    if (!m_cachedDisplayGhostBins.empty() && m_cachedGhostMaxVal > 0.0) {
         QColor ghostColor(100, 100, 100, 120);
-        for (int c = 0; c < (int)m_resampledGhostBins.size(); ++c) {
-            QPainterPath ghostPath;
+        painter.setPen(QPen(ghostColor, 1, Qt::DotLine));
+        
+        for (int c = 0; c < (int)m_cachedDisplayGhostBins.size(); ++c) {
+            QPainterPath path;
             bool first = true;
             for (int px = 0; px < w; ++px) {
-                double normH = m_resampledGhostBins[c][px] / m_ghostMaxVal;
+                double normH = m_cachedDisplayGhostBins[c][px] / m_cachedGhostMaxVal;
                 float py = h - (normH * h);
-                if (first) { ghostPath.moveTo(px, py); first = false; }
-                else { ghostPath.lineTo(px, py); }
+                if (first) {
+                    path.moveTo(px, py);
+                    first = false;
+                } else {
+                    path.lineTo(px, py);
+                }
             }
-            painter.setPen(QPen(ghostColor, 1, Qt::DotLine));
-            painter.drawPath(ghostPath);
+            painter.drawPath(path);
         }
     }
-
-    // Draw Histogram
-    if (!m_resampledBins.empty() && m_maxVal > 0) {
+    
+    // Draw cached main histogram
+    if (!m_cachedDisplayBins.empty() && m_cachedMaxVal > 0.0) {
         QColor colors[3] = { QColor(255, 80, 80), QColor(80, 255, 80), QColor(80, 80, 255) };
         if (m_channels == 1) colors[0] = Qt::white;
-        painter.setCompositionMode(QPainter::CompositionMode_Screen);
         
-        for (int c = 0; c < (int)m_resampledBins.size(); ++c) {
+        for (int c = 0; c < (int)m_cachedDisplayBins.size(); ++c) {
             QPainterPath path;
-            QPainterPath linePath;
             path.moveTo(0, h);
             
             bool first = true;
             for (int px = 0; px < w; ++px) {
-                double normH = m_resampledBins[c][px] / m_maxVal;
+                double normH = m_cachedDisplayBins[c][px] / m_cachedMaxVal;
                 float py = h - (normH * h);
                 path.lineTo(px, py);
-                if (first) { linePath.moveTo(px, py); first = false; }
-                else { linePath.lineTo(px, py); }
             }
             path.lineTo(w, h);
             path.closeSubpath();
@@ -184,16 +190,30 @@ void HistogramWidget::paintEvent(QPaintEvent *) {
             painter.setPen(Qt::NoPen);
             painter.drawPath(path);
             
+            // Draw outline
+            QPainterPath outline;
+            outline.moveTo(0, h);
+            first = true;
+            for (int px = 0; px < w; ++px) {
+                double normH = m_cachedDisplayBins[c][px] / m_cachedMaxVal;
+                float py = h - (normH * h);
+                if (first) {
+                    outline.moveTo(px, py);
+                    first = false;
+                } else {
+                    outline.lineTo(px, py);
+                }
+            }
+            
             col.setAlpha(200);
             painter.setPen(QPen(col, 1.2));
             painter.setBrush(Qt::NoBrush);
-            painter.drawPath(linePath);
+            painter.drawPath(outline);
         }
     }
     
     // Draw Transform Curve
     if (m_showCurve) {
-        painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
         painter.setPen(QPen(QColor(100, 100, 100), 1));
         painter.drawLine(0, h, w, 0);
         if (!m_lut.empty()) {
@@ -205,8 +225,12 @@ void HistogramWidget::paintEvent(QPaintEvent *) {
                 float t = (float)i / (float)(w - 1);
                 int lutIdx = std::clamp(static_cast<int>(t * (lutSize - 1)), 0, lutSize - 1);
                 float py = h - std::clamp(m_lut[lutIdx], 0.0f, 1.0f) * h;
-                if (first) { path.moveTo(i, py); first = false; }
-                else { path.lineTo(i, py); }
+                if (first) {
+                    path.moveTo(i, py);
+                    first = false;
+                } else {
+                    path.lineTo(i, py);
+                }
             }
             painter.drawPath(path);
         }
