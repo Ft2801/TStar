@@ -4716,6 +4716,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Kanaldimensionen stimmen nicht überein.</translation>
         </message>
         <message>
+            <source>Choose:</source>
+            <translation type="finished">Wählen:</translation>
+        </message>
+        <message>
             <source>Clear Inputs</source>
             <translation type="finished">Eingaben löschen</translation>
         </message>
@@ -4748,8 +4752,8 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Von Datei</translation>
         </message>
         <message>
-            <source>From Open View</source>
-            <translation type="finished">Aus offener Ansicht</translation>
+            <source>From View</source>
+            <translation type="finished">Von Ansicht</translation>
         </message>
         <message>
             <source>From View (%1x%2)</source>
@@ -4868,6 +4872,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Datei %1 auswählen</translation>
         </message>
         <message>
+            <source>Select View - %1</source>
+            <translation type="finished">Wählen Sie eine Ansicht - %1</translation>
+        </message>
+        <message>
             <source>Size Mismatch</source>
             <translation type="finished">Größenabweichung</translation>
         </message>
@@ -4931,6 +4939,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Kanaldimensionen stimmen nicht überein.</translation>
         </message>
         <message>
+            <source>Choose:</source>
+            <translation type="finished">Wählen:</translation>
+        </message>
+        <message>
             <source>Clear</source>
             <translation type="finished">Löschen</translation>
         </message>
@@ -4983,8 +4995,8 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Aus OSC2 R</translation>
         </message>
         <message>
-            <source>From Open View</source>
-            <translation type="finished">Aus offener Ansicht</translation>
+            <source>From View</source>
+            <translation type="finished">Von Ansicht</translation>
         </message>
         <message>
             <source>From View (%1x%2)</source>
@@ -5221,6 +5233,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Select %1 File</source>
             <translation type="finished">Datei %1 auswählen</translation>
+        </message>
+        <message>
+            <source>Select View - %1</source>
+            <translation type="finished">Wählen Sie eine Ansicht - %1</translation>
         </message>
         <message>
             <source>Select an RGB mapped view first.</source>

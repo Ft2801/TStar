@@ -4713,6 +4713,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Choose:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Clear Inputs</source>
             <translation type="unfinished" />
         </message>
@@ -4745,7 +4749,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>From Open View</source>
+            <source>From View</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4865,6 +4869,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Select View - %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Size Mismatch</source>
             <translation type="unfinished" />
         </message>
@@ -4928,6 +4936,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Choose:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Clear</source>
             <translation type="unfinished" />
         </message>
@@ -4980,7 +4992,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>From Open View</source>
+            <source>From View</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5217,6 +5229,10 @@
         </message>
         <message>
             <source>Select %1 File</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select View - %1</source>
             <translation type="unfinished" />
         </message>
         <message>

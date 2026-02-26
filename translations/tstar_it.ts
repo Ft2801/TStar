@@ -4716,6 +4716,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Le dimensioni dei canali non corrispondono.</translation>
         </message>
         <message>
+            <source>Choose:</source>
+            <translation type="finished">Scegli:</translation>
+        </message>
+        <message>
             <source>Clear Inputs</source>
             <translation type="finished">Cancella input</translation>
         </message>
@@ -4748,8 +4752,8 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Da File</translation>
         </message>
         <message>
-            <source>From Open View</source>
-            <translation type="finished">Dalla vista aperta</translation>
+            <source>From View</source>
+            <translation type="finished">Da Vista</translation>
         </message>
         <message>
             <source>From View (%1x%2)</source>
@@ -4868,6 +4872,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Seleziona file %1</translation>
         </message>
         <message>
+            <source>Select View - %1</source>
+            <translation type="finished">Seleziona vista - %1</translation>
+        </message>
+        <message>
             <source>Size Mismatch</source>
             <translation type="finished">Mancata corrispondenza dimensioni</translation>
         </message>
@@ -4931,6 +4939,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Le dimensioni dei canali non corrispondono.</translation>
         </message>
         <message>
+            <source>Choose:</source>
+            <translation type="finished">Scegli:</translation>
+        </message>
+        <message>
             <source>Clear</source>
             <translation type="finished">Cancella</translation>
         </message>
@@ -4983,8 +4995,8 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Da OSC2 R</translation>
         </message>
         <message>
-            <source>From Open View</source>
-            <translation type="finished">Dalla vista aperta</translation>
+            <source>From View</source>
+            <translation type="finished">Da Vista</translation>
         </message>
         <message>
             <source>From View (%1x%2)</source>
@@ -5221,6 +5233,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Select %1 File</source>
             <translation type="finished">Seleziona file %1</translation>
+        </message>
+        <message>
+            <source>Select View - %1</source>
+            <translation type="finished">Seleziona vista - %1</translation>
         </message>
         <message>
             <source>Select an RGB mapped view first.</source>

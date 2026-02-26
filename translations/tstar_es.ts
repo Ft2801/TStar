@@ -4716,6 +4716,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Las dimensiones del canal no coinciden.</translation>
         </message>
         <message>
+            <source>Choose:</source>
+            <translation type="finished">Elegir:</translation>
+        </message>
+        <message>
             <source>Clear Inputs</source>
             <translation type="finished">Limpiar entradas</translation>
         </message>
@@ -4748,8 +4752,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Desde Archivo</translation>
         </message>
         <message>
-            <source>From Open View</source>
-            <translation type="finished">Desde vista abierta</translation>
+            <source>From View</source>
+            <translation type="finished">Da Vista</translation>
         </message>
         <message>
             <source>From View (%1x%2)</source>
@@ -4868,6 +4872,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Seleccionar archivo %1</translation>
         </message>
         <message>
+            <source>Select View - %1</source>
+            <translation type="finished">Seleccionar vista - %1</translation>
+        </message>
+        <message>
             <source>Size Mismatch</source>
             <translation type="finished">Discrepancia de tamaño</translation>
         </message>
@@ -4931,6 +4939,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Las dimensiones del canal no coinciden.</translation>
         </message>
         <message>
+            <source>Choose:</source>
+            <translation type="finished">Elegir:</translation>
+        </message>
+        <message>
             <source>Clear</source>
             <translation type="finished">Limpiar</translation>
         </message>
@@ -4983,8 +4995,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Desde OSC2 R</translation>
         </message>
         <message>
-            <source>From Open View</source>
-            <translation type="finished">Desde vista abierta</translation>
+            <source>From View</source>
+            <translation type="finished">Da Vista</translation>
         </message>
         <message>
             <source>From View (%1x%2)</source>
@@ -5221,6 +5233,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Select %1 File</source>
             <translation type="finished">Seleccionar archivo %1</translation>
+        </message>
+        <message>
+            <source>Select View - %1</source>
+            <translation type="finished">Seleccionar vista - %1</translation>
         </message>
         <message>
             <source>Select an RGB mapped view first.</source>
