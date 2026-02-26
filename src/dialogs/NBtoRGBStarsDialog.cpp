@@ -1,6 +1,7 @@
 #include "NBtoRGBStarsDialog.h"
 #include "../ImageViewer.h"
 #include "../MainWindowCallbacks.h"
+#include "../widgets/CustomMdiSubWindow.h"
 #include "../io/FitsLoader.h"
 #include "../io/XISFReader.h"
 #include "../io/SimpleTiffReader.h"
@@ -235,13 +236,13 @@ void NBtoRGBStarsDialog::onSatChanged(int v) {
 // ============================================================================
 
 void NBtoRGBStarsDialog::onLoadChannel(const QString& which) {
-    QStringList options = { tr("From Open View"), tr("From File") };
+    QStringList options = { tr("From View"), tr("From File") };
     bool ok;
     QString src = QInputDialog::getItem(this, tr("Load %1").arg(which),
                                          tr("Source:"), options, 0, false, &ok);
     if (!ok) return;
 
-    if (src == tr("From Open View")) {
+    if (src == tr("From View")) {
         loadFromViewer(which);
     } else {
         loadFromFile(which);
@@ -251,14 +252,43 @@ void NBtoRGBStarsDialog::onLoadChannel(const QString& which) {
 void NBtoRGBStarsDialog::loadFromViewer(const QString& which) {
     if (!m_mainWindow) return;
 
-    auto* viewer = m_mainWindow->getCurrentViewer();
-    if (!viewer || !viewer->getBuffer().isValid()) {
-        QMessageBox::warning(this, tr("No Image"),
-                             tr("No active image view found."));
+    ImageViewer* v_cur = m_mainWindow->getCurrentViewer();
+    if (!v_cur) {
+        QMessageBox::warning(this, tr("No Image"), tr("No active image view found."));
         return;
     }
 
-    const ImageBuffer& buf = viewer->getBuffer();
+    auto sublist = v_cur->window()->findChildren<CustomMdiSubWindow*>();
+    QStringList names;
+    QList<ImageViewer*> viewers;
+    for (CustomMdiSubWindow* csw : sublist) {
+        ImageViewer* v = csw->viewer();
+        if (!v || !v->getBuffer().isValid()) continue;
+        if (csw->isToolWindow()) continue;
+        names << csw->windowTitle();
+        viewers << v;
+    }
+
+    if (names.isEmpty()) {
+        QMessageBox::warning(this, tr("No Image"), tr("No active image view found."));
+        return;
+    }
+
+    bool ok = true;
+    QString choice;
+    if (names.size() == 1) {
+        choice = names[0];
+    } else {
+        choice = QInputDialog::getItem(
+            this, tr("Select View - %1").arg(which),
+            tr("Choose:"), names, 0, false, &ok);
+        if (!ok) return;
+    }
+
+    int idx = names.indexOf(choice);
+    if (idx < 0) return;
+
+    const ImageBuffer& buf = viewers[idx]->getBuffer();
     ImageBuffer::ReadLock lock(&buf);
 
     int w = buf.width();
