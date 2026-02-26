@@ -15,6 +15,7 @@
 #include "core/Logger.h"
 
 #include "core/ResourceManager.h"
+#include "core/TaskManager.h"
 #include "core/Version.h"
 #include <QFile>
 #include <QTextStream>
@@ -36,6 +37,7 @@ int main(int argc, char *argv[])
     // Now initialize logger with proper paths
     Logger::init();
     ResourceManager::instance().init();
+    Threading::TaskManager::instance().init();
     Logger::info("TStar starting up...", "Main");
     qDebug() << "TStar startup - Debug Log Initialized";
     

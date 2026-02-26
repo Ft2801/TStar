@@ -104,6 +104,9 @@
 #include "dialogs/ClaheDialog.h"
 #include "dialogs/AberrationInspectorDialog.h"
 #include "dialogs/SelectiveColorDialog.h"
+#include "dialogs/MultiscaleDecompDialog.h"
+#include "dialogs/NarrowbandNormalizationDialog.h"
+#include "dialogs/NBtoRGBStarsDialog.h"
 #include <QResizeEvent>
 #include <QStatusBar>
 #include <QRegularExpression>
@@ -957,6 +960,12 @@ MainWindow::MainWindow(QWidget *parent)
     addMenuAction(chanMenu, tr("Continuum Subtraction"), "", [this](){
         openContinuumSubtractionDialog();
     });
+    addMenuAction(chanMenu, tr("Narrowband Normalization"), "", [this](){
+        openNarrowbandNormalizationDialog();
+    });
+    addMenuAction(chanMenu, tr("NB → RGB Stars"), "", [this](){
+        openNBtoRGBStarsDialog();
+    });
 
     // --- E. Utilities ---
     QMenu* utilMenu = processMenu->addMenu(tr("Utilities"));
@@ -986,6 +995,9 @@ MainWindow::MainWindow(QWidget *parent)
     });
     addMenuAction(utilMenu, tr("Aberration Inspector (9-Points)"), "", [this](){
         openAberrationInspectorDialog();
+    });
+    addMenuAction(utilMenu, tr("Multiscale Decomposition"), "", [this](){
+        openMultiscaleDecompDialog();
     });
 
     // --- F. Effects ---
@@ -3363,6 +3375,7 @@ void MainWindow::openContinuumSubtractionDialog() {
     
     CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, m_continuumDlg, tr("Continuum Subtraction"));
     centerToolWindow(sub);
+    sub->move(sub->x(), sub->y() - 50);
 }
 
 void MainWindow::openAlignChannelsDialog() {
@@ -3867,5 +3880,107 @@ void MainWindow::openScriptDialog() {
 void MainWindow::updatePixelInfo(const QString& info) {
     if (m_pixelInfoLabel) {
          m_pixelInfoLabel->setText(info);
+    }
+}
+
+// ============================================================================
+// Multiscale Decomposition
+// ============================================================================
+void MainWindow::openMultiscaleDecompDialog() {
+    ImageViewer* v = currentViewer();
+    if (!v || !v->getBuffer().isValid()) {
+        QMessageBox::warning(this, tr("No Image"), tr("Please open an image first."));
+        return;
+    }
+
+    if (m_multiscaleDecompDlg) {
+        m_multiscaleDecompDlg->raise();
+        m_multiscaleDecompDlg->activateWindow();
+        m_multiscaleDecompDlg->setViewer(v);
+        return;
+    }
+
+    m_multiscaleDecompDlg = new MultiscaleDecompDialog(this);
+    log(tr("Opening Multiscale Decomposition..."), Log_Action, true);
+    m_multiscaleDecompDlg->setAttribute(Qt::WA_DeleteOnClose);
+    m_multiscaleDecompDlg->setViewer(v);
+
+    connect(m_multiscaleDecompDlg, &QDialog::destroyed, this, [this]() {
+        m_multiscaleDecompDlg = nullptr;
+    });
+
+    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, m_multiscaleDecompDlg,
+                                                  tr("Multiscale Decomposition"));
+    centerToolWindow(sub);
+    if (sub) {
+        QPoint p = sub->pos();
+        const QRect scr = this->screen()->availableGeometry();
+        p.setY(qMax(scr.top(), p.y() - 50));
+        sub->move(p);
+    }
+}
+
+// ============================================================================
+// Narrowband Normalization
+// ============================================================================
+void MainWindow::openNarrowbandNormalizationDialog() {
+    if (m_nbNormDlg) {
+        m_nbNormDlg->raise();
+        m_nbNormDlg->activateWindow();
+        m_nbNormDlg->refreshImageList();
+        return;
+    }
+
+    m_nbNormDlg = new NarrowbandNormalizationDialog(this);
+    log(tr("Opening Narrowband Normalization..."), Log_Action, true);
+    m_nbNormDlg->setAttribute(Qt::WA_DeleteOnClose);
+    if (currentViewer()) {
+        m_nbNormDlg->setViewer(currentViewer());
+    }
+
+    connect(m_nbNormDlg, &QDialog::destroyed, this, [this]() {
+        m_nbNormDlg = nullptr;
+    });
+
+    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, m_nbNormDlg,
+                                                  tr("Narrowband Normalization"));
+    centerToolWindow(sub);
+    if (sub) {
+        QPoint p = sub->pos();
+        const QRect scr = this->screen()->availableGeometry();
+        p.setY(qMax(scr.top(), p.y() - 50));
+        sub->move(p);
+    }
+}
+
+// ============================================================================
+// NB → RGB Stars
+// ============================================================================
+void MainWindow::openNBtoRGBStarsDialog() {
+    if (m_nbToRGBStarsDlg) {
+        m_nbToRGBStarsDlg->raise();
+        m_nbToRGBStarsDlg->activateWindow();
+        return;
+    }
+
+    m_nbToRGBStarsDlg = new NBtoRGBStarsDialog(this);
+    log(tr("Opening NB → RGB Stars..."), Log_Action, true);
+    m_nbToRGBStarsDlg->setAttribute(Qt::WA_DeleteOnClose);
+    if (currentViewer()) {
+        m_nbToRGBStarsDlg->setViewer(currentViewer());
+    }
+
+    connect(m_nbToRGBStarsDlg, &QDialog::destroyed, this, [this]() {
+        m_nbToRGBStarsDlg = nullptr;
+    });
+
+    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, m_nbToRGBStarsDlg,
+                                                  tr("NB → RGB Stars"));
+    centerToolWindow(sub);
+    if (sub) {
+        QPoint p = sub->pos();
+        const QRect scr = this->screen()->availableGeometry();
+        p.setY(qMax(scr.top(), p.y() - 50));
+        sub->move(p);
     }
 }

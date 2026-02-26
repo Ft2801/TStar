@@ -43,6 +43,9 @@ class DebayerDialog;
 class ContinuumSubtractionDialog;
 class AlignChannelsDialog;
 class AnnotationToolDialog;
+class MultiscaleDecompDialog;
+class NarrowbandNormalizationDialog;
+class NBtoRGBStarsDialog;
 struct Annotation;
 
 class MainWindow : public QMainWindow, public MainWindowCallbacks {
@@ -108,6 +111,9 @@ private slots:
     void openContinuumSubtractionDialog();
     void openAlignChannelsDialog();
     void openImageAnnotatorDialog();
+    void openMultiscaleDecompDialog();
+    void openNarrowbandNormalizationDialog();
+    void openNBtoRGBStarsDialog();
     
     void openExtractLuminanceDialog();
     void openRecombineLuminanceDialog();
@@ -221,6 +227,9 @@ private:
     QPointer<class ContinuumSubtractionDialog> m_continuumDlg;
     QPointer<class AlignChannelsDialog> m_alignChannelsDlg;
     QPointer<class AnnotationToolDialog> m_annotatorDlg;
+    QPointer<class MultiscaleDecompDialog> m_multiscaleDecompDlg;
+    QPointer<class NarrowbandNormalizationDialog> m_nbNormDlg;
+    QPointer<class NBtoRGBStarsDialog> m_nbToRGBStarsDlg;
     QPointer<class SettingsDialog> m_settingsDlg;
     
 public:

@@ -439,6 +439,10 @@ set(TSTAR_SOURCES
     src/core/RobustStatistics.h
     src/core/ThreadState.cpp
     src/core/ThreadState.h
+    src/core/Task.cpp
+    src/core/Task.h
+    src/core/TaskManager.cpp
+    src/core/TaskManager.h
     src/core/MaskManager.h
     src/core/MaskLayer.h
     src/core/Logger.cpp
@@ -651,6 +655,12 @@ set(TSTAR_SOURCES
     src/dialogs/DebayerDialog.h
     src/dialogs/ContinuumSubtractionDialog.cpp
     src/dialogs/ContinuumSubtractionDialog.h
+    src/dialogs/MultiscaleDecompDialog.cpp
+    src/dialogs/MultiscaleDecompDialog.h
+    src/dialogs/NarrowbandNormalizationDialog.cpp
+    src/dialogs/NarrowbandNormalizationDialog.h
+    src/dialogs/NBtoRGBStarsDialog.cpp
+    src/dialogs/NBtoRGBStarsDialog.h
     src/dialogs/AlignChannelsDialog.cpp
     src/dialogs/AlignChannelsDialog.h
     src/dialogs/AnnotationToolDialog.cpp

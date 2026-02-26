@@ -74,14 +74,6 @@ void StarDetectionThread::run() {
     cv::Mat blurred;
     cv::GaussianBlur(m_grayMat, blurred, cv::Size(0, 0), 1.5);
 
-    // --- Robust background estimation via 8-bit histogram ---
-    // Using meanStdDev on the whole image fails for astrophotos: the bright stars
-    // inflate stddev to ~40-60, pushing threshold = mean + 5*σ above 254 (the cap),
-    // so nothing is ever detected.  The correct approach (mirroring Siril) is:
-    //   bg    = median of the image (50th percentile) → robust against star outliers
-    //   noise = stddev computed only on pixels near the background (below the median)
-    //
-    // We build a 256-bin histogram in O(N) and derive both quantities from it.
     int hist[256] = {};
     for (int y2 = 0; y2 < ny; ++y2) {
         const uint8_t* brow = blurred.ptr<uint8_t>(y2);
@@ -98,9 +90,6 @@ void StarDetectionThread::run() {
     }
     const double bg = (double)bgInt;
 
-    // Noise: stddev of pixels in the range [max(0, bgInt-30), bgInt].
-    // Using only the dark side of the distribution excludes star pixels entirely.
-    // (Siril similarly uses bgnoise computed after sigma-clipping the bright tail.)
     double sumN = 0.0, sumSqN = 0.0;
     int    countN = 0;
     const int noiseHalfRange = std::min(bgInt, 30);
@@ -113,7 +102,6 @@ void StarDetectionThread::run() {
     const double varN    = (countN > 1) ? (sumSqN / countN - meanN * meanN) : 1.0;
     const double bgnoise = std::sqrt(std::max(varN, 1.0));
 
-    // threshold = bg + 5 * bgnoise  (same multiplier as Siril's default sigma=1 → 5*bgnoise)
     // Hard floor: at least bg+3 to avoid firing on flat areas.
     // Hard ceiling: 250 so we always catch stars even in bright frames.
     const float threshold = (float)std::min(std::max(bg + 5.0 * bgnoise, bg + 3.0), 250.0);
@@ -168,12 +156,8 @@ void StarDetectionThread::run() {
             // ── Saturated plateau correction ──
             // A large saturated star has a flat plateau where all pixels share the
             // same value. The local-max tie-break always selects the top-left corner
-            // of the plateau, NOT the center. Siril's peaker detects this by checking
-            // that all 8 direct neighbours are within 10 grey-levels of the peak (flat
-            // plateau), then scans right and down from the corner to measure the full
-            // extent and moves the working center to the midpoint.
-            //
-            // hasSaturated condition (adapted from Siril SAT_DETECTION_RANGE = 0.10):
+            // of the plateau, NOT the center. 
+            // hasSaturated condition:
             //   • pixel >= 240  (close to 8-bit clip)
             //   • all 8 neighbours are within 10 counts of peak  (truly flat plateau)
             float minhigh8 = 255.f;

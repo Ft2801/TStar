@@ -1,6 +1,14 @@
 TStar Changelog
 ===============
 
+Version 1.7.0
+-------------
+- Improved threading system with per-task cancellation and priority work queue
+- Updated continuum subtraction tool
+- New tool: multiscale decomposition
+- New tool: narrowband normalization
+- New tool: narrowband to rgb stars
+
 Version 1.6.4
 -------------
 - Update to the add/recombine luminance tool

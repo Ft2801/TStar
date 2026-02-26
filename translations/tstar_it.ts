@@ -552,10 +552,6 @@
             <translation type="finished">Sfocatura</translation>
         </message>
         <message>
-            <source>Detected %1 total stars. Filtering...</source>
-            <translation type="finished">Rilevate %1 stelle totali. Filtraggio...</translation>
-        </message>
-        <message>
             <source>Detecting all stars...</source>
             <translation type="finished">Rilevamento di tutte le stelle...</translation>
         </message>
@@ -895,92 +891,276 @@
     <context>
         <name>ContinuumSubtractionDialog</name>
         <message>
-            <source>-- Use Green Channel --</source>
-            <translation type="finished">-- Usa Canale Verde --</translation>
+            <source>%1 starless: NB (%2x%3) and Continuum (%4x%5) dimensions must match.</source>
+            <translation type="finished">%1 starless: le dimensioni NB (%2x%3) e Continuum (%4x%5) devono corrispondere.</translation>
         </message>
         <message>
-            <source>-- Use Red Channel --</source>
-            <translation type="finished">-- Usa Canale Rosso --</translation>
+            <source>%1 starry: NB (%2x%3) and Continuum (%4x%5) dimensions must match.</source>
+            <translation type="finished">%1 starry: le dimensioni NB (%2x%3) e Continuum (%4x%5) devono corrispondere.</translation>
         </message>
         <message>
-            <source>Apply</source>
-            <translation type="finished">Applica</translation>
+            <source>All loaded images cleared.</source>
+            <translation type="finished">Tutte le immagini caricate rimosse.</translation>
         </message>
         <message>
-            <source>Cancel</source>
-            <translation type="finished">Annulla</translation>
+            <source>Choose:</source>
+            <translation type="finished">Scegli:</translation>
+        </message>
+        <message>
+            <source>Clear All</source>
+            <translation type="finished">Cancella Tutto</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Chiudi</translation>
+        </message>
+        <message>
+            <source>Composite Load</source>
+            <translation type="finished">Caricamento Composito</translation>
+        </message>
+        <message>
+            <source>Continuum Sources</source>
+            <translation type="finished">Sorgenti Continuum</translation>
         </message>
         <message>
             <source>Continuum Subtraction</source>
             <translation type="finished">Sottrazione del Continuo</translation>
         </message>
         <message>
-            <source>Continuum:</source>
-            <translation type="finished">Continuo:</translation>
+            <source>Continuum Subtraction: created '%1'</source>
+            <translation type="finished">Sottrazione Continuum: creato '%1'</translation>
+        </message>
+        <message>
+            <source>Curves Boost:</source>
+            <translation type="finished">Boost Curve:</translation>
+        </message>
+        <message>
+            <source>Denoise with Cosmic Clarity (0.9)</source>
+            <translation type="finished">Denoise con Cosmic Clarity (0.9)</translation>
+        </message>
+        <message>
+            <source>Denoising %1 starless with Cosmic Clarity...</source>
+            <translation type="finished">Denoise di %1 starless con Cosmic Clarity...</translation>
+        </message>
+        <message>
+            <source>Denoising %1 with Cosmic Clarity...</source>
+            <translation type="finished">Denoise di %1 con Cosmic Clarity...</translation>
+        </message>
+        <message>
+            <source>Dimension Mismatch</source>
+            <translation type="finished">Dimensioni non corrispondenti</translation>
         </message>
         <message>
             <source>Done.</source>
             <translation type="finished">Fatto.</translation>
         </message>
         <message>
-            <source>Failed.</source>
-            <translation type="finished">Fallito.</translation>
+            <source>Error</source>
+            <translation type="finished">Errore</translation>
         </message>
         <message>
-            <source>Formula: Result = NB - Q × (Continuum - median)</source>
-            <translation type="finished">Formula: Risultato = NB - Q × (Continuo - mediana)</translation>
+            <source>Execute</source>
+            <translation type="finished">Esegui</translation>
         </message>
         <message>
-            <source>Image Selection</source>
-            <translation type="finished">Selezione Immagine</translation>
+            <source>Failed to load FITS: %1</source>
+            <translation type="finished">Caricamento FITS fallito: %1</translation>
         </message>
         <message>
-            <source>Image dimensions must match.\nNB: %1x%2, Cont: %3x%4</source>
-            <translation type="finished">Dimensioni non corrispondenti. NB: %1x%2, Cont: %3x%4</translation>
+            <source>Failed to load TIFF: %1</source>
+            <translation type="finished">Caricamento TIFF fallito: %1</translation>
         </message>
         <message>
-            <source>Invalid continuum image.</source>
-            <translation type="finished">Immagine continuo non valida.</translation>
+            <source>Failed to load XISF: %1</source>
+            <translation type="finished">Caricamento XISF fallito: %1</translation>
         </message>
         <message>
-            <source>Invalid narrowband image.</source>
-            <translation type="finished">Immagine banda stretta non valida.</translation>
+            <source>Failed to load image.</source>
+            <translation type="finished">Caricamento immagine fallito.</translation>
         </message>
         <message>
-            <source>Narrowband image is empty.</source>
-            <translation type="finished">Immagine banda stretta vuota.</translation>
+            <source>From File</source>
+            <translation type="finished">Da File</translation>
         </message>
         <message>
-            <source>Narrowband:</source>
-            <translation type="finished">Banda Stretta:</translation>
+            <source>From View</source>
+            <translation type="finished">Da Vista</translation>
         </message>
         <message>
-            <source>No images available.</source>
-            <translation type="finished">Nessuna immagine disponibile.</translation>
+            <source>Green</source>
+            <translation type="finished">Verde</translation>
         </message>
         <message>
-            <source>Output Linear Only (skip stretch)</source>
-            <translation type="finished">Output Lineare (salta stretch)</translation>
+            <source>Green (Starless)</source>
+            <translation type="finished">Verde (Senza Stelle)</translation>
+        </message>
+        <message>
+            <source>Ha</source>
+            <translation type="finished">Ha</translation>
+        </message>
+        <message>
+            <source>Ha (Starless)</source>
+            <translation type="finished">Ha (Senza Stelle)</translation>
+        </message>
+        <message>
+            <source>Ha from HaO3 (starless)</source>
+            <translation type="finished">Ha da HaO3 (senza stelle)</translation>
+        </message>
+        <message>
+            <source>Ha from HaO3 [R]</source>
+            <translation type="finished">Ha da HaO3 [R]</translation>
+        </message>
+        <message>
+            <source>HaO3</source>
+            <translation type="finished">HaO3</translation>
+        </message>
+        <message>
+            <source>HaO3 (Starless)</source>
+            <translation type="finished">HaO3 (Senza Stelle)</translation>
+        </message>
+        <message>
+            <source>Image is empty or invalid.</source>
+            <translation type="finished">L'immagine è vuota o non valida.</translation>
+        </message>
+        <message>
+            <source>Images (*.png *.tif *.tiff *.fits *.fit *.xisf)</source>
+            <translation type="finished">Immagini (*.png *.tif *.tiff *.fits *.fit *.xisf)</translation>
+        </message>
+        <message>
+            <source>Load</source>
+            <translation type="finished">Carica</translation>
+        </message>
+        <message>
+            <source>Load %1</source>
+            <translation type="finished">Carica %1</translation>
+        </message>
+        <message>
+            <source>Load at least one NB filter + matching continuum (or OSC).</source>
+            <translation type="finished">Carica almeno un filtro NB + continuum corrispondente (o OSC).</translation>
+        </message>
+        <message>
+            <source>Load image from:</source>
+            <translation type="finished">Carica immagine da:</translation>
+        </message>
+        <message>
+            <source>Loaded %1: %2</source>
+            <translation type="finished">Caricato %1: %2</translation>
+        </message>
+        <message>
+            <source>Narrowband Filters</source>
+            <translation type="finished">Filtri Banda Stretta</translation>
+        </message>
+        <message>
+            <source>No open images.</source>
+            <translation type="finished">Nessuna immagine aperta.</translation>
+        </message>
+        <message>
+            <source>OIII</source>
+            <translation type="finished">OIII</translation>
+        </message>
+        <message>
+            <source>OIII (Starless)</source>
+            <translation type="finished">OIII (Senza Stelle)</translation>
+        </message>
+        <message>
+            <source>OIII from %1 (averaged)%2</source>
+            <translation type="finished">OIII da %1 (media)%2</translation>
+        </message>
+        <message>
+            <source>OIII from %1%2</source>
+            <translation type="finished">OIII da %1%2</translation>
+        </message>
+        <message>
+            <source>OSC</source>
+            <translation type="finished">OSC</translation>
+        </message>
+        <message>
+            <source>OSC (Starless)</source>
+            <translation type="finished">OSC (Senza Stelle)</translation>
+        </message>
+        <message>
+            <source>Output Linear Image Only</source>
+            <translation type="finished">Solo immagine lineare in output</translation>
         </message>
         <message>
             <source>Parameters</source>
             <translation type="finished">Parametri</translation>
         </message>
         <message>
-            <source>Processing (Q=%1)...</source>
-            <translation type="finished">Elaborazione (Q=%1)...</translation>
+            <source>Processing %1 (starless)...</source>
+            <translation type="finished">Elaborazione %1 (senza stelle)...</translation>
         </message>
         <message>
-            <source>Processing failed.</source>
-            <translation type="finished">Elaborazione fallita.</translation>
+            <source>Processing %1 (starry)...</source>
+            <translation type="finished">Elaborazione %1 (con stelle)...</translation>
+        </message>
+        <message>
+            <source>Processing...</source>
+            <translation type="finished">Elaborazione...</translation>
         </message>
         <message>
             <source>Q-Factor:</source>
             <translation type="finished">Fattore Q:</translation>
         </message>
         <message>
+            <source>Red</source>
+            <translation type="finished">Rosso</translation>
+        </message>
+        <message>
+            <source>Red (Starless)</source>
+            <translation type="finished">Rosso (Senza Stelle)</translation>
+        </message>
+        <message>
             <source>Refresh</source>
             <translation type="finished">Aggiorna</translation>
+        </message>
+        <message>
+            <source>S2O3</source>
+            <translation type="finished">S2O3</translation>
+        </message>
+        <message>
+            <source>S2O3 (Starless)</source>
+            <translation type="finished">S2O3 (Senza Stelle)</translation>
+        </message>
+        <message>
+            <source>SII</source>
+            <translation type="finished">SII</translation>
+        </message>
+        <message>
+            <source>SII (Starless)</source>
+            <translation type="finished">SII (Senza Stelle)</translation>
+        </message>
+        <message>
+            <source>SII from S2O3 (starless)</source>
+            <translation type="finished">SII da S2O3 (senza stelle)</translation>
+        </message>
+        <message>
+            <source>SII from S2O3 [R]</source>
+            <translation type="finished">SII da S2O3 [R]</translation>
+        </message>
+        <message>
+            <source>Select %1 Image</source>
+            <translation type="finished">Seleziona immagine %1</translation>
+        </message>
+        <message>
+            <source>Select %1 Image Source</source>
+            <translation type="finished">Seleziona sorgente immagine %1</translation>
+        </message>
+        <message>
+            <source>Select View - %1</source>
+            <translation type="finished">Seleziona vista - %1</translation>
+        </message>
+        <message>
+            <source>Settings</source>
+            <translation type="finished">Impostazioni</translation>
+        </message>
+        <message>
+            <source>Unknown channel: %1</source>
+            <translation type="finished">Canale sconosciuto: %1</translation>
+        </message>
+        <message>
+            <source>WB Star Threshold (σ):</source>
+            <translation type="finished">Soglia stelle WB (σ):</translation>
         </message>
     </context>
     <context>
@@ -7545,6 +7725,13 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>© 2026 SetiAstro</source>
             <translation type="finished">© 2026 SetiAstro</translation>
+        </message>
+    </context>
+    <context>
+        <name>Task</name>
+        <message>
+            <source>Processing %1 / 100</source>
+            <translation type="finished">Elaborazione %1 / 100</translation>
         </message>
     </context>
     <context>

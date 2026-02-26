@@ -552,10 +552,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Detected %1 total stars. Filtering...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Detecting all stars...</source>
             <translation type="unfinished" />
         </message>
@@ -895,19 +891,35 @@
     <context>
         <name>ContinuumSubtractionDialog</name>
         <message>
-            <source>-- Use Green Channel --</source>
+            <source>%1 starless: NB (%2x%3) and Continuum (%4x%5) dimensions must match.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>-- Use Red Channel --</source>
+            <source>%1 starry: NB (%2x%3) and Continuum (%4x%5) dimensions must match.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Apply</source>
+            <source>All loaded images cleared.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Cancel</source>
+            <source>Choose:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Clear All</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Composite Load</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Continuum Sources</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -915,7 +927,27 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Continuum:</source>
+            <source>Continuum Subtraction: created '%1'</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Curves Boost:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Denoise with Cosmic Clarity (0.9)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Denoising %1 starless with Cosmic Clarity...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Denoising %1 with Cosmic Clarity...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Dimension Mismatch</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -923,43 +955,131 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Failed.</source>
+            <source>Error</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Formula: Result = NB - Q × (Continuum - median)</source>
+            <source>Execute</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Image Selection</source>
+            <source>Failed to load FITS: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Image dimensions must match.\nNB: %1x%2, Cont: %3x%4</source>
+            <source>Failed to load TIFF: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Invalid continuum image.</source>
+            <source>Failed to load XISF: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Invalid narrowband image.</source>
+            <source>Failed to load image.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Narrowband image is empty.</source>
+            <source>From File</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Narrowband:</source>
+            <source>From View</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>No images available.</source>
+            <source>Green</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Output Linear Only (skip stretch)</source>
+            <source>Green (Starless)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Ha</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Ha (Starless)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Ha from HaO3 (starless)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Ha from HaO3 [R]</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>HaO3</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>HaO3 (Starless)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image is empty or invalid.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Images (*.png *.tif *.tiff *.fits *.fit *.xisf)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Load</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Load %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Load at least one NB filter + matching continuum (or OSC).</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Load image from:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Loaded %1: %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Narrowband Filters</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No open images.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>OIII</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>OIII (Starless)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>OIII from %1 (averaged)%2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>OIII from %1%2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>OSC</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>OSC (Starless)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Output Linear Image Only</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -967,11 +1087,15 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Processing (Q=%1)...</source>
+            <source>Processing %1 (starless)...</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Processing failed.</source>
+            <source>Processing %1 (starry)...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Processing...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -979,7 +1103,63 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Red</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Red (Starless)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Refresh</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>S2O3</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>S2O3 (Starless)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>SII</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>SII (Starless)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>SII from S2O3 (starless)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>SII from S2O3 [R]</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select %1 Image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select %1 Image Source</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select View - %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Settings</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Unknown channel: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>WB Star Threshold (σ):</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -7541,6 +7721,13 @@
         </message>
         <message>
             <source>© 2026 SetiAstro</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>Task</name>
+        <message>
+            <source>Processing %1 / 100</source>
             <translation type="unfinished" />
         </message>
     </context>
