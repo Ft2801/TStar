@@ -63,6 +63,7 @@ private:
     void createUI();
     void startPreview();
     void updateQuickMask(); // New fast mask update
+    void applyOpacityBlend(); // Blend m_rawResult with m_originalBuffer using opacity + mask
 
     ImageViewer* m_viewer; // Internal Preview
     QLabel* m_maskLabel; // Small preview of mask
@@ -74,7 +75,10 @@ private:
     // NEW: Dimming Gamma Slider (to fix shadow crushing)
     QSlider* m_dimmingSlider;
     QLabel* m_dimmingLabel;
-    
+
+    QSlider* m_opacitySlider = nullptr;
+    QLabel*  m_opacityLabel  = nullptr;
+
     QLabel* m_scalesLabel;
     QLabel* m_compLabel;
     QLabel* m_gammaLabel;
@@ -87,7 +91,8 @@ private:
     
     // Logic
     QPointer<ImageViewer> m_targetViewer; // Source Image Window (Safe Pointer)
-    ImageBuffer m_previewBuffer; // Current processed result
+    ImageBuffer m_previewBuffer; // Current processed result (mask+opacity blended)
+    ImageBuffer m_rawResult;     // Unblended worker output
     ImageBuffer m_maskBuffer;    // Current mask
     ImageBuffer m_originalBuffer; 
     

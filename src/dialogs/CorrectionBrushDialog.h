@@ -54,6 +54,7 @@ public:
 
 protected:
     bool eventFilter(QObject* src, QEvent* ev) override;
+    void keyPressEvent(QKeyEvent* e) override;
 
 private slots:
     void onWorkerFinished(ImageBuffer result);

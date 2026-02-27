@@ -16,20 +16,27 @@
 // ============================================================================
 struct ASTNode {
     enum Type { 
-        ADD, SUB, MUL, DIV, POW, 
+        ADD, SUB, MUL, DIV, POW, MOD,
         VAR_R, VAR_G, VAR_B, CONST,
-        FUNC_MTF, FUNC_GAMMA, FUNC_CLAMP, FUNC_MIN, FUNC_MAX, FUNC_IFF,
-        FUNC_ABS, FUNC_SQRT, FUNC_LOG, FUNC_SIN, FUNC_COS
+        FUNC_MTF, FUNC_GAMMA, FUNC_CLAMP, FUNC_MIN, FUNC_MAX, FUNC_IIF,
+        FUNC_ABS, FUNC_SQRT, FUNC_LOG, FUNC_SIN, FUNC_COS,
+        FUNC_EXP, FUNC_LN, FUNC_LOG2, FUNC_FLOOR, FUNC_CEIL,
+        FUNC_TAN, FUNC_POW, FUNC_SIGN, FUNC_TRUNC,
+        FUNC_ASIN, FUNC_ACOS, FUNC_ATAN, FUNC_ATAN2,
+        FUNC_SINH, FUNC_COSH, FUNC_TANH,
+        // Relational & logical
+        CMP_GT, CMP_GE, CMP_LT, CMP_LE, CMP_EQ, CMP_NE,
+        LOGIC_AND, LOGIC_OR, LOGIC_NOT
     } type;
     
-    float val = 0;
+    double val = 0;
     std::vector<ASTNode*> children;
 
     ASTNode(Type t) : type(t) {}
-    ASTNode(float v) : type(CONST), val(v) {}
+    ASTNode(double v) : type(CONST), val(v) {}
     ~ASTNode() { for (auto c : children) delete c; }
 
-    float eval(float r, float g, float b) const {
+    double eval(double r, double g, double b) const {
         switch (type) {
             case VAR_R: return r;
             case VAR_G: return g;
@@ -39,28 +46,61 @@ struct ASTNode {
             case SUB: return children[0]->eval(r,g,b) - children[1]->eval(r,g,b);
             case MUL: return children[0]->eval(r,g,b) * children[1]->eval(r,g,b);
             case DIV: {
-                float d = children[1]->eval(r,g,b);
-                return (std::abs(d) < 1e-10f) ? 0.0f : children[0]->eval(r,g,b) / d;
+                double d = children[1]->eval(r,g,b);
+                return (d == 0.0) ? 1.0 : children[0]->eval(r,g,b) / d;
             }
-            case POW: return std::pow(std::max(0.0f, children[0]->eval(r,g,b)), children[1]->eval(r,g,b));
-            case FUNC_ABS:  return std::abs(children[0]->eval(r,g,b));
-            case FUNC_SQRT: return std::sqrt(std::max(0.0f, children[0]->eval(r,g,b)));
-            case FUNC_LOG:  return std::log10(std::max(1e-10f, children[0]->eval(r,g,b)));
-            case FUNC_SIN:  return std::sin(children[0]->eval(r,g,b));
-            case FUNC_COS:  return std::cos(children[0]->eval(r,g,b));
+            case MOD: {
+                double d = children[1]->eval(r,g,b);
+                return (d == 0.0) ? 0.0 : std::fmod(children[0]->eval(r,g,b), d);
+            }
+            case POW: return std::pow(children[0]->eval(r,g,b), children[1]->eval(r,g,b));
+            case FUNC_ABS:   return std::abs(children[0]->eval(r,g,b));
+            case FUNC_SQRT:  return std::sqrt(std::max(0.0, children[0]->eval(r,g,b)));
+            case FUNC_LOG:   return std::log10(std::max(1e-300, children[0]->eval(r,g,b)));
+            case FUNC_LN:    return std::log(std::max(1e-300, children[0]->eval(r,g,b)));
+            case FUNC_LOG2:  return std::log2(std::max(1e-300, children[0]->eval(r,g,b)));
+            case FUNC_EXP:   return std::exp(children[0]->eval(r,g,b));
+            case FUNC_SIN:   return std::sin(children[0]->eval(r,g,b));
+            case FUNC_COS:   return std::cos(children[0]->eval(r,g,b));
+            case FUNC_TAN:   return std::tan(children[0]->eval(r,g,b));
+            case FUNC_ASIN:  return std::asin(children[0]->eval(r,g,b));
+            case FUNC_ACOS:  return std::acos(children[0]->eval(r,g,b));
+            case FUNC_ATAN:  return std::atan(children[0]->eval(r,g,b));
+            case FUNC_ATAN2: return std::atan2(children[0]->eval(r,g,b), children[1]->eval(r,g,b));
+            case FUNC_SINH:  return std::sinh(children[0]->eval(r,g,b));
+            case FUNC_COSH:  return std::cosh(children[0]->eval(r,g,b));
+            case FUNC_TANH:  return std::tanh(children[0]->eval(r,g,b));
+            case FUNC_FLOOR: return std::floor(children[0]->eval(r,g,b));
+            case FUNC_CEIL:  return std::ceil(children[0]->eval(r,g,b));
+            case FUNC_TRUNC: return std::trunc(children[0]->eval(r,g,b));
+            case FUNC_SIGN: {
+                double x = children[0]->eval(r,g,b);
+                return (x > 0.0) ? 1.0 : ((x < 0.0) ? -1.0 : 0.0);
+            }
             case FUNC_MIN:  return std::min(children[0]->eval(r,g,b), children[1]->eval(r,g,b));
             case FUNC_MAX:  return std::max(children[0]->eval(r,g,b), children[1]->eval(r,g,b));
+            case FUNC_POW:  return std::pow(children[0]->eval(r,g,b), children[1]->eval(r,g,b));
             case FUNC_MTF: {
-                float x = children[0]->eval(r,g,b);
-                float m = children[1]->eval(r,g,b);
-                if (x <= 0) return 0;
-                if (x >= 1) return 1;
-                float den = ((2.0f * m - 1.0f) * x) - m;
-                return (std::abs(den) < 1e-10f) ? x : ((m - 1.0f) * x) / den;
+                // mtf(m, x) — arg order: first arg is midtones, second is value
+                double m = children[0]->eval(r,g,b);
+                double x = children[1]->eval(r,g,b);
+                double den = ((2.0 * m - 1.0) * x) - m;
+                return (std::abs(den) < 1e-15) ? x : ((m - 1.0) * x) / den;
             }
-            case FUNC_GAMMA: return std::pow(std::max(0.0f, children[0]->eval(r,g,b)), children[1]->eval(r,g,b));
+            case FUNC_GAMMA: return std::pow(std::max(0.0, children[0]->eval(r,g,b)), children[1]->eval(r,g,b));
             case FUNC_CLAMP: return std::clamp(children[0]->eval(r,g,b), children[1]->eval(r,g,b), children[2]->eval(r,g,b));
-            case FUNC_IFF:   return (children[0]->eval(r,g,b) > 0.5f) ? children[1]->eval(r,g,b) : children[2]->eval(r,g,b);
+            case FUNC_IIF:   return (children[0]->eval(r,g,b) > 0.0) ? children[1]->eval(r,g,b) : children[2]->eval(r,g,b);
+            // Relational
+            case CMP_GT: return children[0]->eval(r,g,b) > children[1]->eval(r,g,b) ? 1.0 : 0.0;
+            case CMP_GE: return children[0]->eval(r,g,b) >= children[1]->eval(r,g,b) ? 1.0 : 0.0;
+            case CMP_LT: return children[0]->eval(r,g,b) < children[1]->eval(r,g,b) ? 1.0 : 0.0;
+            case CMP_LE: return children[0]->eval(r,g,b) <= children[1]->eval(r,g,b) ? 1.0 : 0.0;
+            case CMP_EQ: return children[0]->eval(r,g,b) == children[1]->eval(r,g,b) ? 1.0 : 0.0;
+            case CMP_NE: return children[0]->eval(r,g,b) != children[1]->eval(r,g,b) ? 1.0 : 0.0;
+            // Logical
+            case LOGIC_AND: return (children[0]->eval(r,g,b) != 0.0 && children[1]->eval(r,g,b) != 0.0) ? 1.0 : 0.0;
+            case LOGIC_OR:  return (children[0]->eval(r,g,b) != 0.0 || children[1]->eval(r,g,b) != 0.0) ? 1.0 : 0.0;
+            case LOGIC_NOT: return (children[0]->eval(r,g,b) == 0.0) ? 1.0 : 0.0;
             default: return 0;
         }
     }
@@ -68,18 +108,89 @@ struct ASTNode {
 
 // ============================================================================
 // Recursive Descent Parser
+// Grammar: parse → logicalOr → logicalAnd → comparison → expression → term → power → factor
 // ============================================================================
 class PMParser {
 public:
     PMParser(const QString& s) : m_str(s), m_pos(0) {}
 
     ASTNode* parse() {
-        return parseExpression();
+        return parseLogicalOr();
     }
 
     QString error() const { return m_error; }
 
 private:
+    ASTNode* parseLogicalOr() {
+        ASTNode* node = parseLogicalAnd();
+        while (m_pos < m_str.length()) {
+            skipWS();
+            if (matchStr("||")) {
+                ASTNode* next = new ASTNode(ASTNode::LOGIC_OR);
+                next->children.push_back(node);
+                next->children.push_back(parseLogicalAnd());
+                node = next;
+            } else break;
+        }
+        return node;
+    }
+
+    ASTNode* parseLogicalAnd() {
+        ASTNode* node = parseComparison();
+        while (m_pos < m_str.length()) {
+            skipWS();
+            if (matchStr("&&")) {
+                ASTNode* next = new ASTNode(ASTNode::LOGIC_AND);
+                next->children.push_back(node);
+                next->children.push_back(parseComparison());
+                node = next;
+            } else break;
+        }
+        return node;
+    }
+
+    ASTNode* parseComparison() {
+        ASTNode* node = parseExpression();
+        while (m_pos < m_str.length()) {
+            skipWS();
+            if (m_pos >= m_str.length()) break;
+            if (matchStr("==")) {
+                ASTNode* next = new ASTNode(ASTNode::CMP_EQ);
+                next->children.push_back(node);
+                next->children.push_back(parseExpression());
+                node = next;
+            } else if (matchStr("!=")) {
+                ASTNode* next = new ASTNode(ASTNode::CMP_NE);
+                next->children.push_back(node);
+                next->children.push_back(parseExpression());
+                node = next;
+            } else if (matchStr(">=")) {
+                ASTNode* next = new ASTNode(ASTNode::CMP_GE);
+                next->children.push_back(node);
+                next->children.push_back(parseExpression());
+                node = next;
+            } else if (matchStr("<=")) {
+                ASTNode* next = new ASTNode(ASTNode::CMP_LE);
+                next->children.push_back(node);
+                next->children.push_back(parseExpression());
+                node = next;
+            } else if (m_str[m_pos] == '>' && (m_pos+1 >= m_str.length() || m_str[m_pos+1] != '=')) {
+                m_pos++;
+                ASTNode* next = new ASTNode(ASTNode::CMP_GT);
+                next->children.push_back(node);
+                next->children.push_back(parseExpression());
+                node = next;
+            } else if (m_str[m_pos] == '<' && (m_pos+1 >= m_str.length() || m_str[m_pos+1] != '=')) {
+                m_pos++;
+                ASTNode* next = new ASTNode(ASTNode::CMP_LT);
+                next->children.push_back(node);
+                next->children.push_back(parseExpression());
+                node = next;
+            } else break;
+        }
+        return node;
+    }
+
     ASTNode* parseExpression() {
         ASTNode* node = parseTerm();
         while (m_pos < m_str.length()) {
@@ -103,7 +214,7 @@ private:
     }
 
     ASTNode* parseTerm() {
-        ASTNode* node = parseFactor();
+        ASTNode* node = parsePower();
         while (m_pos < m_str.length()) {
             skipWS();
             if (m_pos >= m_str.length()) break;
@@ -111,33 +222,53 @@ private:
                 m_pos++;
                 ASTNode* next = new ASTNode(ASTNode::MUL);
                 next->children.push_back(node);
-                next->children.push_back(parseFactor());
+                next->children.push_back(parsePower());
                 node = next;
             } else if (m_str[m_pos] == '/') {
                 m_pos++;
                 ASTNode* next = new ASTNode(ASTNode::DIV);
                 next->children.push_back(node);
-                next->children.push_back(parseFactor());
+                next->children.push_back(parsePower());
                 node = next;
-            } else if (m_str[m_pos] == '^') {
+            } else if (m_str[m_pos] == '%') {
                 m_pos++;
-                ASTNode* next = new ASTNode(ASTNode::POW);
+                ASTNode* next = new ASTNode(ASTNode::MOD);
                 next->children.push_back(node);
-                next->children.push_back(parseFactor());
+                next->children.push_back(parsePower());
                 node = next;
             } else break;
         }
         return node;
     }
 
+    ASTNode* parsePower() {
+        ASTNode* node = parseFactor();
+        skipWS();
+        if (m_pos < m_str.length() && m_str[m_pos] == '^') {
+            m_pos++;
+            ASTNode* next = new ASTNode(ASTNode::POW);
+            next->children.push_back(node);
+            next->children.push_back(parseFactor()); // right-associative
+            node = next;
+        }
+        return node;
+    }
+
     ASTNode* parseFactor() {
         skipWS();
-        if (m_pos >= m_str.length()) return new ASTNode(0.0f);
+        if (m_pos >= m_str.length()) return new ASTNode(0.0);
 
         if (m_str[m_pos] == '~') {
             m_pos++;
             ASTNode* next = new ASTNode(ASTNode::SUB);
-            next->children.push_back(new ASTNode(1.0f));
+            next->children.push_back(new ASTNode(1.0));
+            next->children.push_back(parseFactor());
+            return next;
+        }
+
+        if (m_str[m_pos] == '!') {
+            m_pos++;
+            ASTNode* next = new ASTNode(ASTNode::LOGIC_NOT);
             next->children.push_back(parseFactor());
             return next;
         }
@@ -145,14 +276,14 @@ private:
         if (m_str[m_pos] == '-') {
             m_pos++;
             ASTNode* next = new ASTNode(ASTNode::SUB);
-            next->children.push_back(new ASTNode(0.0f));
+            next->children.push_back(new ASTNode(0.0));
             next->children.push_back(parseFactor());
             return next;
         }
 
         if (m_str[m_pos] == '(') {
             m_pos++;
-            ASTNode* node = parseExpression();
+            ASTNode* node = parseLogicalOr();
             skipWS();
             if (m_pos >= m_str.length()) {
                 m_error = QCoreApplication::translate("PixelMathDialog", "Missing closing parenthesis");
@@ -165,14 +296,19 @@ private:
 
         if (m_str[m_pos].isDigit() || m_str[m_pos] == '.') {
             int start = m_pos;
-            while (m_pos < m_str.length() && (m_str[m_pos].isDigit() || m_str[m_pos] == '.')) m_pos++;
-            return new ASTNode(m_str.mid(start, m_pos - start).toFloat());
+            while (m_pos < m_str.length() && (m_str[m_pos].isDigit() || m_str[m_pos] == '.' || m_str[m_pos] == 'e' || m_str[m_pos] == 'E'
+                   || ((m_str[m_pos] == '+' || m_str[m_pos] == '-') && m_pos > start && (m_str[m_pos-1] == 'e' || m_str[m_pos-1] == 'E')))) m_pos++;
+            return new ASTNode(m_str.mid(start, m_pos - start).toDouble());
         }
 
         if (m_str[m_pos].isLetter()) {
             int start = m_pos;
             while (m_pos < m_str.length() && (m_str[m_pos].isLetterOrNumber() || m_str[m_pos] == '_')) m_pos++;
             QString name = m_str.mid(start, m_pos - start).toLower();
+
+            // Constants
+            if (name == "pi") return new ASTNode(3.14159265358979323846);
+            if (name == "e") return new ASTNode(2.71828182845904523536);
 
             if (name == "r") return new ASTNode(ASTNode::VAR_R);
             if (name == "g") return new ASTNode(ASTNode::VAR_G);
@@ -183,42 +319,64 @@ private:
             if (m_pos < m_str.length() && m_str[m_pos] == '(') {
                 m_pos++;
                 std::vector<ASTNode*> args;
-                while (m_pos < m_str.length() && m_str[m_pos] != ')') {
-                    args.push_back(parseExpression());
+                skipWS();
+                if (m_pos < m_str.length() && m_str[m_pos] != ')') {
+                    args.push_back(parseLogicalOr());
                     skipWS();
-                    if (m_pos < m_str.length() && m_str[m_pos] == ',') {
+                    while (m_pos < m_str.length() && m_str[m_pos] == ',') {
                         m_pos++;
+                        skipWS();
+                        args.push_back(parseLogicalOr());
                         skipWS();
                     }
                 }
                 if (m_pos >= m_str.length()) {
                     m_error = QCoreApplication::translate("PixelMathDialog", "Unclosed function call: %1").arg(name);
                     for (auto a : args) delete a;
-                    return new ASTNode(0.0f);
+                    return new ASTNode(0.0);
                 }
                 m_pos++;  // Skip ')'
 
                 ASTNode* func = nullptr;
+                // Two-argument functions
                 if (name == "mtf" && args.size() == 2) func = new ASTNode(ASTNode::FUNC_MTF);
                 else if (name == "gamma" && args.size() == 2) func = new ASTNode(ASTNode::FUNC_GAMMA);
-                else if (name == "clamp" && args.size() == 3) func = new ASTNode(ASTNode::FUNC_CLAMP);
+                else if (name == "pow" && args.size() == 2) func = new ASTNode(ASTNode::FUNC_POW);
                 else if (name == "min" && args.size() == 2) func = new ASTNode(ASTNode::FUNC_MIN);
                 else if (name == "max" && args.size() == 2) func = new ASTNode(ASTNode::FUNC_MAX);
-                else if (name == "iff" && args.size() == 3) func = new ASTNode(ASTNode::FUNC_IFF);
+                else if (name == "atan2" && args.size() == 2) func = new ASTNode(ASTNode::FUNC_ATAN2);
+                // Three-argument functions
+                else if (name == "clamp" && args.size() == 3) func = new ASTNode(ASTNode::FUNC_CLAMP);
+                else if ((name == "iif" || name == "iff") && args.size() == 3) func = new ASTNode(ASTNode::FUNC_IIF);
+                // One-argument functions
                 else if (name == "abs" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_ABS);
                 else if (name == "sqrt" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_SQRT);
                 else if (name == "log" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_LOG);
+                else if (name == "log10" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_LOG);
+                else if (name == "ln" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_LN);
+                else if (name == "log2" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_LOG2);
+                else if (name == "exp" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_EXP);
                 else if (name == "sin" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_SIN);
                 else if (name == "cos" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_COS);
+                else if (name == "tan" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_TAN);
+                else if (name == "asin" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_ASIN);
+                else if (name == "acos" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_ACOS);
+                else if (name == "atan" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_ATAN);
+                else if (name == "sinh" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_SINH);
+                else if (name == "cosh" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_COSH);
+                else if (name == "tanh" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_TANH);
+                else if (name == "floor" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_FLOOR);
+                else if (name == "ceil" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_CEIL);
+                else if (name == "trunc" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_TRUNC);
+                else if (name == "sign" && args.size() == 1) func = new ASTNode(ASTNode::FUNC_SIGN);
                 else {
-                    // Check if this is an unknown function or a typo
                     for (auto a : args) delete a;
                     if (args.size() > 0) {
                         m_error = QCoreApplication::translate("PixelMathDialog", "Unknown function '%1' with %2 arguments").arg(name).arg(args.size());
                     } else {
                         m_error = QCoreApplication::translate("PixelMathDialog", "Unknown variable or function: '%1' (only r, g, b are allowed)").arg(name);
                     }
-                    return new ASTNode(0.0f);
+                    return new ASTNode(0.0);
                 }
 
                 if (func) {
@@ -227,12 +385,22 @@ private:
                 } else {
                     for (auto a : args) delete a;
                     m_error = QCoreApplication::translate("PixelMathDialog", "Unknown function or wrong arg count: %1").arg(name);
-                    return new ASTNode(0.0f);
+                    return new ASTNode(0.0);
                 }
             }
         }
 
-        return new ASTNode(0.0f);
+        return new ASTNode(0.0);
+    }
+
+    bool matchStr(const char* s) {
+        int len = (int)strlen(s);
+        if (m_pos + len > m_str.length()) return false;
+        for (int i = 0; i < len; ++i) {
+            if (m_str[m_pos + i].toLatin1() != s[i]) return false;
+        }
+        m_pos += len;
+        return true;
     }
 
     void skipWS() {
@@ -270,11 +438,13 @@ void PixelMathDialog::setupUI() {
     
     // Help Label
     QLabel* helpLabel = new QLabel(tr(
-        "<b>Variables:</b> r, g, b<br>"
+        "<b>Variables:</b> r, g, b &nbsp; <b>Constants:</b> pi, e<br>"
         "<b>Targets:</b> R = ...; G = ...; B = ...;<br>"
-        "<b>Operators:</b> +, -, *, /, ^, ( ), ~ (invert)<br>"
-        "<b>Functions:</b> mtf(x, mid), gamma(x, g), clamp(x, lo, hi), iff(cond, t, f), min(a, b), max(a, b), sqrt, abs, log, sin, cos<br>"
-        "<b>Example:</b> R = ~r; G = (g * 1.5) - 0.1; B = mtf(b, 0.5);")
+        "<b>Operators:</b> +, -, *, /, ^, %, ( ), ~ (invert), !, &lt;, &lt;=, &gt;, &gt;=, ==, !=, &amp;&amp;, ||<br>"
+        "<b>Functions:</b> mtf(m, x), gamma(x, g), clamp(x, lo, hi), iif(cond, t, f), min, max, pow,<br>"
+        "&nbsp;&nbsp;abs, sqrt, log, log10, ln, log2, exp, sin, cos, tan, asin, acos, atan, atan2,<br>"
+        "&nbsp;&nbsp;sinh, cosh, tanh, floor, ceil, trunc, sign<br>"
+        "<b>Example:</b> R = ~r; G = (g * 1.5) - 0.1; B = mtf(0.5, b);")
     );
     helpLabel->setWordWrap(true);
     mainLayout->addWidget(helpLabel);
@@ -353,31 +523,31 @@ bool PixelMathDialog::evaluateExpression(const QString& expr, ImageBuffer& buf, 
     if (!asts[1]) asts[1] = new ASTNode(ASTNode::VAR_G);
     if (!asts[2]) asts[2] = new ASTNode(ASTNode::VAR_B);
 
-    float globalMin = 1e30f;
-    float globalMax = -1e30f;
+    double globalMin = 1e30;
+    double globalMax = -1e30;
 
-    // Apply loop
+    // Apply loop 
     #pragma omp parallel
     {
-        float localMin = 1e30f;
-        float localMax = -1e30f;
+        double localMin = 1e30;
+        double localMax = -1e30;
         
-        #pragma omp for
+        #pragma omp for schedule(static)
         for (long long i = 0; i < (long long)totalPixels; ++i) {
             size_t idx = i * 3;
-            float r = src[idx];
-            float g = src[idx + 1];
-            float b = src[idx + 2];
+            double r = (double)src[idx];
+            double g = (double)src[idx + 1];
+            double b = (double)src[idx + 2];
             
             for (int c = 0; c < 3; ++c) {
-                float res = asts[c]->eval(r, g, b);
+                double res = asts[c]->eval(r, g, b);
                 if (rescale) {
                     if (res < localMin) localMin = res;
                     if (res > localMax) localMax = res;
-                    data[idx + c] = res;  // Keep original for rescale pass
+                    data[idx + c] = (float)res;  // Keep original for rescale pass
                 } else {
-                    // Always clamp to [0, 1] when not rescaling
-                    data[idx + c] = std::clamp(res, 0.0f, 1.0f);
+                    // Clamp to [0, 1] when not rescaling
+                    data[idx + c] = (float)std::clamp(res, 0.0, 1.0);
                 }
             }
         }
@@ -396,10 +566,10 @@ bool PixelMathDialog::evaluateExpression(const QString& expr, ImageBuffer& buf, 
 
     // Rescale pass
     if (rescale && globalMax > globalMin) {
-        float den = globalMax - globalMin;
-        #pragma omp parallel for
+        double den = globalMax - globalMin;
+        #pragma omp parallel for schedule(static)
         for (long long i = 0; i < (long long)data.size(); ++i) {
-            data[i] = (data[i] - globalMin) / den;
+            data[i] = (float)(((double)data[i] - globalMin) / den);
         }
     }
     

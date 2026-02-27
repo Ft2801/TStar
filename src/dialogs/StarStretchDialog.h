@@ -16,6 +16,7 @@ class StarStretchDialog : public DialogBase {
     Q_OBJECT
 public:
     explicit StarStretchDialog(QWidget* parent, ImageViewer* viewer);
+    ~StarStretchDialog();
 
     void setViewer(ImageViewer* v);
 
@@ -39,6 +40,7 @@ private:
     QSlider* m_sliderBoost;
     
     QCheckBox* m_chkScnr;
+    QCheckBox* m_chkPreview;
     
     QPushButton* m_btnApply;
     

@@ -9,6 +9,7 @@
 #include <QCheckBox>
 #include <QDoubleSpinBox>
 #include <QMouseEvent>
+#include <QKeyEvent>
 #include <QWheelEvent>
 #include <QTimer>
 #include <QScrollBar>
@@ -16,6 +17,7 @@
 #include <QComboBox>
 #include <cmath>
 #include <algorithm>
+#include <optional>
 #include <QScrollBar>
 #include <opencv2/opencv.hpp>
 #include <opencv2/photo.hpp>
@@ -75,6 +77,7 @@ float CorrectionWorker::medianCircle(const ImageBuffer& img, int cx, int cy, int
 
 ImageBuffer CorrectionWorker::removeBlemish(const ImageBuffer& img, int x, int y, int radius, float feather, float opacity, const std::vector<int>& channels, CorrectionMethod method) {
     if (method == CorrectionMethod::ContentAware) {
+        auto caResult = [&]() -> std::optional<ImageBuffer> {
         // Smart Patch - Context-Aware Fill
         // 1. Search for best matching texture in neighborhood
         // 2. Seamlessly clone the best patch into the blemish area
@@ -95,7 +98,7 @@ ImageBuffer CorrectionWorker::removeBlemish(const ImageBuffer& img, int x, int y
         int roiW = x1 - x0;
         int roiH = y1 - y0;
         
-        if (roiW <= 0 || roiH <= 0) return img;
+        if (roiW <= 0 || roiH <= 0) return std::nullopt;
         
         // Convert ROI to 8-bit CV_8UC3 for seamlessClone (required)
         cv::Mat roiMat;
@@ -129,10 +132,9 @@ ImageBuffer CorrectionWorker::removeBlemish(const ImageBuffer& img, int x, int y
         int cx = x - x0;
         int cy = y - y0;
         
-        // Check bounds
+        // Check bounds – if the template extends beyond the ROI, fall through to Standard method
         if (cx - tRad < 0 || cy - tRad < 0 || cx + tRad >= roiW || cy + tRad >= roiH) {
-             // Fallback to simple logic if too close to edge
-             return img;
+             return std::nullopt;
         }
 
         // Create Mask for Template Matching (1=Valid Context, 0=Hole)
@@ -171,7 +173,7 @@ ImageBuffer CorrectionWorker::removeBlemish(const ImageBuffer& img, int x, int y
         // Verify source patch is within bounds
         cv::Rect srcRect(bestTL.x, bestTL.y, tSize, tSize);
         if (srcRect.x < 0 || srcRect.y < 0 || srcRect.x + srcRect.width > roiW || srcRect.y + srcRect.height > roiH) {
-             return img;
+             return std::nullopt;
         }
 
         cv::Mat sourcePatch = roiMat(srcRect);
@@ -243,6 +245,10 @@ ImageBuffer CorrectionWorker::removeBlemish(const ImageBuffer& img, int x, int y
         }
         
         return result;
+        }(); // end content-aware lambda
+        if (caResult.has_value()) return caResult.value();
+        // Brush too close to image edge for Content-Aware (template out of bounds)
+        // → fall through to Standard Median method which correctly handles partial circles
     }
     
     // Standard Median Logic
@@ -365,8 +371,8 @@ CorrectionBrushDialog::CorrectionBrushDialog(QWidget* parent) : DialogBase(paren
     m_view->setMouseTracking(true);
     m_view->viewport()->installEventFilter(this);
     m_view->setDragMode(QGraphicsView::NoDrag); // We handle clicks
-    m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     m_view->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     
     m_pixItem = new QGraphicsPixmapItem();
@@ -461,6 +467,21 @@ CorrectionBrushDialog::CorrectionBrushDialog(QWidget* parent) : DialogBase(paren
 
 CorrectionBrushDialog::~CorrectionBrushDialog() {
     // Worker deletes itself
+}
+
+void CorrectionBrushDialog::keyPressEvent(QKeyEvent* e) {
+    if (e->matches(QKeySequence::Undo)) {
+        onUndo();
+        e->accept();
+        return;
+    }
+    if (e->matches(QKeySequence::Redo) ||
+        (e->modifiers() == Qt::ControlModifier && e->key() == Qt::Key_Y)) {
+        onRedo();
+        e->accept();
+        return;
+    }
+    DialogBase::keyPressEvent(e);
 }
 
 void CorrectionBrushDialog::setSource(const ImageBuffer& img) {

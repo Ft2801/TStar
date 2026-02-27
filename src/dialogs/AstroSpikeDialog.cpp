@@ -1359,6 +1359,7 @@ void AstroSpikeDialog::applyToDocument() {
     m_viewer->pushUndo();
     
     ImageBuffer newBuffer = m_viewer->getBuffer();
+    ImageBuffer origBuf = newBuffer; // save original pixels for mask blending
     
     // Safety check size match
     if (newBuffer.width() != fullImg.width() || newBuffer.height() != fullImg.height()) {
@@ -1387,6 +1388,11 @@ void AstroSpikeDialog::applyToDocument() {
                 data[idx] = 0.2126f * r + 0.7152f * g + 0.0722f * b;
             }
         }
+    }
+
+    // Respect mask: blend processed result with original using mask
+    if (origBuf.hasMask()) {
+        newBuffer.blendResult(origBuf);
     }
     
     m_viewer->setBuffer(newBuffer, m_viewer->windowTitle(), true);

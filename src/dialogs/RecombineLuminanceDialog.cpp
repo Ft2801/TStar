@@ -109,6 +109,9 @@ void RecombineLuminanceDialog::onApply() {
         return;
     }
     
+    // Save original buffer for mask blending before pushing undo
+    ImageBuffer origBuf = target->getBuffer();
+
     if (m_mainWindow) {
         m_mainWindow->logMessage(tr("Recombining luminance..."), 0); 
         m_mainWindow->startLongProcess();
@@ -121,6 +124,11 @@ void RecombineLuminanceDialog::onApply() {
     float blend = m_blendSlider->value() / 100.0f;
     
     bool ok = ChannelOps::recombineLuminance(target->getBuffer(), srcViewer->getBuffer(), csMode, blend);
+
+    // Respect mask: blend processed result back with original
+    if (ok && origBuf.hasMask()) {
+        target->getBuffer().blendResult(origBuf);
+    }
     
     if (m_mainWindow) {
         m_mainWindow->endLongProcess();

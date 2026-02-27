@@ -14,8 +14,9 @@
 // ============================================================================
 
 MultiscaleDecompDialog::MultiscaleDecompDialog(QWidget* parent)
-    : DialogBase(parent, tr("Multiscale Decomposition"))
+    : DialogBase(parent, tr("Multiscale Decomposition"), 1150, 700)
 {
+    m_mainWindow = dynamic_cast<MainWindowCallbacks*>(parent);
     m_cfgs.resize(m_layers);
     
     m_previewTimer = new QTimer(this);
@@ -250,13 +251,11 @@ void MultiscaleDecompDialog::buildUI() {
     auto* btnRow = new QHBoxLayout();
     m_btnApply = new QPushButton(tr("Apply to Image"));
     m_btnNewDoc = new QPushButton(tr("Send to New Image"));
-    m_btnSplit = new QPushButton(tr("Split Layers"));
     m_btnClose = new QPushButton(tr("Close"));
 
     btnRow->addStretch(1);
     btnRow->addWidget(m_btnApply);
     btnRow->addWidget(m_btnNewDoc);
-    btnRow->addWidget(m_btnSplit);
     btnRow->addWidget(m_btnClose);
     rightLayout->addLayout(btnRow);
 
@@ -300,7 +299,6 @@ void MultiscaleDecompDialog::buildUI() {
 
     connect(m_btnApply, &QPushButton::clicked, this, &MultiscaleDecompDialog::onApplyToImage);
     connect(m_btnNewDoc, &QPushButton::clicked, this, &MultiscaleDecompDialog::onSendToNewImage);
-    connect(m_btnSplit, &QPushButton::clicked, this, &MultiscaleDecompDialog::onSplitLayers);
     connect(m_btnClose, &QPushButton::clicked, this, &QDialog::reject);
 
     // Initial
@@ -576,6 +574,11 @@ void MultiscaleDecompDialog::loadLayerIntoEditor(int idx) {
 }
 
 void MultiscaleDecompDialog::updateParamWidgetsForMode() {
+    // If the residual row is selected, all editors are already disabled by
+    // loadLayerIntoEditor — do not touch them here.
+    if (m_selectedLayer < 0 || m_selectedLayer >= m_layers)
+        return;
+
     bool linear = (m_comboMode->currentText() == tr("Linear"));
     // Only threshold/amount/denoise are disabled in linear mode
     m_spinThr->setEnabled(!linear);
@@ -726,9 +729,17 @@ void MultiscaleDecompDialog::onApplyToImage() {
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
+    // Save original buffer (including mask) before processing
+    ImageBuffer origBuf = m_viewer->getBuffer();
+
     std::vector<std::vector<float>> tuned;
     std::vector<float> residual;
     buildTunedLayers(tuned, residual);
+
+    if (tuned.empty() || residual.empty()) {
+        QApplication::restoreOverrideCursor();
+        return;
+    }
 
     size_t total = (size_t)m_imgW * m_imgH * m_imgCh;
     std::vector<float> res = m_residualEnabled ? residual : std::vector<float>(total, 0.0f);
@@ -757,12 +768,18 @@ void MultiscaleDecompDialog::onApplyToImage() {
     }
     result.setMetadata(m_viewer->getBuffer().metadata());
 
+    // Apply mask blending and push undo
+    if (origBuf.hasMask()) {
+        result.setMask(*origBuf.getMask());
+        result.blendResult(origBuf);
+    }
+
     // Apply to viewer
-    auto* cb = dynamic_cast<MainWindowCallbacks*>(parentWidget());
-    if (cb) {
-        cb->startLongProcess();
+    if (m_mainWindow) {
+        m_mainWindow->startLongProcess();
+        m_viewer->pushUndo();
         m_viewer->setBuffer(result);
-        cb->endLongProcess();
+        m_mainWindow->endLongProcess();
     }
 
     QApplication::restoreOverrideCursor();
@@ -781,6 +798,11 @@ void MultiscaleDecompDialog::onSendToNewImage() {
     std::vector<std::vector<float>> tuned;
     std::vector<float> residual;
     buildTunedLayers(tuned, residual);
+
+    if (tuned.empty() || residual.empty()) {
+        QApplication::restoreOverrideCursor();
+        return;
+    }
 
     size_t total = (size_t)m_imgW * m_imgH * m_imgCh;
     std::vector<float> res = m_residualEnabled ? residual : std::vector<float>(total, 0.0f);
@@ -808,69 +830,8 @@ void MultiscaleDecompDialog::onSendToNewImage() {
     if (m_viewer)
         result.setMetadata(m_viewer->getBuffer().metadata());
 
-    auto* cb = dynamic_cast<MainWindowCallbacks*>(parentWidget());
-    if (cb) {
-        cb->createResultWindow(result, tr("Multiscale Result"));
-    }
-
-    QApplication::restoreOverrideCursor();
-}
-
-void MultiscaleDecompDialog::onSplitLayers() {
-    if (m_image.empty()) {
-        QMessageBox::warning(this, tr("Multiscale Decomposition"),
-                             tr("No image loaded."));
-        return;
-    }
-
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-
-    std::vector<std::vector<float>> tuned;
-    std::vector<float> residual;
-    buildTunedLayers(tuned, residual);
-
-    auto* cb = dynamic_cast<MainWindowCallbacks*>(parentWidget());
-    if (!cb) {
-        QApplication::restoreOverrideCursor();
-        return;
-    }
-
-    size_t n = (size_t)m_imgW * m_imgH;
-
-    // Detail layers
-    for (int i = 0; i < (int)tuned.size(); i++) {
-        auto& d = tuned[i];
-        size_t total = d.size();
-        std::vector<float> vis(total);
-        for (size_t j = 0; j < total; j++)
-            vis[j] = std::clamp(0.5f + d[j] * 4.0f, 0.0f, 1.0f);
-
-        ImageBuffer buf;
-        if (m_origMono) {
-            std::vector<float> mono(n);
-            for (size_t j = 0; j < n; j++) mono[j] = vis[j * 3];
-            buf.setData(m_imgW, m_imgH, 1, mono);
-        } else {
-            buf.setData(m_imgW, m_imgH, 3, vis);
-        }
-        cb->createResultWindow(buf, tr("Multiscale Detail %1").arg(i + 1));
-    }
-
-    // Residual
-    {
-        std::vector<float> res(residual.size());
-        for (size_t j = 0; j < residual.size(); j++)
-            res[j] = std::clamp(residual[j], 0.0f, 1.0f);
-
-        ImageBuffer buf;
-        if (m_origMono) {
-            std::vector<float> mono(n);
-            for (size_t j = 0; j < n; j++) mono[j] = res[j * 3];
-            buf.setData(m_imgW, m_imgH, 1, mono);
-        } else {
-            buf.setData(m_imgW, m_imgH, 3, res);
-        }
-        cb->createResultWindow(buf, tr("Multiscale Residual"));
+    if (m_mainWindow) {
+        m_mainWindow->createResultWindow(result, tr("Multiscale Result"));
     }
 
     QApplication::restoreOverrideCursor();

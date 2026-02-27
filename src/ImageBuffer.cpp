@@ -16,6 +16,7 @@
 #include <QPainter>
 #include <QFile>
 #include <QFileInfo>
+#include <QImageWriter>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QDataStream> 
@@ -1397,10 +1398,88 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
         return true;
         
     } else {
-        // Standard (JPG/PNG) via QImage
-        // Convert to 8-bit RGB
-        QImage saveImg = getDisplayImage(Display_Linear); 
-        return saveImg.save(filePath, format.toLatin1().constData());
+        QString fmtLower = format.toLower();
+
+        if (fmtLower == "jpg" || fmtLower == "jpeg") {
+            // JPEG: convert to 8-bit and save at quality 100 (matches Siril default)
+            QImage saveImg = getDisplayImage(Display_Linear);
+            QImageWriter writer(filePath);
+            writer.setFormat("jpeg");
+            writer.setQuality(100);
+            if (!writer.write(saveImg)) {
+                if (errorMsg) *errorMsg = writer.errorString();
+                return false;
+            }
+            return true;
+
+        } else if (fmtLower == "png") {
+            // PNG: honour the chosen depth (8-bit or 16-bit)
+            int w = m_width, h = m_height, c = m_channels;
+            const float* src = m_data.data();
+            // Maximum lossless PNG compression
+            const std::vector<int> params = {cv::IMWRITE_PNG_COMPRESSION, 9};
+
+            bool use16 = (depth == Depth_16Int || depth == Depth_32Int || depth == Depth_32Float);
+
+            if (c == 1) {
+                if (use16) {
+                    cv::Mat mat(h, w, CV_16UC1);
+                    for (int i = 0; i < h * w; ++i)
+                        mat.at<uint16_t>(i / w, i % w) =
+                            static_cast<uint16_t>(std::clamp(src[i], 0.0f, 1.0f) * 65535.0f + 0.5f);
+                    if (!cv::imwrite(filePath.toStdString(), mat, params)) {
+                        if (errorMsg) *errorMsg = "Failed to write PNG file.";
+                        return false;
+                    }
+                } else {
+                    cv::Mat mat(h, w, CV_8UC1);
+                    for (int i = 0; i < h * w; ++i)
+                        mat.at<uint8_t>(i / w, i % w) =
+                            static_cast<uint8_t>(std::clamp(src[i], 0.0f, 1.0f) * 255.0f + 0.5f);
+                    if (!cv::imwrite(filePath.toStdString(), mat, params)) {
+                        if (errorMsg) *errorMsg = "Failed to write PNG file.";
+                        return false;
+                    }
+                }
+            } else {
+                // TStar stores interleaved RGB; OpenCV expects BGR
+                if (use16) {
+                    cv::Mat mat(h, w, CV_16UC3);
+                    for (int i = 0; i < h * w; ++i)
+                        mat.at<cv::Vec3w>(i / w, i % w) = cv::Vec3w(
+                            static_cast<uint16_t>(std::clamp(src[i*3+2], 0.0f, 1.0f) * 65535.0f + 0.5f), // B
+                            static_cast<uint16_t>(std::clamp(src[i*3+1], 0.0f, 1.0f) * 65535.0f + 0.5f), // G
+                            static_cast<uint16_t>(std::clamp(src[i*3+0], 0.0f, 1.0f) * 65535.0f + 0.5f)  // R
+                        );
+                    if (!cv::imwrite(filePath.toStdString(), mat, params)) {
+                        if (errorMsg) *errorMsg = "Failed to write PNG file.";
+                        return false;
+                    }
+                } else {
+                    cv::Mat mat(h, w, CV_8UC3);
+                    for (int i = 0; i < h * w; ++i)
+                        mat.at<cv::Vec3b>(i / w, i % w) = cv::Vec3b(
+                            static_cast<uint8_t>(std::clamp(src[i*3+2], 0.0f, 1.0f) * 255.0f + 0.5f), // B
+                            static_cast<uint8_t>(std::clamp(src[i*3+1], 0.0f, 1.0f) * 255.0f + 0.5f), // G
+                            static_cast<uint8_t>(std::clamp(src[i*3+0], 0.0f, 1.0f) * 255.0f + 0.5f)  // R
+                        );
+                    if (!cv::imwrite(filePath.toStdString(), mat, params)) {
+                        if (errorMsg) *errorMsg = "Failed to write PNG file.";
+                        return false;
+                    }
+                }
+            }
+            return true;
+
+        } else {
+            // Other formats (BMP, PPM, …): 8-bit via QImage
+            QImage saveImg = getDisplayImage(Display_Linear);
+            if (!saveImg.save(filePath, format.toLatin1().constData())) {
+                if (errorMsg) *errorMsg = "Failed to write image.";
+                return false;
+            }
+            return true;
+        }
     }
 }
 

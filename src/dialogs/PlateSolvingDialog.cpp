@@ -124,12 +124,18 @@ void PlateSolvingDialog::setViewer(ImageViewer* v) {
 void PlateSolvingDialog::updateScaleFromMetadata() {
     const auto& meta = m_image.metadata();
     
-    // Populate from FITS header if available
+    // Populate from FITS/XISF header if available
     if (meta.focalLength > 0) {
         m_focalLength->setText(QString::number(meta.focalLength, 'f', 1));
     }
     if (meta.pixelSize > 0) {
         m_pixelSizeUm->setText(QString::number(meta.pixelSize, 'f', 2));
+    }
+    
+    // Auto-populate RA/Dec from metadata (FITS RA/OBJCTRA/CRVAL1 or XISF properties)
+    if (meta.ra != 0.0 || meta.dec != 0.0) {
+        m_raHint->setText(QString::number(meta.ra, 'f', 6));
+        m_decHint->setText(QString::number(meta.dec, 'f', 6));
     }
     
     // Auto-calculate scale if both values are present

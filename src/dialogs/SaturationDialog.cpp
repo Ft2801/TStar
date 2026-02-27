@@ -6,7 +6,7 @@
 #include <cmath>
 
 SaturationDialog::SaturationDialog(QWidget* parent, ImageViewer* viewer) 
-    : DialogBase(parent, tr("Color Saturation"), 350, 400), m_viewer(nullptr), m_buffer(nullptr) {
+    : DialogBase(parent, tr("Color Saturation"), 500, 250), m_viewer(nullptr), m_buffer(nullptr) {
     setupUI();
     
     if (viewer) {
@@ -88,16 +88,28 @@ void SaturationDialog::setupUI() {
     
     // Buttons
     QHBoxLayout* btnLayout = new QHBoxLayout();
-    QPushButton* btnApply = new QPushButton(tr("Apply"));
+    m_chkPreview = new QCheckBox(tr("Preview"));
+    m_chkPreview->setChecked(true);
+    connect(m_chkPreview, &QCheckBox::toggled, this, [this](bool on){
+        if (on) triggerPreview();
+        else if (m_viewer && m_originalBuffer.isValid())
+            m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
+    });
+    QPushButton* btnReset  = new QPushButton(tr("Reset"));
+    QPushButton* btnApply  = new QPushButton(tr("Apply"));
     btnApply->setDefault(true);
     QPushButton* btnCancel = new QPushButton(tr("Cancel"));
+    
+    btnLayout->addWidget(m_chkPreview);
     btnLayout->addStretch();
+    btnLayout->addWidget(btnReset);
     btnLayout->addWidget(btnCancel);
     btnLayout->addWidget(btnApply);
     
     mainLayout->addLayout(btnLayout);
 
-    connect(btnApply, &QPushButton::clicked, this, &SaturationDialog::handleApply);
+    connect(btnReset,  &QPushButton::clicked, this, &SaturationDialog::resetState);
+    connect(btnApply,  &QPushButton::clicked, this, &SaturationDialog::handleApply);
     connect(btnCancel, &QPushButton::clicked, this, &QDialog::reject);
 }
 
@@ -127,6 +139,7 @@ void SaturationDialog::onPresetChanged(int index) {
     connect(m_sldHueWidth, &QSlider::valueChanged, this, &SaturationDialog::onSliderChanged);
     onSliderChanged();
     emit preview(getParams()); // Also preview on preset change
+    triggerPreview();
 }
 
 
@@ -193,6 +206,7 @@ void SaturationDialog::handleApply() {
 
 void SaturationDialog::triggerPreview() {
     if (!m_viewer || !m_buffer || !m_originalBuffer.isValid()) return;
+    if (m_chkPreview && !m_chkPreview->isChecked()) return;
     
     // Reset to clean state from backup
     *m_buffer = m_originalBuffer;

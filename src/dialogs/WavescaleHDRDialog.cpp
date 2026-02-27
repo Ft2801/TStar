@@ -324,6 +324,7 @@ void WavescaleHDRDialog::createUI() {
     // Left: ImageViewer
     m_viewer = new ImageViewer(this);
     m_viewer->setProperty("isPreview", true);  // Prevent MainWindow activation handler from treating this as target
+    m_viewer->setMaskOverlay(false);           // Never show mask overlay in preview
     m_viewer->setMinimumWidth(600);
     contentLayout->addWidget(m_viewer, 1);
     
@@ -380,7 +381,23 @@ void WavescaleHDRDialog::createUI() {
     m_maskLabel->setAlignment(Qt::AlignCenter); 
     maskLay->addWidget(m_maskLabel);
     rightLayout->addWidget(maskGrp);
-    
+
+    // Opacity slider (0–100, default 100)
+    QGroupBox* opacityGrp = new QGroupBox(tr("Opacity:"), this);
+    QHBoxLayout* opacityLay = new QHBoxLayout(opacityGrp);
+    m_opacitySlider = new QSlider(Qt::Horizontal);
+    m_opacitySlider->setRange(0, 100);
+    m_opacitySlider->setValue(100);
+    m_opacityLabel = new QLabel("100%");
+    m_opacityLabel->setMinimumWidth(36);
+    connect(m_opacitySlider, &QSlider::valueChanged, [this](int val){
+        m_opacityLabel->setText(QString("%1%").arg(val));
+        applyOpacityBlend();  // Immediately re-blend preview
+    });
+    opacityLay->addWidget(m_opacitySlider, 1);
+    opacityLay->addWidget(m_opacityLabel);
+    rightLayout->addWidget(opacityGrp);
+
     rightLayout->addStretch();
     
     m_showOriginalCheck = new QCheckBox(tr("Compare (Show Original)"), this);
@@ -473,8 +490,9 @@ void WavescaleHDRDialog::onApplyClicked() {
     if (m_targetViewer && m_previewBuffer.isValid()) {
         // Push undo before making changes
         m_targetViewer->pushUndo();
-        
-        // Apply the processed buffer to the target viewer
+
+        // m_previewBuffer is already mask-blended (done in onWorkerFinished).
+        // Apply the processed (and mask-blended) buffer to the target viewer.
         m_targetViewer->setBuffer(m_previewBuffer, m_targetViewer->windowTitle(), true);
         m_targetViewer->refreshDisplay();
         
@@ -489,20 +507,42 @@ void WavescaleHDRDialog::onApplyClicked() {
 }
 
 void WavescaleHDRDialog::onWorkerFinished(ImageBuffer result, ImageBuffer mask) {
-    m_previewBuffer = result;
+    m_rawResult = result;   // Keep unblended result so opacity changes can re-blend
     m_maskBuffer = mask;
-    
+
     m_previewBtn->setEnabled(true);
     m_applyBtn->setEnabled(true);
     m_progressBar->setValue(100);
-    
-    if (!m_showOriginalCheck->isChecked()) {
-        // After first process, we want to preserve view if user zooms in
-        m_viewer->setBuffer(m_previewBuffer, tr("Preview"), true);
-        m_viewer->setModified(false);  // Prevent "unsaved changes" dialog
-    }
+
+    applyOpacityBlend();  // Blend with mask + opacity and refresh viewer
     
     // The Quick Mask (updateQuickMask) handles real-time preview; worker's mask is secondary.
+}
+
+void WavescaleHDRDialog::applyOpacityBlend() {
+    if (!m_rawResult.isValid()) return;
+
+    float opacity = m_opacitySlider ? m_opacitySlider->value() / 100.0f : 1.0f;
+    ImageBuffer blended = m_rawResult;
+
+    if (m_originalBuffer.hasMask()) {
+        MaskLayer ml = *m_originalBuffer.getMask();
+        ml.opacity *= opacity;
+        blended.setMask(ml);
+        blended.blendResult(m_originalBuffer);
+    } else if (opacity < 1.0f) {
+        const auto& orig = m_originalBuffer.data();
+        auto& bd = blended.data();
+        for (size_t i = 0; i < bd.size(); ++i)
+            bd[i] = bd[i] * opacity + orig[i] * (1.0f - opacity);
+    }
+
+    m_previewBuffer = blended;
+
+    if (!m_showOriginalCheck->isChecked()) {
+        m_viewer->setBuffer(m_previewBuffer, tr("Preview"), true);
+        m_viewer->setModified(false);
+    }
 }
 
 void WavescaleHDRDialog::toggleOriginal(bool showOriginal) {

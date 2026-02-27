@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QIcon>
+#include <QGroupBox>
 
 StarStretchDialog::StarStretchDialog(QWidget* parent, ImageViewer* viewer)
     : DialogBase(parent, tr("Star Stretch"), 450, 200), m_viewer(viewer)
@@ -41,10 +42,10 @@ void StarStretchDialog::createUI() {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     
     // Stretch Slider
-    m_lblStretch = new QLabel(tr("Stretch Amount: 5.00"));
+    m_lblStretch = new QLabel(tr("Stretch Amount: 0.00"));
     m_sliderStretch = new QSlider(Qt::Horizontal);
     m_sliderStretch->setRange(0, 800);
-    m_sliderStretch->setValue(500);
+    m_sliderStretch->setValue(0);
     connect(m_sliderStretch, &QSlider::valueChanged, this, [this](int val){
         m_lblStretch->setText(tr("Stretch Amount: %1").arg(val / 100.0, 0, 'f', 2));
         onSliderChanged();
@@ -66,21 +67,41 @@ void StarStretchDialog::createUI() {
     mainLayout->addWidget(m_lblBoost);
     mainLayout->addWidget(m_sliderBoost);
     
-    // SCNR
+    // SCNR + Preview toggle on same row
+    QHBoxLayout* scnrRow = new QHBoxLayout();
     m_chkScnr = new QCheckBox(tr("Remove Green via SCNR (Optional)"));
-    connect(m_chkScnr, &QCheckBox::toggled, this, &StarStretchDialog::onSliderChanged);
-    mainLayout->addWidget(m_chkScnr);
+    m_chkPreview = new QCheckBox(tr("Preview"));
+    m_chkPreview->setChecked(true);
+    connect(m_chkScnr,    &QCheckBox::toggled, this, &StarStretchDialog::onSliderChanged);
+    connect(m_chkPreview, &QCheckBox::toggled, this, [this](bool on){
+        if (on) updatePreview();
+        else if (m_viewer)
+            m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
+    });
+    scnrRow->addWidget(m_chkScnr);
+    scnrRow->addStretch();
+    scnrRow->addWidget(m_chkPreview);
+    mainLayout->addLayout(scnrRow);
     
-    // Buttons
+    // Buttons: [Reset] ... [Cancel] ... [Apply]
     QHBoxLayout* btnLayout = new QHBoxLayout();
-    m_btnApply = new QPushButton(tr("Apply"));
+    QPushButton* btnReset  = new QPushButton(tr("Reset"));
+    m_btnApply             = new QPushButton(tr("Apply"));
     QPushButton* btnCancel = new QPushButton(tr("Cancel"));
     
+    connect(btnReset,  &QPushButton::clicked, this, [this](){
+        m_sliderStretch->setValue(500);
+        m_sliderBoost->setValue(100);
+        m_chkScnr->setChecked(false);
+    });
     connect(m_btnApply, &QPushButton::clicked, this, &StarStretchDialog::onApply);
-    connect(btnCancel, &QPushButton::clicked, this, &StarStretchDialog::reject);
+    connect(btnCancel,  &QPushButton::clicked, this, &StarStretchDialog::reject);
     
-    btnLayout->addWidget(m_btnApply);
+    btnLayout->addWidget(btnReset);
+    btnLayout->addStretch();
     btnLayout->addWidget(btnCancel);
+    btnLayout->addStretch();
+    btnLayout->addWidget(m_btnApply);
     
     mainLayout->addLayout(btnLayout);
 }
@@ -91,6 +112,7 @@ void StarStretchDialog::onSliderChanged() {
 
 void StarStretchDialog::updatePreview() {
     if (!m_viewer) return;
+    if (m_chkPreview && !m_chkPreview->isChecked()) return;
 
     StarStretchParams params;
     params.stretchAmount = m_sliderStretch->value() / 100.0f;
@@ -131,4 +153,11 @@ void StarStretchDialog::reject() {
         m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
     }
     QDialog::reject();
+}
+
+StarStretchDialog::~StarStretchDialog() {
+    if (!m_applied && m_viewer && m_originalBuffer.isValid()) {
+        // Ensure original is restored if dialog is closed without applying
+        m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
+    }
 }

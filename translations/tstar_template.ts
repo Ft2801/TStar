@@ -833,7 +833,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Opacity:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Parameters</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preview</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2235,6 +2243,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Add raw Light frames to the sequence</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Adds WCS (World Coordinate System) metadata</source>
             <translation type="unfinished" />
         </message>
@@ -2244,6 +2256,10 @@
         </message>
         <message>
             <source>Adjust Cyan/Magenta/Yellow, RGB, Luminance, Saturation, and Contrast for the selected range</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Adjust Ha:OIII ratio, star stretch, and color saturation</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2267,11 +2283,27 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Adjustable star detection threshold</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Adjusts protection of bright areas</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Advanced stretch tool with full control:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Align Channels</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Aligns a sequence of images to a reference frame using star detection:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Aligns multiple open images to a reference using star registration:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2319,6 +2351,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Automate complex multi-step image processing workflows</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Automatic histogram stretch for best visibility</source>
             <translation type="unfinished" />
         </message>
@@ -2339,11 +2375,27 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Batch Crop: applies the same crop to all currently open images</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Batch converts camera RAW files to FITS format:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Black Point</source>
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Blends narrowband star channels with RGB star data:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Blends starless and star-only images with adjustable parameters.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Browse and execute built-in processing scripts:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2352,6 +2404,10 @@
         </message>
         <message>
             <source>Calibrates colors using star catalog data:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Calibrates raw light frames using master calibration images:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2423,6 +2479,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Compatible with pure narrowband and mixed narrowband/OSC workflows</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Compression:</source>
             <translation type="unfinished" />
         </message>
@@ -2483,6 +2543,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Crop and rotate the image with precision:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Ctrl+Z / Ctrl+Shift+Z</source>
             <translation type="unfinished" />
         </message>
@@ -2495,6 +2559,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Decomposes the image into multiple wavelet layers for local editing:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Define named variables to parameterize script execution</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Display Modes</source>
             <translation type="unfinished" />
         </message>
@@ -2503,11 +2575,27 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Double-click to run a script on the active image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Drag &amp; Drop:</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Drag files directly onto the workspace</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Draw a crop selection directly on the image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Dynamic range compression with highlight recovery</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Each layer represents structures at a specific spatial scale</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2524,6 +2612,10 @@
         </message>
         <message>
             <source>Enhances narrowband details by subtracting broadband continuum/star light:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Export individual layers to new windows</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2595,6 +2687,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Ideal for aligning separate narrowband or RGB channel exposures</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Identifies the exact sky coordinates of your image:</source>
             <translation type="unfinished" />
         </message>
@@ -2603,7 +2699,27 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Image Calibration</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image Pipeline</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image Registration</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image Stacking</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Increases color saturation specifically for stars.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Independently adjust gain, threshold, and noise reduction per layer</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2628,6 +2744,10 @@
         </message>
         <message>
             <source>Linear:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Load Ha, OIII, and SII narrowband star channels</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2663,7 +2783,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Multiple stacking modes: Average, Median, Kappa-Sigma, Winsorized Sigma</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Multiscale Decomposition</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Multiscale HDR transformation to reveal details in both highlights and shadows:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>NB \u2192 RGB Stars</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Narrowband Normalization</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2676,6 +2812,10 @@
         </message>
         <message>
             <source>Non-linear stretch preserving star colors</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Normalizes and balances narrowband channels for compositing:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2695,7 +2835,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Optionally add OSC broadband star data</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Optionally creates a star-only mask</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Outputs calibrated frames ready for registration and stacking</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2723,7 +2871,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Pre-built workflows for common astrophotography tasks</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preserves capture metadata in FITS headers</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Press Ctrl+0</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preview individual layers or the final recomposed result</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preview script content before executing</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2732,6 +2896,10 @@
         </message>
         <message>
             <source>Protection</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>RAW to FITS Converter</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2799,6 +2967,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Rotate &amp; Crop</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Rotate by any angle in degrees</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>SCNR (Selective Color Noise Reduction)</source>
             <translation type="unfinished" />
         </message>
@@ -2823,6 +2999,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Script Runner</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Scripting &amp; Automation</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Select a color range using presets (Red, Green, Blue, etc.) or custom hue values</source>
             <translation type="unfinished" />
         </message>
@@ -2831,7 +3015,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Select master Bias, Dark, and Flat frames</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Selective Color Correction</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Set an aspect ratio constraint or crop freely</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2848,6 +3040,10 @@
         </message>
         <message>
             <source>Shows Red/Green and Blue/Green scatter plots</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Sigma clipping for automatic outlier rejection</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2871,6 +3067,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Stacks aligned images to reduce noise and increase signal-to-noise ratio:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Standard:</source>
             <translation type="unfinished" />
         </message>
@@ -2884,6 +3084,10 @@
         </message>
         <message>
             <source>Star Stretch</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Star-based registration with sub-pixel accuracy</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2907,6 +3111,18 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Supports Ha/OIII/SII with multiple blend and lightness modes</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Supports all major RAW formats (Canon, Nikon, Sony, etc.)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Supports translation, rotation, and scale correction</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Symmetry Point</source>
             <translation type="unfinished" />
         </message>
@@ -2915,7 +3131,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>TStar Scripts</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>TStar includes a built-in pipeline for preprocessing and stacking astronomical images from scratch.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>TStar supports FITS, XISF, TIFF, and PNG image formats commonly used in astrophotography.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>TStar supports scripting for automating processing workflows:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2996,6 +3224,10 @@
         </message>
         <message>
             <source>Welcome to TStar! This guide covers all features and tools available in the application.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Write and run custom TStar scripts (.tss):</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3095,11 +3327,11 @@
     <context>
         <name>LivePreviewDialog</name>
         <message>
-            <source>Live Mask Preview</source>
+            <source>Fit</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>No mask data</source>
+            <source>Live Mask Preview</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -4317,10 +4549,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>False Color</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Fit</source>
             <translation type="unfinished" />
         </message>
@@ -4338,10 +4566,6 @@
         </message>
         <message>
             <source>Internal Blur:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invert</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -6693,7 +6917,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Preview</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Reds</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reset</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8306,7 +8538,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Preview</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Remove Green via SCNR (Optional)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reset</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8322,7 +8562,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Stretch Amount: 5.00</source>
+            <source>Stretch Amount: 0.00</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -8578,6 +8818,10 @@
         </message>
         <message>
             <source>Mask Preview</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opacity:</source>
             <translation type="unfinished" />
         </message>
         <message>

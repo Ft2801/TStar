@@ -66,9 +66,6 @@ private:
     QComboBox* m_previewSizeCombo; // 1024, 2048, Full
     int m_maxPreviewDim = 1024;
     
-    QCheckBox* m_previewInvertCb;
-    QCheckBox* m_previewFalseColorCb;
-    
     QPushButton* m_freeBtn;
     QPushButton* m_ellipseBtn;
     QPushButton* m_selectBtn;

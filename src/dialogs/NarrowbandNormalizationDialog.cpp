@@ -860,12 +860,18 @@ void NarrowbandNormalizationDialog::onApply() {
         return;
     }
 
+    ImageBuffer origBuf = m_viewer->getBuffer();
     ImageBuffer newBuf;
     newBuf.setData(m_chW, m_chH, 3, m_result);
-    newBuf.setMetadata(m_viewer->getBuffer().metadata());
+    newBuf.setMetadata(origBuf.metadata());
+    if (origBuf.hasMask()) {
+        newBuf.setMask(*origBuf.getMask());
+        newBuf.blendResult(origBuf);
+    }
 
     if (m_mainWindow) {
         m_mainWindow->startLongProcess();
+        m_viewer->pushUndo();
         m_viewer->setBuffer(newBuf);
         m_mainWindow->endLongProcess();
     }

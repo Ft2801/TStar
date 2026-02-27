@@ -75,7 +75,7 @@ void GraXpertWorker::process(const ImageBuffer& input, const GraXpertParams& par
     QString inputFile = tempDir.filePath("input.tiff");
     {
         QStringList args;
-        args << scriptPath << "save" << inputFile 
+        args << "-I" << scriptPath << "save" << inputFile 
              << QString::number(input.width()) << QString::number(input.height()) << QString::number(input.channels())
              << rawInputFile;
         
@@ -193,7 +193,7 @@ void GraXpertWorker::process(const ImageBuffer& input, const GraXpertParams& par
     QString rawResult = tempDir.filePath("result.raw");
     {
         QStringList args;
-        args << scriptPath << "load" << outputFile << rawResult;
+        args << "-I" << scriptPath << "load" << outputFile << rawResult;
         
         QString pythonExe = "python";
 #if defined(Q_OS_MAC)

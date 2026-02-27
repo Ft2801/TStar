@@ -217,6 +217,33 @@ QString HelpDialog::buildHelpContent()
     html += "<h3>" + tr("Aberration Remover (RAR)") + "</h3>";
     html += "<p>" + tr("Removes chromatic aberration and optical artifacts.") + "</p>";
 
+    // Image Pipeline
+    html += "<h2>" + tr("Image Pipeline") + "</h2>";
+    html += "<p>" + tr("TStar includes a built-in pipeline for preprocessing and stacking astronomical images from scratch.") + "</p>";
+
+    html += "<h3>" + tr("Image Calibration") + "</h3>";
+    html += "<p>" + tr("Calibrates raw light frames using master calibration images:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Select master Bias, Dark, and Flat frames") + "</li>";
+    html += "<li>" + tr("Add raw Light frames to the sequence") + "</li>";
+    html += "<li>" + tr("Outputs calibrated frames ready for registration and stacking") + "</li>";
+    html += "</ul>";
+
+    html += "<h3>" + tr("Image Registration") + "</h3>";
+    html += "<p>" + tr("Aligns a sequence of images to a reference frame using star detection:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Star-based registration with sub-pixel accuracy") + "</li>";
+    html += "<li>" + tr("Supports translation, rotation, and scale correction") + "</li>";
+    html += "<li>" + tr("Adjustable star detection threshold") + "</li>";
+    html += "</ul>";
+
+    html += "<h3>" + tr("Image Stacking") + "</h3>";
+    html += "<p>" + tr("Stacks aligned images to reduce noise and increase signal-to-noise ratio:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Multiple stacking modes: Average, Median, Kappa-Sigma, Winsorized Sigma") + "</li>";
+    html += "<li>" + tr("Sigma clipping for automatic outlier rejection") + "</li>";
+    html += "</ul>";
+
     // Channel Operations
     html += "<h2>" + tr("Channel Operations") + "</h2>";
     
@@ -255,6 +282,38 @@ QString HelpDialog::buildHelpContent()
     html += "<li>" + tr("Subtracts a scaled continuum image (or RGB channel) from narrowband data") + "</li>";
     html += "<li>" + tr("Adjust Q-Factor to control subtraction strength") + "</li>";
     html += "<li>" + tr("Reveals faint nebular structures hidden by stars") + "</li>";
+    html += "</ul>";
+
+    html += "<h3>" + tr("Align Channels") + "</h3>";
+    html += "<p>" + tr("Aligns multiple open images to a reference using star registration:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Ideal for aligning separate narrowband or RGB channel exposures") + "</li>";
+    html += "<li>" + tr("Supports translation, rotation, and scale correction") + "</li>";
+    html += "</ul>";
+
+    html += "<h3>" + tr("NB \u2192 RGB Stars") + "</h3>";
+    html += "<p>" + tr("Blends narrowband star channels with RGB star data:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Load Ha, OIII, and SII narrowband star channels") + "</li>";
+    html += "<li>" + tr("Optionally add OSC broadband star data") + "</li>";
+    html += "<li>" + tr("Adjust Ha:OIII ratio, star stretch, and color saturation") + "</li>";
+    html += "</ul>";
+
+    html += "<h3>" + tr("Narrowband Normalization") + "</h3>";
+    html += "<p>" + tr("Normalizes and balances narrowband channels for compositing:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Supports Ha/OIII/SII with multiple blend and lightness modes") + "</li>";
+    html += "<li>" + tr("Dynamic range compression with highlight recovery") + "</li>";
+    html += "<li>" + tr("Compatible with pure narrowband and mixed narrowband/OSC workflows") + "</li>";
+    html += "</ul>";
+
+    html += "<h3>" + tr("Multiscale Decomposition") + "</h3>";
+    html += "<p>" + tr("Decomposes the image into multiple wavelet layers for local editing:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Each layer represents structures at a specific spatial scale") + "</li>";
+    html += "<li>" + tr("Independently adjust gain, threshold, and noise reduction per layer") + "</li>";
+    html += "<li>" + tr("Preview individual layers or the final recomposed result") + "</li>";
+    html += "<li>" + tr("Export individual layers to new windows") + "</li>";
     html += "</ul>";
 
     // Utilities
@@ -309,6 +368,22 @@ QString HelpDialog::buildHelpContent()
     html += "<li><b>" + tr("Standard:") + "</b> " + tr("Uses median sampling from surrounding areas (faster)") + "</li>";
     html += "</ul>";
 
+    html += "<h3>" + tr("Rotate & Crop") + "</h3>";
+    html += "<p>" + tr("Crop and rotate the image with precision:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Draw a crop selection directly on the image") + "</li>";
+    html += "<li>" + tr("Set an aspect ratio constraint or crop freely") + "</li>";
+    html += "<li>" + tr("Rotate by any angle in degrees") + "</li>";
+    html += "<li>" + tr("Batch Crop: applies the same crop to all currently open images") + "</li>";
+    html += "</ul>";
+
+    html += "<h3>" + tr("RAW to FITS Converter") + "</h3>";
+    html += "<p>" + tr("Batch converts camera RAW files to FITS format:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Supports all major RAW formats (Canon, Nikon, Sony, etc.)") + "</li>";
+    html += "<li>" + tr("Preserves capture metadata in FITS headers") + "</li>";
+    html += "</ul>";
+
     // Masks
     html += "<h2>" + tr("Masks") + "</h2>";
     html += "<p>" + tr("Create and apply luminosity masks for selective processing:") + "</p>";
@@ -324,6 +399,25 @@ QString HelpDialog::buildHelpContent()
     
     html += "<h3>" + tr("AstroSpike") + "</h3>";
     html += "<p>" + tr("Adds artificial diffraction spikes to bright stars for aesthetic effect.") + "</p>";
+
+    // Scripting & Automation
+    html += "<h2>" + tr("Scripting & Automation") + "</h2>";
+    html += "<p>" + tr("TStar supports scripting for automating processing workflows:") + "</p>";
+
+    html += "<h3>" + tr("TStar Scripts") + "</h3>";
+    html += "<p>" + tr("Browse and execute built-in processing scripts:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Pre-built workflows for common astrophotography tasks") + "</li>";
+    html += "<li>" + tr("Preview script content before executing") + "</li>";
+    html += "<li>" + tr("Double-click to run a script on the active image") + "</li>";
+    html += "</ul>";
+
+    html += "<h3>" + tr("Script Runner") + "</h3>";
+    html += "<p>" + tr("Write and run custom TStar scripts (.tss):") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Define named variables to parameterize script execution") + "</li>";
+    html += "<li>" + tr("Automate complex multi-step image processing workflows") + "</li>";
+    html += "</ul>";
 
     // Keyboard Shortcuts
     html += "<h2>" + tr("Keyboard Shortcuts") + "</h2>";

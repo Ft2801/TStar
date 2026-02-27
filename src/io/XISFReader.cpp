@@ -1,5 +1,6 @@
 #include "XISFReader.h"
 #include "CompressionUtils.h"
+#include "FitsHeaderUtils.h"
 #include <QFile>
 #include <QDataStream>
 #include <QXmlStreamReader>
@@ -205,6 +206,14 @@ bool XISFReader::parseHeader(const QByteArray& headerXml, XISFHeaderInfo& info, 
                             else if (name == "XPIXSZ" || name == "PIXSIZE") info.meta.pixelSize = val.toDouble();
                             else if (name == "RA") info.meta.ra = val.toDouble();
                             else if (name == "DEC") info.meta.dec = val.toDouble();
+                            else if (name == "OBJCTRA") {
+                                // HMS string format, parse to degrees
+                                info.meta.ra = FitsHeaderUtils::parseRA(val);
+                            }
+                            else if (name == "OBJCTDEC") {
+                                // DMS string format, parse to degrees
+                                info.meta.dec = FitsHeaderUtils::parseDec(val);
+                            }
                             else if (name == "DATE-OBS") info.meta.dateObs = val;
                             else if (name == "OBJECT") info.meta.objectName = val;
                             // WCS Keywords
@@ -263,6 +272,15 @@ bool XISFReader::parseHeader(const QByteArray& headerXml, XISFHeaderInfo& info, 
                                             info.meta.cd2_2 = row1[1].toDouble();
                                         }
                                     }
+                                }
+                                // Observation center coordinates (standard XISF properties)
+                                else if (prop.id == "Observation:Center:RA") {
+                                    // RA in degrees
+                                    if (info.meta.ra == 0.0) info.meta.ra = prop.value.toDouble();
+                                }
+                                else if (prop.id == "Observation:Center:Dec") {
+                                    // Dec in degrees
+                                    if (info.meta.dec == 0.0) info.meta.dec = prop.value.toDouble();
                                 }
                             }
                         }
@@ -736,6 +754,12 @@ bool XISFReader::parseAllImages(const QByteArray& headerXml, QList<XISFHeaderInf
                         else if (name == "XPIXSZ" || name == "PIXSIZE") info.meta.pixelSize = val.toDouble();
                         else if (name == "RA") info.meta.ra = val.toDouble();
                         else if (name == "DEC") info.meta.dec = val.toDouble();
+                        else if (name == "OBJCTRA") {
+                            info.meta.ra = FitsHeaderUtils::parseRA(val);
+                        }
+                        else if (name == "OBJCTDEC") {
+                            info.meta.dec = FitsHeaderUtils::parseDec(val);
+                        }
                         else if (name == "DATE-OBS") info.meta.dateObs = val;
                         else if (name == "OBJECT") info.meta.objectName = val;
                         else if (name == "CRVAL1") info.meta.ra = val.toDouble();

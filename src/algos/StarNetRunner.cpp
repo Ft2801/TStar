@@ -335,7 +335,7 @@ void StarNetWorker::process(const ImageBuffer& input, const StarNetParams& param
     
     QString rawOutput = tempDir.filePath("starnet_output.raw");
     QStringList convArgs;
-    convArgs << converterScript << outputFile << rawOutput;
+    convArgs << "-I" << converterScript << outputFile << rawOutput;
     
     QString pythonExe;
 #if defined(Q_OS_MAC)

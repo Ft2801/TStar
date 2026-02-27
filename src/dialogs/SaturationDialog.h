@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QPushButton>
+#include <QCheckBox>
 
 class SaturationDialog : public DialogBase {
     Q_OBJECT
@@ -57,6 +58,7 @@ private:
     QLabel* m_valHueSmooth;
     
     QComboBox* m_cmbPresets;
+    QCheckBox* m_chkPreview = nullptr;
 
     void setupUI();
 };

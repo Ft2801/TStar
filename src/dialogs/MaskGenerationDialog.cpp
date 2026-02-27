@@ -130,7 +130,7 @@ void MaskGenerationDialog::setupUI() {
     connect(m_blurSlider, &QSlider::valueChanged, [this](int v){ 
         m_blurLabel->setText(QString::number(v)); 
     });
-    connect(m_blurSlider, &QSlider::sliderReleased, this, &MaskGenerationDialog::updateLivePreview);
+    connect(m_blurSlider, &QSlider::valueChanged, this, &MaskGenerationDialog::updateLivePreview);
     controls->addWidget(m_blurSlider);
     controls->addWidget(m_blurLabel);
     
@@ -150,7 +150,7 @@ void MaskGenerationDialog::setupUI() {
         connect(s, &QSlider::valueChanged, [this, max, lblInfo](int v){
             lblInfo->setText(QString::number((double)v/max, 'f', 2));
         });
-        connect(s, &QSlider::sliderReleased, this, &MaskGenerationDialog::updateLivePreview);
+        connect(s, &QSlider::valueChanged, this, &MaskGenerationDialog::updateLivePreview);
         return s;
     };
     
@@ -169,7 +169,7 @@ void MaskGenerationDialog::setupUI() {
     connect(m_smoothSl, &QSlider::valueChanged, [this](int v){
         m_smoothLbl->setText(QString("%1 px").arg(v));
     });
-    connect(m_smoothSl, &QSlider::sliderReleased, this, &MaskGenerationDialog::updateLivePreview);
+    connect(m_smoothSl, &QSlider::valueChanged, this, &MaskGenerationDialog::updateLivePreview);
     
     m_linkCb = new QCheckBox(tr("Link Limits"));
     rangeGrid->addWidget(m_linkCb, 0, 3);
@@ -277,15 +277,7 @@ void MaskGenerationDialog::setupUI() {
         updateLivePreview();
     });
     previewLayout->addWidget(m_previewSizeCombo);
-    
-    m_previewInvertCb = new QCheckBox(tr("Invert"));
-    connect(m_previewInvertCb, &QCheckBox::toggled, this, &MaskGenerationDialog::updateLivePreview);
-    previewLayout->addWidget(m_previewInvertCb);
-    
-    m_previewFalseColorCb = new QCheckBox(tr("False Color"));
-    connect(m_previewFalseColorCb, &QCheckBox::toggled, this, &MaskGenerationDialog::updateLivePreview);
-    previewLayout->addWidget(m_previewFalseColorCb);
-    
+
     mainLayout->addWidget(previewGroup);
 
     // --- 6. Buttons ---
@@ -646,10 +638,8 @@ void MaskGenerationDialog::updateLivePreview() {
     
     // Apply visualization settings
     ImageBuffer::DisplayMode mode = static_cast<ImageBuffer::DisplayMode>(m_previewStretchCombo->currentData().toInt());
-    bool inverted = m_previewInvertCb->isChecked();
-    bool falseColor = m_previewFalseColorCb->isChecked();
-    
-    m_livePreview->updateMask(m.data, m.width, m.height, mode, inverted, falseColor);
+
+    m_livePreview->updateMask(m.data, m.width, m.height, mode, false, false);
 }
 
 void MaskGenerationDialog::generatePreview() {
@@ -662,17 +652,21 @@ void MaskGenerationDialog::generatePreview() {
         });
     }
     
-    // Generate and update mask
-    MaskLayer m = getGeneratedMask();
+    // Generate and update mask (use small-res for consistency with live preview)
+    MaskLayer m;
+    if (m_smallW > 0 && m_smallH > 0) {
+        m = getGeneratedMask(m_smallW, m_smallH);
+    } else {
+        m = getGeneratedMask();
+    }
     if (m.data.empty() || m.width == 0 || m.height == 0) {
         QMessageBox::warning(this, tr("Preview"), tr("No mask data generated. Please draw shapes or select a mask type."));
         return;
     }
-    
+
     m_livePreview->updateMask(m.data, m.width, m.height,
                               static_cast<ImageBuffer::DisplayMode>(m_previewStretchCombo->currentData().toInt()),
-                              m_previewInvertCb->isChecked(),
-                              m_previewFalseColorCb->isChecked());
+                              false, false);
     
     // Show if hidden (reuse if already open)
     if (!m_livePreview->isVisible()) {

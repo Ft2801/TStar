@@ -10,8 +10,8 @@ SOURCE_DIR = os.path.join(script_dir, "../src")
 OUTPUT_FILE = os.path.join(script_dir, "../translations/tstar_template.ts")
 
 # Regex for matching tr("string") and QCoreApplication::translate("context", "string")
-# Handles escaped quotes mostly
-TR_REGEX = re.compile(r'tr\s*\(\s*"((?:[^"\\]|\\.)*)"\s*\)')
+# \b ensures we don't accidentally match function names ending in "tr", e.g. matchStr(
+TR_REGEX = re.compile(r'\btr\s*\(\s*"((?:[^"\\]|\\.)*)"\s*\)')
 TRANSLATE_REGEX = re.compile(r'QCoreApplication::translate\s*\(\s*"((?:[^"\\]|\\.)*)"\s*,\s*"((?:[^"\\]|\\.)*)"\s*\)')
 
 def scan_files(root_dir):

@@ -1663,8 +1663,12 @@ void MainWindow::saveFile() {
             burnBox->setToolTip(tr("Cannot burn annotations into raw data formats (FITS/XISF)"));
         }
     } else {
-        depthBox->addItems({tr("8-bit Integer")});
-        if (format == "PNG") depthBox->addItem(tr("16-bit Integer"));
+        // PNG / JPG: only 8-bit and 16-bit make sense; default 16-bit for PNG
+        if (format == "PNG") {
+            depthBox->addItems({tr("16-bit Integer"), tr("8-bit Integer")});
+        } else {
+            depthBox->addItems({tr("8-bit Integer")});
+        }
     }
     
     layout->addRow(tr("Format:"), new QLabel(format));

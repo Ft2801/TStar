@@ -49,7 +49,7 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
     }
 
     QStringList args;
-    args << scriptPath 
+    args << "-I" << scriptPath 
          << "--input" << inputFile 
          << "--output" << outputFile 
          << "--model" << params.modelPath

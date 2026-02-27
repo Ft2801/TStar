@@ -3,6 +3,8 @@
 
 #include "DialogBase.h"
 #include <QSlider>
+#include <QCheckBox>
+#include <QTimer>
 #include <QImage>
 #include "../ImageBuffer.h"
 
@@ -19,8 +21,11 @@ class ClaheDialog : public DialogBase {
 public:
     explicit ClaheDialog(QWidget* parent = nullptr);
     ~ClaheDialog();
-    
+
     void setSource(const ImageBuffer& img);
+
+protected:
+    bool eventFilter(QObject* obj, QEvent* ev) override;
 
 private slots:
     void onApply();
@@ -36,16 +41,24 @@ private:
     ImageBuffer m_previewImage;
     
     // UI Elements
-    QSlider* m_clipSlider;
-    QLabel* m_clipLabel;
-    
-    QSlider* m_tileSlider;
-    QLabel* m_tileLabel;
-    
-    QGraphicsView* m_view;
-    QGraphicsScene* m_scene;
+    QSlider*    m_clipSlider;
+    QLabel*     m_clipLabel;
+
+    QSlider*    m_tileSlider;
+    QLabel*     m_tileLabel;
+
+    QSlider*    m_opacitySlider = nullptr;
+    QLabel*     m_opacityLabel  = nullptr;
+
+    QCheckBox*  m_chkPreview;
+    QTimer*     m_previewTimer;
+
+    QGraphicsView*       m_view;
+    QGraphicsScene*      m_scene;
     QGraphicsPixmapItem* m_pixmapItem;
-    
+    float                m_zoom = 1.0f;
+    bool                 m_firstDisplay = true; // fit-to-view only on first render
+
     bool m_previewDirty;
 };
 

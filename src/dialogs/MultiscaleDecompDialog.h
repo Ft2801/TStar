@@ -2,6 +2,7 @@
 #define MULTISCALE_DECOMP_DIALOG_H
 
 #include <QVBoxLayout>
+#include "../MainWindowCallbacks.h"
 #include <QHBoxLayout>
 #include <QSplitter>
 #include <QGroupBox>
@@ -26,7 +27,6 @@
 #include "../algos/ChannelOps.h"
 
 class ImageViewer;
-class MainWindowCallbacks;
 
 // ============================================================================
 // MultiscaleDecompDialog — Multiscale Decomposition Tool
@@ -53,7 +53,6 @@ private slots:
     void onDenoiseSliderChanged(int v);
     void onApplyToImage();
     void onSendToNewImage();
-    void onSplitLayers();
     void rebuildPreview();
 
 private:
@@ -126,9 +125,10 @@ private:
     QSlider* m_sliderAmt = nullptr;
     QSlider* m_sliderDenoise = nullptr;
 
+    MainWindowCallbacks* m_mainWindow = nullptr;
+
     QPushButton* m_btnApply = nullptr;
     QPushButton* m_btnNewDoc = nullptr;
-    QPushButton* m_btnSplit = nullptr;
     QPushButton* m_btnClose = nullptr;
 };
 
