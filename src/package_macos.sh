@@ -154,6 +154,15 @@ copy_dylib "libharfbuzz" "harfbuzz" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "liblapack" "lapack" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libjasper" "jasper" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 
+# ====================================================================
+# Transitive dependencies that macdeployqt often misses
+# ====================================================================
+copy_dylib "libdbus-1.3" "dbus" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libtbb.12" "tbb" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
+copy_dylib "libtbb" "tbb" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libopenjp2.7" "openjpeg" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
+copy_dylib "libopenjp2" "openjpeg" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+
 OPENCV_PREFIX=$(brew --prefix opencv 2>/dev/null || echo "")
 if [ ! -d "$OPENCV_PREFIX/lib" ]; then
     for base in /opt/homebrew /usr/local; do
