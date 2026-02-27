@@ -101,6 +101,32 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
     else if (!foundPython.isEmpty()) pythonExe = foundPython;
     else pythonExe = "python3";
 
+    // Inject bundled venv site-packages into PYTHONPATH so numpy/tifffile/onnxruntime
+    // are found even when the venv python3 symlink is broken after packaging (macOS).
+    {
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+#if defined(Q_OS_MAC)
+        const QStringList venvBases = {
+            QCoreApplication::applicationDirPath() + "/../Resources/python_venv/lib",
+            QCoreApplication::applicationDirPath() + "/../../deps/python_venv/lib"
+        };
+        for (const QString& venvLib : venvBases) {
+            if (QDir(venvLib).exists()) {
+                const QStringList pyDirs = QDir(venvLib).entryList({"python3*"}, QDir::Dirs | QDir::NoDotAndDotDot);
+                if (!pyDirs.isEmpty()) {
+                    const QString sitePkgs = venvLib + "/" + pyDirs.first() + "/site-packages";
+                    if (QDir(sitePkgs).exists()) {
+                        const QString cur = env.value("PYTHONPATH");
+                        env.insert("PYTHONPATH", cur.isEmpty() ? sitePkgs : sitePkgs + ":" + cur);
+                        break;
+                    }
+                }
+            }
+        }
+#endif
+        p.setProcessEnvironment(env);
+    }
+
     p.start(pythonExe, args);
     
     // Check if it started successfully

@@ -151,6 +151,31 @@ void CosmicClarityWorker::process(const ImageBuffer& input, const CosmicClarityP
     QProcess proc;
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     env.insert("PYTHONUNBUFFERED", "1");  // Force Python line buffering in subprocess
+
+    // Inject bundled venv site-packages into PYTHONPATH so numpy/tifffile/onnxruntime
+    // are found even when the venv python3 symlink is broken after packaging (macOS).
+#if defined(Q_OS_MAC)
+    {
+        const QStringList venvBases = {
+            QCoreApplication::applicationDirPath() + "/../Resources/python_venv/lib",
+            QCoreApplication::applicationDirPath() + "/../../deps/python_venv/lib"
+        };
+        for (const QString& venvLib : venvBases) {
+            if (QDir(venvLib).exists()) {
+                const QStringList pyDirs = QDir(venvLib).entryList({"python3*"}, QDir::Dirs | QDir::NoDotAndDotDot);
+                if (!pyDirs.isEmpty()) {
+                    const QString sitePkgs = venvLib + "/" + pyDirs.first() + "/site-packages";
+                    if (QDir(sitePkgs).exists()) {
+                        const QString cur = env.value("PYTHONPATH");
+                        env.insert("PYTHONPATH", cur.isEmpty() ? sitePkgs : sitePkgs + ":" + cur);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+#endif
+
     proc.setProcessEnvironment(env);
     
     proc.setProgram(pythonExe);

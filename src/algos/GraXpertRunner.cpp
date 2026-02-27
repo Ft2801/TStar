@@ -94,6 +94,30 @@ void GraXpertWorker::process(const ImageBuffer& input, const GraXpertParams& par
         else pythonExe = "python3";
         
         QProcess p;
+        // Inject bundled venv site-packages into PYTHONPATH (macOS: venv symlink may be broken after packaging)
+        {
+            QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+#if defined(Q_OS_MAC)
+            const QStringList venvBases = {
+                QCoreApplication::applicationDirPath() + "/../Resources/python_venv/lib",
+                QCoreApplication::applicationDirPath() + "/../../deps/python_venv/lib"
+            };
+            for (const QString& venvLib : venvBases) {
+                if (QDir(venvLib).exists()) {
+                    const QStringList pyDirs = QDir(venvLib).entryList({"python3*"}, QDir::Dirs | QDir::NoDotAndDotDot);
+                    if (!pyDirs.isEmpty()) {
+                        const QString sitePkgs = venvLib + "/" + pyDirs.first() + "/site-packages";
+                        if (QDir(sitePkgs).exists()) {
+                            const QString cur = env.value("PYTHONPATH");
+                            env.insert("PYTHONPATH", cur.isEmpty() ? sitePkgs : sitePkgs + ":" + cur);
+                            break;
+                        }
+                    }
+                }
+            }
+#endif
+            p.setProcessEnvironment(env);
+        }
         p.start(pythonExe, args);
         if (!p.waitForFinished(60000)) {
             emit finished(output, "Bridge timeout saving TIFF.");
@@ -207,6 +231,30 @@ void GraXpertWorker::process(const ImageBuffer& input, const GraXpertParams& par
         else if (QFile::exists(devPython)) pythonExe = devPython;
 
         QProcess p;
+        // Inject bundled venv site-packages into PYTHONPATH (macOS: venv symlink may be broken after packaging)
+        {
+            QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+#if defined(Q_OS_MAC)
+            const QStringList venvBases = {
+                QCoreApplication::applicationDirPath() + "/../Resources/python_venv/lib",
+                QCoreApplication::applicationDirPath() + "/../../deps/python_venv/lib"
+            };
+            for (const QString& venvLib : venvBases) {
+                if (QDir(venvLib).exists()) {
+                    const QStringList pyDirs = QDir(venvLib).entryList({"python3*"}, QDir::Dirs | QDir::NoDotAndDotDot);
+                    if (!pyDirs.isEmpty()) {
+                        const QString sitePkgs = venvLib + "/" + pyDirs.first() + "/site-packages";
+                        if (QDir(sitePkgs).exists()) {
+                            const QString cur = env.value("PYTHONPATH");
+                            env.insert("PYTHONPATH", cur.isEmpty() ? sitePkgs : sitePkgs + ":" + cur);
+                            break;
+                        }
+                    }
+                }
+            }
+#endif
+            p.setProcessEnvironment(env);
+        }
         p.start(pythonExe, args);
         if (!p.waitForFinished(60000)) {
             emit finished(output, "Bridge timeout loading result.");

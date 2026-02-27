@@ -219,7 +219,13 @@ verify_dir "$PYTHON_VENV" "Python venv" || {
 }
 
 if [ -d "$PYTHON_VENV" ]; then
-    cp -R "$PYTHON_VENV" "$RESOURCES_DIR/python_venv"
+    # Use rsync -aL to dereference ALL symlinks (including bin/python3) so the venv
+    # is self-contained inside the bundle and works on machines without the dev's Python.
+    if command -v rsync &> /dev/null; then
+        rsync -aL "$PYTHON_VENV/" "$RESOURCES_DIR/python_venv/"
+    else
+        cp -RL "$PYTHON_VENV" "$RESOURCES_DIR/python_venv"
+    fi
     echo "  - Python venv: OK"
 fi
 

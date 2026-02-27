@@ -77,7 +77,9 @@ fi
 echo ""
 echo "[STEP 3] Creating virtual environment..."
 
-"$PYTHON_CMD" -m venv "$PYTHON_VENV"
+# --copies: copies the Python executable instead of symlinking it.
+# This makes the venv portable (symlinks break when the venv is copied into the app bundle).
+"$PYTHON_CMD" -m venv --copies "$PYTHON_VENV"
 
 if [ ! -f "$PYTHON_VENV/bin/python3" ]; then
     echo "[ERROR] Failed to create virtual environment!"
