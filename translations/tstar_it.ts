@@ -4869,14 +4869,6 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Decomposizione multiscala</translation>
         </message>
         <message>
-            <source>Multiscale Detail %1</source>
-            <translation type="finished">Dettagli multiscala %1</translation>
-        </message>
-        <message>
-            <source>Multiscale Residual</source>
-            <translation type="finished">Residua multiscala</translation>
-        </message>
-        <message>
             <source>Multiscale Result</source>
             <translation type="finished">Risultato multiscala</translation>
         </message>
@@ -4907,10 +4899,6 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Send to New Image</source>
             <translation type="finished">Invia a nuova immagine</translation>
-        </message>
-        <message>
-            <source>Split Layers</source>
-            <translation type="finished">Dividi strati</translation>
         </message>
         <message>
             <source>Thr (σ)</source>

@@ -4869,14 +4869,6 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Multiskalare Zerlegung</translation>
         </message>
         <message>
-            <source>Multiscale Detail %1</source>
-            <translation type="finished">Multiskalare Details %1</translation>
-        </message>
-        <message>
-            <source>Multiscale Residual</source>
-            <translation type="finished">Multiskalarer Rest</translation>
-        </message>
-        <message>
             <source>Multiscale Result</source>
             <translation type="finished">Multiskalares Ergebnis</translation>
         </message>
@@ -4907,10 +4899,6 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Send to New Image</source>
             <translation type="finished">An neues Bild senden</translation>
-        </message>
-        <message>
-            <source>Split Layers</source>
-            <translation type="finished">Schichten aufteilen</translation>
         </message>
         <message>
             <source>Thr (σ)</source>

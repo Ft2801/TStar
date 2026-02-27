@@ -3,6 +3,7 @@
 #include "../MainWindowCallbacks.h"
 #include <QMessageBox>
 #include <QApplication>
+#include <QWheelEvent>
 #include <cmath>
 
 #ifdef _OPENMP
@@ -28,6 +29,16 @@ MultiscaleDecompDialog::MultiscaleDecompDialog(QWidget* parent)
 }
 
 MultiscaleDecompDialog::~MultiscaleDecompDialog() = default;
+
+bool MultiscaleDecompDialog::eventFilter(QObject* obj, QEvent* event) {
+    if (m_view && obj == m_view->viewport() && event->type() == QEvent::Wheel) {
+        QWheelEvent* we = static_cast<QWheelEvent*>(event);
+        double factor = (we->angleDelta().y() > 0) ? 1.15 : (1.0 / 1.15);
+        m_view->scale(factor, factor);
+        return true;
+    }
+    return DialogBase::eventFilter(obj, event);
+}
 
 // ============================================================================
 // Public API
@@ -74,11 +85,13 @@ void MultiscaleDecompDialog::setViewer(ImageViewer* v) {
     recomputeDecomp(true);
     rebuildPreview();
 
-    // Fit view
-    if (m_pixBase && !m_pixBase->pixmap().isNull()) {
-        m_view->resetTransform();
-        m_view->fitInView(m_pixBase, Qt::KeepAspectRatio);
-    }
+    // Defer fit-to-view: the view has no valid geometry until the window is shown
+    QTimer::singleShot(0, this, [this]() {
+        if (m_pixBase && !m_pixBase->pixmap().isNull()) {
+            m_view->resetTransform();
+            m_view->fitInView(m_pixBase, Qt::KeepAspectRatio);
+        }
+    });
 }
 
 // ============================================================================
@@ -101,6 +114,7 @@ void MultiscaleDecompDialog::buildUI() {
     m_view->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     m_view->setResizeAnchor(QGraphicsView::AnchorUnderMouse);
     m_view->setAlignment(Qt::AlignCenter);
+    m_view->viewport()->installEventFilter(this);
 
     m_pixBase = new QGraphicsPixmapItem();
     m_scene->addItem(m_pixBase);

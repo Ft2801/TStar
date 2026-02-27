@@ -39,6 +39,9 @@ public:
 
     void setViewer(ImageViewer* v);
 
+protected:
+    bool eventFilter(QObject* obj, QEvent* event) override;
+
 private slots:
     void onLayersChanged(int val);
     void onSigmaChanged(double val);

@@ -4866,14 +4866,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Multiscale Detail %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Multiscale Residual</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Multiscale Result</source>
             <translation type="unfinished" />
         </message>
@@ -4903,10 +4895,6 @@
         </message>
         <message>
             <source>Send to New Image</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Split Layers</source>
             <translation type="unfinished" />
         </message>
         <message>

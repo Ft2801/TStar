@@ -4869,14 +4869,6 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Décomposition multéchelle</translation>
         </message>
         <message>
-            <source>Multiscale Detail %1</source>
-            <translation type="finished">Détails multéchelle %1</translation>
-        </message>
-        <message>
-            <source>Multiscale Residual</source>
-            <translation type="finished">Résidu multéchelle</translation>
-        </message>
-        <message>
             <source>Multiscale Result</source>
             <translation type="finished">Résultat multéchelle</translation>
         </message>
@@ -4907,10 +4899,6 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Send to New Image</source>
             <translation type="finished">Envoyer vers nouvelle image</translation>
-        </message>
-        <message>
-            <source>Split Layers</source>
-            <translation type="finished">Diviser couches</translation>
         </message>
         <message>
             <source>Thr (σ)</source>
