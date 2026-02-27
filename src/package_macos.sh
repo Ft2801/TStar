@@ -133,6 +133,12 @@ copy_dylib "libmd4c" "md4c" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libopenblas.0" "openblas" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
 copy_dylib "libopenblas" "openblas" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 
+# GCC/Fortran dependencies (required by math libraries like OpenBLAS/GSL)
+copy_dylib "libgcc_s.1.1" "gcc" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
+copy_dylib "libgcc_s.1" "gcc" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+copy_dylib "libgfortran.5" "gcc" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
+copy_dylib "libgfortran" "gcc" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+
 copy_dylib "libpng16" "libpng" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
 copy_dylib "libpng" "libpng" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libjpeg" "jpeg" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
