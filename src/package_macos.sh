@@ -77,39 +77,26 @@ QT_PREFIX=$(detect_qt_prefix)
 MACDEPLOYQT=$(find_macdeployqt "$QT_PREFIX")
 
 if [ -f "$MACDEPLOYQT" ]; then
-    # Run macdeployqt with Qt lib path and filter out rpath warnings
-    # The rpath warnings are non-fatal and occur because some plugins reference
-    # Qt frameworks that will be bundled. We filter them to keep output clean.
-    
-    # EXECUTABLE path was defined earlier or needs re-definition here if used
     EXECUTABLE="$DIST_DIR/Contents/MacOS/TStar"
     TARGET_ARCH=$(detect_build_architecture "$EXECUTABLE")
 
-    # Build libpath string with architecture-specific paths
-    # SIMPLIFIED: Only pass main lib directories, avoid looping over opt subdirs
-    # which confuses macdeployqt when symlinks are broken or libs are missing
     LIBPATH_ARGS="-libpath=$QT_PREFIX/lib"
     
-    # Only add Homebrew paths matching the target architecture
     if [ "$TARGET_ARCH" == "arm64" ]; then
-        # Apple Silicon: Add /opt/homebrew main lib
         if [ -d "/opt/homebrew/lib" ]; then
             LIBPATH_ARGS="$LIBPATH_ARGS -libpath=/opt/homebrew/lib"
         fi
     else
-        # Intel: Add /usr/local main lib
         if [ -d "/usr/local/lib" ]; then
              LIBPATH_ARGS="$LIBPATH_ARGS -libpath=/usr/local/lib"
         fi
     fi
     
-    # Run macdeployqt with expanded libpath and filter non-fatal errors
-    # We filter "Cannot resolve rpath" and missing file errors for /opt/homebrew/opt
-    # which we manually fix anyway in the next steps.
+    # Eseguo macdeployqt (rimosso il grep che nascondeva gli errori su /opt/homebrew/opt)
     "$MACDEPLOYQT" "$DIST_DIR" \
         -verbose=1 \
         $LIBPATH_ARGS \
-        2>&1 | grep -v "Cannot resolve rpath" | grep -v "using QList" | grep -v "No such file or directory" | grep -v "error: /opt/homebrew/opt" || true
+        2>&1 | grep -v "Cannot resolve rpath" | grep -v "using QList" | grep -v "No such file or directory" || true
     echo "  - Qt frameworks deployed"
 else
     echo "[WARNING] macdeployqt not found. Qt frameworks not bundled."
@@ -121,7 +108,6 @@ fi
 echo ""
 log_step 5 "Copying Homebrew libraries..."
 
-# Detect build architecture from executable
 EXECUTABLE="$DIST_DIR/Contents/MacOS/TStar"
 BUILD_ARCH=$(detect_build_architecture "$EXECUTABLE")
 echo "  - Target architecture: $BUILD_ARCH"
@@ -129,13 +115,10 @@ echo "  - Target architecture: $BUILD_ARCH"
 FRAMEWORKS_DIR="$DIST_DIR/Contents/Frameworks"
 ensure_dir "$FRAMEWORKS_DIR"
 
-# Copy required dylibs using shared function (pass architecture)
-# CRITICAL: ZLIB is required by CMakeLists.txt (find_package(ZLIB REQUIRED))
 copy_dylib "libz.dylib" "zlib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
 copy_dylib "libz" "zlib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libz.1.dylib" "zlib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 
-# Core dependencies
 copy_dylib "libgsl" "gsl" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libgslcblas" "gsl" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libcfitsio" "cfitsio" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
@@ -147,12 +130,9 @@ copy_dylib "libbrotlidec" "brotli" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libraw" "libraw" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libmd4c" "md4c" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 
-# OpenBLAS: transitive dependency of libopencv_core - must be bundled explicitly
 copy_dylib "libopenblas.0" "openblas" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
 copy_dylib "libopenblas" "openblas" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 
-# Image format libraries required by OpenCV and Qt
-# These are critical for image loading/saving in Qt and OpenCV pipelines
 copy_dylib "libpng16" "libpng" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
 copy_dylib "libpng" "libpng" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libjpeg" "jpeg" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
@@ -162,22 +142,14 @@ copy_dylib "libtiff.6" "libtiff" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libwebp" "libwebp" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libwebpdemux" "libwebp" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 
-# Font and text rendering (required by Qt and OpenCV for text rendering)
 copy_dylib "libfreetype" "freetype" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libharfbuzz" "harfbuzz" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 
-# Additional OpenCV dependencies
 copy_dylib "liblapack" "lapack" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libjasper" "jasper" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
-copy_dylib "libraw" "libraw" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
-copy_dylib "libmd4c" "md4c" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
-# OpenBLAS: transitive dependency of libopencv_core - must be bundled explicitly
-copy_dylib "libopenblas.0" "openblas" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 
-# OpenCV (only required modules - dnn and video excluded to avoid external dependencies)
 OPENCV_PREFIX=$(brew --prefix opencv 2>/dev/null || echo "")
 if [ ! -d "$OPENCV_PREFIX/lib" ]; then
-    # OpenCV Fallback (search BOTH possible Homebrew paths)
     for base in /opt/homebrew /usr/local; do
         if [ -d "$base/Cellar/opencv" ]; then
             OPENCV_PREFIX=$(find "$base/Cellar/opencv" -maxdepth 2 -name "lib" -type d 2>/dev/null | head -1)
@@ -190,9 +162,6 @@ if [ ! -d "$OPENCV_PREFIX/lib" ]; then
 fi
 
 if [ -n "$OPENCV_PREFIX" ] && [ -d "$OPENCV_PREFIX/lib" ]; then
-    # Only copy the modules TStar actually uses (matching CMakeLists.txt requirements)
-    # INCLUDED: core, imgproc, imgcodecs, photo, features2d, calib3d
-    # EXCLUDED: dnn (OpenVINO dependency), video, videoio, objdetect (not required)
     OPENCV_MODULES="core imgproc imgcodecs photo features2d calib3d"
     
     COPIED_COUNT=0
@@ -212,7 +181,6 @@ if [ -n "$OPENCV_PREFIX" ] && [ -d "$OPENCV_PREFIX/lib" ]; then
     fi
     echo "    (dnn, video, videoio, objdetect excluded to avoid external dependencies)"
     
-    # Verify no OpenVINO or other problematic dependencies are bundled
     PROBLEMATIC_LIBS=$(find "$FRAMEWORKS_DIR" -name "*openvino*" -o -name "*protobuf*" 2>/dev/null | grep -v "/Applications" || true)
     if [ -n "$PROBLEMATIC_LIBS" ]; then
         echo "  [WARNING] Found external dependencies that should not be bundled:"
@@ -222,7 +190,6 @@ if [ -n "$OPENCV_PREFIX" ] && [ -d "$OPENCV_PREFIX/lib" ]; then
 else
     echo "  - OpenCV: NOT FOUND"
 fi
-
 
 # --- Copy Python environment ---
 echo ""
@@ -270,7 +237,6 @@ if [ -d "$BUILD_DIR/translations" ]; then
     echo "  - Translations: OK"
 fi
 
-
 # --- Resolve & Fix Libraries ---
 echo ""
 log_step 9 "Resolving and Fixing Libraries..."
@@ -279,7 +245,6 @@ EXECUTABLE="$DIST_DIR/Contents/MacOS/TStar"
 
 # 1. Recursive copy of missing dependencies
 echo "  - Recursively collecting dependencies..."
-# Loop multiple times to handle deep chains (3 passes for safety)
 for i in {1..3}; do
     for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
         if [ -f "$dylib" ]; then
@@ -303,14 +268,39 @@ if [ -f "$EXECUTABLE" ]; then
     fix_executable_deps "$EXECUTABLE" "$FRAMEWORKS_DIR"
 fi
 
-# 4. Final sweep: rewrite ALL remaining Homebrew absolute paths
-echo "  - Final sweep: rewriting any remaining Homebrew paths..."
+# 4. Final sweep: rewrite ALL remaining Homebrew absolute paths in dylibs
+echo "  - Final sweep: rewriting any remaining Homebrew paths in executable and dylibs..."
 rewrite_homebrew_paths "$EXECUTABLE"
 for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
     if [ -f "$dylib" ]; then
         rewrite_homebrew_paths "$dylib"
     fi
 done
+
+# 5. Fix absolute paths inside Qt Framework binaries (NUOVO)
+echo "  - Fixing dependencies inside .framework bundles..."
+for framework in "$FRAMEWORKS_DIR"/*.framework; do
+    if [ -d "$framework" ]; then
+        framework_name=$(basename "$framework" .framework)
+        framework_binary="$framework/Versions/A/$framework_name"
+        
+        if [ -f "$framework_binary" ]; then
+            rewrite_homebrew_paths "$framework_binary"
+        fi
+    fi
+done
+
+# 6. Fix absolute paths inside Qt Plugins (NUOVO)
+echo "  - Fixing dependencies inside Qt Plugins..."
+PLUGINS_DIR="$DIST_DIR/Contents/PlugIns"
+if [ -d "$PLUGINS_DIR" ]; then
+    find "$PLUGINS_DIR" -name "*.dylib" | while read -r plugin_path; do
+        if [ -f "$plugin_path" ]; then
+            rewrite_homebrew_paths "$plugin_path"
+            install_name_tool -add_rpath "@executable_path/../Frameworks" "$plugin_path" 2>/dev/null || true
+        fi
+    done
+fi
 
 # --- Verify bundled dylibs dependencies ---
 echo ""
@@ -323,7 +313,6 @@ HOMEBREW_REFS=0
 echo "  - Checking for unresolved @rpath references..."
 for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
     if [ -f "$dylib" ]; then
-        # Check @rpath references that can't be resolved
         UNRESOLVED=$(otool -L "$dylib" 2>/dev/null | grep "@rpath" | grep -v "^$dylib:" | grep -v "@rpath/Qt" || true)
         if [ -n "$UNRESOLVED" ]; then
             while IFS= read -r dep_line; do
@@ -337,7 +326,6 @@ for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
             done <<< "$UNRESOLVED"
         fi
         
-        # Check for absolute Homebrew paths that slipped through
         BREW_REFS=$(otool -L "$dylib" 2>/dev/null | grep -v "^$dylib:" | awk '{print $1}' | grep -E "^(/opt/homebrew|/usr/local/(Cellar|opt|lib))" || true)
         if [ -n "$BREW_REFS" ]; then
             while IFS= read -r brew_ref; do
@@ -348,7 +336,6 @@ for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
     fi
 done
 
-# Also check the executable
 if [ -f "$EXECUTABLE" ]; then
     EXEC_BREW_REFS=$(otool -L "$EXECUTABLE" 2>/dev/null | grep -v "^$EXECUTABLE:" | awk '{print $1}' | grep -E "^(/opt/homebrew|/usr/local/(Cellar|opt|lib))" || true)
     if [ -n "$EXEC_BREW_REFS" ]; then
@@ -394,7 +381,6 @@ else
     echo "  - libmd4c.0.dylib: OK"
 fi
 
-# Check for ZLIB (CRITICAL - required by CMakeLists.txt)
 ZLIB_FOUND=0
 for zlib_name in libz.dylib libz.1.dylib libz libz.1; do
     if [ -f "$FRAMEWORKS_DIR/$zlib_name" ]; then
@@ -412,7 +398,6 @@ else
     echo "  - ZLIB: OK"
 fi
 
-# Check for critical image format libraries
 for imglib in libpng libjpeg libtiff libwebp; do
     if find "$FRAMEWORKS_DIR" -name "$imglib*" 2>/dev/null | head -1 | grep -q .; then
         echo "  - $imglib: OK"
@@ -455,7 +440,6 @@ EOF
 
 echo "  - README.txt: OK"
 
-# Copy changelog
 cp "changelog.txt" "dist/" 2>/dev/null || true
 
 # --- Summary ---
