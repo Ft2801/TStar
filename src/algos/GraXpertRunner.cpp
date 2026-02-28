@@ -79,6 +79,16 @@ void GraXpertWorker::process(const ImageBuffer& input, const GraXpertParams& par
              << QString::number(input.width()) << QString::number(input.height()) << QString::number(input.channels())
              << rawInputFile;
         
+        // Verify the python binary actually loads before committing to it.
+        // On macOS, dyld may hard-crash the venv python3 (exit 6) if Python.framework
+        // is not at the Homebrew Cellar path baked in at venv creation time.
+        auto pythonWorks = [](const QString& exe) -> bool {
+            if (!QFile::exists(exe)) return false;
+            QProcess test;
+            test.start(exe, QStringList() << "-c" << "import sys; sys.exit(0)");
+            return test.waitForFinished(5000) && test.exitCode() == 0;
+        };
+
         QString pythonExe;
 #if defined(Q_OS_MAC)
         QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
@@ -88,8 +98,8 @@ void GraXpertWorker::process(const ImageBuffer& input, const GraXpertParams& par
         QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
 #endif
         QString foundPython = QStandardPaths::findExecutable("python3");
-        if (QFile::exists(bundledPython)) pythonExe = bundledPython;
-        else if (QFile::exists(devPython)) pythonExe = devPython;
+        if (pythonWorks(bundledPython)) pythonExe = bundledPython;
+        else if (pythonWorks(devPython)) pythonExe = devPython;
         else if (!foundPython.isEmpty()) pythonExe = foundPython;
         else pythonExe = "python3";
         
@@ -219,7 +229,15 @@ void GraXpertWorker::process(const ImageBuffer& input, const GraXpertParams& par
         QStringList args;
         args << "-I" << scriptPath << "load" << outputFile << rawResult;
         
-        QString pythonExe = "python";
+        // Verify the python binary actually loads before committing to it.
+        auto pythonWorks2 = [](const QString& exe) -> bool {
+            if (!QFile::exists(exe)) return false;
+            QProcess test;
+            test.start(exe, QStringList() << "-c" << "import sys; sys.exit(0)");
+            return test.waitForFinished(5000) && test.exitCode() == 0;
+        };
+
+        QString pythonExe;
 #if defined(Q_OS_MAC)
         QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
         QString devPython = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
@@ -227,8 +245,11 @@ void GraXpertWorker::process(const ImageBuffer& input, const GraXpertParams& par
         QString bundledPython = QCoreApplication::applicationDirPath() + "/python/python.exe";
         QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
 #endif
-        if (QFile::exists(bundledPython)) pythonExe = bundledPython;
-        else if (QFile::exists(devPython)) pythonExe = devPython;
+        QString foundPython2 = QStandardPaths::findExecutable("python3");
+        if (pythonWorks2(bundledPython)) pythonExe = bundledPython;
+        else if (pythonWorks2(devPython)) pythonExe = devPython;
+        else if (!foundPython2.isEmpty()) pythonExe = foundPython2;
+        else pythonExe = "python3";
 
         QProcess p;
         // Inject bundled venv site-packages into PYTHONPATH (macOS: venv symlink may be broken after packaging)

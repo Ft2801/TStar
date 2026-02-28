@@ -337,6 +337,16 @@ void StarNetWorker::process(const ImageBuffer& input, const StarNetParams& param
     QStringList convArgs;
     convArgs << "-I" << converterScript << outputFile << rawOutput;
     
+    // Verify the python binary actually loads before committing to it.
+    // On macOS, dyld may hard-crash the venv python3 (exit 6) if Python.framework
+    // is not at the Homebrew Cellar path baked in at venv creation time.
+    auto pythonWorks = [](const QString& exe) -> bool {
+        if (!QFile::exists(exe)) return false;
+        QProcess test;
+        test.start(exe, QStringList() << "-c" << "import sys; sys.exit(0)");
+        return test.waitForFinished(5000) && test.exitCode() == 0;
+    };
+
     QString pythonExe;
 #if defined(Q_OS_MAC)
     QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
@@ -346,8 +356,8 @@ void StarNetWorker::process(const ImageBuffer& input, const StarNetParams& param
     QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
 #endif
     QString foundPython = QStandardPaths::findExecutable("python3");
-    if (QFile::exists(bundledPython)) pythonExe = bundledPython;
-    else if (QFile::exists(devPython)) pythonExe = devPython;
+    if (pythonWorks(bundledPython)) pythonExe = bundledPython;
+    else if (pythonWorks(devPython)) pythonExe = devPython;
     else if (!foundPython.isEmpty()) pythonExe = foundPython;
     else pythonExe = "python3";
 

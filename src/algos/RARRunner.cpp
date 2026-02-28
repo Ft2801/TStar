@@ -85,6 +85,20 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
         }
     });
 
+    // Verify the python binary actually loads before committing to it.
+    // On macOS a venv python3 may exist on disk but crash at load time (dyld:
+    // Library not loaded: Python.framework) when the Homebrew Cellar path used at
+    // venv creation does not exist on the target machine (different Python version
+    // installed, or no Homebrew Python at all).  If the sanity-run fails we fall
+    // through to the system python3 while our PYTHONPATH injection (below) puts
+    // numpy / tifffile / onnxruntime on the search path.
+    auto pythonWorks = [](const QString& exe) -> bool {
+        if (!QFile::exists(exe)) return false;
+        QProcess test;
+        test.start(exe, QStringList() << "-c" << "import sys; sys.exit(0)");
+        return test.waitForFinished(5000) && test.exitCode() == 0;
+    };
+
     QString pythonExe;
 #if defined(Q_OS_MAC)
     // macOS: Check for bundled virtualenv in app bundle Resources
@@ -96,8 +110,8 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
     QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
 #endif
     QString foundPython = QStandardPaths::findExecutable("python3");
-    if (QFile::exists(bundledPython)) pythonExe = bundledPython;
-    else if (QFile::exists(devPython)) pythonExe = devPython;
+    if (pythonWorks(bundledPython)) pythonExe = bundledPython;
+    else if (pythonWorks(devPython)) pythonExe = devPython;
     else if (!foundPython.isEmpty()) pythonExe = foundPython;
     else pythonExe = "python3";
 

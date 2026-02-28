@@ -54,7 +54,18 @@ void CosmicClarityWorker::process(const ImageBuffer& input, const CosmicClarityP
     };
     purge(tempDir);
 
-    // Find Python
+    // Find Python — verify the binary actually runs before committing to it.
+    // On macOS a venv python3 may exist but crash (dyld: Library not loaded:
+    // Python.framework) when the Homebrew Cellar path baked into the binary at
+    // venv creation is absent on the target machine.  Fall back to system python3
+    // while PYTHONPATH injection (below) makes the bundled packages available.
+    auto pythonWorks = [](const QString& exe) -> bool {
+        if (!QFile::exists(exe)) return false;
+        QProcess test;
+        test.start(exe, QStringList() << "-c" << "import sys; sys.exit(0)");
+        return test.waitForFinished(5000) && test.exitCode() == 0;
+    };
+
     QString pythonExe;
 #if defined(Q_OS_MAC)
     QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
@@ -64,19 +75,14 @@ void CosmicClarityWorker::process(const ImageBuffer& input, const CosmicClarityP
     QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
 #endif
     QString foundPython = QStandardPaths::findExecutable("python3");
-    if (QFile::exists(bundledPython))       pythonExe = bundledPython;
-    else if (QFile::exists(devPython))      pythonExe = devPython;
-    else if (!foundPython.isEmpty())        pythonExe = foundPython;
-    else                                    pythonExe = "python3";
+    if (pythonWorks(bundledPython))     pythonExe = bundledPython;
+    else if (pythonWorks(devPython))    pythonExe = devPython;
+    else if (!foundPython.isEmpty())    pythonExe = foundPython;
+    else                                pythonExe = "python3";
 
-    // Quick Python check
-    {
-        QProcess chk;
-        chk.start(pythonExe, QStringList() << "--version");
-        if (!chk.waitForFinished(5000) || chk.exitCode() != 0) {
-            emit finished(output, "Python interpreter not working.");
-            return;
-        }
+    if (pythonExe.isEmpty() || (!pythonWorks(pythonExe) && pythonExe == "python3")) {
+        emit finished(output, "No working Python interpreter found.");
+        return;
     }
 
     // Find bridge script

@@ -227,6 +227,47 @@ if [ -d "$PYTHON_VENV" ]; then
         cp -RL "$PYTHON_VENV" "$RESOURCES_DIR/python_venv"
     fi
     echo "  - Python venv: OK"
+
+    # --- Bundle Python.framework so the copied python3 binary can find it ---
+    #
+    # On macOS, Homebrew Python is a framework build: the python3 binary links against
+    # Python.framework/Versions/X.Y/Python at an absolute Cellar path that does NOT
+    # exist on the user's machine → dyld crash (exit code 6).
+    # Fix: copy the framework shared library into Contents/Frameworks/ and rewrite the
+    # reference inside the bundled python3 binary to a @loader_path-relative path.
+    BUNDLED_PYTHON="$RESOURCES_DIR/python_venv/bin/python3"
+    if [ -f "$BUNDLED_PYTHON" ]; then
+        FRAMEWORK_LINK=$(otool -L "$BUNDLED_PYTHON" 2>/dev/null \
+            | grep "Python.framework" | awk '{print $1}' | head -1 || true)
+        if [ -n "$FRAMEWORK_LINK" ] && [ -f "$FRAMEWORK_LINK" ]; then
+            FRAMEWORK_VERSION=$(echo "$FRAMEWORK_LINK" \
+                | grep -oE 'Versions/[^/]+' | head -1 | cut -d/ -f2)
+            PYTHON_FW_DEST="$FRAMEWORKS_DIR/Python.framework/Versions/$FRAMEWORK_VERSION"
+            mkdir -p "$PYTHON_FW_DEST"
+            cp "$FRAMEWORK_LINK" "$PYTHON_FW_DEST/Python"
+
+            # Fix the library's own install name so @rpath-based references resolve.
+            install_name_tool -id \
+                "@rpath/Python.framework/Versions/$FRAMEWORK_VERSION/Python" \
+                "$PYTHON_FW_DEST/Python" 2>/dev/null || true
+
+            # Rewrite the absolute Homebrew Cellar path inside the python3 binary.
+            # @loader_path for bin/python3 resolves to the bin/ directory, so
+            # ../../.. reaches Contents/, then /Frameworks.
+            NEW_FW_PATH="@loader_path/../../../Frameworks/Python.framework/Versions/$FRAMEWORK_VERSION/Python"
+            install_name_tool -change "$FRAMEWORK_LINK" "$NEW_FW_PATH" \
+                "$BUNDLED_PYTHON" 2>/dev/null || true
+            install_name_tool -add_rpath "@loader_path/../../../Frameworks" \
+                "$BUNDLED_PYTHON" 2>/dev/null || true
+
+            echo "  - Python.framework/$FRAMEWORK_VERSION: bundled & patched in python3"
+        elif [ -n "$FRAMEWORK_LINK" ]; then
+            echo "  [WARNING] Python.framework source not found at: $FRAMEWORK_LINK"
+            echo "            python3 may crash on machines without Python@$FRAMEWORK_VERSION"
+        else
+            echo "  - python3: no external Python.framework reference (already portable)"
+        fi
+    fi
 fi
 
 # --- Copy scripts ---
@@ -303,10 +344,24 @@ echo "  - Fixing dependencies inside .framework bundles..."
 for framework in "$FRAMEWORKS_DIR"/*.framework; do
     if [ -d "$framework" ]; then
         framework_name=$(basename "$framework" .framework)
+
+        # Standard Qt layout: Versions/A/<Name>
         framework_binary="$framework/Versions/A/$framework_name"
-        
         if [ -f "$framework_binary" ]; then
             rewrite_homebrew_paths "$framework_binary"
+        fi
+
+        # Non-standard layout (e.g. Python.framework uses Versions/3.x/Python).
+        # Iterate every Versions/* subdir that is not "A".
+        if [ -d "$framework/Versions" ]; then
+            for ver_dir in "$framework/Versions"/*/; do
+                ver_name=$(basename "$ver_dir")
+                [ "$ver_name" = "A" ] && continue  # already handled above
+                ver_binary="$ver_dir$framework_name"
+                if [ -f "$ver_binary" ]; then
+                    rewrite_homebrew_paths "$ver_binary"
+                fi
+            done
         fi
     fi
 done
