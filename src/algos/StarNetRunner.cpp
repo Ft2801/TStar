@@ -335,7 +335,7 @@ void StarNetWorker::process(const ImageBuffer& input, const StarNetParams& param
     
     QString rawOutput = tempDir.filePath("starnet_output.raw");
     QStringList convArgs;
-    convArgs << "-I" << converterScript << outputFile << rawOutput;
+    convArgs << converterScript << outputFile << rawOutput;
     
     // Verify the python binary actually loads before committing to it.
     // On macOS, dyld may hard-crash the venv python3 (exit 6) if Python.framework

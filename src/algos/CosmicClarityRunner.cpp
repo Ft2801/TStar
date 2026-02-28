@@ -185,7 +185,7 @@ void CosmicClarityWorker::process(const ImageBuffer& input, const CosmicClarityP
     proc.setProcessEnvironment(env);
     
     proc.setProgram(pythonExe);
-    proc.setArguments(QStringList() << "-I" << bridge << "process" << paramsFile << rawIn << rawOut);
+    proc.setArguments(QStringList() << bridge << "process" << paramsFile << rawIn << rawOut);
     proc.setProcessChannelMode(QProcess::MergedChannels);
 
     // Real-time stdout relay
