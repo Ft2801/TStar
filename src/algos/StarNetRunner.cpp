@@ -349,17 +349,21 @@ void StarNetWorker::process(const ImageBuffer& input, const StarNetParams& param
 
     QString pythonExe;
 #if defined(Q_OS_MAC)
-    QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
-    QString devPython = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
+    pythonExe = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
+    if (!QFile::exists(pythonExe)) {
+        pythonExe = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
+    }
 #else
-    QString bundledPython = QCoreApplication::applicationDirPath() + "/python/python.exe";
-    QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
+    pythonExe = QCoreApplication::applicationDirPath() + "/python/python.exe";
+    if (!QFile::exists(pythonExe)) {
+        pythonExe = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
+    }
 #endif
-    QString foundPython = QStandardPaths::findExecutable("python3");
-    if (pythonWorks(bundledPython)) pythonExe = bundledPython;
-    else if (pythonWorks(devPython)) pythonExe = devPython;
-    else if (!foundPython.isEmpty()) pythonExe = foundPython;
-    else pythonExe = "python3";
+
+    if (!pythonWorks(pythonExe)) {
+        emit finished(output, "Errore Critico: Interprete AI integrato mancante o corrotto.");
+        return;
+    }
 
     QProcess conv;
     // Inject bundled venv site-packages into PYTHONPATH (macOS: venv symlink may be broken after packaging)

@@ -98,6 +98,7 @@ private:
     QPointF m_lastPanPos; // For right-click panning
     
     bool m_busy = false; // Prevent overlapping ops
+    bool m_sourceSet = false; // True after first valid setSource call
 };
 
 #endif // CORRECTIONBRUSHDIALOG_H

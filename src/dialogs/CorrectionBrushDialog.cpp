@@ -360,6 +360,7 @@ CorrectionBrushDialog::CorrectionBrushDialog(QWidget* parent) : DialogBase(paren
     if (MainWindowCallbacks* mw = getCallbacks()) {
         if (mw->getCurrentViewer()) {
             m_currentImage = mw->getCurrentViewer()->getBuffer();
+            m_sourceSet = true; // Mark as initialized
         }
     }
     
@@ -485,6 +486,12 @@ void CorrectionBrushDialog::keyPressEvent(QKeyEvent* e) {
 }
 
 void CorrectionBrushDialog::setSource(const ImageBuffer& img) {
+    // If we already have an active editing session with changes, don't override it.
+    // This prevents losing unsaved brush work when the MDI window focus changes.
+    if (m_sourceSet && !m_undoStack.empty()) {
+        return;
+    }
+    m_sourceSet = true;
     m_currentImage = img;
     m_undoStack.clear();
     m_redoStack.clear();

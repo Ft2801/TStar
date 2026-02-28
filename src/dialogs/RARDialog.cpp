@@ -81,7 +81,12 @@ RARDialog::RARDialog(QWidget* parent) : DialogBase(parent, tr("Aberration Remove
     
     pLayout->addWidget(new QLabel(tr("Provider:")), 2, 0);
     m_comboProvider = new QComboBox(this);
-    m_comboProvider->addItems({"CPU", "DirectML", "CUDA"});
+    m_comboProvider->addItem("CPU");
+#if defined(Q_OS_WIN)
+    // Mostra CUDA e DirectML SOLO su Windows
+    m_comboProvider->addItem("DirectML");
+    m_comboProvider->addItem("CUDA");
+#endif
     m_comboProvider->setStyleSheet(
         "QComboBox { color: white; background-color: #2a2a2a; border: 1px solid #555; padding: 2px; border-radius: 3px; }"
         "QComboBox:focus { border: 2px solid #4a9eff; }"
