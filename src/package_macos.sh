@@ -246,6 +246,25 @@ if [ -d "$PYTHON_VENV" ]; then
             mkdir -p "$PYTHON_FW_DEST"
             cp "$FRAMEWORK_LINK" "$PYTHON_FW_DEST/Python"
 
+            # === FIX: COPIA LA LIBRERIA STANDARD E SISTEMA PYVENV.CFG ===
+            FRAMEWORK_ROOT=$(dirname "$FRAMEWORK_LINK")
+            if [ -d "$FRAMEWORK_ROOT/lib" ]; then
+                cp -R "$FRAMEWORK_ROOT/lib" "$PYTHON_FW_DEST/"
+            fi
+            if [ -d "$FRAMEWORK_ROOT/bin" ]; then
+                cp -R "$FRAMEWORK_ROOT/bin" "$PYTHON_FW_DEST/"
+            fi
+            if [ -d "$FRAMEWORK_ROOT/include" ]; then
+                cp -R "$FRAMEWORK_ROOT/include" "$PYTHON_FW_DEST/"
+            fi
+
+            CFG_FILE="$RESOURCES_DIR/python_venv/pyvenv.cfg"
+            if [ -f "$CFG_FILE" ]; then
+                sed -i '' 's|^home = .*|home = ../../Frameworks/Python.framework/Versions/Current/bin|' "$CFG_FILE"
+                sed -i '' 's|^executable = .*|executable = ../../Frameworks/Python.framework/Versions/Current/bin/python3|' "$CFG_FILE"
+            fi
+            # ==========================================================
+
             # Fix the library's own install name so @rpath-based references resolve.
             install_name_tool -id \
                 "@rpath/Python.framework/Versions/$FRAMEWORK_VERSION/Python" \

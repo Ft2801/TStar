@@ -101,19 +101,21 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
 
     QString pythonExe;
 #if defined(Q_OS_MAC)
-    // macOS: Check for bundled virtualenv in app bundle Resources
-    QString bundledPython = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
-    QString devPython = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
+    pythonExe = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
+    if (!QFile::exists(pythonExe)) {
+        pythonExe = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
+    }
 #else
-    // Windows: Check for bundled embeddable Python
-    QString bundledPython = QCoreApplication::applicationDirPath() + "/python/python.exe";
-    QString devPython = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
+    pythonExe = QCoreApplication::applicationDirPath() + "/python/python.exe";
+    if (!QFile::exists(pythonExe)) {
+        pythonExe = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
+    }
 #endif
-    QString foundPython = QStandardPaths::findExecutable("python3");
-    if (pythonWorks(bundledPython)) pythonExe = bundledPython;
-    else if (pythonWorks(devPython)) pythonExe = devPython;
-    else if (!foundPython.isEmpty()) pythonExe = foundPython;
-    else pythonExe = "python3";
+
+    if (!pythonWorks(pythonExe)) {
+        if(errorMsg) *errorMsg = "Errore Critico: Interprete AI integrato mancante o corrotto. L'app non proverà a usare il Python di sistema.";
+        return false;
+    }
 
     // Inject bundled venv site-packages into PYTHONPATH so numpy/tifffile/onnxruntime
     // are found even when the venv python3 symlink is broken after packaging (macOS).
