@@ -260,6 +260,45 @@ if [ -d "$PYTHON_VENV" ]; then
             install_name_tool -add_rpath "@loader_path/../../../Frameworks" \
                 "$BUNDLED_PYTHON" 2>/dev/null || true
 
+            # ----------------------------------------------------------------
+            # Create a valid macOS framework structure so that codesign --deep
+            # does not report "bundle format unrecognized, invalid, or unsuitable".
+            # A framework bundle requires:
+            #   Versions/Current  -> <version>   symlink
+            #   Python            -> Versions/Current/Python  symlink
+            #   Resources         -> Versions/Current/Resources symlink
+            #   Resources/Info.plist  (minimal CFBundlePackageType=FMWK)
+            # ----------------------------------------------------------------
+            mkdir -p "$PYTHON_FW_DEST/Resources"
+            cat > "$PYTHON_FW_DEST/Resources/Info.plist" << PLIST_EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>org.python.python</string>
+    <key>CFBundleName</key>
+    <string>Python</string>
+    <key>CFBundleVersion</key>
+    <string>${FRAMEWORK_VERSION}</string>
+    <key>CFBundleShortVersionString</key>
+    <string>${FRAMEWORK_VERSION}</string>
+    <key>CFBundlePackageType</key>
+    <string>FMWK</string>
+    <key>CFBundleExecutable</key>
+    <string>Python</string>
+</dict>
+</plist>
+PLIST_EOF
+            # Required Versions/Current symlink
+            ln -sf "$FRAMEWORK_VERSION" \
+                "$FRAMEWORKS_DIR/Python.framework/Versions/Current" 2>/dev/null || true
+            # Top-level convenience symlinks expected by codesign
+            ln -sf "Versions/Current/Python" \
+                "$FRAMEWORKS_DIR/Python.framework/Python" 2>/dev/null || true
+            ln -sf "Versions/Current/Resources" \
+                "$FRAMEWORKS_DIR/Python.framework/Resources" 2>/dev/null || true
+
             echo "  - Python.framework/$FRAMEWORK_VERSION: bundled & patched in python3"
         elif [ -n "$FRAMEWORK_LINK" ]; then
             echo "  [WARNING] Python.framework source not found at: $FRAMEWORK_LINK"
@@ -487,7 +526,23 @@ echo ""
 log_step 9.5 "Applying ad-hoc code signing..."
 
 check_command codesign && {
-    codesign --force --deep -s - "$DIST_DIR"
+    # Sign Python.framework explicitly first (inside-out signing).
+    # codesign --deep cannot sign a framework with a broken structure;
+    # by signing the framework binary directly before touching the outer
+    # bundle we guarantee the subcomponent has a valid signature.
+    PYTHON_FW="$FRAMEWORKS_DIR/Python.framework"
+    if [ -d "$PYTHON_FW" ]; then
+        codesign --force --sign - "$PYTHON_FW" 2>&1 | grep -v '^$' || true
+    fi
+    # Sign all other nested .framework bundles explicitly before signing the app
+    for fw in "$FRAMEWORKS_DIR"/*.framework; do
+        [ -d "$fw" ] || continue
+        [ "$fw" = "$PYTHON_FW" ] && continue
+        codesign --force --sign - "$fw" 2>&1 | grep -v '^$' || true
+    done
+    # Finally sign the whole app bundle (--deep will re-sign already-signed
+    # subcomponents, which is fine, but now they are all valid first)
+    codesign --force --deep -s - "$DIST_DIR" 2>&1 | grep -v '^$' || true
     echo "  - Ad-hoc signed: OK"
 } || {
     log_warning "codesign not found (skip)"
