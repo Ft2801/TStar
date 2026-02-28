@@ -13,6 +13,7 @@
 #include "dialogs/GHSDialog.h"
 #include "dialogs/CurvesDialog.h"
 #include "dialogs/SaturationDialog.h"
+#include "dialogs/TemperatureTintDialog.h"
 #include <QMap>
 #include <QSettings>
 
@@ -122,6 +123,7 @@ private slots:
     void openClaheDialog();
     void openAberrationInspectorDialog();
     void openSelectiveColorDialog();
+    void openTemperatureTintDialog();
     
     // Stacking Suite
     void openStackingDialog();
@@ -204,6 +206,7 @@ private:
     QPointer<class CurvesDialog> m_curvesDlg;
     QPointer<class StretchDialog> m_stretchDlg;
     QPointer<class SaturationDialog> m_satDlg;
+    QPointer<class TemperatureTintDialog> m_tempTintDlg;
 
     // Tool Dialog Singletons
     QPointer<class ABEDialog> m_abeDlg;
@@ -256,12 +259,14 @@ private:
     QPointer<ImageViewer> m_curvesTarget;
     QPointer<ImageViewer> m_ghsTarget;
     QPointer<ImageViewer> m_satTarget; // Track Saturation Target
+    QPointer<ImageViewer> m_tempTintTarget; // Track Temperature/Tint Target
     QPointer<QWidget> m_activeInteractiveTool; // Tracks presently exclusive tool (ABE vs BN)
 
     // Tool State Persistence
     QMap<ImageViewer*, GHSDialog::State> m_ghsStates;
     QMap<ImageViewer*, CurvesDialog::State> m_curvesStates;
     QMap<ImageViewer*, SaturationDialog::State> m_satStates;
+    QMap<ImageViewer*, TemperatureTintDialog::State> m_tempTintStates;
 
     // Sidebar
     SidebarWidget* m_sidebar = nullptr;

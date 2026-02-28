@@ -4132,6 +4132,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Apertura Statistical Stretch...</translation>
         </message>
         <message>
+            <source>Opening Temperature / Tint tool...</source>
+            <translation type="finished">Apertura strumento Temperatura / Tinta...</translation>
+        </message>
+        <message>
             <source>PCC Applied: R=%1 G=%2 B=%3 (BG: %4, %5, %6)</source>
             <translation type="finished">PCC Applicato: R=%1 G=%2 B=%3 (BG: %4, %5, %6)</translation>
         </message>
@@ -4431,6 +4435,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Target Median for Auto Stretch</source>
             <translation type="finished">Mediana Target per Auto Stretch</translation>
+        </message>
+        <message>
+            <source>Temperature / Tint</source>
+            <translation type="finished">Temperatura / Tinta</translation>
+        </message>
+        <message>
+            <source>Temperature / Tint applied permanently</source>
+            <translation type="finished">Temperatura / Tinta applicata definitivamente</translation>
         </message>
         <message>
             <source>Tile Images</source>
@@ -8685,6 +8697,37 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Processing %1 / 100</source>
             <translation type="finished">Elaborazione %1 / 100</translation>
+        </message>
+    </context>
+    <context>
+        <name>TemperatureTintDialog</name>
+        <message>
+            <source>Apply</source>
+            <translation type="finished">Applica</translation>
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="finished">Annulla</translation>
+        </message>
+        <message>
+            <source>Preview</source>
+            <translation type="finished">Anteprima</translation>
+        </message>
+        <message>
+            <source>Reset</source>
+            <translation type="finished">Reimposta</translation>
+        </message>
+        <message>
+            <source>Temperature / Tint</source>
+            <translation type="finished">Temperatura / Tinta</translation>
+        </message>
+        <message>
+            <source>Temperature:</source>
+            <translation type="finished">Temperatura:</translation>
+        </message>
+        <message>
+            <source>Tint:</source>
+            <translation type="finished">Tinta:</translation>
         </message>
     </context>
     <context>

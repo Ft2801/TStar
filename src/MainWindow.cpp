@@ -104,6 +104,7 @@
 #include "dialogs/ClaheDialog.h"
 #include "dialogs/AberrationInspectorDialog.h"
 #include "dialogs/SelectiveColorDialog.h"
+#include "dialogs/TemperatureTintDialog.h"
 #include "dialogs/MultiscaleDecompDialog.h"
 #include "dialogs/NarrowbandNormalizationDialog.h"
 #include "dialogs/NBtoRGBStarsDialog.h"
@@ -417,6 +418,7 @@ MainWindow::MainWindow(QWidget *parent)
                         if (m_ghsDlg) m_ghsStates[m_lastActiveImageViewer] = m_ghsDlg->getState();
                         if (m_curvesDlg) m_curvesStates[m_lastActiveImageViewer] = m_curvesDlg->getState();
                         if (m_satDlg) m_satStates[m_lastActiveImageViewer] = m_satDlg->getState();
+                        if (m_tempTintDlg) m_tempTintStates[m_lastActiveImageViewer] = m_tempTintDlg->getState();
                     }
 
                     m_lastActiveImageViewer = v;
@@ -450,6 +452,11 @@ MainWindow::MainWindow(QWidget *parent)
                         m_satTarget = v; // Update tracker for menu updates
                         m_satDlg->setViewer(v); 
                         if (m_satStates.contains(v)) m_satDlg->setState(m_satStates[v]);
+                    }
+                    if (m_tempTintDlg) {
+                        m_tempTintTarget = v;
+                        m_tempTintDlg->setViewer(v);
+                        if (m_tempTintStates.contains(v)) m_tempTintDlg->setState(m_tempTintStates[v]);
                     }
                     if (m_arcsinhDlg) m_arcsinhDlg->setViewer(v);
                     if (m_scnrDlg) m_scnrDlg->setViewer(v);
@@ -893,6 +900,9 @@ MainWindow::MainWindow(QWidget *parent)
     });
     addMenuAction(colorMenu, tr("Selective Color Correction"), "", [this](){
         openSelectiveColorDialog();
+    });
+    addMenuAction(colorMenu, tr("Temperature / Tint"), "", [this](){
+        openTemperatureTintDialog();
     });
 
     // --- C. AI ---
@@ -2008,6 +2018,43 @@ void MainWindow::openSaturationDialog() {
     setupToolSubwindow(sub, m_satDlg, tr("Color Saturation"));
     centerToolWindow(sub);
 }
+
+void MainWindow::openTemperatureTintDialog() {
+    ImageViewer* viewer = currentViewer();
+    if (!viewer) {
+        QMessageBox::warning(this, tr("No Image"), tr("Please select an image first."));
+        return;
+    }
+
+    if (m_tempTintDlg) {
+        m_tempTintDlg->raise();
+        m_tempTintDlg->activateWindow();
+        m_tempTintDlg->setViewer(viewer);
+        return;
+    }
+
+    log(tr("Opening Temperature / Tint tool..."), Log_Action, true);
+
+    m_tempTintDlg = new TemperatureTintDialog(this, viewer);
+    m_tempTintDlg->setAttribute(Qt::WA_DeleteOnClose);
+
+    connect(m_tempTintDlg, &TemperatureTintDialog::applyInternal, this, [this]() {
+        log(tr("Temperature / Tint applied permanently"), Log_Success, true);
+        updateMenus();
+    });
+
+    connect(m_tempTintDlg, &QObject::destroyed, this, [this]() {
+        m_tempTintDlg = nullptr;
+        m_tempTintTarget = nullptr;
+    });
+
+    m_tempTintTarget = viewer;
+
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, m_tempTintDlg, tr("Temperature / Tint"));
+    centerToolWindow(sub);
+}
+
 
 void MainWindow::openAstroSpikeDialog() {
     ImageViewer* viewer = currentViewer();

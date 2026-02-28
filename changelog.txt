@@ -3,6 +3,7 @@ TStar Changelog
 
 Version 1.7.1
 -------------
+- New mini tool: temperature/tint
 - Fixed MacOS Python environment bug
 - Fixed CUDA/DML showing on Rar tool on MacOS
 - Fixed a small bug in the correction brush tool

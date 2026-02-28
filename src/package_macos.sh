@@ -239,6 +239,38 @@ if [ -d "$PYTHON_VENV" ]; then
     if [ -f "$BUNDLED_PYTHON" ]; then
         FRAMEWORK_LINK=$(otool -L "$BUNDLED_PYTHON" 2>/dev/null \
             | grep "Python.framework" | awk '{print $1}' | head -1 || true)
+
+        # If FRAMEWORK_LINK already points to @loader_path the binary was already
+        # fixed on a previous packaging run — nothing more to do for the binary itself.
+        if echo "$FRAMEWORK_LINK" | grep -q "^@"; then
+            echo "  - python3: Python.framework reference already relative (OK)"
+            FRAMEWORK_LINK=""   # skip the copy/patch block below
+        fi
+
+        # If the exact Cellar path no longer exists (Python was updated in Homebrew),
+        # search for the framework library under common Homebrew prefixes.
+        if [ -n "$FRAMEWORK_LINK" ] && [ ! -f "$FRAMEWORK_LINK" ]; then
+            FRAMEWORK_VERSION_SEARCH=$(echo "$FRAMEWORK_LINK" \
+                | grep -oE 'Versions/[^/]+' | head -1 | cut -d/ -f2)
+            echo "  [INFO] Python.framework not at original path, searching..."
+            FOUND_FW=""
+            for SEARCH_BASE in /opt/homebrew /usr/local; do
+                FOUND_FW=$(find "$SEARCH_BASE" -name "Python" \
+                    -path "*/Python.framework/Versions/$FRAMEWORK_VERSION_SEARCH/Python" \
+                    2>/dev/null | head -1 || true)
+                [ -n "$FOUND_FW" ] && break
+            done
+            if [ -n "$FOUND_FW" ]; then
+                echo "  [INFO] Found Python.framework at: $FOUND_FW"
+                FRAMEWORK_LINK="$FOUND_FW"
+            else
+                echo "  [ERROR] Python.framework not found anywhere! python3 will NOT work."
+                echo "          Rebuild the venv: ./setup_python_macos.sh"
+                ERROR_COUNT=$((ERROR_COUNT + 1))
+                FRAMEWORK_LINK=""
+            fi
+        fi
+
         if [ -n "$FRAMEWORK_LINK" ] && [ -f "$FRAMEWORK_LINK" ]; then
             FRAMEWORK_VERSION=$(echo "$FRAMEWORK_LINK" \
                 | grep -oE 'Versions/[^/]+' | head -1 | cut -d/ -f2)
@@ -246,24 +278,11 @@ if [ -d "$PYTHON_VENV" ]; then
             mkdir -p "$PYTHON_FW_DEST"
             cp "$FRAMEWORK_LINK" "$PYTHON_FW_DEST/Python"
 
-            # === FIX: COPIA LA LIBRERIA STANDARD E SISTEMA PYVENV.CFG ===
+            # Copy stdlib, headers and bin from the framework so Python can find them.
             FRAMEWORK_ROOT=$(dirname "$FRAMEWORK_LINK")
-            if [ -d "$FRAMEWORK_ROOT/lib" ]; then
-                cp -R "$FRAMEWORK_ROOT/lib" "$PYTHON_FW_DEST/"
-            fi
-            if [ -d "$FRAMEWORK_ROOT/bin" ]; then
-                cp -R "$FRAMEWORK_ROOT/bin" "$PYTHON_FW_DEST/"
-            fi
-            if [ -d "$FRAMEWORK_ROOT/include" ]; then
-                cp -R "$FRAMEWORK_ROOT/include" "$PYTHON_FW_DEST/"
-            fi
-
-            CFG_FILE="$RESOURCES_DIR/python_venv/pyvenv.cfg"
-            if [ -f "$CFG_FILE" ]; then
-                sed -i '' 's|^home = .*|home = ../../Frameworks/Python.framework/Versions/Current/bin|' "$CFG_FILE"
-                sed -i '' 's|^executable = .*|executable = ../../Frameworks/Python.framework/Versions/Current/bin/python3|' "$CFG_FILE"
-            fi
-            # ==========================================================
+            for sub in lib bin include; do
+                [ -d "$FRAMEWORK_ROOT/$sub" ] && cp -R "$FRAMEWORK_ROOT/$sub" "$PYTHON_FW_DEST/" || true
+            done
 
             # Fix the library's own install name so @rpath-based references resolve.
             install_name_tool -id \
@@ -271,22 +290,28 @@ if [ -d "$PYTHON_VENV" ]; then
                 "$PYTHON_FW_DEST/Python" 2>/dev/null || true
 
             # Rewrite the absolute Homebrew Cellar path inside the python3 binary.
-            # @loader_path for bin/python3 resolves to the bin/ directory, so
-            # ../../.. reaches Contents/, then /Frameworks.
+            # @loader_path for bin/python3 = Contents/Resources/python_venv/bin/
+            # ../../..  reaches  Contents/
             NEW_FW_PATH="@loader_path/../../../Frameworks/Python.framework/Versions/$FRAMEWORK_VERSION/Python"
             install_name_tool -change "$FRAMEWORK_LINK" "$NEW_FW_PATH" \
                 "$BUNDLED_PYTHON" 2>/dev/null || true
+            # Ensure the bundled python3 has an rpath that includes Contents/Frameworks
+            # so every .so it loads (numpy, onnxruntime, etc.) can use @rpath/<lib>.
             install_name_tool -add_rpath "@loader_path/../../../Frameworks" \
                 "$BUNDLED_PYTHON" 2>/dev/null || true
 
+            # Rewrite pyvenv.cfg so Python finds its stdlib inside the bundle.
+            CFG_FILE="$RESOURCES_DIR/python_venv/pyvenv.cfg"
+            if [ -f "$CFG_FILE" ]; then
+                # Use absolute bundle-relative path via Resources.
+                # We write a placeholder; at runtime python3 resolves its own prefix
+                # from the binary location, so these values are informational only.
+                sed -i '' 's|^home = .*|home = ../../Frameworks/Python.framework/Versions/Current/bin|' "$CFG_FILE"
+                sed -i '' 's|^executable = .*|executable = ../../Frameworks/Python.framework/Versions/Current/bin/python3|' "$CFG_FILE"
+            fi
+
             # ----------------------------------------------------------------
-            # Create a valid macOS framework structure so that codesign --deep
-            # does not report "bundle format unrecognized, invalid, or unsuitable".
-            # A framework bundle requires:
-            #   Versions/Current  -> <version>   symlink
-            #   Python            -> Versions/Current/Python  symlink
-            #   Resources         -> Versions/Current/Resources symlink
-            #   Resources/Info.plist  (minimal CFBundlePackageType=FMWK)
+            # Create a valid macOS framework structure required by codesign.
             # ----------------------------------------------------------------
             mkdir -p "$PYTHON_FW_DEST/Resources"
             cat > "$PYTHON_FW_DEST/Resources/Info.plist" << PLIST_EOF
@@ -309,22 +334,62 @@ if [ -d "$PYTHON_VENV" ]; then
 </dict>
 </plist>
 PLIST_EOF
-            # Required Versions/Current symlink
             ln -sf "$FRAMEWORK_VERSION" \
                 "$FRAMEWORKS_DIR/Python.framework/Versions/Current" 2>/dev/null || true
-            # Top-level convenience symlinks expected by codesign
             ln -sf "Versions/Current/Python" \
                 "$FRAMEWORKS_DIR/Python.framework/Python" 2>/dev/null || true
             ln -sf "Versions/Current/Resources" \
                 "$FRAMEWORKS_DIR/Python.framework/Resources" 2>/dev/null || true
 
+            # Fix for posix_spawn error: Homebrew Python expects a Python.app stub inside Resources
+            # to spawn subprocesses or itself. We must copy the actual Python.app bundle if it exists,
+            # because a symlink or missing Info.plist causes posix_spawn to fail with "Undefined error: 0".
+            if [ -d "$FRAMEWORK_ROOT/Resources/Python.app" ]; then
+                cp -R "$FRAMEWORK_ROOT/Resources/Python.app" "$PYTHON_FW_DEST/Resources/"
+                # Ensure the executable inside Python.app also has relative rpaths
+                APP_PYTHON="$PYTHON_FW_DEST/Resources/Python.app/Contents/MacOS/Python"
+                if [ -f "$APP_PYTHON" ]; then
+                    install_name_tool -change "$FRAMEWORK_LINK" "@executable_path/../../../../Python" "$APP_PYTHON" 2>/dev/null || true
+                    install_name_tool -add_rpath "@executable_path/../../../../" "$APP_PYTHON" 2>/dev/null || true
+                fi
+            else
+                # Fallback if Python.app doesn't exist in source framework
+                mkdir -p "$PYTHON_FW_DEST/Resources/Python.app/Contents/MacOS"
+                ln -sf "../../../../../../../Resources/python_venv/bin/python3" \
+                    "$PYTHON_FW_DEST/Resources/Python.app/Contents/MacOS/Python" 2>/dev/null || true
+            fi
+
             echo "  - Python.framework/$FRAMEWORK_VERSION: bundled & patched in python3"
-        elif [ -n "$FRAMEWORK_LINK" ]; then
-            echo "  [WARNING] Python.framework source not found at: $FRAMEWORK_LINK"
-            echo "            python3 may crash on machines without Python@$FRAMEWORK_VERSION"
-        else
-            echo "  - python3: no external Python.framework reference (already portable)"
         fi
+
+        # ----------------------------------------------------------------
+        # Rewrite Homebrew absolute paths in ALL Python extension modules
+        # (.so / .dylib under the venv).  These files reference libopenblas,
+        # libgfortran, etc. from the developer's Homebrew installation — paths
+        # that don't exist on a clean target Mac.
+        # After rewriting to @rpath/<lib>, dyld will search the rpath chain
+        # anchored on python3 (which now includes Contents/Frameworks/).
+        # We also copy any newly-referenced dylibs that aren't yet in Frameworks.
+        # ----------------------------------------------------------------
+        echo "  - Rewriting Homebrew paths in Python extension modules (.so)..."
+        SO_FIXED=0
+        SO_MISSING=0
+        find "$RESOURCES_DIR/python_venv" \( -name "*.so" -o -name "*.dylib" \) | while read -r so_file; do
+            chmod +w "$so_file" 2>/dev/null || true
+            deps=$(otool -L "$so_file" 2>/dev/null | grep -v "^$so_file:" | awk '{print $1}')
+            for dep in $deps; do
+                if echo "$dep" | grep -qE "^(/opt/homebrew|/usr/local/(Cellar|opt|lib))"; then
+                    dep_name=$(basename "$dep")
+                    install_name_tool -change "$dep" "@rpath/$dep_name" "$so_file" 2>/dev/null || true
+                    SO_FIXED=$((SO_FIXED + 1))
+                    # Copy the dylib into Frameworks if not already there
+                    if [ ! -f "$FRAMEWORKS_DIR/$dep_name" ] && [ -f "$dep" ]; then
+                        cp "$dep" "$FRAMEWORKS_DIR/$dep_name" 2>/dev/null || true
+                    fi
+                fi
+            done
+        done
+        echo "  - Extension module path fix: done"
     fi
 fi
 
@@ -369,6 +434,37 @@ for i in {1..3}; do
     for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
         if [ -f "$dylib" ]; then
             copy_dylib_with_dependencies "$dylib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+        fi
+    done
+
+    # Add plugins to recursive scan
+    if [ -d "$DIST_DIR/Contents/PlugIns" ]; then
+        find "$DIST_DIR/Contents/PlugIns" -name "*.dylib" | while read -r plugin_path; do
+            if [ -f "$plugin_path" ]; then
+                copy_dylib_with_dependencies "$plugin_path" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+            fi
+        done
+    fi
+
+    # Add framework binaries to recursive scan
+    for framework in "$FRAMEWORKS_DIR"/*.framework; do
+        if [ -d "$framework" ]; then
+            framework_name=$(basename "$framework" .framework)
+            # Standard
+            if [ -f "$framework/Versions/A/$framework_name" ]; then
+                copy_dylib_with_dependencies "$framework/Versions/A/$framework_name" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+            fi
+            # Non-standard (like Python)
+            if [ -d "$framework/Versions" ]; then
+                for ver_dir in "$framework/Versions"/*/; do
+                    ver_name=$(basename "$ver_dir")
+                    [ "$ver_name" = "A" ] && continue
+                    ver_binary="$ver_dir$framework_name"
+                    if [ -f "$ver_binary" ]; then
+                        copy_dylib_with_dependencies "$ver_binary" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+                    fi
+                done
+            fi
         fi
     done
 done
@@ -443,29 +539,65 @@ echo "[STEP 9.1] Verifying bundled dependencies..."
 MISSING_DEPS=0
 HOMEBREW_REFS=0
 
+# Helper to verify a single binary file for unresolved rpaths or absolute homebrew paths
+verify_binary_file() {
+    local bin_file="$1"
+    
+    UNRESOLVED=$(otool -L "$bin_file" 2>/dev/null | grep "@rpath" | grep -v "^$bin_file:" | grep -v "@rpath/Qt" || true)
+    if [ -n "$UNRESOLVED" ]; then
+        while IFS= read -r dep_line; do
+            DEP_NAME=$(echo "$dep_line" | awk '{print $1}' | sed 's|@rpath/||')
+            if [ -n "$DEP_NAME" ] && [ "$DEP_NAME" != "@rpath" ]; then
+                if [ ! -f "$FRAMEWORKS_DIR/$DEP_NAME" ]; then
+                    echo "  [WARNING] Unresolved @rpath: $(basename "$bin_file") -> $DEP_NAME"
+                    MISSING_DEPS=$((MISSING_DEPS + 1))
+                fi
+            fi
+        done <<< "$UNRESOLVED"
+    fi
+    
+    BREW_REFS=$(otool -L "$bin_file" 2>/dev/null | grep -v "^$bin_file:" | awk '{print $1}' | grep -E "^(/opt/homebrew|/usr/local/(Cellar|opt|lib))" || true)
+    if [ -n "$BREW_REFS" ]; then
+        while IFS= read -r brew_ref; do
+            echo "  [WARNING] Absolute Homebrew path in $(basename "$bin_file"): $brew_ref"
+            HOMEBREW_REFS=$((HOMEBREW_REFS + 1))
+        done <<< "$BREW_REFS"
+    fi
+}
+
 # Check all bundled dylibs
 echo "  - Checking for unresolved @rpath references..."
 for dylib in "$FRAMEWORKS_DIR"/*.dylib; do
     if [ -f "$dylib" ]; then
-        UNRESOLVED=$(otool -L "$dylib" 2>/dev/null | grep "@rpath" | grep -v "^$dylib:" | grep -v "@rpath/Qt" || true)
-        if [ -n "$UNRESOLVED" ]; then
-            while IFS= read -r dep_line; do
-                DEP_NAME=$(echo "$dep_line" | awk '{print $1}' | sed 's|@rpath/||')
-                if [ -n "$DEP_NAME" ] && [ "$DEP_NAME" != "@rpath" ]; then
-                    if [ ! -f "$FRAMEWORKS_DIR/$DEP_NAME" ]; then
-                        echo "  [WARNING] Unresolved @rpath: $(basename "$dylib") -> $DEP_NAME"
-                        MISSING_DEPS=$((MISSING_DEPS + 1))
-                    fi
-                fi
-            done <<< "$UNRESOLVED"
+        verify_binary_file "$dylib"
+    fi
+done
+
+# Check plugins
+if [ -d "$DIST_DIR/Contents/PlugIns" ]; then
+    find "$DIST_DIR/Contents/PlugIns" -name "*.dylib" | while read -r plugin_path; do
+        if [ -f "$plugin_path" ]; then
+            verify_binary_file "$plugin_path"
         fi
-        
-        BREW_REFS=$(otool -L "$dylib" 2>/dev/null | grep -v "^$dylib:" | awk '{print $1}' | grep -E "^(/opt/homebrew|/usr/local/(Cellar|opt|lib))" || true)
-        if [ -n "$BREW_REFS" ]; then
-            while IFS= read -r brew_ref; do
-                echo "  [WARNING] Absolute Homebrew path in $(basename "$dylib"): $brew_ref"
-                HOMEBREW_REFS=$((HOMEBREW_REFS + 1))
-            done <<< "$BREW_REFS"
+    done
+fi
+
+# Check frameworks
+for framework in "$FRAMEWORKS_DIR"/*.framework; do
+    if [ -d "$framework" ]; then
+        framework_name=$(basename "$framework" .framework)
+        if [ -f "$framework/Versions/A/$framework_name" ]; then
+            verify_binary_file "$framework/Versions/A/$framework_name"
+        fi
+        if [ -d "$framework/Versions" ]; then
+            for ver_dir in "$framework/Versions"/*/; do
+                ver_name=$(basename "$ver_dir")
+                [ "$ver_name" = "A" ] && continue
+                ver_binary="$ver_dir$framework_name"
+                if [ -f "$ver_binary" ]; then
+                    verify_binary_file "$ver_binary"
+                fi
+            done
         fi
     fi
 done
@@ -539,6 +671,48 @@ for imglib in libpng libjpeg libtiff libwebp; do
         echo "  [WARNING] $imglib NOT FOUND - some image formats may fail"
     fi
 done
+
+# --- Verify bundled python3 actually starts (after all dylib patching) ---
+echo ""
+log_step "9.4" "Verifying bundled Python..."
+BUNDLED_PY_CHECK="$DIST_DIR/Contents/Resources/python_venv/bin/python3"
+FRAMEWORKS_DIR="$DIST_DIR/Contents/Frameworks"
+if [ -f "$BUNDLED_PY_CHECK" ]; then
+    # Test 1: Python interpreter runs
+    TEST_OUT=$("$BUNDLED_PY_CHECK" -c "import sys; print('OK')" 2>&1) || true
+    if [ "$TEST_OUT" = "OK" ]; then
+        echo "  - Bundled python3: OK"
+    else
+        echo "  [ERROR] Bundled python3 FAILED to start!"
+        echo "          Error output:"
+        "$BUNDLED_PY_CHECK" --version 2>&1 || true
+        echo "          --- DEBUG INFO ---"
+        echo "          otool -L of python binary:"
+        otool -L "$BUNDLED_PY_CHECK" | sed 's/^/          /'
+        echo "          otool -L of Python framework:"
+        PYTHON_FW_SO="$FRAMEWORKS_DIR/Python.framework/Versions/Current/Python"
+        [ -f "$PYTHON_FW_SO" ] && otool -L "$PYTHON_FW_SO" | sed 's/^/          /'
+        echo "          python3 path resolution debug:"
+        DYLD_PRINT_LIBRARIES=1 DYLD_PRINT_RPATHS=1 "$BUNDLED_PY_CHECK" --version 2>&1 | tail -n 50 | sed 's/^/          /'
+        echo "          ------------------"
+        echo "          The app will NOT be able to run AI tools on a clean Mac."
+        echo "          Possible fixes:"
+        echo "            1. Rebuild the venv:  ./setup_python_macos.sh"
+        echo "            2. Then repackage:    ./src/package_macos.sh"
+        ERROR_COUNT=$((ERROR_COUNT + 1))
+    fi
+
+    # Test if it can load numpy (which tests dynamic library loading like libopenblas)
+    if "$BUNDLED_PY_CHECK" -c "import numpy" 2>/dev/null; then
+        echo "  - Bundled numpy: OK"
+    else
+        echo "  - Bundled numpy: NOT available (some AI tools may fail)"
+        echo "          Error output:"
+        DYLD_PRINT_LIBRARIES=1 DYLD_PRINT_RPATHS=1 "$BUNDLED_PY_CHECK" -c "import numpy" 2>&1 || true
+    fi
+else
+    echo "  [WARNING] Bundled python3 not found, cannot verify."
+fi
 
 # --- Ad-hoc Code Signing ---
 echo ""

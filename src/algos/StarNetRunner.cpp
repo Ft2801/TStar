@@ -278,9 +278,13 @@ void StarNetWorker::process(const ImageBuffer& input, const StarNetParams& param
     p.setProcessChannelMode(QProcess::MergedChannels); 
     p.setWorkingDirectory(QFileInfo(exe).absolutePath());
     
-    connect(&p, &QProcess::readyReadStandardOutput, [&p, this](){
+    QString starNetLog;
+    connect(&p, &QProcess::readyReadStandardOutput, [&p, &starNetLog, this](){
         QString txt = p.readAllStandardOutput().trimmed();
-        if (!txt.isEmpty()) emit processOutput(txt);
+        if (!txt.isEmpty()) {
+            emit processOutput(txt);
+            starNetLog.append(txt + "\n");
+        }
     });
 
     p.start(exe, args);
@@ -306,9 +310,11 @@ void StarNetWorker::process(const ImageBuffer& input, const StarNetParams& param
     }
     
     if (p.exitCode() != 0) {
-        errorMsg = QString("StarNet process failed (Code %1): %2")
+        QString tail = starNetLog.trimmed().right(1000);
+        errorMsg = QString("StarNet process failed (Code %1): %2\n\nLog:\n%3")
                     .arg(p.exitCode())
-                    .arg(p.errorString().isEmpty() ? "Unknown error" : p.errorString());
+                    .arg(p.errorString().isEmpty() ? "Unknown error" : p.errorString())
+                    .arg(tail);
         emit finished(output, errorMsg);
         return;
     }
@@ -337,39 +343,39 @@ void StarNetWorker::process(const ImageBuffer& input, const StarNetParams& param
     QStringList convArgs;
     convArgs << converterScript << outputFile << rawOutput;
     
-    // Verify the python binary actually loads before committing to it.
-    // On macOS, dyld may hard-crash the venv python3 (exit 6) if Python.framework
-    // is not at the Homebrew Cellar path baked in at venv creation time.
-    auto pythonWorks = [](const QString& exe) -> bool {
-        if (!QFile::exists(exe)) return false;
-        QProcess test;
-        test.start(exe, QStringList() << "-c" << "import sys; sys.exit(0)");
-        return test.waitForFinished(5000) && test.exitCode() == 0;
-    };
-
+    // Locate bundled Python interpreter.
+    // No test-run: DYLD_FRAMEWORK_PATH (set below) lets dyld find Python.framework
+    // inside the bundle even when the baked-in Homebrew Cellar path is stale.
     QString pythonExe;
 #if defined(Q_OS_MAC)
     pythonExe = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
-    if (!QFile::exists(pythonExe)) {
+    if (!QFile::exists(pythonExe))
         pythonExe = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
-    }
 #else
     pythonExe = QCoreApplication::applicationDirPath() + "/python/python.exe";
-    if (!QFile::exists(pythonExe)) {
+    if (!QFile::exists(pythonExe))
         pythonExe = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
-    }
 #endif
 
-    if (!pythonWorks(pythonExe)) {
-        emit finished(output, "Errore Critico: Interprete AI integrato mancante o corrotto.");
+    if (!QFile::exists(pythonExe)) {
+        emit finished(output, "Bundled Python interpreter not found.\nExpected path: " + pythonExe);
         return;
     }
 
     QProcess conv;
-    // Inject bundled venv site-packages into PYTHONPATH (macOS: venv symlink may be broken after packaging)
+    // Build process environment: DYLD paths so Python.framework resolves inside
+    // the bundle, plus PYTHONPATH to reach bundled site-packages.
     {
         QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        env.insert("PYTHONUNBUFFERED", "1");
 #if defined(Q_OS_MAC)
+        const QString frameworksDir = QCoreApplication::applicationDirPath() + "/../Frameworks";
+        if (QDir(frameworksDir).exists()) {
+            const QString curFw = env.value("DYLD_FRAMEWORK_PATH");
+            env.insert("DYLD_FRAMEWORK_PATH", curFw.isEmpty() ? frameworksDir : frameworksDir + ":" + curFw);
+            const QString curLib = env.value("DYLD_LIBRARY_PATH");
+            env.insert("DYLD_LIBRARY_PATH", curLib.isEmpty() ? frameworksDir : frameworksDir + ":" + curLib);
+        }
         const QStringList venvBases = {
             QCoreApplication::applicationDirPath() + "/../Resources/python_venv/lib",
             QCoreApplication::applicationDirPath() + "/../../deps/python_venv/lib"
@@ -390,14 +396,28 @@ void StarNetWorker::process(const ImageBuffer& input, const StarNetParams& param
 #endif
         conv.setProcessEnvironment(env);
     }
+    
+    conv.setProcessChannelMode(QProcess::MergedChannels);
+    QString convLog;
+    connect(&conv, &QProcess::readyReadStandardOutput, [&conv, &convLog, this]() {
+        QString txt = QString::fromUtf8(conv.readAllStandardOutput()).trimmed();
+        if(!txt.isEmpty()){
+            emit processOutput(txt);
+            convLog.append(txt + "\n");
+        }
+    });
+
     conv.start(pythonExe, convArgs);
     if (!conv.waitForFinished(60000)) {
-        emit finished(output, "Output conversion timed out.");
+        emit finished(output, "Output conversion timed out.\n\nLog:\n" + convLog.trimmed().right(1000));
         return;
     }
     
     if (conv.exitCode() != 0) {
-        emit finished(output, "Output conversion failed: " + conv.readAllStandardOutput() + conv.readAllStandardError());
+        QString err = QString::fromUtf8(conv.readAllStandardError()).trimmed();
+        if (err.isEmpty() && !convLog.isEmpty()) err = convLog.trimmed().right(1000);
+        
+        emit finished(output, "Output conversion failed:\n\n" + err);
         return;
     }
     

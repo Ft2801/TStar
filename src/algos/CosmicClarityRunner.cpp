@@ -54,33 +54,22 @@ void CosmicClarityWorker::process(const ImageBuffer& input, const CosmicClarityP
     };
     purge(tempDir);
 
-    // Find Python — verify the binary actually runs before committing to it.
-    // On macOS a venv python3 may exist but crash (dyld: Library not loaded:
-    // Python.framework) when the Homebrew Cellar path baked into the binary at
-    // venv creation is absent on the target machine.  Fall back to system python3
-    // while PYTHONPATH injection (below) makes the bundled packages available.
-    auto pythonWorks = [](const QString& exe) -> bool {
-        if (!QFile::exists(exe)) return false;
-        QProcess test;
-        test.start(exe, QStringList() << "-c" << "import sys; sys.exit(0)");
-        return test.waitForFinished(5000) && test.exitCode() == 0;
-    };
-
+    // Locate bundled Python interpreter.
+    // No test-run: DYLD_FRAMEWORK_PATH (set below) lets dyld find Python.framework
+    // inside the bundle even when the baked-in Homebrew Cellar path is stale.
     QString pythonExe;
 #if defined(Q_OS_MAC)
     pythonExe = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
-    if (!QFile::exists(pythonExe)) {
+    if (!QFile::exists(pythonExe))
         pythonExe = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
-    }
 #else
     pythonExe = QCoreApplication::applicationDirPath() + "/python/python.exe";
-    if (!QFile::exists(pythonExe)) {
+    if (!QFile::exists(pythonExe))
         pythonExe = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
-    }
 #endif
 
-    if (!pythonWorks(pythonExe)) {
-        emit finished(output, "Errore Critico: Interprete AI integrato mancante o corrotto.");
+    if (!QFile::exists(pythonExe)) {
+        emit finished(output, "Bundled Python interpreter not found.\nExpected path: " + pythonExe);
         return;
     }
 
@@ -155,12 +144,17 @@ void CosmicClarityWorker::process(const ImageBuffer& input, const CosmicClarityP
 
     QProcess proc;
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    env.insert("PYTHONUNBUFFERED", "1");  // Force Python line buffering in subprocess
-
-    // Inject bundled venv site-packages into PYTHONPATH so numpy/tifffile/onnxruntime
-    // are found even when the venv python3 symlink is broken after packaging (macOS).
+    env.insert("PYTHONUNBUFFERED", "1");
 #if defined(Q_OS_MAC)
+    // Make Python.framework findable regardless of the path baked into the binary.
     {
+        const QString frameworksDir = QCoreApplication::applicationDirPath() + "/../Frameworks";
+        if (QDir(frameworksDir).exists()) {
+            const QString curFw = env.value("DYLD_FRAMEWORK_PATH");
+            env.insert("DYLD_FRAMEWORK_PATH", curFw.isEmpty() ? frameworksDir : frameworksDir + ":" + curFw);
+            const QString curLib = env.value("DYLD_LIBRARY_PATH");
+            env.insert("DYLD_LIBRARY_PATH", curLib.isEmpty() ? frameworksDir : frameworksDir + ":" + curLib);
+        }
         const QStringList venvBases = {
             QCoreApplication::applicationDirPath() + "/../Resources/python_venv/lib",
             QCoreApplication::applicationDirPath() + "/../../deps/python_venv/lib"
@@ -187,10 +181,14 @@ void CosmicClarityWorker::process(const ImageBuffer& input, const CosmicClarityP
     proc.setArguments(QStringList() << bridge << "process" << paramsFile << rawIn << rawOut);
     proc.setProcessChannelMode(QProcess::MergedChannels);
 
+    QString aiLog;
     // Real-time stdout relay
-    connect(&proc, &QProcess::readyReadStandardOutput, [&proc, this]() {
+    connect(&proc, &QProcess::readyReadStandardOutput, [&proc, &aiLog, this]() {
         QString txt = QString::fromUtf8(proc.readAllStandardOutput()).trimmed();
-        if (!txt.isEmpty()) emit processOutput(txt);
+        if (!txt.isEmpty()) {
+            emit processOutput(txt);
+            aiLog.append(txt + "\n");
+        }
     });
 
     proc.start();
@@ -222,13 +220,16 @@ void CosmicClarityWorker::process(const ImageBuffer& input, const CosmicClarityP
     // Grab any remaining output
     {
         QString tail = QString::fromUtf8(proc.readAllStandardOutput()).trimmed();
-        if (!tail.isEmpty()) emit processOutput(tail);
+        if (!tail.isEmpty()) {
+             emit processOutput(tail);
+             aiLog.append(tail + "\n");
+        }
     }
 
     if (proc.exitCode() != 0) {
         QString err = QString::fromUtf8(proc.readAllStandardError()).trimmed();
         if (err.isEmpty()) err = "bridge exited with code " + QString::number(proc.exitCode());
-        emit finished(output, "Python error: " + err);
+        emit finished(output, "Python error: " + err + "\n\nLog:\n" + aiLog.trimmed().right(1000));
         return;
     }
 

@@ -671,6 +671,8 @@ set(TSTAR_SOURCES
     src/dialogs/ClaheDialog.h
     src/dialogs/SelectiveColorDialog.cpp
     src/dialogs/SelectiveColorDialog.h
+    src/dialogs/TemperatureTintDialog.cpp
+    src/dialogs/TemperatureTintDialog.h
     src/dialogs/CorrectionBrushDialog.cpp
     src/dialogs/CorrectionBrushDialog.h
     src/dialogs/ExtractLuminanceDialog.cpp

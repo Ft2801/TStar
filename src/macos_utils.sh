@@ -450,6 +450,12 @@ rewrite_homebrew_paths() {
     
     chmod +w "$binary_path" 2>/dev/null || true
     
+    # 1. Fix the binary's own ID first (fixes QtDBus warning)
+    local binary_id=$(otool -D "$binary_path" 2>/dev/null | sed -n '2p' | awk '{print $1}')
+    if echo "$binary_id" | grep -qE "^(/opt/homebrew|/usr/local/(Cellar|opt|lib))"; then
+        install_name_tool -id "@rpath/$(basename "$binary_path")" "$binary_path" 2>/dev/null || true
+    fi    
+    
     local deps=$(otool -L "$binary_path" 2>/dev/null | grep -v "^$binary_path:" | awk '{print $1}')
     local rewrote=0
     

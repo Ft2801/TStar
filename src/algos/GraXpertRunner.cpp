@@ -71,75 +71,89 @@ void GraXpertWorker::process(const ImageBuffer& input, const GraXpertParams& par
         raw.close();
     }
 
+    // Locate bundled Python interpreter once for all bridge calls.
+    // No test-run: DYLD_FRAMEWORK_PATH (set below) lets dyld find Python.framework
+    // inside the bundle even when the baked-in Homebrew Cellar path is stale.
+    QString pythonExe;
+#if defined(Q_OS_MAC)
+    pythonExe = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
+    if (!QFile::exists(pythonExe))
+        pythonExe = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
+#else
+    pythonExe = QCoreApplication::applicationDirPath() + "/python/python.exe";
+    if (!QFile::exists(pythonExe))
+        pythonExe = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
+#endif
+
+    if (!QFile::exists(pythonExe)) {
+        emit finished(output, "Bundled Python interpreter not found.\nExpected path: " + pythonExe);
+        return;
+    }
+
+    // Helper lambda: build QProcessEnvironment for every Python bridge subprocess.
+    auto makePythonEnv = []() -> QProcessEnvironment {
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        env.insert("PYTHONUNBUFFERED", "1");
+#if defined(Q_OS_MAC)
+        const QString frameworksDir = QCoreApplication::applicationDirPath() + "/../Frameworks";
+        if (QDir(frameworksDir).exists()) {
+            const QString curFw = env.value("DYLD_FRAMEWORK_PATH");
+            env.insert("DYLD_FRAMEWORK_PATH", curFw.isEmpty() ? frameworksDir : frameworksDir + ":" + curFw);
+            const QString curLib = env.value("DYLD_LIBRARY_PATH");
+            env.insert("DYLD_LIBRARY_PATH", curLib.isEmpty() ? frameworksDir : frameworksDir + ":" + curLib);
+        }
+        const QStringList venvBases = {
+            QCoreApplication::applicationDirPath() + "/../Resources/python_venv/lib",
+            QCoreApplication::applicationDirPath() + "/../../deps/python_venv/lib"
+        };
+        for (const QString& venvLib : venvBases) {
+            if (QDir(venvLib).exists()) {
+                const QStringList pyDirs = QDir(venvLib).entryList({"python3*"}, QDir::Dirs | QDir::NoDotAndDotDot);
+                if (!pyDirs.isEmpty()) {
+                    const QString sitePkgs = venvLib + "/" + pyDirs.first() + "/site-packages";
+                    if (QDir(sitePkgs).exists()) {
+                        const QString cur = env.value("PYTHONPATH");
+                        env.insert("PYTHONPATH", cur.isEmpty() ? sitePkgs : sitePkgs + ":" + cur);
+                        break;
+                    }
+                }
+            }
+        }
+#endif
+        return env;
+    };
+
     // 3. Convert Raw to TIFF using Bridge
     QString inputFile = tempDir.filePath("input.tiff");
+    QString convLog;
     {
         QStringList args;
         args << scriptPath << "save" << inputFile 
              << QString::number(input.width()) << QString::number(input.height()) << QString::number(input.channels())
              << rawInputFile;
         
-        // Verify the python binary actually loads before committing to it.
-        // On macOS, dyld may hard-crash the venv python3 (exit 6) if Python.framework
-        // is not at the Homebrew Cellar path baked in at venv creation time.
-        auto pythonWorks = [](const QString& exe) -> bool {
-            if (!QFile::exists(exe)) return false;
-            QProcess test;
-            test.start(exe, QStringList() << "-c" << "import sys; sys.exit(0)");
-            return test.waitForFinished(5000) && test.exitCode() == 0;
-        };
-
-        QString pythonExe;
-#if defined(Q_OS_MAC)
-        pythonExe = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
-        if (!QFile::exists(pythonExe)) {
-            pythonExe = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
-        }
-#else
-        pythonExe = QCoreApplication::applicationDirPath() + "/python/python.exe";
-        if (!QFile::exists(pythonExe)) {
-            pythonExe = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
-        }
-#endif
-
-        if (!pythonWorks(pythonExe)) {
-            emit finished(output, "Errore Critico: Interprete AI integrato mancante o corrotto.");
-            return;
-        }
-
         QProcess p;
-        // Inject bundled venv site-packages into PYTHONPATH (macOS: venv symlink may be broken after packaging)
-        {
-            QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-#if defined(Q_OS_MAC)
-            const QStringList venvBases = {
-                QCoreApplication::applicationDirPath() + "/../Resources/python_venv/lib",
-                QCoreApplication::applicationDirPath() + "/../../deps/python_venv/lib"
-            };
-            for (const QString& venvLib : venvBases) {
-                if (QDir(venvLib).exists()) {
-                    const QStringList pyDirs = QDir(venvLib).entryList({"python3*"}, QDir::Dirs | QDir::NoDotAndDotDot);
-                    if (!pyDirs.isEmpty()) {
-                        const QString sitePkgs = venvLib + "/" + pyDirs.first() + "/site-packages";
-                        if (QDir(sitePkgs).exists()) {
-                            const QString cur = env.value("PYTHONPATH");
-                            env.insert("PYTHONPATH", cur.isEmpty() ? sitePkgs : sitePkgs + ":" + cur);
-                            break;
-                        }
-                    }
-                }
+        p.setProcessEnvironment(makePythonEnv());
+        p.setProcessChannelMode(QProcess::MergedChannels);
+        
+        connect(&p, &QProcess::readyReadStandardOutput, [&p, &convLog, this]() {
+            QString txt = QString::fromUtf8(p.readAllStandardOutput()).trimmed();
+            if(!txt.isEmpty()){
+                emit processOutput(txt);
+                convLog.append(txt + "\n");
             }
-#endif
-            p.setProcessEnvironment(env);
-        }
+        });
+        
         p.start(pythonExe, args);
         if (!p.waitForFinished(60000)) {
-            emit finished(output, "Bridge timeout saving TIFF.");
+            emit finished(output, "Bridge timeout saving TIFF.\n\nLog:\n" + convLog.trimmed().right(1000));
             return;
         }
-        
+
         if (p.exitCode() != 0) {
-            emit finished(output, "Bridge failed to save TIFF: " + p.readAllStandardOutput());
+            QString err = QString::fromUtf8(p.readAllStandardError()).trimmed();
+            if (err.isEmpty() && !convLog.isEmpty()) err = convLog.trimmed().right(1000);
+            emit finished(output, "Bridge failed to save TIFF:\n\n" + err);
             return;
         }
     }
@@ -166,14 +180,19 @@ void GraXpertWorker::process(const ImageBuffer& input, const GraXpertParams& par
     process.setProgram(exe);
     process.setArguments(args);
     
+    QString graxpertLog;
     // Real-time output
-    connect(&process, &QProcess::readyReadStandardOutput, [&process, this](){
+    connect(&process, &QProcess::readyReadStandardOutput, [&process, &graxpertLog, this](){
         QString out = process.readAllStandardOutput();
-        if (!out.isEmpty()) emit processOutput(out.trimmed());
+        if (!out.isEmpty()) {
+             emit processOutput(out.trimmed());
+             graxpertLog.append(out + "\n");
+        }
     });
-    connect(&process, &QProcess::readyReadStandardError, [&process, this](){
+    connect(&process, &QProcess::readyReadStandardError, [&process, &graxpertLog, this](){
         QString err = process.readAllStandardError();
         if (!err.isEmpty()) {
+            graxpertLog.append(err + "\n");
             QString trimmed = err.trimmed();
             if (trimmed.contains("INFO") || trimmed.contains("Progress")) {
                 emit processOutput(trimmed);
@@ -206,9 +225,11 @@ void GraXpertWorker::process(const ImageBuffer& input, const GraXpertParams& par
     }
 
     if (process.exitCode() != 0) {
-        errorMsg = QString("GraXpert failed (Exit Code %1): %2")
+        QString tail = graxpertLog.trimmed().right(1000);
+        errorMsg = QString("GraXpert failed (Exit Code %1): %2\n\nLog:\n%3")
                     .arg(process.exitCode())
-                    .arg(process.errorString().isEmpty() ? "Unknown error" : process.errorString());
+                    .arg(process.errorString().isEmpty() ? "Unknown error" : process.errorString())
+                    .arg(tail);
         emit finished(output, errorMsg);
         return;
     }
@@ -233,68 +254,31 @@ void GraXpertWorker::process(const ImageBuffer& input, const GraXpertParams& par
         QStringList args;
         args << scriptPath << "load" << outputFile << rawResult;
         
-        // Verify the python binary actually loads before committing to it.
-        auto pythonWorks2 = [](const QString& exe) -> bool {
-            if (!QFile::exists(exe)) return false;
-            QProcess test;
-            test.start(exe, QStringList() << "-c" << "import sys; sys.exit(0)");
-            return test.waitForFinished(5000) && test.exitCode() == 0;
-        };
-
-        QString pythonExe;
-#if defined(Q_OS_MAC)
-        pythonExe = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
-        if (!QFile::exists(pythonExe)) {
-            pythonExe = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
-        }
-#else
-        pythonExe = QCoreApplication::applicationDirPath() + "/python/python.exe";
-        if (!QFile::exists(pythonExe)) {
-            pythonExe = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
-        }
-#endif
-
-        if (!pythonWorks2(pythonExe)) {
-            emit finished(output, "Errore Critico: Interprete AI integrato mancante o corrotto.");
-            return;
-        }
-
         QProcess p;
-        // Inject bundled venv site-packages into PYTHONPATH (macOS: venv symlink may be broken after packaging)
-        {
-            QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-#if defined(Q_OS_MAC)
-            const QStringList venvBases = {
-                QCoreApplication::applicationDirPath() + "/../Resources/python_venv/lib",
-                QCoreApplication::applicationDirPath() + "/../../deps/python_venv/lib"
-            };
-            for (const QString& venvLib : venvBases) {
-                if (QDir(venvLib).exists()) {
-                    const QStringList pyDirs = QDir(venvLib).entryList({"python3*"}, QDir::Dirs | QDir::NoDotAndDotDot);
-                    if (!pyDirs.isEmpty()) {
-                        const QString sitePkgs = venvLib + "/" + pyDirs.first() + "/site-packages";
-                        if (QDir(sitePkgs).exists()) {
-                            const QString cur = env.value("PYTHONPATH");
-                            env.insert("PYTHONPATH", cur.isEmpty() ? sitePkgs : sitePkgs + ":" + cur);
-                            break;
-                        }
-                    }
-                }
+        p.setProcessEnvironment(makePythonEnv());
+        p.setProcessChannelMode(QProcess::MergedChannels);
+        
+        convLog.clear();
+        connect(&p, &QProcess::readyReadStandardOutput, [&p, &convLog, this]() {
+            QString txt = QString::fromUtf8(p.readAllStandardOutput()).trimmed();
+            if(!txt.isEmpty()){
+                emit processOutput(txt);
+                convLog.append(txt + "\n");
             }
-#endif
-            p.setProcessEnvironment(env);
-        }
+        });
+        
         p.start(pythonExe, args);
         if (!p.waitForFinished(60000)) {
-            emit finished(output, "Bridge timeout loading result.");
+            emit finished(output, "Bridge timeout loading result.\n\nLog:\n" + convLog.trimmed().right(1000));
             return;
         }
         
-        QString outData = p.readAllStandardOutput().trimmed();
-        emit processOutput("Bridge Output:\n" + outData);
+        QString outData = convLog.trimmed();
 
-        if (outData.contains("Error")) {
-            emit finished(output, "Bridge error: " + outData);
+        if (p.exitCode() != 0 || outData.contains("Error")) {
+            QString err = QString::fromUtf8(p.readAllStandardError()).trimmed();
+            if (err.isEmpty() && !convLog.isEmpty()) err = convLog.trimmed().right(1000);
+            emit finished(output, "Bridge error loading result:\n\n" + err);
             return;
         }
 

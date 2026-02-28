@@ -61,8 +61,10 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
     QProcess p;
     p.setProcessChannelMode(QProcess::MergedChannels);
     
+    QString fullLog;
+    
     // Connect output
-    connect(&p, &QProcess::readyReadStandardOutput, [this, &p](){
+    connect(&p, &QProcess::readyReadStandardOutput, [this, &p, &fullLog](){
         QByteArray data = p.readAllStandardOutput();
         QString txt = QString::fromUtf8(data).trimmed();
         if(!txt.isEmpty()){
@@ -82,46 +84,43 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
                 }
                 emit processOutput(txt);
             }
+            fullLog.append(txt + "\n");
         }
     });
 
-    // Verify the python binary actually loads before committing to it.
-    // On macOS a venv python3 may exist on disk but crash at load time (dyld:
-    // Library not loaded: Python.framework) when the Homebrew Cellar path used at
-    // venv creation does not exist on the target machine (different Python version
-    // installed, or no Homebrew Python at all).  If the sanity-run fails we fall
-    // through to the system python3 while our PYTHONPATH injection (below) puts
-    // numpy / tifffile / onnxruntime on the search path.
-    auto pythonWorks = [](const QString& exe) -> bool {
-        if (!QFile::exists(exe)) return false;
-        QProcess test;
-        test.start(exe, QStringList() << "-c" << "import sys; sys.exit(0)");
-        return test.waitForFinished(5000) && test.exitCode() == 0;
-    };
-
+    // Locate bundled Python interpreter.
+    // No test-run: DYLD_FRAMEWORK_PATH (set below) lets dyld find Python.framework
+    // inside the bundle even when the baked-in Homebrew Cellar path is stale.
     QString pythonExe;
 #if defined(Q_OS_MAC)
     pythonExe = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/bin/python3";
-    if (!QFile::exists(pythonExe)) {
+    if (!QFile::exists(pythonExe))
         pythonExe = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/bin/python3";
-    }
 #else
     pythonExe = QCoreApplication::applicationDirPath() + "/python/python.exe";
-    if (!QFile::exists(pythonExe)) {
+    if (!QFile::exists(pythonExe))
         pythonExe = QCoreApplication::applicationDirPath() + "/../deps/python/python.exe";
-    }
 #endif
 
-    if (!pythonWorks(pythonExe)) {
-        if(errorMsg) *errorMsg = "Errore Critico: Interprete AI integrato mancante o corrotto. L'app non proverà a usare il Python di sistema.";
+    if (!QFile::exists(pythonExe)) {
+        if(errorMsg) *errorMsg = "Bundled Python interpreter not found.\nExpected path: " + pythonExe;
         return false;
     }
 
-    // Inject bundled venv site-packages into PYTHONPATH so numpy/tifffile/onnxruntime
-    // are found even when the venv python3 symlink is broken after packaging (macOS).
+    // Build process environment: PYTHONPATH + DYLD paths so the bundled Python
+    // framework and all extension modules (.so) resolve without Homebrew present.
     {
         QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        env.insert("PYTHONUNBUFFERED", "1");
 #if defined(Q_OS_MAC)
+        // Make Python.framework findable regardless of the path baked into the binary.
+        const QString frameworksDir = QCoreApplication::applicationDirPath() + "/../Frameworks";
+        if (QDir(frameworksDir).exists()) {
+            const QString curFw = env.value("DYLD_FRAMEWORK_PATH");
+            env.insert("DYLD_FRAMEWORK_PATH", curFw.isEmpty() ? frameworksDir : frameworksDir + ":" + curFw);
+            const QString curLib = env.value("DYLD_LIBRARY_PATH");
+            env.insert("DYLD_LIBRARY_PATH", curLib.isEmpty() ? frameworksDir : frameworksDir + ":" + curLib);
+        }
         const QStringList venvBases = {
             QCoreApplication::applicationDirPath() + "/../Resources/python_venv/lib",
             QCoreApplication::applicationDirPath() + "/../../deps/python_venv/lib"
@@ -164,9 +163,11 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
     }
 
     if (p.exitCode() != 0) {
-        if(errorMsg) *errorMsg = QString("Worker process failed (Code %1): %2")
+        QString tail = fullLog.trimmed().right(1000);
+        if(errorMsg) *errorMsg = QString("Worker process failed (Code %1): %2\n\nLog:\n%3")
                                     .arg(p.exitCode())
-                                    .arg(p.errorString().isEmpty() ? "Unknown error" : p.errorString());
+                                    .arg(p.errorString().isEmpty() ? "Unknown error" : p.errorString())
+                                    .arg(tail);
         return false;
     }
     

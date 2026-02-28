@@ -4130,6 +4130,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Opening Temperature / Tint tool...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>PCC Applied: R=%1 G=%2 B=%3 (BG: %4, %5, %6)</source>
             <translation type="unfinished" />
         </message>
@@ -4427,6 +4431,14 @@
         </message>
         <message>
             <source>Target Median for Auto Stretch</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Temperature / Tint</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Temperature / Tint applied permanently</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8681,6 +8693,37 @@
         <name>Task</name>
         <message>
             <source>Processing %1 / 100</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>TemperatureTintDialog</name>
+        <message>
+            <source>Apply</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preview</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reset</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Temperature / Tint</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Temperature:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Tint:</source>
             <translation type="unfinished" />
         </message>
     </context>

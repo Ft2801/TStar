@@ -3021,4 +3021,10 @@ TRANSLATIONS = {
     "Define named variables to parameterize script execution": {'it': "Definisci variabili con nome per parametrizzare l'esecuzione degli script", 'de': 'Benannte Variablen zur Parametrisierung der Skriptausführung definieren', 'es': 'Definir variables con nombre para parametrizar la ejecución de scripts', 'fr': "Définir des variables nommées pour paramétrer l'exécution des scripts"},
     "Automate complex multi-step image processing workflows": {'it': 'Automatizza flussi di elaborazione immagini complessi a più fasi', 'de': 'Komplexe mehrstufige Bildverarbeitungsworkflows automatisieren', 'es': 'Automatizar flujos de procesamiento de imágenes complejos de múltiples pasos', 'fr': "Automatiser les flux de traitement d'images complexes en plusieurs étapes"},
 
+    "Temperature / Tint": {'it': 'Temperatura / Tinta', 'es': 'Temperatura / Tono', 'fr': 'Température / Teinte', 'de': 'Temperatur / Farbton'},
+    "Temperature:": {'it': 'Temperatura:', 'es': 'Temperatura:', 'fr': 'Température :', 'de': 'Temperatur:'},
+    "Tint:": {'it': 'Tinta:', 'es': 'Tono:', 'fr': 'Teinte :', 'de': 'Farbton:'},
+    "Opening Temperature / Tint tool...": {'it': 'Apertura strumento Temperatura / Tinta...', 'es': 'Abriendo herramienta Temperatura / Tono...', 'fr': 'Ouverture outil Température / Teinte...', 'de': 'Werkzeug Temperatur / Farbton wird geöffnet...'},
+    "Temperature / Tint applied permanently": {'it': 'Temperatura / Tinta applicata definitivamente', 'es': 'Temperatura / Tono aplicado permanentemente', 'fr': 'Température / Teinte appliquée définitivement', 'de': 'Temperatur / Farbton dauerhaft angewendet'},
+
 }

@@ -271,16 +271,14 @@ void CurvesGraph::mouseMoveEvent(QMouseEvent* event) {
         if (m_dragIdx > 0) {
             float minX = (float)m_points[m_dragIdx - 1].x + 0.0001f;
             if (mx < minX) mx = minX;
-        } else {
-             mx = 0.0f; 
         }
+        // No else: first (corner) point can move freely in x within [0, 1]
         
         if (m_dragIdx < (int)m_points.size() - 1) {
             float maxX = (float)m_points[m_dragIdx + 1].x - 0.0001f;
             if (mx > maxX) mx = maxX;
-        } else {
-             mx = 1.0f; 
         }
+        // No else: last (corner) point can move freely in x within [0, 1]
         
         m_points[m_dragIdx].x = mx;
         m_points[m_dragIdx].y = my;

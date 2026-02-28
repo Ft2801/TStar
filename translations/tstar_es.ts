@@ -4132,6 +4132,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Abriendo Statistical Stretch...</translation>
         </message>
         <message>
+            <source>Opening Temperature / Tint tool...</source>
+            <translation type="finished">Abriendo herramienta Temperatura / Tono...</translation>
+        </message>
+        <message>
             <source>PCC Applied: R=%1 G=%2 B=%3 (BG: %4, %5, %6)</source>
             <translation type="finished">PCC Aplicado: R=%1 G=%2 B=%3 (BG: %4, %5, %6)</translation>
         </message>
@@ -4431,6 +4435,14 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Target Median for Auto Stretch</source>
             <translation type="finished">Mediana Objetivo para Auto Stretch</translation>
+        </message>
+        <message>
+            <source>Temperature / Tint</source>
+            <translation type="finished">Temperatura / Tono</translation>
+        </message>
+        <message>
+            <source>Temperature / Tint applied permanently</source>
+            <translation type="finished">Temperatura / Tono aplicado permanentemente</translation>
         </message>
         <message>
             <source>Tile Images</source>
@@ -8685,6 +8697,37 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Processing %1 / 100</source>
             <translation type="finished">Procesando %1 / 100</translation>
+        </message>
+    </context>
+    <context>
+        <name>TemperatureTintDialog</name>
+        <message>
+            <source>Apply</source>
+            <translation type="finished">Aplicar</translation>
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="finished">Cancelar</translation>
+        </message>
+        <message>
+            <source>Preview</source>
+            <translation type="finished">Previsualización</translation>
+        </message>
+        <message>
+            <source>Reset</source>
+            <translation type="finished">Restablecer</translation>
+        </message>
+        <message>
+            <source>Temperature / Tint</source>
+            <translation type="finished">Temperatura / Tono</translation>
+        </message>
+        <message>
+            <source>Temperature:</source>
+            <translation type="finished">Temperatura:</translation>
+        </message>
+        <message>
+            <source>Tint:</source>
+            <translation type="finished">Tono:</translation>
         </message>
     </context>
     <context>
