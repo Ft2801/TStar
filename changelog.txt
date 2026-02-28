@@ -6,6 +6,7 @@ Version 1.7.0
 - Improved threading system with per-task cancellation and priority work queue
 - Updated continuum subtraction tool
 - Updated CLAHE tool
+- Updated wavescale hdr tool
 - Updated mask preview functions
 - Updated correction brush tool
 - Updated pixel math engine
