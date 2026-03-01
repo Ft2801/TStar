@@ -38,6 +38,7 @@ std::vector<ImageBuffer> ChannelOps::extractChannels(const ImageBuffer& src) {
             data[p] = srcPtr[p * srcChannels + i];
         }
         mono.setData(width, height, 1, data);
+        mono.setMetadata(src.metadata());
         channels.push_back(std::move(mono));
     }
     return channels;

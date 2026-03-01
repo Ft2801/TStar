@@ -733,6 +733,23 @@ check_command codesign && {
         [ "$fw" = "$PYTHON_FW" ] && continue
         codesign --force --sign - "$fw" 2>&1 | grep -v '^$' || true
     done
+
+    # Explicitly sign all binaries and .so in the python venv
+    # codesign --deep skips binaries in Resources, so they must be signed explicitly
+    # since they were modified by install_name_tool
+    PYTHON_VENV_DEST="$DIST_DIR/Contents/Resources/python_venv"
+    if [ -d "$PYTHON_VENV_DEST" ]; then
+        echo "  - Explicitly signing Python venv binaries..."
+        find "$PYTHON_VENV_DEST" \( -name "*.so" -o -name "*.dylib" \) | while read -r so_file; do
+            codesign --force --sign - "$so_file" 2>/dev/null || true
+        done
+        # Sign python executables. We attempt to sign all files in bin/.
+        # Text scripts (like pip) will fail cleanly and be ignored.
+        find "$PYTHON_VENV_DEST/bin" -type f 2>/dev/null | while read -r bin_file; do
+            codesign --force --sign - "$bin_file" 2>/dev/null || true
+        done
+    fi
+
     # Finally sign the whole app bundle (--deep will re-sign already-signed
     # subcomponents, which is fine, but now they are all valid first)
     codesign --force --deep -s - "$DIST_DIR" 2>&1 | grep -v '^$' || true

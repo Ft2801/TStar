@@ -121,6 +121,11 @@ bool PerfectPaletteRunner::run(const ImageBuffer* ha, const ImageBuffer* oiii, c
     if (!ha && sii) fHa = fSii;
     if (!sii && ha) fSii = fHa;
 
+    ImageBuffer::Metadata outMeta;
+    if (ha) outMeta = ha->metadata();
+    else if (oiii) outMeta = oiii->metadata();
+    else if (sii) outMeta = sii->metadata();
+    
     if (params.paletteName == "SHO") mapSHO(fHa, fOiii, fSii, output);
     else if (params.paletteName == "HOO") mapGeneric(fHa, fOiii, fOiii, output);
     else if (params.paletteName == "HSO") mapGeneric(fHa, fSii, fOiii, output);
@@ -137,6 +142,8 @@ bool PerfectPaletteRunner::run(const ImageBuffer* ha, const ImageBuffer* oiii, c
         // Default to SHO
         mapSHO(fHa, fOiii, fSii, output);
     }
+    
+    output.setMetadata(outMeta);
 
     return true;
 }

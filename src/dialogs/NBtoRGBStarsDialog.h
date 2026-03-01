@@ -54,6 +54,8 @@ private:
 
     // Result
     std::vector<float> m_result; // RGB interleaved
+    ImageBuffer::Metadata m_srcMeta; // Store metadata
+    bool m_hasSrcMeta = false;
 
     // --- UI Widgets ---
     // Load buttons + labels

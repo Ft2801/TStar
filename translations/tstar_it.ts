@@ -2281,6 +2281,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Regola l'ordine polinomiale per la complessità del modello</translation>
         </message>
         <message>
+            <source>Adjust the color balance of the image by shifting towards warm (red) or cool (blue) tones and balancing green/magenta tints. Useful for manual white balance correction.</source>
+            <translation type="finished">Regola il bilanciamento del colore dell'immagine spostandolo verso toni caldi (rosso) o freddi (blu) e bilanciando le tinte verde/magenta. Utile per la correzione manuale del bilanciamento del bianco.</translation>
+        </message>
+        <message>
             <source>Adjust tonal curves for each RGB channel independently or together.</source>
             <translation type="finished">Regola le curve tonali per ogni canale RGB indipendentemente o insieme.</translation>
         </message>
@@ -3147,6 +3151,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>TStar supports scripting for automating processing workflows:</source>
             <translation type="finished">TStar supporta gli script per automatizzare i flussi di elaborazione:</translation>
+        </message>
+        <message>
+            <source>Temperature / Tint</source>
+            <translation type="finished">Temperatura / Tinta</translation>
         </message>
         <message>
             <source>The tool will balance RGB channels</source>

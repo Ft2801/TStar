@@ -3027,4 +3027,10 @@ TRANSLATIONS = {
     "Opening Temperature / Tint tool...": {'it': 'Apertura strumento Temperatura / Tinta...', 'es': 'Abriendo herramienta Temperatura / Tono...', 'fr': 'Ouverture outil Température / Teinte...', 'de': 'Werkzeug Temperatur / Farbton wird geöffnet...'},
     "Temperature / Tint applied permanently": {'it': 'Temperatura / Tinta applicata definitivamente', 'es': 'Temperatura / Tono aplicado permanentemente', 'fr': 'Température / Teinte appliquée définitivement', 'de': 'Temperatur / Farbton dauerhaft angewendet'},
 
+    "Adjust the color balance of the image by shifting towards warm (red) or cool (blue) tones and balancing green/magenta tints. Useful for manual white balance correction.": {
+        'it': "Regola il bilanciamento del colore dell'immagine spostandolo verso toni caldi (rosso) o freddi (blu) e bilanciando le tinte verde/magenta. Utile per la correzione manuale del bilanciamento del bianco.",
+        'es': "Ajusta el equilibrio de color de la imagen desplazándolo hacia tonos cálidos (rojo) o fríos (azul) y equilibrando los tonos verde/magenta. Útil para la corrección manual del equilibrio de blancos.",
+        'fr': "Ajuste l'équilibre des couleurs de l'image en se déplaçant vers des tons chauds (rouge) ou froids (bleu) et en équilibrant les teintes vert/magenta. Utile pour la correction manuelle de la balance des blancs.",
+        'de': "Passt die Farbbalance des Bildes an, indem sie zu warmen (roten) oder kühlen (blauen) Tönen verschoben wird und Grün-/Magenta-Töne ausgleicht. Nützlich für die manuelle Weißabgleich-Korrektur."
+    },
 }

@@ -46,6 +46,8 @@ bool StarRecompositionRunner::run(const ImageBuffer& starless, const ImageBuffer
             outData[i * outC + ch] = std::max(0.0f, std::min(1.0f, val));
         }
     }
+    
+    output.setMetadata(starless.metadata());
 
     return true;
 }

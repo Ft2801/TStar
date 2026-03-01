@@ -122,6 +122,12 @@ void TemperatureTintDialog::triggerPreview() {
     float r, g, b;
     computeGain(r, g, b);
     m_buffer->applyWhiteBalance(r, g, b);
+    
+    // Apply Mask if present
+    if (m_originalBuffer.hasMask()) {
+        m_buffer->blendResult(m_originalBuffer);
+    }
+    
     m_viewer->refreshDisplay(true);
 }
 
@@ -137,6 +143,11 @@ void TemperatureTintDialog::handleApply() {
         float r, g, b;
         computeGain(r, g, b);
         m_buffer->applyWhiteBalance(r, g, b);
+
+        // Apply Mask if present
+        if (m_originalBuffer.hasMask()) {
+            m_buffer->blendResult(m_originalBuffer);
+        }
 
         m_viewer->refreshDisplay(true);
         m_applied = true;

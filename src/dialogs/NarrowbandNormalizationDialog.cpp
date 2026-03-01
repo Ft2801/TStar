@@ -886,6 +886,9 @@ void NarrowbandNormalizationDialog::onPushNew() {
 
     ImageBuffer newBuf;
     newBuf.setData(m_chW, m_chH, 3, m_result);
+    if (m_viewer && m_viewer->getBuffer().isValid()) {
+        newBuf.setMetadata(m_viewer->getBuffer().metadata());
+    }
 
     if (m_mainWindow) {
         m_mainWindow->createResultWindow(newBuf, tr("NB Normalized"));

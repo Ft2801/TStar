@@ -1,6 +1,11 @@
 TStar Changelog
 ===============
 
+Version 1.7.2
+-------------
+- Fixed metadata not preserving after some operations
+- Added mask support to the temperature/tint tool 
+
 Version 1.7.1
 -------------
 - New mini tool: temperature/tint

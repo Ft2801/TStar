@@ -2279,6 +2279,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Adjust the color balance of the image by shifting towards warm (red) or cool (blue) tones and balancing green/magenta tints. Useful for manual white balance correction.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Adjust tonal curves for each RGB channel independently or together.</source>
             <translation type="unfinished" />
         </message>
@@ -3144,6 +3148,10 @@
         </message>
         <message>
             <source>TStar supports scripting for automating processing workflows:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Temperature / Tint</source>
             <translation type="unfinished" />
         </message>
         <message>

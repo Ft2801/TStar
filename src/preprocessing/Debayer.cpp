@@ -182,6 +182,7 @@ bool Debayer::bilinear(const ImageBuffer& input, ImageBuffer& output,
         }
     }
     
+    output.setMetadata(input.metadata());
     return true;
 }
 
@@ -372,6 +373,7 @@ bool Debayer::vng(const ImageBuffer& input, ImageBuffer& output,
         }
     }
     
+    output.setMetadata(input.metadata());
     return true;
 }
 
@@ -444,6 +446,7 @@ bool Debayer::superpixel(const ImageBuffer& input, ImageBuffer& output,
         }
     }
     
+    output.setMetadata(input.metadata());
     return true;
 }
 

@@ -179,6 +179,9 @@ QString HelpDialog::buildHelpContent()
     html += "<h3>" + tr("Saturation") + "</h3>";
     html += "<p>" + tr("Adjust color saturation with protection for highlights and shadows.") + "</p>";
 
+    html += "<h3>" + tr("Temperature / Tint") + "</h3>";
+    html += "<p>" + tr("Adjust the color balance of the image by shifting towards warm (red) or cool (blue) tones and balancing green/magenta tints. Useful for manual white balance correction.") + "</p>";
+
     html += "<h3>" + tr("Selective Color Correction") + "</h3>";
     html += "<p>" + tr("Adjust colors within a specific hue range without affecting other colors:") + "</p>";
     html += "<ul>";

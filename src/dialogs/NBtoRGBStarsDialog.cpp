@@ -315,6 +315,12 @@ void NBtoRGBStarsDialog::loadFromViewer(const QString& which) {
         if (which == "Ha") m_ha = std::move(mono);
         else if (which == "OIII") m_oiii = std::move(mono);
         else m_sii = std::move(mono);
+        
+        // Save metadata from the FIRST valid source image to be inherited by the result
+        if (!m_hasSrcMeta) {
+            m_srcMeta = buf.metadata();
+            m_hasSrcMeta = true;
+        }
 
         setStatusLabel(which, tr("From View (%1x%2)").arg(w).arg(h));
     } else if (which == "OSC") {
@@ -345,6 +351,10 @@ void NBtoRGBStarsDialog::loadFromViewer(const QString& which) {
 
         m_chW = w;
         m_chH = h;
+        if (!m_hasSrcMeta) {
+            m_srcMeta = buf.metadata();
+            m_hasSrcMeta = true;
+        }
         setStatusLabel(which, tr("From View (%1x%2)").arg(w).arg(h));
     }
 
@@ -385,11 +395,10 @@ void NBtoRGBStarsDialog::loadFromFile(const QString& which) {
 
         m_chW = w;
         m_chH = h;
-
-        if (which == "Ha") m_ha = std::move(mono);
-        else if (which == "OIII") m_oiii = std::move(mono);
-        else m_sii = std::move(mono);
-
+        if (!m_hasSrcMeta) {
+            m_srcMeta = buf.metadata();
+            m_hasSrcMeta = true;
+        }
         setStatusLabel(which, QFileInfo(path).fileName());
     } else if (which == "OSC") {
         if (ch >= 3) {
@@ -418,6 +427,10 @@ void NBtoRGBStarsDialog::loadFromFile(const QString& which) {
 
         m_chW = w;
         m_chH = h;
+        if (!m_hasSrcMeta) {
+            m_srcMeta = buf.metadata();
+            m_hasSrcMeta = true;
+        }
         setStatusLabel(which, QFileInfo(path).fileName());
     }
 
@@ -493,6 +506,8 @@ void NBtoRGBStarsDialog::onPushFinal() {
 
     ImageBuffer newBuf;
     newBuf.setData(m_chW, m_chH, 3, m_result);
+    // Apply previously saved metadata to the target output buffer
+    newBuf.setMetadata(m_srcMeta);
 
     if (m_mainWindow) {
         m_mainWindow->createResultWindow(newBuf, tr("NB→RGB Stars"));
@@ -506,6 +521,8 @@ void NBtoRGBStarsDialog::onClear() {
     m_osc.clear();
     m_oscChannels = 0;
     m_result.clear();
+    m_hasSrcMeta = false;
+    m_srcMeta = ImageBuffer::Metadata();
     m_chW = m_chH = 0;
 
     m_lblHa->setText(tr("No Ha loaded."));
