@@ -115,9 +115,9 @@ echo "  - Target architecture: $BUILD_ARCH"
 FRAMEWORKS_DIR="$DIST_DIR/Contents/Frameworks"
 ensure_dir "$FRAMEWORKS_DIR"
 
+copy_dylib "libz.1.dylib" "zlib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
 copy_dylib "libz.dylib" "zlib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
-copy_dylib "libz" "zlib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
-copy_dylib "libz.1.dylib" "zlib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+cp "/usr/lib/libz.1.dylib" "$FRAMEWORKS_DIR/libz.1.dylib" 2>/dev/null || true
 
 copy_dylib "libgsl" "gsl" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libgslcblas" "gsl" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
