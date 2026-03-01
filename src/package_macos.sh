@@ -730,6 +730,19 @@ check_command codesign && {
     # Sign all other nested .framework bundles explicitly before signing the app
     for fw in "$FRAMEWORKS_DIR"/*.framework; do
         [ -d "$fw" ] || continue
+        
+        # Explicitly sign inner apps inside the framework (like Python.app) before the framework itself
+        if [ -d "$fw/Versions/Current/Resources" ]; then
+            find "$fw/Versions/Current/Resources" -name "*.app" -type d | while read -r inner_app; do
+                if [ -d "$inner_app/Contents/MacOS" ]; then
+                    find "$inner_app/Contents/MacOS" -type f 2>/dev/null | while read -r inner_bin; do
+                        codesign --force --sign - "$inner_bin" 2>/dev/null || true
+                    done
+                fi
+                codesign --force --sign - "$inner_app" 2>/dev/null || true
+            done
+        fi
+        
         [ "$fw" = "$PYTHON_FW" ] && continue
         codesign --force --sign - "$fw" 2>&1 | grep -v '^$' || true
     done
