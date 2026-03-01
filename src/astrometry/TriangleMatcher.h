@@ -82,6 +82,13 @@ private:
                       const std::vector<int>& votesB,
                       GenericTrans& trans);
                       
+    int verifyTransform(const std::vector<MatchStar>& imgStars,
+                        const std::vector<MatchStar>& catStars,
+                        const GenericTrans& trans,
+                        double tol,
+                        std::vector<int>& inlierA,
+                        std::vector<int>& inlierB);
+                      
     // calc_trans_linear
     bool calcTransLinear(int n, 
                          const std::vector<MatchStar>& listA,

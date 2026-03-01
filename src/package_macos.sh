@@ -732,16 +732,14 @@ check_command codesign && {
         [ -d "$fw" ] || continue
         
         # Explicitly sign inner apps inside the framework (like Python.app) before the framework itself
-        if [ -d "$fw/Versions/Current/Resources" ]; then
-            find "$fw/Versions/Current/Resources" -name "*.app" -type d | while read -r inner_app; do
-                if [ -d "$inner_app/Contents/MacOS" ]; then
-                    find "$inner_app/Contents/MacOS" -type f 2>/dev/null | while read -r inner_bin; do
-                        codesign --force --sign - "$inner_bin" 2>/dev/null || true
-                    done
-                fi
-                codesign --force --sign - "$inner_app" 2>/dev/null || true
-            done
-        fi
+        find "$fw" -name "*.app" -type d 2>/dev/null | while read -r inner_app; do
+            if [ -d "$inner_app/Contents/MacOS" ]; then
+                find "$inner_app/Contents/MacOS" -type f 2>/dev/null | while read -r inner_bin; do
+                    codesign --force --sign - "$inner_bin" 2>&1 | grep -v '^$' || true
+                done
+            fi
+            codesign --force --sign - "$inner_app" 2>&1 | grep -v '^$' || true
+        done
         
         [ "$fw" = "$PYTHON_FW" ] && continue
         codesign --force --sign - "$fw" 2>&1 | grep -v '^$' || true

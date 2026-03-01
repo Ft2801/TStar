@@ -185,8 +185,78 @@ bool TriangleMatcher::solve(const std::vector<MatchStar>& imgStars,
     
     if ((int)winnerA.size() < required_pairs) return false;
     
-    // 5. Iterative Fit
-    return iterativeFit(sA, sB, winnerA, winnerB, resultTrans);
+    // 5. Initial Iterative Fit
+    if (!iterativeFit(sA, sB, winnerA, winnerB, resultTrans)) {
+        return false;
+    }
+    
+    // 6. Strict Verification Pass (Inlier Check)
+    std::vector<int> inlierA;
+    std::vector<int> inlierB;
+    
+    // Scale is units per pixel (e.g., arcsec/px)
+    double scale = std::sqrt(resultTrans.x10 * resultTrans.x10 + resultTrans.y10 * resultTrans.y10);
+    double verifyTol = scale * 5.0; // 5 pixels tolerance translated to target coordinate system
+    
+    int inliersFound = verifyTransform(imgStars, catStars, resultTrans, verifyTol, inlierA, inlierB);
+    
+    // Require at least 15 inliers, or 15% of image stars if fewer (absolute minimum 8)
+    int requiredInliers = std::max(8, std::min(15, (int)(imgStars.size() * 0.15)));
+    
+    if (inliersFound < requiredInliers) {
+        return false; // Rejected as a false positive!
+    }
+    
+    // 7. Final Precision Refitting using all inliers
+    return iterativeFit(imgStars, catStars, inlierA, inlierB, resultTrans);
+}
+
+int TriangleMatcher::verifyTransform(const std::vector<MatchStar>& imgStars,
+                                     const std::vector<MatchStar>& catStars,
+                                     const GenericTrans& trans,
+                                     double tol,
+                                     std::vector<int>& inlierA,
+                                     std::vector<int>& inlierB)
+{
+    int inliers = 0;
+    double tolSq = tol * tol;
+    std::vector<int> catMatchedTo(catStars.size(), -1);
+    std::vector<double> catMatchDistSq(catStars.size(), tolSq);
+    
+    for (size_t i = 0; i < imgStars.size(); ++i) {
+        double tx = trans.x00 + trans.x10 * imgStars[i].x + trans.x01 * imgStars[i].y;
+        double ty = trans.y00 + trans.y10 * imgStars[i].x + trans.y01 * imgStars[i].y;
+        
+        int bestJ = -1;
+        double minDistSq = tolSq;
+        
+        for (size_t j = 0; j < catStars.size(); ++j) {
+            double dx = tx - catStars[j].x;
+            double dy = ty - catStars[j].y;
+            double distSq = dx * dx + dy * dy;
+            if (distSq < minDistSq) {
+                minDistSq = distSq;
+                bestJ = (int)j;
+            }
+        }
+        
+        if (bestJ >= 0) {
+            if (catMatchedTo[bestJ] == -1 || minDistSq < catMatchDistSq[bestJ]) {
+                catMatchedTo[bestJ] = (int)i;
+                catMatchDistSq[bestJ] = minDistSq;
+            }
+        }
+    }
+    
+    for (size_t j = 0; j < catStars.size(); ++j) {
+        if (catMatchedTo[j] >= 0) {
+            inlierA.push_back(catMatchedTo[j]);
+            inlierB.push_back((int)j);
+            inliers++;
+        }
+    }
+    
+    return inliers;
 }
 
 // ... (skipping generateTriangles, it is unchanged)

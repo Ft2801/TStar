@@ -104,8 +104,8 @@ void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars) {
     TriangleMatcher matcher;
     matcher.setMaxStars(40); 
     GenericTrans trans;
-    double minScale = 1.0 / (m_pixelScale * 1.1); 
-    double maxScale = 1.0 / (m_pixelScale * 0.9);
+    double minScale = 1.0 / (m_pixelScale * 1.05); 
+    double maxScale = 1.0 / (m_pixelScale * 0.95);
     
     bool solved = matcher.solve(imgMatchStars, projCatStars, trans, 
                                 minScale, maxScale);
