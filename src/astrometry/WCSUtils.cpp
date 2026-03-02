@@ -69,6 +69,28 @@ double WCSUtils::imageRotation(const Metadata& meta) {
     return crota;
 }
 
+double WCSUtils::positionAngle(const Metadata& meta) {
+    if (!hasValidWCS(meta)) return 0.0;
+    // PA of image Y-axis from North, measured East of North (CCW positive).
+    // Moving in +Y (increasing row) shifts RA by CD1_2 and Dec by CD2_2.
+    // The angle of that direction from North (pure Dec increase) toward East:  atan2(ΔRA, ΔDec)
+    // Normalized to (-180, 180].
+    double pa = std::atan2(meta.cd1_2, meta.cd2_2) * RAD_TO_DEG;
+    // Normalize to (-180, 180]
+    while (pa >  180.0) pa -= 360.0;
+    while (pa <= -180.0) pa += 360.0;
+    return pa;
+}
+
+bool WCSUtils::isParityFlipped(const Metadata& meta) {
+    if (!hasValidWCS(meta)) return false;
+    // Determinant of the CD matrix.
+    // Standard astronomical orientation: East-left → det < 0.
+    // Mirrored (East-right, odd number of reflections): det > 0.
+    double det = meta.cd1_1 * meta.cd2_2 - meta.cd1_2 * meta.cd2_1;
+    return det > 0.0;
+}
+
 void WCSUtils::tanProject(double ra, double dec, double ra0, double dec0,
                           double& xi, double& eta) {
     // Gnomonic (TAN) projection: world to native plane

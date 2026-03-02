@@ -1,6 +1,11 @@
 TStar Changelog
 ===============
 
+Version 1.7.3
+-------------
+- New powerful plate solving engine
+- Introduction to MARS-like background extraction tool
+
 Version 1.7.2
 -------------
 - Fixed metadata not preserving after some operations

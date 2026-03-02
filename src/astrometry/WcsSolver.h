@@ -44,6 +44,25 @@ public:
         crpix2 = imageHeight * 0.5 + 0.5;
         
         // CD matrix: convert transform coefficients from arcsec/px to deg/px
+        //
+        // COORDINATE CONVENTION NOTE:
+        // The plate solver uses centered pixel coords where:
+        //   ms.x = buffer_x - W/2           (same direction as FITS X)
+        //   ms.y = H/2 - buffer_y            (increases northward, same as η)
+        //
+        // The TRANS maps (ms.x, ms.y) → tangent plane (ξ, η) in arcsec.
+        // Both ms.y and η increase northward, so the Y-column mapping is direct.
+        // The CD matrix maps (Δpix_x, Δpix_y) → (Δra, Δdec) in degrees.
+        //
+        // FITS pixel Y and ms.y are related by:  ms.y = H/2 - pix_y
+        // But the TRANS was fitted with ms.y on the A-side and η on the B-side —
+        // both axes increase in the same direction (northward) — so no sign flip
+        // is needed when converting TRANS terms to the CD matrix.
+        //
+        //   CD1_1 = trans.x10 / 3600
+        //   CD1_2 = trans.x01 / 3600
+        //   CD2_1 = trans.y10 / 3600
+        //   CD2_2 = trans.y01 / 3600
         cd[0][0] = trans.x10 * ARCSEC_TO_DEG;  // CD1_1
         cd[0][1] = trans.x01 * ARCSEC_TO_DEG;  // CD1_2
         cd[1][0] = trans.y10 * ARCSEC_TO_DEG;  // CD2_1

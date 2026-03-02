@@ -88,10 +88,12 @@ public:
     bool isDisplayInverted() const { return m_displayInverted; }
     bool isDisplayFalseColor() const { return m_displayFalseColor; }
     float getAutoStretchMedian() const { return m_autoStretchMedian; }
+    ImageBuffer::ChannelView channelView() const { return m_channelView; }
     void setDisplayState(ImageBuffer::DisplayMode mode, bool linked);
     void setAutoStretchMedian(float median);
     void setInverted(bool inverted);
     void setFalseColor(bool falseColor);
+    void setChannelView(ImageBuffer::ChannelView cv);
     QImage getCurrentDisplayImage() const { return m_displayImage; }
     
     // Modification State
@@ -213,6 +215,7 @@ private:
     bool m_displayInverted = false;
     bool m_displayFalseColor = false;
     float m_autoStretchMedian = 0.25f;  // Target median for AutoStretch display
+    ImageBuffer::ChannelView m_channelView = ImageBuffer::ChannelRGB;
     bool m_isModified = false;
     bool m_showMaskOverlay = true;
 };

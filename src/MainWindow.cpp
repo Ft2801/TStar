@@ -507,7 +507,30 @@ MainWindow::MainWindow(QWidget *parent)
         m_displayLinked ? getImgPath("linked.svg") : getImgPath("unlinked.svg")
     ));
                     }
-                    
+
+                    // Sync channel view buttons to new viewer state
+                    if (m_channelRGBBtn && m_channelRBtn && m_channelGBtn && m_channelBBtn) {
+                        bool isColor = (v->getBuffer().channels() == 3);
+                        m_channelRBtn->setEnabled(isColor);
+                        m_channelGBtn->setEnabled(isColor);
+                        m_channelBBtn->setEnabled(isColor);
+                        QSignalBlocker b1(m_channelRGBBtn), b2(m_channelRBtn),
+                                       b3(m_channelGBtn),  b4(m_channelBBtn);
+                        if (!isColor) {
+                            m_channelRGBBtn->setChecked(true);
+                        } else {
+                            switch (v->channelView()) {
+                                case ImageBuffer::ChannelRGB: m_channelRGBBtn->setChecked(true); break;
+                                case ImageBuffer::ChannelR:   m_channelRBtn->setChecked(true);   break;
+                                case ImageBuffer::ChannelG:   m_channelGBtn->setChecked(true);   break;
+                                case ImageBuffer::ChannelB:   m_channelBBtn->setChecked(true);   break;
+                            }
+                        }
+                    }
+
+                    // CBE tracks active view
+                    if (m_cbeDlg) m_cbeDlg->setViewer(v);
+
                     // Ensure connections
                     connect(v, &ImageViewer::viewChanged, this, &MainWindow::propagateViewChange, Qt::UniqueConnection);
                     connect(v, &ImageViewer::historyChanged, this, &MainWindow::updateMenus, Qt::UniqueConnection);
@@ -755,7 +778,60 @@ MainWindow::MainWindow(QWidget *parent)
     { QWidget* s = new QWidget(this); s->setFixedWidth(2); mainToolbar->addWidget(s); }
     
     // 5. Tools (Files)
-    
+
+    // -- Channel view buttons: R / G / B / RGB --
+    // Styled to match the dark toolbar; exclusively checkable via QButtonGroup.
+    {
+        const QString chanBtnStyle =
+            "QToolButton {"
+            "  background-color:#333; color:#e0e0e0; border:1px solid #555;"
+            "  border-radius:3px; padding:2px 5px; font-size:11px;"
+            "} "
+            "QToolButton:checked {"
+            "  background-color:#555; color:#fff; border-color:#888;"
+            "} "
+            "QToolButton:hover { background-color:#444; }"
+            "QToolButton:disabled { color:#666; border-color:#444; }";
+
+        auto makeChannelBtn = [&](const QString& label) {
+            QToolButton* btn = new QToolButton(this);
+            btn->setText(label);
+            btn->setCheckable(true);
+            btn->setToolButtonStyle(Qt::ToolButtonTextOnly);
+            btn->setFixedWidth(label == tr("RGB") ? 44 : 28);
+            btn->setStyleSheet(chanBtnStyle);
+            mainToolbar->addWidget(btn);
+            return btn;
+        };
+
+        m_channelRGBBtn = makeChannelBtn(tr("RGB"));
+        m_channelRBtn   = makeChannelBtn(tr("R"));
+        m_channelGBtn   = makeChannelBtn(tr("G"));
+        m_channelBBtn   = makeChannelBtn(tr("B"));
+
+        auto* chanGroup = new QButtonGroup(this);
+        chanGroup->setExclusive(true);
+        chanGroup->addButton(m_channelRGBBtn);
+        chanGroup->addButton(m_channelRBtn);
+        chanGroup->addButton(m_channelGBtn);
+        chanGroup->addButton(m_channelBBtn);
+        m_channelRGBBtn->setChecked(true);
+
+        auto applyChannelView = [this](QToolButton* btn, ImageBuffer::ChannelView cv) {
+            connect(btn, &QToolButton::toggled, this, [this, cv](bool checked) {
+                if (checked) {
+                    if (auto v = currentViewer()) v->setChannelView(cv);
+                }
+            });
+        };
+        applyChannelView(m_channelRGBBtn, ImageBuffer::ChannelRGB);
+        applyChannelView(m_channelRBtn,   ImageBuffer::ChannelR);
+        applyChannelView(m_channelGBtn,   ImageBuffer::ChannelG);
+        applyChannelView(m_channelBBtn,   ImageBuffer::ChannelB);
+
+        { QWidget* s = new QWidget(this); s->setFixedWidth(4); mainToolbar->addWidget(s); }
+    }
+
     // Add AutoStretch median selector (before display mode combo)
     mainToolbar->addWidget(m_autoStretchMedianCombo);
     { QWidget* s = new QWidget(this); s->setFixedWidth(3); mainToolbar->addWidget(s); }

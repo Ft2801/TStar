@@ -24,9 +24,9 @@ HiPSClient::HiPSClient(QObject* parent)
 }
 
 void HiPSClient::fetchFITS(const QString& hips, double ra, double dec,
-                            double fov, int width, int height)
+                            double fov, int width, int height, double rotationAngle)
 {
-    QString cachePath = getCacheFilePath(hips, ra, dec, fov, width, height);
+    QString cachePath = getCacheFilePath(hips, ra, dec, fov, width, height, rotationAngle);
 
     // Try cache first
     if (QFile::exists(cachePath)) {
@@ -56,15 +56,16 @@ void HiPSClient::fetchFITS(const QString& hips, double ra, double dec,
     // Build CDS Aladin hips2fits URL
     QUrl url("https://alasky.cds.unistra.fr/hips-image-services/hips2fits");
     QUrlQuery query;
-    query.addQueryItem("hips",       hips);
-    query.addQueryItem("width",      QString::number(width));
-    query.addQueryItem("height",     QString::number(height));
-    query.addQueryItem("fov",        QString::number(fov, 'f', 6));
-    query.addQueryItem("projection", "TAN");
-    query.addQueryItem("coordsys",   "icrs");
-    query.addQueryItem("ra",         QString::number(ra, 'f', 6));
-    query.addQueryItem("dec",        QString::number(dec, 'f', 6));
-    query.addQueryItem("format",     "fits");
+    query.addQueryItem("hips",             hips);
+    query.addQueryItem("width",            QString::number(width));
+    query.addQueryItem("height",           QString::number(height));
+    query.addQueryItem("fov",              QString::number(fov, 'f', 6));
+    query.addQueryItem("projection",       "TAN");
+    query.addQueryItem("coordsys",         "icrs");
+    query.addQueryItem("ra",               QString::number(ra, 'f', 6));
+    query.addQueryItem("dec",              QString::number(dec, 'f', 6));
+    query.addQueryItem("rotation_angle",   QString::number(rotationAngle, 'f', 3));
+    query.addQueryItem("format",           "fits");
     url.setQuery(query);
 
     QNetworkRequest req(url);
@@ -130,7 +131,7 @@ void HiPSClient::onReplyFinished() {
 }
 
 QString HiPSClient::getCacheFilePath(const QString& hips, double ra, double dec,
-                                      double fov, int width, int height)
+                                      double fov, int width, int height, double rotationAngle)
 {
     // Round coordinates to a precision proportional to the FoV.
     // This allows nearby fields (within ~10% of the FoV) to share cached tiles.
@@ -138,14 +139,18 @@ QString HiPSClient::getCacheFilePath(const QString& hips, double ra, double dec,
     double roundedRA  = std::round(ra  / roundingStep) * roundingStep;
     double roundedDec = std::round(dec / roundingStep) * roundingStep;
     double roundedFoV = std::round(fov * 100.0) / 100.0; // round to 0.01 deg
+    // Round rotation_angle to nearest 0.1° so small floating-point jitter
+    // doesn't create duplicate cache entries for the same orientation.
+    double roundedRot = std::round(rotationAngle * 10.0) / 10.0;
 
-    QString key = QString("%1_%2_%3_%4_%5_%6")
+    QString key = QString("%1_%2_%3_%4_%5_%6_%7")
                       .arg(hips)
                       .arg(roundedRA,  0, 'f', 6)
                       .arg(roundedDec, 0, 'f', 6)
                       .arg(roundedFoV, 0, 'f', 6)
                       .arg(width)
-                      .arg(height);
+                      .arg(height)
+                      .arg(roundedRot, 0, 'f', 1);
 
     QByteArray hash = QCryptographicHash::hash(key.toUtf8(), QCryptographicHash::Md5).toHex();
     return m_cacheDir + "/" + hash + ".fits";

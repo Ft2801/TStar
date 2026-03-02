@@ -70,6 +70,7 @@ public:
 
     enum BitDepth { Depth_8Int, Depth_16Int, Depth_32Int, Depth_32Float };
     enum DisplayMode { Display_Linear, Display_AutoStretch, Display_ArcSinh, Display_Sqrt, Display_Log, Display_Histogram };
+    enum ChannelView  { ChannelRGB = 0, ChannelR, ChannelG, ChannelB };
     int channels() const { Q_ASSERT(m_channels > 0); return m_channels; }
     size_t size() const { return static_cast<size_t>(m_width) * m_height * m_channels; }
     bool isValid() const { return !m_data.empty() && m_width > 0 && m_height > 0; }
@@ -78,7 +79,7 @@ public:
     // Replaces the boolean autostretch with mode and link option
     // Optional overrideLUT: if provided (size 3x65536), it is used instead of internal logic.
     // autoStretchTargetMedian: target median brightness for AutoStretch mode (default 0.25)
-    QImage getDisplayImage(DisplayMode mode = Display_Linear, bool linked = true, const std::vector<std::vector<float>>* overrideLUT = nullptr, int maxWidth = 0, int maxHeight = 0, bool showMask = false, bool inverted = false, bool falseColor = false, float autoStretchTargetMedian = 0.25f) const; 
+    QImage getDisplayImage(DisplayMode mode = Display_Linear, bool linked = true, const std::vector<std::vector<float>>* overrideLUT = nullptr, int maxWidth = 0, int maxHeight = 0, bool showMask = false, bool inverted = false, bool falseColor = false, float autoStretchTargetMedian = 0.25f, ChannelView channelView = ChannelRGB) const; 
 
     // Mask Support
     void setMask(const MaskLayer& mask);

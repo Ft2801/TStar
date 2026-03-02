@@ -6,6 +6,114 @@
 
 namespace Background {
 
+// ---------------------------------------------------------------------------
+// fitPolynomialBackground
+// Fits a 2D polynomial (up to Degree 3) to valid sky pixels to model true gradients.
+// Used to perfectly interpolate background through the masked nebulas without bumps.
+// ---------------------------------------------------------------------------
+static cv::Mat fitPolynomialBackground(const cv::Mat& src, const cv::Mat& mask, int degree) {
+    constexpr int kSize = 128; // heavy downsample for speed and robustness
+    double scale = std::min(1.0, (double)kSize / std::max(src.cols, src.rows));
+    
+    cv::Mat smallSrc, smallMask;
+    cv::resize(src, smallSrc, cv::Size(), scale, scale, cv::INTER_AREA);
+    cv::resize(mask, smallMask, cv::Size(), scale, scale, cv::INTER_NEAREST);
+    
+    // COLLECT POINTS: Use ONLY the pixels that are clean background.
+    // We avoid blurring before resizing to prevent structural bleeding.
+    std::vector<cv::Point> pts;
+    std::vector<float> vals;
+    pts.reserve(smallSrc.rows * smallSrc.cols);
+    vals.reserve(smallSrc.rows * smallSrc.cols);
+    
+    for (int y = 0; y < smallSrc.rows; ++y) {
+        for (int x = 0; x < smallSrc.cols; ++x) {
+            if (smallMask.at<uchar>(y, x) > 128) {
+                pts.push_back(cv::Point(x, y));
+                vals.push_back(smallSrc.at<float>(y, x));
+            }
+        }
+    }
+    
+    // Minimum points check
+    size_t minPts = (degree == 1) ? 3 : (degree == 2) ? 6 : (degree == 3) ? 10 : 1;
+    if (pts.size() < minPts) {
+        cv::Scalar m = cv::mean(src, mask);
+        return cv::Mat(src.size(), src.type(), m[0]);
+    }
+
+    // ROBUSTNESS: Discard outliers (stars or residuals) using Z-Score on the collected samples
+    cv::Mat vMat(vals.size(), 1, CV_32F, vals.data());
+    cv::Scalar meanV, stdDevV;
+    cv::meanStdDev(vMat, meanV, stdDevV);
+    
+    std::vector<cv::Point> cleanPts;
+    std::vector<float> cleanVals;
+    float threshold = 2.0f * (float)stdDevV[0]; // 2 sigma rejection
+    for (size_t i = 0; i < vals.size(); ++i) {
+        if (std::abs(vals[i] - (float)meanV[0]) < threshold) {
+            cleanPts.push_back(pts[i]);
+            cleanVals.push_back(vals[i]);
+        }
+    }
+    
+    if (cleanPts.size() < minPts) {
+        cleanPts = pts; cleanVals = vals;
+    }
+
+    int cols = (degree == 1) ? 3 : (degree == 2) ? 6 : (degree == 3) ? 10 : 15;
+    cv::Mat A(cleanPts.size(), cols, CV_32FC1);
+    cv::Mat B(cleanPts.size(), 1, CV_32FC1);
+    
+    float nx = 2.0f / (smallSrc.cols - 1);
+    float ny = 2.0f / (smallSrc.rows - 1);
+    
+    for (size_t i = 0; i < cleanPts.size(); ++i) {
+        float x = cleanPts[i].x * nx - 1.0f;
+        float y = cleanPts[i].y * ny - 1.0f;
+        B.at<float>(i, 0) = cleanVals[i];
+        
+        float* row = A.ptr<float>(i);
+        int c = 0;
+        row[c++] = 1.0f;
+        if (degree >= 1) { row[c++] = x; row[c++] = y; }
+        if (degree >= 2) { row[c++] = x*x; row[c++] = y*y; row[c++] = x*y; }
+        if (degree >= 3) { row[c++] = x*x*x; row[c++] = y*y*y; row[c++] = x*x*y; row[c++] = x*y*y; }
+    }
+    
+    cv::Mat coeffs;
+    cv::solve(A, B, coeffs, cv::DECOMP_SVD);
+    
+    cv::Mat result(src.rows, src.cols, CV_32FC1);
+    float Fnx = 2.0f / (src.cols - 1);
+    float Fny = 2.0f / (src.rows - 1);
+    const float* cPtr = coeffs.ptr<float>(0);
+    
+    for (int y = 0; y < src.rows; ++y) {
+        float py = y * Fny - 1.0f;
+        float py2 = py * py;
+        float py3 = py2 * py;
+        float* row = result.ptr<float>(y);
+        for (int x = 0; x < src.cols; ++x) {
+            float px = x * Fnx - 1.0f;
+            float px2 = px * px;
+            float px3 = px2 * px;
+            
+            float val = cPtr[0];
+            int c = 1;
+            if (degree >= 1) { val += cPtr[c]*px + cPtr[c+1]*py; c += 2; }
+            if (degree >= 2) { val += cPtr[c]*px2 + cPtr[c+1]*py2 + cPtr[c+2]*px*py; c += 3; }
+            if (degree >= 3) { val += cPtr[c]*px3 + cPtr[c+1]*py3 + cPtr[c+2]*px2*py + cPtr[c+3]*px*py2; c += 4; }
+            
+            row[x] = val;
+        }
+    }
+    return result;
+}
+
+// ---------------------------------------------------------------------------
+// extractLargeScale — fallback low-frequency background map 
+// ---------------------------------------------------------------------------
 static cv::Mat extractLargeScale(const cv::Mat& src, int blurSigma, bool protectStars) {
     cv::Mat map;
     if (protectStars) {
@@ -29,12 +137,15 @@ static cv::Mat extractLargeScale(const cv::Mat& src, int blurSigma, bool protect
     return map;
 }
 
-static cv::Mat toLuminance(const cv::Mat& src) {
-    if (src.channels() == 1) return src;
-    cv::Mat gray;
-    // ImageBuffer is RGB-interleaved, NOT BGR
-    cv::cvtColor(src, gray, cv::COLOR_RGB2GRAY);
-    return gray;
+// ---------------------------------------------------------------------------
+// Split an interleaved ImageBuffer channel into a CV_32FC1 mat (no copy when
+// nChannels == 1; extracts one plane when nChannels == 3).
+// ---------------------------------------------------------------------------
+static cv::Mat extractChannel(const cv::Mat& mat, int ch) {
+    if (mat.channels() == 1) return mat;
+    cv::Mat out;
+    cv::extractChannel(mat, out, ch);
+    return out;
 }
 
 bool CatalogGradientExtractor::extract(ImageBuffer& target,
@@ -43,9 +154,6 @@ bool CatalogGradientExtractor::extract(ImageBuffer& target,
                                        std::function<void(int)> /*progress*/,
                                        const bool* /*cancelFlag*/)
 {
-    if (target.width() != reference.width() || target.height() != reference.height())
-        return false;
-
     ImageBuffer gradMap = computeGradientMap(target, reference, opts);
     if (!gradMap.isValid()) return false;
 
@@ -54,13 +162,16 @@ bool CatalogGradientExtractor::extract(ImageBuffer& target,
         return true;
     }
 
-    // Subtract gradient map from target, clamping to [0, 1]
-    auto& tgtData = target.data();
-    const auto& gradData = gradMap.data();
+    // Subtract the gradient map from the target.
+    // We do NOT hard-clamp to [0,1] here: that would clip dark pixels and destroy
+    // relative channel brightness. The caller / display pipeline handles the range.
+    // We only clamp at 0 to avoid negative values (physically meaningless flux).
+    auto& tgtData  = target.data();
+    const auto& gd = gradMap.data();
     const size_t n = tgtData.size();
-    for (size_t i = 0; i < n; ++i) {
-        tgtData[i] = std::max(0.0f, std::min(1.0f, tgtData[i] - gradData[i]));
-    }
+    for (size_t i = 0; i < n; ++i)
+        tgtData[i] = tgtData[i] - gd[i];   // unclamped: preserves shadows & colour balance
+
     return true;
 }
 
@@ -69,85 +180,109 @@ ImageBuffer CatalogGradientExtractor::computeGradientMap(const ImageBuffer& targ
                                                           const Options& opts)
 {
     ImageBuffer result;
-    int W = target.width();
-    int H = target.height();
-    if (W != reference.width() || H != reference.height()) return result;
+    const int W    = target.width();
+    const int H    = target.height();
+    const int tCh  = target.channels();   // 1 or 3
 
-    int tgtCh = target.channels();
-    int refCh = reference.channels();
+    // -------------------------------------------------------------------------
+    // Wrap target data as cv::Mat (no copy — data owned by ImageBuffer)
+    // -------------------------------------------------------------------------
+    const int cvTgtType = (tCh == 3) ? CV_32FC3 : CV_32FC1;
+    cv::Mat tgtMat(H, W, cvTgtType, const_cast<float*>(target.data().data()));
 
-    // Wrap ImageBuffer data as cv::Mat (no copy)
-    int cvTypeTgt = tgtCh == 3 ? CV_32FC3 : CV_32FC1;
-    cv::Mat tgtMat(H, W, cvTypeTgt, const_cast<float*>(target.data().data()));
-
-    int cvTypeRef = refCh == 3 ? CV_32FC3 : CV_32FC1;
-    cv::Mat refMat(H, W, cvTypeRef, const_cast<float*>(reference.data().data()));
-
-    // Extract luminance for both images (ImageBuffer is RGB, not BGR)
-    cv::Mat refLuma = toLuminance(refMat);
-    cv::Mat tgtLuma = toLuminance(tgtMat);
-
-    // Generate large-scale (low-frequency) maps
-    cv::Mat refLargeScale = extractLargeScale(refLuma, opts.blurScale, opts.protectStars);
-    cv::Mat tgtLumaLarge  = extractLargeScale(tgtLuma, opts.blurScale, opts.protectStars);
-
-    // Compute affine intensity matching: matched = a * (ref - refMean) + tgtMean
-    // This properly aligns both the mean and the contrast of the reference to the target
-    cv::Scalar tgtMeanS, tgtStdS, refMeanS, refStdS;
-    cv::meanStdDev(tgtLumaLarge, tgtMeanS, tgtStdS);
-    cv::meanStdDev(refLargeScale, refMeanS, refStdS);
-
-    double a = (refStdS[0] > 1e-8) ? (tgtStdS[0] / refStdS[0]) : 1.0;
-    double tgtMean = tgtMeanS[0];
-    double refMean = refMeanS[0];
-
-    // refMatched = a * (refLargeScale - refMean) + tgtMean
-    cv::Mat refMatched;
-    refLargeScale.convertTo(refMatched, -1, a, tgtMean - a * refMean);
-
-    // Build per-channel gradient
-    // For each target channel: extract its large-scale, then grad = tgtChanLarge - refMatched
-    // This uses the SAME matched reference for all channels → preserves inter-channel ratios
-    std::vector<cv::Mat> tgtChannels;
-    if (tgtCh == 3) {
-        cv::split(tgtMat, tgtChannels);
-    } else {
-        tgtChannels.push_back(tgtMat);
+    // -------------------------------------------------------------------------
+    // Prepare Reference Mat
+    // -------------------------------------------------------------------------
+    cv::Mat refMat;
+    if (reference.isValid()) {
+        const int rcvType = (reference.channels() == 3) ? CV_32FC3 : CV_32FC1;
+        cv::Mat rawRef(reference.height(), reference.width(), rcvType, const_cast<float*>(reference.data().data()));
+        if (rawRef.cols != W || rawRef.rows != H) {
+            cv::resize(rawRef, refMat, cv::Size(W, H), 0, 0, cv::INTER_CUBIC);
+        } else {
+            refMat = rawRef;
+        }
     }
 
+    // -------------------------------------------------------------------------
+    // Per-channel gradient extraction
+    // -------------------------------------------------------------------------
     std::vector<cv::Mat> gradChannels;
-    for (int c = 0; c < tgtCh; ++c) {
-        cv::Mat chanLarge = extractLargeScale(tgtChannels[c], opts.blurScale, opts.protectStars);
+    gradChannels.reserve(tCh);
 
-        // Per-channel affine match against channel's own mean, using luminance-derived scale
-        // This ensures channels share the same gradient shape but preserve individual offsets
-        cv::Scalar chanMeanS, chanStdS;
-        cv::meanStdDev(chanLarge, chanMeanS, chanStdS);
+    for (int c = 0; c < tCh; ++c) {
+        cv::Mat tgtChan = extractChannel(tgtMat, c);  // CV_32FC1
 
-        // Offset the matched reference to this channel's mean level
-        cv::Mat refChanMatched;
-        refLargeScale.convertTo(refChanMatched, -1, a, chanMeanS[0] - a * refMean);
+        cv::Mat gradient;
 
-        cv::Mat grad = chanLarge - refChanMatched;
+        if (!refMat.empty()) {
+            int refC = (refMat.channels() == 1) ? 0 : c;
+            cv::Mat refChan = extractChannel(refMat, refC);
 
-        // Smooth to suppress any residual high-frequency artifacts
-        int smoothSigma = std::max(1, opts.blurScale / 2);
-        cv::GaussianBlur(grad, grad, cv::Size(0, 0), smoothSigma);
+            // 1. Create a logical mask of the "sky" using the Reference image.
+            // We want to identify the dark background vs the bright nebulas/galaxies.
+            // We use a small blur to remove catalog noise before thresholding.
+            cv::Mat rBg;
+            cv::GaussianBlur(refChan, rBg, cv::Size(0, 0), 4.0);
 
-        gradChannels.push_back(grad);
+            // Determine reference sky level (median) and spread
+            cv::Mat r1D;
+            rBg.reshape(1, 1).copyTo(r1D);
+            cv::sort(r1D, r1D, cv::SORT_EVERY_ROW + cv::SORT_ASCENDING);
+            float rMedian = r1D.at<float>(0, r1D.cols / 2);
+            // MAD (Median Absolute Deviation) for robust noise estimation
+            cv::Mat rDev = cv::abs(r1D - rMedian);
+            cv::sort(rDev, rDev, cv::SORT_EVERY_ROW + cv::SORT_ASCENDING);
+            float rMAD = rDev.at<float>(0, rDev.cols / 2);
+            float rSigma = rMAD * 1.4826f;
+
+            // Mask: 1 (255) for SKY, 0 for NEBULA/STARS
+            // We use a slightly stricter threshold to truly isolate the deep background.
+            cv::Mat skyMask;
+            cv::threshold(rBg, skyMask, rMedian + 1.0f * rSigma, 255.0, cv::THRESH_BINARY_INV);
+            skyMask.convertTo(skyMask, CV_8U);
+
+            // Morphological erode to grow the protection area around nebulas/stars.
+            // Using a larger kernel (15x15) to ensure we don't sample faint halo edges.
+            cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(15, 15));
+            cv::erode(skyMask, skyMask, kernel);
+
+            // 2. Extract target background using true polynomial interpolation.
+            // Using Degree 2 (Quadratic) by default as it is much more stable than Degree 3
+            // and captures standard sky gradients (vignetting + linear LP) perfectly.
+            gradient = fitPolynomialBackground(tgtChan, skyMask, 2);
+            
+            // 3. NORMALIZATION: Professional Sky-Median Alignment
+            // We shift the gradient so its own value AT THE SKY PIXELS is zero.
+            // This ensures that when target - gradient is performed, the background
+            // stays at its original median level (maintaining 0.25 autostretch gray).
+            cv::Scalar gSkyMean = cv::mean(gradient, skyMask);
+            gradient = gradient - gSkyMean[0];
+            
+        } else {
+            // Fallback: No reference, just quadratic blur/fit on the target
+            gradient = fitPolynomialBackground(tgtChan, cv::Mat::ones(tgtChan.size(), CV_8U) * 255, 2);
+            cv::Scalar gMedian = cv::mean(gradient);
+            gradient = gradient - gMedian[0];
+        }
+
+        // NO CLAMPING to 0. We preserve the natural noise floor.
+        gradChannels.push_back(gradient);
     }
 
-    cv::Mat mergedGrad;
-    if (gradChannels.size() == 3) {
-        cv::merge(gradChannels, mergedGrad);
+    // -------------------------------------------------------------------------
+    // Merge back into an interleaved float mat and copy to result ImageBuffer
+    // -------------------------------------------------------------------------
+    cv::Mat merged;
+    if (tCh == 3) {
+        cv::merge(gradChannels, merged);
     } else {
-        mergedGrad = gradChannels[0];
+        merged = gradChannels[0];
     }
 
-    // Copy into result ImageBuffer
-    result.resize(W, H, tgtCh);
-    std::memcpy(result.data().data(), mergedGrad.ptr<float>(), result.size() * sizeof(float));
-
+    result.resize(W, H, tCh);
+    std::memcpy(result.data().data(), merged.ptr<float>(),
+                static_cast<size_t>(W) * H * tCh * sizeof(float));
     return result;
 }
 

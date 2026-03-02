@@ -18,15 +18,19 @@ public:
     static const QString SUR_UNWISE_COLOR;
 
     /**
-     * @brief Fetches a FITS image cutout from CDS Aladin
-     * @param hips   The HiPS survey ID (e.g. "CDS/P/DSS2/red")
-     * @param ra     Right Ascension of the center in degrees
-     * @param dec    Declination of the center in degrees
-     * @param fov    Field of View horizontally in degrees
-     * @param width  Width of the requested image in pixels
-     * @param height Height of the requested image in pixels
+     * @brief Fetches a FITS image cutout from CDS Aladin hips2fits
+     * @param hips          The HiPS survey ID (e.g. "CDS/P/DSS2/red")
+     * @param ra            Right Ascension of the center in degrees
+     * @param dec           Declination of the center in degrees
+     * @param fov           Field of View of the X axis (width) in degrees
+     * @param width         Width of the requested image in pixels
+     * @param height        Height of the requested image in pixels
+     * @param rotationAngle Position angle of image Y-axis from North, East of North (degrees).
+     *                      Pass 0 for standard North-up orientation.
+     *                      Computed from target image WCS CD matrix via WCSUtils::positionAngle().
      */
-    void fetchFITS(const QString& hips, double ra, double dec, double fov, int width, int height);
+    void fetchFITS(const QString& hips, double ra, double dec, double fov,
+                   int width, int height, double rotationAngle = 0.0);
     void clearCache();
     static qint64 getCacheSize();
     static void setMaxCacheSize(qint64 bytes);
@@ -40,7 +44,8 @@ private slots:
     void onReplyFinished();
 
 private:
-    QString getCacheFilePath(const QString& hips, double ra, double dec, double fov, int width, int height);
+    QString getCacheFilePath(const QString& hips, double ra, double dec, double fov,
+                             int width, int height, double rotationAngle);
     void cleanupCache();
 
     QNetworkAccessManager* m_manager;

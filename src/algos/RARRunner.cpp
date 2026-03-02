@@ -113,6 +113,34 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
         QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
         env.insert("PYTHONUNBUFFERED", "1");
 #if defined(Q_OS_MAC)
+        // Robustly fix pyvenv.cfg with the actual absolute path of the bundled framework at runtime
+        QString pyvenvCfg = QCoreApplication::applicationDirPath() + "/../Resources/python_venv/pyvenv.cfg";
+        if (!QFile::exists(pyvenvCfg)) pyvenvCfg = QCoreApplication::applicationDirPath() + "/../../deps/python_venv/pyvenv.cfg";
+        if (QFile::exists(pyvenvCfg)) {
+            QString pythonFwBin = QDir::cleanPath(QCoreApplication::applicationDirPath() + "/../Frameworks/Python.framework/Versions/Current/bin");
+            QFile f(pyvenvCfg);
+            if (f.open(QIODevice::ReadWrite | QIODevice::Text)) {
+                QString content = QString::fromUtf8(f.readAll());
+                bool changed = false;
+                QStringList lines = content.split('\n');
+                for (int i=0; i<lines.size(); ++i) {
+                    if (lines[i].trimmed().startsWith("home =")) {
+                        QString newLine = "home = " + pythonFwBin;
+                        if (lines[i] != newLine) { lines[i] = newLine; changed = true; }
+                    } else if (lines[i].trimmed().startsWith("executable =")) {
+                        QString newLine = "executable = " + pythonFwBin + "/python3";
+                        if (lines[i] != newLine) { lines[i] = newLine; changed = true; }
+                    }
+                }
+                if (changed) {
+                    f.resize(0);
+                    f.seek(0);
+                    f.write(lines.join('\n').toUtf8());
+                }
+                f.close();
+            }
+        }
+
         // Make Python.framework findable regardless of the path baked into the binary.
         const QString frameworksDir = QCoreApplication::applicationDirPath() + "/../Frameworks";
         if (QDir(frameworksDir).exists()) {
@@ -120,23 +148,6 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
             env.insert("DYLD_FRAMEWORK_PATH", curFw.isEmpty() ? frameworksDir : frameworksDir + ":" + curFw);
             const QString curLib = env.value("DYLD_LIBRARY_PATH");
             env.insert("DYLD_LIBRARY_PATH", curLib.isEmpty() ? frameworksDir : frameworksDir + ":" + curLib);
-        }
-        const QStringList venvBases = {
-            QCoreApplication::applicationDirPath() + "/../Resources/python_venv/lib",
-            QCoreApplication::applicationDirPath() + "/../../deps/python_venv/lib"
-        };
-        for (const QString& venvLib : venvBases) {
-            if (QDir(venvLib).exists()) {
-                const QStringList pyDirs = QDir(venvLib).entryList({"python3*"}, QDir::Dirs | QDir::NoDotAndDotDot);
-                if (!pyDirs.isEmpty()) {
-                    const QString sitePkgs = venvLib + "/" + pyDirs.first() + "/site-packages";
-                    if (QDir(sitePkgs).exists()) {
-                        const QString cur = env.value("PYTHONPATH");
-                        env.insert("PYTHONPATH", cur.isEmpty() ? sitePkgs : sitePkgs + ":" + cur);
-                        break;
-                    }
-                }
-            }
         }
 #endif
         p.setProcessEnvironment(env);

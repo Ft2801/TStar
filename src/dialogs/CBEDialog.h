@@ -17,6 +17,7 @@ class CBEDialog : public DialogBase {
 public:
     explicit CBEDialog(QWidget* parent, ImageViewer* viewer, const ImageBuffer& buffer);
     ~CBEDialog();
+    void setViewer(ImageViewer* viewer);
 
 signals:
     void applyResult(const ImageBuffer& result);
@@ -40,6 +41,11 @@ private:
     QCheckBox*  m_checkProtectStars;
     QCheckBox*  m_checkGradientMap;
     QPushButton* m_btnApply;
+
+    // State tracked across onApply() → onHiPSImageReady()
+    int  m_targetWidth    = 0;   // full-resolution target width (pixels)
+    int  m_targetHeight   = 0;   // full-resolution target height (pixels)
+    bool m_parityFlipped  = false; // reference needs horizontal flip before extraction
 };
 
 #endif // CBEDIALOG_H

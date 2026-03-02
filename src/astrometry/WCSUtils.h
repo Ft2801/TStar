@@ -19,6 +19,23 @@ public:
     static double pixelScale(const Metadata& meta);
 
     static double imageRotation(const Metadata& meta);
+
+    /**
+     * Position angle of the image Y-axis, measured East of North (degrees, CCW positive).
+     * This is the value expected by the hips2fits `rotation_angle` parameter.
+     * Computed as atan2(CD1_2, CD2_2) — the angle of increasing-row direction from North.
+     * Returns 0.0 if WCS is invalid.
+     */
+    static double positionAngle(const Metadata& meta);
+
+    /**
+     * Returns true if the image has a mirrored (East-right) orientation.
+     * Formally: the determinant of the CD matrix > 0.
+     * Standard astronomical images have det < 0 (East-left).
+     * When true the reference image from hips2fits must be flipped horizontally
+     * before use as a gradient reference.
+     */
+    static bool isParityFlipped(const Metadata& meta);
     
     static bool pixelToWorld(const Metadata& meta, double px, double py,
                              double& ra, double& dec);

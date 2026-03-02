@@ -254,6 +254,11 @@ private:
     class QToolButton* m_invertBtn;
     class QToolButton* m_falseColorBtn;
     class QAction* m_linkViewsAction;
+    // Channel view buttons (R / G / B / RGB)
+    class QToolButton* m_channelRGBBtn = nullptr;
+    class QToolButton* m_channelRBtn   = nullptr;
+    class QToolButton* m_channelGBtn   = nullptr;
+    class QToolButton* m_channelBBtn   = nullptr;
     
     CustomMdiSubWindow* setupToolSubwindow(CustomMdiSubWindow* sub, QWidget* dlg, const QString& title);
     void centerToolWindow(CustomMdiSubWindow* sub);

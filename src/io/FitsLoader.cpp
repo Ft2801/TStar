@@ -56,10 +56,11 @@ bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* err
          return false;
     }
     
-    // Check if 3D (e.g. RGB)
+    // Check if 3D (e.g. RGB or RGBA).  If NAXIS3 >= 3, treat as colour and
+    // read only the first three planes
     int nChannels = 1;
     if (naxis == 3) {
-        if (naxes[2] == 3) nChannels = 3;
+        if (naxes[2] >= 3) nChannels = 3;
     }
     
     int width = naxes[0];
@@ -133,16 +134,21 @@ bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* err
     } else if (bitpix < 0) {
         // Floating point data.
         // If data is in range [0, 1], do nothing.
-        // If data exceeds 1.0, it's likely ADU counts (e.g. 0-65535 saved as float).
-        // We normalize to [0, 1] for consistency with integer pipeline.
+        // Otherwise normalize based on value range heuristic:
         if (globalMax > 1.0f) {
-             // Heuristic: If max is within 16-bit range (plus margin), assume 16-bit scale
-             if (globalMax <= 66000.0f) {
-                 divisor = 65535.0f;
-                 doScale = true;
-             }
-             // Else: Leave it as is (e.g. stacked 32-bit HDR or unknown scale)
-             // This preserves large values but avoids destructive Min-Max.
+            if (globalMax <= 255.5f) {
+                // Values in 8-bit range: e.g. color HiPS FITS from hips2fits (PanSTARRS, DSS)
+                // stored as float32 with values 0–255. Dividing by 65535 would make the
+                // image nearly black; use 255 instead.
+                divisor = 255.0f;
+                doScale = true;
+            } else if (globalMax <= 66000.0f) {
+                // Values in 16-bit ADU range (0–65535): typical raw astronomical sensor data
+                // saved as float FITS.
+                divisor = 65535.0f;
+                doScale = true;
+            }
+            // else: leave as-is (32-bit HDR, unknown large-value scale)
         }
     }
 
@@ -524,7 +530,7 @@ bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuff
         return false;
     }
     
-    int nChannels = (naxis == 3 && naxes[2] == 3) ? 3 : 1;
+    int nChannels = (naxis == 3 && naxes[2] >= 3) ? 3 : 1;
     int imgWidth = naxes[0];
     int imgHeight = naxes[1];
     
@@ -610,7 +616,12 @@ bool FitsLoader::loadHDU(void* fitsptr, [[maybe_unused]] int hduIndex, ImageBuff
         doScale = true;
     } else if (bitpix < 0) {
         if (globalMax > 1.0f) {
-             if (globalMax <= 66000.0f) {
+            if (globalMax <= 255.5f) {
+                // Float FITS in 8-bit range (e.g. hips2fits PanSTARRS/DSS color FITS).
+                // Dividing by 65535 would produce near-black; use 255 instead.
+                divisor = 255.0f;
+                doScale = true;
+            } else if (globalMax <= 66000.0f) {
                  divisor = 65535.0f;
                  doScale = true;
              }

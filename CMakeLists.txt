@@ -697,6 +697,8 @@ set(TSTAR_SOURCES
     src/dialogs/ConversionDialog.h
     src/dialogs/CBEDialog.cpp
     src/dialogs/CBEDialog.h
+    src/dialogs/ReferenceAlignDialog.cpp
+    src/dialogs/ReferenceAlignDialog.h
     
     # Astrometry
     src/astrometry/SimbadSearcher.cpp

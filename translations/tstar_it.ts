@@ -752,6 +752,144 @@
         </message>
     </context>
     <context>
+        <name>CBEDialog</name>
+        <message>
+            <source>  (non-standard orientation — ensure image has been recently plate-solved)</source>
+            <translation type="finished">  (orientamento non standard — assicurati che l'immagine sia stata risolta astrometricamente di recente)</translation>
+        </message>
+        <message>
+            <source> px</source>
+            <translation type="finished"> px</translation>
+        </message>
+        <message>
+            <source>Apply</source>
+            <translation type="finished">Applica</translation>
+        </message>
+        <message>
+            <source>Background extracted successfully.</source>
+            <translation type="finished">Sfondo estratto con successo.</translation>
+        </message>
+        <message>
+            <source>Cache Cleared</source>
+            <translation type="finished">Cache svuotata</translation>
+        </message>
+        <message>
+            <source>Catalog Background Extraction (MARS-like)</source>
+            <translation type="finished">Estrazione Sfondo da Catalogo (tipo MARS)</translation>
+        </message>
+        <message>
+            <source>Catalog Background Extraction tool active.</source>
+            <translation type="finished">Strumento Estrazione Sfondo da Catalogo attivo.</translation>
+        </message>
+        <message>
+            <source>Catalog download failed: %1</source>
+            <translation type="finished">Download catalogo fallito: %1</translation>
+        </message>
+        <message>
+            <source>Clear Cache</source>
+            <translation type="finished">Svuota Cache</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Chiudi</translation>
+        </message>
+        <message>
+            <source>DSS2 Red (Optical)</source>
+            <translation type="finished">DSS2 Red (Ottico)</translation>
+        </message>
+        <message>
+            <source>Delete all cached HiPS reference images.</source>
+            <translation type="finished">Elimina tutte le immagini di riferimento HiPS in cache.</translation>
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="finished">Errore</translation>
+        </message>
+        <message>
+            <source>Extraction failed during gradient matching.</source>
+            <translation type="finished">Estrazione fallita durante l'abbinamento del gradiente.</translation>
+        </message>
+        <message>
+            <source>Failed to match gradients with the reference catalog.</source>
+            <translation type="finished">Impossibile far corrispondere i gradienti con il catalogo di riferimento.</translation>
+        </message>
+        <message>
+            <source>HiPS Error</source>
+            <translation type="finished">Errore HiPS</translation>
+        </message>
+        <message>
+            <source>HiPS Survey:</source>
+            <translation type="finished">Survey HiPS:</translation>
+        </message>
+        <message>
+            <source>HiPS request: %1x%2 px, FoV=%3° (%4°x%5°), rot=%6°, parity=%7</source>
+            <translation type="finished">Richiesta HiPS: %1x%2 px, FoV=%3° (%4°x%5°), rot=%6°, parità=%7</translation>
+        </message>
+        <message>
+            <source>Image must be Plate Solved before using Catalog Background Extraction.</source>
+            <translation type="finished">L'immagine deve essere risolta astrometricamente prima di usare l'Estrazione Sfondo da Catalogo.</translation>
+        </message>
+        <message>
+            <source>No Astrometry</source>
+            <translation type="finished">Nessuna Astrometria</translation>
+        </message>
+        <message>
+            <source>No WCS</source>
+            <translation type="finished">Nessun WCS</translation>
+        </message>
+        <message>
+            <source>Output Background Map</source>
+            <translation type="finished">Output Mappa Sfondo</translation>
+        </message>
+        <message>
+            <source>PanSTARRS DR1 (Color)</source>
+            <translation type="finished">PanSTARRS DR1 (Colore)</translation>
+        </message>
+        <message>
+            <source>Protect Stars (Morphological filter)</source>
+            <translation type="finished">Proteggi Stelle (Filtro morfologico)</translation>
+        </message>
+        <message>
+            <source>Reference image cache has been emptied.</source>
+            <translation type="finished">La cache delle immagini di riferimento è stata svuotata.</translation>
+        </message>
+        <message>
+            <source>Reference received (%1x%2, %3ch). Running gradient extraction...</source>
+            <translation type="finished">Riferimento ricevuto (%1x%2, %3ch). Estrazione del gradiente in corso...</translation>
+        </message>
+        <message>
+            <source>Requesting reference survey from HiPS...</source>
+            <translation type="finished">Richiesta della survey di riferimento da HiPS...</translation>
+        </message>
+        <message>
+            <source>Smoothing Scale:</source>
+            <translation type="finished">Scala Sfumatura:</translation>
+        </message>
+        <message>
+            <source>flipped</source>
+            <translation type="finished">riflesso</translation>
+        </message>
+        <message>
+            <source>normal</source>
+            <translation type="finished">normale</translation>
+        </message>
+        <message>
+            <source>unWISE (Infrared)</source>
+            <translation type="finished">unWISE (Infrarosso)</translation>
+        </message>
+    </context>
+    <context>
+        <name>CatalogClient</name>
+        <message>
+            <source>All VizieR mirrors failed for APASS.</source>
+            <translation type="finished">Tutti i mirror VizieR hanno fallito per APASS.</translation>
+        </message>
+        <message>
+            <source>All VizieR mirrors failed for Gaia DR3.</source>
+            <translation type="finished">Tutti i mirror VizieR hanno fallito per Gaia DR3.</translation>
+        </message>
+    </context>
+    <context>
         <name>ChannelCombinationDialog</name>
         <message>
             <source>Apply</source>
@@ -3254,6 +3392,29 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
     </context>
     <context>
+        <name>HiPSClient</name>
+        <message>
+            <source>Failed to parse downloaded FITS: %1</source>
+            <translation type="finished">Impossibile analizzare il FITS scaricato: %1</translation>
+        </message>
+        <message>
+            <source>Failed to save reference image to cache.</source>
+            <translation type="finished">Impossibile salvare l'immagine di riferimento nella cache.</translation>
+        </message>
+        <message>
+            <source>HiPS service error: %1</source>
+            <translation type="finished">Errore del servizio HiPS: %1</translation>
+        </message>
+        <message>
+            <source>Network error: %1</source>
+            <translation type="finished">Errore di rete: %1</translation>
+        </message>
+        <message>
+            <source>Received empty response from HiPS server.</source>
+            <translation type="finished">Ricevuta risposta vuota dal server HiPS.</translation>
+        </message>
+    </context>
+    <context>
         <name>HistogramStretchDialog</name>
         <message>
             <source>Apply</source>
@@ -3496,6 +3657,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Auto-Stretch</translation>
         </message>
         <message>
+            <source>B</source>
+            <translation type="finished">B</translation>
+        </message>
+        <message>
             <source>Background Neutralization</source>
             <translation type="finished">Neutralizzazione Fondo</translation>
         </message>
@@ -3516,6 +3681,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Imprimi Annotazioni</translation>
         </message>
         <message>
+            <source>CBE successful.</source>
+            <translation type="finished">CBE completato con successo.</translation>
+        </message>
+        <message>
             <source>CLAHE</source>
             <translation type="finished">CLAHE</translation>
         </message>
@@ -3534,6 +3703,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Cannot burn annotations into raw data formats (FITS/XISF)</source>
             <translation type="finished">Impossibile imprimere annotazioni su formati raw (FITS/XISF)</translation>
+        </message>
+        <message>
+            <source>Catalog Background Extraction (CBE)</source>
+            <translation type="finished">Estrazione Sfondo da Catalogo (CBE)</translation>
+        </message>
+        <message>
+            <source>Catalog Background Extraction (MARS-like)</source>
+            <translation type="finished">Estrazione Sfondo da Catalogo (tipo MARS)</translation>
         </message>
         <message>
             <source>Channel Operations</source>
@@ -3732,6 +3909,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Formato:</translation>
         </message>
         <message>
+            <source>G</source>
+            <translation type="finished">G</translation>
+        </message>
+        <message>
             <source>GHS (Generalized Hyperbolic)</source>
             <translation type="finished">GHS (Iperbolico Generalizzato)</translation>
         </message>
@@ -3916,6 +4097,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Nessuna Immagine</translation>
         </message>
         <message>
+            <source>No image loaded for CBE.</source>
+            <translation type="finished">Nessuna immagine caricata per CBE.</translation>
+        </message>
+        <message>
             <source>No image loaded. Cannot open Aberration Inspector.</source>
             <translation type="finished">Nessuna immagine caricata. Impossibile aprire Aberration Inspector.</translation>
         </message>
@@ -4018,6 +4203,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Opening CLAHE...</source>
             <translation type="finished">Apertura CLAHE...</translation>
+        </message>
+        <message>
+            <source>Opening Catalog Background Extractor...</source>
+            <translation type="finished">Apertura dell'Estrattore di Sfondo da Catalogo...</translation>
         </message>
         <message>
             <source>Opening Color Saturation tool...</source>
@@ -4218,6 +4407,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Project loaded: %1</source>
             <translation type="finished">Progetto caricato: %1</translation>
+        </message>
+        <message>
+            <source>R</source>
+            <translation type="finished">R</translation>
+        </message>
+        <message>
+            <source>RGB</source>
+            <translation type="finished">RGB</translation>
         </message>
         <message>
             <source>RGB Link: %1</source>
@@ -5490,8 +5687,64 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
     <context>
         <name>NativePlateSolver</name>
         <message>
+            <source>    [Attempt %1 diag] maxVote=%2 validPairs=%3 nMatched=%4 stage=%5</source>
+            <translation type="finished">    [Tentativo %1 diag] maxVote=%2 validPairs=%3 nMatched=%4 stage=%5</translation>
+        </message>
+        <message>
+            <source>  Attempt 1 failed, retrying without scale filter...</source>
+            <translation type="finished">  Tentativo 1 fallito, nuovo tentativo senza filtro di scala...</translation>
+        </message>
+        <message>
+            <source>  Attempt 2 failed, retrying with 150 stars...</source>
+            <translation type="finished">  Tentativo 2 fallito, nuovo tentativo con 150 stelle...</translation>
+        </message>
+        <message>
+            <source>  Attempt 3 failed, retrying with wider triangle radius 0.003...</source>
+            <translation type="finished">  Tentativo 3 fallito, nuovo tentativo con raggio triangolo più ampio 0.003...</translation>
+        </message>
+        <message>
+            <source>  Attempt 4 failed, retrying with image-Y parity flip...</source>
+            <translation type="finished">  Tentativo 4 fallito, nuovo tentativo con inversione di parità dell'asse Y dell'immagine...</translation>
+        </message>
+        <message>
+            <source>  Converged: offset=%1 arcsec</source>
+            <translation type="finished">  Convergenza raggiunta: offset=%1 arcsec</translation>
+        </message>
+        <message>
+            <source>  Initial: offset=%1 arcsec, nr=%2</source>
+            <translation type="finished">  Iniziale: offset=%1 arcsec, nr=%2</translation>
+        </message>
+        <message>
+            <source>  No full convergence (offset=%1 arcsec), using best solution</source>
+            <translation type="finished">  Nessuna convergenza completa (offset=%1 arcsec), uso della migliore soluzione</translation>
+        </message>
+        <message>
+            <source>  Not enough stars after reprojection (%1).</source>
+            <translation type="finished">  Stelle insufficienti dopo la riproiezione (%1).</translation>
+        </message>
+        <message>
+            <source>  Parity un-flip applied to TRANS (x01, y01 negated).</source>
+            <translation type="finished">  Inversione parità annullata su TRANS (x01, y01 negati).</translation>
+        </message>
+        <message>
+            <source>  Parity-flip succeeded (image-Y inverted).</source>
+            <translation type="finished">  Inversione di parità riuscita (immagine-Y invertita).</translation>
+        </message>
+        <message>
+            <source>  Recalculation failed at trial %1.</source>
+            <translation type="finished">  Ricalcolo fallito al tentativo %1.</translation>
+        </message>
+        <message>
+            <source>  Trial %1: RA=%2 Dec=%3, offset=%4 arcsec, nr=%5</source>
+            <translation type="finished">  Tentativo %1: AR=%2 Dec=%3, offset=%4 arcsec, nr=%5</translation>
+        </message>
+        <message>
             <source>Catalog Error: %1</source>
             <translation type="finished">Errore Catalogo: %1</translation>
+        </message>
+        <message>
+            <source>Catalog mag range: %1 – %2 (%3 stars, %4 with bad mag)</source>
+            <translation type="finished">Intervallo magnitudine catalogo: %1 – %2 (%3 stelle, %4 con mag non valida)</translation>
         </message>
         <message>
             <source>Catalog received. Found %1 stars.</source>
@@ -5506,40 +5759,52 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Rilevamento Stelle Immagine...</translation>
         </message>
         <message>
-            <source>Match Success!</source>
-            <translation type="finished">Corrispondenza Riuscita!</translation>
+            <source>Initial match: %1 pairs, offset=(%2, %3) arcsec</source>
+            <translation type="finished">Abbinamento iniziale: %1 coppie, offset=(%2, %3) arcsec</translation>
         </message>
         <message>
-            <source>Matching Triangles...</source>
-            <translation type="finished">Abbinamento Triangoli...</translation>
+            <source>Match Success! Computing WCS...</source>
+            <translation type="finished">Corrispondenza Riuscita! Calcolo WCS...</translation>
         </message>
         <message>
-            <source>Matching failed. Pattern not found.</source>
-            <translation type="finished">Abbinamento fallito. Pattern non trovato.</translation>
+            <source>Matching failed. No valid solution found.</source>
+            <translation type="finished">Abbinamento fallito. Nessuna soluzione valida trovata.</translation>
         </message>
         <message>
-            <source>Not enough catalog stars found.</source>
-            <translation type="finished">Non abbastanza stelle catalogo trovate.</translation>
+            <source>Not enough catalog stars found (%1).</source>
+            <translation type="finished">Stelle del catalogo trovate insufficienti (%1).</translation>
         </message>
         <message>
-            <source>Not enough image stars detected.</source>
-            <translation type="finished">Non abbastanza stelle rilevate.</translation>
+            <source>Not enough image stars detected (%1).</source>
+            <translation type="finished">Stelle dell'immagine rilevate insufficienti (%1).</translation>
         </message>
         <message>
-            <source>Projecting Catalog Stars...</source>
-            <translation type="finished">Proiezione Stelle Catalogo...</translation>
+            <source>Projected %1 catalog stars at RA=%2 Dec=%3</source>
+            <translation type="finished">Proiettate %1 stelle del catalogo a AR=%2 Dec=%3</translation>
         </message>
         <message>
             <source>Querying Catalog (VizieR)...</source>
             <translation type="finished">Interrogazione Catalogo (VizieR)...</translation>
         </message>
         <message>
+            <source>Solved pixel scale: %1 arcsec/px</source>
+            <translation type="finished">Scala dei pixel risolta: %1 arcsec/px</translation>
+        </message>
+        <message>
             <source>Starting Native Solver. Center: %1, %2 Radius: %3 deg</source>
             <translation type="finished">Avvio Solver Nativo. Centro: %1, %2 Raggio: %3 deg</translation>
         </message>
         <message>
-            <source>TRANS sanity warning: possible skew in transform (var1=%1 var2=%2 tol=%3). Proceeding anyway.</source>
-            <translation type="finished">Avvertenza TRANS sanità: possibile skew nella trasformazione (var1=%1 var2=%2 tol=%3). Procedendo comunque.</translation>
+            <source>Transform sanity check failed (|cos|≠|sin| by &gt;%.1f arcsec/px).</source>
+            <translation type="finished">Controllo di integrità della trasformazione fallito (|cos|≠|sin| per &gt;%.1f arcsec/px).</translation>
+        </message>
+        <message>
+            <source>Transform scale check failed.</source>
+            <translation type="finished">Controllo scala di trasformazione fallito.</translation>
+        </message>
+        <message>
+            <source>Triangle matching failed.</source>
+            <translation type="finished">Abbinamento dei triangoli fallito.</translation>
         </message>
         <message>
             <source>WCS Computation failed (Singular Matrix)</source>

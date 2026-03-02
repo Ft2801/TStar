@@ -81,7 +81,7 @@ void ImageViewer::setPreviewLUT(const std::vector<std::vector<float>>& luts) {
     m_previewLUT = luts;
     // Use full resolution preview - no downsampling
     const std::vector<std::vector<float>>* pLut = m_previewLUT.empty() ? nullptr : &m_previewLUT;
-    QImage img = m_buffer.getDisplayImage(m_displayMode, m_displayLinked, pLut, 0, 0, m_showMaskOverlay, m_displayInverted, m_displayFalseColor, m_autoStretchMedian);
+    QImage img = m_buffer.getDisplayImage(m_displayMode, m_displayLinked, pLut, 0, 0, m_showMaskOverlay, m_displayInverted, m_displayFalseColor, m_autoStretchMedian, m_channelView);
     setImage(img, true); // PRESERVE VIEW
 }
 
@@ -132,6 +132,12 @@ void ImageViewer::setFalseColor(bool falseColor) {
     refreshDisplay(true);
 }
 
+void ImageViewer::setChannelView(ImageBuffer::ChannelView cv) {
+    if (m_channelView == cv) return;
+    m_channelView = cv;
+    refreshDisplay(true);
+}
+
 QRectF ImageViewer::getSelectionRect() const {
     if (m_queryRectItem && m_queryRectItem->isVisible()) {
         return m_queryRectItem->rect();
@@ -176,7 +182,7 @@ void ImageViewer::setBuffer(const ImageBuffer& buffer, const QString& name, bool
     m_buffer = buffer;
     
     // Use current stored display state with all parameters
-    QImage img = m_buffer.getDisplayImage(m_displayMode, m_displayLinked, nullptr, 0, 0, m_showMaskOverlay, m_displayInverted, m_displayFalseColor, m_autoStretchMedian);
+    QImage img = m_buffer.getDisplayImage(m_displayMode, m_displayLinked, nullptr, 0, 0, m_showMaskOverlay, m_displayInverted, m_displayFalseColor, m_autoStretchMedian, m_channelView);
     if (!name.isEmpty()) setWindowTitle(name);
     
     setImage(img, preserveView);
@@ -186,7 +192,7 @@ void ImageViewer::setBuffer(const ImageBuffer& buffer, const QString& name, bool
 
 void ImageViewer::refreshDisplay(bool preserveView) {
     const std::vector<std::vector<float>>* pLut = m_previewLUT.empty() ? nullptr : &m_previewLUT;
-    QImage img = m_buffer.getDisplayImage(m_displayMode, m_displayLinked, pLut, 0, 0, m_showMaskOverlay, m_displayInverted, m_displayFalseColor, m_autoStretchMedian);
+    QImage img = m_buffer.getDisplayImage(m_displayMode, m_displayLinked, pLut, 0, 0, m_showMaskOverlay, m_displayInverted, m_displayFalseColor, m_autoStretchMedian, m_channelView);
     setImage(img, preserveView);
 }
 

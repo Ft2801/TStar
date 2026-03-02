@@ -752,6 +752,144 @@
         </message>
     </context>
     <context>
+        <name>CBEDialog</name>
+        <message>
+            <source>  (non-standard orientation — ensure image has been recently plate-solved)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source> px</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Apply</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Background extracted successfully.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cache Cleared</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Catalog Background Extraction (MARS-like)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Catalog Background Extraction tool active.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Catalog download failed: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Clear Cache</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>DSS2 Red (Optical)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Delete all cached HiPS reference images.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Extraction failed during gradient matching.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to match gradients with the reference catalog.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>HiPS Error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>HiPS Survey:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>HiPS request: %1x%2 px, FoV=%3° (%4°x%5°), rot=%6°, parity=%7</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image must be Plate Solved before using Catalog Background Extraction.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No Astrometry</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No WCS</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Output Background Map</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>PanSTARRS DR1 (Color)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Protect Stars (Morphological filter)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reference image cache has been emptied.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reference received (%1x%2, %3ch). Running gradient extraction...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Requesting reference survey from HiPS...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Smoothing Scale:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>flipped</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>normal</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>unWISE (Infrared)</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>CatalogClient</name>
+        <message>
+            <source>All VizieR mirrors failed for APASS.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>All VizieR mirrors failed for Gaia DR3.</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>ChannelCombinationDialog</name>
         <message>
             <source>Apply</source>
@@ -3252,6 +3390,29 @@
         </message>
     </context>
     <context>
+        <name>HiPSClient</name>
+        <message>
+            <source>Failed to parse downloaded FITS: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to save reference image to cache.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>HiPS service error: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Network error: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Received empty response from HiPS server.</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>HistogramStretchDialog</name>
         <message>
             <source>Apply</source>
@@ -3494,6 +3655,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>B</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Background Neutralization</source>
             <translation type="unfinished" />
         </message>
@@ -3514,6 +3679,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>CBE successful.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>CLAHE</source>
             <translation type="unfinished" />
         </message>
@@ -3531,6 +3700,14 @@
         </message>
         <message>
             <source>Cannot burn annotations into raw data formats (FITS/XISF)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Catalog Background Extraction (CBE)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Catalog Background Extraction (MARS-like)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3730,6 +3907,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>G</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>GHS (Generalized Hyperbolic)</source>
             <translation type="unfinished" />
         </message>
@@ -3914,6 +4095,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>No image loaded for CBE.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>No image loaded. Cannot open Aberration Inspector.</source>
             <translation type="unfinished" />
         </message>
@@ -4015,6 +4200,10 @@
         </message>
         <message>
             <source>Opening CLAHE...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening Catalog Background Extractor...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4215,6 +4404,14 @@
         </message>
         <message>
             <source>Project loaded: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>R</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>RGB</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5487,7 +5684,63 @@
     <context>
         <name>NativePlateSolver</name>
         <message>
+            <source>    [Attempt %1 diag] maxVote=%2 validPairs=%3 nMatched=%4 stage=%5</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Attempt 1 failed, retrying without scale filter...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Attempt 2 failed, retrying with 150 stars...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Attempt 3 failed, retrying with wider triangle radius 0.003...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Attempt 4 failed, retrying with image-Y parity flip...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Converged: offset=%1 arcsec</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Initial: offset=%1 arcsec, nr=%2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  No full convergence (offset=%1 arcsec), using best solution</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Not enough stars after reprojection (%1).</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Parity un-flip applied to TRANS (x01, y01 negated).</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Parity-flip succeeded (image-Y inverted).</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Recalculation failed at trial %1.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Trial %1: RA=%2 Dec=%3, offset=%4 arcsec, nr=%5</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Catalog Error: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Catalog mag range: %1 – %2 (%3 stars, %4 with bad mag)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5503,27 +5756,27 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Match Success!</source>
+            <source>Initial match: %1 pairs, offset=(%2, %3) arcsec</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Matching Triangles...</source>
+            <source>Match Success! Computing WCS...</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Matching failed. Pattern not found.</source>
+            <source>Matching failed. No valid solution found.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Not enough catalog stars found.</source>
+            <source>Not enough catalog stars found (%1).</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Not enough image stars detected.</source>
+            <source>Not enough image stars detected (%1).</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Projecting Catalog Stars...</source>
+            <source>Projected %1 catalog stars at RA=%2 Dec=%3</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5531,11 +5784,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Solved pixel scale: %1 arcsec/px</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Starting Native Solver. Center: %1, %2 Radius: %3 deg</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>TRANS sanity warning: possible skew in transform (var1=%1 var2=%2 tol=%3). Proceeding anyway.</source>
+            <source>Transform sanity check failed (|cos|≠|sin| by &gt;%.1f arcsec/px).</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Transform scale check failed.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Triangle matching failed.</source>
             <translation type="unfinished" />
         </message>
         <message>

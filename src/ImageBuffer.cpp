@@ -722,10 +722,28 @@ struct StandardSTFParams {
     return result;
 }
 
-QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::vector<std::vector<float>>* overrideLUT, int maxWidth, int maxHeight, bool showMask, bool inverted, bool falseColor, float autoStretchTargetMedian) const {
+QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::vector<std::vector<float>>* overrideLUT, int maxWidth, int maxHeight, bool showMask, bool inverted, bool falseColor, float autoStretchTargetMedian, ChannelView channelView) const {
     ReadLock lock(this);  // Thread-safe read access
     
     if (m_data.empty()) return QImage();
+
+    // Helper: zero out non-selected channels for R/G/B views (applied before each return)
+    auto applyChannelView = [&](QImage& img) {
+        // For R/G/B single-channel views: show that channel as grayscale.
+        // All three output components are set to the selected channel value.
+        if (channelView == ChannelRGB || m_channels != 3) return;
+        if (img.format() != QImage::Format_RGB888) return;
+        int ch = 0; // index of the selected channel: R=0, G=1, B=2
+        if      (channelView == ChannelG) ch = 1;
+        else if (channelView == ChannelB) ch = 2;
+        for (int y = 0; y < img.height(); ++y) {
+            uchar* p = img.scanLine(y);
+            for (int x = 0; x < img.width(); ++x, p += 3) {
+                uchar v = p[ch];
+                p[0] = v; p[1] = v; p[2] = v;
+            }
+        }
+    };
 
     // Check for 24-bit High Definition Stretch setting
     QSettings settings;
@@ -898,6 +916,7 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
                 } // End scalar x loop 
 
         }
+        applyChannelView(result);
         return result;
     }
 
@@ -1208,6 +1227,7 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
         }
     }
     
+    applyChannelView(result);
     return result;
 }
 
