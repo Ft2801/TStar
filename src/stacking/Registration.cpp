@@ -864,7 +864,10 @@ int RegistrationEngine::matchStars(const std::vector<DetectedStar>& refStars,
 
     GenericTrans gTrans;
     // solve(imgStars=target, catStars=ref) → transform target→ref
-    if (!matcher.solve(mTarget, mRef, gTrans))
+    // Provide scale limits. For image-to-image Registration, we expect scale ~1.0
+    // So we use minScale=0.9 and maxScale=1.1
+    std::vector<MatchStar> regMatchedA, regMatchedB; // output matched pairs (unused in registration)
+    if (!matcher.solve(mTarget, mRef, gTrans, regMatchedA, regMatchedB, 0.9, 1.1))
         return 0;
 
     // Affine: ref = A * [1, target_x, target_y]^T

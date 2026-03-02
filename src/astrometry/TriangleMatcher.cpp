@@ -3,436 +3,712 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
-#include <map>
 #include <iostream>
+#include <cstring>
+#include <numeric>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-// Replicate Reference logic for vote counting and iterative fitting.
-
 TriangleMatcher::TriangleMatcher() {
-    m_maxStars = 20;
+    m_maxStars     = AT_MATCH_CATALOG_NBRIGHT; // 60 catalog stars
+    m_maxImgStars  = AT_MATCH_NBRIGHT;         // 20 image stars
+    m_triangleRadius = AT_TRIANGLE_RADIUS;     // 0.002 in (ba,ca) space
 }
 
-// Helper to sort stars by mag
-bool compareStarsMag(const MatchStar& a, const MatchStar& b) {
+static bool compareStarsMag(const MatchStar& a, const MatchStar& b) {
     return a.mag < b.mag;
 }
 
-std::vector<MatchTriangle> TriangleMatcher::generateTriangles(const std::vector<MatchStar>& stars, int limit) {
+// ============================================================================
+// gaussSolve — Gaussian elimination with partial pivoting
+// Solves in-place: matrix[n][n] * x = vector[n], result → vector
+// ============================================================================
+bool TriangleMatcher::gaussSolve(std::vector<std::vector<double>>& matrix, int n,
+                                  std::vector<double>& vector)
+{
+    // Forward elimination with partial pivoting
+    for (int i = 0; i < n; i++) {
+        // Find pivot
+        double biggest = -1.0;
+        int pivot_row = -1;
+        for (int j = i; j < n; j++) {
+            if (std::abs(matrix[j][i]) > biggest) {
+                biggest = std::abs(matrix[j][i]);
+                pivot_row = j;
+            }
+        }
+        if (biggest < GAUSS_MATRIX_TOL) {
+            return false; // Singular or near-singular
+        }
+
+        // Swap rows if needed
+        if (pivot_row != i) {
+            std::swap(matrix[i], matrix[pivot_row]);
+            std::swap(vector[i], vector[pivot_row]);
+        }
+
+        // Eliminate below
+        for (int j = i + 1; j < n; j++) {
+            double factor = matrix[j][i] / matrix[i][i];
+            for (int k = i + 1; k < n; k++) {
+                matrix[j][k] -= factor * matrix[i][k];
+            }
+            vector[j] -= factor * vector[i];
+            matrix[j][i] = 0.0;
+        }
+    }
+
+    // Back substitution
+    for (int i = n - 1; i >= 0; i--) {
+        if (std::abs(matrix[i][i]) < GAUSS_MATRIX_TOL) {
+            return false;
+        }
+        double sum = vector[i];
+        for (int j = i + 1; j < n; j++) {
+            sum -= matrix[i][j] * vector[j];
+        }
+        vector[i] = sum / matrix[i][i];
+    }
+
+    return true;
+}
+
+// ============================================================================
+// calcTransCoords — Apply linear transform to a single point
+// ============================================================================
+void TriangleMatcher::calcTransCoords(double x, double y, const GenericTrans& trans,
+                                       double& newx, double& newy)
+{
+    newx = trans.x00 + trans.x10 * x + trans.x01 * y;
+    newy = trans.y00 + trans.y10 * x + trans.y01 * y;
+}
+
+// ============================================================================
+// Given 3 star indices and a distance matrix, fill in a triangle structure
+// ============================================================================
+void TriangleMatcher::setTriangle(MatchTriangle& tri, const std::vector<MatchStar>& stars,
+                                    int s1, int s2, int s3,
+                                    const std::vector<std::vector<double>>& distMatrix)
+{
+    double d12 = distMatrix[s1][s2];
+    double d23 = distMatrix[s2][s3];
+    double d13 = distMatrix[s1][s3];
+
+    double a = 0.0, b = 0.0, c = 0.0;
+
+    if ((d12 >= d23) && (d12 >= d13)) {
+        // Longest side connects stars s1 and s2 → opposite vertex is s3
+        tri.a_index = stars[s3].index;
+        a = d12;
+        if (d23 >= d13) {
+            tri.b_index = stars[s1].index; b = d23;
+            tri.c_index = stars[s2].index; c = d13;
+        } else {
+            tri.b_index = stars[s2].index; b = d13;
+            tri.c_index = stars[s1].index; c = d23;
+        }
+    } else if ((d23 > d12) && (d23 >= d13)) {
+        // Longest side connects stars s2 and s3 → opposite vertex is s1
+        tri.a_index = stars[s1].index;
+        a = d23;
+        if (d12 > d13) {
+            tri.b_index = stars[s3].index; b = d12;
+            tri.c_index = stars[s2].index; c = d13;
+        } else {
+            tri.b_index = stars[s2].index; b = d13;
+            tri.c_index = stars[s3].index; c = d12;
+        }
+    } else {
+        // Longest side connects stars s1 and s3 → opposite vertex is s2
+        tri.a_index = stars[s2].index;
+        a = d13;
+        if (d12 > d23) {
+            tri.b_index = stars[s3].index; b = d12;
+            tri.c_index = stars[s1].index; c = d23;
+        } else {
+            tri.b_index = stars[s1].index; b = d23;
+            tri.c_index = stars[s3].index; c = d12;
+        }
+    }
+
+    tri.a_length = a;
+    if (a > 0.0) {
+        tri.ba = b / a;
+        tri.ca = c / a;
+    } else {
+        tri.ba = 1.0;
+        tri.ca = 1.0;
+    }
+}
+
+// ============================================================================
+// Step 1: Compute distance matrix (calc_distances)
+// Step 2: Fill triangle array (fill_triangle_array)
+// Step 3: Sort by ba and prune high-ba triangles
+// ============================================================================
+std::vector<MatchTriangle> TriangleMatcher::generateTriangles(const std::vector<MatchStar>& stars, int nbright)
+{
+    int n = std::min((int)stars.size(), nbright);
     std::vector<MatchTriangle> triangles;
-    int n = std::min((int)stars.size(), limit);
     if (n < 3) return triangles;
 
-    // Generate all combinations
+    // Step 1: Compute distance matrix (port of calc_distances)
+    std::vector<std::vector<double>> distMatrix(n, std::vector<double>(n, 0.0));
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            double dx = stars[i].x - stars[j].x;
+            double dy = stars[i].y - stars[j].y;
+            double dist = std::sqrt(dx * dx + dy * dy);
+            distMatrix[i][j] = dist;
+            distMatrix[j][i] = dist;
+        }
+    }
+
+    // Step 2: Fill triangle array (port of fill_triangle_array)
+    int numTriangles = (n * (n - 1) * (n - 2)) / 6;
+    triangles.reserve(numTriangles);
+
+    int triId = 0;  // local counter, reset each call (not static)
     for (int i = 0; i < n - 2; i++) {
         for (int j = i + 1; j < n - 1; j++) {
             for (int k = j + 1; k < n; k++) {
-                double x1 = stars[i].x, y1 = stars[i].y;
-                double x2 = stars[j].x, y2 = stars[j].y;
-                double x3 = stars[k].x, y3 = stars[k].y;
-
-                // Side lengths squared
-                double d12 = (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2); // c
-                double d23 = (x2 - x3)*(x2 - x3) + (y2 - y3)*(y2 - y3); // a
-                double d31 = (x3 - x1)*(x3 - x1) + (y3 - y1)*(y3 - y1); // b
-
-// Distance squares - variables removed
-
-                // Sort sides so a is largest
-                // Start with assignments matching standard convention if possible
-                // Reference logic checks sides and reorders indices so a is longest.
-                
-                // Bubble sort 3 items logic to find longest side 'a'
-                // Find longest side 'a'
-                // a = BC, b = AC, c = AB.
-                
-                // Identify vertices to permute to canonical form
-                // Canonical: Side 'a' is longest.
-                // We need to map (i,j,k) to (A,B,C) such that dist(B,C) is max.
-                
-                // distances: d_ij, d_jk, d_ki
-                double d_ij = std::sqrt(d12);
-                double d_jk = std::sqrt(d23);
-                double d_ki = std::sqrt(d31);
-                
-                double max_d = d_ij;
-                if (d_jk > max_d) max_d = d_jk;
-                if (d_ki > max_d) max_d = d_ki;
-                
-                int A_idx, B_idx, C_idx; // Indices in the stars array
-                double a_len, b_len, c_len;
-                
-                if (max_d == d_jk) {
-                    // Side opposite i is longest. i is A. a = jk.
-                    A_idx = i; B_idx = j; C_idx = k;
-                    
-                    // Let's check neighbors.
-                    // Side b = AC = d_ki. Side c = AB = d_ij.
-                    b_len = d_ki;
-                    c_len = d_ij;
-                    
-                } else if (max_d == d_ki) {
-                    // Side opposite j is longest. j is A.
-                    // a = ki.
-                    A_idx = j; B_idx = k; C_idx = i;
-                    b_len = d_ij; // AC => j-i? No, A=j, C=i. dist(j,i)=d_ij. Correct.
-                    c_len = d_jk; // AB => j-k? dist(j,k)=d_jk. Correct.
-                } else {
-                    // d_ij is max. Side opposite k. k is A.
-                    A_idx = k; B_idx = i; C_idx = j;
-                    b_len = d_jk; // AC => k-j? dist(k,j)=d_jk.
-                    c_len = d_ki; // AB => k-i? dist(k,i)=d_ki.
-                }
-                
-                // Ensure b >= c to reduce search space (invariant)
-                if (b_len < c_len) {
-                    std::swap(B_idx, C_idx);
-                    std::swap(b_len, c_len);
-                }
-                
-                a_len = max_d;
-                
                 MatchTriangle t;
-                t.a_index = A_idx;
-                t.b_index = B_idx;
-                t.c_index = C_idx;
-                t.a_length = a_len;
-                t.ba = b_len / a_len;
-                t.ca = c_len / a_len;
-                
-                
+                t.id = triId++;
+                setTriangle(t, stars, i, j, k, distMatrix);
                 triangles.push_back(t);
             }
         }
     }
-    
-    // Sort by ba for binary search in voting
-    std::sort(triangles.begin(), triangles.end(), [](const MatchTriangle& a, const MatchTriangle& b) {
-        return a.ba < b.ba;
-    });
-    
+
+    // Step 3: Prune degenerate triangles (ba > AT_MATCH_RATIO)
+    // Port of prune_triangle_array
+    triangles.erase(
+        std::remove_if(triangles.begin(), triangles.end(),
+                        [](const MatchTriangle& t) { return t.ba > AT_MATCH_RATIO; }),
+        triangles.end());
+
+    // Step 4: Sort by ba for binary search (port of sort_triangle_array)
+    std::sort(triangles.begin(), triangles.end(),
+              [](const MatchTriangle& a, const MatchTriangle& b) { return a.ba < b.ba; });
+
     return triangles;
 }
 
-bool TriangleMatcher::solve(const std::vector<MatchStar>& imgStars,
-                            const std::vector<MatchStar>& catStars,
-                            GenericTrans& resultTrans,
-                            double minScale, double maxScale,
-                            double centerX, double centerY, double posTolerance) 
+// ============================================================================
+// computeVotes
+// ============================================================================
+std::vector<std::vector<int>> TriangleMatcher::computeVotes(
+    const std::vector<MatchTriangle>& triA,
+    const std::vector<MatchTriangle>& triB,
+    int numStarsA, int numStarsB,
+    double minScale, double maxScale)
 {
-    // 1. Sort and Filter Brightest
+    std::vector<std::vector<int>> votes(numStarsA, std::vector<int>(numStarsB, 0));
+
+    double rad2 = m_triangleRadius * m_triangleRadius;
+    bool useScaleFilter = (minScale > 0 && maxScale > 0);
+
+    int totalB = (int)triB.size();
+
+    // For each triangle in B, find matching triangles in A using binary search on ba
+    for (int i = 0; i < totalB; i++) {
+        if (!Threading::getThreadRun()) return votes;
+
+        const auto& tb = triB[i];
+
+        double ba_min = tb.ba - m_triangleRadius;
+        double ba_max = tb.ba + m_triangleRadius;
+
+        // Binary search for ba_min in sorted triA
+        auto it_start = std::lower_bound(triA.begin(), triA.end(), ba_min,
+            [](const MatchTriangle& t, double val) { return t.ba < val; });
+
+        for (auto it = it_start; it != triA.end(); ++it) {
+            if (it->ba > ba_max) break;
+
+            // Shape check: distance in (ba, ca) space
+            double d_ba = it->ba - tb.ba;
+            double d_ca = it->ca - tb.ca;
+            if (d_ba * d_ba + d_ca * d_ca >= rad2) continue;
+
+            // Scale check: ratio = sideA / sideB
+            if (useScaleFilter) {
+                double ratio = it->a_length / tb.a_length;
+                if (ratio < minScale || ratio > maxScale) continue;
+            }
+
+            // Vote for each vertex pair
+            if (it->a_index < numStarsA && tb.a_index < numStarsB)
+                votes[it->a_index][tb.a_index]++;
+            if (it->b_index < numStarsA && tb.b_index < numStarsB)
+                votes[it->b_index][tb.b_index]++;
+            if (it->c_index < numStarsA && tb.c_index < numStarsB)
+                votes[it->c_index][tb.c_index]++;
+        }
+    }
+
+    return votes;
+}
+
+// ============================================================================
+// calcTransLinear 
+// Builds 3×3 system and solves via Gauss elimination
+// x' = x00 + x10*x + x01*y  (similarly for y')
+// ============================================================================
+bool TriangleMatcher::calcTransLinear(int nbright,
+                                       const std::vector<MatchStar>& starsA,
+                                       const std::vector<MatchStar>& starsB,
+                                       const std::vector<int>& idxA,
+                                       const std::vector<int>& idxB,
+                                       GenericTrans& trans)
+{
+    // Count valid pairs
+    int n = 0;
+    for (int i = 0; i < nbright; i++) {
+        if (idxA[i] >= 0 && idxB[i] >= 0 &&
+            idxA[i] < (int)starsA.size() && idxB[i] < (int)starsB.size())
+            n++;
+    }
+
+    if (n < AT_MATCH_REQUIRE_LINEAR) return false;
+
+    // Build the normal equations for least-squares:
+    //   x' = c0 + c1*x + c2*y
+    //   y' = d0 + d1*x + d2*y
+    //
+    // Normal equations matrix (3x3):
+    // | Σ1    Σx    Σy  |   | c0 |   | Σx' |
+    // | Σx    Σx²   Σxy | × | c1 | = | Σx'x |
+    // | Σy    Σxy   Σy² |   | c2 |   | Σx'y |
+
+    double sum1 = 0, sumx = 0, sumy = 0;
+    double sumx2 = 0, sumy2 = 0, sumxy = 0;
+    double sumxp = 0, sumxpx = 0, sumxpy = 0;
+    double sumyp = 0, sumypx = 0, sumypy = 0;
+
+    for (int i = 0; i < nbright; i++) {
+        if (idxA[i] < 0 || idxB[i] < 0) continue;
+        if (idxA[i] >= (int)starsA.size() || idxB[i] >= (int)starsB.size()) continue;
+
+        double xa = starsA[idxA[i]].x;
+        double ya = starsA[idxA[i]].y;
+        double xb = starsB[idxB[i]].x;
+        double yb = starsB[idxB[i]].y;
+
+        sum1  += 1.0;
+        sumx  += xa;
+        sumy  += ya;
+        sumx2 += xa * xa;
+        sumy2 += ya * ya;
+        sumxy += xa * ya;
+        sumxp  += xb;
+        sumxpx += xb * xa;
+        sumxpy += xb * ya;
+        sumyp  += yb;
+        sumypx += yb * xa;
+        sumypy += yb * ya;
+    }
+
+    // Solve for x' coefficients
+    std::vector<std::vector<double>> matX = {
+        {sum1, sumx, sumy},
+        {sumx, sumx2, sumxy},
+        {sumy, sumxy, sumy2}
+    };
+    std::vector<double> vecX = {sumxp, sumxpx, sumxpy};
+
+    if (!gaussSolve(matX, 3, vecX)) return false;
+
+    // Solve for y' coefficients
+    std::vector<std::vector<double>> matY = {
+        {sum1, sumx, sumy},
+        {sumx, sumx2, sumxy},
+        {sumy, sumxy, sumy2}
+    };
+    std::vector<double> vecY = {sumyp, sumypx, sumypy};
+
+    if (!gaussSolve(matY, 3, vecY)) return false;
+
+    trans.x00 = vecX[0];
+    trans.x10 = vecX[1];
+    trans.x01 = vecX[2];
+
+    trans.y00 = vecY[0];
+    trans.y10 = vecY[1];
+    trans.y01 = vecY[2];
+
+    trans.order = 1;
+    trans.nr = n;
+
+    return true;
+}
+
+// ============================================================================
+// iterTrans 
+// Iteratively fits a linear transform, removing outliers via sigma clipping
+// ============================================================================
+bool TriangleMatcher::iterTrans(int nbright,
+                                 const std::vector<MatchStar>& starsA,
+                                 const std::vector<MatchStar>& starsB,
+                                 std::vector<int>& winnerIndexA,
+                                 std::vector<int>& winnerIndexB,
+                                 bool recalc,
+                                 GenericTrans& trans)
+{
+    int required_pairs = AT_MATCH_REQUIRE_LINEAR;
+    int start_pairs = AT_MATCH_STARTN_LINEAR;
+
+    if (nbright < required_pairs) return false;
+
+    // On first call (RECALC_NO), use only start_pairs best stars
+    // On RECALC_YES, use all pairs
+    int use_pairs;
+    if (recalc) {
+        use_pairs = nbright;
+    } else {
+        use_pairs = std::min(nbright, start_pairs);
+    }
+
+    // Calculate initial TRANS
+    if (!calcTransLinear(use_pairs, starsA, starsB, winnerIndexA, winnerIndexB, trans)) {
+        return false;
+    }
+
+    // Now iterate: apply trans, compute residuals, sigma-clip, recalculate
+    int nr = nbright; // start with all pairs for residual computation
+    double max_dist2_absolute = AT_MATCH_MAXDIST * AT_MATCH_MAXDIST;
+
+    int is_ok = 0;
+    int iters_so_far = 0;
+
+    while (iters_so_far < AT_MATCH_MAXITER) {
+        int nb = 0;
+
+        // Compute residuals for all nr pairs
+        std::vector<double> dist2(nr);
+        for (int i = 0; i < nr; i++) {
+            double newx, newy;
+            calcTransCoords(starsA[winnerIndexA[i]].x, starsA[winnerIndexA[i]].y, trans, newx, newy);
+            double dx = newx - starsB[winnerIndexB[i]].x;
+            double dy = newy - starsB[winnerIndexB[i]].y;
+            dist2[i] = dx * dx + dy * dy;
+        }
+
+        // Step 1: Remove pairs with dist2 > AT_MATCH_MAXDIST^2
+        for (int i = 0; i < nr; i++) {
+            if (dist2[i] > max_dist2_absolute) {
+                for (int j = i + 1; j < nr; j++) {
+                    winnerIndexA[j-1] = winnerIndexA[j];
+                    winnerIndexB[j-1] = winnerIndexB[j];
+                    dist2[j-1] = dist2[j];
+                }
+                nr--;
+                nb++;
+                i--;
+            }
+        }
+
+        // Step 2: Compute sigma at percentile (port of find_percentile)
+        double sigma;
+        if (nr < 2) {
+            if (nr == 0) return false;
+            sigma = 0.0;
+        } else {
+            std::vector<double> dist2_sorted(dist2.begin(), dist2.begin() + nr);
+            std::sort(dist2_sorted.begin(), dist2_sorted.end());
+            int percentile_idx = (int)std::floor(nr * AT_MATCH_PERCENTILE + 0.5); // round-to-nearest
+            if (percentile_idx >= nr) percentile_idx = nr - 1;
+            if (percentile_idx < 0) percentile_idx = 0;
+            sigma = dist2_sorted[percentile_idx];
+        }
+
+        // Check halt condition
+        if (sigma <= AT_MATCH_HALTSIGMA) {
+            is_ok = 1;
+        }
+
+        // Step 3: Remove pairs with dist2 > AT_MATCH_NSIGMA * sigma
+        double threshold = AT_MATCH_NSIGMA * sigma;
+        for (int i = 0; i < nr; i++) {
+            if (dist2[i] > threshold) {
+                for (int j = i + 1; j < nr; j++) {
+                    winnerIndexA[j-1] = winnerIndexA[j];
+                    winnerIndexB[j-1] = winnerIndexB[j];
+                    dist2[j-1] = dist2[j];
+                }
+                nr--;
+                nb++;
+                i--;
+            }
+        }
+
+        // Check if no removals (all remaining are good)
+        if (nb == 0) {
+            is_ok = 1;
+        }
+
+        // Check minimum viable pairs
+        if (nr < required_pairs) {
+            return false;
+        }
+
+        // Recalculate TRANS with remaining pairs
+        if (!calcTransLinear(nr, starsA, starsB, winnerIndexA, winnerIndexB, trans))
+            return false;
+
+        iters_so_far++;
+        if (is_ok) break;
+    }
+
+    trans.nr = nr;
+    return true;
+}
+
+// ============================================================================
+// applyTransAndMatch 
+// Applies transform to all A stars, finds nearest match in B within radius
+// Uses 1-to-1 matching (each B star matched to at most one A star)
+// ============================================================================
+int TriangleMatcher::applyTransAndMatch(
+    const std::vector<MatchStar>& imgStars,
+    const std::vector<MatchStar>& catStars,
+    const GenericTrans& trans,
+    double matchRadius,
+    std::vector<MatchStar>& matchedListA,
+    std::vector<MatchStar>& matchedListB)
+{
+    matchedListA.clear();
+    matchedListB.clear();
+
+    double matchRadSq = matchRadius * matchRadius;
+    int numA = (int)imgStars.size();
+    int numB = (int)catStars.size();
+
+    // Transform all image stars
+    std::vector<MatchStar> transformedA(numA);
+    for (int i = 0; i < numA; i++) {
+        transformedA[i] = imgStars[i];
+        calcTransCoords(imgStars[i].x, imgStars[i].y, trans,
+                        transformedA[i].x, transformedA[i].y);
+    }
+
+    // Sort transformed A by x for potential optimization
+    // For each A, find nearest B within radius (1-to-1 matching)
+    // Track which B stars are already matched
+    std::vector<int> bestMatchA(numB, -1);
+    std::vector<double> bestMatchDist(numB, matchRadSq);
+
+    for (int i = 0; i < numA; i++) {
+        double best_dist2 = matchRadSq;
+        int best_j = -1;
+
+        for (int j = 0; j < numB; j++) {
+            double dx = transformedA[i].x - catStars[j].x;
+            double dy = transformedA[i].y - catStars[j].y;
+            double d2 = dx * dx + dy * dy;
+            if (d2 < best_dist2) {
+                best_dist2 = d2;
+                best_j = j;
+            }
+        }
+
+        if (best_j >= 0) {
+            if (bestMatchA[best_j] < 0 || best_dist2 < bestMatchDist[best_j]) {
+                bestMatchA[best_j] = i;
+                bestMatchDist[best_j] = best_dist2;
+            }
+        }
+    }
+
+    // Collect matched pairs using ORIGINAL (untransformed) A coordinates
+    int num_matches = 0;
+    for (int j = 0; j < numB; j++) {
+        if (bestMatchA[j] >= 0) {
+            matchedListA.push_back(imgStars[bestMatchA[j]]);
+            matchedListB.push_back(catStars[j]);
+            num_matches++;
+        }
+    }
+
+    return num_matches;
+}
+
+// ============================================================================
+// solve — Main entry point
+//   1. Sort by mag, select brightest
+//   2. Generate triangles for A and B
+//   3. Compute vote matrix
+//   4. Extract top vote getters
+//   5. Disqualify pairs with < AT_MATCH_MINVOTES
+//   6. iter_trans (RECALC_NO) on vote winners
+//   7. atApplyTrans + atMatchLists using the TRANS
+//   8. atRecalcTrans (iter_trans RECALC_YES) on matched pairs
+//   9. Second round: re-apply improved TRANS, re-match, recalc
+//  10. Fill outMatchedA / outMatchedB with final matched pairs (original coords)
+//      These are used by the convergence loop in matchCatalog.
+// ============================================================================
+bool TriangleMatcher::solve(const std::vector<MatchStar>& imgStars,
+                             const std::vector<MatchStar>& catStars,
+                             GenericTrans& resultTrans,
+                             std::vector<MatchStar>& outMatchedA,
+                             std::vector<MatchStar>& outMatchedB,
+                             double minScale, double maxScale)
+{
+    // Reset diagnostics
+    m_lastMaxVote    = 0;
+    m_lastValidPairs = 0;
+    m_lastNmatched   = 0;
+    m_lastFailStage  = -1;
+
+    // === Step 1: Sort and select brightest ===
+    // Both use m_maxStars (default 60). Using fewer image stars (20) degrades matching
+    // when star detections are not PSF-quality — needs the full set for reliable votes.
     int nA = std::min((int)imgStars.size(), m_maxStars);
     int nB = std::min((int)catStars.size(), m_maxStars);
-    
-    if (nA < 5 || nB < 5) return false;
-    
+
+    if (nA < AT_MATCH_STARTN_LINEAR || nB < AT_MATCH_STARTN_LINEAR) {
+        m_lastFailStage = 0;
+        return false;
+    }
+
     std::vector<MatchStar> sA = imgStars;
     std::vector<MatchStar> sB = catStars;
     std::sort(sA.begin(), sA.end(), compareStarsMag);
     std::sort(sB.begin(), sB.end(), compareStarsMag);
     sA.resize(nA);
     sB.resize(nB);
-    
-    // Update indices
-    for(int i=0; i<nA; ++i) sA[i].index = i;
-    for(int i=0; i<nB; ++i) sB[i].index = i;
-    
-    // 2. Generate Triangles
-    auto triA = generateTriangles(sA, nA);
-    auto triB = generateTriangles(sB, nB);
-    
-    // 3. Vote
-    auto votes = computeVotes(triA, triB, sA, sB, nA, nB, minScale, maxScale, centerX, centerY, posTolerance);
-    
-    // 4. Find Winners (Top vote getters)
-    // We need pairs (i, j) with high votes.
-    // Reference uses a loop to pick max vote in matrix, zero out row/col, repeat.
-    
-    std::vector<int> winnerA;
-    std::vector<int> winnerB;
-    
-    // Copy votes to temp to destructively find max
-    auto tempVotes = votes;
-    
-    // Minimum 6 pairs for a valid linear transform.
-    int required_pairs = 6;
-    for(int k=0; k<std::min(nA, nB); ++k) {
-        int maxv = 0;
-        int max_i = -1, max_j = -1;
-        
-        for(int i=0; i<nA; ++i) {
-            for(int j=0; j<nB; ++j) {
-                if(tempVotes[i][j] > maxv) {
-                    maxv = tempVotes[i][j];
-                    max_i = i; 
+
+    // Set indices 
+    for (int i = 0; i < nA; ++i) sA[i].index = i;
+    for (int i = 0; i < nB; ++i) sB[i].index = i;
+
+    // nbright = min(max(nA, nB), m_maxStars), clamped to actual sizes
+    int nbright = std::min(std::max(nA, nB), m_maxStars);
+
+    // === Step 2: Generate triangles ===
+    auto triA = generateTriangles(sA, std::min(nA, nbright));
+    auto triB = generateTriangles(sB, std::min(nB, nbright));
+
+    if (triA.empty() || triB.empty()) return false;
+
+    // === Step 3: Vote matrix ===
+    auto votes = computeVotes(triA, triB, nA, nB, minScale, maxScale);
+
+    // === Step 4: Top vote getters ===
+    // Port of top_vote_getters: extract nbright best pairs from vote_matrix
+    std::vector<int> winnerIndexA(nbright, -1);
+    std::vector<int> winnerIndexB(nbright, -1);
+    std::vector<int> winnerVotes(nbright, 0);
+
+    for (int k = 0; k < nbright; k++) {
+        int max_vote = 0;
+        int max_i = -1;
+        int max_j = -1;
+
+        for (int i = 0; i < nA; i++) {
+            for (int j = 0; j < nB; j++) {
+                if (votes[i][j] > max_vote) {
+                    max_vote = votes[i][j];
+                    max_i = i;
                     max_j = j;
                 }
             }
         }
-        
-        if (maxv < 1) break; // No more votes
-        
-        winnerA.push_back(max_i);
-        winnerB.push_back(max_j);
-        
-        // Zero out row/col to enforce 1-to-1 in this greedy step
-        for(int j=0; j<nB; ++j) tempVotes[max_i][j] = -1;
-        for(int i=0; i<nA; ++i) tempVotes[i][max_j] = -1;
+
+        if (max_vote < 1) break;
+
+        if (k == 0) m_lastMaxVote = max_vote; // record the single highest vote
+
+        winnerVotes[k] = max_vote;
+        winnerIndexA[k] = max_i;
+        winnerIndexB[k] = max_j;
+
+        // Zero out row and column (star already used)
+        for (int j = 0; j < nB; j++) votes[max_i][j] = 0;
+        for (int i = 0; i < nA; i++) votes[i][max_j] = 0;
     }
-    
-    if ((int)winnerA.size() < required_pairs) return false;
-    
-    // 5. Iterative Fit
-    return iterativeFit(sA, sB, winnerA, winnerB, resultTrans);
-}
 
-// ... (skipping generateTriangles, it is unchanged)
-
-std::vector<std::vector<int>> TriangleMatcher::computeVotes(const std::vector<MatchTriangle>& triA,
-                                           const std::vector<MatchTriangle>& triB,
-                                           const std::vector<MatchStar>& starsA,
-                                           const std::vector<MatchStar>& starsB,
-                                           int numStarsA, int numStarsB,
-                                           double minScale, double maxScale,
-                                           double centerX, double centerY, double posTolerance) 
-{
-    // Allocate vote matrix
-    std::vector<std::vector<int>> votes(numStarsA, std::vector<int>(numStarsB, 0));
-    
-    double max_r = AT_MATCH_MAX_RADIUS;
-    double max_r2 = max_r * max_r;
-    double posTol2 = posTolerance * posTolerance;
-
-    // Walk through B
-    for (const auto& tb : triB) {
-        if (!Threading::getThreadRun()) return votes; // Cancellation check
-        double ba_min = tb.ba - max_r;
-        double ba_max = tb.ba + max_r;
-        
-        // Find range in A
-        auto it_start = std::lower_bound(triA.begin(), triA.end(), ba_min, [](const MatchTriangle& t, double val){
-            return t.ba < val;
-        });
-        
-        for (auto it = it_start; it != triA.end(); ++it) {
-            if (it->ba > ba_max) break;
-            
-            // SCALE CHECK
-            double ratio = it->a_length / tb.a_length;
-            if (ratio < minScale || ratio > maxScale) {
-                continue; 
-            }
-            
-            // POSITION CHECK (Centroid)
-            if (posTolerance > 0) {
-                // Calculate geometric centers (approximate)
-                // Use star coordinates from starsA/starsB using indices in triangle
-                // Tri contains indices into the SORTED subset sA/sB passed to this function
-                
-                const auto& sA1 = starsA[it->a_index];
-                const auto& sA2 = starsA[it->b_index];
-                const auto& sA3 = starsA[it->c_index];
-                
-                const auto& sB1 = starsB[tb.a_index];
-                const auto& sB2 = starsB[tb.b_index];
-                const auto& sB3 = starsB[tb.c_index];
-                
-                double cxA = (sA1.x + sA2.x + sA3.x) / 3.0;
-                double cyA = (sA1.y + sA2.y + sA3.y) / 3.0;
-                
-                double cxB = (sB1.x + sB2.x + sB3.x) / 3.0;
-                double cyB = (sB1.y + sB2.y + sB3.y) / 3.0;
-                
-                // Estimated shift = Img - Cat (since Cat is near 0)
-                // Shift should be near centerX, centerY
-                double dx = cxA - cxB; 
-                double dy = cyA - cyB;
-                
-                double distSq = (dx - centerX)*(dx - centerX) + (dy - centerY)*(dy - centerY);
-                if (distSq > posTol2) {
-                    continue; // Reject match too far from expected position
-                }
-            }
-
-            // Check distance in triangle space (ba, ca)
-            double d_ba = it->ba - tb.ba;
-            double d_ca = it->ca - tb.ca;
-            if (d_ba*d_ba + d_ca*d_ca < max_r2) {
-                // Match! Vote for vertices.
-                if (it->a_index < numStarsA && tb.a_index < numStarsB) votes[it->a_index][tb.a_index]++;
-                if (it->b_index < numStarsA && tb.b_index < numStarsB) votes[it->b_index][tb.b_index]++;
-                if (it->c_index < numStarsA && tb.c_index < numStarsB) votes[it->c_index][tb.c_index]++;
-            }
+    // === Step 5: Disqualify pairs with < AT_MATCH_MINVOTES ===
+    int validNbright = nbright;
+    for (int i = 0; i < nbright; i++) {
+        if (winnerVotes[i] < AT_MATCH_MINVOTES) {
+            validNbright = i;
+            break;
         }
     }
-    return votes;
-}
+    m_lastValidPairs = validNbright;
 
-bool TriangleMatcher::solveLinearSystem3x3(double M[3][3], double V[3], double res[3]) {
-    // Determinant
-    double det = M[0][0] * (M[1][1] * M[2][2] - M[2][1] * M[1][2]) -
-                 M[0][1] * (M[1][0] * M[2][2] - M[1][2] * M[2][0]) +
-                 M[0][2] * (M[1][0] * M[2][1] - M[1][1] * M[2][0]);
+    if (validNbright < AT_MATCH_STARTN_LINEAR) {
+        m_lastFailStage = (m_lastMaxVote < 1) ? 1 : 2;
+        return false;
+    }
 
-    if (std::abs(det) < 1e-9) return false;
+    // === Step 6: iter_trans (RECALC_NO) on vote winners ===
+    // TRANS now maps: image pixel coords  →  catalog arcsec (tangent plane)
+    // This TRANS is valid for ALL image stars, not just the 60 used for triangles.
+    if (!iterTrans(validNbright, sA, sB, winnerIndexA, winnerIndexB, false, resultTrans)) {
+        m_lastFailStage = 3;
+        return false;
+    }
 
-    double invDet = 1.0 / det;
+    // === Step 7: Apply TRANS to ALL imgStars, match against ALL catStars ===
+    // AT_MATCH_MAXDIST=50 arcsec — lenient first pass since TRANS came from ~6 pairs.
+    std::vector<MatchStar> matchedA, matchedB;
+    int numMatches = applyTransAndMatch(imgStars, catStars, resultTrans, AT_MATCH_MAXDIST, matchedA, matchedB);
+    resultTrans.nm = numMatches;
+    m_lastNmatched = numMatches;
 
-    res[0] = (V[0] * (M[1][1] * M[2][2] - M[2][1] * M[1][2]) -
-              V[1] * (M[0][1] * M[2][2] - M[0][2] * M[2][1]) +
-              V[2] * (M[0][1] * M[1][2] - M[0][2] * M[1][1])) * invDet;
+    if (numMatches < AT_MATCH_STARTN_LINEAR) {
+        m_lastFailStage = 4;
+        return false;
+    }
 
-    res[1] = (V[1] * (M[0][0] * M[2][2] - M[0][2] * M[2][0]) -
-              V[0] * (M[1][0] * M[2][2] - M[1][2] * M[2][0]) -
-              V[2] * (M[0][0] * M[1][2] - M[0][2] * M[1][0])) * invDet;
+    // === Step 8: atRecalcTrans (iter_trans RECALC_YES on matched pairs) ===
+    std::vector<int> recalcIdxA(numMatches), recalcIdxB(numMatches);
+    for (int i = 0; i < numMatches; i++) {
+        recalcIdxA[i] = i;
+        recalcIdxB[i] = i;
+    }
 
-    res[2] = (V[2] * (M[0][0] * M[1][1] - M[0][1] * M[1][0]) -
-              V[1] * (M[0][0] * M[2][1] - M[2][0] * M[0][1]) +
-              V[0] * (M[1][0] * M[2][1] - M[2][0] * M[1][1])) * invDet;
-              
+    if (!iterTrans(numMatches, matchedA, matchedB, recalcIdxA, recalcIdxB, true, resultTrans)) {
+        m_lastFailStage = 5;
+        return false;
+    }
+
+    // === Step 9: Second round — apply improved TRANS to ALL imgStars, tight radius ===
+    // TRANS is now well-calibrated, 5 arcsec is appropriate.
+    matchedA.clear();
+    matchedB.clear();
+    numMatches = applyTransAndMatch(imgStars, catStars, resultTrans, AT_MATCH_RADIUS, matchedA, matchedB);
+    resultTrans.nm = numMatches;
+    m_lastNmatched = numMatches;
+
+    if (numMatches < AT_MATCH_STARTN_LINEAR) {
+        m_lastFailStage = 6;
+        return false;
+    }
+
+    recalcIdxA.resize(numMatches);
+    recalcIdxB.resize(numMatches);
+    for (int i = 0; i < numMatches; i++) {
+        recalcIdxA[i] = i;
+        recalcIdxB[i] = i;
+    }
+
+    if (!iterTrans(numMatches, matchedA, matchedB, recalcIdxA, recalcIdxB, true, resultTrans)) {
+        m_lastFailStage = 7;
+        return false;
+    }
+
+    // === Step 10: Output matched pairs for the convergence loop ===
+    // matchedA contains original (untransformed) image star coords
+    // matchedB contains catalog star projected coords
+    outMatchedA = matchedA;
+    outMatchedB = matchedB;
+
+    m_lastFailStage  = 8; // success
+    m_lastNmatched   = (int)matchedA.size();
     return true;
 }
-
-bool TriangleMatcher::calcTransLinear(int n, 
-                                      const std::vector<MatchStar>& listA,
-                                      const std::vector<MatchStar>& listB,
-                                      const std::vector<int>& idxA,
-                                      const std::vector<int>& idxB,
-                                      GenericTrans& trans) 
-{
-    // Solve x' = A + Bx + Cy
-    // Solve y' = D + Ex + Fy
-    // Using Least Squares
-    
-    double sumx = 0, sumy = 0, sumx2 = 0, sumy2 = 0, sumxy = 0;
-    double sumxp = 0, sumxpx = 0, sumxpy = 0;
-    double sumyp = 0, sumypx = 0, sumypy = 0;
-    
-    int used = 0;
-    for(int i=0; i<n; ++i) {
-        if(idxA[i] < 0 || idxB[i] < 0) continue;
-        
-        const auto& s1 = listA[idxA[i]]; // Source (x,y)
-        const auto& s2 = listB[idxB[i]]; // Target (x',y')
-        
-        sumx += s1.x;
-        sumy += s1.y;
-        sumx2 += s1.x * s1.x;
-        sumy2 += s1.y * s1.y;
-        sumxy += s1.x * s1.y;
-        
-        sumxp += s2.x;
-        sumxpx += s2.x * s1.x;
-        sumxpy += s2.x * s1.y;
-        
-        sumyp += s2.y;
-        sumypx += s2.y * s1.x;
-        sumypy += s2.y * s1.y;
-        
-        used++;
-    }
-    
-    if (used < 3) return false;
-    
-    // Matrix M is same for both systems
-    // | N    sumx  sumy |
-    // | sumx sumx2 sumxy|
-    // | sumy sumxy sumy2|
-    
-    double M[3][3] = {
-        {(double)used, sumx, sumy},
-        {sumx, sumx2, sumxy},
-        {sumy, sumxy, sumy2}
-    };
-    
-    // Solve for (A,B,C) -> (x00, x10, x01)
-    double V1[3] = {sumxp, sumxpx, sumxpy};
-    double sol1[3];
-    if (!solveLinearSystem3x3(M, V1, sol1)) return false;
-    
-    // Solve for (D,E,F) -> (y00, y10, y01)
-    double V2[3] = {sumyp, sumypx, sumypy};
-    double sol2[3];
-    if (!solveLinearSystem3x3(M, V2, sol2)) return false;
-    
-    trans.x00 = sol1[0]; trans.x10 = sol1[1]; trans.x01 = sol1[2];
-    trans.y00 = sol2[0]; trans.y10 = sol2[1]; trans.y01 = sol2[2];
-    trans.order = 1;
-    trans.nr = used;
-    
-    return true;
-}
-
-bool TriangleMatcher::iterativeFit(const std::vector<MatchStar>& listA,
-                                   const std::vector<MatchStar>& listB,
-                                   const std::vector<int>& votesA,
-                                   const std::vector<int>& votesB,
-                                   GenericTrans& trans)
-{
-    // Replicate iter_trans
-    std::vector<int> idxA = votesA;
-    std::vector<int> idxB = votesB;
-    int nr = idxA.size();
-    
-    int max_iter = 5;
-    double halt_sigma = 0.1;
-    
-    for(int iter=0; iter<max_iter; ++iter) {
-        if (nr < 6) return false; // Need min points
-        
-        // Calculate current transformation
-        if (!calcTransLinear(nr, listA, listB, idxA, idxB, trans)) return false;
-        
-        // Calculate residuals
-        std::vector<double> dist2(nr);
-        std::vector<double> sorted_dist2(nr);
-        
-        for(int i=0; i<nr; ++i) {
-            const auto& s1 = listA[idxA[i]];
-            const auto& s2 = listB[idxB[i]];
-            
-            // Transform s1
-            double tx = trans.x00 + trans.x10 * s1.x + trans.x01 * s1.y;
-            double ty = trans.y00 + trans.y10 * s1.x + trans.y01 * s1.y;
-            
-            double dx = tx - s2.x;
-            double dy = ty - s2.y;
-            dist2[i] = dx*dx + dy*dy;
-            sorted_dist2[i] = dist2[i];
-        }
-        
-        std::sort(sorted_dist2.begin(), sorted_dist2.end());
-        
-        // Find sigma (approx percentile)
-        // Standard uses AT_MATCH_PERCENTILE (usually 0.5 or 0.68)
-        double sigma2 = sorted_dist2[std::max(0, (int)(nr * 0.35))];
-        
-        if (sigma2 <= halt_sigma*halt_sigma) break; // Good enough
-        
-        // Filter outliers
-        int new_nr = 0;
-        int nb = 0;
-        double threshold = 10.0 * sigma2;
-        
-        for(int i=0; i<nr; ++i) {
-            if (dist2[i] <= threshold) {
-                idxA[new_nr] = idxA[i];
-                idxB[new_nr] = idxB[i];
-                new_nr++;
-            } else {
-                nb++;
-            }
-        }
-        
-        nr = new_nr;
-        if (nb == 0) break; // No more outliers removed
-    }
-    
-    trans.nr = nr;
-    return (nr >= 6); 
-}
-
-

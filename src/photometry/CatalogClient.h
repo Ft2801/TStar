@@ -34,6 +34,10 @@ private:
     int m_currentMirrorIndex;
     double m_lastQueryRa, m_lastQueryDec, m_lastQueryRadius;
     QString m_lastQueryType; // "GAIA" or "APASS"
+    
+    // Internal send methods (don't reset mirror index — used for retries)
+    void sendGaia();
+    void sendAPASS();
 
 };
 

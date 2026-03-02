@@ -54,9 +54,8 @@ bool Normalization::computeCoefficients(
 // FULL IMAGE NORMALIZATION — Two-Stage Approach
 //
 // Stage 1: Compute location and scale estimators for each image and channel.
-//   - lite_norm (fast): location = median, scale = 1.5 * MAD
-//   - full:             location = median, scale = MAD (we use MAD since
-//                       we don't have IKSS/BWMV)
+//   - lite_norm (fast): location = median, scale = 1.5 × MAD
+//   - full:             location + scale from IKSSlite (biweight midvariance × 0.991)
 //
 // Stage 2: Compute factors from estimators relative to reference image.
 //   compute_factors_from_estimators():
@@ -124,13 +123,20 @@ bool Normalization::computeFullImageNormalization(
             
             float median = Statistics::quickMedian(vec);
             float mad = Statistics::mad(vec, median);
-            
+
             estimators[i].location[c] = median;
 
             if (liteNorm) {
+                // Fast: location = median, scale = 1.5 × MAD 
                 estimators[i].scale[c] = 1.5 * mad;
             } else {
-                estimators[i].scale[c] = mad;
+                // Full: location+scale from IKSSlite 
+                double ikssLocation = median;
+                double ikssScale    = mad;   // fallback
+                Statistics::ikssLite(vec.data(), vec.size(), median, mad,
+                                     ikssLocation, ikssScale);
+                estimators[i].location[c] = ikssLocation;
+                estimators[i].scale[c]    = (ikssScale > 0.0) ? ikssScale : mad;
             }
         }
         estimators[i].valid = true;
@@ -337,8 +343,24 @@ bool Normalization::computeOverlapNormalization(
              
              double refLoc = refMedian;
              double tgtLoc = tgtMedian;
-             double refSca = params.fastNormalization ? 1.5 * refMAD : (double)refMAD;
-             double tgtSca = params.fastNormalization ? 1.5 * tgtMAD : (double)tgtMAD;
+             double refSca, tgtSca;
+
+             if (params.fastNormalization) {
+                 // Fast: 1.5 × MAD 
+                 refSca = 1.5 * refMAD;
+                 tgtSca = 1.5 * tgtMAD;
+             } else {
+                 // Full: IKSSlite (biweight midvariance)
+                 double ikssLoc = refMedian;
+                 Statistics::ikssLite(ref_roi.data(), ref_roi.size(), refMedian, refMAD,
+                                      ikssLoc, refSca);
+                 refLoc = ikssLoc;
+                 if (refSca <= 0.0) refSca = refMAD;
+
+                 Statistics::ikssLite(tgt_roi.data(), tgt_roi.size(), tgtMedian, tgtMAD,
+                                      tgtLoc, tgtSca);
+                 if (tgtSca <= 0.0) tgtSca = tgtMAD;
+             }
              
              // Compute factors (same logic as Stage 2 above)
              switch (params.normalization) {

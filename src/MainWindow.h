@@ -23,6 +23,7 @@ class StretchDialog;
 class PixelMathDialog;
 class CustomMdiSubWindow;
 class ABEDialog;
+class CBEDialog;
 class BackgroundNeutralizationDialog;
 class WavescaleHDRDialog;
 class HistogramStretchDialog;
@@ -84,6 +85,7 @@ private slots:
     void saveFile();
     void openStretchDialog();
     void openAbeDialog();
+    void openCbeDialog();
     void openSCNRDialog();
     void openGHSDialog();
     void extractChannels();
@@ -210,6 +212,7 @@ private:
 
     // Tool Dialog Singletons
     QPointer<class ABEDialog> m_abeDlg;
+    QPointer<class CBEDialog> m_cbeDlg;
     QPointer<class BackgroundNeutralizationDialog> m_bnDlg;
     QPointer<class WavescaleHDRDialog> m_wavescaleDlg;
     QPointer<class HistogramStretchDialog> m_histoDlg;

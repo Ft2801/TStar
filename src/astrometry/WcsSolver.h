@@ -14,77 +14,53 @@ public:
     // ARCSEC to DEGREES conversion
     static constexpr double ARCSEC_TO_DEG = 1.0 / 3600.0;
     
+    // ==========================================================================
+    // computeWcs — Compute WCS from converged solution
+    //
+    // After the convergence loop in matchCatalog:
+    //   - raConverged, decConverged = the converged projection center
+    //   - trans = the final affine transform from centered pixel coords
+    //             to tangent plane coords in arcsec
+    //
+    // The WCS parameters are:
+    //   CRPIX = image center (FITS convention, 1-indexed)
+    //   CRVAL = converged (RA, Dec)  ← this is the projection center itself
+    //   CD    = linear coefficients of trans (arcsec → degrees)
+    //
+    // IMPORTANT: After convergence, trans.x00 ≈ 0 and trans.y00 ≈ 0,
+    // meaning the tangent plane origin coincides with the image center.
+    // Therefore CRVAL = (raConverged, decConverged) directly.
+    // No de-projection needed — the convergence loop already did that.
+    // ==========================================================================
     static bool computeWcs(const GenericTrans& trans, 
-                           double raHint, double decHint,
+                           double raConverged, double decConverged,
                            int imageWidth, int imageHeight,
                            double& crpix1, double& crpix2,
                            double& crval1, double& crval2,
                            double cd[2][2]) 
     {
+        // CRPIX: image center in FITS convention (1-indexed)
         crpix1 = imageWidth * 0.5 + 0.5;
         crpix2 = imageHeight * 0.5 + 0.5;
         
-        // Initialize CD Matrix from affine transform
+        // CD matrix: convert transform coefficients from arcsec/px to deg/px
         cd[0][0] = trans.x10 * ARCSEC_TO_DEG;  // CD1_1
         cd[0][1] = trans.x01 * ARCSEC_TO_DEG;  // CD1_2
         cd[1][0] = trans.y10 * ARCSEC_TO_DEG;  // CD2_1
         cd[1][1] = trans.y01 * ARCSEC_TO_DEG;  // CD2_2
         
-        // Verify singular
+        // Verify non-singular
         double det = cd[0][0] * cd[1][1] - cd[0][1] * cd[1][0];
         if (std::abs(det) < 1e-20) {
             std::cerr << "WcsSolver: Singular CD matrix (det=" << det << ")" << std::endl;
             return false;
         }
         
-        double crpix1_input = crpix1; // Center X
-        double crpix2_input = crpix2; // Center Y
-        
-        // Calculate standard coords (in arcsec) at center pixel
-        double xi_sec = trans.x00 + trans.x10 * crpix1_input + trans.x01 * crpix2_input;
-        double eta_sec = trans.y00 + trans.y10 * crpix1_input + trans.y01 * crpix2_input;
-        
-        // Convert to degrees (standard coordinates on the tangent plane)
-        double xi = xi_sec * ARCSEC_TO_DEG;
-        double eta = eta_sec * ARCSEC_TO_DEG;
-        
-        // De-project from tangent plane to RA/DEC
-        double ra0 = raHint * (M_PI / 180.0);
-        double dec0 = decHint * (M_PI / 180.0);
-        
-        double xi_rad = xi * (M_PI / 180.0);
-        double eta_rad = eta * (M_PI / 180.0);
-        
-        double rho = std::sqrt(xi_rad * xi_rad + eta_rad * eta_rad);
-        double c = std::atan(rho);
-        double ra_new = raHint;
-        double dec_new = decHint;
-        
-        if (rho > 1e-10) {
-            c = std::atan(rho); // angular distance from center
-            double cos_c = std::cos(c);
-            double sin_c = std::sin(c);
-            
-            double sin_dec = std::cos(c) * std::sin(dec0) + (eta_rad * std::sin(c) * std::cos(dec0)) / rho;
-            double dec_rad_new = std::asin(sin_dec);
-            
-            double y_term = rho * std::cos(dec0) * cos_c - eta_rad * std::sin(dec0) * sin_c;
-            double x_term = xi_rad * sin_c;
-            
-            double ra_diff = std::atan2(x_term, y_term);
-            double ra_rad_new = ra0 + ra_diff;
-            
-            ra_new = ra_rad_new * (180.0 / M_PI);
-            dec_new = dec_rad_new * (180.0 / M_PI);
-            
-            // Normalize RA
-            while (ra_new < 0) ra_new += 360.0;
-            while (ra_new >= 360.0) ra_new -= 360.0;
-        }
-        
-        // Set new CRVAL
-        crval1 = ra_new;
-        crval2 = dec_new;
+        // CRVAL: the converged projection center
+        // After convergence, trans.x00 ≈ 0, trans.y00 ≈ 0
+        // so no additional de-projection is needed
+        crval1 = raConverged;
+        crval2 = decConverged;
         
         return true;
     }

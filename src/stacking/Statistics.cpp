@@ -571,4 +571,84 @@ void Statistics::quickSortImpl(float* data, size_t left, size_t right) {
     }
 }
 
+} // namespace Stacking — quickSortImpl end + namespace end (continued below)
+
+namespace Stacking {
+
+//=============================================================================
+// BIWEIGHT MIDVARIANCE 
+//
+// bwmv = n × Σ( (xi-m)² × (1−yi²)² )  /  ( Σ(1−yi²)(1−5yi²) )²
+// where yi = (xi − m) / (9 × mad),  clamped: yi² ≤ 1
+//=============================================================================
+double Statistics::biweightMidvariance(const float* data, size_t n,
+                                       float mad, float median) {
+    if (mad <= 0.0f || n == 0) return 0.0;
+
+    const float factor = 1.0f / (9.0f * mad);
+    double up   = 0.0;
+    double down = 0.0;
+
+    for (size_t i = 0; i < n; ++i) {
+        float  i_med = data[i] - median;
+        float  yi    = i_med * factor;
+        float  yi2   = (std::abs(yi) < 1.0f) ? yi * yi : 1.0f;
+        double t     = 1.0 - yi2;
+        up   += (double)(i_med * t) * (double)(i_med * t) * t * t;
+        down += t * (1.0 - 5.0 * yi2);
+    }
+
+    return (down != 0.0) ? (double)n * up / (down * down) : 0.0;
+}
+
+//=============================================================================
+// IKSS-LITE 
+//
+// 1. Remove pixels outside ±6×MAD from median
+// 2. Recompute median (location) of filtered data
+// 3. Recompute MAD of filtered data
+// 4. scale = sqrt(bwmv(filtered, new_mad, new_location)) × 0.991
+//=============================================================================
+bool Statistics::ikssLite(const float* data, size_t size,
+                          float med, float madVal,
+                          double& outLocation, double& outScale) {
+    if (size == 0 || madVal <= 0.0f) {
+        outLocation = med;
+        outScale    = 0.0;
+        return false;
+    }
+
+    // Step 1: clip to ±6×MAD
+    float xlow  = med - 6.0f * madVal;
+    float xhigh = med + 6.0f * madVal;
+
+    std::vector<float> filtered;
+    filtered.reserve(size);
+    for (size_t i = 0; i < size; ++i) {
+        if (data[i] >= xlow && data[i] <= xhigh)
+            filtered.push_back(data[i]);
+    }
+    if (filtered.empty()) {
+        outLocation = med;
+        outScale    = 0.0;
+        return false;
+    }
+
+    // Step 2: recompute median (location)
+    float newMed = quickMedian(filtered);
+    outLocation  = newMed;
+
+    // Step 3: recompute MAD
+    float newMad = (float)Statistics::mad(filtered.data(), filtered.size(), newMed);
+    if (newMad == 0.0f) {
+        outScale = 0.0;
+        return false;
+    }
+
+    // Step 4: scale = sqrt(biweightMidvariance) × 0.991
+    double bwmv = biweightMidvariance(filtered.data(), filtered.size(), newMad, newMed);
+    outScale = std::sqrt(bwmv) * 0.991;
+    return true;
+}
+
 } // namespace Stacking

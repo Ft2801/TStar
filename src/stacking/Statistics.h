@@ -141,16 +141,44 @@ public:
     static float histogramMedian(const float* data, size_t size, int numBins = 65536);
     
     /**
-     * @brief IKSS (Iterative K-Sigma Sigma-clipping) location estimator
+     * @brief IKSS-lite location/scale estimator
      * 
-     * More robust than mean for background estimation.
-     * 
-     * @param data Input data
+     *   1. Clip to ±6×MAD from median (one-shot)
+     *   2. Recompute median (location) of filtered data
+     *   3. Recompute MAD of filtered data
+     *   4. Scale = sqrt(biweightMidvariance) × 0.991
+     *
+     * Used for stacking normalization — more robust than plain MAD.
+     *
+     * @param data Input data (will be partially reordered internally)
      * @param size Number of elements
      * @param median Pre-computed median
      * @param mad Pre-computed MAD
-     * @param outLocation Output location estimate
-     * @param outScale Output scale estimate
+     * @param outLocation Output location estimate (new median after clip)
+     * @param outScale Output scale estimate (0.991 × sqrt(BWMV))
+     * @return false if computation fails (e.g. MAD==0 after filtering)
+     */
+    static bool ikssLite(const float* data, size_t size,
+                         float median, float mad,
+                         double& outLocation, double& outScale);
+
+    /**
+     * @brief Biweight midvariance (BWMV)
+     *
+     *   bwmv = n × Σ(yi²(1−yi²)²) / (Σ(1−yi²)(1−5yi²))²
+     *   where yi = (xi − median) / (9×mad)  clamped to |yi| < 1
+     *
+     * @param data Input data
+     * @param size Number of elements
+     * @param mad MAD of data about median
+     * @param median Median of data
+     * @return Biweight midvariance estimate
+     */
+    static double biweightMidvariance(const float* data, size_t size,
+                                      float mad, float median);
+
+    /**
+     * @brief Legacy Huber-reweighted IKSS estimator (kept for compatibility)
      */
     static void ikssEstimator(const float* data, size_t size,
                               float median, float mad,

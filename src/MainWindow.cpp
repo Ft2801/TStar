@@ -46,6 +46,7 @@
 #include "io/RawLoader.h"
 #include "dialogs/StretchDialog.h"
 #include "dialogs/ABEDialog.h"
+#include "dialogs/CBEDialog.h"
 #include "dialogs/SCNRDialog.h"
 #include "dialogs/SaturationDialog.h"
 #include "dialogs/ChannelCombinationDialog.h"
@@ -882,6 +883,9 @@ MainWindow::MainWindow(QWidget *parent)
     QMenu* colorMenu = processMenu->addMenu(tr("Color Management"));
     addMenuAction(colorMenu, tr("Auto Background Extraction (ABE)"), "", [this](){
         openAbeDialog();
+    });
+    addMenuAction(colorMenu, tr("Catalog Background Extraction (CBE)"), "", [this](){
+        openCbeDialog();
     });
     addMenuAction(colorMenu, tr("Photometric Color Calibration"), "", [this](){
         openPCCDialog();
@@ -1907,6 +1911,40 @@ void MainWindow::cropTool() {
     log(tr("Opening Rotate / Crop Tool..."), Log_Info, true);
     setupToolSubwindow(nullptr, dlg, tr("Rotate / Crop"));
 }
+
+void MainWindow::openCbeDialog() {
+    if (activateTool(tr("Catalog Background Extraction (MARS-like)"))) return;
+
+    auto v = currentViewer();
+    if (!v) {
+        log(tr("No image loaded for CBE."), Log_Warning, true);
+        return;
+    }
+
+    log(tr("Opening Catalog Background Extractor..."), Log_Action);
+    auto dlg = new CBEDialog(this, v, v->getBuffer());
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    
+    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, dlg, tr("Catalog Background Extraction (MARS-like)"));
+    m_cbeDlg = dlg;
+
+    connect(dlg, &CBEDialog::applyResult, [this, v](const ImageBuffer& res) {
+        QString oldName = v->getBuffer().name();
+        QString newName = oldName + "_cbe";
+        
+        ImageBuffer resBuffer = res;
+        resBuffer.setName(newName);
+        createNewImageWindow(resBuffer, newName);
+        log(tr("CBE successful."), Log_Success, true);
+    });
+
+    connect(dlg, &CBEDialog::progressMsg, this, [this](const QString& msg){ log(msg, Log_Info); });
+    
+    centerToolWindow(sub);
+    sub->raise();
+    dlg->setFocus();
+}
+
 
 void MainWindow::openAbeDialog() {
     ImageViewer* v = currentViewer();

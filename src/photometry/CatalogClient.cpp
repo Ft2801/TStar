@@ -25,67 +25,72 @@ void CatalogClient::queryAPASS(double ra, double dec, double radiusDeg) {
     m_lastQueryDec = dec;
     m_lastQueryRadius = radiusDeg;
     m_lastQueryType = "APASS";
+    m_currentMirrorIndex = 0;  // Reset on fresh query
+    sendAPASS();
+}
+
+void CatalogClient::sendAPASS() {
     if (m_currentMirrorIndex >= VIZIER_MIRRORS.size()) {
-        m_currentMirrorIndex = 0;  // Reset to primary mirror on fresh query
+        emit errorOccurred(tr("All VizieR mirrors failed for APASS."));
+        return;
     }
     
-    // VizieR Cone Search for APASS (II/336)
-    // VizieR Cone Search (II/336) uses arcminutes for radius (-c.rm)
-    
-    QString baseUrl = VIZIER_MIRRORS[m_currentMirrorIndex];  // Use current mirror
-    QUrl url(baseUrl + "/viz-bin/votable");
+    QString baseUrl = VIZIER_MIRRORS[m_currentMirrorIndex];
+    QUrl url(baseUrl);
     QUrlQuery query;
     query.addQueryItem("-source", "II/336/apass9"); 
-    query.addQueryItem("-c", QString("%1 %2").arg(ra).arg(dec));
-    query.addQueryItem("-c.rm", QString::number(radiusDeg * 60.0));
+    query.addQueryItem("-c", QString("%1 %2").arg(m_lastQueryRa).arg(m_lastQueryDec));
+    query.addQueryItem("-c.rm", QString::number(m_lastQueryRadius * 60.0));
     query.addQueryItem("-out", "RAJ2000,DEJ2000,Bmag,Vmag");
     query.addQueryItem("-out.max", "2000");
     url.setQuery(query);
     
     QNetworkRequest req(url);
+    req.setHeader(QNetworkRequest::UserAgentHeader, "TStar-CatalogClient");
     QNetworkReply* reply = m_manager->get(req);
     
-    // Timeout mechanism - 30 seconds per attempt
-    QTimer::singleShot(30000, reply, [this, reply]() {
+    // Timeout mechanism - 15 seconds per mirror
+    QTimer::singleShot(15000, reply, [this, reply]() {
         if (reply->isRunning()) {
+            qWarning() << "VizieR APASS timeout on mirror" << m_currentMirrorIndex;
             reply->abort();
-            retryWithNextMirror();
         }
     });
     
-    // Error handlers - network failures trigger retry
-    connect(reply, &QNetworkReply::errorOccurred,
-            this, &CatalogClient::retryWithNextMirror);
-    
-    // Success handler
+    // Only use finished signal — errorOccurred also triggers finished
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         onReply(reply);
     });
 }
 
 void CatalogClient::queryGaiaDR3(double ra, double dec, double radiusDeg) {
-    // VizieR Cone Search for Gaia DR3 (I/355/gaiadr3)
-    // Save query parameters for retry on next mirror
     m_lastQueryRa = ra;
     m_lastQueryDec = dec;
     m_lastQueryRadius = radiusDeg;
     m_lastQueryType = "GAIA";
-    m_currentMirrorIndex = 0;
+    m_currentMirrorIndex = 0;  // Reset on fresh query
+    sendGaia();
+}
+
+void CatalogClient::sendGaia() {
+    if (m_currentMirrorIndex >= VIZIER_MIRRORS.size()) {
+        emit errorOccurred(tr("All VizieR mirrors failed for Gaia DR3."));
+        return;
+    }
     
-    QString baseUrl = VIZIER_MIRRORS[0];
+    qWarning() << "[CatalogClient] Querying Gaia DR3 on mirror" << m_currentMirrorIndex
+               << VIZIER_MIRRORS[m_currentMirrorIndex];
+    
+    QString baseUrl = VIZIER_MIRRORS[m_currentMirrorIndex];
     QUrl url(baseUrl);
     QUrlQuery query;
     query.addQueryItem("-source", "I/355/gaiadr3"); 
-    query.addQueryItem("-c", QString("%1 %2").arg(ra).arg(dec));
-    query.addQueryItem("-c.rm", QString::number(radiusDeg * 60.0)); // arcmin
-    // Request basic astrometry + photometry + parameters
-    // Note: 'Teff' is the standardized column name in VizieR for Effective Temperature or teff_gspphot
+    query.addQueryItem("-c", QString("%1 %2").arg(m_lastQueryRa).arg(m_lastQueryDec));
+    query.addQueryItem("-c.rm", QString::number(m_lastQueryRadius * 60.0)); // arcmin
     query.addQueryItem("-out", "RA_ICRS,DE_ICRS,Gmag,BPmag,RPmag,Teff");
-    // 3000 stars: better coverage for both plate solving and PCC,
-    // especially in sparse fields (galactic poles) where mag 16 is insufficient.
     query.addQueryItem("-out.max", "3000");
-    query.addQueryItem("-out.add", "_r"); // sort by distance from center
-    // Gmag < 17: extra magnitude depth vs <16 for sparse high-galactic-latitude fields.
+    query.addQueryItem("-sort", "Gmag");   // sort brightest-first so the 3000-star limit
+                                           // retains the most useful stars for plate solving
     query.addQueryItem("Gmag", "<17");
     
     url.setQuery(query);
@@ -94,16 +99,16 @@ void CatalogClient::queryGaiaDR3(double ra, double dec, double radiusDeg) {
     req.setHeader(QNetworkRequest::UserAgentHeader, "TStar-CatalogClient");
     QNetworkReply* reply = m_manager->get(req);
     
-    // Timeout: VizieR queries should respond within 30 seconds
-    QTimer::singleShot(30000, reply, [this, reply]() {
+    // Timeout: 15 seconds per mirror attempt
+    QTimer::singleShot(15000, reply, [this, reply]() {
         if (reply->isRunning()) {
+            qWarning() << "VizieR Gaia timeout on mirror" << m_currentMirrorIndex;
             reply->abort();
-            retryWithNextMirror();
         }
     });
     
-    connect(reply, &QNetworkReply::errorOccurred,
-            this, &CatalogClient::retryWithNextMirror);
+    // Only use finished signal — errorOccurred also triggers finished,
+    // connecting both causes double-retry → exponential loop
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         onReply(reply);
     });
@@ -244,19 +249,13 @@ void CatalogClient::onReply(QNetworkReply* reply) {
 void CatalogClient::retryWithNextMirror() {
     m_currentMirrorIndex++;
     
-    if (m_currentMirrorIndex >= VIZIER_MIRRORS.size()) {
-        emit errorOccurred(
-            tr("All VizieR mirrors failed. Network connectivity issue?\n"
-               "Tried: %1").arg(VIZIER_MIRRORS.join(", ")));
-        return;
-    }
+    qWarning() << "[CatalogClient] Retry mirror" << m_currentMirrorIndex
+               << "of" << VIZIER_MIRRORS.size();
     
-    qWarning() << "VizieR mirror retry:" << m_currentMirrorIndex 
-               << "switching to" << VIZIER_MIRRORS[m_currentMirrorIndex];
-    
+    // Call sendGaia/sendAPASS directly (NOT queryGaiaDR3/queryAPASS which reset the index)
     if (m_lastQueryType == "GAIA") {
-        queryGaiaDR3(m_lastQueryRa, m_lastQueryDec, m_lastQueryRadius);
+        sendGaia();
     } else if (m_lastQueryType == "APASS") {
-        queryAPASS(m_lastQueryRa, m_lastQueryDec, m_lastQueryRadius);
+        sendAPASS();
     }
 }

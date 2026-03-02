@@ -534,6 +534,8 @@ set(TSTAR_SOURCES
     # Background
     src/background/BackgroundExtraction.cpp
     src/background/BackgroundExtraction.h
+    src/background/CatalogGradientExtractor.cpp
+    src/background/CatalogGradientExtractor.h
 
     # Stacking
     src/stacking/StackingProject.cpp
@@ -693,10 +695,14 @@ set(TSTAR_SOURCES
     src/dialogs/ScriptBrowserDialog.h
     src/dialogs/ConversionDialog.cpp
     src/dialogs/ConversionDialog.h
+    src/dialogs/CBEDialog.cpp
+    src/dialogs/CBEDialog.h
     
     # Astrometry
     src/astrometry/SimbadSearcher.cpp
     src/astrometry/SimbadSearcher.h
+    src/astrometry/HiPSClient.cpp
+    src/astrometry/HiPSClient.h
     src/astrometry/TriangleMatcher.cpp
     src/astrometry/TriangleMatcher.h
     src/astrometry/NativePlateSolver.cpp
@@ -708,6 +714,8 @@ set(TSTAR_SOURCES
     # Photometry
     src/photometry/StarDetector.cpp
     src/photometry/StarDetector.h
+    src/photometry/PsfFitter.cpp
+    src/photometry/PsfFitter.h
     src/photometry/CatalogClient.cpp
     src/photometry/CatalogClient.h
     src/photometry/PCCCalibrator.cpp

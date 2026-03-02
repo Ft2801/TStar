@@ -1323,7 +1323,7 @@ void ChannelOps::multiscaleDecompose(const std::vector<float>& img, int w, int h
 std::vector<float> ChannelOps::multiscaleReconstruct(
     const std::vector<std::vector<float>>& details,
     const std::vector<float>& residual,
-    int pixelCount) {
+    [[maybe_unused]] int pixelCount) {
     
     std::vector<float> out = residual;
     for (const auto& d : details) {

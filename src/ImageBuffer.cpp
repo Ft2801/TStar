@@ -1401,7 +1401,7 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
         QString fmtLower = format.toLower();
 
         if (fmtLower == "jpg" || fmtLower == "jpeg") {
-            // JPEG: convert to 8-bit and save at quality 100 (matches Siril default)
+            // JPEG: convert to 8-bit and save at quality 100
             QImage saveImg = getDisplayImage(Display_Linear);
             QImageWriter writer(filePath);
             writer.setFormat("jpeg");

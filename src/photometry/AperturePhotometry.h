@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <cmath>
+#include <memory>
+#include "PsfFitter.h"
 
 // Aperture Photometry parameters (matching Standard config)
 struct ApertureConfig {
@@ -24,15 +26,18 @@ struct PhotometryResult {
     bool valid = false;
 };
 
-// Star PSF result
+// Star PSF result — wraps PsfStar for compatibility with existing callers
 struct PSFResult {
-    double x0 = 0.0;         // Centroid X
+    double x0 = 0.0;         // Centroid X (absolute image coords)
     double y0 = 0.0;         // Centroid Y
-    double fwhmx = 0.0;      // FWHM X
-    double fwhmy = 0.0;      // FWHM Y
-    double amplitude = 0.0;  // Peak amplitude
-    double background = 0.0; // Local background
+    double fwhmx = 0.0;      // FWHM X (pixels)
+    double fwhmy = 0.0;      // FWHM Y (pixels)
+    double amplitude = 0.0;  // Peak amplitude (A from PSF fit)
+    double background = 0.0; // Local background (B from PSF fit)
+    double rmse = 0.0;       // PSF fit RMSE
+    double beta = -1.0;      // Moffat β (-1 = Gaussian)
     bool valid = false;
+    std::shared_ptr<PsfStar> psf; // Full PSF fit result (may be null)
 };
 
 class AperturePhotometry {

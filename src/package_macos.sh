@@ -115,9 +115,9 @@ echo "  - Target architecture: $BUILD_ARCH"
 FRAMEWORKS_DIR="$DIST_DIR/Contents/Frameworks"
 ensure_dir "$FRAMEWORKS_DIR"
 
+copy_dylib "libz.1.dylib" "zlib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
 copy_dylib "libz.dylib" "zlib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || \
-copy_dylib "libz" "zlib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
-copy_dylib "libz.1.dylib" "zlib" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
+cp "/usr/lib/libz.1.dylib" "$FRAMEWORKS_DIR/libz.1.dylib" 2>/dev/null || true
 
 copy_dylib "libgsl" "gsl" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 copy_dylib "libgslcblas" "gsl" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
@@ -281,7 +281,7 @@ if [ -d "$PYTHON_VENV" ]; then
             # Copy stdlib, headers and bin from the framework so Python can find them.
             FRAMEWORK_ROOT=$(dirname "$FRAMEWORK_LINK")
             for sub in lib bin include; do
-                [ -d "$FRAMEWORK_ROOT/$sub" ] && cp -R "$FRAMEWORK_ROOT/$sub" "$PYTHON_FW_DEST/" || true
+                [ -d "$FRAMEWORK_ROOT/$sub" ] && cp -RL "$FRAMEWORK_ROOT/$sub" "$PYTHON_FW_DEST/" || true
             done
 
             # Fix the library's own install name so @rpath-based references resolve.
@@ -374,7 +374,7 @@ PLIST_EOF
         echo "  - Rewriting Homebrew paths in Python extension modules (.so)..."
         SO_FIXED=0
         SO_MISSING=0
-        find "$RESOURCES_DIR/python_venv" \( -name "*.so" -o -name "*.dylib" \) | while read -r so_file; do
+        find "$RESOURCES_DIR/python_venv" "$FRAMEWORKS_DIR/Python.framework" \( -name "*.so" -o -name "*.dylib" \) | while read -r so_file; do
             chmod +w "$so_file" 2>/dev/null || true
             deps=$(otool -L "$so_file" 2>/dev/null | grep -v "^$so_file:" | awk '{print $1}')
             for dep in $deps; do
@@ -730,6 +730,17 @@ check_command codesign && {
     # Sign all other nested .framework bundles explicitly before signing the app
     for fw in "$FRAMEWORKS_DIR"/*.framework; do
         [ -d "$fw" ] || continue
+        
+        # Explicitly sign inner apps inside the framework (like Python.app) before the framework itself
+        find "$fw" -name "*.app" -type d 2>/dev/null | while read -r inner_app; do
+            if [ -d "$inner_app/Contents/MacOS" ]; then
+                find "$inner_app/Contents/MacOS" -type f 2>/dev/null | while read -r inner_bin; do
+                    codesign --force --sign - "$inner_bin" 2>&1 | grep -v '^$' || true
+                done
+            fi
+            codesign --force --sign - "$inner_app" 2>&1 | grep -v '^$' || true
+        done
+        
         [ "$fw" = "$PYTHON_FW" ] && continue
         codesign --force --sign - "$fw" 2>&1 | grep -v '^$' || true
     done

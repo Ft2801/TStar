@@ -1,4 +1,5 @@
 #include "AperturePhotometry.h"
+#include "PsfFitter.h"
 #include <algorithm>
 #include <numeric>
 #include <cmath>
@@ -101,102 +102,120 @@ double AperturePhotometry::getMagnitude(double intensity) {
 
 double AperturePhotometry::getMagError(double intensity, double area, int nsky, 
                                         double skysig, double gain, double* snr) {
-    // Standard getMagErr formula
-    if (intensity <= 0 || area <= 0) {
+    // err1 = sky variance × aperture area
+    // err2 = photon noise (intensity / camera gain)
+    // err3 = sky uncertainty (skyvar/nsky × area²)
+    if (intensity <= 0 || area <= 0 || nsky <= 0) {
         if (snr) *snr = 0.0;
         return 9.999;
     }
-    
-    // CCD equation for photometric error
-    double noise_sq = intensity / gain + area * (1.0 + area / nsky) * skysig * skysig;
-    double noise = std::sqrt(noise_sq);
-    
-    if (snr) *snr = intensity / noise;
-    
-    // Magnitude error from noise
-    double mag_err = 2.5 / std::log(10.0) * noise / intensity;
-    return mag_err;
+    double skyvar = skysig * skysig;
+    double sigsq  = skyvar / nsky;
+    double err1   = area   * skyvar;
+    double err2   = intensity / gain;
+    double err3   = sigsq  * area * area;
+    double noise  = std::sqrt(err1 + err2 + err3);
+    if (noise <= 0) { if (snr) *snr = 9999.0; return 0.0; }
+    // SNR in dB (10 × log10) 
+    if (snr) *snr = 10.0 * std::log10(intensity / noise);
+    // Magnitude error: 1.0857 = 2.5 / ln(10)
+    return std::fmin(9.999, 1.0857 * noise / intensity);
 }
 
 PSFResult AperturePhotometry::fitPSF(const float* data, int width, int height, int channels,
                                       int channel, int starX, int starY, int boxRadius) {
     PSFResult result;
-    
-    // Bounds check
-    int x1 = std::max(0, starX - boxRadius);
-    int x2 = std::min(width - 1, starX + boxRadius);
-    int y1 = std::max(0, starY - boxRadius);
-    int y2 = std::min(height - 1, starY + boxRadius);
-    
-    if (x2 <= x1 || y2 <= y1) return result;
-    
-    // Estimate background from corners of the box
+
+    // Clamp box to image boundaries
+    int bx0 = std::max(0, starX - boxRadius);
+    int by0 = std::max(0, starY - boxRadius);
+    int bx1 = std::min(width  - 1, starX + boxRadius);
+    int by1 = std::min(height - 1, starY + boxRadius);
+    int boxw = bx1 - bx0 + 1;
+    int boxh = by1 - by0 + 1;
+    if (boxw < 3 || boxh < 3) return result;
+
+    // Extract box into a double buffer for PsfFitter
+    std::vector<double> box((size_t)boxw * boxh);
+    for (int jj = 0; jj < boxh; jj++) {
+        for (int ii = 0; ii < boxw; ii++) {
+            int ix = bx0 + ii, iy = by0 + jj;
+            box[(size_t)jj * boxw + ii] =
+                (double)data[(iy * width + ix) * channels + channel];
+        }
+    }
+
+    // Estimate background from box border pixels (robust median)
     std::vector<double> bgPix;
-    for (int y = y1; y <= std::min(y1 + 2, y2); ++y) {
-        for (int x = x1; x <= std::min(x1 + 2, x2); ++x) {
-            bgPix.push_back(data[(y * width + x) * channels + channel]);
-        }
-        for (int x = std::max(x1, x2 - 2); x <= x2; ++x) {
-            bgPix.push_back(data[(y * width + x) * channels + channel]);
-        }
+    bgPix.reserve(2 * (boxw + boxh));
+    for (int ii = 0; ii < boxw; ii++) {
+        bgPix.push_back(box[ii]);
+        bgPix.push_back(box[(size_t)(boxh-1)*boxw+ii]);
     }
-    for (int y = std::max(y1, y2 - 2); y <= y2; ++y) {
-        for (int x = x1; x <= std::min(x1 + 2, x2); ++x) {
-            bgPix.push_back(data[(y * width + x) * channels + channel]);
-        }
-        for (int x = std::max(x1, x2 - 2); x <= x2; ++x) {
-            bgPix.push_back(data[(y * width + x) * channels + channel]);
-        }
+    for (int jj = 1; jj < boxh - 1; jj++) {
+        bgPix.push_back(box[(size_t)jj*boxw]);
+        bgPix.push_back(box[(size_t)jj*boxw+boxw-1]);
     }
-    
+    double bg = 0.0;
     if (!bgPix.empty()) {
         std::sort(bgPix.begin(), bgPix.end());
-        result.background = bgPix[bgPix.size() / 2];
+        bg = bgPix[bgPix.size() / 2];
     }
-    
-    // Centroid calculation (intensity-weighted center of mass)
-    double sumI = 0, sumIX = 0, sumIY = 0;
-    double maxVal = result.background;
-    
-    for (int y = y1; y <= y2; ++y) {
-        for (int x = x1; x <= x2; ++x) {
-            double v = data[(y * width + x) * channels + channel];
-            double intensity = v - result.background;
-            if (intensity > 0) {
-                sumI += intensity;
-                sumIX += intensity * x;
-                sumIY += intensity * y;
-            }
-            if (v > maxVal) maxVal = v;
-        }
-    }
-    
-    if (sumI <= 0) return result;
-    
-    result.x0 = sumIX / sumI;
-    result.y0 = sumIY / sumI;
-    result.amplitude = maxVal - result.background;
-    
-    // Estimate FWHM using second moments
-    double sumI2XX = 0, sumI2YY = 0;
-    for (int y = y1; y <= y2; ++y) {
-        for (int x = x1; x <= x2; ++x) {
-            double v = data[(y * width + x) * channels + channel];
-            double intensity = v - result.background;
-            if (intensity > 0) {
-                sumI2XX += intensity * (x - result.x0) * (x - result.x0);
-                sumI2YY += intensity * (y - result.y0) * (y - result.y0);
+
+    // PSF fit using Gaussian model (PsfFitter — Levenberg-Marquardt trust region)
+    PsfError err = PsfError::OK;
+    PsfStar* psf = PsfFitter::fit(box.data(), (size_t)boxh, (size_t)boxw,
+                                  bg, 1.0,   // sat = 1.0 (no saturation masking)
+                                  1,         // convergence factor
+                                  false,     // not called from peaker
+                                  PsfProfile::Gaussian, &err);
+    if (!psf) {
+        // Fallback: moment-based centroid + FWHM estimate
+        double sumI = 0, sumIX = 0, sumIY = 0, maxVal = bg;
+        for (int jj = 0; jj < boxh; jj++) {
+            for (int ii = 0; ii < boxw; ii++) {
+                double v = box[(size_t)jj*boxw+ii];
+                double intensity = v - bg;
+                if (intensity > 0) { sumI += intensity; sumIX += intensity*(bx0+ii); sumIY += intensity*(by0+jj); }
+                if (v > maxVal) maxVal = v;
             }
         }
+        if (sumI > 0) {
+            result.x0 = sumIX / sumI;
+            result.y0 = sumIY / sumI;
+            result.amplitude  = maxVal - bg;
+            result.background = bg;
+            // Second-moment FWHM estimate
+            double s2xx = 0, s2yy = 0;
+            for (int jj = 0; jj < boxh; jj++) {
+                for (int ii = 0; ii < boxw; ii++) {
+                    double v = box[(size_t)jj*boxw+ii] - bg;
+                    if (v > 0) {
+                        s2xx += v * ((bx0+ii) - result.x0) * ((bx0+ii) - result.x0);
+                        s2yy += v * ((by0+jj) - result.y0) * ((by0+jj) - result.y0);
+                    }
+                }
+            }
+            result.fwhmx = 2.355 * std::sqrt(s2xx / sumI);
+            result.fwhmy = 2.355 * std::sqrt(s2yy / sumI);
+            result.valid = (result.fwhmx > 0.5 && result.amplitude > 0);
+        }
+        return result;
     }
-    
-    // Sigma to FWHM: FWHM = 2.355 * sigma
-    double sigmaX = std::sqrt(sumI2XX / sumI);
-    double sigmaY = std::sqrt(sumI2YY / sumI);
-    result.fwhmx = 2.355 * sigmaX;
-    result.fwhmy = 2.355 * sigmaY;
-    result.valid = (result.fwhmx > 0.5 && result.fwhmy > 0.5 && result.amplitude > 0);
-    
+
+    // Populate result from PsfStar 
+    result.x0         = bx0 + psf->x0;
+    result.y0         = by0 + psf->y0;
+    result.fwhmx      = psf->fwhmx;
+    result.fwhmy      = psf->fwhmy;
+    result.amplitude  = psf->A;
+    result.background = psf->B;
+    result.rmse       = psf->rmse;
+    result.beta       = psf->beta;
+    result.valid      = std::isfinite(psf->fwhmx) && psf->fwhmx > 0.0
+                     && std::isfinite(psf->fwhmy) && psf->fwhmy > 0.0
+                     && psf->A > 0.0;
+    result.psf        = std::shared_ptr<PsfStar>(psf);
     return result;
 }
 
