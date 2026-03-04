@@ -59,6 +59,7 @@ private slots:
     void onLogMessage(const QString& message, const QString& color);
     void onProgressChanged(const QString& message, double progress);
     void onFinished(bool success);
+    void onImageLoaded(const QString& title);
     
 private:
     void setupUI();

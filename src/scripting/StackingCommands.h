@@ -50,6 +50,20 @@ public:
      * @brief Get current preprocessing engine
      */
     static Preprocessing::PreprocessingEngine* preprocessor() { return &s_preprocessor; }
+
+    /**
+     * @brief Initialize the script's current image from an external buffer.
+     *
+     * Call this before running a script so that commands like @c save and
+     * @c starnet operate on the image currently displayed in the main window
+     * rather than an empty buffer.
+     */
+    static void initCurrentImage(const ImageBuffer& image);
+    
+    /**
+     * @brief Get the current image loaded by script commands
+     */
+    static const ImageBuffer* getCurrentImage() { return s_currentImage.get(); }
     
 private:
     // Command handlers
@@ -88,6 +102,7 @@ private:
     // State
     static std::unique_ptr<Stacking::ImageSequence> s_sequence;
     static std::unique_ptr<ImageBuffer> s_currentImage;
+    static QString s_currentFilename;    ///< Basename of the last loaded/saved file
     static Preprocessing::PreprocessingEngine s_preprocessor;
     static QString s_workingDir;
     static ScriptRunner* s_runner;

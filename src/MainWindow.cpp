@@ -4030,14 +4030,17 @@ void MainWindow::openScriptDialog() {
         
         log(tr("Running script: %1").arg(QFileInfo(scriptFile).fileName()), Log_Action, true);
         
-        // Open ScriptDialog with console and progress bar
+        // Open ScriptDialog with console and progress bar (non-modal so that the
+        // main window remains interactive while the script runs in the background).
         ScriptDialog* scriptDlg = new ScriptDialog(this);
         scriptDlg->setAttribute(Qt::WA_DeleteOnClose);
         scriptDlg->loadScript(scriptFile);
-        scriptDlg->exec();
         
-        // Log result after dialog closes
-        log(tr("Script dialog closed."), Log_Info);
+        connect(scriptDlg, &QDialog::finished, this, [this](int) {
+            log(tr("Script dialog closed."), Log_Info);
+        });
+        
+        scriptDlg->show();
     }
 }
 

@@ -6,6 +6,8 @@
 #include "../io/TiffIO.h"
 #include "../background/BackgroundExtraction.h"
 #include "../preprocessing/Debayer.h"
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/core.hpp>
 #include <QApplication>
 #include <QCoreApplication>
 #include <QProcess>
@@ -19,8 +21,11 @@
 #include <QSemaphore>
 #include <mutex>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QDirIterator>
+#include <QSettings>
+#include <QRegularExpression>
 #include "../core/ResourceManager.h"
 
 namespace Scripting {
@@ -28,6 +33,7 @@ namespace Scripting {
 // Static member initialization
 std::unique_ptr<Stacking::ImageSequence> StackingCommands::s_sequence;
 std::unique_ptr<ImageBuffer> StackingCommands::s_currentImage;
+QString StackingCommands::s_currentFilename;
 Preprocessing::PreprocessingEngine StackingCommands::s_preprocessor;
 QString StackingCommands::s_workingDir;
 ScriptRunner* StackingCommands::s_runner = nullptr;
@@ -35,6 +41,11 @@ ScriptRunner* StackingCommands::s_runner = nullptr;
 //=============================================================================
 // REGISTRATION
 //=============================================================================
+
+void StackingCommands::initCurrentImage(const ImageBuffer& image) {
+    s_currentImage = std::make_unique<ImageBuffer>(image);
+    s_currentFilename.clear();  // unknown filename – will be set by an explicit save/load
+}
 
 void StackingCommands::registerCommands(ScriptRunner& runner) {
     s_runner = &runner;
@@ -215,18 +226,34 @@ bool StackingCommands::cmdLoad(const ScriptCommand& cmd) {
         return false;
     }
     
+    // Track the basename so that starnet can derive its output filename correctly
+    s_currentFilename = QFileInfo(path).fileName();
+    
+    // Signal that an image has been loaded so the UI can display it
+    if (s_runner) {
+        QString title = QFileInfo(path).fileName();
+        emit s_runner->imageLoaded(title);
+    }
+    
     return true;
 }
 
 bool StackingCommands::cmdSave(const ScriptCommand& cmd) {
     if (!s_currentImage || !s_currentImage->isValid()) {
+        if (s_runner)
+            s_runner->logMessage(QObject::tr("save: no image loaded"), "red");
         return false;
     }
     
     QString path = resolvePath(cmd.args[0]);
     int bits = cmd.hasOption("32b") ? 32 : (cmd.hasOption("16b") ? 16 : 32);
     
-    return Stacking::FitsIO::write(path, *s_currentImage, bits);
+    if (!Stacking::FitsIO::write(path, *s_currentImage, bits))
+        return false;
+
+    // Track the basename so subsequent commands can reference the saved file
+    s_currentFilename = QFileInfo(path).fileName();
+    return true;
 }
 
 bool StackingCommands::cmdClose(const ScriptCommand& cmd) {
@@ -1058,51 +1085,275 @@ bool StackingCommands::cmdPixelMath(const ScriptCommand& cmd) {
 #include <QProcess>
 
 bool StackingCommands::cmdStarNet(const ScriptCommand& cmd) {
-    if (!s_currentImage || !s_currentImage->isValid()) return false;
-    
-    // 1. Save current to temporary input
-    QString tmpInput = resolvePath("starnet_input_temp.tiff"); 
-    QString tmpInputFit = resolvePath("starnet_input.fit");
-    Stacking::FitsIO::write(tmpInputFit, *s_currentImage, 16);
-    
-    QString tmpOutput = resolvePath("starless_" + QFileInfo(tmpInputFit).fileName());
-    
-    // 2. Prepare Process
-    QProcess process;
-    QString program = "starnet-cli"; // Assumed in PATH
+    if (!s_currentImage || !s_currentImage->isValid()) {
+        if (s_runner)
+            s_runner->logMessage(QObject::tr("StarNet: no image loaded"), "red");
+        return false;
+    }
+
+    // Get StarNet executable path from application settings
+    QSettings settings("TStar", "TStar");
+    QString starnetExe = settings.value("paths/starnet").toString();
+    if (starnetExe.isEmpty() || !QFileInfo::exists(starnetExe)) {
+        if (s_runner)
+            s_runner->logMessage(
+                QObject::tr("StarNet executable not configured or not found. "
+                            "Please set it in Settings \u2192 StarNet Executable."), "red");
+        return false;
+    }
+
+    // Derive the stem (filename without extension) from the tracked current image filename.
+    //   starnet_{stem}.tif   - 16-bit TIFF fed to StarNet
+    //   starless_{stem}.tif  - starless TIFF produced by StarNet
+    //   starless_{stem}.fit  - starless image saved as FITS (resolved by $starless_X$ in pm)
+    QString stem = s_currentFilename.isEmpty()
+        ? QStringLiteral("image")
+        : QFileInfo(s_currentFilename).completeBaseName();
+
+    QString inputTif  = resolvePath("starnet_"  + stem + ".tif");
+    QString outputTif = resolvePath("starless_" + stem + ".tif");
+    QString outputFit = resolvePath("starless_" + stem + ".fit");
+
+    // Save current image as a 16-bit TIFF – StarNet only accepts TIFF input
+    if (!Stacking::TiffIO::write(inputTif, *s_currentImage, 16)) {
+        if (s_runner)
+            s_runner->logMessage(
+                QObject::tr("StarNet: failed to write input TIFF: %1").arg(inputTif), "red");
+        return false;
+    }
+    if (s_runner)
+        s_runner->logMessage(
+            QObject::tr("StarNet: input TIFF saved: %1").arg(inputTif), "neutral");
+
+    // Change to StarNet's own directory so it can locate its weight files
+    QString starnetDir  = QFileInfo(starnetExe).absolutePath();
+    QString previousDir = QDir::currentPath();
+    QDir::setCurrent(starnetDir);
+
+    // Build process arguments. StarNet v2-torch uses -i and -o flags,
+    // while v1 and standard v2.0 use positional arguments.
+    // Default to positional args; only use -i/-o if explicitly torch version.
     QStringList args;
-    args << tmpInputFit << tmpOutput;
+    bool isTorchFormat = false;
     
-    if (cmd.hasOption("stride")) {
-        args << cmd.option("stride");
+    // Detect if this is PyTorch-based TORCH version (newer reimplementation)
+    // Standard v2.0 uses positional args, so only torch format if explicitly marked
+    if (starnetExe.contains("torch", Qt::CaseInsensitive)) {
+        isTorchFormat = true;
+    }
+    
+    if (isTorchFormat) {
+        args << QLatin1String("-i") << inputTif;
+        args << QLatin1String("-o") << outputTif;
     } else {
-        args << "128"; // Default
+        // Standard v1/v2: positional arguments
+        args << inputTif << outputTif;
     }
     
-    // Start
-    process.start(program, args);
-    if (!process.waitForStarted()) {
-        if (s_runner) s_runner->setVariable("error", "Failed to start StarNet CLI");
+    if (cmd.hasOption("stride"))
+        args << cmd.option("stride");
+
+    if (s_runner)
+        s_runner->logMessage(
+            QObject::tr("StarNet: starting %1 %2").arg(starnetExe, args.join(" ")), "neutral");
+
+    QProcess process;
+    process.start(starnetExe, args);
+    if (!process.waitForStarted(5000)) {
+        QDir::setCurrent(previousDir);
+        if (s_runner)
+            s_runner->logMessage(
+                QObject::tr("StarNet: failed to start – check executable path and permissions."), "red");
+        QFile::remove(inputTif);
         return false;
     }
-    
-    // Wait for finish (can take long, should be async in GUI but sync in script)
-    while (!process.waitForFinished(100)) {
+
+    // Wait for completion, polling stdout every 200 ms for real-time progress.
+    // StarNet emits progress as space-separated tokens on one line, e.g.:
+    //   "Reading input image... Done! ... 8% finished 16% finished ..."
+    // We accumulate tokens and emit a log entry on each "% finished" pair.
+    QString accumulatedOut;  // unprocessed stdout text
+    auto flushAccumulated = [&]() {
+        // Split into tokens and emit each recognised status phrase
+        // We keep a pending token in case a pair is split across chunks.
+        QStringList tokens = accumulatedOut.split(QRegularExpression("[\\s]+"),
+                                                   Qt::SkipEmptyParts);
+        QString pending;
+        for (int ti = 0; ti < tokens.size(); ++ti) {
+            const QString& tok = tokens[ti];
+            // "N% finished" pair
+            if (tok.endsWith('%') && ti + 1 < tokens.size() &&
+                tokens[ti + 1].compare("finished", Qt::CaseInsensitive) == 0) {
+                QString pct = tok.left(tok.size() - 1); // strip '%'
+                bool ok;
+                int pctVal = pct.toInt(&ok);
+                if (ok && s_runner) {
+                    s_runner->logMessage(
+                        QObject::tr("StarNet: %1% completato").arg(pctVal), "neutral");
+                    s_runner->progressChanged(
+                        QObject::tr("StarNet elaborazione..."), pctVal / 100.0);
+                }
+                ++ti; // skip "finished"
+            } else if (tok.compare("Done!", Qt::CaseInsensitive) == 0 ||
+                       tok.compare("Done", Qt::CaseInsensitive) == 0) {
+                if (s_runner)
+                    s_runner->logMessage(QObject::tr("StarNet: Done!"), "neutral");
+            }
+            // "Reading", "Restoring", "Total" lines are informational – skip verbose
+        }
+        accumulatedOut.clear();
+    };
+
+    while (!process.waitForFinished(200)) {
         QCoreApplication::processEvents();
+
+        QByteArray chunk = process.readAllStandardOutput();
+        if (!chunk.isEmpty()) {
+            accumulatedOut += QString::fromUtf8(chunk);
+            flushAccumulated();
+        }
+
+        if (s_runner && s_runner->isCancelled()) {
+            process.kill();
+            process.waitForFinished(3000);
+            QDir::setCurrent(previousDir);
+            QFile::remove(inputTif);
+            return false;
+        }
     }
-    
+
+    // Flush any leftover stdout after process ends
+    accumulatedOut += QString::fromUtf8(process.readAllStandardOutput());
+    flushAccumulated();
+
+    QDir::setCurrent(previousDir);
+
+    // Ignore tensorflow info messages in stderr (not errors)
+    QString stdErr = QString::fromUtf8(process.readAllStandardError()).trimmed();
+    if (!stdErr.isEmpty() && !stdErr.startsWith("2") && s_runner)
+        s_runner->logMessage(QObject::tr("StarNet: %1").arg(stdErr), "orange");
+
     if (process.exitStatus() != QProcess::NormalExit || process.exitCode() != 0) {
-        if (s_runner) s_runner->setVariable("error", "StarNet failed: " + process.readAllStandardError());
+        if (s_runner)
+            s_runner->logMessage(
+                QObject::tr("StarNet: process exit code: %1").arg(process.exitCode()),
+                "red");
+        QFile::remove(inputTif);
         return false;
     }
-    
-    ImageBuffer result;
-    if (Stacking::FitsIO::read(tmpOutput, result)) {
-        *s_currentImage = std::move(result);
-        return true;
+
+    // Verify StarNet produced the expected output TIFF.
+    // If file doesn't exist, list what files are in the directory for debugging.
+    if (!QFileInfo::exists(outputTif)) {
+        if (s_runner) {
+            QString outputDir = QFileInfo(outputTif).absolutePath();
+            QDir dir(outputDir);
+            QStringList tifFiles = dir.entryList({"*.tif", "*.tiff"}, QDir::Files);
+            QString filesMsg = tifFiles.isEmpty() 
+                ? QObject::tr("(no .tif files found)")
+                : QObject::tr("Found: %1").arg(tifFiles.join(", "));
+            
+            s_runner->logMessage(
+                QObject::tr("StarNet: output TIFF not found: %1\n%2").arg(outputTif, filesMsg),
+                "red");
+        }
+        QFile::remove(inputTif);
+        return false;
     }
-    
-    return false;
+
+    // Read the starless TIFF via OpenCV (handles any compression incl. LZW)
+    if (!QFileInfo::exists(outputTif)) {
+        if (s_runner)
+            s_runner->logMessage(
+                QObject::tr("StarNet: output TIFF not found: %1").arg(outputTif), "red");
+        QFile::remove(inputTif);
+        return false;
+    }
+
+    cv::Mat mat = cv::imread(outputTif.toStdString(),
+                             cv::IMREAD_UNCHANGED | cv::IMREAD_ANYCOLOR | cv::IMREAD_ANYDEPTH);
+    if (mat.empty()) {
+        if (s_runner)
+            s_runner->logMessage(
+                QObject::tr("StarNet: OpenCV failed to read output TIFF: %1").arg(outputTif), "red");
+        QFile::remove(inputTif);
+        QFile::remove(outputTif);
+        return false;
+    }
+
+    // Convert cv::Mat (BGR, 16-bit uint) → float32 RGB ImageBuffer
+    int w = mat.cols, h = mat.rows;
+    int cvCh = mat.channels();
+    std::vector<float> floatData(w * h * cvCh);
+
+    bool is16bit = (mat.depth() == CV_16U);
+    bool is8bit  = (mat.depth() == CV_8U);
+    float scale  = is16bit ? (1.0f / 65535.0f) : (is8bit ? (1.0f / 255.0f) : 1.0f);
+
+    for (int r = 0; r < h; ++r) {
+        for (int c = 0; c < w; ++c) {
+            int dstBase = (r * w + c) * cvCh;
+            if (cvCh == 3) {
+                if (is16bit) {
+                    cv::Vec3w px = mat.at<cv::Vec3w>(r, c);
+                    floatData[dstBase + 0] = px[2] * scale; // R (BGR→RGB)
+                    floatData[dstBase + 1] = px[1] * scale; // G
+                    floatData[dstBase + 2] = px[0] * scale; // B
+                } else if (is8bit) {
+                    cv::Vec3b px = mat.at<cv::Vec3b>(r, c);
+                    floatData[dstBase + 0] = px[2] * scale;
+                    floatData[dstBase + 1] = px[1] * scale;
+                    floatData[dstBase + 2] = px[0] * scale;
+                } else { // float
+                    cv::Vec3f px = mat.at<cv::Vec3f>(r, c);
+                    floatData[dstBase + 0] = px[2];
+                    floatData[dstBase + 1] = px[1];
+                    floatData[dstBase + 2] = px[0];
+                }
+            } else { // mono
+                if (is16bit) {
+                    floatData[dstBase] = mat.at<quint16>(r, c) * scale;
+                } else if (is8bit) {
+                    floatData[dstBase] = mat.at<quint8>(r, c) * scale;
+                } else {
+                    floatData[dstBase] = mat.at<float>(r, c);
+                }
+            }
+        }
+    }
+
+    ImageBuffer starless;
+    starless.setData(w, h, cvCh, floatData);
+
+    if (!starless.isValid()) {
+        if (s_runner)
+            s_runner->logMessage(
+                QObject::tr("StarNet: loaded TIFF produced invalid buffer."), "red");
+        QFile::remove(inputTif);
+        QFile::remove(outputTif);
+        return false;
+    }
+
+    // Save as 32-bit FITS so $starless_{stem}$ resolves correctly in pm
+    if (!Stacking::FitsIO::write(outputFit, starless, 32)) {
+        if (s_runner)
+            s_runner->logMessage(
+                QObject::tr("StarNet: could not save starless FITS: %1").arg(outputFit), "orange");
+    } else {
+        if (s_runner)
+            s_runner->logMessage(
+                QObject::tr("StarNet: starless FITS saved: %1").arg(outputFit), "green");
+    }
+
+    // Clean up temp TIFFs
+    QFile::remove(inputTif);
+    QFile::remove(outputTif);
+
+    // Update current image state for subsequent commands
+    s_currentFilename = QFileInfo(outputFit).fileName();
+    *s_currentImage   = std::move(starless);
+
+    return true;
 }
 
 //=============================================================================

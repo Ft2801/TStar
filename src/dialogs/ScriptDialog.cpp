@@ -7,6 +7,8 @@
 
 #include "ScriptDialog.h"
 #include "../MainWindow.h"
+#include "../scripting/StackingCommands.h"
+#include "../ImageViewer.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QSplitter>
@@ -48,6 +50,8 @@ ScriptDialog::ScriptDialog(MainWindow* parent)
             this, &ScriptDialog::onProgressChanged);
     connect(&m_runner, &Scripting::ScriptRunner::finished,
             this, &ScriptDialog::onFinished);
+    connect(&m_runner, &Scripting::ScriptRunner::imageLoaded,
+            this, &ScriptDialog::onImageLoaded);
     
     // Center on parent
     if (parent) {
@@ -295,6 +299,19 @@ void ScriptDialog::onRunScript() {
         m_runner.setVariable(name, value);
     }
     
+    // Seed the scripting engine's current image from the main window so that
+    // commands like "save" and "starnet" have something to work with from the start.
+    if (m_mainWindow) {
+        ImageViewer* viewer = m_mainWindow->currentViewer();
+        if (viewer && viewer->getBuffer().isValid()) {
+            Scripting::StackingCommands::initCurrentImage(viewer->getBuffer());
+            m_outputLog->append(tr("Initialized script image from current viewer."));
+        } else {
+            m_outputLog->append(tr("<span style='color:orange'>Warning: no image open in the viewer. "
+                                   "Commands that need a current image (save, starnet, pm \u2026) may fail.</span>"));
+        }
+    }
+    
     m_outputLog->append(tr("Running script..."));
     
     // Run in background thread to keep UI responsive
@@ -351,6 +368,20 @@ void ScriptDialog::onFinished(bool success) {
         highlightLine(line, true);
     } else {
         m_outputLog->append(tr("<span style='color:lime'>Script finished successfully.</span>"));
+    }
+}
+
+void ScriptDialog::onImageLoaded(const QString& title) {
+    // Get the image that was loaded by the script
+    const ImageBuffer* img = Scripting::StackingCommands::getCurrentImage();
+    if (!img || !img->isValid()) {
+        return;  // Image not available
+    }
+    
+    // Create a copy of the image and display it in the main window
+    if (m_mainWindow) {
+        ImageBuffer displayBuf = *img;  // Make a copy
+        m_mainWindow->createNewImageWindow(displayBuf, title);
     }
 }
 

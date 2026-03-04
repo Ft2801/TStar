@@ -174,6 +174,12 @@ signals:
      * @brief Signal for cancellation requested
      */
     void cancelRequested();
+    
+    /**
+     * @brief Emitted when a script command loads an image
+     * The image is available via StackingCommands::getCurrentImage()
+     */
+    void imageLoaded(const QString& title);
 
 
 private:
