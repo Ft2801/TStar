@@ -1,6 +1,11 @@
 TStar Changelog
 ===============
 
+Version 1.7.4
+-------------
+- Fixed a small bug in the crop tool
+- Fixed a bug in the star reduction script
+
 Version 1.7.3
 -------------
 - New powerful plate solving engine

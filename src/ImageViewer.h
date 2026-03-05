@@ -192,6 +192,23 @@ private:
     bool m_moving = false;
     QPointF m_lastPos; // Used for moving crop box
     
+    enum CropDragMode {
+        CropDrag_None,
+        CropDrag_Move,
+        CropDrag_Left,
+        CropDrag_Right,
+        CropDrag_Top,
+        CropDrag_Bottom,
+        CropDrag_TopLeft,
+        CropDrag_TopRight,
+        CropDrag_BottomLeft,
+        CropDrag_BottomRight
+    };
+    CropDragMode m_cropDragMode = CropDrag_None;
+    CropDragMode getCropDragMode(const QPointF& itemPos, const QRectF& rect, float tolerance = 10.0f) const;
+    void updateCropCursor(CropDragMode mode, float rotation);
+
+    
     float m_cropAngle = 0.0f;
     
     // ABE State

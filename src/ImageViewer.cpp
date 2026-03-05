@@ -316,6 +316,73 @@ void ImageViewer::clearBackgroundSamples() {
     m_sampleItems.clear();
 }
 
+ImageViewer::CropDragMode ImageViewer::getCropDragMode(const QPointF& itemPos, const QRectF& rect, float tolerance) const {
+    if (!rect.isValid() || rect.isEmpty()) return CropDrag_None;
+    
+    // Scale tolerance based on zoom level to keep handles consistent on screen
+    float scaledTol = tolerance / m_scaleFactor;
+    
+    QRectF outer = rect.adjusted(-scaledTol, -scaledTol, scaledTol, scaledTol);
+    if (!outer.contains(itemPos)) return CropDrag_None;
+
+    bool left = std::abs(itemPos.x() - rect.left()) <= scaledTol;
+    bool right = std::abs(itemPos.x() - rect.right()) <= scaledTol;
+    bool top = std::abs(itemPos.y() - rect.top()) <= scaledTol;
+    bool bottom = std::abs(itemPos.y() - rect.bottom()) <= scaledTol;
+
+    if (top && left) return CropDrag_TopLeft;
+    if (top && right) return CropDrag_TopRight;
+    if (bottom && left) return CropDrag_BottomLeft;
+    if (bottom && right) return CropDrag_BottomRight;
+    if (left) return CropDrag_Left;
+    if (right) return CropDrag_Right;
+    if (top) return CropDrag_Top;
+    if (bottom) return CropDrag_Bottom;
+
+    if (rect.contains(itemPos)) return CropDrag_Move;
+
+    return CropDrag_None;
+}
+
+void ImageViewer::updateCropCursor(CropDragMode mode, float rotation) {
+    if (mode == CropDrag_None) {
+        setCursor(Qt::ArrowCursor);
+        return;
+    }
+    if (mode == CropDrag_Move) {
+        setCursor(Qt::SizeAllCursor);
+        return;
+    }
+
+    float baseAngle = 0;
+    switch (mode) {
+        case CropDrag_Top:    baseAngle = 0; break;
+        case CropDrag_TopRight: baseAngle = 45; break;
+        case CropDrag_Right:  baseAngle = 90; break;
+        case CropDrag_BottomRight: baseAngle = 135; break;
+        case CropDrag_Bottom: baseAngle = 180; break;
+        case CropDrag_BottomLeft: baseAngle = 225; break;
+        case CropDrag_Left:   baseAngle = 270; break;
+        case CropDrag_TopLeft: baseAngle = 315; break;
+        default: break;
+    }
+
+    float totalAngle = std::fmod(baseAngle + rotation, 360.0f);
+    if (totalAngle < 0) totalAngle += 360.0f;
+
+    float a = std::fmod(totalAngle, 180.0f);
+    if (a < 22.5f || a >= 157.5f) {
+        setCursor(Qt::SizeVerCursor);
+    } else if (a < 67.5f) {
+        setCursor(Qt::SizeBDiagCursor); // /
+    } else if (a < 112.5f) {
+        setCursor(Qt::SizeHorCursor);
+    } else {
+        setCursor(Qt::SizeFDiagCursor); // diagonal
+    }
+}
+
+
 void ImageViewer::mousePressEvent(QMouseEvent* event) {
     if (m_pickMode && event->button() == Qt::LeftButton) {
         QPointF scenePos = mapToScene(event->pos());
@@ -384,21 +451,24 @@ void ImageViewer::mousePressEvent(QMouseEvent* event) {
         QPointF scenePos = mapToScene(event->pos());
         QPointF itemPos = m_cropItem->mapFromScene(scenePos);
         
-        // Hit test for Move (inside rect)
-        // Make sure we check against the local rect which defines the shape
-        if (m_cropItem->isVisible() && m_cropItem->contains(itemPos)) {
-            m_moving = true;
-            m_lastPos = scenePos;
-            setCursor(Qt::SizeAllCursor);
-        } else {
-            // New Draw
-            m_startPoint = scenePos;
-            m_drawing = true;
-            m_cropItem->setRect(QRectF(scenePos, scenePos)); // Zero size
-            m_cropItem->setPos(0, 0); // Reset translation if any (important!)
-            m_cropItem->setRotation(m_cropAngle); 
-            setCursor(Qt::CrossCursor);
+        if (m_cropItem->isVisible()) {
+            m_cropDragMode = getCropDragMode(itemPos, m_cropItem->rect());
+            if (m_cropDragMode != CropDrag_None) {
+                m_moving = true; // Use m_moving to indicate an active drag (either move or resize)
+                m_lastPos = scenePos;
+                updateCropCursor(m_cropDragMode, m_cropAngle);
+                return;
+            }
         }
+        
+        // New Draw if clicking outside
+        m_startPoint = scenePos;
+        m_drawing = true;
+        m_cropDragMode = CropDrag_None;
+        m_cropItem->setRect(QRectF(scenePos, scenePos)); // Zero size
+        m_cropItem->setPos(0, 0); // Reset translation if any (important!)
+        m_cropItem->setRotation(m_cropAngle); 
+        setCursor(Qt::CrossCursor);
         return; 
     }
 
@@ -443,7 +513,96 @@ void ImageViewer::mouseMoveEvent(QMouseEvent* event) {
         return;
     }
     
-    if (m_cropMode && m_moving) {
+    if (m_cropMode && m_moving && m_cropDragMode != CropDrag_None && m_cropDragMode != CropDrag_Move) {
+        // Handle resizing
+        QPointF itemDelta = m_cropItem->mapFromScene(scenePos) - m_cropItem->mapFromScene(m_lastPos);
+        QRectF rect = m_cropItem->rect();
+
+        float dx = itemDelta.x();
+        float dy = itemDelta.y();
+        
+        float newLeft = rect.left();
+        float newRight = rect.right();
+        float newTop = rect.top();
+        float newBottom = rect.bottom();
+
+        if (m_cropDragMode == CropDrag_Left || m_cropDragMode == CropDrag_TopLeft || m_cropDragMode == CropDrag_BottomLeft) {
+            newLeft += dx;
+        }
+        if (m_cropDragMode == CropDrag_Right || m_cropDragMode == CropDrag_TopRight || m_cropDragMode == CropDrag_BottomRight) {
+            newRight += dx;
+        }
+        if (m_cropDragMode == CropDrag_Top || m_cropDragMode == CropDrag_TopLeft || m_cropDragMode == CropDrag_TopRight) {
+            newTop += dy;
+        }
+        if (m_cropDragMode == CropDrag_Bottom || m_cropDragMode == CropDrag_BottomLeft || m_cropDragMode == CropDrag_BottomRight) {
+            newBottom += dy;
+        }
+        
+        // Prevent negative dimensions/flipping
+        if (newRight - newLeft < 1.0f) {
+            if (m_cropDragMode == CropDrag_Left || m_cropDragMode == CropDrag_TopLeft || m_cropDragMode == CropDrag_BottomLeft)
+                newLeft = newRight - 1.0f;
+            else
+                newRight = newLeft + 1.0f;
+        }
+        if (newBottom - newTop < 1.0f) {
+            if (m_cropDragMode == CropDrag_Top || m_cropDragMode == CropDrag_TopLeft || m_cropDragMode == CropDrag_TopRight)
+                newTop = newBottom - 1.0f;
+            else
+                newBottom = newTop + 1.0f;
+        }
+
+        QRectF newRect(QPointF(newLeft, newTop), QPointF(newRight, newBottom));
+
+        if (m_aspectRatio > 0.0f) {
+            // Apply aspect ratio restriction
+            float w = newRect.width();
+            float h = newRect.height();
+            
+            // Adjust depending on which edge was pulled
+            bool pulledX = (m_cropDragMode == CropDrag_Left || m_cropDragMode == CropDrag_Right);
+            bool pulledY = (m_cropDragMode == CropDrag_Top || m_cropDragMode == CropDrag_Bottom);
+            // If dragging a corner, choose the dominant delta. We'll simplify and fix Height based on Width
+            if (pulledY && !pulledX) {
+                float targetW = h * m_aspectRatio;
+                float diffW = targetW - w;
+                newRect.adjust(-diffW / 2, 0, diffW / 2, 0); // Expand horizontally symmetrically
+            } else {
+                float targetH = w / m_aspectRatio;
+                float diffH = targetH - h;
+                
+                if (m_cropDragMode == CropDrag_Top || m_cropDragMode == CropDrag_TopLeft || m_cropDragMode == CropDrag_TopRight) {
+                    newRect.setTop(newRect.top() - diffH); 
+                } else if (m_cropDragMode == CropDrag_Bottom || m_cropDragMode == CropDrag_BottomLeft || m_cropDragMode == CropDrag_BottomRight) {
+                     newRect.setBottom(newRect.bottom() + diffH);
+                } else {
+                     newRect.adjust(0, -diffH / 2, 0, diffH / 2); // Symmetrical
+                }
+            }
+        }
+        
+        // Because rotation is around the center, moving an edge shifts the center, moving the box in scene coords
+        // To keep the static edge in place during resize when rotation is non-zero,
+        // we need to translate the item inversely to the center's motion.
+        QPointF oldCenterScene = m_cropItem->mapToScene(rect.center());
+        
+        m_cropItem->setRect(newRect);
+        m_cropItem->setTransformOriginPoint(newRect.center());
+        
+        QPointF newCenterScene = m_cropItem->mapToScene(newRect.center());
+        QPointF centerShift = newCenterScene - oldCenterScene;
+        
+        // Move item back to keep opposite edge anchored
+        m_cropItem->moveBy(-centerShift.x(), -centerShift.y());
+
+        // We moved the item in scene, the scenePos changed relative to next mouse event?
+        // No, event->pos() is absolute. But lastPos should be updated.
+        m_lastPos = scenePos;
+        return;
+    }
+
+    if (m_cropMode && m_moving && m_cropDragMode == CropDrag_Move) {
         QPointF delta = scenePos - m_lastPos;
         m_cropItem->moveBy(delta.x(), delta.y());
         m_lastPos = scenePos;
@@ -522,6 +681,13 @@ void ImageViewer::mouseMoveEvent(QMouseEvent* event) {
         emit pixelInfoUpdated(info);
     } else {
         emit pixelInfoUpdated("");
+    }
+    
+    // Update crop hover cursor if we are just moving the mouse without dragging
+    if (m_cropMode && !m_moving && !m_drawing && m_cropItem->isVisible()) {
+        QPointF itemPos = m_cropItem->mapFromScene(scenePos);
+        CropDragMode hoverMode = getCropDragMode(itemPos, m_cropItem->rect());
+        updateCropCursor(hoverMode, m_cropAngle);
     }
     
     QGraphicsView::mouseMoveEvent(event);
