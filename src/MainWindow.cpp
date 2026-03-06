@@ -2257,7 +2257,8 @@ void MainWindow::log(const QString& msg, LogType type, bool autoShow) {
                            trimmed.contains(" - ", Qt::CaseInsensitive) || // Parameters like "smoothing - 0.1"
                            trimmed.contains("Providers :", Qt::CaseInsensitive) ||
                            trimmed.contains("Used providers :", Qt::CaseInsensitive) ||
-                           trimmed.contains("Model enforces", Qt::CaseInsensitive);
+                           trimmed.contains("Model enforces", Qt::CaseInsensitive) ||
+                           trimmed.contains(QRegularExpression("\\d+\\s*/\\s*\\d+"));
 
         // Keep explicit bridge/tool actions persistent if they look like milestones or successes
         if (trimmed.contains("RESULT:", Qt::CaseInsensitive) || 

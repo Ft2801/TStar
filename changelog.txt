@@ -3,9 +3,7 @@ TStar Changelog
 
 Version 1.7.4
 -------------
-- Fixed a small bug in the crop tool
-- Fixed a bug in the star reduction script
-- Other small bugfixes
+- Small overall bugfixes
 
 Version 1.7.3
 -------------

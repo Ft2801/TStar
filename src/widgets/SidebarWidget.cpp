@@ -13,6 +13,7 @@
 #include <QCheckBox>
 #include <QVBoxLayout>
 #include <QSettings>
+#include <QTextFrame>
 
 SidebarWidget::SidebarWidget(QWidget* parent) : QWidget(parent) {
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
@@ -130,7 +131,7 @@ void SidebarWidget::addPanel(const QString& name, const QString& iconPath, QWidg
             if (panel->layout()) panel->layout()->setContentsMargins(0,0,0,0);
             
             layout->addWidget(panel, 1); // Expand to fill rest
-            
+
             widgetToAdd = container;
         }
     }
@@ -276,6 +277,14 @@ QString SidebarWidget::currentPanel() const {
 
 void SidebarWidget::logToConsole(const QString& htmlMsg) {
     if (!m_console) return;
+    
+    // Ensure padding to allow scrolling past the last line via document frame
+    QTextFrameFormat fmt = m_console->document()->rootFrame()->frameFormat();
+    if (fmt.bottomMargin() != 150) {
+        fmt.setBottomMargin(150);
+        m_console->document()->rootFrame()->setFrameFormat(fmt);
+    }
+    
     m_console->append(htmlMsg);
     m_console->verticalScrollBar()->setValue(m_console->verticalScrollBar()->maximum());
 }
@@ -283,6 +292,13 @@ void SidebarWidget::logToConsole(const QString& htmlMsg) {
 void SidebarWidget::updateLastLogLine(const QString& htmlMsg) {
     if (!m_console) return;
     
+    // Ensure padding to allow scrolling past the last line via document frame
+    QTextFrameFormat fmt = m_console->document()->rootFrame()->frameFormat();
+    if (fmt.bottomMargin() != 150) {
+        fmt.setBottomMargin(150);
+        m_console->document()->rootFrame()->setFrameFormat(fmt);
+    }
+
     QTextCursor cursor = m_console->textCursor();
     cursor.movePosition(QTextCursor::End);
     
