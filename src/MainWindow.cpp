@@ -1136,10 +1136,10 @@ MainWindow::MainWindow(QWidget *parent)
     addMenuAction(maskMenu, tr("Invert Mask"), "", &MainWindow::invertMaskAction);
     maskMenu->addSeparator();
     
-    QAction* toggleOverlayAct = maskMenu->addAction(tr("Show Overlay"));
-    toggleOverlayAct->setCheckable(true);
-    toggleOverlayAct->setChecked(true); 
-    connect(toggleOverlayAct, &QAction::triggered, this, &MainWindow::toggleMaskOverlayAction);
+    m_toggleOverlayAct = maskMenu->addAction(tr("Show Overlay"));
+    m_toggleOverlayAct->setCheckable(true);
+    m_toggleOverlayAct->setChecked(false);
+    connect(m_toggleOverlayAct, &QAction::triggered, this, &MainWindow::toggleMaskOverlayAction);
     
     maskBtn->setMenu(maskMenu);
     mainToolbar->addWidget(maskBtn);
@@ -3438,6 +3438,9 @@ void MainWindow::createMaskAction() {
 
              // set to current viewer buffer
              v->getBuffer().setMask(mask);
+             if (m_toggleOverlayAct) {
+                 m_toggleOverlayAct->setChecked(v->isMaskOverlayEnabled());
+             }
              updateActiveImage();
              log(tr("Mask Created and Applied."), Log_Success);
         }
@@ -3503,6 +3506,9 @@ void MainWindow::applyMaskAction() {
                 }
                 
                 v->getBuffer().setMask(mask);
+                if (m_toggleOverlayAct) {
+                    m_toggleOverlayAct->setChecked(v->isMaskOverlayEnabled());
+                }
                 updateActiveImage();
                 log(tr("Mask Applied: %1").arg(mask.name), Log_Success);
             }
@@ -3516,6 +3522,11 @@ void MainWindow::removeMaskAction() {
     if (auto v = currentViewer()) {
         if (v->getBuffer().hasMask()) {
             v->getBuffer().removeMask();
+            // Reset overlay toggle since there's no longer a mask
+            v->setMaskOverlay(false);
+            if (m_toggleOverlayAct) {
+                m_toggleOverlayAct->setChecked(false);
+            }
             updateActiveImage();
             log(tr("Mask Removed."), Log_Info);
         } else {

@@ -837,8 +837,9 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
                  
                  // Apply Mask Overlay if enabled
                  if (m_hasMask && showMask) {
+                     const float* maskRow = m_mask.data.data() + (size_t)srcY * m_mask.width;
                      for (int x = 0; x < outW; ++x) {
-                        float maskAlpha = m_mask.pixel(x, srcY);
+                        float maskAlpha = maskRow[x];
                         if (m_mask.inverted) maskAlpha = 1.0f - maskAlpha;
                         if (m_mask.mode == "protect") maskAlpha = 1.0f - maskAlpha;
                         maskAlpha *= m_mask.opacity;
@@ -862,6 +863,9 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
             // Fallback Scalar for subsampled or masked or 1-channel
             const float* srcPtr = m_data.data(); // Need base pointer
             size_t srcIdxBase = (size_t)srcY * m_width * m_channels;
+            const float* maskRow = nullptr;
+            if (m_hasMask && showMask && srcY < m_mask.height)
+                maskRow = m_mask.data.data() + (size_t)srcY * m_mask.width;
 
             for (int x = 0; x < outW; ++x) {
                 int srcX = x * stepX;
@@ -926,8 +930,7 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
                 // Mask Logic
                 if (m_hasMask && showMask) { 
                      int maskX = x * stepX;
-                     int maskY = y * stepY;
-                     float maskAlpha = m_mask.pixel(maskX, maskY);
+                     float maskAlpha = maskRow ? maskRow[maskX] : 0.0f;
                      if (m_mask.inverted) maskAlpha = 1.0f - maskAlpha;
                      if (m_mask.mode == "protect") maskAlpha = 1.0f - maskAlpha;
                      maskAlpha *= m_mask.opacity;
@@ -1141,6 +1144,14 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
         
         size_t srcIdxBase = (size_t)srcY * m_width * m_channels;
         
+        // Precalculate mask row pointer for this y to avoid per-pixel bounds checking
+        const float* maskRow = nullptr;
+        if (m_hasMask && (overrideLUT != nullptr || showMask)) {
+            int maskY = y * stepY;
+            if (maskY < m_mask.height)
+                maskRow = m_mask.data.data() + (size_t)maskY * m_mask.width;
+        }
+        
         for (int x = 0; x < outW; ++x) {
             int srcX = x * stepX;
             if (srcX >= m_width) srcX = m_width - 1;
@@ -1152,8 +1163,7 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
             bool applyMaskBlend = (m_hasMask && overrideLUT != nullptr);
             if (applyMaskBlend) {
                 int maskX = x * stepX;
-                int maskY = y * stepY;
-                maskAlpha = m_mask.pixel(maskX, maskY);
+                maskAlpha = maskRow ? maskRow[maskX] : 0.0f;
                 if (m_mask.inverted) maskAlpha = 1.0f - maskAlpha;
                 if (m_mask.mode == "protect") maskAlpha = 1.0f - maskAlpha;
                 maskAlpha *= m_mask.opacity;
@@ -1227,10 +1237,9 @@ QImage ImageBuffer::getDisplayImage(DisplayMode mode, bool linked, const std::ve
             if (showMask && m_hasMask) {
                 // Since this is downsampled, we need to map x,y to mask coords
                 int maskX = x * stepX;
-                int maskY = y * stepY;
                 
                 // For better quality, maybe average? simpler: nearest neighbor
-                float mVal = m_mask.pixel(maskX, maskY);
+                float mVal = maskRow ? maskRow[maskX] : 0.0f;
                 if (m_mask.inverted) mVal = 1.0f - mVal;
                 
                 // Treat mVal as transparency of the redness

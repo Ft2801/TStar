@@ -261,6 +261,7 @@ private:
     class QAction* m_linkViewsAction;
     // Channel view button (popup: RGB / R / G / B)
     class QToolButton* m_channelViewBtn = nullptr;
+    class QAction* m_toggleOverlayAct = nullptr;
     
     CustomMdiSubWindow* setupToolSubwindow(CustomMdiSubWindow* sub, QWidget* dlg, const QString& title);
     void centerToolWindow(CustomMdiSubWindow* sub);

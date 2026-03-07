@@ -475,21 +475,19 @@ void SelectiveColorDialog::onApply() {
     ImageBuffer& buffer = v->getBuffer();
     
     // Save original for mask blending
-    ImageBuffer original;
-    if (buffer.hasMask()) {
-        original = buffer;
-    }
+    ImageBuffer original = buffer;
     
-    // Recompute mask based on current buffer (not cached source)
+    // Recompute hue mask based on current buffer
     std::vector<float> currentMask = computeHueMask(buffer);
     ImageBuffer result = applyAdjustments(buffer, currentMask);
-    v->setBuffer(result, buffer.name(), true);
     
-    // Blend with mask if present
-    ImageBuffer& newBuffer = v->getBuffer();
-    if (original.isValid() && newBuffer.hasMask()) {
-        newBuffer.blendResult(original);
+    // Inherit the mask from the original buffer onto the result
+    if (original.hasMask()) {
+        result.setMask(*original.getMask());
+        result.blendResult(original);
     }
+    
+    v->setBuffer(result, buffer.name(), true);
     
     accept();
 }
