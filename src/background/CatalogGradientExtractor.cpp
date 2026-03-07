@@ -112,32 +112,6 @@ static cv::Mat fitPolynomialBackground(const cv::Mat& src, const cv::Mat& mask, 
 }
 
 // ---------------------------------------------------------------------------
-// extractLargeScale — fallback low-frequency background map 
-// ---------------------------------------------------------------------------
-static cv::Mat extractLargeScale(const cv::Mat& src, int blurSigma, bool protectStars) {
-    cv::Mat map;
-    if (protectStars) {
-        // Downsample → morphological open (removes stars) → blur → upsample
-        constexpr int kDownscale = 4;
-        cv::Mat down;
-        cv::resize(src, down, cv::Size(), 1.0 / kDownscale, 1.0 / kDownscale, cv::INTER_AREA);
-
-        int morphRadius = std::max(1, blurSigma / kDownscale / 4);
-        cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE,
-                                                    cv::Size(2 * morphRadius + 1, 2 * morphRadius + 1));
-        cv::Mat opened;
-        cv::morphologyEx(down, opened, cv::MORPH_OPEN, kernel);
-
-        int sigma = std::max(1, blurSigma / kDownscale);
-        cv::GaussianBlur(opened, opened, cv::Size(0, 0), sigma);
-        cv::resize(opened, map, src.size(), 0, 0, cv::INTER_CUBIC);
-    } else {
-        cv::GaussianBlur(src, map, cv::Size(0, 0), blurSigma);
-    }
-    return map;
-}
-
-// ---------------------------------------------------------------------------
 // Split an interleaved ImageBuffer channel into a CV_32FC1 mat (no copy when
 // nChannels == 1; extracts one plane when nChannels == 3).
 // ---------------------------------------------------------------------------
@@ -177,7 +151,7 @@ bool CatalogGradientExtractor::extract(ImageBuffer& target,
 
 ImageBuffer CatalogGradientExtractor::computeGradientMap(const ImageBuffer& target,
                                                           const ImageBuffer& reference,
-                                                          const Options& opts)
+                                                          const Options& /*opts*/)
 {
     ImageBuffer result;
     const int W    = target.width();
