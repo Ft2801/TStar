@@ -513,6 +513,36 @@ void ImageViewer::mousePressEvent(QMouseEvent* event) {
 void ImageViewer::mouseMoveEvent(QMouseEvent* event) {
     QPointF scenePos = mapToScene(event->pos());
     
+    // ── Update magnifier state FIRST, before any early returns ──
+    // Magnifier must be INVISIBLE during any drawing/editing operation
+    if (m_imageItem && !m_imageItem->pixmap().isNull()) {
+        bool overImage = m_imageItem->boundingRect().contains(scenePos);
+        // Magnifier only visible if NOT in a special drawing/editing mode
+        bool inDrawingMode = m_drawing || m_moving || m_lassoDrawing || m_movingSample;
+        
+        if (overImage && m_cursorOverViewport && !inDrawingMode) {
+            m_magnifierScenePos   = scenePos;
+            m_magnifierViewportPos = event->pos();
+            m_magnifierVisible    = true;
+        } else {
+            m_magnifierVisible = false;
+        }
+        // Update cursor only if not in a special mode that handles its own cursors
+        if (overImage && m_cursorOverViewport && !inDrawingMode) {
+            if (m_interactionMode == Mode_PanZoom && !m_cropMode && !m_abeMode && !m_pickMode && !m_rectQueryMode) {
+                viewport()->setCursor(Qt::CrossCursor);
+            }
+        } else {
+            if (m_interactionMode == Mode_PanZoom && !m_cropMode && !m_abeMode && !m_pickMode && !m_rectQueryMode) {
+                viewport()->unsetCursor();
+            }
+        }
+        // Force immediate redraw when entering drawing mode to hide magnifier instantly
+        if (inDrawingMode) {
+            viewport()->update();
+        }
+    }
+    
     if (m_movingSample) {
         QPointF delta = scenePos - m_lastPos;
         m_movingSample->moveBy(delta.x(), delta.y());
@@ -696,22 +726,9 @@ void ImageViewer::mouseMoveEvent(QMouseEvent* event) {
         CropDragMode hoverMode = getCropDragMode(itemPos, m_cropItem->rect());
         updateCropCursor(hoverMode, m_cropAngle);
     }
-    
-    // ── Magnifier: cross cursor + floating loupe ──────────
-    if (m_imageItem && !m_imageItem->pixmap().isNull()) {
-        bool overImage = m_imageItem->boundingRect().contains(scenePos);
-        if (overImage) {
-            m_magnifierScenePos   = scenePos;
-            m_magnifierViewportPos = event->pos();
-            m_magnifierVisible    = true;
-            // viewport()->setCursor() overrides the hand cursor set by ScrollHandDrag
-            viewport()->setCursor(Qt::CrossCursor);
-        } else {
-            m_magnifierVisible = false;
-            viewport()->unsetCursor();  // Restore default (hand from drag mode)
-        }
-        viewport()->update();
-    }
+
+    // Always update viewport to redraw magnifier (it's already updated at mouseMoveEvent start)
+    viewport()->update();
 
     QGraphicsView::mouseMoveEvent(event);
 }

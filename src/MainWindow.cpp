@@ -2021,7 +2021,7 @@ void MainWindow::openAbeDialog() {
     m_abeDlg = dlg; // Track
     
     CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
-    setupToolSubwindow(sub, dlg, tr("ABE - ") + v->windowTitle());
+    setupToolSubwindow(sub, dlg, tr("ABE"));
     centerToolWindow(sub);
 
     // When ABE applies, it emits a result buffer
