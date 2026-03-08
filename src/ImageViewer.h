@@ -140,6 +140,8 @@ protected:
     void wheelEvent(QWheelEvent* event) override;
     void scrollContentsBy(int dx, int dy) override;
     void resizeEvent(QResizeEvent* event) override;
+    void enterEvent(QEnterEvent* event) override;
+    void leaveEvent(QEvent* event) override;
     void drawForeground(QPainter* painter, const QRectF& rect) override;
     void dragEnterEvent(QDragEnterEvent* event) override;
     void dragMoveEvent(QDragMoveEvent* event) override;
@@ -233,6 +235,7 @@ private:
     
     // Magnifier: 50x50, floating top-right of cursor
     bool m_magnifierVisible = false;
+    bool m_cursorOverViewport = false;  // True only when cursor is over this viewport
     QPointF m_magnifierScenePos;    // Scene coords under cursor (what to zoom into)
     QPoint  m_magnifierViewportPos; // Viewport coords of cursor (where to anchor the loupe)
     

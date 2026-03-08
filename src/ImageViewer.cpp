@@ -1029,11 +1029,25 @@ double ImageViewer::pixelScale() const {
     return scale * 3600.0;  // Convert deg to arcsec
 }
 
+void ImageViewer::enterEvent(QEnterEvent* event) {
+    m_cursorOverViewport = true;
+    QGraphicsView::enterEvent(event);
+}
+
+void ImageViewer::leaveEvent(QEvent* event) {
+    m_cursorOverViewport = false;
+    m_magnifierVisible = false;
+    viewport()->unsetCursor();
+    viewport()->update();
+    QGraphicsView::leaveEvent(event);
+}
+
 void ImageViewer::drawForeground(QPainter* painter, [[maybe_unused]] const QRectF& rect) {
     // ── Magnifier loupe ───────────────────────────────────
     // 100×100 px, floating top-right of the cursor at a small gap.
     // Drawn in viewport space: setWorldMatrixEnabled(false) disables the scene transform.
-    if (!m_magnifierVisible || !painter || !m_imageItem || m_imageItem->pixmap().isNull())
+    // Only draw if cursor is actually over THIS viewport (not hovering another window)
+    if (!m_magnifierVisible || !m_cursorOverViewport || !painter || !m_imageItem || m_imageItem->pixmap().isNull())
         return;
 
     static constexpr int   LOUPE_SIZE  = 100;   // pixels
