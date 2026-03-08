@@ -884,7 +884,26 @@ void GHSDialog::onPreviewTrigger() {
             m_activeViewer->setBuffer(m_originalBuffer, m_activeViewer->windowTitle(), true);
             m_selfUpdating = false;
             setClippingStats(0, 0);
+        } else if (params.colorMode == ImageBuffer::GHS_Independent || m_originalBuffer.channels() == 1) {
+            // *** FAST PATH: LUT-based preview (no buffer copy, mask blend at render time) ***
+            // Valid for Independent color mode (per-channel) and mono images.
+            // The LUT is applied per-pixel in getDisplayImage; mask blending is handled
+            // there too, so we avoid the expensive double-buffer-copy + blendResult pass.
+            const int LUT_SZ = 65536;
+            std::vector<float> ghsLut = m_originalBuffer.computeGHSLUT(params, LUT_SZ);
+            const float identityScale = 1.0f / (LUT_SZ - 1);
+            std::vector<std::vector<float>> luts(3, std::vector<float>(LUT_SZ));
+            for (int i = 0; i < LUT_SZ; ++i) {
+                float identity = i * identityScale;
+                luts[0][i] = params.channels[0] ? ghsLut[i] : identity;
+                luts[1][i] = params.channels[1] ? ghsLut[i] : identity;
+                luts[2][i] = params.channels[2] ? ghsLut[i] : identity;
+            }
+            m_activeViewer->setPreviewLUT(luts);
+            // Clipping stats are already updated by updateHistogram() called from onValueChange() above
         } else {
+            // Slow path for coupled color modes (WeightedLuminance, EvenWeightedLuminance, Saturation)
+            // These require per-pixel multi-channel math that cannot be expressed as a simple LUT.
             ImageBuffer temp = m_originalBuffer;
             temp.applyGHS(params);
             
@@ -1003,24 +1022,23 @@ void GHSDialog::updateHistogram() {
         }
     }
 
-    // 3. Update Widget (Filter displayed channels)
-    int displayChannels = 0;
-    std::vector<std::vector<int>> displayBins;
+    // 3. Update Widget - always show ALL channels (mirrors CurvesDialog behaviour).
+    // Active channels show their transformed (stretched) histogram.
+    // Inactive channels show their original (untransformed) histogram at its native position.
+    // This way the user can always see every channel while only the selected ones move.
     bool showChannels[3] = {m_showRed, m_showGreen, m_showBlue};
 
+    std::vector<std::vector<int>> displayBins(m_channels);
     for (int c = 0; c < m_channels && c < 3; ++c) {
         if (showChannels[c]) {
-            displayBins.push_back(transformedBins[c]);
-            displayChannels++;
+            displayBins[c] = transformedBins[c];   // Active: show stretched position
+        } else if (c < (int)m_origBins.size()) {
+            displayBins[c] = m_origBins[c];         // Inactive: show original position
         }
     }
+    int displayChannels = m_channels;
 
-    if (displayBins.empty()) {
-        displayBins = transformedBins;
-        displayChannels = m_channels;
-    }
-
-    // Compute clipping stats from transformed bins
+    // Compute clipping stats from transformed bins (active channels only)
     long lowClip = 0, highClip = 0, totalPixels = 0;
     for (int c = 0; c < m_channels && c < (int)transformedBins.size(); ++c) {
         if (!showChannels[c]) continue;

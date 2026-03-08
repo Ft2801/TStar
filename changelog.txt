@@ -1,6 +1,10 @@
 TStar Changelog
 ===============
 
+Version 1.7.5
+-------------
+- Minor optimizations
+
 Version 1.7.4
 -------------
 - Small overall bugfixes

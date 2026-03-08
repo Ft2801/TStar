@@ -2219,25 +2219,31 @@ void ImageBuffer::blendResult(const ImageBuffer& original, bool inverseMask) {
     if (!hasMask() || m_mask.data.empty()) return;
     if (m_data.size() != original.m_data.size()) return;
 
-    size_t total = m_data.size();
+    long n_pixels = (long)m_width * m_height;
     int ch = m_channels;
+    // Hoist branch-invariant flags out of the loop
+    const bool maskInverted = m_mask.inverted;
+    const bool protectMode  = (m_mask.mode == "protect");
+    const float opacity     = m_mask.opacity;
 
-    #pragma omp parallel for
-    for (long long i = 0; i < (long long)total; ++i) {
-         size_t pixelIdx = i / ch;
-         if (pixelIdx >= m_mask.data.size()) continue;
+    // Iterate over pixels (not over individual channel elements) to avoid
+    // the expensive integer division (i / ch) that was in the previous per-element loop.
+    #pragma omp parallel for schedule(static)
+    for (long pi = 0; pi < n_pixels; ++pi) {
+        if ((size_t)pi >= m_mask.data.size()) continue;
 
-         float alpha = m_mask.data[pixelIdx];
-         if (m_mask.inverted) alpha = 1.0f - alpha;
-         if (inverseMask) alpha = 1.0f - alpha;
+        float alpha = m_mask.data[pi];
+        if (maskInverted) alpha = 1.0f - alpha;
+        if (inverseMask)  alpha = 1.0f - alpha;
+        if (protectMode)  alpha = 1.0f - alpha;
+        alpha *= opacity;
+        const float inv_alpha = 1.0f - alpha;
 
-         // Mode "protect" means white protects (alpha=0 effect)
-         if (m_mask.mode == "protect") alpha = 1.0f - alpha;
-         
-         alpha *= m_mask.opacity;
-
-         // Result = Processed * alpha + Original * (1 - alpha)
-         m_data[i] = m_data[i] * alpha + original.m_data[i] * (1.0f - alpha);
+        // Result = Processed * alpha + Original * (1 - alpha)
+        size_t base = (size_t)pi * ch;
+        for (int c = 0; c < ch; ++c) {
+            m_data[base + c] = m_data[base + c] * alpha + original.m_data[base + c] * inv_alpha;
+        }
     }
 }
 

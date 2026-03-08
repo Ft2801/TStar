@@ -180,6 +180,10 @@ void ImageViewer::setImage(const QImage& image, bool preserveView) {
 
 void ImageViewer::setBuffer(const ImageBuffer& buffer, const QString& name, bool preserveView) {
     m_buffer = buffer;
+    // Always clear any preview LUT when the buffer is replaced; the new buffer should
+    // be displayed as-is, and a stale LUT from the previous state could cause
+    // double-processing if refreshDisplay() is called later (e.g. on resize).
+    m_previewLUT.clear();
     
     // Use current stored display state with all parameters
     QImage img = m_buffer.getDisplayImage(m_displayMode, m_displayLinked, nullptr, 0, 0, m_showMaskOverlay, m_displayInverted, m_displayFalseColor, m_autoStretchMedian, m_channelView);
