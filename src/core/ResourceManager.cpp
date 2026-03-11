@@ -68,7 +68,7 @@ double ResourceManager::getMemoryUsagePercent() const {
 #elif defined(Q_OS_MAC)
     mach_msg_type_number_t count = HOST_VM_INFO64_COUNT;
     vm_statistics64_data_t vmstat;
-    if (host_statistics64(mach_host_self(), HOST_VM_INFO64, (host_info_64_t)&vmstat, &count) == KERN_SUCCESS) {
+    if (host_statistics64(mach_host_self(), HOST_VM_INFO64, (host_info64_t)&vmstat, &count) == KERN_SUCCESS) {
         // Physical memory usage calculation: (active + wired + compressed) / total
         // Note: wired is memory that cannot be swapped out.
         // Compressed is memory stored in the compressed segment.
@@ -79,7 +79,6 @@ double ResourceManager::getMemoryUsagePercent() const {
         host_page_size(host_port, &vmsize);
         page_size = vmsize;
 
-        long long total_pages = 0;
         int mib[2];
         mib[0] = CTL_HW;
         mib[1] = HW_MEMSIZE;
