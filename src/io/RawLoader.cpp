@@ -157,6 +157,8 @@ QString filterString()
 bool load(const QString& filePath, ImageBuffer& buf, QString* errorMsg)
 {
 #ifndef HAVE_LIBRAW
+    Q_UNUSED(filePath)
+    Q_UNUSED(buf)
     if (errorMsg)
         *errorMsg = "RAW support not compiled in (HAVE_LIBRAW missing).";
     return false;

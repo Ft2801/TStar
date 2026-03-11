@@ -31,12 +31,14 @@ typedef nvmlReturn_t_ (*nvmlDeviceGetUtilizationRates_t)(void*, nvmlUtilization_
 typedef nvmlReturn_t_ (*nvmlDeviceGetName_t)(void*, char*, unsigned int);
 
 // Cached function pointers
+#ifdef Q_OS_WIN
 static nvmlInit_t                       s_nvmlInit = nullptr;
 static nvmlShutdown_t                   s_nvmlShutdown = nullptr;
 static nvmlDeviceGetCount_t             s_nvmlDeviceGetCount = nullptr;
 static nvmlDeviceGetHandleByIndex_t     s_nvmlDeviceGetHandleByIndex = nullptr;
 static nvmlDeviceGetUtilizationRates_t  s_nvmlDeviceGetUtilizationRates = nullptr;
 static nvmlDeviceGetName_t              s_nvmlDeviceGetName = nullptr;
+#endif
 
 // ============================================================================
 // Constructor / Destructor
@@ -346,7 +348,12 @@ void ResourceMonitorWidget::initNvml() {
     // We'll just report the GPU name and mark usage as unavailable
     io_iterator_t iterator;
     CFMutableDictionaryRef matchDict = IOServiceMatching("IOPCIDevice");
-    if (matchDict && IOServiceGetMatchingServices(kIOMainPortDefault, matchDict, &iterator) == KERN_SUCCESS) {
+#if defined(Q_OS_MACOS) && __MAC_OS_X_VERSION_MIN_REQUIRED < 120000
+    mach_port_t mainPort = kIOMasterPortDefault;
+#else
+    mach_port_t mainPort = kIOMainPortDefault;
+#endif
+    if (matchDict && IOServiceGetMatchingServices(mainPort, matchDict, &iterator) == KERN_SUCCESS) {
         io_service_t service;
         while ((service = IOIteratorNext(iterator)) != 0) {
             CFTypeRef model = IORegistryEntryCreateCFProperty(service, CFSTR("model"), kCFAllocatorDefault, 0);

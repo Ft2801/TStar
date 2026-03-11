@@ -163,7 +163,6 @@ RejectionResult RejectionAlgorithms::sigmaClipping(
     
     // Iterative sigma clipping
     bool changed = true;
-    int totalRejected = 0;
     
     while (changed && currentN > 3) {
         changed = false;
@@ -203,7 +202,6 @@ RejectionResult RejectionAlgorithms::sigmaClipping(
             if ((median - pixel) > sigma * sigmaLow) {
                 rejected[i] = -1;
                 result.lowRejected++;
-                totalRejected++;
                 changed = true;
                 currentN--; 
             }
@@ -211,7 +209,6 @@ RejectionResult RejectionAlgorithms::sigmaClipping(
             else if ((pixel - median) > sigma * sigmaHigh) {
                 rejected[i] = 1;
                 result.highRejected++;
-                totalRejected++;
                 changed = true;
                 currentN--;
             }
@@ -243,7 +240,6 @@ RejectionResult RejectionAlgorithms::madClipping(
     
     // Iterative MAD clipping
     bool changed = true;
-    int totalRejected = 0;
     int currentN = n;
     
     // Local scratch for stats (needed because MAD implementation likely modifies buffer or we need sorted copy)
@@ -278,14 +274,12 @@ RejectionResult RejectionAlgorithms::madClipping(
             if ((median - pixel) > sigma * sigmaLow) {
                 rejected[i] = -1;
                 result.lowRejected++;
-                totalRejected++;
                 changed = true;
                 currentN--;
             }
             else if ((pixel - median) > sigma * sigmaHigh) {
                 rejected[i] = 1;
                 result.highRejected++;
-                totalRejected++;
                 changed = true;
                 currentN--;
             }
@@ -386,7 +380,6 @@ RejectionResult RejectionAlgorithms::winsorizedClipping(
     wStack = stack;
     
     bool changed = true;
-    int totalRejected = 0;
     int currentN = n;
     
     while (changed && currentN > 3) {
@@ -459,14 +452,12 @@ RejectionResult RejectionAlgorithms::winsorizedClipping(
             if ((median - pixel) > sigma * sigmaLow) {
                 rejected[i] = -1;
                 result.lowRejected++;
-                totalRejected++;
                 changed = true;
                 currentN--;
             }
             else if ((pixel - median) > sigma * sigmaHigh) {
                 rejected[i] = 1;
                 result.highRejected++;
-                totalRejected++;
                 changed = true;
                 currentN--;
             }

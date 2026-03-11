@@ -148,7 +148,7 @@ void MaskGenerationDialog::setupUI() {
         lblInfo = new QLabel("0.00");
         rangeGrid->addWidget(s, row, 1);
         rangeGrid->addWidget(lblInfo, row, 2);
-        connect(s, &QSlider::valueChanged, [this, max, lblInfo](int v){
+        connect(s, &QSlider::valueChanged, [max, lblInfo](int v){
             lblInfo->setText(QString::number((double)v/max, 'f', 2));
         });
         connect(s, &QSlider::valueChanged, this, &MaskGenerationDialog::updateLivePreview);
@@ -667,7 +667,7 @@ void MaskGenerationDialog::generatePreview() {
     if (!m_livePreview) {
         m_livePreview = new LivePreviewDialog(m_sourceImage.width(), m_sourceImage.height(), this);
         // Do NOT nullify on finished, just hide if needed, or keep logic as is but handle close.
-        connect(m_livePreview, &QDialog::finished, [this]() {
+        connect(m_livePreview, &QDialog::finished, []() {
              // Optional: Handle cleanup or state
         });
     }

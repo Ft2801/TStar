@@ -17,10 +17,10 @@ const quint16 TAG_ImageWidth = 256;
 const quint16 TAG_ImageLength = 257;
 const quint16 TAG_BitsPerSample = 258;
 const quint16 TAG_Compression = 259;
-const quint16 TAG_PhotometricInterpretation = 262;
+// const quint16 TAG_PhotometricInterpretation = 262;
 const quint16 TAG_StripOffsets = 273;
 const quint16 TAG_SamplesPerPixel = 277;
-const quint16 TAG_RowsPerStrip = 278;
+// const quint16 TAG_RowsPerStrip = 278;
 const quint16 TAG_StripByteCounts = 279;
 const quint16 TAG_SampleFormat = 339; // 3 = Float
 const quint16 TAG_PlanarConfiguration = 284; // 1 = Chunky, 2 = Planar

@@ -1,6 +1,13 @@
 #include "CalibrationC.h"
 #include <math.h>
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+#endif
 #include <omp.h>
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>

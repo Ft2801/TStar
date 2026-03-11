@@ -438,11 +438,6 @@ void ABEDialog::generateModel(ImageBuffer& output) {
     bool showBg = m_checkShowBG->isChecked();
     bool normalize = m_checkNormalize->isChecked();
     
-    // Calculate Unified Min (Global Background Level)
-    float globalBgMin = 0.0f;
-    for(float m : bgMins) globalBgMin += m;
-    globalBgMin /= (float)channels;
-    
     // Let's use the minimum of all channels as the common target.
     float targetFloor = FLT_MAX;
     for(float m : bgMins) if(m < targetFloor) targetFloor = m;

@@ -13,9 +13,7 @@
 #include <omp.h>
 #endif
 
-static constexpr float AS_DEFAULT_SHADOWS_CLIPPING = -2.80f;
 static constexpr float AS_DEFAULT_TARGET_BACKGROUND = 0.25f;
-static constexpr float MAD_NORM = 1.4826f;
 
 HistogramStretchDialog::HistogramStretchDialog(ImageViewer* viewer, QWidget* parent)
     : DialogBase(parent, tr("Histogram Transformation"), 700, 600), m_viewer(nullptr), m_applied(false)

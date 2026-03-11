@@ -62,7 +62,7 @@ namespace {
     static inline bool supports_avx2() { return false; } // MSVC would need __cpuid
 #else
     #define ATTRIBUTE_TARGET_AVX2
-    static inline bool supports_avx2() { return false; }
+    [[maybe_unused]] static inline bool supports_avx2() { return false; }
 #endif
 
 namespace SimdOps {

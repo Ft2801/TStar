@@ -9,7 +9,6 @@
 #define DEG2RAD (M_PI / 180.0)
 #define RAD2DEG (180.0 / M_PI)
 static const double RAD2ARCSEC = 206264.80624709636;
-static const double ARCSEC2DEG = 1.0 / 3600.0;
 
 // 1E-2 arcsec convergence tolerance
 static const double CONV_TOLERANCE = 1E-2;
