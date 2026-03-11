@@ -68,31 +68,16 @@ if exist "%DIST_DIR%\TStar.exe" (
 )
 
 echo.
-echo [STEP 3] Copying Qt DLLs...
+echo [STEP 3] Copying Qt and MinGW DLLs...
 setlocal enabledelayedexpansion
-for %%f in (Qt6Core.dll Qt6Gui.dll Qt6Network.dll Qt6Svg.dll Qt6Widgets.dll Qt6Xml.dll Qt6Concurrent.dll) do (
-    copy "%BUILD_DIR%\%%f" "%DIST_DIR%\" >nul 2>&1
-    if exist "%DIST_DIR%\%%f" (
+for %%f in ("%BUILD_DIR%\*.dll") do (
+    copy "%%f" "%DIST_DIR%\" >nul 2>&1
+    if exist "%DIST_DIR%\%%~nxf" (
         set /a COPY_COUNT+=1
-        echo   - %%f: OK
+        echo   - %%~nxf: OK
     ) else (
         set /a ERROR_COUNT+=1
-        echo   [ERROR] %%f: FAILED
-    )
-)
-endlocal & set "COPY_COUNT=%COPY_COUNT%" & set "ERROR_COUNT=%ERROR_COUNT%"
-
-echo.
-echo [STEP 4] Copying MinGW runtime...
-setlocal enabledelayedexpansion
-for %%f in (libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll libgomp-1.dll) do (
-    copy "%BUILD_DIR%\%%f" "%DIST_DIR%\" >nul 2>&1
-    if exist "%DIST_DIR%\%%f" (
-        set /a COPY_COUNT+=1
-        echo   - %%f: OK
-    ) else (
-        set /a ERROR_COUNT+=1
-        echo   [ERROR] %%f: FAILED
+        echo   [ERROR] %%~nxf: FAILED
     )
 )
 endlocal & set "COPY_COUNT=%COPY_COUNT%" & set "ERROR_COUNT=%ERROR_COUNT%"
@@ -219,6 +204,23 @@ if exist "%DIST_DIR%\python\python.exe" (
     set /a ERROR_COUNT+=1
     echo   [ERROR] python folder: FAILED
 )
+
+echo.
+echo [STEP 10.5] Copying MSVC Redistributables for Python...
+set "VCREDIST_SRC=%windir%\System32"
+set "VCREDIST_FILES=vcruntime140.dll vcruntime140_1.dll msvcp140.dll msvcp140_1.dll msvcp140_2.dll vcomp140.dll concrt140.dll"
+set "VC_COPY_COUNT=0"
+
+for %%f in (%VCREDIST_FILES%) do (
+    if exist "%VCREDIST_SRC%\%%f" (
+        copy "%VCREDIST_SRC%\%%f" "%DIST_DIR%\python\" >nul 2>&1
+        copy "%VCREDIST_SRC%\%%f" "%DIST_DIR%\" >nul 2>&1
+        if exist "%DIST_DIR%\python\%%f" (
+            set /a VC_COPY_COUNT+=1
+        )
+    )
+)
+echo   - Copied %VC_COPY_COUNT% MSVC DLLs to avoid crashes on clean machines.
 
 echo.
 echo [STEP 11] Copying Scripts...

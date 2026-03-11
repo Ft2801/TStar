@@ -113,7 +113,7 @@ TStar is distributed as a portable Windows x64 application.
 2. Extract the archive.
 3. Run `TStar.exe`.
 
-*Note: Python environments for AI tools (StarNet, etc.) are bundled internally.*
+*Note: Python environments for AI tools (StarNet, etc.) and required MSVC Redistributable DLLs are bundled internally. Very old processors (Intel 3rd gen or older, ancient AMDs) lacking AVX instructions may not support certain AI features.*
 
 ## Building from Source
 

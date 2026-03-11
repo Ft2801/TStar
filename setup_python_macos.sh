@@ -18,7 +18,7 @@ echo ""
 echo "[STEP 1] Finding Python..."
 
 # Priority list of compatible Python versions (avoiding 3.13+ for stable numpy/onnx wheels)
-COMPAT_VERSIONS=("3.12" "3.11")
+COMPAT_VERSIONS=("3.11" "3.12")
 PYTHON_CMD=""
 
 # 1. Try specific versioned commands in PATH
@@ -92,7 +92,7 @@ echo "  - Virtual environment created"
 echo ""
 echo "[STEP 4] Upgrading pip..."
 
-"$PYTHON_VENV/bin/python3" -m pip install --upgrade pip --quiet
+"$PYTHON_VENV/bin/python3" -m pip install --upgrade pip setuptools wheel --quiet
 
 # --- 5. Install Dependencies ---
 echo ""
