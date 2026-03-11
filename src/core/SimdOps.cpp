@@ -50,12 +50,16 @@ namespace {
 
 // --- Runtime Dispatch Logic ---
 
-#if defined(__GNUC__) || defined(__clang__)
+#if (defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)) && (defined(__GNUC__) || defined(__clang__))
     #define ATTRIBUTE_TARGET_AVX2 __attribute__((target("avx2")))
     static inline bool supports_avx2() {
         static bool supported = __builtin_cpu_supports("avx2");
         return supported;
     }
+#elif (defined(__x86_64__) || defined(_M_X64)) && defined(_MSC_VER)
+    // MSVC handles intrinsics differently; for now, we follow the same pattern
+    #define ATTRIBUTE_TARGET_AVX2 
+    static inline bool supports_avx2() { return false; } // MSVC would need __cpuid
 #else
     #define ATTRIBUTE_TARGET_AVX2
     static inline bool supports_avx2() { return false; }
