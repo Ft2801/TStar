@@ -20,7 +20,7 @@ public:
                   CustomMdiSubWindow* sub, QWidget* parent = nullptr)
         : QWidget(parent), m_sub(sub)
     {
-        setFixedWidth(RightSidebarWidget::THUMB_W + 8);  // 4px padding each side
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         setAttribute(Qt::WA_StyledBackground, true);
         setStyleSheet("background: transparent;");
         setCursor(Qt::PointingHandCursor);
@@ -31,16 +31,17 @@ public:
 
         // ── Thumbnail (fixed safe-zone size) ──────────────────────────────
         m_thumbLabel = new QLabel(this);
-        m_thumbLabel->setFixedSize(RightSidebarWidget::THUMB_W, RightSidebarWidget::THUMB_H);
+        m_thumbLabel->setFixedHeight(RightSidebarWidget::THUMB_H);
+        m_thumbLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         m_thumbLabel->setAlignment(Qt::AlignCenter);
-        m_thumbLabel->setStyleSheet("background: #1a1a1a; border: 1px solid #444;");
+        m_thumbLabel->setStyleSheet("background: transparent; border: 1px solid #000000ff;");
         setThumb(thumb);
         vl->addWidget(m_thumbLabel);
 
         // ── Title (safe zone: fixed height, text elided to fit) ───────────
         m_titleLabel = new QLabel(this);
-        m_titleLabel->setFixedWidth(RightSidebarWidget::THUMB_W);
         m_titleLabel->setFixedHeight(18);
+        m_titleLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         m_titleLabel->setAlignment(Qt::AlignCenter);
         m_titleLabel->setStyleSheet("color: #ccc; font-size: 10px; background: transparent;");
         setTitle(title);
@@ -135,11 +136,12 @@ RightSidebarWidget::RightSidebarWidget(QWidget* parent)
 
     m_listWidget = new QWidget();
     m_listLayout = new QVBoxLayout(m_listWidget);
-    m_listLayout->setContentsMargins(4, 8, 4, 8);
+    m_listLayout->setContentsMargins(0, 8, 0, 8);
     m_listLayout->setSpacing(6);
     m_listLayout->addStretch();
 
     m_listWidget->setMinimumWidth(m_expandedWidth);
+    m_listWidget->setStyleSheet("background: transparent;");
     m_contentContainer->setWidget(m_listWidget);
     m_contentContainer->setWidgetResizable(true);
 

@@ -583,27 +583,12 @@ std::vector<float> MaskGenerationDialog::getComponentChrominance() const {
 }
 
 std::vector<float> MaskGenerationDialog::getStarMask(int w, int h) const {
-     // 1. Get Lightness at resolution
-     std::vector<float> L = getLightness(w, h);
-     
-     // 2. Extract stars
-     auto stars = ImageBuffer::extractStars(L, w, h, 3.0f, 5);
-     
-     // 3. Draw
-     cv::Mat mask = cv::Mat::zeros(h, w, CV_32FC1);
-     
-     for (const auto& s : stars) {
-         int r = std::max(1, (int)(s.hfr * 2.0f)); 
-         cv::circle(mask, cv::Point((int)s.x, (int)s.y), r, cv::Scalar(1.0), -1); 
-     }
-     
-     if (mask.empty()) return std::vector<float>(w*h, 0.0f);
-
-     cv::GaussianBlur(mask, mask, cv::Size(0,0), 2.0);
-     
-     std::vector<float> res(w*h);
-     memcpy(res.data(), mask.data, res.size()*sizeof(float));
-     return res;
+    // Perform high-quality star detection once at full resolution.
+    auto stars = m_sourceImage.detectStarsHQ();
+    
+    // Generate the star mask at the requested resolution (full or preview)
+    // using the centralized ImageBuffer method for consistency and performance.
+    return m_sourceImage.generateHQStarMask(stars, w, h);
 }
 
 std::vector<float> MaskGenerationDialog::getStarMask() const {

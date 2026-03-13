@@ -27,6 +27,7 @@
 #include "algos/StatisticalStretch.h"
 #include "io/FitsLoader.h"
 #include <opencv2/opencv.hpp>
+#include "photometry/StarDetector.h"
 
 ImageBuffer::ImageBuffer() : m_mutex(std::make_unique<QReadWriteLock>(QReadWriteLock::Recursive)) {}
 
@@ -2687,7 +2688,17 @@ void ImageBuffer::applySCNR(float amount, int method) {
     }
 }
 
-void ImageBuffer::applyMagentaCorrection(float amount, int method) {
+void ImageBuffer::applyMagentaCorrection(float mod_b, float threshold, bool withStarMask) {
+    if (mod_b >= 1.0f) return; // No correction (1.0 = 100% original blue)
+
+    // Optional Star Mask generation MUST be done before WriteLock 
+    // because it acquires a ReadLock internally (otherwise it deadlocks)
+    std::vector<float> starMask;
+    if (withStarMask) {
+        auto stars = detectStarsHQ();
+        starMask = generateHQStarMask(stars);
+    }
+
     WriteLock lock(this);
 
     if (m_data.empty() || m_channels < 3) return;
@@ -2697,40 +2708,60 @@ void ImageBuffer::applyMagentaCorrection(float amount, int method) {
 
     long total = static_cast<long>(m_width) * m_height;
 
-    // Magenta correction: suppress R and B channels where magenta dominates.
-    // ref is computed from the G channel using the selected protection method.
+    // Magenta correction: suppress B channel where magenta dominates (HSV based)
     #pragma omp parallel for
     for (long i = 0; i < total; ++i) {
-        long idx = i * m_channels;
+        long idx = i * 3;
         float r = m_data[idx + 0];
         float g = m_data[idx + 1];
         float b = m_data[idx + 2];
 
-        float ref = 0.0f;
-        switch (method) {
-            case 0: // Average Neutral: ref = G (green channel as neutral reference)
-                ref = g;
-                break;
-            case 1: // Maximum Neutral: ref = max(G, (R+B)/2) – conservative
-                ref = std::max(g, (r + b) / 2.0f);
-                break;
-            case 2: // Minimum Neutral: ref = min(G, (R+B)/2) – aggressive
-                ref = std::min(g, (r + b) / 2.0f);
-                break;
-            default:
-                ref = g;
-        }
+        float h, s, v_hsv;
+        rgbToHsv(r, g, b, h, s, v_hsv);
 
-        // Reduce R and B where they exceed the reference (magenta cast)
-        float r_mask = std::max(0.0f, r - ref);
-        float b_mask = std::max(0.0f, b - ref);
-        m_data[idx + 0] = r - amount * r_mask;
-        m_data[idx + 2] = b - amount * b_mask;
+        // "is_purple" test (Hue 0.40 to 0.99)
+        if (h >= 0.40f && h <= 0.99f) {
+            float luminance = 0.299f * r + 0.587f * g + 0.114f * b;
+            
+            bool apply = false;
+            if (withStarMask) {
+                if (starMask[i] > 0.01f) apply = true;
+            } else {
+                if (luminance > threshold) apply = true;
+            }
+
+            if (apply) {
+                // To neutralize magenta, we bring the blue channel down to match green
+                // mod_b = 1.0 means no effect (keep original b), 0.0 means fully override with green
+                float target_blue = g;
+                float b_new = b * mod_b + target_blue * (1.0f - mod_b);
+
+                m_data[idx + 2] = std::max(0.0f, std::min(1.0f, b_new));
+            }
+        }
     }
 
     if (hasMask()) {
         blendResult(original);
     }
+}
+
+void ImageBuffer::rgbToHsv(float r, float g, float b, float& h, float& s, float& v) {
+    float cmax = std::max({r, g, b});
+    float cmin = std::min({r, g, b});
+    float delta = cmax - cmin;
+    v = cmax;
+    if (delta == 0.0f) {
+        s = 0.0f;
+        h = 0.0f;
+        return;
+    }
+    s = delta / cmax;
+    if (cmax == r) h = (g - b) / delta;
+    else if (cmax == g) h = (b - r) / delta + 2.0f;
+    else h = (r - g) / delta + 4.0f;
+    h /= 6.0f;
+    if (h < 0.0f) h += 1.0f;
 }
 
 
@@ -3736,3 +3767,204 @@ void ImageBuffer::applyArcSinh(float stretchFactor, float blackPoint, bool human
 
 
 
+
+std::vector<ImageBuffer::HQStar> ImageBuffer::detectStarsHQ(int channel) const {
+    ReadLock lock(this);
+    const int w = m_width;
+    const int h = m_height;
+    const int ch = m_channels;
+    
+    // Default to Green for color images if -1, or luminance proxy
+    int targetCh = (channel < 0) ? (ch >= 3 ? 1 : 0) : std::clamp(channel, 0, ch - 1);
+
+    // 1. Gaussian blur (sigma=1.5) to reduce noise
+    std::vector<float> blurred(w * h);
+    StarDetector::gaussianBlur(m_data.data(), blurred.data(), w, h, ch, targetCh, 1.5f);
+
+    // 2. Background Estimation (robust noise estimate)
+    // We'll reuse computation from computeStats or a simple median
+    ChStats stats = computeStats(m_data, w, h, ch, targetCh);
+    float bg = stats.median;
+    float bgnoise = stats.mad; // robust noise estimate
+    
+    const float threshold = std::min(std::max(bg + 5.0f * bgnoise, bg + 0.01f), 0.98f);
+
+    std::vector<HQStar> stars;
+    const int r = 3;   // local-max neighborhood radius
+
+    for (int y = r; y < h - r; ++y) {
+        for (int x = r; x < w - r; ++x) {
+            const float pixel = blurred[y * w + x];
+            if (pixel <= threshold) continue;
+
+            // Check strict local maximum
+            bool isMax = true;
+            for (int dy = -r; dy <= r && isMax; ++dy) {
+                for (int dx = -r; dx <= r && isMax; ++dx) {
+                    if (dx == 0 && dy == 0) continue;
+                    const float neighbor = blurred[(y + dy) * w + (x + dx)];
+                    if (neighbor > pixel) {
+                        isMax = false;
+                    } else if (neighbor == pixel && (dx < 0 || (dx == 0 && dy < 0))) {
+                        isMax = false; 
+                    }
+                }
+            }
+            if (!isMax) continue;
+
+            const int peakX = x;
+            const int peakY = y;
+            x += r; 
+
+            // Plateau correction for saturated stars
+            float minhigh8 = 1.0f;
+            for (int dy = -1; dy <= 1; ++dy)
+                for (int dx = -1; dx <= 1; ++dx) {
+                    if (dx == 0 && dy == 0) continue;
+                    float nv = blurred[(peakY + dy) * w + (peakX + dx)];
+                    if (nv < minhigh8) minhigh8 = nv;
+                }
+            bool hasSaturated = (pixel >= 0.94f) && ((pixel - minhigh8) <= 0.04f);
+
+            int pCx = peakX, pCy = peakY;
+            int plateauExtR = 0, plateauExtD = 0;
+            if (hasSaturated) {
+                const float satFloor = pixel - 0.04f;
+                while (pCx + plateauExtR + 1 < w && blurred[pCy * w + (pCx + plateauExtR + 1)] >= satFloor)
+                    ++plateauExtR;
+                while (pCy + plateauExtD + 1 < h && blurred[(pCy + plateauExtD + 1) * w + pCx] >= satFloor)
+                    ++plateauExtD;
+                pCx = std::min(peakX + plateauExtR / 2, w - 1);
+                pCy = std::min(peakY + plateauExtD / 2, h - 1);
+                if (plateauExtR > r) x += (plateauExtR - r);
+            }
+
+            // Centroid refinement
+            const int refineR = 3;
+            float refinedCx = 0.f, refinedCy = 0.f, totalW = 0.f;
+            float peakVal = 0.f;
+            for (int py = std::max(0, pCy - refineR); py <= std::min(h - 1, pCy + refineR); ++py) {
+                for (int px = std::max(0, pCx - refineR); px <= std::min(w - 1, pCx + refineR); ++px) {
+                    const float val = m_data[(py * w + px) * ch + targetCh];
+                    const float weight = val * val; 
+                    refinedCx += px * weight;
+                    refinedCy += py * weight;
+                    totalW    += weight;
+                    if (val > peakVal) peakVal = val;
+                }
+            }
+            float cx = (totalW > 0.f) ? refinedCx / totalW : (float)pCx;
+            float cy = (totalW > 0.f) ? refinedCy / totalW : (float)pCy;
+
+            // FWHM-based radius
+            const float halfMax = bg + (peakVal - bg) * 0.5f;
+            const int maxScan = 40;
+            auto scanHalfWidth = [&](int dx, int dy) -> float {
+                for (int step = 1; step <= maxScan; ++step) {
+                    const int spx = std::clamp((int)std::round(cx) + dx * step, 0, w - 1);
+                    const int spy = std::clamp((int)std::round(cy) + dy * step, 0, h - 1);
+                    const float val = m_data[(spy * w + spx) * ch + targetCh];
+                    if (val < halfMax) {
+                        float prevVal = m_data[((spy - dy) * w + (spx - dx)) * ch + targetCh];
+                        float denom = prevVal - val;
+                        return (float)(step - 1) + (denom > 1e-6f ? (prevVal - halfMax) / denom : 0.5f);
+                    }
+                }
+                return (float)maxScan;
+            };
+
+            float radius = (scanHalfWidth(1,0) + scanHalfWidth(-1,0) + scanHalfWidth(0,1) + scanHalfWidth(0,-1)) * 0.25f;
+            radius = std::max(radius, 0.5f);
+
+            // Brightness and Color
+            float brightness = std::clamp((peakVal - bg) / (1.0f - bg + 1e-6f), 0.0f, 1.0f);
+            float sr=1, sg=1, sb=1;
+            if (ch >= 3) {
+                sr = m_data[(pCy * w + pCx) * ch + 0];
+                sg = m_data[(pCy * w + pCx) * ch + 1];
+                sb = m_data[(pCy * w + pCx) * ch + 2];
+            } else {
+                sr = sg = sb = m_data[pCy * w + pCx];
+            }
+
+            stars.push_back({cx, cy, brightness, radius, sr, sg, sb});
+        }
+    }
+
+    // Sort and merge close stars
+    std::sort(stars.begin(), stars.end(), [](const HQStar& a, const HQStar& b) {
+        return a.brightness > b.brightness;
+    });
+
+    std::vector<HQStar> merged;
+    for (const auto& s : stars) {
+        bool dup = false;
+        for (const auto& existing : merged) {
+            float dx = s.x - existing.x;
+            float dy = s.y - existing.y;
+            float mergeR = (existing.radius + s.radius) * 0.9f;
+            if (dx*dx + dy*dy < mergeR * mergeR) {
+                dup = true; break;
+            }
+        }
+        if (!dup) merged.push_back(s);
+    }
+
+    return merged;
+}
+
+std::vector<float> ImageBuffer::generateHQStarMask(const std::vector<HQStar>& stars, int targetW, int targetH) const {
+    ReadLock lock(this);
+    
+    const int originalW = m_width;
+    const int originalH = m_height;
+    const int w = (targetW > 0) ? targetW : originalW;
+    const int h = (targetH > 0) ? targetH : originalH;
+    
+    std::vector<float> mask(static_cast<size_t>(w) * h, 0.0f);
+    if (stars.empty()) return mask;
+
+    float scaleX = (float)w / originalW;
+    float scaleY = (float)h / originalH;
+    float meanScale = (scaleX + scaleY) / 2.0f;
+
+    // We draw soft circles for each star. 
+    // Mask value = 1.0 inside FWHM, then fades out. 
+    for (auto s : stars) {
+        // Scale to target resolution
+        s.x *= scaleX;
+        s.y *= scaleY;
+        s.radius *= meanScale;
+
+        float coreR = s.radius * 2.5f;
+        int x0 = std::max(0, (int)(s.x - coreR * 2.5f));
+        int x1 = std::min(w - 1, (int)(s.x + coreR * 2.5f));
+        int y0 = std::max(0, (int)(s.y - coreR * 2.5f));
+        int y1 = std::min(h - 1, (int)(s.y + coreR * 2.5f));
+
+        for (int y = y0; y <= y1; ++y) {
+            for (int x = x0; x <= x1; ++x) {
+                float dx = x - s.x;
+                float dy = y - s.y;
+                float dist = std::sqrt(dx*dx + dy*dy);
+                
+                // Linear fade from 1.0 at center to 0.0 at coreR*2
+                float val = 0.0f;
+                if (dist < coreR) val = 1.0f;
+                else if (dist < coreR * 2.0f) {
+                    val = 1.0f - (dist - coreR) / coreR;
+                }
+                
+                size_t idx = static_cast<size_t>(y) * w + x;
+                mask[idx] = std::max(mask[idx], val);
+            }
+        }
+    }
+
+    // Final global blur to smooth transitions
+    cv::Mat mat(h, w, CV_32FC1, mask.data());
+      cv::Mat blurredMask;
+      cv::GaussianBlur(mat, blurredMask, cv::Size(0,0), 2.0 * meanScale);
+      std::memcpy(mask.data(), blurredMask.ptr<float>(), mask.size() * sizeof(float));
+      return mask;
+}

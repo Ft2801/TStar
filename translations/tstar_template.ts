@@ -3618,7 +3618,7 @@
     <context>
         <name>MagentaCorrectionDialog</name>
         <message>
-            <source>Amount:</source>
+            <source>Amount (Mod B):</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3630,7 +3630,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Green Channel (Average Neutral)</source>
+            <source>Luma Threshold:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3638,15 +3638,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Maximum Neutral</source>
+            <source>Reduces magenta halos by modulating the\nblue channel based on green luminance and HSV purple detection.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Minimum Neutral</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Protection Method:</source>
+            <source>Restrict to Stars (Star Mask)</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -7408,7 +7404,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Views</source>
+            <source>Previews</source>
             <translation type="unfinished" />
         </message>
     </context>

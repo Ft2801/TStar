@@ -206,29 +206,19 @@ public:
     // SCNR
     void applySCNR(float amount, int method);
     
-    // Magenta Correction: reduces R and B where they exceed green
-    void applyMagentaCorrection(float amount, int method);
+    // Magenta Correction:
+    // mod_b: 0.0 (max correction) to 1.0 (no correction)
+    // threshold: luminance threshold
+    void applyMagentaCorrection(float mod_b, float threshold, bool withStarMask);
     
-    // Color Saturation
-    struct SaturationParams {
-        float amount = 1.0f;     // 1.0 = No change, >1.0 = Boost
-        float bgFactor = 1.0f; // Power factor for intensity masking
-        float hueCenter = 0.0f;  // 0-360
-        float hueWidth = 360.0f; // 0-360
-        float hueSmooth = 30.0f; // Transition width
-    };
-    void applySaturation(const SaturationParams& params);
-    void applyArcSinh(float stretchFactor);
-    void applyArcSinh(float stretchFactor, float blackPoint, bool humanLuminance); // Full version
-    
-    // Stats Helper
+    // Stats & Pixel Access
     float getChannelMedian(int channelIndex) const;
     float getChannelMAD(int channelIndex, float median) const;
-    float getRobustMedian(int channelIndex, float t0, float t1) const; 
+    float getRobustMedian(int channelIndex, float t0, float t1) const;
     float getPixelValue(int x, int y, int c) const;
     float value(int x, int y, int c = 0) const { return getPixelValue(x, y, c); }
-    float& value(int x, int y, int c = 0) { 
-        return m_data[(static_cast<size_t>(y) * m_width + x) * m_channels + c]; 
+    float& value(int x, int y, int c = 0) {
+        return m_data[(static_cast<size_t>(y) * m_width + x) * m_channels + c];
     }
     float getPixelFlat(size_t index, int c) const;
     float getAreaMean(int x, int y, int w, int h, int c) const;
@@ -286,22 +276,75 @@ public:
     const Metadata& metadata() const { return m_meta; }
     Metadata& metadata() { return m_meta; }
     
-    // Computes clipping stats (pixels <= 0 and >= 1) - Parallelized
-    void computeClippingStats(long& lowClip, long& highClip) const;
-
-    // Histogram
-    std::vector<std::vector<int>> computeHistogram(int bins = 256) const;
-
     // Name Tracking
     void setName(const QString& name) { m_name = name; }
     QString name() const { return m_name; }
 
     bool isModified() const { return m_modified; }
     void setModified(bool modified) { m_modified = modified; }
-    
+
+    // Color Saturation
+    struct SaturationParams {
+        float amount = 1.0f;     // 1.0 = No change, >1.0 = Boost
+        float bgFactor = 1.0f; // Power factor for intensity masking
+        float hueCenter = 0.0f;  // 0-360
+        float hueWidth = 360.0f; // 0-360
+        float hueSmooth = 30.0f; // Transition width
+    };
+    void applySaturation(const SaturationParams& params);
+    void applyArcSinh(float stretchFactor);
+    void applyArcSinh(float stretchFactor, float blackPoint, bool humanLuminance); // Full version
+
+    // Computes clipping stats (pixels <= 0 and >= 1) - Parallelized
+    void computeClippingStats(long& lowClip, long& highClip) const;
+
+    // Histogram
+    std::vector<std::vector<int>> computeHistogram(int bins = 256) const;
+
     // Synchronize WCS struct values back to rawHeaders vector
     void syncWcsToHeaders();
+
+    // Star Extraction & Masking helper structs
+    struct DetectedStar {
+        float x, y;
+        float flux;
+        float peak;
+        float a, b, theta; // Ellipse parameters
+        float hfr; // Half Flux Radius (~FWHM/2.35 usually, or direct HFR)
+    };
     
+    // High Quality Star Struct (AstroSpike-aligned)
+    struct HQStar {
+        float x, y;
+        float brightness; // 0.0 to 1.0 (relative to local dynamic range)
+        float radius;     // FWHM-based radius
+        float r, g, b;    // Average color in core
+    };
+    
+    // Extract stars (Single Channel input)
+    // sigma: detection threshold above background RMS
+    static std::vector<DetectedStar> extractStars(const std::vector<float>& src, int w, int h, float sigma = 3.0f, int minArea = 5);
+    
+    // High Quality Star Detection (ported from AstroSpike)
+    // returns stars detected using the refined DAOFIND-style algorithm
+    std::vector<HQStar> detectStarsHQ(int channel = -1) const; // -1 = Luminance, 0-2 = specific channel
+
+    // Generate a high-quality star mask
+    // Returns a flat float buffer (0.0 to 1.0) of size targetW * targetH (or m_width * m_height if -1)
+    std::vector<float> generateHQStarMask(const std::vector<HQStar>& stars, int targetW = -1, int targetH = -1) const;
+
+    // Wavelet Utilities
+    // Convolve 1D Separable with Reflect Padding and optional holes (dilation) based on scale
+    // Returns a SINGLE CHANNEL float buffer.
+    static std::vector<float> convolveSepReflect(const std::vector<float>& src, int w, int h, const std::vector<float>& kernel, int scale = 0);
+    
+    // Decompose into planes (Detail 0..N-1, Residual). Expects Single Channel input.
+    // Returns vector of flat float buffers.
+    static std::vector<std::vector<float>> atrousDecompose(const std::vector<float>& src, int w, int h, int n_scales);
+    
+    // Reconstruct from planes
+    static std::vector<float> atrousReconstruct(const std::vector<std::vector<float>>& planes, int w, int h);
+
     // Thread Safety: Lock/Unlock for multi-threaded access
     // Usage: buffer.lockRead(); /* read data */ buffer.unlock();
     // Or:    buffer.lockWrite(); /* modify data */ buffer.unlock();
@@ -348,6 +391,11 @@ public:
     };
 
 private:
+    static void rgbToHsv(float r, float g, float b, float& h, float& s, float& v);
+    
+    // Agile Autostretch (Display only)
+    std::vector<float> computeAgileLUT(int channelIndex, float targetMedian = 0.25f);
+
     int m_width = 0;
     int m_height = 0;
     int m_channels = 1; 
@@ -370,37 +418,6 @@ private:
     mutable qint64 m_lastAccess = 0;
     bool m_isSwapped = false;
     QString m_swapFile;
-
-
-    // Agile Autostretch (Display only)
-    std::vector<float> computeAgileLUT(int channelIndex, float targetMedian = 0.25f);
-    
-public:
-    // Wavelet Utilities
-    // Convolve 1D Separable with Reflect Padding and optional holes (dilation) based on scale
-    // Returns a SINGLE CHANNEL float buffer.
-    static std::vector<float> convolveSepReflect(const std::vector<float>& src, int w, int h, const std::vector<float>& kernel, int scale = 0);
-    
-    // Decompose into planes (Detail 0..N-1, Residual). Expects Single Channel input.
-    // Returns vector of flat float buffers.
-    static std::vector<std::vector<float>> atrousDecompose(const std::vector<float>& src, int w, int h, int n_scales);
-    
-    // Reconstruct from planes
-    static std::vector<float> atrousReconstruct(const std::vector<std::vector<float>>& planes, int w, int h);
-    
-    // Star Extraction Struct
-    struct DetectedStar {
-        float x, y;
-        float flux;
-        float peak;
-        float a, b, theta; // Ellipse parameters
-        float hfr; // Half Flux Radius (~FWHM/2.35 usually, or direct HFR)
-    };
-    
-    // Extract stars (Single Channel input)
-    // sigma: detection threshold above background RMS
-    static std::vector<DetectedStar> extractStars(const std::vector<float>& src, int w, int h, float sigma = 3.0f, int minArea = 5);
-    
 };
 
 #endif // IMAGEBUFFER_H

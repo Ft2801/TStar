@@ -1596,6 +1596,11 @@ CustomMdiSubWindow* MainWindow::createNewImageWindow(const ImageBuffer& buffer, 
                 m_rightSidebar->removeThumbnail(sub);
             }
         });
+        
+        // Ensure thumbnail is removed if the window is closed while shaded
+        connect(sub, &CustomMdiSubWindow::destroyed, this, [this, sub]() {
+            if (m_rightSidebar) m_rightSidebar->removeThumbnail(sub);
+        });
     }
     
     // Restore maximized state of windows that were maximized before
@@ -2459,11 +2464,12 @@ void MainWindow::openMagentaCorrectionDialog() {
     connect(dlg, &MagentaCorrectionDialog::apply, this, [this, dlg]() {
         ImageViewer* v = currentViewer();
         if (!v) return;
-        float amount = dlg->getAmount();
-        int method = static_cast<int>(dlg->getMethod());
+        float mod_b = dlg->getAmount();
+        float threshold = dlg->getThreshold();
+        bool starmask = dlg->isWithStarMask();
 
         v->pushUndo();
-        v->getBuffer().applyMagentaCorrection(amount, method);
+        v->getBuffer().applyMagentaCorrection(mod_b, threshold, starmask);
         v->setBuffer(v->getBuffer(), v->windowTitle(), true);
         log(tr("Magenta Correction applied."), Log_Success, true);
     });

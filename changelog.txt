@@ -1,6 +1,13 @@
 TStar Changelog
 ===============
 
+Version 1.7.8
+-------------
+- Added right side panel to show previews of the collapsed views
+- Added magenta correction tool
+- Collapsed views now have consistent titlebar width
+- Unified star detection logic derived from AstroSpike
+
 Version 1.7.7
 -------------
 - Forced windows app uninstall/reinstall to fix python environment

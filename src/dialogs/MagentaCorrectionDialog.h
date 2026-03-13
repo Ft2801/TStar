@@ -2,26 +2,20 @@
 #define MAGENTACORRECTIONDIALOG_H
 
 #include "DialogBase.h"
-#include <QPointer>
-#include "../ImageViewer.h"
-#include <QComboBox>
+#include <QCheckBox>
 #include <QSlider>
 #include <QDoubleSpinBox>
+#include <QPointer>
 
 class MagentaCorrectionDialog : public DialogBase {
     Q_OBJECT
 public:
-    enum ProtectionMethod {
-        GreenChannel,    // Use G as neutral reference (average neutral)
-        MaximumNeutral,  // Conservative
-        MinimumNeutral   // Aggressive
-    };
-
     explicit MagentaCorrectionDialog(QWidget* parent = nullptr);
     ~MagentaCorrectionDialog();
 
     float getAmount() const;
-    ProtectionMethod getMethod() const;
+    float getThreshold() const;
+    bool isWithStarMask() const;
 
     void setViewer(class ImageViewer* v);
 
@@ -31,9 +25,11 @@ signals:
 private:
     QPointer<class ImageViewer> m_viewer;
 
-    QComboBox* m_methodCombo;
     QSlider* m_amountSlider;
     QDoubleSpinBox* m_amountSpin;
+    QSlider* m_threshSlider;
+    QDoubleSpinBox* m_threshSpin;
+    QCheckBox* m_starMaskCheck;
 };
 
 #endif // MAGENTACORRECTIONDIALOG_H

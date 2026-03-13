@@ -373,17 +373,11 @@ CustomTitleBar::CustomTitleBar(QWidget *parent) : QWidget(parent) {
     m_closeBtn = new QPushButton(this);
     configBtn(m_closeBtn, Icons::WIN_CLOSE, "#c00");
 
-    // Balance layout for centering
-    int buttonsWidth = 3 * btnSize + 2 * DpiHelper::scale(4, this); 
-    
-    m_leftSpacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    // Right-aligned buttons
     m_rightSpacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    // Add fixed spacing to match buttons width on the right
-    layout->addSpacing(buttonsWidth); 
-    layout->addSpacerItem(m_leftSpacer);
-    layout->addWidget(m_zoomLabel); 
     layout->addWidget(m_titleLabel);
+    layout->addWidget(m_zoomLabel); 
     layout->addSpacerItem(m_rightSpacer);
     layout->addWidget(m_minBtn);
     layout->addWidget(m_maxBtn);
@@ -403,7 +397,7 @@ void CustomTitleBar::setTitle(const QString& title) {
         QFontMetrics fm(m_titleLabel->font());
         int btnSize = DpiHelper::buttonSize(this);
         int buttonsW = 3 * btnSize + DpiHelper::scale(20, this);
-        int available = DpiHelper::minShadedWidth(this) - buttonsW - DpiHelper::scale(16, this);
+        int available = 1.5 * DpiHelper::minShadedWidth(this) - buttonsW - DpiHelper::scale(16, this);
         m_titleLabel->setText(fm.elidedText(title, Qt::ElideRight, std::max(available, 20)));
     } else {
         m_titleLabel->setText(title);
@@ -835,10 +829,11 @@ void CustomMdiSubWindow::toggleShade() {
         
         qDebug() << "  SHADING: saving m_wasMaximized =" << m_wasMaximized << ", originalSize =" << m_originalWidth << "x" << m_originalHeight;
 
-        // Capture thumbnail BEFORE hiding content area
-        QPixmap thumb = m_contentArea->isVisible()
-                        ? m_contentArea->grab()
-                        : QPixmap();
+        // Capture thumbnail BEFORE hiding content area - grab only the image viewport!
+        ImageViewer* v = viewer();
+        QPixmap thumb = (v && v->viewport()) 
+                        ? v->viewport()->grab() 
+                        : (m_contentArea->isVisible() ? m_contentArea->grab() : QPixmap());
         
         m_contentArea->hide();
         int newH = m_titleBar->height() + DpiHelper::borderWidth(this);

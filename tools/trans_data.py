@@ -3198,4 +3198,8 @@ TRANSLATIONS = {
     "Tile Images Horizontal": {'it': 'Affianca Immagini Orizzontalmente', 'es': 'Mosaico de imágenes horizontal', 'fr': 'Mosaïque d\'images horizontale', 'de': 'Bilder horizontal kacheln'},
     "Tile Images Vertical": {'it': 'Affianca Immagini Verticalmente', 'es': 'Mosaico de imágenes vertical', 'fr': 'Mosaïque d\'images verticale', 'de': 'Bilder vertikal kacheln'},
     "Collapsed Views": {'it': 'Anteprime compresse', 'es': 'Vistas comprimidas', 'fr': 'Vues compressées', 'de': 'Komprimierte Ansichten'},
+    "Amount (Mod B):": {'it': 'Quantità (Mod B):', 'es': 'Cantidad (Mod B):', 'fr': 'Quantité (Mod B) :', 'de': 'Menge (Mod B):'},
+    "Luma Threshold:": {'it': 'Soglia Luma:', 'es': 'Umbral de Luma:', 'fr': 'Seuil de Luma :', 'de': 'Luminanz-Schwellenwert:'},
+    "Reduces magenta halos by modulating the\\nblue channel based on green luminance and HSV purple detection.": {'it': 'Riduce gli aloni magenta modulando il\ncanale blu in base alla luminanza del verde e al rilevamento HSV del viola.', 'es': 'Reduce los halos magenta modulando el\ncanal azul en función de la luminancia verde y la detección de púrpura HSV.', 'fr': 'Réduit les halos magenta en modulant le\ncanal bleu en fonction de la luminance verte et de la détection du pourpre HSV.', 'de': 'Reduziert Magenta-Farbsäume durch Modulation des\nBlaukanals basierend auf der Grün-Luminanz und HSV-Purpur-Erkennung.'},
+    "Restrict to Stars (Star Mask)": {'it': 'Limita alle Stelle (Maschera Stelle)', 'es': 'Restringir a Estrellas (Máscara de Estrellas)', 'fr': 'Restreindre aux étoiles (Masque d\'étoiles)', 'de': 'Auf Sterne beschränken (Sternmaske)'},
 }

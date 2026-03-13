@@ -111,7 +111,7 @@ private:
     QPushButton* m_minBtn;
     QPushButton* m_maxBtn;
     QPushButton* m_closeBtn;
-    QSpacerItem* m_leftSpacer;
+    // QSpacerItem* m_leftSpacer;
     QSpacerItem* m_rightSpacer;
     QPoint m_dragPos;
     bool m_active = false;

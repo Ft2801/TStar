@@ -26,8 +26,8 @@ class QEvent;
 class RightSidebarWidget : public QWidget {
     Q_OBJECT
 public:
-    static constexpr int THUMB_W = 120;
-    static constexpr int THUMB_H = 90;
+    static constexpr int THUMB_W = 160;
+    static constexpr int THUMB_H = 120;
 
     explicit RightSidebarWidget(QWidget* parent = nullptr);
 

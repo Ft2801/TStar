@@ -3618,6 +3618,38 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         </message>
     </context>
     <context>
+        <name>MagentaCorrectionDialog</name>
+        <message>
+            <source>Amount (Mod B):</source>
+            <translation type="finished">Quantità (Mod B):</translation>
+        </message>
+        <message>
+            <source>Apply</source>
+            <translation type="finished">Applica</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Chiudi</translation>
+        </message>
+        <message>
+            <source>Luma Threshold:</source>
+            <translation type="finished">Soglia Luma:</translation>
+        </message>
+        <message>
+            <source>Magenta Correction</source>
+            <translation type="finished">Correzione Magenta</translation>
+        </message>
+        <message>
+            <source>Reduces magenta halos by modulating the\nblue channel based on green luminance and HSV purple detection.</source>
+            <translation type="finished">Riduce gli aloni magenta modulando il
+canale blu in base alla luminanza del verde e al rilevamento HSV del viola.</translation>
+        </message>
+        <message>
+            <source>Restrict to Stars (Star Mask)</source>
+            <translation type="finished">Limita alle Stelle (Maschera Stelle)</translation>
+        </message>
+    </context>
+    <context>
         <name>MainWindow</name>
         <message>
             <source />
@@ -3750,6 +3782,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Are you sure you want to exit?</source>
             <translation type="finished">Sei sicuro di voler uscire?</translation>
+        </message>
+        <message>
+            <source>Arranged %1 images horizontally.</source>
+            <translation type="finished">Disposte %1 immagini orizzontalmente.</translation>
+        </message>
+        <message>
+            <source>Arranged %1 images vertically.</source>
+            <translation type="finished">Disposte %1 immagini verticalmente.</translation>
         </message>
         <message>
             <source>AstroSpike (Diffraction Spikes)</source>
@@ -4164,6 +4204,18 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Luminanza ricombinata.</translation>
         </message>
         <message>
+            <source>Magenta Correction</source>
+            <translation type="finished">Correzione Magenta</translation>
+        </message>
+        <message>
+            <source>Magenta Correction applied.</source>
+            <translation type="finished">Correzione Magenta applicata.</translation>
+        </message>
+        <message>
+            <source>Magenta Correction requires a color image.</source>
+            <translation type="finished">La correzione Magenta richiede un'immagine a colori.</translation>
+        </message>
+        <message>
             <source>Main Toolbar</source>
             <translation type="finished">Barra degli Strumenti Principale</translation>
         </message>
@@ -4234,6 +4286,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>No image loaded. Cannot open Aberration Inspector.</source>
             <translation type="finished">Nessuna immagine caricata. Impossibile aprire Aberration Inspector.</translation>
+        </message>
+        <message>
+            <source>No images to arrange.</source>
+            <translation type="finished">Nessuna immagine da disporre.</translation>
         </message>
         <message>
             <source>No mask to remove.</source>
@@ -4386,6 +4442,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Opening Histogram Transformation...</source>
             <translation type="finished">Apertura Trasformazione Istogramma...</translation>
+        </message>
+        <message>
+            <source>Opening Magenta Correction Tool...</source>
+            <translation type="finished">Apertura dello strumento Correzione Magenta...</translation>
         </message>
         <message>
             <source>Opening Multiscale Decomposition...</source>
@@ -4785,8 +4845,16 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Temperatura / Tinta applicata definitivamente</translation>
         </message>
         <message>
-            <source>Tile Images</source>
-            <translation type="finished">Affianca Immagini</translation>
+            <source>Tile Images (Smart Grid)</source>
+            <translation type="finished">Affianca Immagini (Griglia Intelligente)</translation>
+        </message>
+        <message>
+            <source>Tile Images Horizontal</source>
+            <translation type="finished">Affianca Immagini Orizzontalmente</translation>
+        </message>
+        <message>
+            <source>Tile Images Vertical</source>
+            <translation type="finished">Affianca Immagini Verticalmente</translation>
         </message>
         <message>
             <source>Tiled %1 images in %2x%3 layout.</source>
@@ -7331,6 +7399,17 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Status</source>
             <translation type="finished">Stato</translation>
+        </message>
+    </context>
+    <context>
+        <name>RightSidebarWidget</name>
+        <message>
+            <source>Collapsed Views</source>
+            <translation type="finished">Anteprime compresse</translation>
+        </message>
+        <message>
+            <source>Previews</source>
+            <translation type="finished">Anteprime</translation>
         </message>
     </context>
     <context>

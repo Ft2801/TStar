@@ -4,10 +4,11 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QIcon>
+#include <QCheckBox>
 #include "../ImageViewer.h"
 
 MagentaCorrectionDialog::MagentaCorrectionDialog(QWidget* parent)
-    : DialogBase(parent, tr("Magenta Correction"), 350, 210) {
+    : DialogBase(parent, tr("Magenta Correction"), 380, 240) {
     setModal(false);
     setWindowModality(Qt::NonModal);
     setWindowIcon(QIcon(":/images/Logo.png"));
@@ -15,55 +16,65 @@ MagentaCorrectionDialog::MagentaCorrectionDialog(QWidget* parent)
     QVBoxLayout* layout = new QVBoxLayout(this);
 
     // Description
-    QLabel* desc = new QLabel(tr("Reduces magenta cast by suppressing excess red and blue channels,\n"
-                                 "using the green channel as neutral reference."), this);
+    QLabel* desc = new QLabel(tr("Reduces magenta halos by modulating the\nblue channel based on green luminance and HSV purple detection."), this);
     desc->setStyleSheet("color: #aaa; font-size: 11px;");
     desc->setWordWrap(true);
     layout->addWidget(desc);
 
-    // Method
-    QHBoxLayout* methodLayout = new QHBoxLayout();
-    methodLayout->addWidget(new QLabel(tr("Protection Method:")));
-    m_methodCombo = new QComboBox();
-    m_methodCombo->addItem(tr("Green Channel (Average Neutral)"), GreenChannel);
-    m_methodCombo->addItem(tr("Maximum Neutral"),                 MaximumNeutral);
-    m_methodCombo->addItem(tr("Minimum Neutral"),                 MinimumNeutral);
-    m_methodCombo->setStyleSheet(
-        "QComboBox { color: white; background-color: #2a2a2a; border: 1px solid #555; padding: 2px; border-radius: 3px; }"
-        "QComboBox:focus { border: 2px solid #4a9eff; }"
-        "QComboBox::drop-down { border: none; }"
-        "QComboBox::down-arrow { image: url(:/images/dropdown.png); }"
-        "QComboBox QAbstractItemView { color: white; background-color: #2a2a2a; outline: none; }"
-        "QComboBox QAbstractItemView::item { padding: 3px; margin: 0px; }"
-        "QComboBox QAbstractItemView::item:hover { background-color: #4a7ba7 !important; color: white; }"
-        "QComboBox QAbstractItemView::item:selected { background-color: #4a7ba7; color: white; }"
-    );
-    methodLayout->addWidget(m_methodCombo);
-    layout->addLayout(methodLayout);
-
     // Amount
+    // 1.0 = No change, 0.0 = Full modulation
     QHBoxLayout* amountLayout = new QHBoxLayout();
-    amountLayout->addWidget(new QLabel(tr("Amount:")));
+    amountLayout->addWidget(new QLabel(tr("Amount (Mod B):")));
 
     m_amountSlider = new QSlider(Qt::Horizontal);
     m_amountSlider->setRange(0, 100);
-    m_amountSlider->setValue(100);
+    m_amountSlider->setValue(50); // Default to some effect
 
     m_amountSpin = new QDoubleSpinBox();
     m_amountSpin->setRange(0.0, 1.0);
-    m_amountSpin->setSingleStep(0.1);
-    m_amountSpin->setValue(1.0);
+    m_amountSpin->setSingleStep(0.05);
+    m_amountSpin->setValue(0.5);
 
     amountLayout->addWidget(m_amountSlider);
     amountLayout->addWidget(m_amountSpin);
     layout->addLayout(amountLayout);
 
-    // Sync slider <-> spinbox
+    // Threshold (Luminance)
+    QHBoxLayout* threshLayout = new QHBoxLayout();
+    threshLayout->addWidget(new QLabel(tr("Luma Threshold:")));
+
+    m_threshSlider = new QSlider(Qt::Horizontal);
+    m_threshSlider->setRange(0, 100);
+    m_threshSlider->setValue(10); // Default low threshold
+
+    m_threshSpin = new QDoubleSpinBox();
+    m_threshSpin->setRange(0.0, 1.0);
+    m_threshSpin->setSingleStep(0.01);
+    m_threshSpin->setValue(0.1);
+
+    threshLayout->addWidget(m_threshSlider);
+    threshLayout->addWidget(m_threshSpin);
+    layout->addLayout(threshLayout);
+
+    // Star Mask
+    m_starMaskCheck = new QCheckBox(tr("Restrict to Stars (Star Mask)"));
+    m_starMaskCheck->setStyleSheet("color: white;");
+    layout->addWidget(m_starMaskCheck);
+
+    // Sync slider <-> spinbox for Amount
     connect(m_amountSlider, &QSlider::valueChanged, [this](int val) {
         m_amountSpin->setValue(val / 100.0);
     });
     connect(m_amountSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [this](double val) {
         m_amountSlider->setValue(static_cast<int>(val * 100));
+    });
+
+    // Sync slider <-> spinbox for Threshold
+    connect(m_threshSlider, &QSlider::valueChanged, [this](int val) {
+        m_threshSpin->setValue(val / 100.0);
+    });
+    connect(m_threshSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [this](double val) {
+        m_threshSlider->setValue(static_cast<int>(val * 100));
     });
 
     // Buttons
@@ -89,6 +100,10 @@ float MagentaCorrectionDialog::getAmount() const {
     return static_cast<float>(m_amountSpin->value());
 }
 
-MagentaCorrectionDialog::ProtectionMethod MagentaCorrectionDialog::getMethod() const {
-    return static_cast<ProtectionMethod>(m_methodCombo->currentData().toInt());
+float MagentaCorrectionDialog::getThreshold() const {
+    return static_cast<float>(m_threshSpin->value());
+}
+
+bool MagentaCorrectionDialog::isWithStarMask() const {
+    return m_starMaskCheck->isChecked();
 }

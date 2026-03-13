@@ -76,6 +76,10 @@ public:
     // ── Main entry point ──
     std::vector<DetectedStar> detect(const ImageBuffer& image, int channel = 0);
 
+    // Separable Gaussian blur (σ = KERNEL_SIZE = 2.0)
+    static void gaussianBlur(const float* src, float* dst,
+                             int w, int h, int ch, int channel, float sigma);
+
 private:
     StarFinderParams m_params;
     float  m_minFWHM  = 0.5f;
@@ -88,10 +92,6 @@ private:
         double max     = 0.0;
     };
     BgStats computeBackground(const float* data, int w, int h, int ch, int channel) const;
-
-    // Separable Gaussian blur (σ = KERNEL_SIZE = 2.0)
-    static void gaussianBlur(const float* src, float* dst,
-                             int w, int h, int ch, int channel, float sigma);
 
     // Rejection criteria
     enum class RejectReason {
