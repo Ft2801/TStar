@@ -845,7 +845,7 @@ void CustomMdiSubWindow::toggleShade() {
         
         // Use a fixed shaded width for all windows so the UI stays uniform
         // regardless of filename/title length (Task 2: fixed-width collapsed bar)
-        int totalW = DpiHelper::minShadedWidth(this); 
+        int totalW = 1.5 * DpiHelper::minShadedWidth(this); 
         
         // Center Collapse Implementation (Horizontal Center, Vertical Top)
         int newX = center.x() - totalW / 2;

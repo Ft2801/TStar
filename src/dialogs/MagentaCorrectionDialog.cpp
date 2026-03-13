@@ -16,7 +16,7 @@ MagentaCorrectionDialog::MagentaCorrectionDialog(QWidget* parent)
 
     // Description
     QLabel* desc = new QLabel(tr("Reduces magenta cast by suppressing excess red and blue channels,\n"
-                                 "using the green channel as neutral reference (Siril-style)."), this);
+                                 "using the green channel as neutral reference."), this);
     desc->setStyleSheet("color: #aaa; font-size: 11px;");
     desc->setWordWrap(true);
     layout->addWidget(desc);

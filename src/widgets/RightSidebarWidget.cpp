@@ -89,6 +89,31 @@ private:
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// VerticalButton: rotated text button for sidebar
+// ─────────────────────────────────────────────────────────────────────────────
+class VerticalButton : public QPushButton {
+public:
+    VerticalButton(const QString& text, QWidget* parent = nullptr) : QPushButton(text, parent) {}
+    QSize sizeHint() const override {
+        QSize s = QPushButton::sizeHint();
+        return QSize(s.height(), s.width());
+    }
+protected:
+    void paintEvent(QPaintEvent*) override {
+        QPainter p(this);
+        p.setRenderHint(QPainter::Antialiasing);
+        if (isChecked()) p.fillRect(rect(), QColor("#0055aa"));
+        else if (underMouse()) p.fillRect(rect(), QColor("#444"));
+        p.save();
+        p.translate(width(), 0);
+        p.rotate(90);
+        p.setPen(isChecked() ? Qt::white : QColor("#ccc"));
+        p.drawText(QRect(0, 0, height(), width()), Qt::AlignCenter, text());
+        p.restore();
+    }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // RightSidebarWidget
 // ─────────────────────────────────────────────────────────────────────────────
 RightSidebarWidget::RightSidebarWidget(QWidget* parent)
@@ -127,7 +152,7 @@ RightSidebarWidget::RightSidebarWidget(QWidget* parent)
     tabLayout->setContentsMargins(2, 5, 2, 5);
     tabLayout->setSpacing(5);
 
-    m_tabBtn = new QPushButton(tr("Views"), m_tabContainer);
+    m_tabBtn = new VerticalButton(tr("Previews"), m_tabContainer);
     m_tabBtn->setCheckable(true);
     m_tabBtn->setFixedSize(30, 100);
     m_tabBtn->setToolTip(tr("Collapsed Views"));

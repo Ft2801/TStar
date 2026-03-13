@@ -3616,6 +3616,41 @@
         </message>
     </context>
     <context>
+        <name>MagentaCorrectionDialog</name>
+        <message>
+            <source>Amount:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Apply</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Green Channel (Average Neutral)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Magenta Correction</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Maximum Neutral</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Minimum Neutral</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Protection Method:</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>MainWindow</name>
         <message>
             <source />
@@ -3747,6 +3782,14 @@
         </message>
         <message>
             <source>Are you sure you want to exit?</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Arranged %1 images horizontally.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Arranged %1 images vertically.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4162,6 +4205,18 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Magenta Correction</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Magenta Correction applied.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Magenta Correction requires a color image.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Main Toolbar</source>
             <translation type="unfinished" />
         </message>
@@ -4231,6 +4286,10 @@
         </message>
         <message>
             <source>No image loaded. Cannot open Aberration Inspector.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No images to arrange.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4383,6 +4442,10 @@
         </message>
         <message>
             <source>Opening Histogram Transformation...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening Magenta Correction Tool...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4782,7 +4845,15 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Tile Images</source>
+            <source>Tile Images (Smart Grid)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Tile Images Horizontal</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Tile Images Vertical</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -7327,6 +7398,17 @@
         </message>
         <message>
             <source>Status</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>RightSidebarWidget</name>
+        <message>
+            <source>Collapsed Views</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Views</source>
             <translation type="unfinished" />
         </message>
     </context>

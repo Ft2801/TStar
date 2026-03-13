@@ -2698,7 +2698,6 @@ void ImageBuffer::applyMagentaCorrection(float amount, int method) {
     long total = static_cast<long>(m_width) * m_height;
 
     // Magenta correction: suppress R and B channels where magenta dominates.
-    // Similar to Siril's green channel protection but applied to R and B.
     // ref is computed from the G channel using the selected protection method.
     #pragma omp parallel for
     for (long i = 0; i < total; ++i) {
