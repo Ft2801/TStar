@@ -2687,7 +2687,54 @@ void ImageBuffer::applySCNR(float amount, int method) {
     }
 }
 
-void ImageBuffer::cropRotated(float cx, float cy, float w, float h, float angleDegrees) {
+void ImageBuffer::applyMagentaCorrection(float amount, int method) {
+    WriteLock lock(this);
+
+    if (m_data.empty() || m_channels < 3) return;
+
+    ImageBuffer original;
+    if (hasMask()) original = *this;
+
+    long total = static_cast<long>(m_width) * m_height;
+
+    // Magenta correction: suppress R and B channels where magenta dominates.
+    // Similar to Siril's green channel protection but applied to R and B.
+    // ref is computed from the G channel using the selected protection method.
+    #pragma omp parallel for
+    for (long i = 0; i < total; ++i) {
+        long idx = i * m_channels;
+        float r = m_data[idx + 0];
+        float g = m_data[idx + 1];
+        float b = m_data[idx + 2];
+
+        float ref = 0.0f;
+        switch (method) {
+            case 0: // Average Neutral: ref = G (green channel as neutral reference)
+                ref = g;
+                break;
+            case 1: // Maximum Neutral: ref = max(G, (R+B)/2) – conservative
+                ref = std::max(g, (r + b) / 2.0f);
+                break;
+            case 2: // Minimum Neutral: ref = min(G, (R+B)/2) – aggressive
+                ref = std::min(g, (r + b) / 2.0f);
+                break;
+            default:
+                ref = g;
+        }
+
+        // Reduce R and B where they exceed the reference (magenta cast)
+        float r_mask = std::max(0.0f, r - ref);
+        float b_mask = std::max(0.0f, b - ref);
+        m_data[idx + 0] = r - amount * r_mask;
+        m_data[idx + 2] = b - amount * b_mask;
+    }
+
+    if (hasMask()) {
+        blendResult(original);
+    }
+}
+
+
     WriteLock lock(this);  // Thread-safe write access
     if (m_data.empty()) return;
     if (w <= 1 || h <= 1) return;

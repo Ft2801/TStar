@@ -397,7 +397,17 @@ CustomTitleBar::CustomTitleBar(QWidget *parent) : QWidget(parent) {
 }
 
 void CustomTitleBar::setTitle(const QString& title) {
-    m_titleLabel->setText(title);
+    m_titleLabel->setProperty("fullTitle", title);
+    if (m_shaded) {
+        // Elide title to fit fixed shaded width
+        QFontMetrics fm(m_titleLabel->font());
+        int btnSize = DpiHelper::buttonSize(this);
+        int buttonsW = 3 * btnSize + DpiHelper::scale(20, this);
+        int available = DpiHelper::minShadedWidth(this) - buttonsW - DpiHelper::scale(16, this);
+        m_titleLabel->setText(fm.elidedText(title, Qt::ElideRight, std::max(available, 20)));
+    } else {
+        m_titleLabel->setText(title);
+    }
 }
 
 void CustomTitleBar::setActive(bool active) {
@@ -411,6 +421,10 @@ void CustomTitleBar::setShaded(bool shaded) {
     m_minBtn->setIcon(iconFromSvg(m_shaded ? Icons::WIN_UNSHADE : Icons::WIN_SHADE));
     // Hide maximize button when shaded
     setMaximizeButtonVisible(!shaded);
+    // Re-apply title with correct elision for shaded state
+    QString fullTitle = m_titleLabel->property("fullTitle").toString();
+    if (fullTitle.isEmpty()) fullTitle = m_titleLabel->text();
+    setTitle(fullTitle);
 }
 
 void CustomTitleBar::setZoom(int percent) {
@@ -820,23 +834,27 @@ void CustomMdiSubWindow::toggleShade() {
         m_originalWidth = width(); 
         
         qDebug() << "  SHADING: saving m_wasMaximized =" << m_wasMaximized << ", originalSize =" << m_originalWidth << "x" << m_originalHeight;
+
+        // Capture thumbnail BEFORE hiding content area
+        QPixmap thumb = m_contentArea->isVisible()
+                        ? m_contentArea->grab()
+                        : QPixmap();
         
         m_contentArea->hide();
         int newH = m_titleBar->height() + DpiHelper::borderWidth(this);
         
-        // Shrink width to title + buttons for ALL windows (DPI-aware)
-        QFontMetrics fm(m_titleBar->font());
-        int textW = fm.horizontalAdvance(windowTitle());
-        int btnSize = DpiHelper::buttonSize(this);
-        int buttonsW = 3 * btnSize + DpiHelper::scale(20, this); 
-        int minW = DpiHelper::minShadedWidth(this);
-        int totalW = std::max(minW, textW + buttonsW + DpiHelper::scale(90, this)); 
+        // Use a fixed shaded width for all windows so the UI stays uniform
+        // regardless of filename/title length (Task 2: fixed-width collapsed bar)
+        int totalW = DpiHelper::minShadedWidth(this); 
         
         // Center Collapse Implementation (Horizontal Center, Vertical Top)
         int newX = center.x() - totalW / 2;
         int newY = geometry().top(); // Preserve Top
         
         setGeometry(newX, newY, totalW, newH);
+        
+        // Notify interested parties (e.g. RightSidebarWidget)
+        emit shadingChanged(true, thumb);
         
     } else {
         // Restore
@@ -898,6 +916,8 @@ void CustomMdiSubWindow::toggleShade() {
             qDebug() << "  -> Restoring to" << m_originalWidth << "x" << m_originalHeight;
             setGeometry(newX, newY, m_originalWidth, m_originalHeight);
         }
+        // Notify interested parties (e.g. RightSidebarWidget)
+        emit shadingChanged(false, QPixmap());
     }
 }
 

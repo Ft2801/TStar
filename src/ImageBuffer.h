@@ -206,6 +206,9 @@ public:
     // SCNR
     void applySCNR(float amount, int method);
     
+    // Magenta Correction (Siril-style): reduces R and B where they exceed green
+    void applyMagentaCorrection(float amount, int method);
+    
     // Color Saturation
     struct SaturationParams {
         float amount = 1.0f;     // 1.0 = No change, >1.0 = Boost

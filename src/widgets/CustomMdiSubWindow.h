@@ -9,6 +9,7 @@
 #include <QVBoxLayout>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPixmap>
 #include <QSpacerItem>
 
 // NameStrip: Displays vertical title, Double-click to rename
@@ -151,6 +152,11 @@ public:
     // Close logic
     void setSkipCloseAnimation(bool skip) { m_skipCloseAnimation = skip; }
     bool canClose(); 
+
+signals:
+    // Emitted when the window is shaded (collapsed to title bar) or unshaded.
+    // When shading (shaded=true), thumbnail holds a grab of the content area.
+    void shadingChanged(bool shaded, const QPixmap& thumbnail);
     
 protected:
     // Animations

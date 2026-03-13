@@ -495,6 +495,8 @@ set(TSTAR_SOURCES
     src/widgets/SplashScreen.h
     src/widgets/SidebarWidget.cpp
     src/widgets/SidebarWidget.h
+    src/widgets/RightSidebarWidget.cpp
+    src/widgets/RightSidebarWidget.h
     src/widgets/HeaderPanel.cpp
     src/widgets/HeaderPanel.h
     src/widgets/AnnotationOverlay.cpp
@@ -596,6 +598,8 @@ set(TSTAR_SOURCES
     src/dialogs/ABEDialog.h
     src/dialogs/SCNRDialog.cpp
     src/dialogs/SCNRDialog.h
+    src/dialogs/MagentaCorrectionDialog.cpp
+    src/dialogs/MagentaCorrectionDialog.h
     src/dialogs/GHSDialog.cpp
     src/dialogs/GHSDialog.h
     src/dialogs/ChannelCombinationDialog.cpp

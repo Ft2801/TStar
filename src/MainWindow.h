@@ -42,6 +42,7 @@ class CropRotateDialog; // Forward declaration
 class StarAnalysisDialog;
 class HeaderViewerDialog;
 class SidebarWidget;
+class RightSidebarWidget;
 class HeaderPanel;
 class AstroSpikeDialog;
 class DebayerDialog;
@@ -150,6 +151,7 @@ private slots:
     void openAberrationInspectorDialog();
     void openSelectiveColorDialog();
     void openTemperatureTintDialog();
+    void openMagentaCorrectionDialog();
     
     // Stacking Suite
     void openStackingDialog();
@@ -172,6 +174,8 @@ private slots:
     void runCosmicClarity(const struct CosmicClarityParams& params);
     void runGraXpert(const struct GraXpertParams& params);
     void tileImageViews();
+    void tileImageViewsVertical();
+    void tileImageViewsHorizontal();
     // Settings
     void onSettingsAction();
 
@@ -247,6 +251,7 @@ private:
     QPointer<class HistogramStretchDialog> m_histoDlg;
     QPointer<class ArcsinhStretchDialog> m_arcsinhDlg;
     QPointer<class SCNRDialog> m_scnrDlg;
+    QPointer<class MagentaCorrectionDialog> m_magentaDlg;
     QPointer<PixelMathDialog> m_pixelMathDialog;
     QPointer<class RARDialog> m_rarDlg;
     QPointer<class StarStretchDialog> m_starStretchDlg;
@@ -308,6 +313,7 @@ private:
 
     // Sidebar
     SidebarWidget* m_sidebar = nullptr;
+    RightSidebarWidget* m_rightSidebar = nullptr;
     HeaderPanel* m_headerPanel = nullptr;
     
     // Animations

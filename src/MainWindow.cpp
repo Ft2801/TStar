@@ -101,6 +101,7 @@
 #include "dialogs/BlinkComparatorDialog.h"
 #include "widgets/AnnotationOverlay.h"
 #include "widgets/SidebarWidget.h"
+#include "widgets/RightSidebarWidget.h"
 #include "widgets/HeaderPanel.h"
 #include "dialogs/ExtractLuminanceDialog.h"
 #include "dialogs/RecombineLuminanceDialog.h"
@@ -109,6 +110,7 @@
 #include "dialogs/AberrationInspectorDialog.h"
 #include "dialogs/SelectiveColorDialog.h"
 #include "dialogs/TemperatureTintDialog.h"
+#include "dialogs/MagentaCorrectionDialog.h"
 #include "dialogs/MultiscaleDecompDialog.h"
 #include "dialogs/NarrowbandNormalizationDialog.h"
 #include "dialogs/NBtoRGBStarsDialog.h"
@@ -316,17 +318,35 @@ MainWindow::MainWindow(QWidget *parent)
     m_sidebar->setParent(this);
     m_sidebar->raise(); // Ensure on top
     
+    // Right Sidebar (collapsed view thumbnails) - overlay on the right edge
+    m_rightSidebar = new RightSidebarWidget(this);
+    m_rightSidebar->setParent(this);
+    m_rightSidebar->raise();
+    
     // Create left margin to prevent windows from going under sidebar tab strip
     // The tab strip is 32px wide, add small padding
     int sidebarTabWidth = 34; // 32px tab + 2px buffer
-    mainLayout->setContentsMargins(sidebarTabWidth, 0, 0, 0);
+    mainLayout->setContentsMargins(sidebarTabWidth, 0, 34, 0); // also right margin for right sidebar tab
 
     
     // Immediate initial sync for overlay positioning
     if (this->centralWidget()) {
         m_sidebar->move(this->centralWidget()->x(), this->centralWidget()->y());
         m_sidebar->resize(m_sidebar->totalVisibleWidth(), this->centralWidget()->height());
+        
+        // Position right sidebar anchored to the right edge of the central widget
+        QRect cw = this->centralWidget()->geometry();
+        m_rightSidebar->setAnchorGeometry(cw.right(), cw.y(), cw.height());
     }
+    
+    // Connect right sidebar: activate window when thumbnail is clicked
+    connect(m_rightSidebar, &RightSidebarWidget::thumbnailActivated, this, [this](CustomMdiSubWindow* sub) {
+        if (sub && m_mdiArea) {
+            if (sub->isShaded()) sub->toggleShade();
+            m_mdiArea->setActiveSubWindow(sub);
+            sub->raise();
+        }
+    });
     
     // Setup Sidebar Panels
     
@@ -961,6 +981,9 @@ MainWindow::MainWindow(QWidget *parent)
     addMenuAction(colorMenu, tr("SCNR (Remove Green)"), "", [this](){
         openSCNRDialog(); 
     });
+    addMenuAction(colorMenu, tr("Magenta Correction"), "", [this](){
+        openMagentaCorrectionDialog();
+    });
     addMenuAction(colorMenu, tr("PCC Distribution"), "", [this](){
         openPCCDistributionDialog();
     });
@@ -1174,8 +1197,14 @@ MainWindow::MainWindow(QWidget *parent)
     QMenu* viewMenu = new QMenu(this);
     viewMenu->setStyleSheet(processMenu->styleSheet()); // Re-use style
     
-    addMenuAction(viewMenu, tr("Tile Images"), "", [this](){
+    addMenuAction(viewMenu, tr("Tile Images (Smart Grid)"), "", [this](){
         tileImageViews();
+    });
+    addMenuAction(viewMenu, tr("Tile Images Vertical"), "", [this](){
+        tileImageViewsVertical();
+    });
+    addMenuAction(viewMenu, tr("Tile Images Horizontal"), "", [this](){
+        tileImageViewsHorizontal();
     });
     
     viewBtn->setMenu(viewMenu);
@@ -1322,6 +1351,58 @@ void MainWindow::tileImageViews() {
     }
     
     log(tr("Tiled %1 images in %2x%3 layout.").arg(count).arg(cols).arg(rows), Log_Success, true);
+}
+
+void MainWindow::tileImageViewsVertical() {
+    QList<CustomMdiSubWindow*> imageWindows;
+    for (auto* sub : m_mdiArea->subWindowList()) {
+        auto* csw = qobject_cast<CustomMdiSubWindow*>(sub);
+        if (csw && !csw->isToolWindow() && csw->viewer()) imageWindows.append(csw);
+    }
+
+    int count = imageWindows.size();
+    if (count < 1) {
+        log(tr("No images to arrange."), Log_Warning, true);
+        return;
+    }
+
+    QRect area = m_mdiArea->viewport()->rect();
+    int cellH = area.height() / count;
+    int cellW = area.width();
+
+    for (int i = 0; i < count; ++i) {
+        auto* win = imageWindows[i];
+        win->showNormal();
+        win->setGeometry(0, i * cellH, cellW, cellH);
+        if (auto* v = win->viewer()) QTimer::singleShot(50, v, &ImageViewer::fitToWindow);
+    }
+    log(tr("Arranged %1 images vertically.").arg(count), Log_Success, true);
+}
+
+void MainWindow::tileImageViewsHorizontal() {
+    QList<CustomMdiSubWindow*> imageWindows;
+    for (auto* sub : m_mdiArea->subWindowList()) {
+        auto* csw = qobject_cast<CustomMdiSubWindow*>(sub);
+        if (csw && !csw->isToolWindow() && csw->viewer()) imageWindows.append(csw);
+    }
+
+    int count = imageWindows.size();
+    if (count < 1) {
+        log(tr("No images to arrange."), Log_Warning, true);
+        return;
+    }
+
+    QRect area = m_mdiArea->viewport()->rect();
+    int cellW = area.width() / count;
+    int cellH = area.height();
+
+    for (int i = 0; i < count; ++i) {
+        auto* win = imageWindows[i];
+        win->showNormal();
+        win->setGeometry(i * cellW, 0, cellW, cellH);
+        if (auto* v = win->viewer()) QTimer::singleShot(50, v, &ImageViewer::fitToWindow);
+    }
+    log(tr("Arranged %1 images horizontally.").arg(count), Log_Success, true);
 }
 
 void MainWindow::pushUndo() {
@@ -1505,6 +1586,17 @@ CustomMdiSubWindow* MainWindow::createNewImageWindow(const ImageBuffer& buffer, 
     sub->showNormal(); // Ensure new views always open non-maximized
     m_mdiArea->setActiveSubWindow(sub);
     sub->raise();
+
+    // Connect to right sidebar for collapsed-view thumbnails (image windows only)
+    if (m_rightSidebar) {
+        connect(sub, &CustomMdiSubWindow::shadingChanged, this, [this, sub](bool shaded, const QPixmap& thumb) {
+            if (shaded) {
+                m_rightSidebar->addThumbnail(sub, thumb, sub->windowTitle());
+            } else {
+                m_rightSidebar->removeThumbnail(sub);
+            }
+        });
+    }
     
     // Restore maximized state of windows that were maximized before
     if (!wasMaximized.isEmpty()) {
@@ -2341,6 +2433,47 @@ void MainWindow::openTemperatureTintDialog() {
 }
 
 
+void MainWindow::openMagentaCorrectionDialog() {
+    ImageViewer* v = currentViewer();
+    if (!v || !v->getBuffer().isValid()) {
+        QMessageBox::warning(this, tr("No Image"), tr("Please select an image first."));
+        return;
+    }
+
+    if (v->getBuffer().channels() < 3) {
+        log(tr("Magenta Correction requires a color image."), Log_Warning);
+        return;
+    }
+
+    if (m_magentaDlg) {
+        m_magentaDlg->raise();
+        m_magentaDlg->activateWindow();
+        m_magentaDlg->setViewer(v);
+        return;
+    }
+
+    auto dlg = new MagentaCorrectionDialog(this);
+    m_magentaDlg = dlg;
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+
+    connect(dlg, &MagentaCorrectionDialog::apply, this, [this, dlg]() {
+        ImageViewer* v = currentViewer();
+        if (!v) return;
+        float amount = dlg->getAmount();
+        int method = static_cast<int>(dlg->getMethod());
+
+        v->pushUndo();
+        v->getBuffer().applyMagentaCorrection(amount, method);
+        v->setBuffer(v->getBuffer(), v->windowTitle(), true);
+        log(tr("Magenta Correction applied."), Log_Success, true);
+    });
+
+    log(tr("Opening Magenta Correction Tool..."), Log_Info, true);
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, dlg, tr("Magenta Correction"));
+}
+
+
 void MainWindow::openAstroSpikeDialog() {
     ImageViewer* viewer = currentViewer();
     if (!viewer || !viewer->getBuffer().isValid()) {
@@ -2635,12 +2768,14 @@ QString MainWindow::generateUniqueTitle(const QString& baseTitle) {
 
 void MainWindow::resizeEvent(QResizeEvent* event) {
     QMainWindow::resizeEvent(event);
-    if (m_sidebar) {
-        // Overlay sidebar on the left over the central widget area
-        if (centralWidget()) {
-            QRect cw = centralWidget()->geometry();
+    if (centralWidget()) {
+        QRect cw = centralWidget()->geometry();
+        if (m_sidebar) {
             m_sidebar->move(cw.x(), cw.y());
             m_sidebar->resize(m_sidebar->totalVisibleWidth(), cw.height());
+        }
+        if (m_rightSidebar) {
+            m_rightSidebar->setAnchorGeometry(cw.right(), cw.y(), cw.height());
         }
     }
 }
