@@ -3638,10 +3638,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Reduces magenta halos by modulating the\nblue channel based on green luminance and HSV purple detection.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Restrict to Stars (Star Mask)</source>
             <translation type="unfinished" />
         </message>

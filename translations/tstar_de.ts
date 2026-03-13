@@ -3640,11 +3640,6 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Magenta-Korrektur</translation>
         </message>
         <message>
-            <source>Reduces magenta halos by modulating the\nblue channel based on green luminance and HSV purple detection.</source>
-            <translation type="finished">Reduziert Magenta-Farbsäume durch Modulation des
-Blaukanals basierend auf der Grün-Luminanz und HSV-Purpur-Erkennung.</translation>
-        </message>
-        <message>
             <source>Restrict to Stars (Star Mask)</source>
             <translation type="finished">Auf Sterne beschränken (Sternmaske)</translation>
         </message>

@@ -3640,11 +3640,6 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Correzione Magenta</translation>
         </message>
         <message>
-            <source>Reduces magenta halos by modulating the\nblue channel based on green luminance and HSV purple detection.</source>
-            <translation type="finished">Riduce gli aloni magenta modulando il
-canale blu in base alla luminanza del verde e al rilevamento HSV del viola.</translation>
-        </message>
-        <message>
             <source>Restrict to Stars (Star Mask)</source>
             <translation type="finished">Limita alle Stelle (Maschera Stelle)</translation>
         </message>

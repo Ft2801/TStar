@@ -8,18 +8,12 @@
 #include "../ImageViewer.h"
 
 MagentaCorrectionDialog::MagentaCorrectionDialog(QWidget* parent)
-    : DialogBase(parent, tr("Magenta Correction"), 380, 240) {
+    : DialogBase(parent, tr("Magenta Correction"), 380, 180) {
     setModal(false);
     setWindowModality(Qt::NonModal);
     setWindowIcon(QIcon(":/images/Logo.png"));
 
     QVBoxLayout* layout = new QVBoxLayout(this);
-
-    // Description
-    QLabel* desc = new QLabel(tr("Reduces magenta halos by modulating the\nblue channel based on green luminance and HSV purple detection."), this);
-    desc->setStyleSheet("color: #aaa; font-size: 11px;");
-    desc->setWordWrap(true);
-    layout->addWidget(desc);
 
     // Amount
     // 1.0 = No change, 0.0 = Full modulation
