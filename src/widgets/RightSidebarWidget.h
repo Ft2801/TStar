@@ -52,10 +52,6 @@ signals:
     void expandedToggled(bool expanded);
     void thumbnailActivated(CustomMdiSubWindow* sub);
 
-protected:
-    void enterEvent(QEnterEvent* event) override;
-    void leaveEvent(QEvent* event) override;
-
 private slots:
     void onTabClicked();
 

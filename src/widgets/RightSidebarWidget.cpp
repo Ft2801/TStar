@@ -214,14 +214,6 @@ void RightSidebarWidget::removeThumbnail(CustomMdiSubWindow* sub) {
     }
 }
 
-void RightSidebarWidget::enterEvent(QEnterEvent* event) {
-    QWidget::enterEvent(event);
-}
-
-void RightSidebarWidget::leaveEvent(QEvent* event) {
-    QWidget::leaveEvent(event);
-}
-
 // Required for AUTOMOC to process the Q_OBJECT class defined in this .cpp file
 #include "RightSidebarWidget.moc"
 
