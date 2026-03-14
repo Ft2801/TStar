@@ -295,22 +295,19 @@ void ImageSequence::toggleSelection(int index) {
 }
 
 int ImageSequence::applyFilter(ImageFilter filter, FilterMode mode, double parameter) {
-    // First select all
-    selectAll();
-    
     if (filter == ImageFilter::All) {
+        selectAll();
         return count();
     }
     
     if (filter == ImageFilter::Selected) {
-        // Keep current selection (already set)
+        // Preserve the manual selection state managed by the table.
         return selectedCount();
     }
     
     // For quality-based filters, we need metrics
     if (!m_hasQualityMetrics) {
-        // Can't filter without metrics
-        return count();
+        return selectedCount();
     }
     
     double threshold = computeFilterThreshold(filter, mode, parameter);
@@ -513,6 +510,16 @@ double ImageSequence::totalExposure() const {
     return total;
 }
 
+bool ImageSequence::hasRegistration() const {
+    if (m_hasRegistration) {
+        return true;
+    }
+
+    return std::any_of(m_images.begin(), m_images.end(), [](const SequenceImage& img) {
+        return img.registration.hasRegistration;
+    });
+}
+
 //=============================================================================
 // REGISTRATION
 //=============================================================================
@@ -564,7 +571,9 @@ bool ImageSequence::computeQualityMetrics(ProgressCallback progressCallback) {
         ImageBuffer buffer;
         bool loaded = false;
         QString p = m_images[i].filePath;
-        if (p.endsWith(".fits", Qt::CaseInsensitive) || p.endsWith(".fit", Qt::CaseInsensitive)) {
+        if (p.endsWith(".fits", Qt::CaseInsensitive) ||
+            p.endsWith(".fit", Qt::CaseInsensitive) ||
+            p.endsWith(".fts", Qt::CaseInsensitive)) {
             loaded = FitsLoader::load(p, buffer);
         } else if (p.endsWith(".tiff", Qt::CaseInsensitive) || p.endsWith(".tif", Qt::CaseInsensitive)) {
             loaded = TiffIO::read(p, buffer);
@@ -572,8 +581,26 @@ bool ImageSequence::computeQualityMetrics(ProgressCallback progressCallback) {
         
         if (!loaded) continue;
 
-        // Measure background (using median of first channel)
-        m_images[i].quality.background = buffer.getRobustMedian(0, 0, 1.0f);
+        const int width = buffer.width();
+        const int height = buffer.height();
+        const int channels = buffer.channels();
+        const float* data = buffer.data().data();
+
+        std::vector<float> luminance(static_cast<size_t>(width) * height);
+        if (channels == 1) {
+            std::copy(data, data + luminance.size(), luminance.begin());
+        } else {
+            for (size_t pixel = 0; pixel < luminance.size(); ++pixel) {
+                const size_t base = pixel * channels;
+                const float r = data[base];
+                const float g = data[base + 1];
+                const float b = data[base + 2];
+                luminance[pixel] = 0.2126f * r + 0.7152f * g + 0.0722f * b;
+            }
+        }
+
+        m_images[i].quality.background = Statistics::median(luminance);
+        m_images[i].quality.noise = Statistics::computeNoise(luminance.data(), width, height);
 
         // Detect stars and compute metrics
         auto stars = engine.detectStars(buffer);
@@ -602,13 +629,15 @@ bool ImageSequence::computeQualityMetrics(ProgressCallback progressCallback) {
                 float avgFWHM = sumFWHM / validCount;
                 m_images[i].quality.fwhm = avgFWHM;
                 m_images[i].quality.roundness = sumRoundness / validCount;
-                
-                // Compute quality score: combination of star count and inverse FWHM
-                // Quality = (StarCount / 500) * (1.0 / FWHM^2)
-                // Normalized roughly to 0-100 range for typical images
-                m_images[i].quality.quality = (m_images[i].quality.starCount / 50.0) * (2.0 / (avgFWHM * avgFWHM)) * 100.0;
+                m_images[i].quality.weightedFwhm = avgFWHM / std::max(0.05, m_images[i].quality.roundness);
+
+                const double noiseTerm = std::max(0.01, m_images[i].quality.noise);
+                const double sharpnessTerm = std::max(0.05, static_cast<double>(m_images[i].quality.weightedFwhm));
+                const double starTerm = std::max(1.0, static_cast<double>(m_images[i].quality.starCount));
+                m_images[i].quality.quality = starTerm / (sharpnessTerm * noiseTerm);
             } else {
                 m_images[i].quality.fwhm = 99.0f;
+                m_images[i].quality.weightedFwhm = 99.0f;
                 m_images[i].quality.roundness = 0.0f;
                 m_images[i].quality.quality = 0.0;
             }
@@ -616,6 +645,7 @@ bool ImageSequence::computeQualityMetrics(ProgressCallback progressCallback) {
             m_images[i].quality.hasMetrics = true;
             m_images[i].quality.starCount = 0;
             m_images[i].quality.fwhm = 99.0f;
+            m_images[i].quality.weightedFwhm = 99.0f;
             m_images[i].quality.roundness = 0.0f;
             m_images[i].quality.quality = 0.0;
         }

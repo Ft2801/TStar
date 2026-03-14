@@ -4,6 +4,7 @@
 #include "../ImageViewer.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QSignalBlocker>
 #include <QGridLayout>
 #include <QHeaderView>
 #include <QFileDialog>
@@ -126,9 +127,18 @@ void StackingDialog::setupSequenceGroup() {
     m_filterCombo->addItem(tr("All Images"), static_cast<int>(Stacking::ImageFilter::All));
     m_filterCombo->addItem(tr("Selected"), static_cast<int>(Stacking::ImageFilter::Selected));
     m_filterCombo->addItem(tr("Best FWHM"), static_cast<int>(Stacking::ImageFilter::BestFWHM));
+    m_filterCombo->addItem(tr("Best Weighted FWHM"), static_cast<int>(Stacking::ImageFilter::BestWeightedFWHM));
     m_filterCombo->addItem(tr("Best Roundness"), static_cast<int>(Stacking::ImageFilter::BestRoundness));
+    m_filterCombo->addItem(tr("Best Background"), static_cast<int>(Stacking::ImageFilter::BestBackground));
+    m_filterCombo->addItem(tr("Best Star Count"), static_cast<int>(Stacking::ImageFilter::BestStarCount));
     m_filterCombo->addItem(tr("Best Quality"), static_cast<int>(Stacking::ImageFilter::BestQuality));
     filterRow->addWidget(m_filterCombo);
+
+    filterRow->addWidget(new QLabel(tr("Mode:"), this));
+    m_filterModeCombo = new QComboBox(this);
+    m_filterModeCombo->addItem(tr("Percent"), static_cast<int>(Stacking::FilterMode::Percentage));
+    m_filterModeCombo->addItem(tr("K-Sigma"), static_cast<int>(Stacking::FilterMode::KSigma));
+    filterRow->addWidget(m_filterModeCombo);
     
     filterRow->addWidget(new QLabel(tr("Keep:"), this));
     m_filterValue = new QDoubleSpinBox(this);
@@ -153,14 +163,20 @@ void StackingDialog::setupSequenceGroup() {
     connect(m_setRefBtn, &QPushButton::clicked, this, &StackingDialog::onSetReference);
     connect(m_imageTable, &QTableWidget::itemSelectionChanged, 
             this, &StackingDialog::onTableSelectionChanged);
+        connect(m_imageTable, &QTableWidget::itemChanged,
+            this, &StackingDialog::onTableItemChanged);
     connect(m_imageTable, &QTableWidget::cellDoubleClicked,
             this, &StackingDialog::onTableItemDoubleClicked);
     
     // Filter combo/value: apply filtering when changed
     connect(m_filterCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, [this](int) { updateTable(); updateSummary(); });
+            this, [this](int) { applyCurrentFilter(); });
+        connect(m_filterModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this](int) { applyCurrentFilter(); });
     connect(m_filterValue, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-            this, [this](double) { updateTable(); updateSummary(); });
+            this, [this](double) { applyCurrentFilter(); });
+
+        applyCurrentFilter();
 }
 
 void StackingDialog::setupCometTab() {
@@ -399,9 +415,6 @@ void StackingDialog::setupParametersGroup() {
     m_featherSpin->setValue(0);
     layout->addWidget(m_featherSpin, row++, 1);
     
-    // Separator
-    layout->addWidget(new QLabel("", this), row++, 0);
-    
     // Debayering
     m_debayerCheck = new QCheckBox(tr("Debayer (CFA Images)"), this);
     m_debayerCheck->setToolTip(tr("Debayer images on-the-fly during stacking. Enable this for RAW/CFA images."));
@@ -448,6 +461,12 @@ void StackingDialog::setupParametersGroup() {
     
     m_createRejMapsCheck = new QCheckBox(tr("Create rejection maps"), this);
     layout->addWidget(m_createRejMapsCheck, row++, 0, 1, 2);
+
+    m_fastNormCheck = new QCheckBox(tr("Fast normalization"), this);
+    layout->addWidget(m_fastNormCheck, row++, 0, 1, 2);
+
+    m_overlapNormCheck = new QCheckBox(tr("Normalize on overlaps"), this);
+    layout->addWidget(m_overlapNormCheck, row++, 0, 1, 2);
     
     // Drizzle
     m_drizzleCheck = new QCheckBox(tr("Enable Drizzle 2x"), this);
@@ -474,8 +493,10 @@ void StackingDialog::setupParametersGroup() {
 
     connect(m_drizzleCheck, &QCheckBox::toggled, this, &StackingDialog::updateParameterVisibility);
     
-    layout->setRowStretch(row, 1);
+    // Add vertical stretch to push all content up without hardcoded spacing
+    layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding), row, 0, 1, 2);
     
+    // Connect signals
     // Connect signals
     connect(m_methodCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &StackingDialog::onMethodChanged);
@@ -483,6 +504,10 @@ void StackingDialog::setupParametersGroup() {
             this, &StackingDialog::onRejectionChanged);
     connect(m_normCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &StackingDialog::onNormalizationChanged);
+    
+    // Ensure proper spacing between rows and minimum height for visibility
+    layout->setVerticalSpacing(3);
+    m_paramsGroup->setMinimumHeight(400);
 }
 
 void StackingDialog::setupOutputGroup() {
@@ -572,20 +597,37 @@ void StackingDialog::onLoadSequence() {
     
     bool success = m_sequence->loadFromDirectory(dir, filters,
         [this](const QString& msg, double pct) {
-            m_progressBar->setValue(static_cast<int>(pct * 100));
+            if (pct >= 0.0) {
+                m_progressBar->setRange(0, 100);
+                m_progressBar->setValue(static_cast<int>(pct * 100));
+            } else {
+                m_progressBar->setRange(0, 0);
+            }
             m_logText->append(msg);
             QApplication::processEvents();
         });
     
     if (success) {
-        updateTable();
-        updateSummary();
+        m_logText->append(tr("Computing image statistics and quality metrics..."));
+        m_sequence->computeQualityMetrics([this](const QString& msg, double pct) {
+            if (pct >= 0.0) {
+                m_progressBar->setRange(0, 100);
+                m_progressBar->setValue(static_cast<int>(pct * 100));
+            } else {
+                m_progressBar->setRange(0, 0);
+            }
+            m_logText->append(msg);
+            QApplication::processEvents();
+        });
+        m_progressBar->setRange(0, 100);
+        applyCurrentFilter();
         m_logText->append(tr("Loaded %1 images").arg(m_sequence->count()));
     } else {
         m_logText->append(tr("<span style='color:red'>Failed to load sequence or no images found</span>"));
         m_sequence.reset();
     }
     
+    m_progressBar->setRange(0, 100);
     m_progressBar->setValue(0);
 }
 
@@ -605,13 +647,51 @@ void StackingDialog::onAddFiles() {
         settings.setValue("Stacking/InputFolder", QFileInfo(files.first()).absolutePath());
     }
     
-    if (!m_sequence) {
-        m_sequence = std::make_unique<Stacking::ImageSequence>();
+    QStringList combinedFiles;
+    if (m_sequence) {
+        for (const auto& image : m_sequence->images()) {
+            combinedFiles.append(image.filePath);
+        }
     }
-    
-    m_sequence->loadFromFiles(files);
-    updateTable();
-    updateSummary();
+
+    for (const QString& file : files) {
+        if (!combinedFiles.contains(file)) {
+            combinedFiles.append(file);
+        }
+    }
+
+    auto mergedSequence = std::make_unique<Stacking::ImageSequence>();
+    if (!mergedSequence->loadFromFiles(combinedFiles, [this](const QString& msg, double pct) {
+            if (pct >= 0.0) {
+                m_progressBar->setRange(0, 100);
+                m_progressBar->setValue(static_cast<int>(pct * 100));
+            } else {
+                m_progressBar->setRange(0, 0);
+            }
+            m_logText->append(msg);
+            QApplication::processEvents();
+        })) {
+        m_logText->append(tr("<span style='color:red'>Failed to append files to the sequence</span>"));
+        m_progressBar->setRange(0, 100);
+        m_progressBar->setValue(0);
+        return;
+    }
+
+    m_logText->append(tr("Computing image statistics and quality metrics..."));
+    mergedSequence->computeQualityMetrics([this](const QString& msg, double pct) {
+        if (pct >= 0.0) {
+            m_progressBar->setRange(0, 100);
+            m_progressBar->setValue(static_cast<int>(pct * 100));
+        } else {
+            m_progressBar->setRange(0, 0);
+        }
+        m_logText->append(msg);
+        QApplication::processEvents();
+    });
+    m_progressBar->setRange(0, 100);
+
+    m_sequence = std::move(mergedSequence);
+    applyCurrentFilter();
 }
 
 void StackingDialog::onRemoveSelected() {
@@ -666,8 +746,10 @@ void StackingDialog::onSetReference() {
 
 void StackingDialog::setSequence(std::unique_ptr<Stacking::ImageSequence> sequence) {
     m_sequence = std::move(sequence);
-    updateTable();
-    updateSummary();
+    if (m_sequence) {
+        m_sequence->computeQualityMetrics();
+    }
+    applyCurrentFilter();
 }
 
 void StackingDialog::updateTable() {
@@ -675,6 +757,7 @@ void StackingDialog::updateTable() {
     
     if (!m_sequence) return;
     
+    QSignalBlocker blocker(m_imageTable);
     m_imageTable->setRowCount(m_sequence->count());
     
     for (int i = 0; i < m_sequence->count(); ++i) {
@@ -804,8 +887,48 @@ void StackingDialog::updateSummary() {
     
     m_sequenceSummary->setText(tr("%1/%2 images selected, %3 total exposure")
         .arg(selected).arg(total)
-        .arg(exposure > 3600 ? QString("%1h").arg(exposure/3600, 0, 'f', 1) :
-             QString("%1m").arg(exposure/60, 0, 'f', 1)));
+        .arg(exposure >= 3600.0 ? QString("%1h").arg(exposure / 3600.0, 0, 'f', 1) :
+             exposure >= 60.0 ? QString("%1m").arg(exposure / 60.0, 0, 'f', 1) :
+             QString("%1s").arg(exposure, 0, 'f', 1)));
+}
+
+void StackingDialog::applyCurrentFilter() {
+    const auto filter = static_cast<Stacking::ImageFilter>(m_filterCombo->currentData().toInt());
+    const auto mode = static_cast<Stacking::FilterMode>(m_filterModeCombo->currentData().toInt());
+
+    {
+        QSignalBlocker blocker(m_filterValue);
+        const bool filterUsesMetric = filter != Stacking::ImageFilter::All &&
+            filter != Stacking::ImageFilter::Selected;
+        m_filterModeCombo->setEnabled(filterUsesMetric);
+        m_filterValue->setEnabled(filterUsesMetric);
+
+        if (mode == Stacking::FilterMode::KSigma) {
+            m_filterValue->setRange(0.1, 5.0);
+            m_filterValue->setSingleStep(0.1);
+            m_filterValue->setSuffix(tr("σ"));
+            if (m_filterValue->value() > 5.0) {
+                m_filterValue->setValue(3.0);
+            }
+        } else {
+            m_filterValue->setRange(1.0, 100.0);
+            m_filterValue->setSingleStep(1.0);
+            m_filterValue->setSuffix("%");
+            if (m_filterValue->value() > 100.0) {
+                m_filterValue->setValue(90.0);
+            }
+        }
+    }
+
+    if (!m_sequence) {
+        updateTable();
+        updateSummary();
+        return;
+    }
+
+    m_sequence->applyFilter(filter, mode, m_filterValue->value());
+    updateTable();
+    updateSummary();
 }
 
 //=============================================================================
@@ -824,6 +947,7 @@ void StackingDialog::onRejectionChanged(int index) {
 
 void StackingDialog::onNormalizationChanged(int index) {
     Q_UNUSED(index);
+    updateParameterVisibility();
 }
 
 void StackingDialog::updateParameterVisibility() {
@@ -841,6 +965,10 @@ void StackingDialog::updateParameterVisibility() {
                      method == Stacking::Method::Median);
     m_normCombo->setEnabled(showNorm);
     m_weightingCombo->setEnabled(showNorm);
+    bool normActive = showNorm &&
+        m_normCombo->currentData().toInt() != static_cast<int>(Stacking::NormalizationMethod::None);
+    m_fastNormCheck->setEnabled(normActive);
+    m_overlapNormCheck->setEnabled(normActive);
     
     // Drizzle options
     bool drizzleCtx = m_drizzleCheck->isChecked();
@@ -882,6 +1010,8 @@ Stacking::StackingParams StackingDialog::gatherParams() const {
     params.equalizeRGB = m_equalizeRGBCheck->isChecked();
     params.maximizeFraming = m_maximizeFramingCheck->isChecked();
     params.createRejectionMaps = m_createRejMapsCheck->isChecked();
+    params.fastNormalization = m_fastNormCheck->isChecked();
+    params.overlapNormalization = m_overlapNormCheck->isChecked();
     
     params.drizzle = m_drizzleCheck->isChecked();
     params.drizzleScale = m_drizzleScale->value();
@@ -889,6 +1019,8 @@ Stacking::StackingParams StackingDialog::gatherParams() const {
     
     params.filter = static_cast<Stacking::ImageFilter>(
         m_filterCombo->currentData().toInt());
+    params.filterMode = static_cast<Stacking::FilterMode>(
+        m_filterModeCombo->currentData().toInt());
     params.filterParameter = m_filterValue->value();
     
     params.outputFilename = m_outputPath->text();
@@ -1034,18 +1166,43 @@ void StackingDialog::onTableSelectionChanged() {
 }
 
 void StackingDialog::onTableItemDoubleClicked(int row, int column) {
-    Q_UNUSED(column);
-    
-    // Toggle selection
-    if (m_sequence && row < m_sequence->count()) {
-        m_sequence->toggleSelection(row);
-        
-        QTableWidgetItem* item = m_imageTable->item(row, 0);
-        if (item) {
-            item->setCheckState(m_sequence->image(row).selected ? Qt::Checked : Qt::Unchecked);
-        }
-        
-        updateSummary();
+    if (!m_sequence || row < 0 || row >= m_sequence->count()) {
+        return;
     }
+
+    if (column == 0) {
+        if (QTableWidgetItem* item = m_imageTable->item(row, 0)) {
+            item->setCheckState(item->checkState() == Qt::Checked ? Qt::Unchecked : Qt::Checked);
+        }
+        return;
+    }
+
+    if (!m_mainWindow) {
+        return;
+    }
+
+    ImageBuffer buffer;
+    if (!m_sequence->readImage(row, buffer)) {
+        m_logText->append(tr("<span style='color:red'>Failed to open image %1</span>")
+            .arg(m_sequence->image(row).fileName()));
+        return;
+    }
+
+    m_mainWindow->createNewImageWindow(buffer, m_sequence->image(row).fileName());
+}
+
+void StackingDialog::onTableItemChanged(QTableWidgetItem* item) {
+    if (!m_sequence || !item || item->column() != 0) {
+        return;
+    }
+
+    const int row = item->row();
+    if (row < 0 || row >= m_sequence->count()) {
+        return;
+    }
+
+    m_sequence->setSelected(row, item->checkState() == Qt::Checked);
+    updateSummary();
+    updatePlot();
 }
 

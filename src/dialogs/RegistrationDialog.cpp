@@ -185,11 +185,28 @@ void RegistrationDialog::onLoadSequence() {
     
     bool success = m_sequence->loadFromDirectory(dir, filters,
         [this]([[maybe_unused]] const QString& msg, double pct) {
-            m_progressBar->setValue(static_cast<int>(pct * 100));
+            if (pct >= 0.0) {
+                m_progressBar->setRange(0, 100);
+                m_progressBar->setValue(static_cast<int>(pct * 100));
+            } else {
+                m_progressBar->setRange(0, 0);
+            }
             QApplication::processEvents();
         });
     
     if (success) {
+        m_logText->append(tr("Computing image statistics and star counts..."));
+        m_sequence->computeQualityMetrics([this](const QString& msg, double pct) {
+            if (pct >= 0.0) {
+                m_progressBar->setRange(0, 100);
+                m_progressBar->setValue(static_cast<int>(pct * 100));
+            } else {
+                m_progressBar->setRange(0, 0);
+            }
+            m_logText->append(msg);
+            QApplication::processEvents();
+        });
+        m_progressBar->setRange(0, 100);
         updateTable();
         updateReferenceLabel();
         m_logText->append(tr("Loaded %1 images").arg(m_sequence->count()));
@@ -198,11 +215,15 @@ void RegistrationDialog::onLoadSequence() {
         m_logText->append(tr("<span style='color:red'>Failed to load sequence</span>"));
     }
     
+    m_progressBar->setRange(0, 100);
     m_progressBar->setValue(0);
 }
 
 void RegistrationDialog::setSequence(std::unique_ptr<Stacking::ImageSequence> sequence) {
     m_sequence = std::move(sequence);
+    if (m_sequence) {
+        m_sequence->computeQualityMetrics();
+    }
     updateTable();
     updateReferenceLabel();
 }
@@ -235,7 +256,8 @@ void RegistrationDialog::updateTable() {
             m_imageTable->setItem(i, 3, new QTableWidgetItem("-"));
         }
         
-        m_imageTable->setItem(i, 4, new QTableWidgetItem("-"));
+        m_imageTable->setItem(i, 4, new QTableWidgetItem(
+            img.quality.hasMetrics ? QString::number(img.quality.starCount) : "-"));
     }
 }
 

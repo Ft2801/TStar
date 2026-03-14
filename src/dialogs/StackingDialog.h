@@ -4,6 +4,7 @@
 
 #include <QDialog>
 #include <QTableWidget>
+#include <QTableWidgetItem>
 #include <QComboBox>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
@@ -82,6 +83,7 @@ private slots:
     // Table slots
     void onTableSelectionChanged();
     void onTableItemDoubleClicked(int row, int column);
+    void onTableItemChanged(QTableWidgetItem* item);
     
     // Comet slots
     void onPickCometFirst();
@@ -101,6 +103,7 @@ private:
     void updateTable();
     void updateParameterVisibility();
     void updateSummary();
+    void applyCurrentFilter();
     
     Stacking::StackingParams gatherParams() const;
     QString generateOutputFilename() const;
@@ -118,6 +121,7 @@ private:
     
     // UI Components - Filtering
     QComboBox* m_filterCombo;
+    QComboBox* m_filterModeCombo;
     QDoubleSpinBox* m_filterValue;
     
     // UI Components - Parameters
@@ -136,6 +140,8 @@ private:
     QCheckBox* m_equalizeRGBCheck;
     QCheckBox* m_maximizeFramingCheck;
     QCheckBox* m_createRejMapsCheck;
+    QCheckBox* m_fastNormCheck;
+    QCheckBox* m_overlapNormCheck;
 
     // Debayer Options
     QCheckBox* m_debayerCheck;

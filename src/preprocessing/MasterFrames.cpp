@@ -6,10 +6,55 @@
  */
 
 #include "MasterFrames.h"
+#include "Preprocessing.h"
 #include "../io/FitsWrapper.h"
 #include "../stacking/StackingEngine.h"
 #include "../stacking/StackingSequence.h"
 #include "../stacking/Statistics.h"
+#include <QDateTime>
+#include <QDir>
+
+namespace {
+
+bool calibrateFramesForMaster(const QStringList& sourceFiles,
+                              const Preprocessing::PreprocessParams& params,
+                              const QString& workingDirectory,
+                              QStringList& calibratedFiles,
+                              Preprocessing::ProgressCallback progress,
+                              const QString& stageLabel) {
+    QDir dir(workingDirectory);
+    if (!dir.exists() && !dir.mkpath(".")) {
+        return false;
+    }
+
+    Preprocessing::PreprocessingEngine engine;
+    engine.setParams(params);
+
+    calibratedFiles.clear();
+    for (int i = 0; i < sourceFiles.size(); ++i) {
+        if (progress) {
+            progress(QObject::tr("%1 %2/%3...").arg(stageLabel).arg(i + 1).arg(sourceFiles.size()),
+                     static_cast<double>(i) / std::max(1LL, static_cast<long long>(sourceFiles.size())));
+        }
+
+        const QFileInfo fileInfo(sourceFiles[i]);
+        const QString outPath = dir.filePath(QString("cal_%1.fit").arg(i, 4, 10, QChar('0')));
+        if (!engine.preprocessFile(sourceFiles[i], outPath)) {
+            calibratedFiles.clear();
+            return false;
+        }
+
+        calibratedFiles.append(outPath);
+    }
+
+    if (progress) {
+        progress(QObject::tr("%1 complete").arg(stageLabel), 1.0);
+    }
+
+    return !calibratedFiles.isEmpty();
+}
+
+} // namespace
 
 namespace Preprocessing {
 
@@ -189,19 +234,33 @@ bool MasterFrames::createMasterDark(
     if (files.isEmpty()) {
         return false;
     }
-    
-    // Load master bias if provided
-    std::unique_ptr<ImageBuffer> bias;
+
+    QStringList stackInputFiles = files;
+    QString tempDirPath;
     if (!masterBias.isEmpty()) {
-        bias = std::make_unique<ImageBuffer>();
-        if (!Stacking::FitsIO::read(masterBias, *bias)) {
-            bias.reset();
+        tempDirPath = QDir::temp().filePath(
+            QString("tstar_masterdark_%1").arg(QDateTime::currentMSecsSinceEpoch()));
+
+        PreprocessParams params;
+        params.masterBias = masterBias;
+        params.useBias = true;
+        params.useDark = false;
+        params.useFlat = false;
+        params.outputFloat = true;
+
+        if (!calibrateFramesForMaster(files, params, tempDirPath, stackInputFiles, progress,
+                                      QObject::tr("Calibrating dark frame"))) {
+            QDir(tempDirPath).removeRecursively();
+            return false;
         }
     }
     
     // Create stacking sequence
     Stacking::ImageSequence sequence;
-    if (!sequence.loadFromFiles(files, progress)) {
+    if (!sequence.loadFromFiles(stackInputFiles, progress)) {
+        if (!tempDirPath.isEmpty()) {
+            QDir(tempDirPath).removeRecursively();
+        }
         return false;
     }
     
@@ -229,19 +288,14 @@ bool MasterFrames::createMasterDark(
     auto result = engine.execute(args);
     
     if (result != Stacking::StackResult::OK) {
+        if (!tempDirPath.isEmpty()) {
+            QDir(tempDirPath).removeRecursively();
+        }
         return false;
     }
-    
-    // Subtract bias from result if provided
-    if (bias && bias->isValid()) {
-        float* darkData = args.result.data().data();
-        const float* biasData = bias->data().data();
-        size_t size = static_cast<size_t>(args.result.width()) * 
-                      args.result.height() * args.result.channels();
-        
-        for (size_t i = 0; i < size; ++i) {
-            darkData[i] -= biasData[i];
-        }
+
+    if (!tempDirPath.isEmpty()) {
+        QDir(tempDirPath).removeRecursively();
     }
     
     // Save result
@@ -262,28 +316,34 @@ bool MasterFrames::createMasterFlat(
     if (files.isEmpty()) {
         return false;
     }
-    
-    // Load master bias if provided
-    std::unique_ptr<ImageBuffer> bias;
-    if (!masterBias.isEmpty()) {
-        bias = std::make_unique<ImageBuffer>();
-        if (!Stacking::FitsIO::read(masterBias, *bias)) {
-            bias.reset();
-        }
-    }
-    
-    // Load master dark if provided
-    std::unique_ptr<ImageBuffer> dark;
-    if (!masterDark.isEmpty()) {
-        dark = std::make_unique<ImageBuffer>();
-        if (!Stacking::FitsIO::read(masterDark, *dark)) {
-            dark.reset();
+
+    QStringList stackInputFiles = files;
+    QString tempDirPath;
+    if (!masterBias.isEmpty() || !masterDark.isEmpty()) {
+        tempDirPath = QDir::temp().filePath(
+            QString("tstar_masterflat_%1").arg(QDateTime::currentMSecsSinceEpoch()));
+
+        PreprocessParams params;
+        params.masterBias = masterBias;
+        params.masterDark = masterDark;
+        params.useBias = !masterBias.isEmpty();
+        params.useDark = !masterDark.isEmpty();
+        params.useFlat = false;
+        params.outputFloat = true;
+
+        if (!calibrateFramesForMaster(files, params, tempDirPath, stackInputFiles, progress,
+                                      QObject::tr("Calibrating flat frame"))) {
+            QDir(tempDirPath).removeRecursively();
+            return false;
         }
     }
     
     // Create stacking sequence
     Stacking::ImageSequence sequence;
-    if (!sequence.loadFromFiles(files, progress)) {
+    if (!sequence.loadFromFiles(stackInputFiles, progress)) {
+        if (!tempDirPath.isEmpty()) {
+            QDir(tempDirPath).removeRecursively();
+        }
         return false;
     }
     
@@ -312,27 +372,17 @@ bool MasterFrames::createMasterFlat(
     auto result = engine.execute(args);
     
     if (result != Stacking::StackResult::OK) {
+        if (!tempDirPath.isEmpty()) {
+            QDir(tempDirPath).removeRecursively();
+        }
         return false;
     }
-    
-    // Calibrate result: subtract bias and dark
+
+    if (!tempDirPath.isEmpty()) {
+        QDir(tempDirPath).removeRecursively();
+    }
+
     float* flatData = args.result.data().data();
-    size_t size = static_cast<size_t>(args.result.width()) * 
-                  args.result.height() * args.result.channels();
-    
-    if (bias && bias->isValid()) {
-        const float* biasData = bias->data().data();
-        for (size_t i = 0; i < size; ++i) {
-            flatData[i] -= biasData[i];
-        }
-    }
-    
-    if (dark && dark->isValid()) {
-        const float* darkData = dark->data().data();
-        for (size_t i = 0; i < size; ++i) {
-            flatData[i] -= darkData[i];
-        }
-    }
     
     // Normalize flat so median = 1.0
     // Per channel if color

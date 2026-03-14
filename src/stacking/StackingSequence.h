@@ -272,7 +272,7 @@ public:
     /**
      * @brief Check if any image has registration data
      */
-    bool hasRegistration() const { return m_hasRegistration; }
+    bool hasRegistration() const;
     
     /**
      * @brief Check if quality metrics are available
