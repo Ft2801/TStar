@@ -3711,6 +3711,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Correction des Aberrations</translation>
         </message>
         <message>
+            <source>Abort</source>
+            <translation type="finished">Abandonner</translation>
+        </message>
+        <message>
             <source>About TStar</source>
             <translation type="finished">À propos de TStar</translation>
         </message>
@@ -3867,16 +3871,12 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Impossible de valider le fichier projet : %1</translation>
         </message>
         <message>
+            <source>Cannot commit snapshot file.</source>
+            <translation type="finished">Impossible de sauvegarder le fichier d'instantané.</translation>
+        </message>
+        <message>
             <source>Cannot create project directory: %1</source>
             <translation type="finished">Impossible de créer le dossier du projet : %1</translation>
-        </message>
-        <message>
-            <source>Cannot create temporary snapshot file.</source>
-            <translation type="finished">Impossible de créer le fichier temporaire d'instantané.</translation>
-        </message>
-        <message>
-            <source>Cannot finalize compressed snapshot file.</source>
-            <translation type="finished">Impossible de finaliser le fichier d'instantané compressé.</translation>
         </message>
         <message>
             <source>Cannot open project file for writing: %1</source>
@@ -3887,8 +3887,12 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Impossible d'ouvrir le fichier projet : %1</translation>
         </message>
         <message>
-            <source>Cannot read temporary snapshot file.</source>
-            <translation type="finished">Impossible de lire le fichier temporaire d'instantané.</translation>
+            <source>Cannot open snapshot file for writing.</source>
+            <translation type="finished">Impossible d'ouvrir le fichier d'instantané en écriture.</translation>
+        </message>
+        <message>
+            <source>Cannot open snapshot file.</source>
+            <translation type="finished">Impossible d'ouvrir le fichier d'instantané.</translation>
         </message>
         <message>
             <source>Cannot restore '%1' from source image.</source>
@@ -3897,10 +3901,6 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Cannot restore '%1': snapshot and source image are missing.</source>
             <translation type="finished">Impossible de restaurer "%1" : l'instantané et l'image source sont manquants.</translation>
-        </message>
-        <message>
-            <source>Cannot write compressed snapshot file.</source>
-            <translation type="finished">Impossible d'écrire le fichier d'instantané compressé.</translation>
         </message>
         <message>
             <source>Catalog Background Extraction (CBE)</source>
@@ -3989,6 +3989,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Ctrl+Z / Ctrl+Shift+Z: undo / redo</source>
             <translation type="finished">Ctrl+Z / Ctrl+Maj+Z: annuler / refaire</translation>
+        </message>
+        <message>
+            <source>Current</source>
+            <translation type="finished">Actuel</translation>
         </message>
         <message>
             <source>Curves Transformation</source>
@@ -4081,6 +4085,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Failed to load extension %1: %2</source>
             <translation type="finished">Échec chargement extension %1 : %2</translation>
+        </message>
+        <message>
+            <source>Failed to load legacy FITS snapshot.</source>
+            <translation type="finished">Impossible de charger l'instantané FITS legacy.</translation>
         </message>
         <message>
             <source>Failed to load project snapshot '%1': %2</source>
@@ -4239,6 +4247,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Lier Zoom et Pan</translation>
         </message>
         <message>
+            <source>Loading Workspace Snapshots...</source>
+            <translation type="finished">Chargement des instantanés de l'espace de travail...</translation>
+        </message>
+        <message>
             <source>Loading image %1/%2...</source>
             <translation type="finished">Chargement image %1/%2...</translation>
         </message>
@@ -4309,10 +4321,6 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Multiscale Decomposition</source>
             <translation type="finished">Décomposition multéchelle</translation>
-        </message>
-        <message>
-            <source>NB to RGB Stars</source>
-            <translation type="finished">NB à RGB Stars</translation>
         </message>
         <message>
             <source>NB → RGB Stars</source>
@@ -4683,6 +4691,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Erreur d'Enregistrement du Projet</translation>
         </message>
         <message>
+            <source>Project Workspace Management</source>
+            <translation type="finished">Gestion du projet Workspace</translation>
+        </message>
+        <message>
             <source>Project created: %1</source>
             <translation type="finished">Projet créé : %1</translation>
         </message>
@@ -4713,6 +4725,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Redo</source>
             <translation type="finished">Refaire</translation>
+        </message>
+        <message>
+            <source>Redo %1</source>
+            <translation type="finished">Rétablir %1</translation>
         </message>
         <message>
             <source>Redo (Ctrl+Shift+Z)</source>
@@ -4836,6 +4852,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Enregistré : %1</translation>
         </message>
         <message>
+            <source>Saving Workspace Project...</source>
+            <translation type="finished">Enregistrement du projet d'espace de travail...</translation>
+        </message>
+        <message>
             <source>Script dialog closed.</source>
             <translation type="finished">Dialogue script fermé.</translation>
         </message>
@@ -4890,6 +4910,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Show Overlay</source>
             <translation type="finished">Afficher la Superposition</translation>
+        </message>
+        <message>
+            <source>Snapshot data corruption or incompatible version.</source>
+            <translation type="finished">Corruption des données de l'instantané ou version incompatible.</translation>
         </message>
         <message>
             <source>Some source images are missing. Do you want to select a folder for automatic relink?</source>
@@ -4984,8 +5008,16 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Annuler</translation>
         </message>
         <message>
+            <source>Undo %1</source>
+            <translation type="finished">Annuler %1</translation>
+        </message>
+        <message>
             <source>Undo (Ctrl+Z)</source>
             <translation type="finished">Annuler (Ctrl+Z)</translation>
+        </message>
+        <message>
+            <source>Unknown error during snapshot saving.</source>
+            <translation type="finished">Erreur inconnue lors de la sauvegarde de l'instantané.</translation>
         </message>
         <message>
             <source>Untitled</source>

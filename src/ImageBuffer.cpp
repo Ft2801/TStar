@@ -3968,3 +3968,160 @@ std::vector<float> ImageBuffer::generateHQStarMask(const std::vector<HQStar>& st
       std::memcpy(mask.data(), blurredMask.ptr<float>(), mask.size() * sizeof(float));
       return mask;
 }
+// --- Serialization Implementation ---
+
+// Helper for std::vector serialization with QDataStream
+template<typename T>
+QDataStream &operator<<(QDataStream &out, const std::vector<T> &v) {
+    out << (quint32)v.size();
+    for (const auto &item : v) out << item;
+    return out;
+}
+
+template<typename T>
+QDataStream &operator>>(QDataStream &in, std::vector<T> &v) {
+    quint32 size; in >> size;
+    if (in.status() != QDataStream::Ok || size > 1000000000) { // Safety limit: 1B elements
+        in.setStatus(QDataStream::ReadPastEnd);
+        return in;
+    }
+    v.resize(size);
+    for (quint32 i = 0; i < size; ++i) in >> v[i];
+    return in;
+}
+
+QDataStream &operator<<(QDataStream &out, const CatalogStar &star) {
+    out << star.ra << star.dec << star.magB << star.magV << star.B_V << star.teff;
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, CatalogStar &star) {
+    in >> star.ra >> star.dec >> star.magB >> star.magV >> star.B_V >> star.teff;
+    return in;
+}
+
+QDataStream &operator<<(QDataStream &out, const PCCResult &res) {
+    out << res.valid << res.R_factor << res.G_factor << res.B_factor
+        << res.bg_r << res.bg_g << res.bg_b
+        << res.CatRG << res.ImgRG << res.CatBG << res.ImgBG
+        << res.slopeRG << res.iceptRG << res.slopeBG << res.iceptBG;
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, PCCResult &res) {
+    in >> res.valid >> res.R_factor >> res.G_factor >> res.B_factor
+       >> res.bg_r >> res.bg_g >> res.bg_b
+       >> res.CatRG >> res.ImgRG >> res.CatBG >> res.ImgBG
+       >> res.slopeRG >> res.iceptRG >> res.slopeBG >> res.iceptBG;
+    return in;
+}
+
+QDataStream &operator<<(QDataStream &out, const ImageBuffer::Metadata::HeaderCard &card) {
+    out << card.key << card.value << card.comment;
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, ImageBuffer::Metadata::HeaderCard &card) {
+    in >> card.key >> card.value >> card.comment;
+    return in;
+}
+
+QDataStream &operator<<(QDataStream &out, const ImageBuffer::Metadata &meta) {
+    out << meta.focalLength << meta.pixelSize << meta.exposure << meta.ra << meta.dec
+        << meta.crpix1 << meta.crpix2 << meta.cd1_1 << meta.cd1_2 << meta.cd2_1 << meta.cd2_2
+        << meta.ctype1 << meta.ctype2 << meta.equinox << meta.lonpole << meta.latpole
+        << meta.sipOrderA << meta.sipOrderB << meta.sipOrderAP << meta.sipOrderBP << meta.sipCoeffs
+        << meta.objectName << meta.dateObs << meta.filePath << meta.bitDepth << meta.isMono
+        << (qint64)meta.stackCount << meta.ccdTemp << meta.bayerPattern;
+    
+    // Manual serialization for vectors of structs
+    out << (quint32)meta.catalogStars.size();
+    for (const auto& s : meta.catalogStars) out << s;
+    
+    out << meta.pccResult;
+    
+    out << (quint32)meta.rawHeaders.size();
+    for (const auto& c : meta.rawHeaders) out << c;
+    
+    out << meta.xisfProperties;
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, ImageBuffer::Metadata &meta) {
+    in >> meta.focalLength >> meta.pixelSize >> meta.exposure >> meta.ra >> meta.dec
+       >> meta.crpix1 >> meta.crpix2 >> meta.cd1_1 >> meta.cd1_2 >> meta.cd2_1 >> meta.cd2_2
+       >> meta.ctype1 >> meta.ctype2 >> meta.equinox >> meta.lonpole >> meta.latpole
+       >> meta.sipOrderA >> meta.sipOrderB >> meta.sipOrderAP >> meta.sipOrderBP >> meta.sipCoeffs
+       >> meta.objectName >> meta.dateObs >> meta.filePath >> meta.bitDepth >> meta.isMono;
+    qint64 sc; in >> sc; meta.stackCount = sc;
+    in >> meta.ccdTemp >> meta.bayerPattern;
+    
+    quint32 starSize; in >> starSize;
+    meta.catalogStars.resize(starSize);
+    for (quint32 i = 0; i < starSize; ++i) in >> meta.catalogStars[i];
+    
+    in >> meta.pccResult;
+    
+    quint32 cardSize; in >> cardSize;
+    meta.rawHeaders.resize(cardSize);
+    for (quint32 i = 0; i < cardSize; ++i) in >> meta.rawHeaders[i];
+    
+    in >> meta.xisfProperties;
+    return in;
+}
+
+QDataStream &operator<<(QDataStream &out, const MaskLayer &mask) {
+    out << mask.data << mask.width << mask.height << mask.id << mask.name
+        << mask.mode << mask.inverted << mask.visible << mask.opacity;
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, MaskLayer &mask) {
+    in >> mask.data >> mask.width >> mask.height >> mask.id >> mask.name
+       >> mask.mode >> mask.inverted >> mask.visible >> mask.opacity;
+    return in;
+}
+
+QDataStream &operator<<(QDataStream &out, const ImageBuffer &buffer) {
+    ImageBuffer::ReadLock lock(&buffer);
+    out.writeRawData("TSNP", 4); // Magic Signature
+    out << (qint32)1; // Format Version
+    out << (qint32)buffer.m_width << (qint32)buffer.m_height << (qint32)buffer.m_channels;
+    
+    // Write pixel data as raw bytes for maximum speed
+    quint64 totalFloats = (quint64)buffer.m_data.size();
+    out << totalFloats;
+    if (totalFloats > 0) {
+        out.writeRawData(reinterpret_cast<const char*>(buffer.m_data.data()), totalFloats * sizeof(float));
+    }
+    
+    out << buffer.m_meta;
+    out << buffer.m_name << buffer.m_modified << buffer.m_hasMask;
+    if (buffer.m_hasMask) out << buffer.m_mask;
+    
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, ImageBuffer &buffer) {
+    ImageBuffer::WriteLock lock(&buffer);
+    char magic[4];
+    if (in.readRawData(magic, 4) != 4 || std::memcmp(magic, "TSNP", 4) != 0) {
+        in.setStatus(QDataStream::ReadPastEnd); // Signal failure to detect format
+        return in;
+    }
+    qint32 version; in >> version;
+    qint32 w, h, ch; in >> w >> h >> ch;
+    buffer.m_width = w; buffer.m_height = h; buffer.m_channels = ch;
+    
+    quint64 totalFloats; in >> totalFloats;
+    buffer.m_data.resize(totalFloats);
+    if (totalFloats > 0) {
+        in.readRawData(reinterpret_cast<char*>(buffer.m_data.data()), totalFloats * sizeof(float));
+    }
+    
+    in >> buffer.m_meta;
+    in >> buffer.m_name >> buffer.m_modified >> buffer.m_hasMask;
+    if (buffer.m_hasMask) in >> buffer.m_mask;
+    
+    return in;
+}

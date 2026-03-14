@@ -15,6 +15,7 @@
 #include "core/MaskLayer.h"
 #include <QTransform>
 #include <QDateTime>
+#include <QDataStream>
 
 
 class ImageBuffer {
@@ -270,6 +271,10 @@ public:
         std::vector<HeaderCard> rawHeaders;
         
         QVariantMap xisfProperties;
+
+        // Serialization
+        friend QDataStream &operator<<(QDataStream &out, const Metadata &meta);
+        friend QDataStream &operator>>(QDataStream &in, Metadata &meta);
     };
 
     void setMetadata(const Metadata& meta) { m_meta = meta; }
@@ -303,6 +308,10 @@ public:
 
     // Synchronize WCS struct values back to rawHeaders vector
     void syncWcsToHeaders();
+
+    // Serialization for snapshots
+    friend QDataStream &operator<<(QDataStream &out, const ImageBuffer &buffer);
+    friend QDataStream &operator>>(QDataStream &in, ImageBuffer &buffer);
 
     // Star Extraction & Masking helper structs
     struct DetectedStar {

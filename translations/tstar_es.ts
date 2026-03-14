@@ -3711,6 +3711,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Eliminación de Aberraciones</translation>
         </message>
         <message>
+            <source>Abort</source>
+            <translation type="finished">Abortar</translation>
+        </message>
+        <message>
             <source>About TStar</source>
             <translation type="finished">Acerca de TStar</translation>
         </message>
@@ -3867,16 +3871,12 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">No se puede confirmar el archivo del proyecto: %1</translation>
         </message>
         <message>
+            <source>Cannot commit snapshot file.</source>
+            <translation type="finished">No se puede guardar el archivo de instantánea.</translation>
+        </message>
+        <message>
             <source>Cannot create project directory: %1</source>
             <translation type="finished">No se puede crear el directorio del proyecto: %1</translation>
-        </message>
-        <message>
-            <source>Cannot create temporary snapshot file.</source>
-            <translation type="finished">No se puede crear el archivo temporal de instantánea.</translation>
-        </message>
-        <message>
-            <source>Cannot finalize compressed snapshot file.</source>
-            <translation type="finished">No se puede finalizar el archivo de instantánea comprimida.</translation>
         </message>
         <message>
             <source>Cannot open project file for writing: %1</source>
@@ -3887,8 +3887,12 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">No se puede abrir el archivo del proyecto: %1</translation>
         </message>
         <message>
-            <source>Cannot read temporary snapshot file.</source>
-            <translation type="finished">No se puede leer el archivo temporal de instantánea.</translation>
+            <source>Cannot open snapshot file for writing.</source>
+            <translation type="finished">No se puede abrir el archivo de instantánea para escritura.</translation>
+        </message>
+        <message>
+            <source>Cannot open snapshot file.</source>
+            <translation type="finished">No se puede abrir el archivo de instantánea.</translation>
         </message>
         <message>
             <source>Cannot restore '%1' from source image.</source>
@@ -3897,10 +3901,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Cannot restore '%1': snapshot and source image are missing.</source>
             <translation type="finished">No se puede restaurar "%1": faltan la instantánea y la imagen de origen.</translation>
-        </message>
-        <message>
-            <source>Cannot write compressed snapshot file.</source>
-            <translation type="finished">No se puede escribir el archivo de instantánea comprimida.</translation>
         </message>
         <message>
             <source>Catalog Background Extraction (CBE)</source>
@@ -3989,6 +3989,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Ctrl+Z / Ctrl+Shift+Z: undo / redo</source>
             <translation type="finished">Ctrl+Z / Ctrl+Mayus+Z: deshacer / rehacer</translation>
+        </message>
+        <message>
+            <source>Current</source>
+            <translation type="finished">Actual</translation>
         </message>
         <message>
             <source>Curves Transformation</source>
@@ -4081,6 +4085,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Failed to load extension %1: %2</source>
             <translation type="finished">Fallo al cargar extensión %1: %2</translation>
+        </message>
+        <message>
+            <source>Failed to load legacy FITS snapshot.</source>
+            <translation type="finished">No se pudo cargar la instantánea FITS legacy.</translation>
         </message>
         <message>
             <source>Failed to load project snapshot '%1': %2</source>
@@ -4239,6 +4247,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Vincular Zoom y Pan</translation>
         </message>
         <message>
+            <source>Loading Workspace Snapshots...</source>
+            <translation type="finished">Cargando instantáneas del espacio de trabajo...</translation>
+        </message>
+        <message>
             <source>Loading image %1/%2...</source>
             <translation type="finished">Cargando imagen %1/%2...</translation>
         </message>
@@ -4309,10 +4321,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Multiscale Decomposition</source>
             <translation type="finished">Descomposición multiscala</translation>
-        </message>
-        <message>
-            <source>NB to RGB Stars</source>
-            <translation type="finished">NB a RGB Stars</translation>
         </message>
         <message>
             <source>NB → RGB Stars</source>
@@ -4683,6 +4691,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Error al Guardar Proyecto</translation>
         </message>
         <message>
+            <source>Project Workspace Management</source>
+            <translation type="finished">Gestión del proyecto Workspace</translation>
+        </message>
+        <message>
             <source>Project created: %1</source>
             <translation type="finished">Proyecto creado: %1</translation>
         </message>
@@ -4713,6 +4725,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Redo</source>
             <translation type="finished">Rehacer</translation>
+        </message>
+        <message>
+            <source>Redo %1</source>
+            <translation type="finished">Rehacer %1</translation>
         </message>
         <message>
             <source>Redo (Ctrl+Shift+Z)</source>
@@ -4836,6 +4852,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Guardato: %1</translation>
         </message>
         <message>
+            <source>Saving Workspace Project...</source>
+            <translation type="finished">Guardando proyecto de espacio de trabajo...</translation>
+        </message>
+        <message>
             <source>Script dialog closed.</source>
             <translation type="finished">Diálogo de script cerrado.</translation>
         </message>
@@ -4890,6 +4910,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Show Overlay</source>
             <translation type="finished">Mostrar Superposizione</translation>
+        </message>
+        <message>
+            <source>Snapshot data corruption or incompatible version.</source>
+            <translation type="finished">Corrupción de datos de la instantánea o versión incompatible.</translation>
         </message>
         <message>
             <source>Some source images are missing. Do you want to select a folder for automatic relink?</source>
@@ -4984,8 +5008,16 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Deshacer</translation>
         </message>
         <message>
+            <source>Undo %1</source>
+            <translation type="finished">Deshacer %1</translation>
+        </message>
+        <message>
             <source>Undo (Ctrl+Z)</source>
             <translation type="finished">Deshacer (Ctrl+Z)</translation>
+        </message>
+        <message>
+            <source>Unknown error during snapshot saving.</source>
+            <translation type="finished">Error desconocido durante el guardado de la instantánea.</translation>
         </message>
         <message>
             <source>Untitled</source>

@@ -3711,6 +3711,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Aberrations-Entferner</translation>
         </message>
         <message>
+            <source>Abort</source>
+            <translation type="finished">Abbrechen</translation>
+        </message>
+        <message>
             <source>About TStar</source>
             <translation type="finished">Über TStar</translation>
         </message>
@@ -3867,16 +3871,12 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Projektdatei kann nicht übernommen werden: %1</translation>
         </message>
         <message>
+            <source>Cannot commit snapshot file.</source>
+            <translation type="finished">Snapshot-Datei kann nicht gespeichert werden.</translation>
+        </message>
+        <message>
             <source>Cannot create project directory: %1</source>
             <translation type="finished">Projektverzeichnis kann nicht erstellt werden: %1</translation>
-        </message>
-        <message>
-            <source>Cannot create temporary snapshot file.</source>
-            <translation type="finished">Temporäre Snapshot-Datei kann nicht erstellt werden.</translation>
-        </message>
-        <message>
-            <source>Cannot finalize compressed snapshot file.</source>
-            <translation type="finished">Komprimierte Snapshot-Datei kann nicht finalisiert werden.</translation>
         </message>
         <message>
             <source>Cannot open project file for writing: %1</source>
@@ -3887,8 +3887,12 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Projektdatei kann nicht geöffnet werden: %1</translation>
         </message>
         <message>
-            <source>Cannot read temporary snapshot file.</source>
-            <translation type="finished">Temporäre Snapshot-Datei kann nicht gelesen werden.</translation>
+            <source>Cannot open snapshot file for writing.</source>
+            <translation type="finished">Snapshot-Datei kann nicht zum Schreiben geöffnet werden.</translation>
+        </message>
+        <message>
+            <source>Cannot open snapshot file.</source>
+            <translation type="finished">Snapshot-Datei kann nicht geöffnet werden.</translation>
         </message>
         <message>
             <source>Cannot restore '%1' from source image.</source>
@@ -3897,10 +3901,6 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Cannot restore '%1': snapshot and source image are missing.</source>
             <translation type="finished">"%1" kann nicht wiederhergestellt werden: Snapshot und Quellbild fehlen.</translation>
-        </message>
-        <message>
-            <source>Cannot write compressed snapshot file.</source>
-            <translation type="finished">Komprimierte Snapshot-Datei kann nicht geschrieben werden.</translation>
         </message>
         <message>
             <source>Catalog Background Extraction (CBE)</source>
@@ -3989,6 +3989,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Ctrl+Z / Ctrl+Shift+Z: undo / redo</source>
             <translation type="finished">Ctrl+Z / Ctrl+Umschalt+Z: rückgängig / wiederherstellen</translation>
+        </message>
+        <message>
+            <source>Current</source>
+            <translation type="finished">Aktuell</translation>
         </message>
         <message>
             <source>Curves Transformation</source>
@@ -4081,6 +4085,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Failed to load extension %1: %2</source>
             <translation type="finished">Laden der Erweiterung %1 fehlgeschlagen: %2</translation>
+        </message>
+        <message>
+            <source>Failed to load legacy FITS snapshot.</source>
+            <translation type="finished">Legacy-FITS-Snapshot konnte nicht geladen werden.</translation>
         </message>
         <message>
             <source>Failed to load project snapshot '%1': %2</source>
@@ -4239,6 +4247,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Zoom und Pan verknüpfen</translation>
         </message>
         <message>
+            <source>Loading Workspace Snapshots...</source>
+            <translation type="finished">Lade Workspace-Snapshots...</translation>
+        </message>
+        <message>
             <source>Loading image %1/%2...</source>
             <translation type="finished">Lade Bild %1/%2...</translation>
         </message>
@@ -4309,10 +4321,6 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Multiscale Decomposition</source>
             <translation type="finished">Multiskalare Zerlegung</translation>
-        </message>
-        <message>
-            <source>NB to RGB Stars</source>
-            <translation type="finished">NB zu RGB Stars</translation>
         </message>
         <message>
             <source>NB → RGB Stars</source>
@@ -4683,6 +4691,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Projekt-Speicherfehler</translation>
         </message>
         <message>
+            <source>Project Workspace Management</source>
+            <translation type="finished">Workspace-Projektverwaltung</translation>
+        </message>
+        <message>
             <source>Project created: %1</source>
             <translation type="finished">Projekt erstellt: %1</translation>
         </message>
@@ -4713,6 +4725,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Redo</source>
             <translation type="finished">Wiederholen</translation>
+        </message>
+        <message>
+            <source>Redo %1</source>
+            <translation type="finished">Wiederholen %1</translation>
         </message>
         <message>
             <source>Redo (Ctrl+Shift+Z)</source>
@@ -4836,6 +4852,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Gespeichert: %1</translation>
         </message>
         <message>
+            <source>Saving Workspace Project...</source>
+            <translation type="finished">Workspace-Projekt wird gespeichert...</translation>
+        </message>
+        <message>
             <source>Script dialog closed.</source>
             <translation type="finished">Skriptdialog geschlossen.</translation>
         </message>
@@ -4890,6 +4910,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Show Overlay</source>
             <translation type="finished">Überlagerung anzeigen</translation>
+        </message>
+        <message>
+            <source>Snapshot data corruption or incompatible version.</source>
+            <translation type="finished">Snapshot-Daten beschädigt oder Version inkompatibel.</translation>
         </message>
         <message>
             <source>Some source images are missing. Do you want to select a folder for automatic relink?</source>
@@ -4984,8 +5008,16 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Rückgängig</translation>
         </message>
         <message>
+            <source>Undo %1</source>
+            <translation type="finished">Rückgängig %1</translation>
+        </message>
+        <message>
             <source>Undo (Ctrl+Z)</source>
             <translation type="finished">Rückgängig (Strg+Z)</translation>
+        </message>
+        <message>
+            <source>Unknown error during snapshot saving.</source>
+            <translation type="finished">Unbekannter Fehler beim Speichern des Snapshots.</translation>
         </message>
         <message>
             <source>Untitled</source>

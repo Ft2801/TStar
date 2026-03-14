@@ -205,7 +205,7 @@ private:
     bool maybeSaveWorkspaceProject(const QString& reason);
     bool saveWorkspaceProjectTo(const QString& projectFilePath);
     bool loadWorkspaceProjectFrom(const QString& projectFilePath);
-    QJsonObject captureWorkspaceProjectState(const QString& dataDirPath, const QString& projectBaseDir);
+    QJsonObject captureWorkspaceProjectState(const QString& dataDirPath, const QString& projectBaseDir, QList<struct SaveSnapshotJob>& saveJobs);
     bool restoreWorkspaceProjectState(const QJsonObject& root, const QString& dataDirPath, const QString& projectBaseDir);
     bool closeAllWorkspaceWindows();
     void connectSubwindowProjectTracking(CustomMdiSubWindow* sub);
@@ -249,6 +249,9 @@ private:
     };
     WorkspaceProjectState m_workspaceProject;
     bool m_restoringWorkspaceProject = false;
+    int m_dirtySuppressCount = 0;
+    bool isDirtyBlocked() const { return m_restoringWorkspaceProject || m_dirtySuppressCount > 0; }
+    void suppressDirtyFlag(int durationMs);
 
 public:
     enum LogType { Log_Info, Log_Success, Log_Warning, Log_Error, Log_Action };

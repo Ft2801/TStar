@@ -3709,6 +3709,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Abort</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>About TStar</source>
             <translation type="unfinished" />
         </message>
@@ -3865,15 +3869,11 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Cannot commit snapshot file.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Cannot create project directory: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cannot create temporary snapshot file.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cannot finalize compressed snapshot file.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3885,7 +3885,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Cannot read temporary snapshot file.</source>
+            <source>Cannot open snapshot file for writing.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cannot open snapshot file.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3894,10 +3898,6 @@
         </message>
         <message>
             <source>Cannot restore '%1': snapshot and source image are missing.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Cannot write compressed snapshot file.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3986,6 +3986,10 @@
         </message>
         <message>
             <source>Ctrl+Z / Ctrl+Shift+Z: undo / redo</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Current</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4078,6 +4082,10 @@
         </message>
         <message>
             <source>Failed to load extension %1: %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to load legacy FITS snapshot.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4237,6 +4245,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Loading Workspace Snapshots...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Loading image %1/%2...</source>
             <translation type="unfinished" />
         </message>
@@ -4306,10 +4318,6 @@
         </message>
         <message>
             <source>Multiscale Decomposition</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>NB to RGB Stars</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4681,6 +4689,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Project Workspace Management</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Project created: %1</source>
             <translation type="unfinished" />
         </message>
@@ -4710,6 +4722,10 @@
         </message>
         <message>
             <source>Redo</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Redo %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4833,6 +4849,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Saving Workspace Project...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Script dialog closed.</source>
             <translation type="unfinished" />
         </message>
@@ -4886,6 +4906,10 @@
         </message>
         <message>
             <source>Show Overlay</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Snapshot data corruption or incompatible version.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4981,7 +5005,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Undo %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Undo (Ctrl+Z)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Unknown error during snapshot saving.</source>
             <translation type="unfinished" />
         </message>
         <message>
