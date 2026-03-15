@@ -255,6 +255,18 @@ int main(int argc, char *argv[])
     splash->startFadeOut();
     window->showMaximized(); 
     
+    // Check for .tstarproj file passed as argument
+    for (int i = 1; i < argc; ++i) {
+        QString arg = QString::fromLocal8Bit(argv[i]);
+        if (arg.endsWith(".tstarproj", Qt::CaseInsensitive)) {
+            QFileInfo fi(arg);
+            if (fi.exists() && fi.isFile()) {
+                window->loadWorkspaceProjectAtStartup(fi.absoluteFilePath());
+            }
+            break;
+        }
+    }
+    
     Logger::info("Main window displayed", "Main");
     Logger::info("Application startup complete", "Main");
 

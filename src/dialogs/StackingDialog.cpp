@@ -497,7 +497,6 @@ void StackingDialog::setupParametersGroup() {
     layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding), row, 0, 1, 2);
     
     // Connect signals
-    // Connect signals
     connect(m_methodCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &StackingDialog::onMethodChanged);
     connect(m_rejectionCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),

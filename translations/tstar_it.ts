@@ -2454,10 +2454,6 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Aggiungi etichette e annotazioni usando dati del catalogo.</translation>
         </message>
         <message>
-            <source>Add raw Light frames to the sequence</source>
-            <translation type="finished">Aggiungi i frame Light grezzi alla sequenza</translation>
-        </message>
-        <message>
             <source>Adds WCS (World Coordinate System) metadata</source>
             <translation type="finished">Aggiunge metadati WCS (World Coordinate System)</translation>
         </message>
@@ -2494,6 +2490,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Regola l'ordine polinomiale per la complessità del modello</translation>
         </message>
         <message>
+            <source>Adjust sensitivity for star detection (lower = more stars detected)</source>
+            <translation type="finished">Regola la sensibilità del rilevamento stelle (minore = più stelle rilevate)</translation>
+        </message>
+        <message>
             <source>Adjust the color balance of the image by shifting towards warm (red) or cool (blue) tones and balancing green/magenta tints. Useful for manual white balance correction.</source>
             <translation type="finished">Regola il bilanciamento del colore dell'immagine spostandolo verso toni caldi (rosso) o freddi (blu) e bilanciando le tinte verde/magenta. Utile per la correzione manuale del bilanciamento del bianco.</translation>
         </message>
@@ -2502,12 +2502,12 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Regola le curve tonali per ogni canale RGB indipendentemente o insieme.</translation>
         </message>
         <message>
-            <source>Adjustable star detection threshold</source>
-            <translation type="finished">Soglia di rilevamento stellare regolabile</translation>
-        </message>
-        <message>
             <source>Adjusts protection of bright areas</source>
             <translation type="finished">Regola la protezione delle aree luminose</translation>
+        </message>
+        <message>
+            <source>Advanced Stacking Options:</source>
+            <translation type="finished">Opzioni Avanzate di Stacking:</translation>
         </message>
         <message>
             <source>Advanced background extraction using catalog reference images:</source>
@@ -2518,16 +2518,28 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Strumento di stretching avanzato con controllo completo:</translation>
         </message>
         <message>
+            <source>After stacking, the result is ready for post-processing:</source>
+            <translation type="finished">Dopo lo stacking, il risultato è pronto per la post-elaborazione:</translation>
+        </message>
+        <message>
             <source>Align Channels</source>
             <translation type="finished">Allinea Canali</translation>
         </message>
         <message>
-            <source>Aligns a sequence of images to a reference frame using star detection:</source>
-            <translation type="finished">Allinea una sequenza di immagini a un frame di riferimento tramite rilevamento stellare:</translation>
+            <source>Aligns a sequence of calibrated images to a common reference frame using star-based registration with sub-pixel accuracy:</source>
+            <translation type="finished">Allinea una sequenza di immagini calibrate a un fotogramma di riferimento comune usando la registrazione basata su stelle con precisione sub-pixel:</translation>
+        </message>
+        <message>
+            <source>Aligns images with precision better than a single pixel for optimal stacking results</source>
+            <translation type="finished">Allinea le immagini con una precisione migliore di un singolo pixel per risultati di stacking ottimali</translation>
         </message>
         <message>
             <source>Aligns multiple open images to a reference using star registration:</source>
             <translation type="finished">Allinea più immagini aperte a un riferimento tramite registrazione stellare:</translation>
+        </message>
+        <message>
+            <source>All subsequent File &gt; Open and File &gt; Save operations default to the project directory</source>
+            <translation type="finished">Tutte le successive operazioni File &gt; Apri e File &gt; Salva usano per impostazione predefinita la directory del progetto</translation>
         </message>
         <message>
             <source>Alternative stretches</source>
@@ -2544,6 +2556,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Analyzes the difference between your image and the reference to build a highly accurate gradient model</source>
             <translation type="finished">Analizza la differenza tra la tua immagine e il riferimento per costruire un modello di gradiente altamente accurato</translation>
+        </message>
+        <message>
+            <source>Applies Kappa-Sigma rejection multiple times for aggressive outlier removal.</source>
+            <translation type="finished">Applica il rifiuto Kappa-Sigma più volte per una rimozione aggressiva dei valori anomali.</translation>
+        </message>
+        <message>
+            <source>Apply Calibration: The Calibration Dialog applies masters in the correct order</source>
+            <translation type="finished">Applica Calibrazione: La finestra di dialogo Calibrazione applica i master nell'ordine corretto</translation>
         </message>
         <message>
             <source>Apply Mask:</source>
@@ -2578,6 +2598,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Auto Stretch:</translation>
         </message>
         <message>
+            <source>Auto-save: Project state is automatically preserved between sessions</source>
+            <translation type="finished">Salvataggio automatico: Lo stato del progetto viene conservato automaticamente tra le sessioni</translation>
+        </message>
+        <message>
             <source>Automate complex multi-step image processing workflows</source>
             <translation type="finished">Automatizza flussi di elaborazione immagini complessi a più fasi</translation>
         </message>
@@ -2598,12 +2622,24 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Allunga automaticamente l'immagine basandosi sull'analisi statistica. Ideale per anteprime veloci.</translation>
         </message>
         <message>
+            <source>Average:</source>
+            <translation type="finished">Media:</translation>
+        </message>
+        <message>
             <source>Background Neutralization</source>
             <translation type="finished">Neutralizzazione Fondo</translation>
         </message>
         <message>
+            <source>Background Removal: Apply ABE or CBE to eliminate gradients</source>
+            <translation type="finished">Rimozione Sfondo: Applica ABE o CBE per eliminare i gradienti</translation>
+        </message>
+        <message>
             <source>Batch Crop: applies the same crop to all currently open images</source>
             <translation type="finished">Ritaglio multiplo: applica lo stesso ritaglio a tutte le immagini aperte</translation>
+        </message>
+        <message>
+            <source>Batch Processing:</source>
+            <translation type="finished">Elaborazione Batch:</translation>
         </message>
         <message>
             <source>Batch converts camera RAW files to FITS format:</source>
@@ -2612,6 +2648,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Black Point</source>
             <translation type="finished">Punto Nero</translation>
+        </message>
+        <message>
+            <source>Blend overlapping image edges smoothly to reduce seaming artifacts</source>
+            <translation type="finished">Mescola i bordi delle immagini sovrapposte in modo fluido per ridurre gli artefatti di cucitura</translation>
         </message>
         <message>
             <source>Blends narrowband star channels with RGB star data:</source>
@@ -2638,12 +2678,16 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Calibra i colori usando dati del catalogo stellare:</translation>
         </message>
         <message>
-            <source>Calibrates raw light frames using master calibration images:</source>
-            <translation type="finished">Calibra i fotogrammi di luce grezzi utilizzando immagini di calibrazione master:</translation>
+            <source>Calibration Workflow:</source>
+            <translation type="finished">Flusso di Lavoro Calibrazione:</translation>
         </message>
         <message>
             <source>Catalog Background Extraction (CBE)</source>
             <translation type="finished">Estrazione Sfondo da Catalogo (CBE)</translation>
+        </message>
+        <message>
+            <source>Channel Mode:</source>
+            <translation type="finished">Modalità Canale:</translation>
         </message>
         <message>
             <source>Channel Operations</source>
@@ -2654,12 +2698,28 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Controlla il pannello Console per i messaggi di elaborazione</translation>
         </message>
         <message>
+            <source>Choose Stacking Mode: Select algorithm matching your needs and data quality</source>
+            <translation type="finished">Scegli Modalità Stacking: Seleziona algoritmo adatto alle tue esigenze e qualità dei dati</translation>
+        </message>
+        <message>
             <source>Choose Subtract or Divide mode</source>
             <translation type="finished">Scegli la modalità Sottrai o Dividi</translation>
         </message>
         <message>
+            <source>Choose between affecting all channels or specific color ranges</source>
+            <translation type="finished">Scegli tra influenzare tutti i canali o intervalli di colore specifici</translation>
+        </message>
+        <message>
             <source>Choose from presets like SHO (Hubble), HOO, HSO, Foraxx, and more</source>
             <translation type="finished">Scegli tra preset come SHO (Hubble), HOO, HSO, Foraxx e altri</translation>
+        </message>
+        <message>
+            <source>Click File &gt; New Project or use the Project Manager</source>
+            <translation type="finished">Fai clic su File &gt; Nuovo Progetto o usa il Gestore Progetti</translation>
+        </message>
+        <message>
+            <source>Click File &gt; Open Project and select the project file (.tsproj)</source>
+            <translation type="finished">Fai clic su File &gt; Apri Progetto e seleziona il file di progetto (.tsproj)</translation>
         </message>
         <message>
             <source>Click Open or press Ctrl+O</source>
@@ -2690,8 +2750,16 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Chiudi</translation>
         </message>
         <message>
+            <source>Closing Project: Use File &gt; Close Project to deactivate the current project</source>
+            <translation type="finished">Chiusura Progetto: Usa File &gt; Chiudi Progetto per disattivare il progetto corrente</translation>
+        </message>
+        <message>
             <source>Color Boost:</source>
             <translation type="finished">Potenziamento Colore:</translation>
+        </message>
+        <message>
+            <source>Color Correction: Calibrate colors using PCC or manual temperature adjustment</source>
+            <translation type="finished">Correzione Colore: Calibra i colori usando PCC o regolazione manuale della temperatura</translation>
         </message>
         <message>
             <source>Color Management</source>
@@ -2704,6 +2772,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Combine images with formulas</source>
             <translation type="finished">Combina immagini con formule</translation>
+        </message>
+        <message>
+            <source>Combines registered images to reduce noise and increase signal-to-noise ratio (SNR). Different stacking modes offer various trade-offs between noise reduction and artifact rejection:</source>
+            <translation type="finished">Combina le immagini registrate per ridurre il rumore e aumentare il rapporto segnale-rumore (SNR). Diverse modalità di stacking offrono vari compromessi tra riduzione del rumore e rifiuto degli artefatti:</translation>
         </message>
         <message>
             <source>Combines separate channel images into one RGB image.</source>
@@ -2722,8 +2794,28 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Compressione:</translation>
         </message>
         <message>
+            <source>Computes translation, rotation, and optional scale corrections</source>
+            <translation type="finished">Calcola correzioni di traslazione, rotazione e scala facoltativa</translation>
+        </message>
+        <message>
+            <source>Configure Normalization: Select normalization method for frame scaling</source>
+            <translation type="finished">Configura Normalizzazione: Seleziona il metodo di normalizzazione per la scalatura dei fotogrammi</translation>
+        </message>
+        <message>
+            <source>Configure Rejection: Set sigma levels or percentages based on frame count</source>
+            <translation type="finished">Configura Rifiuto: Imposta i livelli sigma o percentuali in base al conteggio dei fotogrammi</translation>
+        </message>
+        <message>
+            <source>Configure Weighting: Optionally weight by quality metrics</source>
+            <translation type="finished">Configura Pesterazione: Facoltativamente pesa in base alle metriche di qualità</translation>
+        </message>
+        <message>
             <source>Content-Aware:</source>
             <translation type="finished">Consapevole del Contenuto:</translation>
+        </message>
+        <message>
+            <source>Context: Scripts and processing operations maintain awareness of project-specific paths</source>
+            <translation type="finished">Contesto: Gli script e le operazioni di elaborazione mantengono consapevolezza dei percorsi specifici del progetto</translation>
         </message>
         <message>
             <source>Continuum Subtraction</source>
@@ -2746,16 +2838,48 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Controlla l'intensità dello stretching (0-10)</translation>
         </message>
         <message>
+            <source>Controls the intensity of magenta removal (0-100%)</source>
+            <translation type="finished">Controlla l'intensità della rimozione magenta (0-100%)</translation>
+        </message>
+        <message>
             <source>Controls the non-linear expansion of stars.</source>
             <translation type="finished">Controlla l'espansione non lineare delle stelle.</translation>
+        </message>
+        <message>
+            <source>Convert multiple files at once</source>
+            <translation type="finished">Converti più file contemporaneamente</translation>
+        </message>
+        <message>
+            <source>Convert raw images to a standardized format before processing:</source>
+            <translation type="finished">Converti le immagini raw a un formato standardizzato prima dell'elaborazione:</translation>
+        </message>
+        <message>
+            <source>Converts Bayer pattern (OSC/DSLR) images to full RGB color</source>
+            <translation type="finished">Converte le immagini del pattern Bayer (OSC/DSLR) a colore RGB completo</translation>
         </message>
         <message>
             <source>Converts RAW Bayer pattern images to full color.</source>
             <translation type="finished">Converte immagini pattern Bayer RAW a colori.</translation>
         </message>
         <message>
+            <source>Converts camera RAW (CR2, NEF, ARW, etc.) to FITS format with metadata preservation</source>
+            <translation type="finished">Converte RAW fotocamera (CR2, NEF, ARW, ecc.) in formato FITS con conservazione dei metadati</translation>
+        </message>
+        <message>
             <source>Correction Brush</source>
             <translation type="finished">Pennello Correttivo</translation>
+        </message>
+        <message>
+            <source>Correction Strength:</source>
+            <translation type="finished">Intensità Correzione:</translation>
+        </message>
+        <message>
+            <source>Corrects light frames using master calibration images to remove instrumental signature and improve image quality:</source>
+            <translation type="finished">Corregge i fotogrammi light usando immagini di calibrazione master per rimuovere la firma strumentale e migliorare la qualità dell'immagine:</translation>
+        </message>
+        <message>
+            <source>Corrects vignetting and uneven illumination across the field of view</source>
+            <translation type="finished">Corregge vignetatura e illuminazione non uniforme nel campo visivo</translation>
         </message>
         <message>
             <source>Cosmic Clarity</source>
@@ -2764,6 +2888,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Create Mask:</source>
             <translation type="finished">Crea Maschera:</translation>
+        </message>
+        <message>
+            <source>Create Master Frames: Average multiple bias/dark/flat exposures per filter</source>
+            <translation type="finished">Crea Fotogrammi Master: Media le esposizioni bias/dark/flat multiple per filtro</translation>
         </message>
         <message>
             <source>Create and apply luminosity masks for selective processing:</source>
@@ -2776,6 +2904,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Creates a starless version of your image</source>
             <translation type="finished">Crea una versione senza stelle della tua immagine</translation>
+        </message>
+        <message>
+            <source>Creating a New Project</source>
+            <translation type="finished">Creazione di un Nuovo Progetto</translation>
         </message>
         <message>
             <source>Crop and rotate the image with precision:</source>
@@ -2792,6 +2924,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Debayer</source>
             <translation type="finished">Debayer</translation>
+        </message>
+        <message>
+            <source>Debayer:</source>
+            <translation type="finished">Debayer:</translation>
         </message>
         <message>
             <source>Decomposes the image into multiple wavelet layers for local editing:</source>
@@ -2854,6 +2990,18 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Migliora i dettagli a banda stretta sottraendo la luce continua/stellare a banda larga:</translation>
         </message>
         <message>
+            <source>Ensures all input images are in the same format (FITS recommended for astrophotography)</source>
+            <translation type="finished">Assicura che tutte le immagini di input siano nello stesso formato (FITS consigliato per l'astrofotografia)</translation>
+        </message>
+        <message>
+            <source>Enter a project name and select a directory location</source>
+            <translation type="finished">Inserisci il nome del progetto e seleziona la posizione della directory</translation>
+        </message>
+        <message>
+            <source>Execute Stack: Combine and output final integrated image</source>
+            <translation type="finished">Esegui Stack: Combina e genera l'immagine integrata finale</translation>
+        </message>
+        <message>
             <source>Export individual layers to new windows</source>
             <translation type="finished">Esporta i singoli livelli in nuove finestre</translation>
         </message>
@@ -2874,6 +3022,22 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Editor Header FITS</translation>
         </message>
         <message>
+            <source>FITS keywords and image properties are automatically transferred to preserve EXIF data</source>
+            <translation type="finished">Le parole chiave FITS e le proprietà dell'immagine vengono trasferite automaticamente per preservare i dati EXIF</translation>
+        </message>
+        <message>
+            <source>Fast normalization or K-Sigma-based normalization per frame</source>
+            <translation type="finished">Normalizzazione rapida o normalizzazione basata su K-Sigma per fotogramma</translation>
+        </message>
+        <message>
+            <source>Feathering:</source>
+            <translation type="finished">Sfumatura:</translation>
+        </message>
+        <message>
+            <source>First image in sequence used as reference (or manually selected)</source>
+            <translation type="finished">La prima immagine nella sequenza utilizzata come riferimento (o selezionata manualmente)</translation>
+        </message>
+        <message>
             <source>Fit to Window:</source>
             <translation type="finished">Adatta alla finestra:</translation>
         </message>
@@ -2888,6 +3052,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>For best results, stretch AFTER background removal</source>
             <translation type="finished">Per i migliori risultati, stira DOPO la rimozione dello sfondo</translation>
+        </message>
+        <message>
+            <source>Format Normalization:</source>
+            <translation type="finished">Normalizzazione Formato:</translation>
         </message>
         <message>
             <source>GHS (Generalized Hyperbolic Stretch)</source>
@@ -2930,6 +3098,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Ideale per allineare esposizioni separate di banda stretta o canali RGB</translation>
         </message>
         <message>
+            <source>Ideal for correcting color casts caused by light pollution filters or atmospheric conditions</source>
+            <translation type="finished">Ideale per correggere dominanti di colore causate da filtri anti-inquinamento luminoso o condizioni atmosferiche</translation>
+        </message>
+        <message>
+            <source>Identifies bright stars in each image as reference points</source>
+            <translation type="finished">Identifica le stelle luminose in ogni immagine come punti di riferimento</translation>
+        </message>
+        <message>
             <source>Identifies the exact sky coordinates of your image:</source>
             <translation type="finished">Identifica le coordinate esatte del cielo della tua immagine:</translation>
         </message>
@@ -2942,6 +3118,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Calibrazione Immagine</translation>
         </message>
         <message>
+            <source>Image Conversion</source>
+            <translation type="finished">Conversione Immagine</translation>
+        </message>
+        <message>
             <source>Image Pipeline</source>
             <translation type="finished">Pipeline Immagine</translation>
         </message>
@@ -2952,6 +3132,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Image Stacking</source>
             <translation type="finished">Stacking Immagine</translation>
+        </message>
+        <message>
+            <source>Image Weighting:</source>
+            <translation type="finished">Ponderazione Immagine:</translation>
         </message>
         <message>
             <source>Increases color saturation specifically for stars.</source>
@@ -2978,6 +3162,18 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Inverti selezione maschera</translation>
         </message>
         <message>
+            <source>Isolation: Keep different imaging sessions completely separate</source>
+            <translation type="finished">Isolamento: Mantieni diverse sessioni di imaging completamente separate</translation>
+        </message>
+        <message>
+            <source>Iterative Sigma:</source>
+            <translation type="finished">Sigma Iterativo:</translation>
+        </message>
+        <message>
+            <source>Kappa-Sigma:</source>
+            <translation type="finished">Kappa-Sigma:</translation>
+        </message>
+        <message>
             <source>Keyboard Shortcuts</source>
             <translation type="finished">Scorciatoie da Tastiera</translation>
         </message>
@@ -2990,12 +3186,28 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Carica i canali stellari a banda stretta Ha, OIII e SII</translation>
         </message>
         <message>
+            <source>Load Light Frames: Select all science images to be calibrated</source>
+            <translation type="finished">Carica Fotogrammi Light: Seleziona tutte le immagini scientifiche da calibrare</translation>
+        </message>
+        <message>
+            <source>Load Registered Images: Select the aligned image sequence</source>
+            <translation type="finished">Carica Immagini Registrate: Seleziona la sequenza di immagini allineate</translation>
+        </message>
+        <message>
             <source>Load and apply existing mask</source>
             <translation type="finished">Carica e applica maschera esistente</translation>
         </message>
         <message>
             <source>Local intensity adjustment (-5 to 15)</source>
             <translation type="finished">Regolazione intensità locale (-5 a 15)</translation>
+        </message>
+        <message>
+            <source>Magenta Correction</source>
+            <translation type="finished">Correzione Magenta</translation>
+        </message>
+        <message>
+            <source>Maintains fine structures while removing color cast</source>
+            <translation type="finished">Mantiene le strutture fini mentre rimuove la dominante di colore</translation>
         </message>
         <message>
             <source>Manual histogram stretch with shadows, midtones, and highlights controls.</source>
@@ -3010,6 +3222,46 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Maschere</translation>
         </message>
         <message>
+            <source>Master Bias:</source>
+            <translation type="finished">Master Bias:</translation>
+        </message>
+        <message>
+            <source>Master Dark:</source>
+            <translation type="finished">Master Dark:</translation>
+        </message>
+        <message>
+            <source>Master Flat:</source>
+            <translation type="finished">Master Flat:</translation>
+        </message>
+        <message>
+            <source>Max Rotation:</source>
+            <translation type="finished">Max Rotazione:</translation>
+        </message>
+        <message>
+            <source>Maximum expected rotation angle between exposures</source>
+            <translation type="finished">Angolo di rotazione massimo atteso tra le esposizioni</translation>
+        </message>
+        <message>
+            <source>Median:</source>
+            <translation type="finished">Mediana:</translation>
+        </message>
+        <message>
+            <source>Metadata Handling:</source>
+            <translation type="finished">Gestione Metadati:</translation>
+        </message>
+        <message>
+            <source>Middle value of sorted pixels. Excellent outlier rejection but slower than average.</source>
+            <translation type="finished">Valore medio dei pixel ordinati. Eccellente rifiuto dei valori anomali ma più lento della media.</translation>
+        </message>
+        <message>
+            <source>Min Stars:</source>
+            <translation type="finished">Min Stelle:</translation>
+        </message>
+        <message>
+            <source>Minimum number of matching stars required for successful registration</source>
+            <translation type="finished">Numero minimo di stelle corrispondenti richieste per la registrazione riuscita</translation>
+        </message>
+        <message>
             <source>Mix Ha, OIII, and SII channels with adjustable intensity</source>
             <translation type="finished">Miscela canali Ha, OIII e SII con intensità regolabile</translation>
         </message>
@@ -3022,8 +3274,8 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Rotella del mouse o Ctrl + e Ctrl -</translation>
         </message>
         <message>
-            <source>Multiple stacking modes: Average, Median, Kappa-Sigma, Winsorized Sigma</source>
-            <translation type="finished">Molteplici modalità di stacking: Media, Mediana, Kappa-Sigma, Winsorized Sigma</translation>
+            <source>Multiple Projects: Open only one project at a time; closing a project resets working directory to AppData</source>
+            <translation type="finished">Progetti Multipli: Apri un solo progetto alla volta; chiudere un progetto ripristina la directory funzionante ad AppData</translation>
         </message>
         <message>
             <source>Multiscale Decomposition</source>
@@ -3054,6 +3306,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Stretching non lineare che preserva i colori delle stelle</translation>
         </message>
         <message>
+            <source>Normalization Mode:</source>
+            <translation type="finished">Modalità Normalizzazione:</translation>
+        </message>
+        <message>
+            <source>Normalize brightness variations between frames</source>
+            <translation type="finished">Normalizza le variazioni di luminosità tra i fotogrammi</translation>
+        </message>
+        <message>
             <source>Normalizes and balances narrowband channels for compositing:</source>
             <translation type="finished">Normalizza e bilancia i canali a banda stretta per il compositing:</translation>
         </message>
@@ -3070,6 +3330,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Apri file</translation>
         </message>
         <message>
+            <source>Opening an Existing Project</source>
+            <translation type="finished">Apertura di un Progetto Esistente</translation>
+        </message>
+        <message>
+            <source>Optional Normalization: Flat field normalization normalizes the flat frame before division</source>
+            <translation type="finished">Normalizzazione Opzionale: La normalizzazione del flat field normalizza il fotogramma flat prima della divisione</translation>
+        </message>
+        <message>
             <source>Optional green noise removal during the stretch.</source>
             <translation type="finished">Rimozione opzionale del rumore verde durante lo stretch.</translation>
         </message>
@@ -3082,8 +3350,24 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Crea opzionalmente una maschera solo stelle</translation>
         </message>
         <message>
-            <source>Outputs calibrated frames ready for registration and stacking</source>
-            <translation type="finished">Produce frame calibrati pronti per la registrazione e lo stacking</translation>
+            <source>Or use File &gt; Recent Projects to quickly access recently opened projects</source>
+            <translation type="finished">Oppure usa File &gt; Progetti Recenti per accedere rapidamente ai progetti aperti di recente</translation>
+        </message>
+        <message>
+            <source>Organization: All related files (lights, darks, flats, processed results) in one place</source>
+            <translation type="finished">Organizzazione: Tutti i file correlati (light, dark, flat, risultati elaborati) in un unico posto</translation>
+        </message>
+        <message>
+            <source>Organize your astrophotography workflow using Workspace Projects. A project maintains a dedicated working directory where all associated images, calibration files, and processing results are stored.</source>
+            <translation type="finished">Organizza il flusso di lavoro della tua astrofotografia usando Progetti Workspace. Un progetto mantiene una directory di lavoro dedicata in cui vengono archiviati tutte le immagini associate, i file di calibrazione e i risultati di elaborazione.</translation>
+        </message>
+        <message>
+            <source>Output &amp; Quality Assessment</source>
+            <translation type="finished">Output &amp; Valutazione Qualità</translation>
+        </message>
+        <message>
+            <source>Output: Calibrated light frames ready for registration</source>
+            <translation type="finished">Output: Fotogrammi light calibrati pronti per la registrazione</translation>
         </message>
         <message>
             <source>Overlay and compare two active views by alternating their display:</source>
@@ -3096,6 +3380,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Pan:</source>
             <translation type="finished">Panoramica:</translation>
+        </message>
+        <message>
+            <source>Percent Rejection:</source>
+            <translation type="finished">Rifiuto Percentuale:</translation>
         </message>
         <message>
             <source>Perfect Palette Picker</source>
@@ -3114,8 +3402,16 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Plate Solving</translation>
         </message>
         <message>
+            <source>Portability: Move entire projects to different machines with all relative paths intact</source>
+            <translation type="finished">Portabilità: Sposta interi progetti su diverse macchine con tutti i percorsi relativi intatti</translation>
+        </message>
+        <message>
             <source>Pre-built workflows for common astrophotography tasks</source>
             <translation type="finished">Flussi di lavoro predefiniti per le attività comuni di astrofotografia</translation>
+        </message>
+        <message>
+            <source>Preserve Details:</source>
+            <translation type="finished">Preserva Dettagli:</translation>
         </message>
         <message>
             <source>Preserves capture metadata in FITS headers</source>
@@ -3134,6 +3430,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Anteprima del contenuto dello script prima dell'esecuzione</translation>
         </message>
         <message>
+            <source>Project Benefits</source>
+            <translation type="finished">Vantaggi Progetto</translation>
+        </message>
+        <message>
+            <source>Project Info: View current project name and directory path in the window title and statusbar</source>
+            <translation type="finished">Informazioni Progetto: Visualizza il nome del progetto corrente e il percorso della directory nel titolo della finestra e nella barra di stato</translation>
+        </message>
+        <message>
             <source>Protect shadows/highlights from clipping</source>
             <translation type="finished">Proteggi ombre/luci dal clipping</translation>
         </message>
@@ -3144,6 +3448,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>RAW to FITS Converter</source>
             <translation type="finished">Convertitore RAW in FITS</translation>
+        </message>
+        <message>
+            <source>RAW to FITS:</source>
+            <translation type="finished">RAW a FITS:</translation>
         </message>
         <message>
             <source>Raw pixel values without stretch</source>
@@ -3166,6 +3474,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Riduce il rumore senza perdere dettagli</translation>
         </message>
         <message>
+            <source>Reference Frame:</source>
+            <translation type="finished">Fotogramma Riferimento:</translation>
+        </message>
+        <message>
+            <source>Registration Parameters:</source>
+            <translation type="finished">Parametri di Registrazione:</translation>
+        </message>
+        <message>
             <source>Remove Pedestal</source>
             <translation type="finished">Rimuovi Piedistallo</translation>
         </message>
@@ -3180,6 +3496,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Removes green color cast common in OSC/DSLR images.</source>
             <translation type="finished">Rimuove la dominante verde comune nelle immagini OSC/DSLR.</translation>
+        </message>
+        <message>
+            <source>Removes the electronic noise floor introduced by the camera sensor</source>
+            <translation type="finished">Rimuove il rumore di fondo elettronico introdotto dal sensore della fotocamera</translation>
+        </message>
+        <message>
+            <source>Removes thermal noise that accumulates over exposure time</source>
+            <translation type="finished">Rimuove il rumore termico che si accumula nel tempo di esposizione</translation>
         </message>
         <message>
             <source>Replaces the luminance channel of an RGB image with a processed version. Select the source luminance and target color image, then blend with adjustable intensity.</source>
@@ -3246,6 +3570,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Scale:</translation>
         </message>
         <message>
+            <source>Scaling:</source>
+            <translation type="finished">Scalatura:</translation>
+        </message>
+        <message>
             <source>Script Runner</source>
             <translation type="finished">Esecutore Script</translation>
         </message>
@@ -3260,10 +3588,6 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Select a region of pure background</source>
             <translation type="finished">Seleziona una regione di sfondo puro</translation>
-        </message>
-        <message>
-            <source>Select master Bias, Dark, and Flat frames</source>
-            <translation type="finished">Seleziona i frame master Bias, Dark e Flat</translation>
         </message>
         <message>
             <source>Select two views from the dropdown menus</source>
@@ -3294,8 +3618,16 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Mostra grafici a dispersione Rosso/Verde e Blu/Verde</translation>
         </message>
         <message>
-            <source>Sigma clipping for automatic outlier rejection</source>
-            <translation type="finished">Siglma clipping per il rigetto automatico degli outlier</translation>
+            <source>Similar to Kappa-Sigma but replaces outliers with clipped values instead of rejecting them completely.</source>
+            <translation type="finished">Simile a Kappa-Sigma ma sostituisce i valori anomali con valori ritagliati invece di rifiutarli completamente.</translation>
+        </message>
+        <message>
+            <source>Simple mean of all pixels. Fast but sensitive to outliers (cosmic rays, hot pixels).</source>
+            <translation type="finished">Semplice media di tutti i pixel. Veloce ma sensibile ai valori anomali (raggi cosmici, pixel caldi).</translation>
+        </message>
+        <message>
+            <source>Simple rejection of brightest/darkest N%% of pixels</source>
+            <translation type="finished">Semplice rifiuto dei pixel più luminosi/più scuri N%%</translation>
         </message>
         <message>
             <source>Size of tiles for local processing. Smaller tiles increase local detail.</source>
@@ -3304,6 +3636,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Specialized stretch that preserves star colors while increasing contrast.</source>
             <translation type="finished">Stretching specializzato che preserva i colori delle stelle aumentando il contrasto.</translation>
+        </message>
+        <message>
+            <source>Specialized tool for removing magenta color casts commonly found in deep-sky astrophotography:</source>
+            <translation type="finished">Strumento specializzato per rimuovere le dominanti magenta comunemente trovate nell'astrofotografia del cielo profondo:</translation>
         </message>
         <message>
             <source>Specialized tool to stretch stars while preserving their color and size:</source>
@@ -3318,8 +3654,8 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Radice Quadrata / Logaritmico:</translation>
         </message>
         <message>
-            <source>Stacks aligned images to reduce noise and increase signal-to-noise ratio:</source>
-            <translation type="finished">Combina le immagini allineate per ridurre il rumore e aumentare il rapporto segnale-rumore:</translation>
+            <source>Stacking Workflow:</source>
+            <translation type="finished">Flusso di Lavoro Stacking:</translation>
         </message>
         <message>
             <source>Standard:</source>
@@ -3330,6 +3666,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Analisi Stelle</translation>
         </message>
         <message>
+            <source>Star Detection:</source>
+            <translation type="finished">Rilevamento Stelle:</translation>
+        </message>
+        <message>
             <source>Star Recomposition</source>
             <translation type="finished">Ricomposizione Stelle</translation>
         </message>
@@ -3338,12 +3678,20 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Star Stretch</translation>
         </message>
         <message>
-            <source>Star-based registration with sub-pixel accuracy</source>
-            <translation type="finished">Registrazione basata su stelle con precisione sub-pixel</translation>
+            <source>Star Threshold:</source>
+            <translation type="finished">Soglia Stelle:</translation>
         </message>
         <message>
             <source>StarNet++</source>
             <translation type="finished">StarNet++</translation>
+        </message>
+        <message>
+            <source>Statistical Quality: Check SNR improvement from number of stacked frames</source>
+            <translation type="finished">Qualità Statistica: Controlla il miglioramento SNR dal numero di fotogrammi impilati</translation>
+        </message>
+        <message>
+            <source>Statistical clipping removes pixels beyond N standard deviations from the mean. Customizable rejection strength.</source>
+            <translation type="finished">Il ritaglio statistico rimuove i pixel oltre N deviazioni standard dalla media. Intensità di rifiuto personalizzabile.</translation>
         </message>
         <message>
             <source>Stretch</source>
@@ -3356,6 +3704,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Stretch Tools</source>
             <translation type="finished">Strumenti di Stretching</translation>
+        </message>
+        <message>
+            <source>Stretching &amp; Enhancement: Apply GHS, curves, or AI tools for final presentation</source>
+            <translation type="finished">Stretch &amp; Enhancement: Applica GHS, curve o strumenti AI per la presentazione finale</translation>
+        </message>
+        <message>
+            <source>Sub-pixel Accuracy:</source>
+            <translation type="finished">Precisione Sub-Pixel:</translation>
         </message>
         <message>
             <source>Subtracts a scaled continuum image (or RGB channel) from narrowband data</source>
@@ -3386,8 +3742,8 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Script TStar</translation>
         </message>
         <message>
-            <source>TStar includes a built-in pipeline for preprocessing and stacking astronomical images from scratch.</source>
-            <translation type="finished">TStar include una pipeline integrata per il preprocessing e lo stacking di immagini astronomiche da zero.</translation>
+            <source>TStar includes a comprehensive pipeline for preprocessing and stacking astronomical images. Follow these steps in order: Conversion → Calibration → Registration → Stacking.</source>
+            <translation type="finished">TStar include una pipeline comprensiva per il preprocessing e lo stacking di immagini astronomiche. Segui questi passaggi in ordine: Conversione → Calibrazione → Registrazione → Stacking.</translation>
         </message>
         <message>
             <source>TStar supports FITS, XISF, TIFF, and PNG image formats commonly used in astrophotography.</source>
@@ -3402,8 +3758,28 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Temperatura / Tinta</translation>
         </message>
         <message>
+            <source>The project becomes active and sets its directory as the working location</source>
+            <translation type="finished">Il progetto diventa attivo e imposta la sua directory come posizione funzionante</translation>
+        </message>
+        <message>
+            <source>The project's working directory automatically becomes the default location for file operations</source>
+            <translation type="finished">La directory funzionante del progetto diventa automaticamente la posizione predefinita per le operazioni di file</translation>
+        </message>
+        <message>
             <source>The tool will balance RGB channels</source>
             <translation type="finished">Lo strumento bilancerà i canali RGB</translation>
+        </message>
+        <message>
+            <source>Tip: Create separate master frames for each filter (e.g., L, R, G, B, Ha, OIII, SII)</source>
+            <translation type="finished">Suggerimento: Crea fotogrammi master separati per ogni filtro (ad es. L, R, G, B, Ha, OIII, SII)</translation>
+        </message>
+        <message>
+            <source>Tip: More frames allow aggressive rejection. With N=3 frames, use median. With N&gt;10, can use Kappa-Sigma with σ=2.5</source>
+            <translation type="finished">Suggerimento: Più fotogrammi consentono un rifiuto aggressivo. Con N=3 fotogrammi, usa mediana. Con N&gt;10, puoi usare Kappa-Sigma con σ=2.5</translation>
+        </message>
+        <message>
+            <source>Tip: Registration must be completed before stacking; misaligned frames will produce low-quality stacks</source>
+            <translation type="finished">Suggerimento: La registrazione deve essere completata prima dello stacking; i fotogrammi disallineati produrranno stack di bassa qualità</translation>
         </message>
         <message>
             <source>Tip: Toggle RGB Link to stretch channels independently or together.</source>
@@ -3414,8 +3790,20 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Suggerimenti e Buone Pratiche</translation>
         </message>
         <message>
+            <source>To create a new workspace project:</source>
+            <translation type="finished">Per creare un nuovo progetto workspace:</translation>
+        </message>
+        <message>
+            <source>To work with an existing project:</source>
+            <translation type="finished">Per lavorare con un progetto esistente:</translation>
+        </message>
+        <message>
             <source>Toggle mask visualization</source>
             <translation type="finished">Attiva/disattiva visualizzazione maschera</translation>
+        </message>
+        <message>
+            <source>Transformation:</source>
+            <translation type="finished">Trasformazione:</translation>
         </message>
         <message>
             <source>Undo</source>
@@ -3474,6 +3862,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Visualizza e modifica i metadati dell'header FITS.</translation>
         </message>
         <message>
+            <source>Visual Inspection: Inspect for comet trails, airplane tracks, or registration errors</source>
+            <translation type="finished">Ispezione Visiva: Ispeziona per scie di comete, tracce di aerei o errori di registrazione</translation>
+        </message>
+        <message>
             <source>Visualizes the color distribution of stars after Photometric Color Calibration:</source>
             <translation type="finished">Visualizza la distribuzione del colore delle stelle dopo la Calibrazione Colore Fotometrica:</translation>
         </message>
@@ -3482,8 +3874,28 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Wavescale HDR</translation>
         </message>
         <message>
+            <source>Weight frames by quality (FWHM, star count, background) before combining</source>
+            <translation type="finished">Peso fotogrammi per qualità (FWHM, conteggio stelle, sfondo) prima di combinare</translation>
+        </message>
+        <message>
             <source>Welcome to TStar! This guide covers all features and tools available in the application.</source>
             <translation type="finished">Benvenuto in TStar! Questa guida copre tutte le funzionalità e gli strumenti disponibili nell'applicazione.</translation>
+        </message>
+        <message>
+            <source>Winsorized Sigma:</source>
+            <translation type="finished">Winsorized Sigma:</translation>
+        </message>
+        <message>
+            <source>Working with Projects</source>
+            <translation type="finished">Lavorare con Progetti</translation>
+        </message>
+        <message>
+            <source>Works best when combined with Background Neutralization for optimal color balance</source>
+            <translation type="finished">Funziona meglio se combinato con Neutralizzazione Sfondo per il miglior equilibrio dei colori</translation>
+        </message>
+        <message>
+            <source>Workspace Projects</source>
+            <translation type="finished">Progetti Workspace</translation>
         </message>
         <message>
             <source>Write and run custom TStar scripts (.tss):</source>
@@ -3879,6 +4291,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Impossibile creare la directory del progetto: %1</translation>
         </message>
         <message>
+            <source>Cannot create projects directory: %1</source>
+            <translation type="finished">Impossibile creare la directory dei progetti: %1</translation>
+        </message>
+        <message>
+            <source>Cannot delete project while it is open.</source>
+            <translation type="finished">Impossibile eliminare il progetto mentre è aperto.</translation>
+        </message>
+        <message>
             <source>Cannot open project file for writing: %1</source>
             <translation type="finished">Impossibile aprire il file progetto in scrittura: %1</translation>
         </message>
@@ -3933,6 +4353,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Combine Channels</source>
             <translation type="finished">Combina Canali</translation>
+        </message>
+        <message>
+            <source>Confirm Deletion</source>
+            <translation type="finished">Conferma Eliminazione</translation>
         </message>
         <message>
             <source>Console</source>
@@ -4007,6 +4431,30 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Debayer</translation>
         </message>
         <message>
+            <source>Delete Workspace Project</source>
+            <translation type="finished">Elimina Progetto Workspace</translation>
+        </message>
+        <message>
+            <source>Delete Workspace Project...</source>
+            <translation type="finished">Elimina Progetto Workspace...</translation>
+        </message>
+        <message>
+            <source>Delete project '%1' and all its snapshots? This action cannot be undone.</source>
+            <translation type="finished">Eliminare il progetto '%1' e tutti i suoi snapshot? Questa azione non può essere annullata.</translation>
+        </message>
+        <message>
+            <source>Deleted project files: %1</source>
+            <translation type="finished">File di progetto eliminati: %1</translation>
+        </message>
+        <message>
+            <source>Deleted workspace project '%1' and its snapshots.</source>
+            <translation type="finished">Progetto workspace '%1' e i suoi snapshot eliminati.</translation>
+        </message>
+        <message>
+            <source>Deletion Error</source>
+            <translation type="finished">Errore Eliminazione</translation>
+        </message>
+        <message>
             <source>Disabled</source>
             <translation type="finished">Disabilitato</translation>
         </message>
@@ -4061,6 +4509,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Failed to create project.</source>
             <translation type="finished">Creazione progetto fallita.</translation>
+        </message>
+        <message>
+            <source>Failed to delete project snapshots directory: %1</source>
+            <translation type="finished">Impossibile eliminare la directory degli snapshot del progetto: %1</translation>
         </message>
         <message>
             <source>Failed to extract channels.</source>
@@ -4355,6 +4807,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Nessuna Immagine</translation>
         </message>
         <message>
+            <source>No Projects</source>
+            <translation type="finished">Nessun Progetto</translation>
+        </message>
+        <message>
             <source>No image loaded for CBE.</source>
             <translation type="finished">Nessuna immagine caricata per CBE.</translation>
         </message>
@@ -4381,6 +4837,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>No valid project found at: %1</source>
             <translation type="finished">Nessun progetto valido in: %1</translation>
+        </message>
+        <message>
+            <source>No workspace projects found.</source>
+            <translation type="finished">Nessun progetto workspace trovato.</translation>
+        </message>
+        <message>
+            <source>Note: The .tstarproj file itself (if it exists) was NOT deleted and must be manually removed.</source>
+            <translation type="finished">Nota: Il file .tstarproj stesso (se esiste) NON è stato eliminato e deve essere rimosso manualmente.</translation>
         </message>
         <message>
             <source>Open</source>
@@ -4683,6 +5147,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Progetto</translation>
         </message>
         <message>
+            <source>Project Deleted</source>
+            <translation type="finished">Progetto Eliminato</translation>
+        </message>
+        <message>
             <source>Project Load Error</source>
             <translation type="finished">Errore Caricamento Progetto</translation>
         </message>
@@ -4697,6 +5165,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Project created: %1</source>
             <translation type="finished">Progetto creato: %1</translation>
+        </message>
+        <message>
+            <source>Project is Empty</source>
+            <translation type="finished">Progetto Vuoto</translation>
         </message>
         <message>
             <source>Project loaded: %1</source>
@@ -4868,6 +5340,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Seleziona Cartella Progetto</translation>
         </message>
         <message>
+            <source>Select a project to delete:</source>
+            <translation type="finished">Seleziona un progetto da eliminare:</translation>
+        </message>
+        <message>
             <source>Select image.</source>
             <translation type="finished">Seleziona immagine.</translation>
         </message>
@@ -4980,6 +5456,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Temperatura / Tinta applicata definitivamente</translation>
         </message>
         <message>
+            <source>The following project files referencing this workspace were found: %1 Delete these files?</source>
+            <translation type="finished">I seguenti file di progetto che fanno riferimento a questo workspace sono stati trovati: %1 Eliminare questi file?</translation>
+        </message>
+        <message>
+            <source>The workspace contains no images. Save an empty project anyway?</source>
+            <translation type="finished">Lo spazio di lavoro non contiene immagini. Salvare comunque un progetto vuoto?</translation>
+        </message>
+        <message>
             <source>The workspace project '%1' has unsaved changes (%2). Do you want to save it?</source>
             <translation type="finished">Il progetto workspace "%1" ha modifiche non salvate (%2). Vuoi salvarlo?</translation>
         </message>
@@ -5052,6 +5536,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Wavescale HDR applicato.</translation>
         </message>
         <message>
+            <source>Workspace project '%1' has been deleted.</source>
+            <translation type="finished">Il progetto workspace '%1' è stato eliminato.</translation>
+        </message>
+        <message>
             <source>Workspace project closed.</source>
             <translation type="finished">Progetto workspace chiuso.</translation>
         </message>
@@ -5090,6 +5578,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>before creating a new project</source>
             <translation type="finished">prima di creare un nuovo progetto</translation>
+        </message>
+        <message>
+            <source>before deleting project</source>
+            <translation type="finished">prima di eliminare il progetto</translation>
         </message>
         <message>
             <source>before exiting the application</source>
@@ -5297,6 +5789,22 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
     </context>
     <context>
         <name>MasterFrames</name>
+        <message>
+            <source>%1 %2/%3...</source>
+            <translation type="finished">%1 %2/%3...</translation>
+        </message>
+        <message>
+            <source>%1 complete</source>
+            <translation type="finished">%1 completato</translation>
+        </message>
+        <message>
+            <source>Calibrating dark frame</source>
+            <translation type="finished">Calibrazione frame dark</translation>
+        </message>
+        <message>
+            <source>Calibrating flat frame</source>
+            <translation type="finished">Calibrazione frame flat</translation>
+        </message>
         <message>
             <source>Master %1 dimensions (%2x%3) don't match target (%4x%5)</source>
             <translation type="finished">Dimensioni Master %1 (%2x%3) non corrispondono al target (%4x%5)</translation>
@@ -7472,6 +7980,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Impossibile Allineare</translation>
         </message>
         <message>
+            <source>Computing image statistics and star counts...</source>
+            <translation type="finished">Calcolo statistiche immagine e conteggio stelle...</translation>
+        </message>
+        <message>
             <source>Detection σ:</source>
             <translation type="finished">σ Rilevamento:</translation>
         </message>
@@ -8376,8 +8888,16 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">&lt;span style='color:green'&gt;Stacking completato!&lt;/span&gt;</translation>
         </message>
         <message>
+            <source>&lt;span style='color:red'&gt;Failed to append files to the sequence&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:red'&gt;Impossibile aggiungere file alla sequenza&lt;/span&gt;</translation>
+        </message>
+        <message>
             <source>&lt;span style='color:red'&gt;Failed to load sequence or no images found&lt;/span&gt;</source>
             <translation type="finished">&lt;span style='color:red'&gt;Caricamento sequenza fallito o nessuna immagine trovata&lt;/span&gt;</translation>
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Failed to open image %1&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:red'&gt;Impossibile aprire l'immagine %1&lt;/span&gt;</translation>
         </message>
         <message>
             <source>&lt;span style='color:red'&gt;Failed to save output: %1&lt;/span&gt;</source>
@@ -8420,6 +8940,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Sfondo</translation>
         </message>
         <message>
+            <source>Best Background</source>
+            <translation type="finished">Miglior Sfondo</translation>
+        </message>
+        <message>
             <source>Best FWHM</source>
             <translation type="finished">Miglior FWHM</translation>
         </message>
@@ -8430,6 +8954,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Best Roundness</source>
             <translation type="finished">Miglior Rotondità</translation>
+        </message>
+        <message>
+            <source>Best Star Count</source>
+            <translation type="finished">Miglior Conteggio Stelle</translation>
+        </message>
+        <message>
+            <source>Best Weighted FWHM</source>
+            <translation type="finished">Miglior FWHM Pesato</translation>
         </message>
         <message>
             <source>Bilinear (Fast)</source>
@@ -8474,6 +9006,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Compute Comet Shifts</source>
             <translation type="finished">Calcola Spostamenti Cometa</translation>
+        </message>
+        <message>
+            <source>Computing image statistics and quality metrics...</source>
+            <translation type="finished">Calcolo statistiche immagine e metriche qualità...</translation>
         </message>
         <message>
             <source>Create rejection maps</source>
@@ -8532,6 +9068,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Calcolo spostamenti fallito. Controlla header DATE-OBS.</translation>
         </message>
         <message>
+            <source>Fast normalization</source>
+            <translation type="finished">Normalizzazione veloce</translation>
+        </message>
+        <message>
             <source>Feathering (px):</source>
             <translation type="finished">Sfumatura (px):</translation>
         </message>
@@ -8566,6 +9106,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Images</source>
             <translation type="finished">Immagini</translation>
+        </message>
+        <message>
+            <source>K-Sigma</source>
+            <translation type="finished">K-Sigma</translation>
         </message>
         <message>
             <source>Keep:</source>
@@ -8620,6 +9164,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Minimo</translation>
         </message>
         <message>
+            <source>Mode:</source>
+            <translation type="finished">Modo:</translation>
+        </message>
+        <message>
             <source>Multiplicative</source>
             <translation type="finished">Moltiplicativo</translation>
         </message>
@@ -8648,6 +9196,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Normalizzazione:</translation>
         </message>
         <message>
+            <source>Normalize on overlaps</source>
+            <translation type="finished">Normalizza su sovrapposizioni</translation>
+        </message>
+        <message>
             <source>Normalize output to [0,1]</source>
             <translation type="finished">Normalizza output a [0,1]</translation>
         </message>
@@ -8658,6 +9210,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Pattern:</source>
             <translation type="finished">Pattern:</translation>
+        </message>
+        <message>
+            <source>Percent</source>
+            <translation type="finished">Percentuale</translation>
         </message>
         <message>
             <source>Percentile</source>
@@ -8818,6 +9374,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>result_stacked.fit</source>
             <translation type="finished">risultato_stacked.fit</translation>
+        </message>
+        <message>
+            <source>σ</source>
+            <translation type="finished">σ</translation>
         </message>
     </context>
     <context>

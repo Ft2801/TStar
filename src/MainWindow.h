@@ -102,6 +102,7 @@ public:
     
     ImageBuffer::DisplayMode displayMode() const { return m_displayMode; }
     bool displayLinked() const { return m_displayLinked; }
+    void loadWorkspaceProjectAtStartup(const QString& projectFilePath);
 
 private slots:
     void undo();
@@ -171,6 +172,7 @@ private slots:
     void saveWorkspaceProject();
     void saveWorkspaceProjectAs();
     void closeWorkspaceProject();
+    void deleteWorkspaceProject();
     
     // Mask Tool Actions
     void createMaskAction();
@@ -205,6 +207,8 @@ private:
     bool maybeSaveWorkspaceProject(const QString& reason);
     bool saveWorkspaceProjectTo(const QString& projectFilePath);
     bool loadWorkspaceProjectFrom(const QString& projectFilePath);
+    QString getWorkspaceProjectsDir() const;
+    QString getProjectWorkingDirectory() const;  // Returns current project directory or app data
     QJsonObject captureWorkspaceProjectState(const QString& dataDirPath, const QString& projectBaseDir, QList<struct SaveSnapshotJob>& saveJobs);
     bool restoreWorkspaceProjectState(const QJsonObject& root, const QString& dataDirPath, const QString& projectBaseDir);
     bool closeAllWorkspaceWindows();
@@ -233,6 +237,7 @@ private:
     QAction* m_saveWorkspaceProjectAction = nullptr;
     QAction* m_saveWorkspaceProjectAsAction = nullptr;
     QAction* m_closeWorkspaceProjectAction = nullptr;
+    QAction* m_deleteWorkspaceProjectAction = nullptr;
 
     
     // State

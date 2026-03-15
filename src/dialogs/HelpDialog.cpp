@@ -83,6 +83,43 @@ QString HelpDialog::buildHelpContent()
     html += "<li><b>" + tr("Drag & Drop:") + "</b> " + tr("Drag files directly onto the workspace") + "</li>";
     html += "</ul>";
 
+    // Workspace Projects
+    html += "<h2>" + tr("Workspace Projects") + "</h2>";
+    html += "<p>" + tr("Organize your astrophotography workflow using Workspace Projects. A project maintains a dedicated working directory where all associated images, calibration files, and processing results are stored.") + "</p>";
+    
+    html += "<h3>" + tr("Creating a New Project") + "</h3>";
+    html += "<p>" + tr("To create a new workspace project:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Click File > New Project or use the Project Manager") + "</li>";
+    html += "<li>" + tr("Enter a project name and select a directory location") + "</li>";
+    html += "<li>" + tr("The project becomes active and sets its directory as the working location") + "</li>";
+    html += "<li>" + tr("All subsequent File > Open and File > Save operations default to the project directory") + "</li>";
+    html += "</ul>";
+    
+    html += "<h3>" + tr("Opening an Existing Project") + "</h3>";
+    html += "<p>" + tr("To work with an existing project:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Click File > Open Project and select the project file (.tsproj)") + "</li>";
+    html += "<li>" + tr("Or use File > Recent Projects to quickly access recently opened projects") + "</li>";
+    html += "<li>" + tr("The project's working directory automatically becomes the default location for file operations") + "</li>";
+    html += "</ul>";
+    
+    html += "<h3>" + tr("Project Benefits") + "</h3>";
+    html += "<ul>";
+    html += "<li>" + tr("Isolation: Keep different imaging sessions completely separate") + "</li>";
+    html += "<li>" + tr("Organization: All related files (lights, darks, flats, processed results) in one place") + "</li>";
+    html += "<li>" + tr("Context: Scripts and processing operations maintain awareness of project-specific paths") + "</li>";
+    html += "<li>" + tr("Portability: Move entire projects to different machines with all relative paths intact") + "</li>";
+    html += "</ul>";
+    
+    html += "<h3>" + tr("Working with Projects") + "</h3>";
+    html += "<ul>";
+    html += "<li>" + tr("Multiple Projects: Open only one project at a time; closing a project resets working directory to AppData") + "</li>";
+    html += "<li>" + tr("Project Info: View current project name and directory path in the window title and statusbar") + "</li>";
+    html += "<li>" + tr("Auto-save: Project state is automatically preserved between sessions") + "</li>";
+    html += "<li>" + tr("Closing Project: Use File > Close Project to deactivate the current project") + "</li>";
+    html += "</ul>";
+
     // Navigation Controls
     html += "<h2>" + tr("Navigation Controls") + "</h2>";
     html += "<ul>";
@@ -191,6 +228,16 @@ QString HelpDialog::buildHelpContent()
     html += "<h3>" + tr("Temperature / Tint") + "</h3>";
     html += "<p>" + tr("Adjust the color balance of the image by shifting towards warm (red) or cool (blue) tones and balancing green/magenta tints. Useful for manual white balance correction.") + "</p>";
 
+    html += "<h3>" + tr("Magenta Correction") + "</h3>";
+    html += "<p>" + tr("Specialized tool for removing magenta color casts commonly found in deep-sky astrophotography:") + "</p>";
+    html += "<ul>";
+    html += "<li><b>" + tr("Correction Strength:") + "</b> " + tr("Controls the intensity of magenta removal (0-100%)") + "</li>";
+    html += "<li><b>" + tr("Preserve Details:") + "</b> " + tr("Maintains fine structures while removing color cast") + "</li>";
+    html += "<li><b>" + tr("Channel Mode:") + "</b> " + tr("Choose between affecting all channels or specific color ranges") + "</li>";
+    html += "<li>" + tr("Ideal for correcting color casts caused by light pollution filters or atmospheric conditions") + "</li>";
+    html += "<li>" + tr("Works best when combined with Background Neutralization for optimal color balance") + "</li>";
+    html += "</ul>";
+
     html += "<h3>" + tr("Selective Color Correction") + "</h3>";
     html += "<p>" + tr("Adjust colors within a specific hue range without affecting other colors:") + "</p>";
     html += "<ul>";
@@ -231,29 +278,87 @@ QString HelpDialog::buildHelpContent()
 
     // Image Pipeline
     html += "<h2>" + tr("Image Pipeline") + "</h2>";
-    html += "<p>" + tr("TStar includes a built-in pipeline for preprocessing and stacking astronomical images from scratch.") + "</p>";
+    html += "<p>" + tr("TStar includes a comprehensive pipeline for preprocessing and stacking astronomical images. Follow these steps in order: Conversion → Calibration → Registration → Stacking.") + "</p>";
 
-    html += "<h3>" + tr("Image Calibration") + "</h3>";
-    html += "<p>" + tr("Calibrates raw light frames using master calibration images:") + "</p>";
+    html += "<h3>" + tr("Image Conversion") + "</h3>";
+    html += "<p>" + tr("Convert raw images to a standardized format before processing:") + "</p>";
     html += "<ul>";
-    html += "<li>" + tr("Select master Bias, Dark, and Flat frames") + "</li>";
-    html += "<li>" + tr("Add raw Light frames to the sequence") + "</li>";
-    html += "<li>" + tr("Outputs calibrated frames ready for registration and stacking") + "</li>";
+    html += "<li><b>" + tr("RAW to FITS:") + "</b> " + tr("Converts camera RAW (CR2, NEF, ARW, etc.) to FITS format with metadata preservation") + "</li>";
+    html += "<li><b>" + tr("Debayer:") + "</b> " + tr("Converts Bayer pattern (OSC/DSLR) images to full RGB color") + "</li>";
+    html += "<li><b>" + tr("Format Normalization:") + "</b> " + tr("Ensures all input images are in the same format (FITS recommended for astrophotography)") + "</li>";
+    html += "<li><b>" + tr("Batch Processing:") + "</b> " + tr("Convert multiple files at once") + "</li>";
+    html += "<li><b>" + tr("Metadata Handling:") + "</b> " + tr("FITS keywords and image properties are automatically transferred to preserve EXIF data") + "</li>";
     html += "</ul>";
+    
+    html += "<h3>" + tr("Image Calibration") + "</h3>";
+    html += "<p>" + tr("Corrects light frames using master calibration images to remove instrumental signature and improve image quality:") + "</p>";
+    html += "<ul>";
+    html += "<li><b>" + tr("Master Bias:") + "</b> " + tr("Removes the electronic noise floor introduced by the camera sensor") + "</li>";
+    html += "<li><b>" + tr("Master Dark:") + "</b> " + tr("Removes thermal noise that accumulates over exposure time") + "</li>";
+    html += "<li><b>" + tr("Master Flat:") + "</b> " + tr("Corrects vignetting and uneven illumination across the field of view") + "</li>";
+    html += "</ul>";
+    html += "<p>" + tr("Calibration Workflow:") + "</p>";
+    html += "<ol>";
+    html += "<li>" + tr("Create Master Frames: Average multiple bias/dark/flat exposures per filter") + "</li>";
+    html += "<li>" + tr("Load Light Frames: Select all science images to be calibrated") + "</li>";
+    html += "<li>" + tr("Apply Calibration: The Calibration Dialog applies masters in the correct order") + "</li>";
+    html += "<li>" + tr("Optional Normalization: Flat field normalization normalizes the flat frame before division") + "</li>";
+    html += "<li>" + tr("Output: Calibrated light frames ready for registration") + "</li>";
+    html += "</ol>";
+    html += "<p class=\"tip\">" + tr("Tip: Create separate master frames for each filter (e.g., L, R, G, B, Ha, OIII, SII)") + "</p>";
 
     html += "<h3>" + tr("Image Registration") + "</h3>";
-    html += "<p>" + tr("Aligns a sequence of images to a reference frame using star detection:") + "</p>";
+    html += "<p>" + tr("Aligns a sequence of calibrated images to a common reference frame using star-based registration with sub-pixel accuracy:") + "</p>";
     html += "<ul>";
-    html += "<li>" + tr("Star-based registration with sub-pixel accuracy") + "</li>";
-    html += "<li>" + tr("Supports translation, rotation, and scale correction") + "</li>";
-    html += "<li>" + tr("Adjustable star detection threshold") + "</li>";
+    html += "<li><b>" + tr("Star Detection:") + "</b> " + tr("Identifies bright stars in each image as reference points") + "</li>";
+    html += "<li><b>" + tr("Transformation:") + "</b> " + tr("Computes translation, rotation, and optional scale corrections") + "</li>";
+    html += "<li><b>" + tr("Sub-pixel Accuracy:") + "</b> " + tr("Aligns images with precision better than a single pixel for optimal stacking results") + "</li>";
+    html += "<li><b>" + tr("Reference Frame:") + "</b> " + tr("First image in sequence used as reference (or manually selected)")  + "</li>";
     html += "</ul>";
+    html += "<p>" + tr("Registration Parameters:") + "</p>";
+    html += "<ul>";
+    html += "<li><b>" + tr("Star Threshold:") + "</b> " + tr("Adjust sensitivity for star detection (lower = more stars detected)") + "</li>";
+    html += "<li><b>" + tr("Min Stars:") + "</b> " + tr("Minimum number of matching stars required for successful registration") + "</li>";
+    html += "<li><b>" + tr("Max Rotation:") + "</b> " + tr("Maximum expected rotation angle between exposures") + "</li>";
+    html += "</ul>";
+    html += "<p class=\"tip\">" + tr("Tip: Registration must be completed before stacking; misaligned frames will produce low-quality stacks") + "</p>";
 
     html += "<h3>" + tr("Image Stacking") + "</h3>";
-    html += "<p>" + tr("Stacks aligned images to reduce noise and increase signal-to-noise ratio:") + "</p>";
+    html += "<p>" + tr("Combines registered images to reduce noise and increase signal-to-noise ratio (SNR). Different stacking modes offer various trade-offs between noise reduction and artifact rejection:") + "</p>";
     html += "<ul>";
-    html += "<li>" + tr("Multiple stacking modes: Average, Median, Kappa-Sigma, Winsorized Sigma") + "</li>";
-    html += "<li>" + tr("Sigma clipping for automatic outlier rejection") + "</li>";
+    html += "<li><b>" + tr("Average:") + "</b> " + tr("Simple mean of all pixels. Fast but sensitive to outliers (cosmic rays, hot pixels).") + "</li>";
+    html += "<li><b>" + tr("Median:") + "</b> " + tr("Middle value of sorted pixels. Excellent outlier rejection but slower than average.") + "</li>";
+    html += "<li><b>" + tr("Kappa-Sigma:") + "</b> " + tr("Statistical clipping removes pixels beyond N standard deviations from the mean. Customizable rejection strength.") + "</li>";
+    html += "<li><b>" + tr("Winsorized Sigma:") + "</b> " + tr("Similar to Kappa-Sigma but replaces outliers with clipped values instead of rejecting them completely.") + "</li>";
+    html += "<li><b>" + tr("Iterative Sigma:") + "</b> " + tr("Applies Kappa-Sigma rejection multiple times for aggressive outlier removal.") + "</li>";
+    html += "</ul>";
+    html += "<p>" + tr("Advanced Stacking Options:") + "</p>";
+    html += "<ul>";
+    html += "<li><b>" + tr("Image Weighting:") + "</b> " + tr("Weight frames by quality (FWHM, star count, background) before combining") + "</li>";
+    html += "<li><b>" + tr("Scaling:") + "</b> " + tr("Normalize brightness variations between frames") + "</li>";
+    html += "<li><b>" + tr("Normalization Mode:") + "</b> " + tr("Fast normalization or K-Sigma-based normalization per frame") + "</li>";
+    html += "<li><b>" + tr("Feathering:") + "</b> " + tr("Blend overlapping image edges smoothly to reduce seaming artifacts") + "</li>";
+    html += "<li><b>" + tr("Percent Rejection:") + "</b> " + tr("Simple rejection of brightest/darkest N%% of pixels") + "</li>";
+    html += "</ul>";
+    html += "<p>" + tr("Stacking Workflow:") + "</p>";
+    html += "<ol>";
+    html += "<li>" + tr("Load Registered Images: Select the aligned image sequence") + "</li>";
+    html += "<li>" + tr("Choose Stacking Mode: Select algorithm matching your needs and data quality") + "</li>";
+    html += "<li>" + tr("Configure Rejection: Set sigma levels or percentages based on frame count") + "</li>";
+    html += "<li>" + tr("Configure Weighting: Optionally weight by quality metrics") + "</li>";
+    html += "<li>" + tr("Configure Normalization: Select normalization method for frame scaling") + "</li>";
+    html += "<li>" + tr("Execute Stack: Combine and output final integrated image") + "</li>";
+    html += "</ol>";
+    html += "<p class=\"tip\">" + tr("Tip: More frames allow aggressive rejection. With N=3 frames, use median. With N>10, can use Kappa-Sigma with σ=2.5") + "</p>";
+
+    html += "<h3>" + tr("Output & Quality Assessment") + "</h3>";
+    html += "<p>" + tr("After stacking, the result is ready for post-processing:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Statistical Quality: Check SNR improvement from number of stacked frames") + "</li>";
+    html += "<li>" + tr("Visual Inspection: Inspect for comet trails, airplane tracks, or registration errors") + "</li>";
+    html += "<li>" + tr("Background Removal: Apply ABE or CBE to eliminate gradients") + "</li>";
+    html += "<li>" + tr("Color Correction: Calibrate colors using PCC or manual temperature adjustment") + "</li>";
+    html += "<li>" + tr("Stretching & Enhancement: Apply GHS, curves, or AI tools for final presentation") + "</li>";
     html += "</ul>";
 
     // Channel Operations

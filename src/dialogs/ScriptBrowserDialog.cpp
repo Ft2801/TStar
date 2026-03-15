@@ -83,9 +83,20 @@ void ScriptBrowserDialog::setupUI() {
 }
 
 QString ScriptBrowserDialog::scriptsDir() const {
-    // First try app directory
     QString appDir = QCoreApplication::applicationDirPath();
-    QString scriptsPath = appDir + "/scripts";
+    QString scriptsPath;
+    
+#ifdef Q_OS_MAC
+    // On macOS, app is a bundle: TStar.app/Contents/MacOS/TStar
+    // We need to look in TStar.app/Contents/Resources/scripts
+    scriptsPath = appDir + "/../Resources/scripts";
+    if (QDir(scriptsPath).exists()) {
+        return QDir(scriptsPath).canonicalPath();
+    }
+#endif
+    
+    // First try app directory (Windows/Linux, or development)
+    scriptsPath = appDir + "/scripts";
     if (QDir(scriptsPath).exists()) {
         return scriptsPath;
     }

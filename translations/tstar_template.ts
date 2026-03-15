@@ -2452,10 +2452,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Add raw Light frames to the sequence</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Adds WCS (World Coordinate System) metadata</source>
             <translation type="unfinished" />
         </message>
@@ -2492,6 +2488,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Adjust sensitivity for star detection (lower = more stars detected)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Adjust the color balance of the image by shifting towards warm (red) or cool (blue) tones and balancing green/magenta tints. Useful for manual white balance correction.</source>
             <translation type="unfinished" />
         </message>
@@ -2500,11 +2500,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Adjustable star detection threshold</source>
+            <source>Adjusts protection of bright areas</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Adjusts protection of bright areas</source>
+            <source>Advanced Stacking Options:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2516,15 +2516,27 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>After stacking, the result is ready for post-processing:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Align Channels</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Aligns a sequence of images to a reference frame using star detection:</source>
+            <source>Aligns a sequence of calibrated images to a common reference frame using star-based registration with sub-pixel accuracy:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Aligns images with precision better than a single pixel for optimal stacking results</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Aligns multiple open images to a reference using star registration:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>All subsequent File &gt; Open and File &gt; Save operations default to the project directory</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2541,6 +2553,14 @@
         </message>
         <message>
             <source>Analyzes the difference between your image and the reference to build a highly accurate gradient model</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Applies Kappa-Sigma rejection multiple times for aggressive outlier removal.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Apply Calibration: The Calibration Dialog applies masters in the correct order</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2576,6 +2596,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Auto-save: Project state is automatically preserved between sessions</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Automate complex multi-step image processing workflows</source>
             <translation type="unfinished" />
         </message>
@@ -2596,11 +2620,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Average:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Background Neutralization</source>
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Background Removal: Apply ABE or CBE to eliminate gradients</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Batch Crop: applies the same crop to all currently open images</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Batch Processing:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2609,6 +2645,10 @@
         </message>
         <message>
             <source>Black Point</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Blend overlapping image edges smoothly to reduce seaming artifacts</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2636,11 +2676,15 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Calibrates raw light frames using master calibration images:</source>
+            <source>Calibration Workflow:</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Catalog Background Extraction (CBE)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Channel Mode:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2652,11 +2696,27 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Choose Stacking Mode: Select algorithm matching your needs and data quality</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Choose Subtract or Divide mode</source>
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Choose between affecting all channels or specific color ranges</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Choose from presets like SHO (Hubble), HOO, HSO, Foraxx, and more</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Click File &gt; New Project or use the Project Manager</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Click File &gt; Open Project and select the project file (.tsproj)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2688,7 +2748,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Closing Project: Use File &gt; Close Project to deactivate the current project</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Color Boost:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Color Correction: Calibrate colors using PCC or manual temperature adjustment</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2701,6 +2769,10 @@
         </message>
         <message>
             <source>Combine images with formulas</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Combines registered images to reduce noise and increase signal-to-noise ratio (SNR). Different stacking modes offer various trade-offs between noise reduction and artifact rejection:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2720,7 +2792,27 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Computes translation, rotation, and optional scale corrections</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Configure Normalization: Select normalization method for frame scaling</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Configure Rejection: Set sigma levels or percentages based on frame count</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Configure Weighting: Optionally weight by quality metrics</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Content-Aware:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Context: Scripts and processing operations maintain awareness of project-specific paths</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2744,7 +2836,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Controls the intensity of magenta removal (0-100%)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Controls the non-linear expansion of stars.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Convert multiple files at once</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Convert raw images to a standardized format before processing:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Converts Bayer pattern (OSC/DSLR) images to full RGB color</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2752,7 +2860,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Converts camera RAW (CR2, NEF, ARW, etc.) to FITS format with metadata preservation</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Correction Brush</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Correction Strength:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Corrects light frames using master calibration images to remove instrumental signature and improve image quality:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Corrects vignetting and uneven illumination across the field of view</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2761,6 +2885,10 @@
         </message>
         <message>
             <source>Create Mask:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Create Master Frames: Average multiple bias/dark/flat exposures per filter</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2773,6 +2901,10 @@
         </message>
         <message>
             <source>Creates a starless version of your image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Creating a New Project</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2789,6 +2921,10 @@
         </message>
         <message>
             <source>Debayer</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Debayer:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2852,6 +2988,18 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Ensures all input images are in the same format (FITS recommended for astrophotography)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Enter a project name and select a directory location</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Execute Stack: Combine and output final integrated image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Export individual layers to new windows</source>
             <translation type="unfinished" />
         </message>
@@ -2872,6 +3020,22 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>FITS keywords and image properties are automatically transferred to preserve EXIF data</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Fast normalization or K-Sigma-based normalization per frame</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Feathering:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>First image in sequence used as reference (or manually selected)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Fit to Window:</source>
             <translation type="unfinished" />
         </message>
@@ -2885,6 +3049,10 @@
         </message>
         <message>
             <source>For best results, stretch AFTER background removal</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Format Normalization:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2928,6 +3096,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Ideal for correcting color casts caused by light pollution filters or atmospheric conditions</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Identifies bright stars in each image as reference points</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Identifies the exact sky coordinates of your image:</source>
             <translation type="unfinished" />
         </message>
@@ -2940,6 +3116,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Image Conversion</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Image Pipeline</source>
             <translation type="unfinished" />
         </message>
@@ -2949,6 +3129,10 @@
         </message>
         <message>
             <source>Image Stacking</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image Weighting:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2976,6 +3160,18 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Isolation: Keep different imaging sessions completely separate</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Iterative Sigma:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Kappa-Sigma:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Keyboard Shortcuts</source>
             <translation type="unfinished" />
         </message>
@@ -2988,11 +3184,27 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Load Light Frames: Select all science images to be calibrated</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Load Registered Images: Select the aligned image sequence</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Load and apply existing mask</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Local intensity adjustment (-5 to 15)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Magenta Correction</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Maintains fine structures while removing color cast</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3008,6 +3220,46 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Master Bias:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Master Dark:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Master Flat:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Max Rotation:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Maximum expected rotation angle between exposures</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Median:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Metadata Handling:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Middle value of sorted pixels. Excellent outlier rejection but slower than average.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Min Stars:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Minimum number of matching stars required for successful registration</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Mix Ha, OIII, and SII channels with adjustable intensity</source>
             <translation type="unfinished" />
         </message>
@@ -3020,7 +3272,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Multiple stacking modes: Average, Median, Kappa-Sigma, Winsorized Sigma</source>
+            <source>Multiple Projects: Open only one project at a time; closing a project resets working directory to AppData</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3052,6 +3304,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Normalization Mode:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Normalize brightness variations between frames</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Normalizes and balances narrowband channels for compositing:</source>
             <translation type="unfinished" />
         </message>
@@ -3068,6 +3328,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Opening an Existing Project</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Optional Normalization: Flat field normalization normalizes the flat frame before division</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Optional green noise removal during the stretch.</source>
             <translation type="unfinished" />
         </message>
@@ -3080,7 +3348,23 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Outputs calibrated frames ready for registration and stacking</source>
+            <source>Or use File &gt; Recent Projects to quickly access recently opened projects</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Organization: All related files (lights, darks, flats, processed results) in one place</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Organize your astrophotography workflow using Workspace Projects. A project maintains a dedicated working directory where all associated images, calibration files, and processing results are stored.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Output &amp; Quality Assessment</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Output: Calibrated light frames ready for registration</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3093,6 +3377,10 @@
         </message>
         <message>
             <source>Pan:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Percent Rejection:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3112,7 +3400,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Portability: Move entire projects to different machines with all relative paths intact</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Pre-built workflows for common astrophotography tasks</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preserve Details:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3132,6 +3428,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Project Benefits</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Project Info: View current project name and directory path in the window title and statusbar</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Protect shadows/highlights from clipping</source>
             <translation type="unfinished" />
         </message>
@@ -3141,6 +3445,10 @@
         </message>
         <message>
             <source>RAW to FITS Converter</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>RAW to FITS:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3164,6 +3472,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Reference Frame:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Registration Parameters:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Remove Pedestal</source>
             <translation type="unfinished" />
         </message>
@@ -3177,6 +3493,14 @@
         </message>
         <message>
             <source>Removes green color cast common in OSC/DSLR images.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Removes the electronic noise floor introduced by the camera sensor</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Removes thermal noise that accumulates over exposure time</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3244,6 +3568,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Scaling:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Script Runner</source>
             <translation type="unfinished" />
         </message>
@@ -3257,10 +3585,6 @@
         </message>
         <message>
             <source>Select a region of pure background</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Select master Bias, Dark, and Flat frames</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3292,7 +3616,15 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Sigma clipping for automatic outlier rejection</source>
+            <source>Similar to Kappa-Sigma but replaces outliers with clipped values instead of rejecting them completely.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Simple mean of all pixels. Fast but sensitive to outliers (cosmic rays, hot pixels).</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Simple rejection of brightest/darkest N%% of pixels</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3301,6 +3633,10 @@
         </message>
         <message>
             <source>Specialized stretch that preserves star colors while increasing contrast.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Specialized tool for removing magenta color casts commonly found in deep-sky astrophotography:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3316,7 +3652,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Stacks aligned images to reduce noise and increase signal-to-noise ratio:</source>
+            <source>Stacking Workflow:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3328,6 +3664,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Star Detection:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Star Recomposition</source>
             <translation type="unfinished" />
         </message>
@@ -3336,11 +3676,19 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Star-based registration with sub-pixel accuracy</source>
+            <source>Star Threshold:</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>StarNet++</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Statistical Quality: Check SNR improvement from number of stacked frames</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Statistical clipping removes pixels beyond N standard deviations from the mean. Customizable rejection strength.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3353,6 +3701,14 @@
         </message>
         <message>
             <source>Stretch Tools</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stretching &amp; Enhancement: Apply GHS, curves, or AI tools for final presentation</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Sub-pixel Accuracy:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3384,7 +3740,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>TStar includes a built-in pipeline for preprocessing and stacking astronomical images from scratch.</source>
+            <source>TStar includes a comprehensive pipeline for preprocessing and stacking astronomical images. Follow these steps in order: Conversion → Calibration → Registration → Stacking.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3400,7 +3756,27 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>The project becomes active and sets its directory as the working location</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>The project's working directory automatically becomes the default location for file operations</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>The tool will balance RGB channels</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Tip: Create separate master frames for each filter (e.g., L, R, G, B, Ha, OIII, SII)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Tip: More frames allow aggressive rejection. With N=3 frames, use median. With N&gt;10, can use Kappa-Sigma with σ=2.5</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Tip: Registration must be completed before stacking; misaligned frames will produce low-quality stacks</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3412,7 +3788,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>To create a new workspace project:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>To work with an existing project:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Toggle mask visualization</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Transformation:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3472,6 +3860,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Visual Inspection: Inspect for comet trails, airplane tracks, or registration errors</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Visualizes the color distribution of stars after Photometric Color Calibration:</source>
             <translation type="unfinished" />
         </message>
@@ -3480,7 +3872,27 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Weight frames by quality (FWHM, star count, background) before combining</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Welcome to TStar! This guide covers all features and tools available in the application.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Winsorized Sigma:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Working with Projects</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Works best when combined with Background Neutralization for optimal color balance</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Workspace Projects</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3877,6 +4289,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Cannot create projects directory: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cannot delete project while it is open.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Cannot open project file for writing: %1</source>
             <translation type="unfinished" />
         </message>
@@ -3930,6 +4350,10 @@
         </message>
         <message>
             <source>Combine Channels</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Confirm Deletion</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4005,6 +4429,30 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Delete Workspace Project</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Delete Workspace Project...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Delete project '%1' and all its snapshots? This action cannot be undone.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Deleted project files: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Deleted workspace project '%1' and its snapshots.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Deletion Error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Disabled</source>
             <translation type="unfinished" />
         </message>
@@ -4058,6 +4506,10 @@
         </message>
         <message>
             <source>Failed to create project.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to delete project snapshots directory: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4353,6 +4805,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>No Projects</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>No image loaded for CBE.</source>
             <translation type="unfinished" />
         </message>
@@ -4378,6 +4834,14 @@
         </message>
         <message>
             <source>No valid project found at: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No workspace projects found.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Note: The .tstarproj file itself (if it exists) was NOT deleted and must be manually removed.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4681,6 +5145,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Project Deleted</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Project Load Error</source>
             <translation type="unfinished" />
         </message>
@@ -4694,6 +5162,10 @@
         </message>
         <message>
             <source>Project created: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Project is Empty</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4865,6 +5337,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Select a project to delete:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Select image.</source>
             <translation type="unfinished" />
         </message>
@@ -4977,6 +5453,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>The following project files referencing this workspace were found: %1 Delete these files?</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>The workspace contains no images. Save an empty project anyway?</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>The workspace project '%1' has unsaved changes (%2). Do you want to save it?</source>
             <translation type="unfinished" />
         </message>
@@ -5049,6 +5533,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Workspace project '%1' has been deleted.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Workspace project closed.</source>
             <translation type="unfinished" />
         </message>
@@ -5086,6 +5574,10 @@
         </message>
         <message>
             <source>before creating a new project</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>before deleting project</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5294,6 +5786,22 @@
     </context>
     <context>
         <name>MasterFrames</name>
+        <message>
+            <source>%1 %2/%3...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>%1 complete</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Calibrating dark frame</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Calibrating flat frame</source>
+            <translation type="unfinished" />
+        </message>
         <message>
             <source>Master %1 dimensions (%2x%3) don't match target (%4x%5)</source>
             <translation type="unfinished" />
@@ -7469,6 +7977,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Computing image statistics and star counts...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Detection σ:</source>
             <translation type="unfinished" />
         </message>
@@ -8373,7 +8885,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>&lt;span style='color:red'&gt;Failed to append files to the sequence&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>&lt;span style='color:red'&gt;Failed to load sequence or no images found&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>&lt;span style='color:red'&gt;Failed to open image %1&lt;/span&gt;</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8417,6 +8937,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Best Background</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Best FWHM</source>
             <translation type="unfinished" />
         </message>
@@ -8426,6 +8950,14 @@
         </message>
         <message>
             <source>Best Roundness</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Best Star Count</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Best Weighted FWHM</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8470,6 +9002,10 @@
         </message>
         <message>
             <source>Compute Comet Shifts</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Computing image statistics and quality metrics...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8529,6 +9065,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Fast normalization</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Feathering (px):</source>
             <translation type="unfinished" />
         </message>
@@ -8562,6 +9102,10 @@
         </message>
         <message>
             <source>Images</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>K-Sigma</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8617,6 +9161,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Mode:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Multiplicative</source>
             <translation type="unfinished" />
         </message>
@@ -8645,6 +9193,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Normalize on overlaps</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Normalize output to [0,1]</source>
             <translation type="unfinished" />
         </message>
@@ -8654,6 +9206,10 @@
         </message>
         <message>
             <source>Pattern:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Percent</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8814,6 +9370,10 @@
         </message>
         <message>
             <source>result_stacked.fit</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>σ</source>
             <translation type="unfinished" />
         </message>
     </context>

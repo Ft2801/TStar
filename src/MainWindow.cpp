@@ -861,6 +861,8 @@ MainWindow::MainWindow(QWidget *parent)
     projectMenu->addSeparator();
     m_closeWorkspaceProjectAction = projectMenu->addAction(tr("Close Workspace Project"));
     connect(m_closeWorkspaceProjectAction, &QAction::triggered, this, &MainWindow::closeWorkspaceProject);
+    m_deleteWorkspaceProjectAction = projectMenu->addAction(tr("Delete Workspace Project..."));
+    connect(m_deleteWorkspaceProjectAction, &QAction::triggered, this, &MainWindow::deleteWorkspaceProject);
     projectBtn->setMenu(projectMenu);
     mainToolbar->addWidget(projectBtn);
     
@@ -2091,7 +2093,10 @@ void MainWindow::openFile() {
            "*.ari *.obm *.r3d *.bay *.cap *.iiq *.eip *.srw2);;") +
 #endif
         tr("All Files (*)");
-    QStringList paths = QFileDialog::getOpenFileNames(this, tr("Open Image(s)"), "", filter);
+    
+    // Use project working directory if a project is active
+    QString startDir = getProjectWorkingDirectory();
+    QStringList paths = QFileDialog::getOpenFileNames(this, tr("Open Image(s)"), startDir, filter);
     if (paths.isEmpty()) return;
 
     int total = paths.size();
@@ -2153,7 +2158,8 @@ void MainWindow::saveFile() {
     
     // 1. Get Filename first (Classic Windows Flow)
     QString selectedFilter;
-    QString path = QFileDialog::getSaveFileName(this, tr("Save Image As"), "", 
+    QString startDir = getProjectWorkingDirectory();
+    QString path = QFileDialog::getSaveFileName(this, tr("Save Image As"), startDir, 
         tr("FITS (*.fits);;XISF (*.xisf);;TIFF (*.tif *.tiff);;PNG (*.png);;JPG (*.jpg)"), &selectedFilter);
         
     if (path.isEmpty()) return;
@@ -4549,6 +4555,7 @@ QJsonObject MainWindow::captureWorkspaceProjectState(const QString& dataDirPath,
     root["app"] = "TStar";
     root["name"] = m_workspaceProject.displayName;
     root["savedUtc"] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+    root["snapshotDir"] = QFileInfo(dataDirPath).absoluteFilePath();  // Store absolute path to snapshot directory
 
     QJsonArray images;
     QDir dataDir(dataDirPath);
@@ -4849,6 +4856,28 @@ bool MainWindow::restoreWorkspaceProjectState(const QJsonObject& root, const QSt
 bool MainWindow::saveWorkspaceProjectTo(const QString& projectFilePath) {
     if (projectFilePath.isEmpty()) return false;
 
+    // Check if there are any valid images in the workspace
+    int validImageCount = 0;
+    const auto subs = m_mdiArea->subWindowList(QMdiArea::CreationOrder);
+    for (QMdiSubWindow* rawSub : subs) {
+        auto* sub = qobject_cast<CustomMdiSubWindow*>(rawSub);
+        if (sub && !sub->isToolWindow()) {
+            ImageViewer* v = sub->viewer();
+            if (v && v->getBuffer().isValid()) {
+                validImageCount++;
+            }
+        }
+    }
+
+    if (validImageCount == 0) {
+        auto choice = QMessageBox::warning(this, tr("Project is Empty"),
+            tr("The workspace contains no images. Save an empty project anyway?"),
+            QMessageBox::Yes | QMessageBox::No);
+        if (choice != QMessageBox::Yes) {
+            return false;
+        }
+    }
+
     QFileInfo fi(projectFilePath);
     QDir baseDir = fi.absoluteDir();
     if (!baseDir.exists() && !baseDir.mkpath(".")) {
@@ -4858,7 +4887,15 @@ bool MainWindow::saveWorkspaceProjectTo(const QString& projectFilePath) {
 
     QString fileName = fi.completeBaseName();
     if (fileName.isEmpty()) fileName = "workspace";
-    QString dataDirPath = baseDir.filePath(fileName + "_data");
+    
+    // Snapshots go to AppData/TStar/projects/{projectName}_data
+    QString projDataDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/projects";
+    QDir appDataProjDir(projDataDir);
+    if (!appDataProjDir.exists() && !appDataProjDir.mkpath(".")) {
+        QMessageBox::critical(this, tr("Project Save Error"), tr("Cannot create projects directory: %1").arg(projDataDir));
+        return false;
+    }
+    QString dataDirPath = appDataProjDir.filePath(fileName + "_data");
 
     QList<SaveSnapshotJob> saveJobs;
     QJsonObject root = captureWorkspaceProjectState(dataDirPath, baseDir.absolutePath(), saveJobs);
@@ -4944,7 +4981,20 @@ bool MainWindow::loadWorkspaceProjectFrom(const QString& projectFilePath) {
     }
 
     QFileInfo fi(projectFilePath);
-    QString dataDirPath = fi.absoluteDir().filePath(fi.completeBaseName() + "_data");
+    
+    // Try to get snapshot directory from project file first (new format)
+    QString dataDirPath = doc.object()["snapshotDir"].toString();
+    
+    // Fallback: check in AppData/TStar/projects
+    if (dataDirPath.isEmpty()) {
+        QString projDataDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/projects";
+        dataDirPath = QDir(projDataDir).filePath(fi.completeBaseName() + "_data");
+    }
+    
+    // Final fallback: check next to .tsproj file (old format)
+    if (!QDir(dataDirPath).exists()) {
+        dataDirPath = fi.absoluteDir().filePath(fi.completeBaseName() + "_data");
+    }
 
     m_restoringWorkspaceProject = true;
     bool ok = restoreWorkspaceProjectState(doc.object(), dataDirPath, fi.absoluteDir().absolutePath());
@@ -4961,6 +5011,35 @@ bool MainWindow::loadWorkspaceProjectFrom(const QString& projectFilePath) {
     log(tr("Workspace project loaded: %1").arg(projectFilePath), Log_Success, true);
     m_restoringWorkspaceProject = false;
     return true;
+}
+
+QString MainWindow::getWorkspaceProjectsDir() const {
+    // Returns the AppData directory for workspace projects
+    // Windows: C:\Users\<user>\AppData\Local\TStar\TStar\projects
+    // macOS: ~/Library/Application Support/TStar/projects
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+    
+    // Create projects subdirectory path
+    QString projectsDir = appDataPath + "/projects";
+    
+    // Ensure the directory exists
+    QDir dir(projectsDir);
+    if (!dir.exists()) {
+        dir.mkpath(".");
+    }
+    
+    return projectsDir;
+}
+
+QString MainWindow::getProjectWorkingDirectory() const {
+    // If a workspace project is active, return its directory
+    // Otherwise, return the AppData directory
+    if (m_workspaceProject.active && !m_workspaceProject.filePath.isEmpty()) {
+        return QFileInfo(m_workspaceProject.filePath).absoluteDir().absolutePath();
+    }
+    
+    // Default to AppData/TStar directory
+    return QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
 }
 
 void MainWindow::newWorkspaceProject() {
@@ -4989,7 +5068,7 @@ void MainWindow::openWorkspaceProject() {
     QString projectFile = QFileDialog::getOpenFileName(
         this,
         tr("Open Workspace Project"),
-        QDir::homePath(),
+        getWorkspaceProjectsDir(),
         tr("TStar Workspace Project (*.tstarproj)"));
     if (projectFile.isEmpty()) return;
 
@@ -4997,15 +5076,13 @@ void MainWindow::openWorkspaceProject() {
 }
 
 void MainWindow::saveWorkspaceProject() {
-    if (!m_workspaceProject.active) {
-        newWorkspaceProject();
-        if (!m_workspaceProject.active) return;
-    }
-
+    // If no project file path, ask user where to save
     if (m_workspaceProject.filePath.isEmpty()) {
         saveWorkspaceProjectAs();
         return;
     }
+    
+    // Save to existing project file
     saveWorkspaceProjectTo(m_workspaceProject.filePath);
 }
 
@@ -5013,7 +5090,7 @@ void MainWindow::saveWorkspaceProjectAs() {
     QString path = QFileDialog::getSaveFileName(
         this,
         tr("Save Workspace Project As"),
-        QDir::homePath(),
+        getWorkspaceProjectsDir(),
         tr("TStar Workspace Project (*.tstarproj)"));
     if (path.isEmpty()) return;
     saveWorkspaceProjectTo(path);
@@ -5029,6 +5106,155 @@ void MainWindow::closeWorkspaceProject() {
 
     m_workspaceProject = WorkspaceProjectState{};
     log(tr("Workspace project closed."), Log_Info, true);
+}
+
+void MainWindow::deleteWorkspaceProject() {
+    // Collect all available projects from AppData/TStar/projects
+    QString projDataDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/projects";
+    QDir projDir(projDataDir);
+
+    if (!projDir.exists()) {
+        QMessageBox::information(this, tr("No Projects"), tr("No workspace projects found."));
+        return;
+    }
+
+    // Find all _data folders
+    QStringList filters;
+    filters << "*_data";
+    QStringList dataDirs = projDir.entryList(filters, QDir::Dirs);
+
+    if (dataDirs.isEmpty()) {
+        QMessageBox::information(this, tr("No Projects"), tr("No workspace projects found."));
+        return;
+    }
+
+    // Extract project names from _data folders
+    QStringList projectNames;
+    QMap<QString, QString> projectMap; // name -> dataDirPath
+
+    for (const QString& dataDir : dataDirs) {
+        QString projName = dataDir;
+        projName.chop(5); // Remove "_data" suffix
+        projectNames << projName;
+        projectMap[projName] = projDir.filePath(dataDir);
+    }
+
+    // Show dialog for user to select which project to delete
+    bool ok = false;
+    QString selectedProject = QInputDialog::getItem(this,
+        tr("Delete Workspace Project"),
+        tr("Select a project to delete:"),
+        projectNames,
+        0, false, &ok);
+
+    if (!ok || selectedProject.isEmpty()) {
+        return;
+    }
+
+    QString dataDirPath = projectMap[selectedProject];
+
+    // If the selected project is currently active in the app, attempt to close it first
+    QString currentProjFile = m_workspaceProject.filePath;
+    QString currentProjName = m_workspaceProject.displayName;
+    bool wasActive = false;
+    if (m_workspaceProject.active && (currentProjName == selectedProject || QFileInfo(currentProjFile).baseName() == selectedProject)) {
+        wasActive = true;
+        if (!maybeSaveWorkspaceProject(tr("before deleting project"))) {
+            return; // user cancelled save/close
+        }
+        if (!closeAllWorkspaceWindows()) {
+            QMessageBox::warning(this, tr("Deletion Error"), tr("Cannot delete project while it is open."));
+            return;
+        }
+        // closeWorkspaceProject() will be called as part of normal closing pathway; keep currentProjFile for later deletion attempt
+    }
+
+    // Confirm deletion
+    auto choice = QMessageBox::warning(this,
+        tr("Confirm Deletion"),
+        tr("Delete project '%1' and all its snapshots? This action cannot be undone.").arg(selectedProject),
+        QMessageBox::Yes | QMessageBox::No);
+
+    if (choice != QMessageBox::Yes) {
+        return;
+    }
+
+    // Delete snapshots directory
+    QDir dataDir(dataDirPath);
+    if (!dataDir.removeRecursively()) {
+        QMessageBox::critical(this, tr("Deletion Error"),
+            tr("Failed to delete project snapshots directory: %1").arg(dataDirPath));
+        return;
+    }
+
+    // Attempt to locate and optionally delete any .tstarproj files that reference this snapshot directory
+    QStringList candidateProjFiles;
+    // If project was active and had a file path, add it as first candidate
+    if (wasActive && !currentProjFile.isEmpty() && QFile::exists(currentProjFile)) {
+        candidateProjFiles << currentProjFile;
+    }
+
+    // Search common user locations for .tstarproj files that reference this snapshot dir in their JSON
+    QStringList searchRoots;
+    searchRoots << QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    searchRoots << QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+
+    for (const QString &root : searchRoots) {
+        if (root.isEmpty()) continue;
+        QDirIterator it(root, QStringList() << "*.tstarproj", QDir::Files, QDirIterator::Subdirectories);
+        while (it.hasNext()) {
+            QString fpath = it.next();
+            if (candidateProjFiles.contains(fpath)) continue;
+            QFile f(fpath);
+            if (!f.open(QIODevice::ReadOnly)) continue;
+            QByteArray bytes = f.readAll();
+            f.close();
+            QJsonParseError perr;
+            QJsonDocument doc = QJsonDocument::fromJson(bytes, &perr);
+            if (perr.error == QJsonParseError::NoError && doc.isObject()) {
+                QString snap = doc.object().value("snapshotDir").toString();
+                if (!snap.isEmpty()) {
+                    QDir snapDir(snap);
+                    if (QDir(dataDirPath).absolutePath() == snapDir.absolutePath()) {
+                        candidateProjFiles << fpath;
+                    }
+                }
+            }
+        }
+    }
+
+    QStringList deletedProjFiles;
+    if (!candidateProjFiles.isEmpty()) {
+        QString infoList = candidateProjFiles.join("\n");
+        auto delChoice = QMessageBox::question(this,
+            tr("Delete Workspace Project"),
+            tr("The following project files referencing this workspace were found: %1 Delete these files?").arg(infoList),
+            QMessageBox::Yes | QMessageBox::No);
+        if (delChoice == QMessageBox::Yes) {
+            for (const QString &pf : candidateProjFiles) {
+                if (QFile::remove(pf)) deletedProjFiles << pf;
+            }
+        }
+    }
+
+    log(tr("Deleted workspace project '%1' and its snapshots.").arg(selectedProject), Log_Info, true);
+
+    QString infoMsg = tr("Workspace project '%1' has been deleted.").arg(selectedProject);
+    if (!deletedProjFiles.isEmpty()) {
+        infoMsg += "\n" + tr("Deleted project files: %1").arg(deletedProjFiles.join(", "));
+    } else {
+        infoMsg += "\n" + tr("Note: The .tstarproj file itself (if it exists) was NOT deleted and must be manually removed.");
+    }
+
+    QMessageBox::information(this, tr("Project Deleted"), infoMsg);
+}
+
+void MainWindow::loadWorkspaceProjectAtStartup(const QString& projectFilePath) {
+    // This method is called from main.cpp when a .tstarproj file is passed as argument
+    // It loads the workspace project automatically on startup
+    if (!projectFilePath.isEmpty() && QFile::exists(projectFilePath)) {
+        loadWorkspaceProjectFrom(projectFilePath);
+    }
 }
 
 // ========== Stacking Suite ==========

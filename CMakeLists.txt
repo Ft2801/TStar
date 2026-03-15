@@ -923,6 +923,7 @@ endif()
 # Post-build: Copy resources
 # =============================================================================
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/images" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/scripts" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 if(APPLE)
     add_custom_command(TARGET TStar POST_BUILD
@@ -932,6 +933,9 @@ if(APPLE)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_CURRENT_BINARY_DIR}/translations"
             "$<TARGET_BUNDLE_DIR:TStar>/Contents/Resources/translations"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/scripts"
+            "$<TARGET_BUNDLE_DIR:TStar>/Contents/Resources/scripts"
         COMMENT "Copying resources to app bundle"
     )
 endif()

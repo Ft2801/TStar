@@ -1,6 +1,12 @@
 TStar Changelog
 ===============
 
+Version 1.7.10
+-------------
+- New: implemented full workspace project management system
+- Added automated scripts to the stacking suite
+- Improved stacking suite functions and bugfixes
+
 Version 1.7.9
 -------------
 - Added more tiled views options (tile vertically, tile horizontally)
