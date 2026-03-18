@@ -295,9 +295,12 @@ bool IccProfileExtractor::extractFromFits(const QString& filePath, QByteArray& i
     return false;
 }
 
+#ifdef HAVE_LIBRAW
 #include <libraw/libraw.h>
+#endif
 
 bool IccProfileExtractor::extractFromRaw(const QString& filePath, QByteArray& iccData) {
+#ifdef HAVE_LIBRAW
     LibRaw processor;
     
     // Only open the file, don't unpack yet
@@ -312,6 +315,11 @@ bool IccProfileExtractor::extractFromRaw(const QString& filePath, QByteArray& ic
     }
     
     return false;
+#else
+    Q_UNUSED(filePath)
+    Q_UNUSED(iccData)
+    return false;
+#endif
 }
 
 bool IccProfileExtractor::extractFromXisf(const QString& filePath, QByteArray& iccData) {

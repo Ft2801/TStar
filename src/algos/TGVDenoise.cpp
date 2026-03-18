@@ -45,6 +45,48 @@ static inline double dy_bwd(const std::vector<double>& p, int x, int y, int w, i
     return a - b;
 }
 
+static void rgbToYcbcrInterleaved(const std::vector<float>& rgb, std::vector<float>& ycbcr) {
+    ycbcr.resize(rgb.size());
+    const size_t npixels = rgb.size() / 3;
+
+    #pragma omp parallel for schedule(static)
+    for (int i = 0; i < static_cast<int>(npixels); ++i) {
+        const size_t base = static_cast<size_t>(i) * 3;
+        const float r = rgb[base + 0];
+        const float g = rgb[base + 1];
+        const float b = rgb[base + 2];
+
+        const float y  = 0.299f * r + 0.587f * g + 0.114f * b;
+        const float cb = 0.5f + (-0.168736f * r - 0.331264f * g + 0.5f * b);
+        const float cr = 0.5f + (0.5f * r - 0.418688f * g - 0.081312f * b);
+
+        ycbcr[base + 0] = std::max(0.0f, std::min(1.0f, y));
+        ycbcr[base + 1] = std::max(0.0f, std::min(1.0f, cb));
+        ycbcr[base + 2] = std::max(0.0f, std::min(1.0f, cr));
+    }
+}
+
+static void ycbcrToRgbInterleaved(const std::vector<float>& ycbcr, std::vector<float>& rgb) {
+    rgb.resize(ycbcr.size());
+    const size_t npixels = ycbcr.size() / 3;
+
+    #pragma omp parallel for schedule(static)
+    for (int i = 0; i < static_cast<int>(npixels); ++i) {
+        const size_t base = static_cast<size_t>(i) * 3;
+        const float y  = ycbcr[base + 0];
+        const float cb = ycbcr[base + 1] - 0.5f;
+        const float cr = ycbcr[base + 2] - 0.5f;
+
+        float r = y + 1.402f * cr;
+        float g = y - 0.344136f * cb - 0.714136f * cr;
+        float b = y + 1.772f * cb;
+
+        rgb[base + 0] = std::max(0.0f, std::min(1.0f, r));
+        rgb[base + 1] = std::max(0.0f, std::min(1.0f, g));
+        rgb[base + 2] = std::max(0.0f, std::min(1.0f, b));
+    }
+}
+
 // ─── Dual projection helpers ──────────────────────────────────────────────────
 
 void TGVDenoise::projectP1(double& px, double& py, double alpha1) {
@@ -211,12 +253,33 @@ void TGVDenoise::denoisePlane(float* data, int w, int h,
         }
 
         u_prev = u;
+
+        if (p.progressCallback && ((iter % 5) == 0 || iter + 1 == p.maxIter)) {
+            const int pct = std::max(0, std::min(100, ((iter + 1) * 100) / std::max(1, p.maxIter)));
+            p.progressCallback(pct, QString("TGV iteration %1/%2").arg(iter + 1).arg(p.maxIter));
+        }
     }
 
-    // Write result back to float buffer, clamped to [0,1]
+    // Write result back to float buffer with soft saturation to prevent artifacts
+    // Instead of hard clipping, use exponential decay for values beyond [0,1]
+    // This prevents sharp transitions that can create visible banding
     #pragma omp parallel for schedule(static)
     for (int i = 0; i < N; i++) {
-        data[i] = static_cast<float>(std::max(0.0, std::min(1.0, u[i])));
+        double val = u[i];
+        
+        // Soft saturation at boundaries
+        if (val < 0.0) {
+            // Exponential decay for negative values
+            val = -0.1 * std::log(1.0 + std::abs(val)) * 0.5;
+            val = std::max(val, -1e-3);  // Allow tiny undershoot, prevent extreme negatives
+        } else if (val > 1.0) {
+            // Soft saturation for over-range values
+            // Maps x > 1 to  1 + 0.2*(1 - exp(-(x-1)))
+            val = 1.0 + 0.2 * (1.0 - std::exp(-(val - 1.0)));
+        }
+        
+        // Final clamp to safe range
+        data[i] = static_cast<float>(std::max(0.0f, std::min(1.0f, static_cast<float>(val))));
     }
 
     if (result) {
@@ -241,6 +304,51 @@ TGVResult TGVDenoise::denoiseBuffer(ImageBuffer& buf, const TGVParams& p)
     const int ch = buf.channels();
     std::vector<float>& data = buf.data();
 
+    // RGB luminance-only mode: denoise Y channel to preserve chroma and avoid color blotches.
+    if (ch == 3 && !p.perChannel) {
+        std::vector<float> ycbcr;
+        rgbToYcbcrInterleaved(data, ycbcr);
+
+        std::vector<float> yPlane(static_cast<size_t>(w) * h);
+        for (int y = 0; y < h; ++y) {
+            for (int x = 0; x < w; ++x) {
+                const size_t base = (static_cast<size_t>(y) * w + x) * 3;
+                yPlane[static_cast<size_t>(y) * w + x] = ycbcr[base + 0];
+            }
+        }
+
+        TGVParams channelParams = p;
+        if (p.progressCallback) {
+            channelParams.progressCallback = [p](int pct, const QString& msg) {
+                p.progressCallback(std::max(0, std::min(100, pct)), msg);
+            };
+        }
+
+        TGVResult yRes;
+        denoisePlane(yPlane.data(), w, h, channelParams, &yRes);
+        if (!yRes.success) {
+            return yRes;
+        }
+
+        for (int y = 0; y < h; ++y) {
+            for (int x = 0; x < w; ++x) {
+                const size_t base = (static_cast<size_t>(y) * w + x) * 3;
+                ycbcr[base + 0] = yPlane[static_cast<size_t>(y) * w + x];
+            }
+        }
+
+        ycbcrToRgbInterleaved(ycbcr, data);
+
+        res.success = true;
+        res.iterations = yRes.iterations;
+        res.finalGap = yRes.finalGap;
+        buf.setModified(true);
+        if (p.progressCallback) {
+            p.progressCallback(100, "TGV completed");
+        }
+        return res;
+    }
+
     TGVResult chRes;
     for (int c = 0; c < ch; c++) {
         std::vector<float> plane(static_cast<size_t>(w) * h);
@@ -251,8 +359,16 @@ TGVResult TGVDenoise::denoiseBuffer(ImageBuffer& buf, const TGVParams& p)
             }
         }
 
+        TGVParams channelParams = p;
+        if (p.progressCallback) {
+            channelParams.progressCallback = [p, c, ch](int channelPct, const QString& msg) {
+                const int totalPct = ((c * 100) + std::max(0, std::min(100, channelPct))) / std::max(1, ch);
+                p.progressCallback(totalPct, msg);
+            };
+        }
+
         TGVResult cr;
-        denoisePlane(plane.data(), w, h, p, &cr);
+        denoisePlane(plane.data(), w, h, channelParams, &cr);
         if (!cr.success) { res.errorMsg = cr.errorMsg; return res; }
 
         for (int y = 0; y < h; ++y) {
@@ -269,5 +385,8 @@ TGVResult TGVDenoise::denoiseBuffer(ImageBuffer& buf, const TGVParams& p)
     res.finalGap /= std::max(ch, 1);
     res.success   = true;
     buf.setModified(true);
+    if (p.progressCallback) {
+        p.progressCallback(100, "TGV completed");
+    }
     return res;
 }

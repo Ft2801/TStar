@@ -455,9 +455,6 @@ MainWindow::MainWindow(QWidget *parent)
         m_mdiArea->viewport()->installEventFilter(this);
     }
 
-    connect(&core::ColorProfileManager::instance(), &core::ColorProfileManager::profileMismatchDetected,
-            this, &MainWindow::handleColorProfileMismatch);
-    
     // Connect color profile conversion signals for UI feedback
     connect(&core::ColorProfileManager::instance(), &core::ColorProfileManager::conversionStarted, this, [this](quint64 /*id*/) {
         if (m_sidebar) {
@@ -602,33 +599,10 @@ MainWindow::MainWindow(QWidget *parent)
 
                     if (m_headerPanel) m_headerPanel->setMetadata(v->getBuffer().metadata());
                     
-                    // --- Color Profile Check ---
-                    // Only check/warn if the image profile hasn't already been handled this session
-                    bool alreadyHandled = v->getBuffer().metadata().colorProfileHandled;
-                    if (!alreadyHandled) {
-                        core::ColorProfile imageProfile(v->getBuffer().metadata().iccData);
-                        
-                        if (core::ColorProfileManager::instance().isMismatch(imageProfile)) {
-                            core::AutoConversionMode mode = core::ColorProfileManager::instance().autoConversionMode();
-                            
-                            if (mode == core::AutoConversionMode::Always) {
-                                // Auto-convert without asking
-                                core::ColorProfileManager::instance().convertToWorkspace(v->getBuffer(), imageProfile);
-                                
-                                // Mark as handled and refresh
-                                ImageBuffer::Metadata meta = v->getBuffer().metadata();
-                                meta.colorProfileHandled = true;
-                                v->getBuffer().setMetadata(meta);
-                                v->refreshDisplay();
-                                
-                                log(tr("Auto-converted image '%1' to workspace profile.").arg(v->windowTitle()), Log_Success);
-                            } else if (mode == core::AutoConversionMode::Ask) {
-                                // Show the dialog
-                                core::ColorProfileManager::instance().checkMismatchAndWarn(imageProfile, v->windowTitle());
-                            }
-                            // If mode == Never, do nothing
-                        }
-                    }
+                    // --- Color Profile Check moved to checkAndHandleColorProfile ---
+                    // It is now called in processImageLoadQueue before window creation,
+                    // or here just as a safety measure if needed (but already handled).
+                    checkAndHandleColorProfile(v->getBuffer(), v->windowTitle());
                     
                     // Sync Display Mode UI to the new viewer's state
                     if (m_stretchCombo) {
@@ -775,7 +749,17 @@ MainWindow::MainWindow(QWidget *parent)
     m_stretchCombo->addItem(tr("ArcSinh"), ImageBuffer::Display_ArcSinh);
     m_stretchCombo->addItem(tr("Square Root"), ImageBuffer::Display_Sqrt);
     m_stretchCombo->addItem(tr("Logarithmic"), ImageBuffer::Display_Log);
-    m_stretchCombo->setCurrentIndex(0);
+    // Load default stretch from settings
+    QString defaultStretch = m_settings.value("display/default_stretch", "Linear").toString();
+    int stretchIdx = 0; // Default to Linear
+    if (defaultStretch == "AutoStretch") stretchIdx = m_stretchCombo->findData(ImageBuffer::Display_AutoStretch);
+    else if (defaultStretch == "Histogram") stretchIdx = m_stretchCombo->findData(ImageBuffer::Display_Histogram);
+    else if (defaultStretch == "ArcSinh")    stretchIdx = m_stretchCombo->findData(ImageBuffer::Display_ArcSinh);
+    else if (defaultStretch == "Sqrt")       stretchIdx = m_stretchCombo->findData(ImageBuffer::Display_Sqrt);
+    else if (defaultStretch == "Log")        stretchIdx = m_stretchCombo->findData(ImageBuffer::Display_Log);
+    
+    if (stretchIdx != -1) m_stretchCombo->setCurrentIndex(stretchIdx);
+    else m_stretchCombo->setCurrentIndex(0);
     
     // Custom Styling for Combo to match Buttons
     m_stretchCombo->setStyleSheet(
@@ -1782,9 +1766,22 @@ static bool loadProjectBufferSnapshot(const QString& filePath, ImageBuffer& outB
     return true;
 }
 
+ImageBuffer::DisplayMode MainWindow::getDefaultDisplayMode() const {
+    QString stretchStr = m_settings.value("display/default_stretch", "Linear").toString();
+    if (stretchStr == "AutoStretch") return ImageBuffer::Display_AutoStretch;
+    if (stretchStr == "ArcSinh") return ImageBuffer::Display_ArcSinh;
+    if (stretchStr == "Log") return ImageBuffer::Display_Log;
+    if (stretchStr == "Sqrt") return ImageBuffer::Display_Sqrt;
+    if (stretchStr == "Histogram") return ImageBuffer::Display_Histogram;
+    return ImageBuffer::Display_Linear;
+}
+
 CustomMdiSubWindow* MainWindow::createNewImageWindow(const ImageBuffer& buffer, const QString& title,
                                       ImageBuffer::DisplayMode mode,
                                       float autoStretchMedian, bool displayLinked) {
+    if (static_cast<int>(mode) == -1) {
+        mode = getDefaultDisplayMode();
+    }
     ImageViewer* viewer = new ImageViewer(this); // Parent is temporary
     
     // Sync with current toolbar state, but allow override if mode is NOT linear (or if explicitly requested)
@@ -2149,7 +2146,9 @@ void MainWindow::processImageLoadQueue() {
     }
     
     if (ptr->success) {
-        CustomMdiSubWindow* sub = createNewImageWindow(ptr->buffer, ptr->title);
+        checkAndHandleColorProfile(ptr->buffer, ptr->title);
+        ImageBuffer::DisplayMode mode = getDefaultDisplayMode();
+        CustomMdiSubWindow* sub = createNewImageWindow(ptr->buffer, ptr->title, mode);
         if (sub && sub->viewer()) {
             sub->viewer()->setFilePath(ptr->sourcePath);
             sub->viewer()->setModified(false);
@@ -2549,7 +2548,7 @@ void MainWindow::cropTool() {
 }
 
 void MainWindow::openCbeDialog() {
-    if (activateTool(tr("Catalog Background Extraction (MARS-like)"))) return;
+    if (activateTool(tr("Catalog Background Extraction"))) return;
 
     auto v = currentViewer();
     if (!v) {
@@ -2561,7 +2560,7 @@ void MainWindow::openCbeDialog() {
     auto dlg = new CBEDialog(this, v, v->getBuffer());
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     
-    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, dlg, tr("Catalog Background Extraction (MARS-like)"));
+    CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, dlg, tr("Catalog Background Extraction"));
     m_cbeDlg = dlg;
 
     connect(dlg, &CBEDialog::applyResult, [this, v](const ImageBuffer& res) {
@@ -3767,6 +3766,7 @@ void MainWindow::onSettingsAction() {
     m_settingsDlg = dlg;
     
     connect(dlg, &SettingsDialog::settingsChanged, this, [this](){
+        core::ColorProfileManager::instance().syncSettings();
         updateActiveImage();
         // Also update all other open viewers since this is a global setting
         for (auto sub : m_mdiArea->subWindowList()) {
@@ -3998,30 +3998,54 @@ void MainWindow::openColorProfileDialog() {
     m_colorProfileDlg->activateWindow();
 }
 
-void MainWindow::handleColorProfileMismatch(const QString& imageName, const QString& imageProfile, const QString& workspaceProfile) {
-    QMessageBox::StandardButton reply = QMessageBox::question(this, tr("Color Profile Mismatch"),
-        tr("The image '%1' has a color profile (%2) that differs from the workspace profile (%3). Would you like to convert it to the workspace profile?").arg(imageName, imageProfile, workspaceProfile),
-        QMessageBox::Yes | QMessageBox::No);
-        
-    ImageViewer* viewer = currentViewer();
-    if (!viewer) return;
-    
-    ImageBuffer::Metadata meta = viewer->getBuffer().metadata();
-    
-    if (reply == QMessageBox::Yes) {
-        core::ColorProfile sourceProfile(viewer->getBuffer().metadata().iccData);
-        core::ColorProfileManager::instance().convertToWorkspace(viewer->getBuffer(), sourceProfile);
-        
-        // Update metadata with the new profile ICC data from convertToWorkspace
-        meta = viewer->getBuffer().metadata();
-        meta.colorProfileHandled = true;
-        viewer->getBuffer().setMetadata(meta);
-        
-        viewer->refreshDisplay();
-        log(tr("Converted image '%1' to workspace profile.").arg(imageName), Log_Success);
+void MainWindow::checkAndHandleColorProfile(ImageBuffer& buffer, const QString& title) {
+    bool alreadyHandled = buffer.metadata().colorProfileHandled;
+    if (alreadyHandled) return;
+
+    const auto& meta = buffer.metadata();
+    core::ColorProfile imageProfile;
+    if (!meta.iccData.isEmpty()) {
+        imageProfile = core::ColorProfile(meta.iccData);
+    } else if (meta.iccProfileType >= 0 && meta.iccProfileType <= static_cast<int>(core::StandardProfile::LinearRGB)) {
+        imageProfile = core::ColorProfile(static_cast<core::StandardProfile>(meta.iccProfileType));
     } else {
-        meta.colorProfileHandled = true;
-        viewer->getBuffer().setMetadata(meta);
+        return; // No profile info
+    }
+
+    if (core::ColorProfileManager::instance().isMismatch(imageProfile)) {
+        core::AutoConversionMode mode = core::ColorProfileManager::instance().autoConversionMode();
+
+        if (mode == core::AutoConversionMode::Always) {
+            core::ColorProfileManager::instance().convertToWorkspace(buffer, imageProfile);
+            ImageBuffer::Metadata m = buffer.metadata();
+            m.colorProfileHandled = true;
+            buffer.setMetadata(m);
+            log(tr("Auto-converted image '%1' to workspace profile.").arg(title), Log_Success);
+        } else if (mode == core::AutoConversionMode::Ask) {
+            // Direct call to QMessageBox here to ensure it's synchronous and happens BEFORE window creation
+            QMessageBox::StandardButton reply = QMessageBox::question(this, tr("Color Profile Mismatch"),
+                tr("The image '%1' has a color profile (%2) that differs from the workspace profile (%3). "
+                   "Would you like to convert it to the workspace profile?").arg(title, imageProfile.name(), 
+                   core::ColorProfileManager::instance().workspaceProfile().name()),
+                QMessageBox::Yes | QMessageBox::No);
+
+            if (reply == QMessageBox::Yes) {
+                core::ColorProfileManager::instance().convertToWorkspace(buffer, imageProfile);
+                ImageBuffer::Metadata m = buffer.metadata();
+                m.colorProfileHandled = true;
+                buffer.setMetadata(m);
+                log(tr("Converted image '%1' to workspace profile.").arg(title), Log_Success);
+            } else {
+                ImageBuffer::Metadata m = buffer.metadata();
+                m.colorProfileHandled = true;
+                buffer.setMetadata(m);
+            }
+        }
+    } else {
+        // Even if no mismatch, mark as handled to avoid redundant checks
+        ImageBuffer::Metadata m = buffer.metadata();
+        m.colorProfileHandled = true;
+        buffer.setMetadata(m);
     }
 }
 
@@ -5519,7 +5543,11 @@ void MainWindow::openNewProjectDialog() {
     if (dlg.exec() == QDialog::Accepted) {
         Stacking::StackingProject* project = dlg.createProject();
         if (project) {
-            log(tr("Project created: %1").arg(project->rootDir()), Log_Success, true);
+            QString dir = project->rootDir();
+            QDir::setCurrent(dir);
+            QSettings settings("TStar", "TStar");
+            settings.setValue("General/LastWorkingDir", dir);
+            log(tr("Project created and activated: %1").arg(dir), Log_Success, true);
             delete project;
         } else {
             log(tr("Failed to create project."), Log_Error, true);

@@ -19,6 +19,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QImageWriter>
+#include <QColorSpace>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QDataStream> 
@@ -387,10 +388,14 @@ bool ImageBuffer::loadStandard(const QString& filePath) {
         }
     }
     
+    Metadata& meta = metadata();
+    meta.iccData.clear();
+    meta.iccProfileName.clear();
+    meta.iccProfileType = -1;
+
     // Extract ICC profile if present
     QByteArray iccData;
     if (IccProfileExtractor::extractFromFile(filePath, iccData)) {
-        Metadata& meta = metadata();
         meta.iccData = iccData;
         core::ColorProfile profile(iccData);
         if (profile.isValid()) {
@@ -479,10 +484,14 @@ bool ImageBuffer::loadTiff32(const QString& filePath, QString* errorMsg, QString
     
     setData(w, h, ch, data);
     
+    Metadata& meta = metadata();
+    meta.iccData.clear();
+    meta.iccProfileName.clear();
+    meta.iccProfileType = -1;
+
     // Extract ICC profile if present
     QByteArray iccData;
     if (IccProfileExtractor::extractFromFile(filePath, iccData)) {
-        Metadata& meta = metadata();
         meta.iccData = iccData;
         core::ColorProfile profile(iccData);
         if (profile.isValid()) {
@@ -1493,14 +1502,107 @@ void ImageBuffer::applyDisplayTransform(DisplayMode mode, bool linked, float tar
 
 // ... (previous includes)
 #include <fitsio.h>
+#include <lcms2.h>
 #include <numeric>
+
+static cmsHPROFILE createStandardIccProfile(core::StandardProfile type) {
+    switch (type) {
+        case core::StandardProfile::sRGB:
+            return cmsCreate_sRGBProfile();
+        case core::StandardProfile::AdobeRGB: {
+            cmsCIExyY wp = {0.3127, 0.3290, 1.0};
+            cmsCIExyYTRIPLE primaries = {
+                {0.6400, 0.3300, 1.0},
+                {0.2100, 0.7100, 1.0},
+                {0.1500, 0.0600, 1.0}
+            };
+            cmsToneCurve* gamma = cmsBuildGamma(nullptr, 2.2);
+            cmsToneCurve* curves[3] = {gamma, gamma, gamma};
+            cmsHPROFILE h = cmsCreateRGBProfile(&wp, &primaries, curves);
+            cmsFreeToneCurve(gamma);
+            return h;
+        }
+        case core::StandardProfile::ProPhotoRGB: {
+            cmsCIExyY wp = {0.3457, 0.3585, 1.0};
+            cmsCIExyYTRIPLE primaries = {
+                {0.7347, 0.2653, 1.0},
+                {0.1596, 0.8404, 1.0},
+                {0.0366, 0.0001, 1.0}
+            };
+            cmsToneCurve* gamma = cmsBuildGamma(nullptr, 1.8);
+            cmsToneCurve* curves[3] = {gamma, gamma, gamma};
+            cmsHPROFILE h = cmsCreateRGBProfile(&wp, &primaries, curves);
+            cmsFreeToneCurve(gamma);
+            return h;
+        }
+        case core::StandardProfile::LinearRGB: {
+            cmsCIExyY wp = {0.3127, 0.3290, 1.0};
+            cmsCIExyYTRIPLE primaries = {
+                {0.6400, 0.3300, 1.0},
+                {0.3000, 0.6000, 1.0},
+                {0.1500, 0.0600, 1.0}
+            };
+            cmsToneCurve* gamma = cmsBuildGamma(nullptr, 1.0);
+            cmsToneCurve* curves[3] = {gamma, gamma, gamma};
+            cmsHPROFILE h = cmsCreateRGBProfile(&wp, &primaries, curves);
+            cmsFreeToneCurve(gamma);
+            return h;
+        }
+        default:
+            return nullptr;
+    }
+}
+
+static QByteArray buildStandardIccBytes(core::StandardProfile type) {
+    QByteArray out;
+    cmsHPROFILE h = createStandardIccProfile(type);
+    if (!h) return out;
+
+    cmsUInt32Number size = 0;
+    if (cmsSaveProfileToMem(h, nullptr, &size) && size > 0) {
+        out.resize(static_cast<int>(size));
+        if (!cmsSaveProfileToMem(h, out.data(), &size)) {
+            out.clear();
+        }
+    }
+    cmsCloseProfile(h);
+    return out;
+}
+
+static QByteArray effectiveIccProfileData(const ImageBuffer::Metadata& meta) {
+    if (!meta.iccData.isEmpty()) {
+        return meta.iccData;
+    }
+
+    if (meta.iccProfileType >= 0 && meta.iccProfileType <= static_cast<int>(core::StandardProfile::LinearRGB)) {
+        return buildStandardIccBytes(static_cast<core::StandardProfile>(meta.iccProfileType));
+    }
+
+    return QByteArray();
+}
+
+static void applyIccToQImage(QImage& img, const QByteArray& iccData) {
+    if (iccData.isEmpty()) return;
+    const QColorSpace cs = QColorSpace::fromIccProfile(iccData);
+    if (cs.isValid()) {
+        img.setColorSpace(cs);
+    }
+}
 
 // ------ Saving Logic ------
 bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth depth, QString* errorMsg) const {
     if (m_data.empty()) return false;
+    const QByteArray iccToEmbed = effectiveIccProfileData(m_meta);
 
     // XISF Support
     if (format.compare("xisf", Qt::CaseInsensitive) == 0) {
+        if (!iccToEmbed.isEmpty() && m_meta.iccData.isEmpty()) {
+            ImageBuffer tmp(*this);
+            ImageBuffer::Metadata meta = tmp.metadata();
+            meta.iccData = iccToEmbed;
+            tmp.setMetadata(meta);
+            return XISFWriter::write(filePath, tmp, depth, errorMsg);
+        }
         return XISFWriter::write(filePath, *this, depth, errorMsg);
     }
 
@@ -1662,6 +1764,23 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
             status = 0;
         }
 
+        if (!iccToEmbed.isEmpty()) {
+            long iccAxes[1] = { static_cast<long>(iccToEmbed.size()) };
+            if (fits_create_img(fptr, BYTE_IMG, 1, iccAxes, &status) == 0) {
+                const char* extName = "ICC_PROFILE";
+                const char* comment = "Embedded ICC profile";
+                fits_update_key(fptr, TSTRING, "EXTNAME", (void*)extName, comment, &status);
+                if (status == 0) {
+                    fits_write_img(fptr, 11, 1, iccAxes[0], (void*)iccToEmbed.constData(), &status);
+                }
+            }
+            if (status != 0) {
+                if (errorMsg) *errorMsg = "CFITSIO ICC Write Error: " + QString::number(status);
+                fits_close_file(fptr, &status);
+                return false;
+            }
+        }
+
         fits_close_file(fptr, &status);
         return true;
 
@@ -1671,7 +1790,7 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
         else if (depth == Depth_32Int) fmt = SimpleTiffWriter::Format_uint32;
         else if (depth == Depth_32Float) fmt = SimpleTiffWriter::Format_float32;
         
-        if (!SimpleTiffWriter::write(filePath, m_width, m_height, m_channels, fmt, m_data, errorMsg)) {
+           if (!SimpleTiffWriter::write(filePath, m_width, m_height, m_channels, fmt, m_data, iccToEmbed, errorMsg)) {
              return false;
         }
         return true;
@@ -1682,6 +1801,7 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
         if (fmtLower == "jpg" || fmtLower == "jpeg") {
             // JPEG: convert to 8-bit and save at quality 100
             QImage saveImg = getDisplayImage(Display_Linear);
+            applyIccToQImage(saveImg, iccToEmbed);
             QImageWriter writer(filePath);
             writer.setFormat("jpeg");
             writer.setQuality(100);
@@ -1692,61 +1812,68 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
             return true;
 
         } else if (fmtLower == "png") {
-            // PNG: honour the chosen depth (8-bit or 16-bit)
-            int w = m_width, h = m_height, c = m_channels;
+            const int w = m_width;
+            const int h = m_height;
+            const int c = m_channels;
             const float* src = m_data.data();
-            // Maximum lossless PNG compression
-            const std::vector<int> params = {cv::IMWRITE_PNG_COMPRESSION, 9};
+            const bool use16 = (depth == Depth_16Int || depth == Depth_32Int || depth == Depth_32Float);
 
-            bool use16 = (depth == Depth_16Int || depth == Depth_32Int || depth == Depth_32Float);
-
+            QImage saveImg;
             if (c == 1) {
-                if (use16) {
-                    cv::Mat mat(h, w, CV_16UC1);
-                    for (int i = 0; i < h * w; ++i)
-                        mat.at<uint16_t>(i / w, i % w) =
-                            static_cast<uint16_t>(std::clamp(src[i], 0.0f, 1.0f) * 65535.0f + 0.5f);
-                    if (!cv::imwrite(filePath.toStdString(), mat, params)) {
-                        if (errorMsg) *errorMsg = "Failed to write PNG file.";
-                        return false;
-                    }
-                } else {
-                    cv::Mat mat(h, w, CV_8UC1);
-                    for (int i = 0; i < h * w; ++i)
-                        mat.at<uint8_t>(i / w, i % w) =
-                            static_cast<uint8_t>(std::clamp(src[i], 0.0f, 1.0f) * 255.0f + 0.5f);
-                    if (!cv::imwrite(filePath.toStdString(), mat, params)) {
-                        if (errorMsg) *errorMsg = "Failed to write PNG file.";
-                        return false;
+                saveImg = QImage(w, h, use16 ? QImage::Format_Grayscale16 : QImage::Format_Grayscale8);
+                if (saveImg.isNull()) {
+                    if (errorMsg) *errorMsg = "Failed to allocate PNG image buffer.";
+                    return false;
+                }
+                for (int y = 0; y < h; ++y) {
+                    if (use16) {
+                        quint16* row = reinterpret_cast<quint16*>(saveImg.scanLine(y));
+                        for (int x = 0; x < w; ++x) {
+                            const float v = std::clamp(src[y * w + x], 0.0f, 1.0f);
+                            row[x] = static_cast<quint16>(v * 65535.0f + 0.5f);
+                        }
+                    } else {
+                        uchar* row = saveImg.scanLine(y);
+                        for (int x = 0; x < w; ++x) {
+                            const float v = std::clamp(src[y * w + x], 0.0f, 1.0f);
+                            row[x] = static_cast<uchar>(v * 255.0f + 0.5f);
+                        }
                     }
                 }
             } else {
-                // TStar stores interleaved RGB; OpenCV expects BGR
-                if (use16) {
-                    cv::Mat mat(h, w, CV_16UC3);
-                    for (int i = 0; i < h * w; ++i)
-                        mat.at<cv::Vec3w>(i / w, i % w) = cv::Vec3w(
-                            static_cast<uint16_t>(std::clamp(src[i*3+2], 0.0f, 1.0f) * 65535.0f + 0.5f), // B
-                            static_cast<uint16_t>(std::clamp(src[i*3+1], 0.0f, 1.0f) * 65535.0f + 0.5f), // G
-                            static_cast<uint16_t>(std::clamp(src[i*3+0], 0.0f, 1.0f) * 65535.0f + 0.5f)  // R
-                        );
-                    if (!cv::imwrite(filePath.toStdString(), mat, params)) {
-                        if (errorMsg) *errorMsg = "Failed to write PNG file.";
-                        return false;
-                    }
-                } else {
-                    cv::Mat mat(h, w, CV_8UC3);
-                    for (int i = 0; i < h * w; ++i)
-                        mat.at<cv::Vec3b>(i / w, i % w) = cv::Vec3b(
-                            static_cast<uint8_t>(std::clamp(src[i*3+2], 0.0f, 1.0f) * 255.0f + 0.5f), // B
-                            static_cast<uint8_t>(std::clamp(src[i*3+1], 0.0f, 1.0f) * 255.0f + 0.5f), // G
-                            static_cast<uint8_t>(std::clamp(src[i*3+0], 0.0f, 1.0f) * 255.0f + 0.5f)  // R
-                        );
-                    if (!cv::imwrite(filePath.toStdString(), mat, params)) {
-                        if (errorMsg) *errorMsg = "Failed to write PNG file.";
-                        return false;
+                saveImg = QImage(w, h, use16 ? QImage::Format_RGBA64 : QImage::Format_RGB888);
+                if (saveImg.isNull()) {
+                    if (errorMsg) *errorMsg = "Failed to allocate PNG image buffer.";
+                    return false;
+                }
+                for (int y = 0; y < h; ++y) {
+                    if (use16) {
+                        QRgba64* row = reinterpret_cast<QRgba64*>(saveImg.scanLine(y));
+                        for (int x = 0; x < w; ++x) {
+                            const size_t i = static_cast<size_t>(y) * w + x;
+                            const quint16 r = static_cast<quint16>(std::clamp(src[i*3+0], 0.0f, 1.0f) * 65535.0f + 0.5f);
+                            const quint16 g = static_cast<quint16>(std::clamp(src[i*3+1], 0.0f, 1.0f) * 65535.0f + 0.5f);
+                            const quint16 b = static_cast<quint16>(std::clamp(src[i*3+2], 0.0f, 1.0f) * 65535.0f + 0.5f);
+                            row[x] = qRgba64(r, g, b, 65535);
+                        }
+                    } else {
+                        uchar* row = saveImg.scanLine(y);
+                        for (int x = 0; x < w; ++x) {
+                            const size_t i = static_cast<size_t>(y) * w + x;
+                            row[x*3 + 0] = static_cast<uchar>(std::clamp(src[i*3+0], 0.0f, 1.0f) * 255.0f + 0.5f);
+                            row[x*3 + 1] = static_cast<uchar>(std::clamp(src[i*3+1], 0.0f, 1.0f) * 255.0f + 0.5f);
+                            row[x*3 + 2] = static_cast<uchar>(std::clamp(src[i*3+2], 0.0f, 1.0f) * 255.0f + 0.5f);
+                        }
                     }
                 }
+            }
+
+            applyIccToQImage(saveImg, iccToEmbed);
+            QImageWriter writer(filePath, "png");
+            writer.setCompression(9);
+            if (!writer.write(saveImg)) {
+                if (errorMsg) *errorMsg = writer.errorString();
+                return false;
             }
             return true;
 

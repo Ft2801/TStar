@@ -1,0 +1,56 @@
+[
+  {
+    "type": "WB_REF",
+    "manufacturer": "Standard",
+    "model": "D65",
+    "name": "Daylight (D65)",
+    "dataSource": "CIE Standard Illuminant D65",
+    "comment": "Standard daylight illuminant (6500K color temperature)",
+    "illuminant_spec": {
+      "type": "daylight",
+      "color_temp_K": 6500,
+      "chromaticity_x": 0.3127,
+      "chromaticity_y": 0.3290
+    },
+    "spectral_irradiance_sampleddata": {
+      "wavelengths_nm": [380, 450, 550, 650, 750, 850, 950],
+      "irradiance_relative": [0.5, 0.6, 1.0, 0.95, 0.7, 0.3, 0.1]
+    }
+  },
+  {
+    "type": "WB_REF",
+    "manufacturer": "Standard",
+    "model": "D55",
+    "name": "Daylight (D55)",
+    "dataSource": "CIE Standard Illuminant D55",
+    "comment": "Intermediate daylight illuminant (5500K color temperature)",
+    "illuminant_spec": {
+      "type": "daylight",
+      "color_temp_K": 5500,
+      "chromaticity_x": 0.3324,
+      "chromaticity_y": 0.3474
+    },
+    "spectral_irradiance_sampleddata": {
+      "wavelengths_nm": [380, 450, 550, 650, 750, 850, 950],
+      "irradiance_relative": [0.6, 0.7, 1.0, 0.90, 0.60, 0.25, 0.08]
+    }
+  },
+  {
+    "type": "WB_REF",
+    "manufacturer": "Standard",
+    "model": "A",
+    "name": "Tungsten (A)",
+    "dataSource": "CIE Standard Illuminant A",
+    "comment": "Tungsten lamp illuminant (2856K - warm)",
+    "illuminant_spec": {
+      "type": "planckian",
+      "color_temp_K": 2856,
+      "chromaticity_x": 0.4476,
+      "chromaticity_y": 0.4075
+    },
+    "spectral_irradiance_sampleddata": {
+      "wavelengths_nm": [380, 450, 550, 650, 750, 850, 950],
+      "irradiance_relative": [0.2, 0.4, 0.6, 1.0, 0.9, 0.7, 0.5]
+    }
+  }
+]

@@ -323,6 +323,7 @@ struct StackingParams {
     double drizzleScale = 2.0;         ///< Drizzle output scale
     double drizzlePixFrac = 0.9;       ///< Drizzle pixel fraction
     DrizzleKernelType drizzleKernel = DrizzleKernelType::Square; ///< Drizzle kernel type
+    bool drizzleFast = false;          ///< Enable Fast Drizzle (point kernel)
     bool force32Bit = false;           ///< Force 32-bit float output
     int featherDistance = 0;           ///< Feather pixels for blending
     bool overlapNormalization = false; ///< Normalize on overlap regions

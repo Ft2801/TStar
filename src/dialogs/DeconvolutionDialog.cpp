@@ -34,7 +34,9 @@ DeconvolutionDialog::DeconvolutionDialog(ImageViewer* viewer, MainWindow* mw,
 {
     setWindowTitle(tr("Deconvolution"));
     setWindowFlags(windowFlags() | Qt::Tool);
-    setMinimumWidth(430);
+    
+    // Doubled the minimum width for the two-column layout
+    setMinimumWidth(860);
 
     if (m_viewer && m_viewer->getBuffer().isValid())
         m_originalBuffer = m_viewer->getBuffer();
@@ -61,9 +63,23 @@ void DeconvolutionDialog::setViewer(ImageViewer* viewer)
 
 void DeconvolutionDialog::buildUI()
 {
+    // Main vertical layout for the whole dialog
     auto* root = new QVBoxLayout(this);
     root->setSpacing(10);
     root->setContentsMargins(12, 12, 12, 12);
+
+    // Horizontal layout to hold the two columns
+    auto* columnsLayout = new QHBoxLayout();
+    auto* leftColumn = new QVBoxLayout();
+    auto* rightColumn = new QVBoxLayout();
+    
+    // Setup spacing for columns
+    leftColumn->setSpacing(10);
+    rightColumn->setSpacing(10);
+
+    // =========================================================================
+    // LEFT COLUMN
+    // =========================================================================
 
     // ── Algorithm selector ────────────────────────────────────────────────
     auto* grpAlgo = new QGroupBox(tr("Algorithm"), this);
@@ -79,7 +95,7 @@ void DeconvolutionDialog::buildUI()
            "Wiener: frequency-domain single-pass, fastest, stable."));
     hAlgo->addWidget(new QLabel(tr("Method:"), this));
     hAlgo->addWidget(m_algoCombo);
-    root->addWidget(grpAlgo);
+    leftColumn->addWidget(grpAlgo);
 
     // ── PSF group ─────────────────────────────────────────────────────────
     auto* grpPSF = new QGroupBox(tr("Point Spread Function (PSF)"), this);
@@ -171,7 +187,14 @@ void DeconvolutionDialog::buildUI()
     hThumb->addWidget(m_psfPreview);
     hThumb->addStretch();
     vPSF->addLayout(hThumb);
-    root->addWidget(grpPSF);
+    leftColumn->addWidget(grpPSF);
+    
+    // Add vertical stretch to keep left column elements aligned to the top
+    leftColumn->addStretch();
+
+    // =========================================================================
+    // RIGHT COLUMN
+    // =========================================================================
 
     // ── RL / RLTV iterations ──────────────────────────────────────────────
     m_grpIter = new QGroupBox(tr("Iteration Control"), this);
@@ -184,7 +207,7 @@ void DeconvolutionDialog::buildUI()
     m_tolSpin->setDecimals(6); m_tolSpin->setRange(0, 0.01);
     m_tolSpin->setSingleStep(1e-5); m_tolSpin->setValue(1e-4);
     frmIter->addRow(tr("Convergence tol:"), m_tolSpin);
-    root->addWidget(m_grpIter);
+    rightColumn->addWidget(m_grpIter);
 
     // ── RLTV ─────────────────────────────────────────────────────────────
     m_grpTV = new QGroupBox(tr("TV Regularisation"), this);
@@ -196,7 +219,7 @@ void DeconvolutionDialog::buildUI()
           tr("lambda_TV - higher values produce smoother output but reduce sharpening.\n"
               "Typical range: 0.005-0.05"));
      frmTV->addRow(tr("lambda_TV weight:"), m_tvWeightSpin);
-    root->addWidget(m_grpTV);
+    rightColumn->addWidget(m_grpTV);
 
     // ── Wiener ───────────────────────────────────────────────────────────
     m_grpWiener = new QGroupBox(tr("Wiener Parameters"), this);
@@ -208,7 +231,7 @@ void DeconvolutionDialog::buildUI()
         tr("Noise-to-signal power ratio K.\n"
            "Lower K = more aggressive (noisier); higher K = less sharpening (smoother)."));
     frmW->addRow(tr("K (noise power):"), m_wienerKSpin);
-    root->addWidget(m_grpWiener);
+    rightColumn->addWidget(m_grpWiener);
 
     // ── Star protection mask ──────────────────────────────────────────────
     m_grpStarMask = new QGroupBox(tr("Star Protection Mask"), this);
@@ -235,7 +258,7 @@ void DeconvolutionDialog::buildUI()
     m_starMaskBlendSpin->setValue(0.5);
     m_starMaskBlendSpin->setToolTip(tr("0 = original in masked area, 1 = deconvolved."));
     frmSM->addRow(tr("Blend in mask:"), m_starMaskBlendSpin);
-    root->addWidget(m_grpStarMask);
+    rightColumn->addWidget(m_grpStarMask);
 
     // ── Border ────────────────────────────────────────────────────────────
     auto* grpBorder = new QGroupBox(tr("Border Handling"), this);
@@ -246,11 +269,26 @@ void DeconvolutionDialog::buildUI()
     m_borderPadSpin->setToolTip(tr("Mirror-pad the image before deconvolution\n"
                                     "to reduce edge wrap artefacts."));
     frmBorder->addRow(tr("Mirror padding:"), m_borderPadSpin);
-    root->addWidget(grpBorder);
+    rightColumn->addWidget(grpBorder);
+
+    // Add vertical stretch to keep right column elements aligned to the top
+    rightColumn->addStretch();
+
+    // Add columns to the main horizontal layout
+    columnsLayout->addLayout(leftColumn);
+    columnsLayout->addLayout(rightColumn);
+    
+    // Add columns layout to the root vertical layout
+    root->addLayout(columnsLayout);
+
+    // =========================================================================
+    // BOTTOM SECTION
+    // =========================================================================
 
     // ── Progress ──────────────────────────────────────────────────────────
     m_progressBar = new QProgressBar(this);
-    m_progressBar->setRange(0, 0);
+    m_progressBar->setRange(0, 100);
+    m_progressBar->setValue(0);
     m_progressBar->setVisible(false);
     m_statusLabel = new QLabel(this);
     m_statusLabel->setAlignment(Qt::AlignCenter);
@@ -292,11 +330,11 @@ void DeconvolutionDialog::connectSignals()
             this, [this](double){ renderPSFThumbnail(); });
     connect(m_roundnessSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             this, [this](double){ renderPSFThumbnail(); });
-        connect(m_airyWavelengthSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this](double){ renderPSFThumbnail(); });
-        connect(m_airyApertureSpin,   QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this](double){ renderPSFThumbnail(); });
-        connect(m_airyFocalLenSpin,   QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this](double){ renderPSFThumbnail(); });
-        connect(m_airyPixelSizeSpin,  QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this](double){ renderPSFThumbnail(); });
-        connect(m_airyObstructionSpin,QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this](double){ renderPSFThumbnail(); });
+    connect(m_airyWavelengthSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this](double){ renderPSFThumbnail(); });
+    connect(m_airyApertureSpin,   QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this](double){ renderPSFThumbnail(); });
+    connect(m_airyFocalLenSpin,   QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this](double){ renderPSFThumbnail(); });
+    connect(m_airyPixelSizeSpin,  QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this](double){ renderPSFThumbnail(); });
+    connect(m_airyObstructionSpin,QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this](double){ renderPSFThumbnail(); });
     connect(m_previewBtn, &QPushButton::clicked, this, &DeconvolutionDialog::onPreview);
     connect(m_applyBtn,   &QPushButton::clicked, this, &DeconvolutionDialog::onApply);
     connect(m_resetBtn,   &QPushButton::clicked, this, &DeconvolutionDialog::onReset);
@@ -425,11 +463,19 @@ void DeconvolutionDialog::onPreview()
     m_isPreview = true;
     setControlsEnabled(false);
     m_progressBar->setVisible(true);
+    m_progressBar->setValue(0);
     m_statusLabel->setText(tr("Computing preview..."));
 
-    auto buf    = std::make_shared<ImageBuffer>(m_viewer->getBuffer());
+    // Always use the original clean buffer as input, not the progressively destroyed one
+    auto buf    = std::make_shared<ImageBuffer>(m_originalBuffer);
     auto params = collectParams();
     params.maxIter = std::min(params.maxIter, 20);
+    params.progressCallback = [this](int pct, const QString& msg) {
+        QMetaObject::invokeMethod(this, [this, pct, msg]() {
+            m_progressBar->setValue(pct);
+            if (!msg.isEmpty()) m_statusLabel->setText(msg);
+        }, Qt::QueuedConnection);
+    };
 
     auto* raw = new std::shared_ptr<ImageBuffer>(buf);
     m_watcher->setProperty("bufPtr", QVariant::fromValue(static_cast<void*>(raw)));
@@ -445,10 +491,18 @@ void DeconvolutionDialog::onApply()
     m_isPreview = false;
     setControlsEnabled(false);
     m_progressBar->setVisible(true);
+    m_progressBar->setValue(0);
     m_statusLabel->setText(tr("Applying deconvolution..."));
 
-    auto buf    = std::make_shared<ImageBuffer>(m_viewer->getBuffer());
+    // Always use the original clean buffer as input
+    auto buf    = std::make_shared<ImageBuffer>(m_originalBuffer);
     auto params = collectParams();
+    params.progressCallback = [this](int pct, const QString& msg) {
+        QMetaObject::invokeMethod(this, [this, pct, msg]() {
+            m_progressBar->setValue(pct);
+            if (!msg.isEmpty()) m_statusLabel->setText(msg);
+        }, Qt::QueuedConnection);
+    };
 
     auto* raw = new std::shared_ptr<ImageBuffer>(buf);
     m_watcher->setProperty("bufPtr", QVariant::fromValue(static_cast<void*>(raw)));
@@ -472,8 +526,12 @@ void DeconvolutionDialog::onFinished()
             m_viewer->setBuffer(**raw, m_viewer->windowTitle(), true);
             m_statusLabel->setText(tr("Preview - %1 iterations").arg(res.iterations));
         } else {
+            // Restore original quickly so pushUndo grabs the accurate unaltered state first!
+            m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
             m_viewer->pushUndo();
+            // Now apply the newly computed DECONVOLVED state
             m_viewer->setBuffer(**raw, m_viewer->windowTitle(), true);
+            m_originalBuffer = **raw; // Commit! Future previews start from here.
             m_viewer->refreshDisplay(true);
             QString algo = m_algoCombo->currentText();
             m_statusLabel->setText(tr("Done - %1 iterations, d=%2")
@@ -536,5 +594,12 @@ void DeconvolutionDialog::setControlsEnabled(bool en)
 void DeconvolutionDialog::closeEvent(QCloseEvent* event)
 {
     if (m_watcher->isRunning()) { m_watcher->cancel(); m_watcher->waitForFinished(); }
+    
+    // If the user closes the dialog after previewing without hitting apply, restore original!
+    if (m_viewer && m_viewer->getBuffer().isValid()) {
+        m_viewer->setBuffer(m_originalBuffer, m_viewer->windowTitle(), true);
+        m_viewer->refreshDisplay(true);
+    }
+    
     QDialog::closeEvent(event);
 }

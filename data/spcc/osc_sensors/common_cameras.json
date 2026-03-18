@@ -1,0 +1,61 @@
+[
+  {
+    "type": "OSC_SENSOR",
+    "manufacturer": "Canon",
+    "model": "EOS R7",
+    "name": "Canon EOS R7",
+    "is_dslr": true,
+    "dataSource": "Canon Official Specifications",
+    "comment": "Full-frame mirrorless DSLR with Bayer color filter array",
+    "pixel_array": {
+      "width_px": 7360,
+      "height_px": 4912,
+      "pixel_size_um": 3.31
+    },
+    "sensitivity": {
+      "gain_iso_100": 1.2,
+      "read_noise_e": 8.0,
+      "dark_current": 0.05,
+      "full_well_e": 65800.0
+    },
+    "color_filter_array": "RGGB",
+    "color_matrix": [
+      [0.65, -0.10, -0.05],
+      [-0.15, 0.75, -0.10],
+      [-0.20, -0.15, 1.00]
+    ],
+    "qe_sampleddata": {
+      "wavelengths_nm": [380, 450, 550, 650, 750, 950],
+      "red_qe": [0.05, 0.20, 0.35, 0.40, 0.35, 0.10],
+      "green_qe": [0.08, 0.30, 0.55, 0.45, 0.25, 0.05],
+      "blue_qe": [0.12, 0.50, 0.30, 0.15, 0.05, 0.00]
+    }
+  },
+  {
+    "type": "OSC_SENSOR",
+    "manufacturer": "ZWO",
+    "model": "ASI533MM-Pro",
+    "name": "ZWO ASI533MM-Pro",
+    "is_dslr": false,
+    "dataSource": "ZWO Official Specifications",
+    "comment": "High-sensitivity CMOS mono camera for deep-sky imaging",
+    "pixel_array": {
+      "width_px": 3856,
+      "height_px": 2574,
+      "pixel_size_um": 3.76
+    },
+    "sensitivity": {
+      "gain_iso_100": 0.8,
+      "read_noise_e": 6.0,
+      "dark_current": 0.02,
+      "full_well_e": 100000.0
+    },
+    "color_filter_array": "BGGR",
+    "qe_sampleddata": {
+      "wavelengths_nm": [350, 450, 550, 650, 750, 850, 950],
+      "red_qe": [0.10, 0.25, 0.50, 0.60, 0.50, 0.30, 0.15],
+      "green_qe": [0.15, 0.35, 0.70, 0.75, 0.65, 0.40, 0.20],
+      "blue_qe": [0.20, 0.55, 0.55, 0.45, 0.30, 0.15, 0.05]
+    }
+  }
+]

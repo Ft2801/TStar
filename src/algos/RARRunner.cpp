@@ -44,7 +44,7 @@ bool RARRunner::run(const ImageBuffer& input, ImageBuffer& output, const RARPara
     // Save Input (Float32 for precision)
     emit processOutput("Saving temp input...");
     if (!SimpleTiffWriter::write(inputFile, input.width(), input.height(), input.channels(), 
-                                 SimpleTiffWriter::Format_float32, input.data(), errorMsg)) {
+                                 SimpleTiffWriter::Format_float32, input.data(), QByteArray(), errorMsg)) {
         return false;
     }
 

@@ -222,6 +222,61 @@ cv::Mat Deconvolution::tvGradient(const cv::Mat& u, double eps)
     return grad;
 }
 
+// ─── RGB ↔ YCbCr conversion (ITU-R BT.601) ──────────────────────────────────
+
+void Deconvolution::rgbToYcbcr(const std::vector<float>& rgb, std::vector<float>& ycbcr,
+                               int w, int h)
+{
+    ycbcr.resize(rgb.size());
+    const size_t npixels = static_cast<size_t>(w) * h;
+    
+    #pragma omp parallel for schedule(static)
+    for (int i = 0; i < static_cast<int>(npixels); ++i) {
+        const size_t base = static_cast<size_t>(i) * 3;
+        float r = rgb[base + 0];
+        float g = rgb[base + 1];
+        float b = rgb[base + 2];
+        
+        // ITU-R BT.601 full-range (interleaved RGB input/output)
+        float y  = 0.299f * r + 0.587f * g + 0.114f * b;
+        float cb = 0.5f + (-0.168736f * r - 0.331264f * g + 0.5f * b);
+        float cr = 0.5f + (0.5f * r - 0.418688f * g - 0.081312f * b);
+        
+        ycbcr[base + 0] = std::max(0.0f, std::min(1.0f, y));
+        ycbcr[base + 1] = std::max(0.0f, std::min(1.0f, cb));
+        ycbcr[base + 2] = std::max(0.0f, std::min(1.0f, cr));
+    }
+}
+
+void Deconvolution::ycbcrToRgb(const std::vector<float>& ycbcr, std::vector<float>& rgb,
+                               int w, int h)
+{
+    rgb.resize(ycbcr.size());
+    const size_t npixels = static_cast<size_t>(w) * h;
+    
+    #pragma omp parallel for schedule(static)
+    for (int i = 0; i < static_cast<int>(npixels); ++i) {
+        const size_t base = static_cast<size_t>(i) * 3;
+        float y  = ycbcr[base + 0];
+        float cb = ycbcr[base + 1] - 0.5f;
+        float cr = ycbcr[base + 2] - 0.5f;
+        
+        // Inverse BT.601
+        float r = y + 1.402f * cr;
+        float g = y - 0.34414f * cb - 0.71414f * cr;
+        float b = y + 1.772f * cb;
+        
+        // Clamp to [0, 1]
+        r = std::max(0.0f, std::min(1.0f, r));
+        g = std::max(0.0f, std::min(1.0f, g));
+        b = std::max(0.0f, std::min(1.0f, b));
+        
+        rgb[base + 0] = r;
+        rgb[base + 1] = g;
+        rgb[base + 2] = b;
+    }
+}
+
 // ─── RL (no regularisation) ──────────────────────────────────────────────────
 
 DeconvResult Deconvolution::applyRL(cv::Mat& plane, const cv::Mat& psf,
@@ -255,6 +310,11 @@ DeconvResult Deconvolution::applyRL(cv::Mat& plane, const cv::Mat& psf,
             }
         }
         res.iterations = it + 1;
+
+        if (p.progressCallback && ((it % 5) == 0 || it + 1 == p.maxIter)) {
+            const int pct = std::max(0, std::min(100, ((it + 1) * 100) / std::max(1, p.maxIter)));
+            p.progressCallback(pct, QString("Deconvolution RL %1/%2").arg(it + 1).arg(p.maxIter));
+        }
     }
 
     // Star mask blending
@@ -291,15 +351,15 @@ DeconvResult Deconvolution::applyRLTV(cv::Mat& plane, const cv::Mat& psf,
         cv::divide(plane, conv_u + 1e-6f, ratio);
         cv::Mat corr = convolveFFT(ratio, psf_flip);
 
-        // TV sub-gradient regulariser:  u_new = u · corr / (1 + λ_TV · div_TV)
+        // TV sub-gradient regulariser:  u_new = u · corr / (1 - λ_TV · div_TV) (Matching Siril!)
         cv::Mat tv_grad = tvGradient(u, p.tvEps);
-        cv::Mat denom = cv::Mat::ones(u.size(), CV_32F) + tv_grad * tv;
+        cv::Mat denom = cv::Mat::ones(u.size(), CV_32F) - tv_grad * tv; // Use minus sign like Siril
         cv::max(denom, 1e-6f, denom);
         u.copyTo(u_prev);
         cv::multiply(u, corr, u);
         cv::divide(u, denom, u);
+        
         cv::threshold(u, u, 0.0f, 0.0f, cv::THRESH_TOZERO);
-        cv::threshold(u, u, 1.2f, 1.2f, cv::THRESH_TRUNC); // prevent runaway
 
         if ((it % 10) == 9) {
             cv::Mat diff; cv::absdiff(u, u_prev, diff);
@@ -311,6 +371,11 @@ DeconvResult Deconvolution::applyRLTV(cv::Mat& plane, const cv::Mat& psf,
             }
         }
         res.iterations = it + 1;
+
+        if (p.progressCallback && ((it % 5) == 0 || it + 1 == p.maxIter)) {
+            const int pct = std::max(0, std::min(100, ((it + 1) * 100) / std::max(1, p.maxIter)));
+            p.progressCallback(pct, QString("Deconvolution RLTV %1/%2").arg(it + 1).arg(p.maxIter));
+        }
     }
 
     if (!starMask.empty() && p.starMask.useMask)
@@ -333,6 +398,9 @@ DeconvResult Deconvolution::applyWiener(cv::Mat& plane, const cv::Mat& psf,
     result.copyTo(plane);
     res.success    = true;
     res.iterations = 1;
+    if (p.progressCallback) {
+        p.progressCallback(100, "Deconvolution Wiener completed");
+    }
     return res;
 }
 
@@ -422,13 +490,22 @@ DeconvResult Deconvolution::apply(ImageBuffer& buf, const DeconvParams& p)
     const int ch = buf.channels();
     std::vector<float>& data = buf.data();
 
+    // Deconvolve all channels independently (like Siril), no more YCbCr luminance-only extraction!
+    // Luminance-only deconvolution on RGB leads to massive color fringing and chromatic ringing.
+    std::vector<float> workData = data;
+
     DeconvResult last;
-    for (int c = 0; c < ch; c++) {
+    
+    // Process all 'ch' channels
+    const int numChannelsToDeconv = ch;
+    const int dataStride = ch;
+    
+    for (int c = 0; c < numChannelsToDeconv; c++) {
         std::vector<float> planeData(static_cast<size_t>(w) * h);
         for (int y = 0; y < h; ++y) {
             for (int x = 0; x < w; ++x) {
-                const size_t idx = (static_cast<size_t>(y) * w + x) * ch + c;
-                planeData[static_cast<size_t>(y) * w + x] = data[idx];
+                const size_t idx = (static_cast<size_t>(y) * w + x) * dataStride + c;
+                planeData[static_cast<size_t>(y) * w + x] = workData[idx];
             }
         }
 
@@ -449,33 +526,47 @@ DeconvResult Deconvolution::apply(ImageBuffer& buf, const DeconvParams& p)
             cv::copyMakeBorder(starMask, padMask, p.borderPad, p.borderPad,
                                p.borderPad, p.borderPad, cv::BORDER_CONSTANT, cv::Scalar(0));
 
+        DeconvParams channelParams = p;
+        if (p.progressCallback) {
+            channelParams.progressCallback = [p, c, numChannelsToDeconv](int channelPct, const QString& msg) {
+                const int totalPct = ((c * 100) + std::max(0, std::min(100, channelPct))) / std::max(1, numChannelsToDeconv);
+                p.progressCallback(totalPct, msg);
+            };
+        }
+
         DeconvResult r;
         switch (p.algo) {
             case DeconvAlgorithm::RichardsonLucy:
-                r = applyRL(padded, psf, padMask, p);   break;
+                r = applyRL(padded, psf, padMask, channelParams);   break;
             case DeconvAlgorithm::RLTV:
-                r = applyRLTV(padded, psf, padMask, p); break;
+                r = applyRLTV(padded, psf, padMask, channelParams); break;
             case DeconvAlgorithm::Wiener:
-                r = applyWiener(padded, psf, p);         break;
+                r = applyWiener(padded, psf, channelParams);         break;
         }
         if (!r.success) { res.errorMsg = r.errorMsg; return res; }
 
-        // Crop back and write to interleaved buffer
+        // Crop back and write to buffer
         cv::Mat cropped = padded(cv::Rect(p.borderPad, p.borderPad, w, h));
         for (int y = 0; y < h; ++y) {
             const float* row = cropped.ptr<float>(y);
             for (int x = 0; x < w; ++x) {
-                const size_t idx = (static_cast<size_t>(y) * w + x) * ch + c;
-                data[idx] = row[x];
+                const size_t idx = (static_cast<size_t>(y) * w + x) * dataStride + c;
+                workData[idx] = row[x];
             }
         }
 
         last = r;
     }
 
+    // Overwrite the original data with the fully deconvolved channels
+    data = workData;
+
     res.success     = true;
     res.iterations  = last.iterations;
     res.finalChange = last.finalChange;
     buf.setModified(true);
+    if (p.progressCallback) {
+        p.progressCallback(100, "Deconvolution completed");
+    }
     return res;
 }

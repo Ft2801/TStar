@@ -11,6 +11,7 @@ class QComboBox;
 class QSpinBox;
 class QCheckBox;
 class QPushButton;
+class QProgressDialog;
 
 class CBEDialog : public DialogBase {
     Q_OBJECT
@@ -47,6 +48,7 @@ private:
     int  m_targetHeight   = 0;   // full-resolution target height (pixels)
     bool m_parityFlipped  = false; // reference needs horizontal flip before extraction
     double m_paddingFactor = 2.0; // download larger area to allow rotation without clipping
+    QProgressDialog* m_busyDialog = nullptr;
 };
 
 #endif // CBEDIALOG_H

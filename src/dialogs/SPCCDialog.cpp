@@ -20,8 +20,10 @@
 #include <QCloseEvent>
 #include <QStandardPaths>
 #include <QCoreApplication>
+#include <QFileInfo>
 #include <QFrame>
 #include <QPainter>
+#include <QProgressDialog>
 #include <QtConcurrent/QtConcurrentRun>
 #include <cmath>
 
@@ -32,14 +34,32 @@ SPCCDialog::SPCCDialog(ImageViewer* viewer, MainWindow* mw, QWidget* parent)
 {
     setWindowTitle(tr("Spectrophotometric Color Calibration (SPCC)"));
     setWindowFlags(windowFlags() | Qt::Tool);
-    setMinimumWidth(480);
+    setMinimumWidth(960); // Doubled width to accommodate two columns
 
-    m_dataPath = QCoreApplication::applicationDirPath() + "/data/spcc";
+    const QString appDir = QCoreApplication::applicationDirPath();
+    const QStringList candidates = {
+        appDir + "/data/spcc",
+        appDir + "/../Resources/data/spcc",
+        appDir + "/../data/spcc",
+        appDir + "/data",
+        appDir + "/../Resources/data",
+        appDir + "/../data"
+    };
+    for (const QString& c : candidates) {
+        if (QFileInfo::exists(c + "/pickles_spectra.bin") || QFileInfo::exists(c + "/filter_responses.json")) {
+            m_dataPath = c;
+            break;
+        }
+    }
+    if (m_dataPath.isEmpty()) {
+        m_dataPath = appDir + "/data/spcc";
+    }
 
     if (m_viewer && m_viewer->getBuffer().isValid())
         m_originalBuffer = m_viewer->getBuffer();
 
     m_watcher = new QFutureWatcher<SPCCResult>(this);
+    m_catalog = new CatalogClient(this);
 
     buildUI();
     connectSignals();
@@ -66,6 +86,30 @@ void SPCCDialog::buildUI()
     root->setSpacing(10);
     root->setContentsMargins(12, 12, 12, 12);
 
+    // Create scrollable area for options
+    auto* scrollArea = new QScrollArea(this);
+    scrollArea->setWidgetResizable(true);
+    auto* scrollWidget = new QWidget;
+    auto* scrollLayout = new QVBoxLayout(scrollWidget);
+    
+    // Create horizontal layout for the two columns inside scroll area
+    auto* hCols = new QHBoxLayout;
+    auto* vLeft = new QVBoxLayout;
+    auto* vRight = new QVBoxLayout;
+
+    // ── LEFT COLUMN ───────────────────────────────────────────────────────
+
+    // ── Object Type ───────────────────────────────────────────────────────
+    auto* grpObj = new QGroupBox(tr("Object Type"), this);
+    auto* frmObj = new QFormLayout(grpObj);
+    m_objectTypeCombo = new QComboBox(this);
+    m_objectTypeCombo->addItems({tr("Star Field"), tr("Dark Nebula"), tr("Emission Nebula"), 
+                                 tr("Planetary Nebula"), tr("Galaxy"), tr("Custom")});
+    m_objectTypeCombo->setCurrentIndex(0);
+    m_objectTypeCombo->setToolTip(tr("Select the object type to optimize color calibration"));
+    frmObj->addRow(tr("Object Type:"), m_objectTypeCombo);
+    vLeft->addWidget(grpObj);
+
     // ── Sensor / Filter ───────────────────────────────────────────────────
     auto* grpCam = new QGroupBox(tr("Sensor & Filter Profile"), this);
     auto* frmCam = new QFormLayout(grpCam);
@@ -79,7 +123,7 @@ void SPCCDialog::buildUI()
     m_filterCombo->setToolTip(tr("Optional optical filter in the optical path (L, UV/IR cut, etc.)"));
     frmCam->addRow(tr("Filter:"), m_filterCombo);
 
-    root->addWidget(grpCam);
+    vLeft->addWidget(grpCam);
 
     // ── Star detection ────────────────────────────────────────────────────
     auto* grpDet = new QGroupBox(tr("Star Detection & Cross-Match"), this);
@@ -112,7 +156,7 @@ void SPCCDialog::buildUI()
     hMag->addStretch();
     frmDet->addRow(tr("Magnitude limit:"), hMag);
 
-    root->addWidget(grpDet);
+    vLeft->addWidget(grpDet);
 
     // ── Options ───────────────────────────────────────────────────────────
     auto* grpOpts = new QGroupBox(tr("Calibration Options"), this);
@@ -129,7 +173,11 @@ void SPCCDialog::buildUI()
     vOpts->addWidget(m_fullMatrixCheck);
     vOpts->addWidget(m_solarRefCheck);
     vOpts->addWidget(m_neutralBgCheck);
-    root->addWidget(grpOpts);
+    
+    vLeft->addWidget(grpOpts);
+    vLeft->addStretch(); // Push everything in the left column to the top
+
+    // ── RIGHT COLUMN ──────────────────────────────────────────────────────
 
     // ── Results ───────────────────────────────────────────────────────────
     auto* grpRes = new QGroupBox(tr("Calibration Results"), this);
@@ -159,7 +207,8 @@ void SPCCDialog::buildUI()
     m_matrixTable->setHorizontalHeaderLabels({tr("R_in"), tr("G_in"), tr("B_in")});
     m_matrixTable->setVerticalHeaderLabels({tr("R_out"), tr("G_out"), tr("B_out")});
     m_matrixTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    m_matrixTable->setFixedHeight(100);
+    m_matrixTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    m_matrixTable->setMaximumHeight(120);
     m_matrixTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++) {
@@ -168,7 +217,20 @@ void SPCCDialog::buildUI()
             m_matrixTable->setItem(i, j, it);
         }
     vRes->addWidget(m_matrixTable);
-    root->addWidget(grpRes);
+    
+    vRight->addWidget(grpRes);
+    vRight->addStretch(); // Push everything in the right column to the top
+
+    // Add columns to the scroll layout
+    hCols->addLayout(vLeft);
+    hCols->addLayout(vRight);
+    scrollLayout->addLayout(hCols);
+    scrollLayout->addStretch();
+    
+    scrollArea->setWidget(scrollWidget);
+    root->addWidget(scrollArea);
+
+    // ── BOTTOM SECTION (Progress & Buttons) ───────────────────────────────
 
     // ── Progress ──────────────────────────────────────────────────────────
     m_progressBar = new QProgressBar(this);
@@ -230,6 +292,10 @@ void SPCCDialog::connectSignals()
     connect(m_closeBtn, &QPushButton::clicked, this, &QDialog::close);
     connect(m_watcher,  &QFutureWatcher<SPCCResult>::finished, this, &SPCCDialog::onFinished);
     connect(m_cameraCombo, &QComboBox::currentTextChanged, this, &SPCCDialog::onCameraChanged);
+    
+    // Catalog connections (online Gaia queries)
+    connect(m_catalog, &CatalogClient::catalogReady, this, &SPCCDialog::onCatalogReady);
+    connect(m_catalog, &CatalogClient::errorOccurred, this, &SPCCDialog::onCatalogError);
 }
 
 // ─── Collect params ───────────────────────────────────────────────────────────
@@ -258,42 +324,156 @@ void SPCCDialog::onRun()
     if (!m_viewer || !m_viewer->getBuffer().isValid()) return;
     if (m_watcher->isRunning()) return;
 
+    // Check if image is plate-solved
+    const ImageBuffer::Metadata& meta = m_viewer->getBuffer().metadata();
+    if (meta.ra == 0 && meta.dec == 0) {
+        QMessageBox::critical(this, tr("Error"), tr("Image must be plate solved first."));
+        return;
+    }
+
+    // Validate data directory
+    if (m_dataPath.isEmpty()) {
+        QMessageBox::critical(this, tr("Error"), tr("Data directory not configured."));
+        return;
+    }
+
+    // NOTE: Pickles spectral library is optional — we use Gaia XP-sampled spectra instead.
+    // If embedded catalog exists, load it; otherwise query Gaia DR3 online (like PCC does).
+    
+    // Check if embedded Gaia catalogue file exists
+    bool hasEmbeddedCatalogue = QFileInfo::exists(m_dataPath + "/spcc/gaia_bv_catalogue.bin");
+    
+    if (hasEmbeddedCatalogue) {
+        // Use embedded catalogue directly
+        m_useOnlineCatalog = false;
+        m_catalogStars.clear();
+        Logger::info("[SPCC] Using embedded Gaia catalog...");
+        m_statusLabel->setText(tr("Using embedded Gaia catalog..."));
+        startCalibration();
+    } else {
+        // Fall back to online Gaia DR3 query (like PCC does)
+        m_useOnlineCatalog = true;
+        Logger::info(QString("[SPCC] Querying Gaia DR3 online: RA=%1 Dec=%2").arg(meta.ra).arg(meta.dec));
+        m_statusLabel->setText(tr("Embedded catalog not found. Querying Gaia DR3 via VizieR (this may take a moment)..."));
+        m_runBtn->setEnabled(false);
+        m_catalog->queryGaiaDR3(meta.ra, meta.dec, 1.0);
+    }
+}
+
+void SPCCDialog::startCalibration()
+{
+    if (m_watcher->isRunning()) return;
+
     setControlsEnabled(false);
     m_progressBar->setVisible(true);
     m_statusLabel->setText(tr("Running SPCC…"));
 
+    Logger::info(QString("[SPCC] Starting calibration with %1 stars").arg(m_catalogStars.size()));
+
+    if (!m_busyDialog) {
+        m_busyDialog = new QProgressDialog(tr("Running SPCC..."), QString(), 0, 0, this);
+        m_busyDialog->setWindowTitle(tr("Spectrophotometric Color Calibration"));
+        m_busyDialog->setWindowModality(Qt::WindowModal);
+        m_busyDialog->setCancelButton(nullptr);
+        m_busyDialog->setMinimumDuration(0);
+    }
+    m_busyDialog->setLabelText(tr("Matching stars and solving color matrix..."));
+    m_busyDialog->show();
+
     auto buf    = std::make_shared<ImageBuffer>(m_viewer->getBuffer());
     auto params = collectParams();
+    auto stars  = m_catalogStars;  // Copy catalogue stars for online mode
 
     auto* raw = new std::shared_ptr<ImageBuffer>(buf);
     m_watcher->setProperty("bufPtr", QVariant::fromValue(static_cast<void*>(raw)));
 
-    QFuture<SPCCResult> fut = QtConcurrent::run([buf, params]() {
-        return SPCC::calibrate(*buf, params);
+    const bool useOnlineCatalog = m_useOnlineCatalog;
+    QFuture<SPCCResult> fut = QtConcurrent::run([buf, params, stars, useOnlineCatalog]() {
+        // Call the real SPCC algorithm with Gaia DR3 catalog stars
+        SPCCResult result = SPCC::calibrateWithCatalog(*buf, params, stars);
+        if (result.success) {
+            Logger::info(result.log_msg);
+        } else {
+            Logger::warning(QString("[SPCC] Calibration failed: %1").arg(result.error_msg));
+        }
+        return result;
     });
     m_watcher->setFuture(fut);
+}
+
+void SPCCDialog::onCatalogReady(const std::vector<CatalogStar>& stars)
+{
+    m_catalogStars = stars;
+    if (stars.empty()) {
+        m_statusLabel->setText(tr("WARNING: Gaia query returned 0 stars. Check image coordinates."));
+        QMessageBox::warning(this, tr("Empty Catalog"), 
+            tr("Gaia DR3 query returned no stars. The image location may have no reference stars.\n\n"
+               "Try:\n- Verify plate-solving is correct (RA/Dec)\n- Check magnitude limits\n- Use embedded catalog if available"));
+        setControlsEnabled(true);
+        m_runBtn->setEnabled(true);
+    } else {
+        Logger::info(QString("[SPCC] Catalog loaded: %1 stars").arg(stars.size()));
+        m_statusLabel->setText(tr("Catalog loaded (%1 stars). Running Calibration...").arg(stars.size()));
+        startCalibration();
+    }
+}
+
+void SPCCDialog::onCatalogError(const QString& msg)
+{
+    setControlsEnabled(true);
+    m_runBtn->setEnabled(true);
+    
+    Logger::warning(QString("[SPCC] Catalog error: %1").arg(msg));
+    
+    // Provide actionable error messages
+    QString userMsg = msg;
+    if (msg.toLower().contains("timeout")) {
+        userMsg = tr("Gaia download timeout. Check your internet connection.\n\n"
+                    "You can use the embedded catalog if available, or retry with a stable connection.");
+    } else if (msg.toLower().contains("all vizier mirrors failed")) {
+        userMsg = tr("Could not reach any VizieR mirror server.\n\n"
+                    "Possible causes:\n"
+                    "- No internet connection\n"
+                    "- Firewall/proxy blocking\n"
+                    "- All mirror servers temporarily down\n\n"
+                    "Try again later, or use embedded catalog if available.");
+    } else if (msg.toLower().contains("html")) {
+        userMsg = tr("VizieR server returned an error page.\n\n"
+                    "This may be temporary. Try:\n"
+                    "1. Wait a few minutes\n"
+                    "2. Check your internet connection\n"
+                    "3. Use embedded catalog if available");
+    }
+    
+    m_statusLabel->setText(tr("Catalog error: ") + msg);
+    QMessageBox::critical(this, tr("Catalog Download Error"), userMsg);
 }
 
 void SPCCDialog::onFinished()
 {
     m_progressBar->setVisible(false);
     setControlsEnabled(true);
+    if (m_busyDialog) {
+        m_busyDialog->hide();
+    }
 
     auto* raw = static_cast<std::shared_ptr<ImageBuffer>*>(
         m_watcher->property("bufPtr").value<void*>());
     if (!raw) return;
 
     SPCCResult res = m_watcher->result();
-    if (res.success && m_viewer) {
+    if (res.success && m_viewer && res.modifiedBuffer) {
         m_viewer->pushUndo();
-        m_viewer->setBuffer(**raw, m_viewer->windowTitle(), true);
+        m_viewer->setBuffer(*res.modifiedBuffer, m_viewer->windowTitle(), true);
         m_viewer->refreshDisplay(true);
         showResults(res);
-        if (m_mainWindow) Logger::info(res.logMsg);
+        if (m_mainWindow) {
+            Logger::info(res.log_msg);
+        }
         m_statusLabel->setText(tr("Calibration complete."));
     } else {
-        m_statusLabel->setText(tr("Failed: ") + res.errorMsg);
-        QMessageBox::warning(this, tr("SPCC"), tr("Calibration failed:\n") + res.errorMsg);
+        m_statusLabel->setText(tr("Failed: ") + res.error_msg);
+        QMessageBox::warning(this, tr("SPCC"), tr("Calibration failed:\n") + res.error_msg);
     }
     delete raw;
 }
@@ -315,7 +495,7 @@ void SPCCDialog::onCameraChanged(const QString& /*name*/) {
 void SPCCDialog::showResults(const SPCCResult& res)
 {
     m_starsLabel->setText(tr("Stars used: %1 / %2")
-        .arg(res.starsUsed).arg(res.starsFound));
+        .arg(res.stars_used).arg(res.stars_found));
     m_residualLabel->setText(tr("RMS residual: %1")
         .arg(res.residual, 0, 'f', 5));
     m_scalesLabel->setText(tr("Scales  R=×%1   G=×%2   B=×%3")

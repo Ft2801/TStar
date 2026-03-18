@@ -261,7 +261,7 @@ void StarNetWorker::process(const ImageBuffer& input, const StarNetParams& param
     }
 
     emit processOutput("Saving temporary input TIFF (16-bit)...");
-    if (!SimpleTiffWriter::write(inputFile, w, h, exportChannels, SimpleTiffWriter::Format_uint16, exportData, &errorMsg)) {
+    if (!SimpleTiffWriter::write(inputFile, w, h, exportChannels, SimpleTiffWriter::Format_uint16, exportData, QByteArray(), &errorMsg)) {
         emit finished(output, errorMsg);
         return;
     }

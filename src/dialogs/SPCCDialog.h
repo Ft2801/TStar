@@ -19,9 +19,11 @@
 #include <QFutureWatcher>
 #include "ImageBuffer.h"
 #include "SPCC.h"
+#include "photometry/CatalogClient.h"
 
 class ImageViewer;
 class MainWindow;
+class QProgressDialog;
 
 class SPCCDialog : public QDialog {
     Q_OBJECT
@@ -39,6 +41,8 @@ private slots:
     void onRun();
     void onReset();
     void onFinished();
+    void onCatalogReady(const std::vector<CatalogStar>& stars);
+    void onCatalogError(const QString& msg);
     void onCameraChanged(const QString& name);
 
 private:
@@ -49,7 +53,11 @@ private:
     void showResults(const SPCCResult& res);
     void setControlsEnabled(bool en);
     void updateColourPreview(double r, double g, double b);
+    void startCalibration();
 
+    // ── Object Type ────────────────────────────────────────────────────────
+    QComboBox*      m_objectTypeCombo  = nullptr;
+    
     // ── Camera / filter ────────────────────────────────────────────────────
     QComboBox*      m_cameraCombo      = nullptr;
     QComboBox*      m_filterCombo      = nullptr;
@@ -87,8 +95,13 @@ private:
     MainWindow*     m_mainWindow       = nullptr;
     ImageBuffer     m_originalBuffer;
 
+    CatalogClient*  m_catalog          = nullptr;
+    std::vector<CatalogStar> m_catalogStars;
+    bool            m_useOnlineCatalog = false;
+
     QFutureWatcher<SPCCResult>* m_watcher = nullptr;
     QString         m_dataPath;
+    QProgressDialog* m_busyDialog = nullptr;
 };
 
 #endif // SPCCDIALOG_H

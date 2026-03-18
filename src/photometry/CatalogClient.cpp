@@ -9,11 +9,16 @@
 
 // VizieR mirror servers (fallback chain for robustness)
 static const QStringList VIZIER_MIRRORS = {
-    "http://vizier.u-strasbg.fr/viz-bin/votable",      // Primary (France)
-    "http://vizier.cds.unistra.fr/viz-bin/votable",    // Mirror (France, alt. domain)
-    "http://vizier.iucaa.in/viz-bin/votable",          // Mirror (India)
-    "http://vizier.nao.ac.jp/viz-bin/votable",         // Mirror (Japan)
+    "https://vizier.cds.unistra.fr/viz-bin/votable",   // Primary (France)
+    "https://vizier.u-strasbg.fr/viz-bin/votable",     // Mirror (France, alt. domain)
+    "https://vizier.iucaa.in/viz-bin/votable",         // Mirror (India)
+    "https://vizier.nao.ac.jp/viz-bin/votable",        // Mirror (Japan)
 };
+
+static double gaiaBpRpToBV(double bprp) {
+    // Approximation from Gaia BP-RP to Johnson B-V for main-sequence stars.
+    return 0.3930 + 0.4750 * bprp - 0.0548 * bprp * bprp;
+}
 
 CatalogClient::CatalogClient(QObject* parent) : QObject(parent) {
     m_manager = new QNetworkAccessManager(this);
@@ -220,7 +225,17 @@ void CatalogClient::onReply(QNetworkReply* reply) {
                     
                     s.magB = b;
                     s.magV = v;
-                    s.B_V = b - v; // May be inaccurate if using BP/G proxy, but PCC uses Teff if available.
+
+                    if (idxB != -1 && idxV != -1 && b > 0.0 && v > 0.0) {
+                        s.B_V = b - v;
+                    } else if (idxBP != -1 && idxRP != -1 && bp_mag > 0.0 && rp_mag > 0.0) {
+                        const double bprp = bp_mag - rp_mag;
+                        s.B_V = gaiaBpRpToBV(bprp);
+                    } else if (idxBP != -1 && idxG != -1 && bp_mag > 0.0 && g_mag > 0.0) {
+                        s.B_V = bp_mag - g_mag;
+                    } else {
+                        s.B_V = 0.65; // G2V fallback
+                    }
                     
                     if ((s.magV > 0 || s.teff > 0)) { // Valid star
                         stars.push_back(s);

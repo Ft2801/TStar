@@ -139,14 +139,17 @@ void TGVDenoiseDialog::buildUI()
     frmAdv->addRow(tr("Convergence tol:"), m_tolSpin);
 
     m_perChannelCheck = new QCheckBox(tr("Process each channel independently"), this);
-    m_perChannelCheck->setChecked(true);
+    m_perChannelCheck->setChecked(false);
+    m_perChannelCheck->setToolTip(tr("Off: denoise luminance only (recommended to avoid color artifacts on RGB).\n"
+                                     "On: denoise R/G/B separately (can be more aggressive but may create chroma blotches)."));
     frmAdv->addRow(m_perChannelCheck);
 
     root->addWidget(grpAdv);
 
     // ── Progress / status ─────────────────────────────────────────────────
     m_progressBar  = new QProgressBar(this);
-    m_progressBar->setRange(0, 0);       // indeterminate
+    m_progressBar->setRange(0, 100);
+    m_progressBar->setValue(0);
     m_progressBar->setVisible(false);
     m_statusLabel  = new QLabel(this);
     m_statusLabel->setAlignment(Qt::AlignCenter);
@@ -267,12 +270,19 @@ void TGVDenoiseDialog::onPreview()
     m_previewActive = true;
     setControlsEnabled(false);
     m_progressBar->setVisible(true);
+    m_progressBar->setValue(0);
     m_statusLabel->setText(tr("Computing preview…"));
 
     // Work on a copy
     auto buf   = std::make_shared<ImageBuffer>(m_viewer->getBuffer());
     auto params = collectParams();
     params.maxIter = std::min(params.maxIter, 150); // fast preview
+    params.progressCallback = [this](int pct, const QString& msg) {
+        QMetaObject::invokeMethod(this, [this, pct, msg]() {
+            m_progressBar->setValue(pct);
+            if (!msg.isEmpty()) m_statusLabel->setText(msg);
+        }, Qt::QueuedConnection);
+    };
 
     QFuture<TGVResult> fut = QtConcurrent::run([buf, params]() {
         return TGVDenoise::denoiseBuffer(*buf, params);
@@ -316,11 +326,18 @@ void TGVDenoiseDialog::onApply()
     m_previewActive = false;
     setControlsEnabled(false);
     m_progressBar->setVisible(true);
+    m_progressBar->setValue(0);
     m_statusLabel->setText(tr("Applying TGV Denoise…"));
 
     // Work on the actual buffer (deep-copy for thread safety)
     auto buf    = std::make_shared<ImageBuffer>(m_viewer->getBuffer());
     auto params = collectParams();
+    params.progressCallback = [this](int pct, const QString& msg) {
+        QMetaObject::invokeMethod(this, [this, pct, msg]() {
+            m_progressBar->setValue(pct);
+            if (!msg.isEmpty()) m_statusLabel->setText(msg);
+        }, Qt::QueuedConnection);
+    };
 
     auto* raw = new std::shared_ptr<ImageBuffer>(buf);
     m_watcher->setProperty("bufPtr", QVariant::fromValue(static_cast<void*>(raw)));

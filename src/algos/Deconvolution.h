@@ -32,6 +32,7 @@
 #define DECONVOLUTION_H
 
 #include <vector>
+#include <functional>
 #include <QString>
 #include "ImageBuffer.h"
 #include <opencv2/core.hpp>
@@ -99,6 +100,9 @@ struct DeconvParams {
 
     // ── PSF kernel size ─────────────────────────────────────────────────
     int         kernelSize    = 0;       ///< 0 = auto (4×FWHM rounded to odd)
+
+    // Optional progress callback (0..100, status text)
+    std::function<void(int, const QString&)> progressCallback;
 };
 
 // ─── Result ──────────────────────────────────────────────────────────────────

@@ -1,0 +1,50 @@
+[
+  {
+    "type": "MONO_FILTER",
+    "manufacturer": "Bessel",
+    "model": "B",
+    "name": "Bessel B Filter",
+    "dataSource": "Standard Optical Bandpass",
+    "comment": "Standard Bessel B photometric filter (Blue channel ~440nm)",
+    "bandpass": {
+      "center_nm": 440,
+      "fwhm_nm": 100
+    },
+    "transmission_sampleddata": {
+      "wavelengths_nm": [350, 390, 420, 440, 460, 490, 550],
+      "transmission": [0.01, 0.20, 0.80, 0.95, 0.75, 0.15, 0.02]
+    }
+  },
+  {
+    "type": "MONO_FILTER",
+    "manufacturer": "Bessel",
+    "model": "V",
+    "name": "Bessel V Filter",
+    "dataSource": "Standard Optical Bandpass",
+    "comment": "Standard Bessel V photometric filter (Visual ~550nm)",
+    "bandpass": {
+      "center_nm": 550,
+      "fwhm_nm": 90
+    },
+    "transmission_sampleddata": {
+      "wavelengths_nm": [480, 510, 540, 550, 560, 590, 650],
+      "transmission": [0.01, 0.20, 0.90, 0.98, 0.88, 0.15, 0.02]
+    }
+  },
+  {
+    "type": "MONO_FILTER",
+    "manufacturer": "Bessel",
+    "model": "R",
+    "name": "Bessel R Filter",
+    "dataSource": "Standard Optical Bandpass",
+    "comment": "Standard Bessel R photometric filter (Red~700nm)",
+    "bandpass": {
+      "center_nm": 700,
+      "fwhm_nm": 150
+    },
+    "transmission_sampleddata": {
+      "wavelengths_nm": [600, 650, 690, 700, 710, 750, 850],
+      "transmission": [0.02, 0.15, 0.85, 0.98, 0.85, 0.20, 0.03]
+    }
+  }
+]

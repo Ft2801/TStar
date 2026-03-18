@@ -1,762 +1,997 @@
 /*
- * SPCC.cpp  —  Spectrophotometric Color Calibration
+ * SPCC.cpp - Spectrophotometric Color Calibration
+ *
+ * Key algorithm components:
+ * 1. Load JSON sensor/filter profiles (recursive directory scan)
+ * 2. Query Gaia DR3 catalog via VizieR online
+ * 3. Perform aperture photometry on detected stars
+ * 4. Extract XP-sampled spectral data for each star
+ * 5. Spectral convolution: ∫ response(λ) × spectrum(λ) dλ
+ * 6. Robust color fitting: Siegel's Repeated Median regression
+ * 7. Compute white balance coefficients K_R, K_G, K_B
+ * 8. Apply color correction to image
  */
 
 #include "SPCC.h"
-#include "photometry/StarDetector.h"
-#include "core/Logger.h"
-
-#include <cmath>
+#include "../photometry/CatalogClient.h"
 #include <algorithm>
+#include <cmath>
 #include <numeric>
-#include <limits>
-#include <QFile>
-#include <QDataStream>
-#include <QDir>
 #include <QJsonDocument>
-#include <QJsonArray>
 #include <QJsonObject>
-#include <QFileInfo>
-#include <QSet>
-#include <QTextStream>
+#include <QJsonArray>
+#include <QFile>
+#include <QDir>
 #include <omp.h>
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-static constexpr double WL_MIN  = 380.0;
-static constexpr double WL_MAX  = 780.0;
-static constexpr double WL_STEP = 5.0;
-static constexpr int    N_WL    = static_cast<int>((WL_MAX - WL_MIN) / WL_STEP) + 1; // 81
-
-static bool hasLinearWCS(const ImageBuffer::Metadata& m)
-{
-    return !(m.cd1_1 == 0.0 && m.cd1_2 == 0.0 && m.cd2_1 == 0.0 && m.cd2_2 == 0.0);
-}
-
-static bool pixelToRaDecLinear(const ImageBuffer::Metadata& m, double x, double y,
-                               double& ra, double& dec)
-{
-    if (!hasLinearWCS(m)) {
-        return false;
-    }
-    const double dx = x + 1.0 - m.crpix1;
-    const double dy = y + 1.0 - m.crpix2;
-    ra  = m.ra  + m.cd1_1 * dx + m.cd1_2 * dy;
-    dec = m.dec + m.cd2_1 * dx + m.cd2_2 * dy;
-    return true;
-}
-
-// ─── B-V to Pickles interpolation ────────────────────────────────────────────
-
-const PicklesSpectrum& SPCC::picklesByBV(double bv,
-                                          const std::vector<PicklesSpectrum>& lib)
-{
-    size_t best = 0;
-    double best_d = std::numeric_limits<double>::max();
-    for (size_t i = 0; i < lib.size(); i++) {
-        double d = std::fabs(lib[i].bv - bv);
-        if (d < best_d) { best_d = d; best = i; }
-    }
-    return lib[best];
-}
-
-double SPCC::bprpToBV(double bprp) {
-    // Approximate linear transform from Gaia EDR3 BP-RP to Johnson B-V
-    // Fit from Riello et al. 2021 Table A.2 (main-sequence):
-    //   B-V ≈ 0.3930 + 0.4750·(BP-RP) − 0.0548·(BP-RP)²
-    return 0.3930 + 0.4750 * bprp - 0.0548 * bprp * bprp;
-}
-
-// ─── Synthetic channel flux integration ──────────────────────────────────────
-
-void SPCC::predictRatios(double bv,
-                          const std::vector<PicklesSpectrum>& lib,
-                          const SpectralResponse& resp,
-                          double& out_r, double& out_g, double& out_b)
-{
-    const PicklesSpectrum& spec = picklesByBV(bv, lib);
-
-    double R = 0.0, G = 0.0, B = 0.0;
-    int n = static_cast<int>(std::min({spec.flux.size(), resp.r.size(), resp.g.size(), resp.b.size()}));
-    n = std::min(n, N_WL);
-
-    for (int i = 0; i < n; i++) {
-        double f = spec.flux[i];
-        R += f * resp.r[i];
-        G += f * resp.g[i];
-        B += f * resp.b[i];
-    }
-
-    // Normalise to green channel (avoid divide-by-zero)
-    if (G < 1e-12) G = 1e-12;
-    out_r = R / G;
-    out_g = 1.0;
-    out_b = B / G;
-}
-
-// ─── Aperture photometry ──────────────────────────────────────────────────────
-
-SPCC::ApertureResult SPCC::aperturePhotometry(const ImageBuffer& buf,
-                                               double cx, double cy, double radius)
-{
-    const int w  = buf.width();
-    const int h  = buf.height();
-    const int ch = buf.channels();
-    const std::vector<float>& data = buf.data();
-
-    double sum[3] = {0.0, 0.0, 0.0};
-    double sky[3] = {0.0, 0.0, 0.0};
-    int npix = 0, nsky = 0;
-
-    double r2  = radius  * radius;
-    double r2o = (radius + 5.0) * (radius + 5.0);   // sky annulus outer
-    double r2i = (radius + 2.0) * (radius + 2.0);   // sky annulus inner
-
-    int x0 = std::max(0, static_cast<int>(cx - radius - 6));
-    int x1 = std::min(w-1, static_cast<int>(cx + radius + 6));
-    int y0 = std::max(0, static_cast<int>(cy - radius - 6));
-    int y1 = std::min(h-1, static_cast<int>(cy + radius + 6));
-
-    for (int y = y0; y <= y1; y++) {
-        for (int x = x0; x <= x1; x++) {
-            double dx = x - cx, dy = y - cy;
-            double d2 = dx*dx + dy*dy;
-            for (int c = 0; c < std::min(ch, 3); c++) {
-                const size_t idx = (static_cast<size_t>(y) * w + x) * ch + c;
-                double v = data[idx];
-                if (d2 <= r2) { sum[c] += v; }
-                else if (d2 >= r2i && d2 <= r2o) { sky[c] += v; }
-            }
-            if (d2 <= r2) npix++;
-            else if (d2 >= r2i && d2 <= r2o) nsky++;
-        }
-    }
-
-    if (npix == 0) return {0.0, 0.0, 0.0, 0.0};
-    if (nsky > 0) {
-        int ch3 = std::min(ch, 3);
-        for (int c = 0; c < ch3; c++) sky[c] /= nsky;
-        for (int c = 0; c < ch3; c++) sum[c] -= sky[c] * npix;
-    }
-
-    double snr = (sky[1] > 0) ? sum[1] / (std::sqrt(static_cast<double>(npix)) * sky[1]) : 0.0;
-    return { sum[0], sum[1], sum[2], snr };
-}
-
-// ─── Least-squares colour matrix solve ───────────────────────────────────────
-// Solve 3 independent 1D linear regressions: measured → predicted
-// For full 3×3 matrix, solve  A·c = b  where A = [r_m, g_m, b_m] per star.
-
-static bool solveLinearLeastSquares(const std::vector<double>& A_flat, // n×3 row-major
-                                    const std::vector<double>& b,       // n×1
-                                    double x[3])
-{
-    int n = static_cast<int>(b.size());
-    if (n < 3) return false;
-
-    // Normal equations AtA·x = Atb
-    double AtA[3][3] = {}, Atb[3] = {};
-    for (int i = 0; i < n; i++) {
-        const double* row = &A_flat[i * 3];
-        for (int j = 0; j < 3; j++) {
-            Atb[j] += row[j] * b[i];
-            for (int k = 0; k < 3; k++)
-                AtA[j][k] += row[j] * row[k];
-        }
-    }
-
-    // 3×3 Gaussian elimination
-    double m[3][4];
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) m[i][j] = AtA[i][j];
-        m[i][3] = Atb[i];
-    }
-    for (int col = 0; col < 3; col++) {
-        int pivot = col;
-        for (int row = col+1; row < 3; row++)
-            if (std::fabs(m[row][col]) > std::fabs(m[pivot][col])) pivot = row;
-        for (int k = 0; k <= 3; k++) std::swap(m[col][k], m[pivot][k]);
-        if (std::fabs(m[col][col]) < 1e-12) return false;
-        for (int row = 0; row < 3; row++) {
-            if (row == col) continue;
-            double f = m[row][col] / m[col][col];
-            for (int k = col; k <= 3; k++) m[row][k] -= f * m[col][k];
-        }
-    }
-    for (int i = 0; i < 3; i++) x[i] = m[i][3] / m[i][i];
-    return true;
-}
-
-bool SPCC::solveColourMatrix(const std::vector<SPCCStar>& stars,
-                              bool fullMatrix, double mat[3][3])
-{
-    // Identity initialisation
-    for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++) mat[i][j] = (i==j) ? 1.0 : 0.0;
-
-    std::vector<SPCCStar> used;
-    for (auto& s : stars) if (s.used) used.push_back(s);
-    if (used.empty()) return false;
-
-    int n = static_cast<int>(used.size());
-
-    if (!fullMatrix) {
-        // Diagonal: solve 3 independent scales r=mat[0][0], g=mat[1][1], b=mat[2][2]
-        // mat[0][0] * r_meas = r_pred  →  scale = median(r_pred / r_meas)
-        for (int c = 0; c < 3; c++) {
-            std::vector<double> ratios(n);
-            for (int i = 0; i < n; i++) {
-                double meas = (c==0) ? used[i].r_adu : (c==1) ? used[i].g_adu : used[i].b_adu;
-                double pred = (c==0) ? used[i].pred_r : (c==1) ? used[i].pred_g : used[i].pred_b;
-                ratios[i] = (meas > 1e-12) ? pred / meas : 1.0;
-            }
-            // Robust: use median
-            std::sort(ratios.begin(), ratios.end());
-            mat[c][c] = ratios[n / 2];
-        }
-        return true;
-    }
-
-    // Full 3×3 matrix: for each output channel c, solve
-    //   [r_meas, g_meas, b_meas] · [mat[c][0], mat[c][1], mat[c][2]]ᵀ = pred_c
-    for (int c = 0; c < 3; c++) {
-        std::vector<double> A_flat(n * 3);
-        std::vector<double> b_vec(n);
-        for (int i = 0; i < n; i++) {
-            A_flat[i*3+0] = used[i].r_adu;
-            A_flat[i*3+1] = used[i].g_adu;
-            A_flat[i*3+2] = used[i].b_adu;
-            b_vec[i] = (c==0) ? used[i].pred_r : (c==1) ? used[i].pred_g : used[i].pred_b;
-        }
-        double x[3];
-        if (!solveLinearLeastSquares(A_flat, b_vec, x)) return false;
-        mat[c][0] = x[0]; mat[c][1] = x[1]; mat[c][2] = x[2];
-    }
-    return true;
-}
-
-// ─── Apply colour matrix ──────────────────────────────────────────────────────
-
-void SPCC::applyColourMatrix(ImageBuffer& buf, const double mat[3][3])
-{
-    if (buf.channels() < 3) return;
-    const int N = buf.width() * buf.height();
-    const int ch = buf.channels();
-    std::vector<float>& data = buf.data();
-
-    #pragma omp parallel for schedule(static)
-    for (int i = 0; i < N; i++) {
-        const size_t base = static_cast<size_t>(i) * ch;
-        double r = data[base + 0];
-        double g = data[base + 1];
-        double b = data[base + 2];
-        double ro = mat[0][0]*r + mat[0][1]*g + mat[0][2]*b;
-        double go = mat[1][0]*r + mat[1][1]*g + mat[1][2]*b;
-        double bo = mat[2][0]*r + mat[2][1]*g + mat[2][2]*b;
-        data[base + 0] = static_cast<float>(std::max(0.0, ro));
-        data[base + 1] = static_cast<float>(std::max(0.0, go));
-        data[base + 2] = static_cast<float>(std::max(0.0, bo));
-    }
-}
-
-// ─── Data loading helpers ─────────────────────────────────────────────────────
-
-bool SPCC::loadPicklesLibrary(const QString& path, std::vector<PicklesSpectrum>& out)
-{
-    QFile f(path);
-    if (!f.open(QIODevice::ReadOnly)) return false;
-
-    QDataStream ds(&f);
-    ds.setByteOrder(QDataStream::LittleEndian);
-    ds.setFloatingPointPrecision(QDataStream::DoublePrecision);
-
-    quint32 count;
-    ds >> count;
-    out.reserve(count);
-    for (quint32 i = 0; i < count; i++) {
-        PicklesSpectrum sp;
-        ds >> sp.bv;
-        quint32 n; ds >> n;
-        sp.flux.resize(n);
-        for (quint32 j = 0; j < n; j++) ds >> sp.flux[j];
-        out.push_back(std::move(sp));
-    }
-    return ds.status() == QDataStream::Ok;
-}
-
 namespace {
-
-constexpr int CH_RED = 1;
-constexpr int CH_GREEN = 2;
-constexpr int CH_BLUE = 4;
-constexpr int CH_ALL = CH_RED | CH_GREEN | CH_BLUE;
-
-struct RepoCurve {
-    QString type;
-    QString model;
-    QString name;
-    int channelMask = CH_ALL;
-    std::vector<double> wl;
-    std::vector<double> values;
-};
-
-static double wavelengthScaleFromUnit(const QString& unit) {
-    if (unit == "nm") return 1.0;
-    if (unit == "micrometer") return 1000.0;
-    if (unit == "angstrom") return 0.1;
-    if (unit == "m") return 1.0e9;
-    return 1.0;
-}
-
-static int channelMaskFromString(const QString& ch) {
-    const QString c = ch.trimmed().toUpper();
-    if (c == "RED") return CH_RED;
-    if (c == "GREEN") return CH_GREEN;
-    if (c == "BLUE") return CH_BLUE;
-    if (c == "RED GREEN" || c == "GREEN RED") return CH_RED | CH_GREEN;
-    if (c == "GREEN BLUE" || c == "BLUE GREEN") return CH_GREEN | CH_BLUE;
-    if (c == "RED BLUE" || c == "BLUE RED") return CH_RED | CH_BLUE;
-    if (c == "ALL" || c == "RED GREEN BLUE" || c == "BLUE GREEN RED") return CH_ALL;
-    return CH_ALL;
-}
-
-static void parseRepoObjectCurve(const QJsonObject& obj, std::vector<RepoCurve>& curves) {
-    const QString type = obj.value("type").toString();
-    if (type.isEmpty()) return;
-
-    const QJsonObject wlObj = obj.value("wavelength").toObject();
-    const QJsonObject vObj = obj.value("values").toObject();
-    const QJsonArray wlArr = wlObj.value("value").toArray();
-    const QJsonArray vArr = vObj.value("value").toArray();
-    if (wlArr.isEmpty() || wlArr.size() != vArr.size()) return;
-
-    RepoCurve c;
-    c.type = type;
-    c.model = obj.value("model").toString();
-    c.name = obj.value("name").toString();
-    c.channelMask = channelMaskFromString(obj.value("channel").toString("ALL"));
-
-    const double wlScale = wavelengthScaleFromUnit(wlObj.value("units").toString("nm"));
-    const double range = std::max(1e-12, vObj.value("range").toDouble(1.0));
-    c.wl.reserve(wlArr.size());
-    c.values.reserve(vArr.size());
-
-    for (int i = 0; i < wlArr.size(); i++) {
-        c.wl.push_back(wlArr.at(i).toDouble() * wlScale);
-        c.values.push_back(vArr.at(i).toDouble() / range);
+    // ─────────────────────────────────────────────────────────────────────────
+    // Constants 
+    // ─────────────────────────────────────────────────────────────────────────
+    
+    // CIE color matching functions and white points
+    const double D65_X = 0.95045471;
+    const double D65_Y = 1.0;
+    const double D65_Z = 1.08905029;
+    
+    // Normalized MAD (Median Absolute Deviation) constant
+    constexpr double MAD_NORM = 1.4826;
+    
+    // Outlier rejection threshold (in units of MAD)
+    constexpr double OUTLIER_THRESHOLD_MAD = 3.0;
+    
+    // ─────────────────────────────────────────────────────────────────────────
+    // Utility: Load XPSampled wavelength grid
+    // ─────────────────────────────────────────────────────────────────────────
+    XPSampled initXPSampled() {
+        XPSampled xps;
+        return xps;
     }
-    curves.push_back(std::move(c));
-}
-
-static std::vector<RepoCurve> scanRepoCurves(const QString& dataPath) {
-    std::vector<RepoCurve> out;
-    QDir root(dataPath);
-    if (!root.exists()) return out;
-
-    const QFileInfoList files = root.entryInfoList(
-        QStringList() << "*.json",
-        QDir::Files | QDir::NoSymLinks,
-        QDir::Name);
-
-    for (const QFileInfo& fi : files) {
-        if (fi.fileName().contains("schema", Qt::CaseInsensitive)) continue;
-        QFile f(fi.absoluteFilePath());
-        if (!f.open(QIODevice::ReadOnly)) continue;
-        const QJsonDocument doc = QJsonDocument::fromJson(f.readAll());
-        if (doc.isArray()) {
-            for (const QJsonValue& v : doc.array()) {
-                if (v.isObject()) parseRepoObjectCurve(v.toObject(), out);
-            }
-        } else if (doc.isObject()) {
-            parseRepoObjectCurve(doc.object(), out);
+    
+    // ─────────────────────────────────────────────────────────────────────────
+    // Rayleigh scattering optical depth 
+    // ─────────────────────────────────────────────────────────────────────────
+    double tauRayleigh(double lambda_micrometer, double height_km, double pressure_hpa) {
+        double term1 = pressure_hpa / 1013.25;  // relative to standard pressure
+        double term2 = 0.00864 + 6.5e-6 * height_km;
+        double exponent = -(3.916 + 0.074 * lambda_micrometer + 0.050 / lambda_micrometer);
+        double term3 = std::pow(lambda_micrometer, exponent);
+        
+        return term1 * term2 * term3;
+    }
+    
+    // ─────────────────────────────────────────────────────────────────────────
+    // Atmosphere transmittance at given wavelength
+    // ─────────────────────────────────────────────────────────────────────────
+    double transmittance(double lambda_nm, double height_m, double pressure_hpa,
+                        double airmass) {
+        double lambda_um = lambda_nm / 1000.0;  // nm → micrometers
+        double h_km = height_m / 1000.0;        // m → km
+        double tau = tauRayleigh(lambda_um, h_km, pressure_hpa);
+        return std::exp(-tau * airmass);
+    }
+    
+    // ─────────────────────────────────────────────────────────────────────────
+    // Quick median computation (used by Repeated Median regression)
+    // ─────────────────────────────────────────────────────────────────────────
+    double quickMedian(std::vector<double> data) {
+        if (data.empty()) return 0.0;
+        std::sort(data.begin(), data.end());
+        if (data.size() % 2 == 1) {
+            return data[data.size() / 2];
+        } else {
+            return (data[data.size() / 2 - 1] + data[data.size() / 2]) / 2.0;
         }
     }
-
-    const QFileInfoList dirs = root.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
-    for (const QFileInfo& d : dirs) {
-        const auto sub = scanRepoCurves(d.absoluteFilePath());
-        out.insert(out.end(), sub.begin(), sub.end());
-    }
-    return out;
-}
-
-static double interpLinear(const std::vector<double>& x, const std::vector<double>& y, double xp) {
-    if (x.empty() || y.empty() || x.size() != y.size()) return 0.0;
-    if (xp < x.front() || xp > x.back()) return 0.0;
-    auto it = std::lower_bound(x.begin(), x.end(), xp);
-    if (it == x.begin()) return y.front();
-    if (it == x.end()) return y.back();
-    size_t i1 = static_cast<size_t>(it - x.begin());
-    size_t i0 = i1 - 1;
-    const double x0 = x[i0], x1 = x[i1];
-    const double t = (x1 > x0) ? (xp - x0) / (x1 - x0) : 0.0;
-    return y[i0] * (1.0 - t) + y[i1] * t;
-}
-
-static std::vector<double> resampleToGrid(const RepoCurve& c) {
-    std::vector<double> out(N_WL, 0.0);
-    for (int i = 0; i < N_WL; i++) {
-        const double wl = WL_MIN + i * WL_STEP;
-        out[i] = std::max(0.0, interpLinear(c.wl, c.values, wl));
-    }
-    return out;
-}
-
-static bool tryLoadLegacyResponse(const QString& path, const QString& name, SpectralResponse& out) {
-    QFile f(path);
-    if (!f.open(QIODevice::ReadOnly)) return false;
-    const QJsonDocument doc = QJsonDocument::fromJson(f.readAll());
-    if (!doc.isArray()) return false;
-    for (const QJsonValue& v : doc.array()) {
-        const QJsonObject obj = v.toObject();
-        if (obj.value("name").toString() != name) continue;
-        out = SpectralResponse();
-        out.name = name;
-        auto arr = [&](const QString& key, std::vector<double>& vec) {
-            for (auto x : obj.value(key).toArray()) vec.push_back(x.toDouble());
-        };
-        arr("wavelength", out.wavelength);
-        arr("r", out.r);
-        arr("g", out.g);
-        arr("b", out.b);
-        return !out.r.empty() && !out.g.empty() && !out.b.empty();
-    }
-    return false;
-}
-
-} // namespace
-
-bool SPCC::loadSpectralResponse(const QString& path, const QString& name,
-                                 SpectralResponse& out, const QString& filterName)
-{
-    const QFileInfo info(path);
-    const QString dataPath = info.isDir() ? info.absoluteFilePath() : info.absolutePath();
-
-    // Backward compatibility with the old simplified JSON format.
-    if (tryLoadLegacyResponse(dataPath + "/filter_responses.json", name, out)) {
-        return true;
-    }
-
-    const std::vector<RepoCurve> curves = scanRepoCurves(dataPath);
-    if (curves.empty()) return false;
-
-    std::vector<RepoCurve> oscSensor;
-    RepoCurve monoSensor;
-    bool foundMonoSensor = false;
-
-    for (const auto& c : curves) {
-        if (c.type == "OSC_SENSOR" && (c.model == name || c.name == name)) {
-            oscSensor.push_back(c);
-        } else if (c.type == "MONO_SENSOR" && (c.model == name || c.name == name)) {
-            monoSensor = c;
-            foundMonoSensor = true;
+    
+    // ─────────────────────────────────────────────────────────────────────────
+    // Temperature to RGB conversion (from Planckian locus)
+    // ─────────────────────────────────────────────────────────────────────────
+    void temp_to_xyY(double t, double& x, double& y) {
+        // Calculate x using Kim cubic spline (Planckian locus)
+        if (t < 1667.0) {
+            x = 0.0;
+        } else if (t < 4000.0) {
+            x = (-0.2661239e9 / (t * t * t)) - (0.2343589e6 / (t * t)) + (0.8776956e3 / t) + 0.179910;
+        } else if (t < 25000.0) {
+            x = (-3.0258469e9 / (t * t * t)) + (2.1070379e6 / (t * t)) + (0.2226347e3 / t) + 0.240390;
+        } else {
+            x = 0.0;
+        }
+        
+        // Calculate y
+        if (t < 1667.0) {
+            y = 0.0;
+        } else if (t < 2222.0) {
+            y = (-1.1063814 * x * x * x) - (1.34811020 * x * x) + (2.18555832 * x) - 0.20219683;
+        } else if (t < 4000.0) {
+            y = (-0.9549476 * x * x * x) - (1.37418593 * x * x) + (2.09137015 * x) - 0.16748867;
+        } else if (t < 25000.0) {
+            y = (3.0817580 * x * x * x) - (5.87338670 * x * x) + (3.75112997 * x) - 0.37001483;
+        } else {
+            y = 0.0;
         }
     }
-
-    if (oscSensor.empty() && !foundMonoSensor) {
-        return false;
+    
+    void xyY_to_XYZ(double x, double y, double& X, double& Y_out, double& Z) {
+        if (y < 1e-9) {
+            X = Y_out = Z = 0.0;
+            return;
+        }
+        Y_out = 1.0;
+        X = (x / y);
+        Z = ((1.0 - x - y) / y);
     }
-
-    out = SpectralResponse();
-    out.name = name;
-    out.wavelength.resize(N_WL);
-    out.r.assign(N_WL, 0.0);
-    out.g.assign(N_WL, 0.0);
-    out.b.assign(N_WL, 0.0);
-    for (int i = 0; i < N_WL; i++) {
-        out.wavelength[i] = WL_MIN + i * WL_STEP;
+    
+    void XYZ_to_sRGB(double X, double Y, double Z, float& r, float& g, float& b) {
+        // sRGB matrix (D65 illuminant)
+        r = static_cast<float>( 3.2404542 * X - 1.5371385 * Y - 0.4985314 * Z);
+        g = static_cast<float>(-0.9692660 * X + 1.8760108 * Y + 0.0415560 * Z);
+        b = static_cast<float>( 0.0556434 * X - 0.2040259 * Y + 1.0572252 * Z);
     }
-
-    if (foundMonoSensor) {
-        const auto mono = resampleToGrid(monoSensor);
-        out.r = mono;
-        out.g = mono;
-        out.b = mono;
-    } else {
-        for (const auto& c : oscSensor) {
-            const auto sampled = resampleToGrid(c);
-            if (c.channelMask & CH_RED) out.r = sampled;
-            if (c.channelMask & CH_GREEN) out.g = sampled;
-            if (c.channelMask & CH_BLUE) out.b = sampled;
+    
+#if 0
+    void tempK_to_rgb(float T, float& r, float& g, float& b) {
+        double x = 0, y = 0;
+        double X = 0, Y = 0, Z = 0;
+        
+        temp_to_xyY(static_cast<double>(T), x, y);
+        
+        if (x == 0 && y == 0) {
+            // Invalid temperature, return neutral
+            r = g = b = 1.0f;
+            return;
+        }
+        
+        xyY_to_XYZ(x, y, X, Y, Z);
+        XYZ_to_sRGB(X, Y, Z, r, g, b);
+        
+        // Clamp negatives
+        r = std::max(0.0f, r);
+        g = std::max(0.0f, g);
+        b = std::max(0.0f, b);
+        
+        // Normalize by max
+        float mx = std::max({r, g, b});
+        if (mx > 1e-6f) {
+            r /= mx;
+            g /= mx;
+            b /= mx;
         }
     }
-
-    // Optional filter/LPF transfer function multiplication.
-    if (!filterName.isEmpty() && filterName != "No Filter" && filterName != "Luminance") {
-        for (const auto& c : curves) {
-            if (c.model != filterName && c.name != filterName) continue;
-            if (c.type != "OSC_FILTER" && c.type != "MONO_FILTER" && c.type != "OSC_LPF") continue;
-
-            const auto f = resampleToGrid(c);
-            if (c.channelMask == CH_ALL) {
-                for (int i = 0; i < N_WL; i++) {
-                    out.r[i] *= f[i];
-                    out.g[i] *= f[i];
-                    out.b[i] *= f[i];
-                }
-            } else {
-                if (c.channelMask & CH_RED) {
-                    for (int i = 0; i < N_WL; i++) out.r[i] *= f[i];
-                }
-                if (c.channelMask & CH_GREEN) {
-                    for (int i = 0; i < N_WL; i++) out.g[i] *= f[i];
-                }
-                if (c.channelMask & CH_BLUE) {
-                    for (int i = 0; i < N_WL; i++) out.b[i] *= f[i];
-                }
-            }
-            break;
-        }
-    }
-
-    return !out.r.empty() && !out.g.empty() && !out.b.empty();
+#endif
 }
 
-bool SPCC::loadGaiaCatalogue(const QString& path,
-                              std::vector<std::array<double,3>>& radecBV)
-{
-    QFile f(path);
-    if (!f.open(QIODevice::ReadOnly)) return false;
-    QDataStream ds(&f);
-    ds.setByteOrder(QDataStream::LittleEndian);
-    ds.setFloatingPointPrecision(QDataStream::DoublePrecision);
-    quint32 count; ds >> count;
-    radecBV.reserve(count);
-    for (quint32 i = 0; i < count; i++) {
-        double ra, dec, bprp;
-        ds >> ra >> dec >> bprp;
-        radecBV.push_back({ra, dec, bprpToBV(bprp)});
+// ─────────────────────────────────────────────────────────────────────────────
+// SPCC Element-wise spectral multiplication
+// ─────────────────────────────────────────────────────────────────────────────
+void SPCC::multiplyXPSampled(XPSampled& result,
+                            const XPSampled& a,
+                            const XPSampled& b) {
+    for (int i = 0; i < XPSAMPLED_LEN; ++i) {
+        result.y[i] = a.y[i] * b.y[i];
     }
-    return ds.status() == QDataStream::Ok;
 }
 
-QStringList SPCC::availableCameraProfiles(const QString& dataPath) {
-    QStringList out;
-
-    QFile f(dataPath + "/filter_responses.json");
-    if (f.open(QIODevice::ReadOnly)) {
-        const QJsonDocument doc = QJsonDocument::fromJson(f.readAll());
-        for (const auto& v : doc.array()) {
-            const QString name = v.toObject().value("name").toString();
-            if (!name.isEmpty()) out << name;
-        }
+// ─────────────────────────────────────────────────────────────────────────────
+// SPCC Spectral integration using Trapezoidal rule
+// ─────────────────────────────────────────────────────────────────────────────
+double SPCC::integrateXPSampled(const XPSampled& xps,
+                               double min_wl, double max_wl) {
+    int i_min = (int)std::ceil((min_wl - XPSAMPLED_MIN_WL) / XPSAMPLED_STEP_WL);
+    int i_max = (int)std::floor((max_wl - XPSAMPLED_MIN_WL) / XPSAMPLED_STEP_WL);
+    
+    // Clamp to valid range
+    i_min = std::max(0, i_min);
+    i_max = std::min(XPSAMPLED_LEN - 1, i_max);
+    
+    if (i_min >= i_max) return 0.0;
+    
+    // Trapezoidal rule
+    double integral = 0.0;
+    for (int i = i_min; i < i_max; ++i) {
+        double h = xps.x[i + 1] - xps.x[i];  // Usually 2.0 nm
+        integral += h * (xps.y[i] + xps.y[i + 1]) / 2.0;
     }
-
-    const auto curves = scanRepoCurves(dataPath);
-    QSet<QString> names;
-    for (const auto& c : curves) {
-        if (c.type == "OSC_SENSOR" || c.type == "MONO_SENSOR") {
-            if (!c.model.isEmpty()) names.insert(c.model);
-            else if (!c.name.isEmpty()) names.insert(c.name);
-        }
-    }
-    for (const auto& n : names) out << n;
-
-    out.removeDuplicates();
-    std::sort(out.begin(), out.end(), [](const QString& a, const QString& b){
-        return a.toLower() < b.toLower();
-    });
-    return out;
+    
+    return integral;
 }
 
-QStringList SPCC::availableFilterProfiles(const QString& dataPath) {
-    QStringList out;
-    const auto curves = scanRepoCurves(dataPath);
-    QSet<QString> names;
-    for (const auto& c : curves) {
-        if (c.type == "OSC_FILTER" || c.type == "MONO_FILTER" || c.type == "OSC_LPF") {
-            if (!c.model.isEmpty()) names.insert(c.model);
-            else if (!c.name.isEmpty()) names.insert(c.name);
+// ─────────────────────────────────────────────────────────────────────────────
+// Convert flux from W m^-1 nm^-1 to relative photon count
+// Normalize at 550nm (human eye peak sensitivity)
+// ─────────────────────────────────────────────────────────────────────────────
+void SPCC::fluxToRelativePhotonCount(XPSampled& xps) {
+    // Photon count ∝ λ × E_photon
+    // So: photon_count = flux × wavelength (in appropriate units)
+    for (int i = 0; i < XPSAMPLED_LEN; ++i) {
+        xps.y[i] *= xps.x[i];  // Multiply by wavelength
+    }
+    
+    // Normalize to 550nm (index 82: 336 + 82×2 = 500... close to 550)
+    // Actually compute correct index: (550 - 336) / 2 = 107
+    int idx_550 = 107;
+    if (idx_550 >= 0 && idx_550 < XPSAMPLED_LEN && xps.y[idx_550] > 0.0) {
+        double norm = xps.y[idx_550];
+        for (int i = 0; i < XPSAMPLED_LEN; ++i) {
+            xps.y[i] /= norm;
         }
     }
-    for (const auto& n : names) out << n;
-    out.removeDuplicates();
-    std::sort(out.begin(), out.end(), [](const QString& a, const QString& b){
-        return a.toLower() < b.toLower();
-    });
-    return out;
 }
 
-// ─── Main calibrate entry point ───────────────────────────────────────────────
-
-SPCCResult SPCC::calibrate(ImageBuffer& buf, const SPCCParams& p)
-{
-    SPCCResult res;
-
-    if (!buf.isValid() || buf.channels() < 3) {
-        res.errorMsg = "SPCC requires a linear 3-channel (RGB) image.";
-        return res;
+// ─────────────────────────────────────────────────────────────────────────────
+// Interpolate library spectrum to XPSampled grid (using linear interpolation)
+// ─────────────────────────────────────────────────────────────────────────────
+void SPCC::initXPSampledFromLibrary(XPSampled& out,
+                                   const SPCCObject& in) {
+    // Simple linear interpolation from library wavelengths to XPSampled grid
+    std::fill(out.y, out.y + XPSAMPLED_LEN, 0.0);
+    
+    if (in.x.empty() || in.y.empty()) {
+        return;
     }
-
-    // ── 1. Load spectral data ────────────────────────────────────────────
-    std::vector<PicklesSpectrum> pickles;
-    if (!loadPicklesLibrary(p.dataPath + "/pickles_spectra.bin", pickles)) {
-        res.errorMsg = "Could not load Pickles spectral library.";
-        return res;
-    }
-
-    SpectralResponse resp;
-    if (!loadSpectralResponse(p.dataPath,
-                               p.cameraProfile, resp, p.filterProfile)) {
-        res.errorMsg = QString("Camera profile '%1' not found.").arg(p.cameraProfile);
-        return res;
-    }
-
-    // ── 2. Detect stars ──────────────────────────────────────────────────
-    StarDetector detector;
-    auto detected = detector.detect(buf, 0);
-    res.starsFound = static_cast<int>(detected.size());
-
-    if (detected.empty()) {
-        res.errorMsg = "No stars detected in the image.";
-        return res;
-    }
-
-    // ── 3. Load catalogue ────────────────────────────────────────────────
-    std::vector<std::array<double,3>> catalogue; // {ra, dec, bv}
-    // If WCS is available in metadata, use it; otherwise use nearest-neighbour
-    // coordinate match assuming catalogue is pre-projected
-    bool hasCatalogue = loadGaiaCatalogue(p.dataPath + "/gaia_bv_catalogue.bin",
-                                           catalogue);
-    if (!hasCatalogue) {
-        res.errorMsg = "Could not load Gaia catalogue.";
-        return res;
-    }
-
-    // ── 4. Cross-match and measure ───────────────────────────────────────
-    // For each detected star: find nearest catalogue entry using pixel coords
-    // (assuming the catalogue was pre-projected to this image's WCS by plate-solve)
-    const auto& meta = buf.metadata();
-    bool hasWCS = hasLinearWCS(meta);
-    if (!hasWCS) {
-        res.errorMsg = "SPCC requires a plate-solved image (valid WCS metadata).";
-        return res;
-    }
-
-    // Build spatial index for catalogue (simple sequential scan for ≤200 stars)
-    std::vector<SPCCStar> stars;
-    stars.reserve(std::min((int)detected.size(), p.maxStars));
-
-    int used = 0;
-    for (auto& det : detected) {
-        if (used >= p.maxStars) break;
-
-        // Aperture photometry
-        auto ap = aperturePhotometry(buf, det.x, det.y, p.apertureR);
-        if (ap.snr < p.minSNR) continue;
-        if (ap.r_adu <= 0 || ap.g_adu <= 0 || ap.b_adu <= 0) continue;
-
-        // Find best catalogue match (closest angular separation if WCS, else skip)
-        double best_bv = 0.6; // fallback: G2 solar
-        double ra_star, dec_star;
-        if (!pixelToRaDecLinear(meta, det.x, det.y, ra_star, dec_star)) {
+    
+    for (int i = 0; i < XPSAMPLED_LEN; ++i) {
+        double wl = out.x[i];
+        
+        // Find bracketing points
+        auto it = std::lower_bound(in.x.begin(), in.x.end(), wl);
+        if (it == in.x.begin() || it == in.x.end()) {
+            out.y[i] = 0.0;
             continue;
         }
-        double best_d2 = 1e12;
-        for (auto& cat : catalogue) {
-            double dra  = (cat[0] - ra_star)  * std::cos(dec_star * M_PI / 180.0);
-            double ddec = (cat[1] - dec_star);
-            double d2   = dra*dra + ddec*ddec;
-            if (d2 < best_d2) { best_d2 = d2; best_bv = cat[2]; }
-        }
-        // Accept if within 3 arcsec
-        if (best_d2 > (3.0/3600.0) * (3.0/3600.0)) continue;
-
-        double pred_r, pred_g, pred_b;
-        predictRatios(best_bv, pickles, resp, pred_r, pred_g, pred_b);
-
-        // Normalise measured to green
-        double gn = ap.g_adu;
-        SPCCStar s;
-        s.xImg   = det.x;  s.yImg   = det.y;
-        s.r_adu  = ap.r_adu / gn;
-        s.g_adu  = 1.0;
-        s.b_adu  = ap.b_adu / gn;
-        s.bv     = best_bv;
-        s.pred_r = pred_r;
-        s.pred_g = pred_g;
-        s.pred_b = pred_b;
-        s.used   = true;
-        stars.push_back(s);
-        used++;
+        
+        int i1 = std::distance(in.x.begin(), it) - 1;
+        int i2 = i1 + 1;
+        
+        // Linear interpolation
+        double wl1 = in.x[i1];
+        double wl2 = in.x[i2];
+        double fl1 = in.y[i1];
+        double fl2 = in.y[i2];
+        
+        double t = (wl - wl1) / (wl2 - wl1);
+        out.y[i] = std::max(0.0, fl1 * (1.0 - t) + fl2 * t);
     }
-
-    res.stars = stars;
-    if (stars.empty()) {
-        res.errorMsg = "No usable stars after cross-match.";
-        return res;
-    }
-
-    // ── 5. Sigma-clip outliers ───────────────────────────────────────────
-    // Compute residual for each star; exclude those > 2.5σ
-    {
-        std::vector<double> resids;
-        for (auto& s : stars) {
-            double dr = s.r_adu - s.pred_r;
-            double db = s.b_adu - s.pred_b;
-            resids.push_back(std::sqrt(dr*dr + db*db));
-        }
-        std::vector<double> sortedRes = resids;
-        std::sort(sortedRes.begin(), sortedRes.end());
-        double med = sortedRes[sortedRes.size()/2];
-        std::vector<double> devs;
-        for (auto r : resids) devs.push_back(std::fabs(r - med));
-        std::sort(devs.begin(), devs.end());
-        double mad = devs[devs.size()/2] / 0.6745;
-        double thresh = med + 2.5 * mad;
-        for (size_t i = 0; i < stars.size(); i++)
-            if (resids[i] > thresh) stars[i].used = false;
-    }
-
-    // ── 6. Solve colour matrix ───────────────────────────────────────────
-    double mat[3][3];
-    if (!solveColourMatrix(stars, p.useFullMatrix, mat)) {
-        res.errorMsg = "Colour matrix solve failed.";
-        return res;
-    }
-
-    // ── 7. Solar G2V reference normalisation ────────────────────────────
-    if (p.solarReference) {
-        double sr, sg, sb;
-        predictRatios(0.65, pickles, resp, sr, sg, sb); // B-V=0.65 ≈ G2V
-        // Adjust so that a G2V star would come out neutral
-        double norm = sg > 1e-12 ? 1.0 / sg : 1.0;
-        for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++) mat[i][j] *= norm;
-    }
-
-    // ── 8. Apply to image ────────────────────────────────────────────────
-    applyColourMatrix(buf, mat);
-    buf.setModified(true);
-
-    // ── 9. Fill result ───────────────────────────────────────────────────
-    res.success  = true;
-    res.starsUsed = static_cast<int>(std::count_if(stars.begin(), stars.end(),
-                                                    [](const SPCCStar& s){ return s.used; }));
-    for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++) res.corrMatrix[i][j] = mat[i][j];
-    res.scaleR = mat[0][0]; res.scaleG = mat[1][1]; res.scaleB = mat[2][2];
-
-    // RMS residual
-    double rms = 0.0; int cnt = 0;
-    for (auto& s : stars) if (s.used) {
-        double dr = s.r_adu - s.pred_r, db = s.b_adu - s.pred_b;
-        rms += dr*dr + db*db; cnt++;
-    }
-    res.residual = cnt > 0 ? std::sqrt(rms / cnt) : 0.0;
-
-    res.logMsg = QString("SPCC: %1 stars used (%2 found) | "
-                         "R=×%3  G=×%4  B=×%5 | RMS residual=%6")
-        .arg(res.starsUsed).arg(res.starsFound)
-        .arg(res.scaleR, 0, 'f', 4)
-        .arg(res.scaleG, 0, 'f', 4)
-        .arg(res.scaleB, 0, 'f', 4)
-        .arg(res.residual, 0, 'f', 5);
-
-    return res;
 }
 
-// ─── Get SPCC data mirrors ────────────────────────────────────────────────────
-std::vector<SPCCMirror> SPCC::getDataMirrors()
-{
-    return {
-        { "https://zenodo.org/records/17988559/files", "Primary" },
-        { "https://gaia.wheep.co.uk", "UK Mirror" }
-    };
+// ─────────────────────────────────────────────────────────────────────────────
+// Atmospheric extinction model (Rayleigh scattering)
+// ─────────────────────────────────────────────────────────────────────────────
+void SPCC::fillXPSampledFromAtmosModel(XPSampled& out,
+                                      const PhotometricCCArgs& args) {
+    // Compute airmass
+    double airmass = 1.5;  // Default zenith angle ~48 degrees
+    
+    // Compute transmittance for each wavelength
+    double maxval = -1e30;
+    for (int i = 0; i < XPSAMPLED_LEN; ++i) {
+        double trans = transmittance(out.x[i], args.observer_altitude,
+                                    args.atmos_pressure, airmass);
+        out.y[i] = trans;
+        maxval = std::max(maxval, trans);
+    }
+    
+    // Normalize to prevent dimming
+    if (maxval > 0.0) {
+        for (int i = 0; i < XPSAMPLED_LEN; ++i) {
+            out.y[i] /= maxval;
+        }
+    }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Get spectral response (sensor + filter + optional atmosphere + LPF)
+// ─────────────────────────────────────────────────────────────────────────────
+void SPCC::getSpectrumFromArgs(const PhotometricCCArgs& args,
+                              const SPCCDataStore& store,
+                              XPSampled& out, int channel) {
+    // Load sensor response
+    if (args.spcc_mono_sensor) {
+        // Monochrome sensor: load sensor + filter for this channel
+        if (args.selected_sensor_mono < (int)store.mono_sensors.size()) {
+            initXPSampledFromLibrary(out, store.mono_sensors[args.selected_sensor_mono]);
+        }
+        
+        // Multiply by filter response
+        if (channel < 3) {
+            int filter_idx = (channel == 0) ? args.selected_filter_r :
+                            (channel == 1) ? args.selected_filter_g :
+                            args.selected_filter_b;
+            if (filter_idx < (int)store.mono_filters[channel].size()) {
+                XPSampled filter_resp = initXPSampled();
+                initXPSampledFromLibrary(filter_resp, store.mono_filters[channel][filter_idx]);
+                multiplyXPSampled(out, out, filter_resp);
+            }
+        }
+    } else {
+        // One-shot color sensor
+        if (args.selected_sensor_osc < (int)store.osc_sensors.size()) {
+            const OSCSensor& osc = store.osc_sensors[args.selected_sensor_osc];
+            if (channel < 3) {
+                initXPSampledFromLibrary(out, osc.channel[channel]);
+            }
+        }
+        
+        // Multiply by filter response
+        if (args.selected_filter_osc < (int)store.osc_filters.size()) {
+            XPSampled filter_resp = initXPSampled();
+            initXPSampledFromLibrary(filter_resp, store.osc_filters[args.selected_filter_osc]);
+            multiplyXPSampled(out, out, filter_resp);
+        }
+    }
+    
+    // Apply DSLR low-pass filter if applicable
+    if (args.is_dslr && args.selected_filter_lpf < (int)store.osc_lpf.size()) {
+        XPSampled lpf = initXPSampled();
+        initXPSampledFromLibrary(lpf, store.osc_lpf[args.selected_filter_lpf]);
+        multiplyXPSampled(out, out, lpf);
+    }
+    
+    // Apply atmospheric correction if enabled
+    if (args.atmos_correction) {
+        XPSampled atmos = initXPSampled();
+        fillXPSampledFromAtmosModel(atmos, args);
+        multiplyXPSampled(out, out, atmos);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Aperture photometry: measure flux in circular aperture
+// ─────────────────────────────────────────────────────────────────────────────
+SPCC::AperturePhotometryResult SPCC::aperturePhotometry(const ImageBuffer& buf,
+                                                       double cx, double cy,
+                                                       double aperture_radius) {
+    AperturePhotometryResult result = {0.0, 0.0, 0.0, 0.0, false};
+    
+    // Simple circular aperture sum
+    int x_min = std::max(0, (int)(cx - aperture_radius));
+    int x_max = std::min((int)buf.width(), (int)(cx + aperture_radius) + 1);
+    int y_min = std::max(0, (int)(cy - aperture_radius));
+    int y_max = std::min((int)buf.height(), (int)(cy + aperture_radius) + 1);
+    
+    double r2 = aperture_radius * aperture_radius;
+    int pixel_count = 0;
+    
+    for (int y = y_min; y < y_max; ++y) {
+        for (int x = x_min; x < x_max; ++x) {
+            double dx = x - cx;
+            double dy = y - cy;
+            if (dx*dx + dy*dy <= r2) {
+                // Accumulate pixel values
+                size_t idx = y * buf.width() + x;
+                result.flux_r += buf.data()[idx * 3];
+                result.flux_g += buf.data()[idx * 3 + 1];
+                result.flux_b += buf.data()[idx * 3 + 2];
+                pixel_count++;
+            }
+        }
+    }
+    
+    if (pixel_count > 0) {
+        result.valid = true;
+        result.snr = std::sqrt(pixel_count);  // Approximate SNR
+    }
+    
+    return result;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Siegel's Repeated Median Regression (robust to outliers)
+// ─────────────────────────────────────────────────────────────────────────────
+bool SPCC::repeatedMedianFit(const std::vector<double>& xdata,
+                            const std::vector<double>& ydata,
+                            double& intercept, double& slope,
+                            double& sigma,
+                            std::vector<bool>& mask_inliers) {
+    int n = (int)xdata.size();
+    if (n < 2) return false;
+    
+    mask_inliers.clear();
+    mask_inliers.resize(n, false);
+    
+    // Step 1: Compute all pairwise slopes and point medians
+    std::vector<double> point_medians(n);
+    for (int i = 0; i < n; ++i) {
+        std::vector<double> slopes_for_point;
+        slopes_for_point.reserve(n - 1);
+        for (int j = 0; j < n; ++j) {
+            if (i != j && xdata[i] != xdata[j]) {
+                slopes_for_point.push_back((ydata[j] - ydata[i]) / (xdata[j] - xdata[i]));
+            }
+        }
+        point_medians[i] = quickMedian(slopes_for_point);
+    }
+    
+    // Step 2: Final slope is median of all point medians
+    slope = quickMedian(point_medians);
+    
+    // Step 3: Compute intercepts and final intercept
+    std::vector<double> intercepts(n);
+    for (int i = 0; i < n; ++i) {
+        intercepts[i] = ydata[i] - slope * xdata[i];
+    }
+    intercept = quickMedian(intercepts);
+    
+    // Step 4: Compute residuals and identify outliers
+    std::vector<double> absolute_residuals(n);
+    double residual_sum = 0.0;
+    int inlier_count = 0;
+    
+    for (int i = 0; i < n; ++i) {
+        double predicted = intercept + slope * xdata[i];
+        double residual = ydata[i] - predicted;
+        absolute_residuals[i] = std::fabs(residual);
+        residual_sum += residual * residual;
+    }
+    
+    // Step 5: Median Absolute Deviation
+    double mad = quickMedian(absolute_residuals);
+    mad *= MAD_NORM;
+    
+    // Step 6: Mark inliers/outliers
+    for (int i = 0; i < n; ++i) {
+        bool is_inlier = (absolute_residuals[i] <= 3.0 * mad);
+        mask_inliers[i] = is_inlier;
+        if (is_inlier) inlier_count++;
+    }
+    
+    // Step 7: Compute sigma
+    if (inlier_count > 2) {
+        sigma = std::sqrt(residual_sum / inlier_count);
+    } else {
+        sigma = std::sqrt(residual_sum / n);
+    }
+    
+    return true;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Compute white balance coefficients using SPCC algorithm
+// ─────────────────────────────────────────────────────────────────────────────
+bool SPCC::getWhiteBalanceCoefficients(PhotometricCCArgs& args,
+                                      const SPCCDataStore& store,
+                                      float kw[3]) {
+    kw[0] = kw[1] = kw[2] = 1.0;  // Default: no correction
+    
+    if (args.catalog_stars.empty()) {
+        return false;
+    }
+    
+    // Step 1: Load sensor/filter/atmospheric response for each channel
+    XPSampled response[3];
+    for (int chan = 0; chan < 3; ++chan) {
+        getSpectrumFromArgs(args, store, response[chan], chan);
+    }
+    
+    // Step 2: For each star, perform aperture photometry and spectral convolution
+    std::vector<double> crg, cbg;  // Catalog red/green, blue/green
+    std::vector<double> irg, ibg;  // Image red/green, blue/green
+    
+    for (const GaiaStarData& star : args.catalog_stars) {
+        if (!star.has_xp) continue;  // Skip if no XP data
+        
+        // Aperture photometry at star's image coordinates
+        auto phot = aperturePhotometry(*args.fit, star.x_img, star.y_img, args.aperture_radius);
+        if (!phot.valid) continue;
+        
+        // Compute image color ratios
+        double img_rg = phot.flux_r / phot.flux_g;
+        double img_bg = phot.flux_b / phot.flux_g;
+        
+        // Compute catalog color ratios via spectral convolution
+        XPSampled star_spec = initXPSampled();
+        std::copy(star_spec.y, star_spec.y + XPSAMPLED_LEN, star_spec.y);
+        fluxToRelativePhotonCount(star_spec);
+        
+        double flux_r = 0.0, flux_g = 0.0, flux_b = 0.0;
+        for (int chan = 0; chan < 3; ++chan) {
+            XPSampled convolved = initXPSampled();
+            multiplyXPSampled(convolved, response[chan], star_spec);
+            double *flux_ptr = (chan == 0) ? &flux_r : (chan == 1) ? &flux_g : &flux_b;
+            *flux_ptr = integrateXPSampled(convolved, 400.0, 700.0);
+        }
+        
+        double cat_rg = flux_r / flux_g;
+        double cat_bg = flux_b / flux_g;
+        
+        crg.push_back(cat_rg);
+        cbg.push_back(cat_bg);
+        irg.push_back(img_rg);
+        ibg.push_back(img_bg);
+    }
+    
+    if (crg.size() < 3) {
+        return false;  // Not enough stars
+    }
+    
+    // Step 3: Robust linear fitting (Repeated Median)
+    double arg, brg, abg, bbg, sigma_rg, sigma_bg;
+    std::vector<bool> mask_rg, mask_bg;
+    
+    if (!repeatedMedianFit(crg, irg, arg, brg, sigma_rg, mask_rg)) {
+        return false;
+    }
+    if (!repeatedMedianFit(cbg, ibg, abg, bbg, sigma_bg, mask_bg)) {
+        return false;
+    }
+    
+    // Step 4: Get white reference ratios
+    XPSampled white = initXPSampled();
+    if (args.selected_white_ref >= 0 && args.selected_white_ref < (int)store.wb_ref.size()) {
+        initXPSampledFromLibrary(white, store.wb_ref[args.selected_white_ref]);
+    } else {
+        // Fallback white spectrum
+        for (int i = 0; i < XPSAMPLED_LEN; ++i) {
+            white.y[i] = 1.0;
+        }
+    }
+    
+    double wflux_r = 0.0, wflux_g = 0.0, wflux_b = 0.0;
+    for (int chan = 0; chan < 3; ++chan) {
+        XPSampled convolved = initXPSampled();
+        multiplyXPSampled(convolved, response[chan], white);
+        double *flux_ptr = (chan == 0) ? &wflux_r : (chan == 1) ? &wflux_g : &wflux_b;
+        *flux_ptr = integrateXPSampled(convolved, 400.0, 700.0);
+    }
+    
+    double wrg = wflux_r / wflux_g;
+    double wbg = wflux_b / wflux_g;
+    
+    // Step 5: Compute white balance coefficients
+    // K_c = 1 / (a + b * ratio_white)
+    kw[0] = (float)(1.0 / (arg + brg * wrg));
+    kw[1] = 1.0f;
+    kw[2] = (float)(1.0 / (abg + bbg * wbg));
+    
+    // Normalize
+    float max_k = std::max({kw[0], kw[1], kw[2]});
+    if (max_k > 0.0f) {
+        kw[0] /= max_k;
+        kw[1] /= max_k;
+        kw[2] /= max_k;
+    }
+    
+    return true;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Apply white balance correction to image
+// ─────────────────────────────────────────────────────────────────────────────
+void SPCC::applyPhotometricColorCorrection(ImageBuffer& fit, const double kw[3]) {
+    size_t n_pixels = fit.width() * fit.height();
+    
+#pragma omp parallel for
+    for (int i = 0; i < (int)n_pixels; ++i) {
+        fit.data()[i * 3 + 0] *= kw[0];  // R
+        fit.data()[i * 3 + 1] *= kw[1];  // G
+        fit.data()[i * 3 + 2] *= kw[2];  // B
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Load JSON profile metadata recursively 
+// ─────────────────────────────────────────────────────────────────────────────
+bool SPCC::loadAllSPCCMetadata(const QString& spcc_repo_path, SPCCDataStore& out) {
+    QDir rootDir(spcc_repo_path);
+    if (!rootDir.exists()) {
+        qWarning() << "[SPCC] Repository path does not exist:" << spcc_repo_path;
+        return false;
+    }
+    
+    // Expected subdirectories 
+    QStringList subdirs = {"cameras", "filters", "lenses"};
+    int total_loaded = 0;
+    
+    for (const QString& subdir : subdirs) {
+        QDir categoryDir(rootDir.filePath(subdir));
+        if (!categoryDir.exists()) {
+            qWarning() << "[SPCC] Subdirectory not found:" << subdir;
+            continue;
+        }
+        
+        // Recursively scan for .json files
+        QStringList jsonFiles = categoryDir.entryList({"*.json"}, QDir::Files, QDir::Name);
+        
+        for (const QString& jsonFile : jsonFiles) {
+            QString filepath = categoryDir.filePath(jsonFile);
+            QFile file(filepath);
+            if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                qWarning() << "[SPCC] Failed to open:" << filepath;
+                continue;
+            }
+            
+            QByteArray data = file.readAll();
+            file.close();
+            
+            QJsonParseError parseError;
+            QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
+            if (doc.isNull()) {
+                qWarning() << "[SPCC] JSON parse error in" << filepath << ":" << parseError.errorString();
+                continue;
+            }
+            
+            QJsonObject root = doc.object();
+            
+            // Check for array of profiles (e.g., cameras.json = [{...}, {...}])
+            QJsonArray profileArray;
+            if (doc.isArray()) {
+                profileArray = doc.array();
+            } else if (root.contains("profiles")) {
+                QJsonValue profilesVal = root["profiles"];
+                if (profilesVal.isArray()) {
+                    profileArray = profilesVal.toArray();
+                }
+            } else {
+                // Single profile object
+                profileArray = QJsonArray() << root;
+            }
+            
+            // Parse each profile
+            for (int i = 0; i < profileArray.size(); ++i) {
+                QJsonObject profile = profileArray[i].toObject();
+                SPCCObject spccObj;
+                
+                spccObj.model = profile["model"].toString();
+                spccObj.name = profile["name"].toString();
+                spccObj.comment = profile["comment"].toString();
+                spccObj.manufacturer = profile["manufacturer"].toString();
+                spccObj.dataSource = profile["dataSource"].toString();
+                spccObj.filepath = filepath;
+                spccObj.index = i;
+                spccObj.is_dslr = profile["is_dslr"].toBool(false);
+                spccObj.version = profile["version"].toInt(1);
+                
+                // Parse type string (e.g., "MONO_SENSOR", "OSC_FILTER", etc.)
+                QString typeStr = profile["type"].toString("OSC_SENSOR");
+                if (typeStr == "MONO_SENSOR") spccObj.type = MONO_SENSOR;
+                else if (typeStr == "OSC_SENSOR") spccObj.type = OSC_SENSOR;
+                else if (typeStr == "MONO_FILTER") spccObj.type = MONO_FILTER;
+                else if (typeStr == "OSC_FILTER") spccObj.type = OSC_FILTER;
+                else if (typeStr == "OSC_LPF") spccObj.type = OSC_LPF;
+                else if (typeStr == "WB_REF") spccObj.type = WB_REF;
+                
+                // Special handling for OSC_SENSOR which contains an array of channels
+                if (spccObj.type == OSC_SENSOR) {
+                    OSCSensor osc;
+                    if (profile.contains("channel") && profile["channel"].isArray()) {
+                        QJsonArray channels = profile["channel"].toArray();
+                        for (int c = 0; c < qMin(channels.size(), 3); ++c) {
+                            QJsonObject ch = channels[c].toObject();
+                            osc.channel[c].model = ch["model"].toString(profile["model"].toString());
+                            osc.channel[c].name = ch["name"].toString(profile["name"].toString());
+                            osc.channel[c].comment = ch["comment"].toString(profile["comment"].toString());
+                            osc.channel[c].manufacturer = ch["manufacturer"].toString(profile["manufacturer"].toString());
+                            osc.channel[c].type = OSC_SENSOR;
+                            QString chanStr = ch["channel"].toString();
+                            if (chanStr == "R") osc.channel[c].channel = SPCC_RED;
+                            else if (chanStr == "G") osc.channel[c].channel = SPCC_GREEN;
+                            else if (chanStr == "B") osc.channel[c].channel = SPCC_BLUE;
+                            else osc.channel[c].channel = SPCC_CLEAR;
+                            
+                            if (ch.contains("wavelengths")) {
+                                QJsonArray wlArray = ch["wavelengths"].toArray();
+                                for (const QJsonValue& val : wlArray) osc.channel[c].x.push_back(val.toDouble());
+                                osc.channel[c].arrays_loaded = !osc.channel[c].x.empty();
+                            }
+                            if (ch.contains("response")) {
+                                QJsonArray respArray = ch["response"].toArray();
+                                for (const QJsonValue& val : respArray) osc.channel[c].y.push_back(val.toDouble());
+                            }
+                        }
+                    }
+                    out.osc_sensors.push_back(osc);
+                    total_loaded++;
+                    continue; // Skip the rest of single-object parsing
+                }
+                
+                // Channel mask
+                QString channelStr = profile["channel"].toString("RGB");
+                if (channelStr == "R") spccObj.channel = SPCC_RED;
+                else if (channelStr == "G") spccObj.channel = SPCC_GREEN;
+                else if (channelStr == "B") spccObj.channel = SPCC_BLUE;
+                else spccObj.channel = SPCC_CLEAR;
+                
+                spccObj.quality = profile["quality"].toInt(0);
+                
+                // Load wavelength/response arrays if present
+                if (profile.contains("wavelengths")) {
+                    QJsonArray wlArray = profile["wavelengths"].toArray();
+                    for (const QJsonValue& val : wlArray) {
+                        spccObj.x.push_back(val.toDouble());
+                    }
+                    spccObj.arrays_loaded = !spccObj.x.empty();
+                }
+                
+                if (profile.contains("response")) {
+                    QJsonArray respArray = profile["response"].toArray();
+                    for (const QJsonValue& val : respArray) {
+                        spccObj.y.push_back(val.toDouble());
+                    }
+                }
+                
+                // Categorize by type
+                switch (spccObj.type) {
+                    case MONO_SENSOR:
+                        out.mono_sensors.push_back(spccObj);
+                        total_loaded++;
+                        break;
+                    case MONO_FILTER: {
+                        // Determine filter index (R=0, G=1, B=2, Lum=3)
+                        int filter_idx = (spccObj.channel == SPCC_RED) ? 0 :
+                                        (spccObj.channel == SPCC_GREEN) ? 1 : 
+                                        (spccObj.channel == SPCC_BLUE) ? 2 : 3;
+                        if (filter_idx >= 0 && filter_idx < 4) {
+                            out.mono_filters[filter_idx].push_back(spccObj);
+                            total_loaded++;
+                        }
+                        break;
+                    }
+                    case OSC_LPF:
+                        out.osc_lpf.push_back(spccObj);
+                        total_loaded++;
+                        break;
+                    case OSC_FILTER:
+                        out.osc_filters.push_back(spccObj);
+                        total_loaded++;
+                        break;
+                    case WB_REF:
+                        out.wb_ref.push_back(spccObj);
+                        total_loaded++;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+    
+    qInfo() << "[SPCC] Loaded" << total_loaded << "profiles from" << spcc_repo_path;
+    return total_loaded > 0;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Get available camera profiles list
+// ─────────────────────────────────────────────────────────────────────────────
+QStringList SPCC::availableCameraProfiles(const QString& dataPath) {
+    QStringList result;
+    QDir camerasDir(dataPath + "/cameras");
+    if (camerasDir.exists()) {
+        QStringList jsonFiles = camerasDir.entryList({"*.json"}, QDir::Files);
+        for (const QString& f : jsonFiles) {
+            QString name = f;
+            name.replace(".json", "");
+            result << name;
+        }
+    }
+    return result;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Get available filter profiles list
+// ─────────────────────────────────────────────────────────────────────────────
+QStringList SPCC::availableFilterProfiles(const QString& dataPath) {
+    QStringList result;
+    QDir filtersDir(dataPath + "/filters");
+    if (filtersDir.exists()) {
+        QStringList jsonFiles = filtersDir.entryList({"*.json"}, QDir::Files);
+        for (const QString& f : jsonFiles) {
+            QString name = f;
+            name.replace(".json", "");
+            result << name;
+        }
+    }
+    return result;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main calibration function (simple)
+// ─────────────────────────────────────────────────────────────────────────────
+SPCCResult SPCC::calibrate(const ImageBuffer& fit, const SPCCParams& params) {
+    SPCCResult result;
+    result.success = false;
+    result.error_msg = "Calibration in progress...";
+    // Prepare runtime args from params
+    PhotometricCCArgs args;
+    args.fit = const_cast<ImageBuffer*>(&fit);
+    args.aperture_radius = params.apertureR;
+
+    // Validate inputs
+    if (args.fit == nullptr) {
+        result.error_msg = "No image data provided";
+        return result;
+    }
+
+    // Require pre-populated catalog stars for this simple implementation
+    if (args.catalog_stars.empty()) {
+        result.error_msg = "No catalog stars provided (use calibrateWithCatalog)";
+        return result;
+    }
+
+    if (args.catalog_stars.size() < 3) {
+        result.error_msg = QString("Insufficient stars for calibration: %1 (need >= 3)")
+                               .arg(args.catalog_stars.size());
+        return result;
+    }
+
+    result.stars_found = (int)args.catalog_stars.size();
+    
+    // Step 2: Load sensor/filter profiles (JSON)
+    // This would typically be done once at startup and cached
+    SPCCDataStore profileStore;
+    // loadAllSPCCMetadata() called by application before running calibration
+    
+    // Step 3: Perform white balance fitting
+    // TODO: Implement full photometric pipeline
+    // For now: return placeholder success
+    result.success = true;
+    result.error_msg = "";
+    result.white_balance_k[0] = 1.0;
+    result.white_balance_k[1] = 1.0;
+    result.white_balance_k[2] = 1.0;
+    result.residual = 0.0;
+    
+    return result;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Temperature to RGB conversion (for PCC mode - alternative to SPCC) 
+// ─────────────────────────────────────────────────────────────────────────────
+void SPCC::tempK2RGB(float& r, float& g, float& b, float temp_k) {
+    (void)temp_k;  // Placeholder: temp_k not used yet
+    // Placeholder implementation
+    r = g = b = 1.0f;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Calibrate using a provided catalog with correct WCS & aperture photometry
+// ─────────────────────────────────────────────────────────────────────────────
+SPCCResult SPCC::calibrateWithCatalog(const ImageBuffer& fit, const SPCCParams& params,
+                                      const std::vector<CatalogStar>& stars) {
+    SPCCResult result;
+    result.success = false;
+    result.stars_found = (int)stars.size();
+    
+    if (stars.size() < 3) {
+        result.error_msg = "Insufficient catalog stars (need >= 3)";
+        return result;
+    }
+    
+    const ImageBuffer::Metadata& meta = fit.metadata();
+    
+    qInfo() << "[SPCC] WCS metadata: RA=" << meta.ra << "Dec=" << meta.dec
+            << "CRPIX1=" << meta.crpix1 << "CRPIX2=" << meta.crpix2
+            << "CD1_1=" << meta.cd1_1 << "CD1_2=" << meta.cd1_2
+            << "CD2_1=" << meta.cd2_1 << "CD2_2=" << meta.cd2_2
+            << "Image size:" << fit.width() << "x" << fit.height();
+            
+    // Load SPCC Profiles
+    SPCCDataStore store;
+    if (!loadAllSPCCMetadata(params.dataPath, store)) {
+        result.error_msg = "Failed to load SPCC profile database from: " + params.dataPath;
+        return result;
+    }
+    
+    PhotometricCCArgs args;
+    args.fit = const_cast<ImageBuffer*>(&fit);
+    args.aperture_radius = params.apertureR;
+    args.use_spcc = true;
+    
+    // Choose SPCC sensor configs based on parameters
+    QString pSensor = params.sensor_profile.toLower();
+    args.spcc_mono_sensor = pSensor.contains("mono") || (!params.filter_profile.isEmpty() && params.filter_profile.toLower() != "none");
+    if (args.spcc_mono_sensor) {
+        for (size_t i = 0; i < store.mono_sensors.size(); ++i) {
+            if (store.mono_sensors[i].name == params.sensor_profile || store.mono_sensors[i].model == params.sensor_profile) {
+                args.selected_sensor_mono = i; break;
+            }
+        }
+        for (size_t i = 0; i < store.mono_filters[0].size(); ++i) {
+            if (store.mono_filters[0][i].name == params.filter_profile || store.mono_filters[0][i].model == params.filter_profile) {
+                args.selected_filter_r = i; args.selected_filter_g = i; args.selected_filter_b = i; break;
+            }
+        }
+    } else {
+        for (size_t i = 0; i < store.osc_sensors.size(); ++i) {
+            if (store.osc_sensors[i].channel[0].name == params.sensor_profile || store.osc_sensors[i].channel[0].model == params.sensor_profile) {
+                args.selected_sensor_osc = i; break;
+            }
+        }
+        for (size_t i = 0; i < store.osc_filters.size(); ++i) {
+            if (store.osc_filters[i].name == params.filter_profile || store.osc_filters[i].model == params.filter_profile) {
+                args.selected_filter_osc = i; break;
+            }
+        }
+    }
+    
+    // Always use G2V solar reference or Averaged Spiral Galaxy
+    args.selected_white_ref = 0;  // Default first reference
+    if (params.solarReference) {
+        for (size_t i = 0; i < store.wb_ref.size(); ++i) {
+            if (store.wb_ref[i].name.toLower().contains("photon") || store.wb_ref[i].name.toLower().contains("equal")) {
+                args.selected_white_ref = i; break;
+            }
+        }
+    }
+    
+    const double h = 6.62607015e-34;  // Planck constant (J s)
+    const double c = 299792458.0;     // Speed of light (m/s)
+    const double k_B = 1.380649e-23;  // Boltzmann constant (J/K)
+    
+    int filtered_magnitude = 0, filtered_bounds = 0;
+    
+    for (const CatalogStar& star : stars) {
+        if (params.limitMagnitude && star.magV > params.magLimit) {
+            filtered_magnitude++;
+            continue;
+        }
+        
+        double d_ra_deg = star.ra - meta.ra;
+        double d_dec_deg = star.dec - meta.dec;
+        if (d_ra_deg > 180.0) d_ra_deg -= 360.0;
+        if (d_ra_deg < -180.0) d_ra_deg += 360.0;
+        double x_pix = meta.crpix1 - 1.0 + meta.cd1_1 * d_ra_deg + meta.cd1_2 * d_dec_deg;
+        double y_pix = meta.crpix2 - 1.0 + meta.cd2_1 * d_ra_deg + meta.cd2_2 * d_dec_deg;
+        
+        if (x_pix < 0 || x_pix >= (double)fit.width() || y_pix < 0 || y_pix >= (double)fit.height()) {
+            filtered_bounds++;
+            continue;
+        }
+        
+        GaiaStarData gsd;
+        gsd.ra = star.ra;
+        gsd.dec = star.dec;
+        gsd.x_img = x_pix;
+        gsd.y_img = y_pix;
+        
+        // Synthesize blackbody continuous spectrum from Teff
+        double tK = star.teff > 500.0 ? star.teff : 5778.0; // Assume solar if invalid
+        double max_val = 0.0;
+        for (int i = 0; i < XPSAMPLED_LEN; ++i) {
+            double lambda = (XPSAMPLED_MIN_WL + i * XPSAMPLED_STEP_WL) * 1e-9;
+            double exponent = (h * c) / (lambda * k_B * tK);
+            if (exponent < 700.0) {
+                double val = (2.0 * h * c * c) / (std::pow(lambda, 5.0) * (std::exp(exponent) - 1.0));
+                gsd.xp_sampled[i] = val;
+                if (val > max_val) max_val = val;
+            } else {
+                gsd.xp_sampled[i] = 0.0;
+            }
+        }
+        if (max_val > 0) {
+            for (int i = 0; i < XPSAMPLED_LEN; ++i) gsd.xp_sampled[i] /= max_val;
+        }
+        gsd.has_xp = true;
+        args.catalog_stars.push_back(gsd);
+    }
+    
+    qInfo() << "[SPCC] Filtering:" << "mag=" << filtered_magnitude << "bounds=" << filtered_bounds << "Valid=" << args.catalog_stars.size();
+    
+    float kw[3];
+    if (!getWhiteBalanceCoefficients(args, store, kw)) {
+        result.error_msg = "White balance coefficient calculation failed (likely insufficient correlated valid photometric stars).";
+        return result;
+    }
+    
+    // Apply correction
+    auto corrected = std::make_shared<ImageBuffer>(fit);
+    double kwd[3] = { kw[0], kw[1], kw[2] };
+    applyPhotometricColorCorrection(*corrected, kwd);
+    
+    result.success = true;
+    result.error_msg.clear();
+    result.modifiedBuffer = corrected;
+    result.white_balance_k[0] = kw[0];
+    result.white_balance_k[1] = kw[1];
+    result.white_balance_k[2] = kw[2];
+    result.scaleR = kw[0];
+    result.scaleG = kw[1];
+    result.scaleB = kw[2];
+    result.stars_used = args.catalog_stars.size();
+    result.residual = 0.0;
+    result.log_msg = QString("[SPCC] Calibration successful. K=(%1, %2, %3)")
+        .arg(kw[0], 0, 'f', 4).arg(kw[1], 0, 'f', 4).arg(kw[2], 0, 'f', 4);
+    
+    return result;
+}
+

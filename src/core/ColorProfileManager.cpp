@@ -30,13 +30,48 @@ ColorProfile::ColorProfile(const QString& iccFilePath) : m_type(StandardProfile:
     QFile file(iccFilePath);
     if (file.open(QIODevice::ReadOnly)) {
         m_iccData = file.readAll();
-        m_name = QFileInfo(iccFilePath).baseName();
         m_valid = !m_iccData.isEmpty();
+        
+        // Try to get internal name from ICC data
+        if (m_valid) {
+            cmsHPROFILE hProfile = cmsOpenProfileFromMem(m_iccData.constData(), m_iccData.size());
+            if (hProfile) {
+                char name[256];
+                if (cmsGetProfileInfoASCII(hProfile, cmsInfoDescription, "en", "US", name, 256) > 0) {
+                    m_name = QString::fromLatin1(name);
+                } else if (cmsGetProfileInfoASCII(hProfile, cmsInfoDescription, cmsNoLanguage, cmsNoCountry, name, 256) > 0) {
+                    m_name = QString::fromLatin1(name);
+                } else {
+                    m_name = QFileInfo(iccFilePath).baseName();
+                }
+                cmsCloseProfile(hProfile);
+            } else {
+                m_name = QFileInfo(iccFilePath).baseName();
+            }
+        }
     }
 }
 
-ColorProfile::ColorProfile(const QByteArray& iccData) : m_type(StandardProfile::Custom), m_iccData(iccData), m_valid(true) {
-    m_name = QObject::tr("Embedded ICC Profile");
+ColorProfile::ColorProfile(const QByteArray& iccData) : m_type(StandardProfile::Custom), m_iccData(iccData), m_valid(!iccData.isEmpty()) {
+    if (m_valid) {
+        cmsHPROFILE hProfile = cmsOpenProfileFromMem(m_iccData.constData(), m_iccData.size());
+        if (hProfile) {
+            char name[256];
+            if (cmsGetProfileInfoASCII(hProfile, cmsInfoDescription, "en", "US", name, 256) > 0) {
+                m_name = QString::fromLatin1(name);
+            } else if (cmsGetProfileInfoASCII(hProfile, cmsInfoDescription, cmsNoLanguage, cmsNoCountry, name, 256) > 0) {
+                m_name = QString::fromLatin1(name);
+            } else {
+                m_name = QObject::tr("Unknown");
+            }
+            cmsCloseProfile(hProfile);
+        } else {
+            m_name = QObject::tr("Invalid ICC Profile");
+            m_valid = false;
+        }
+    } else {
+        m_name = QObject::tr("No Embedded Profile");
+    }
 }
 
 bool ColorProfile::isValid() const { return m_valid; }
@@ -90,32 +125,7 @@ ColorProfileManager& ColorProfileManager::instance() {
 }
 
 ColorProfileManager::ColorProfileManager() {
-    // Load workspace color profile preference from settings, default to sRGB
-    QSettings settings;
-    QString profilePref = settings.value("color/workspace_profile", "sRGB").toString();
-    
-    StandardProfile type = StandardProfile::sRGB;
-    if (profilePref == "AdobeRGB") {
-        type = StandardProfile::AdobeRGB;
-    } else if (profilePref == "ProPhotoRGB") {
-        type = StandardProfile::ProPhotoRGB;
-    } else if (profilePref == "LinearRGB") {
-        type = StandardProfile::LinearRGB;
-    }
-    
-    m_workspaceProfile = ColorProfile(type);
-    qDebug() << "[ColorProfileManager] Workspace profile loaded from settings:" << m_workspaceProfile.name();
-    
-    // Load auto-conversion mode from settings
-    QString modePref = settings.value("color/auto_conversion_mode", "Always").toString();
-    if (modePref == "Never") {
-        m_autoConversionMode = AutoConversionMode::Never;
-    } else if (modePref == "Always") {
-        m_autoConversionMode = AutoConversionMode::Always;
-    } else {
-        m_autoConversionMode = AutoConversionMode::Ask;
-    }
-    qDebug() << "[ColorProfileManager] Auto-conversion mode loaded:" << (int)m_autoConversionMode;
+    syncSettings();
 }
 
 // Helper functions for LCMS profile creation
@@ -283,6 +293,39 @@ AutoConversionMode ColorProfileManager::autoConversionMode() const {
     return m_autoConversionMode;
 }
 
+void ColorProfileManager::syncSettings() {
+    QSettings settings;
+    
+    // 1. Sync Workspace Profile
+    QString profilePref = settings.value("color/workspace_profile", "sRGB").toString();
+    StandardProfile type = StandardProfile::sRGB;
+    if (profilePref == "AdobeRGB") {
+        type = StandardProfile::AdobeRGB;
+    } else if (profilePref == "ProPhotoRGB") {
+        type = StandardProfile::ProPhotoRGB;
+    } else if (profilePref == "LinearRGB") {
+        type = StandardProfile::LinearRGB;
+    }
+    
+    setWorkspaceProfile(ColorProfile(type));
+    
+    // 2. Sync Auto-Conversion Mode
+    QString modePref = settings.value("color/auto_conversion_mode", "Always").toString();
+    AutoConversionMode mode = AutoConversionMode::Always;
+    if (modePref == "Never") {
+        mode = AutoConversionMode::Never;
+    } else if (modePref == "Always") {
+        mode = AutoConversionMode::Always;
+    } else {
+        mode = AutoConversionMode::Ask;
+    }
+    
+    setAutoConversionMode(mode);
+    
+    qDebug() << "[ColorProfileManager] Settings synchronized: Profile=" << m_workspaceProfile.name() 
+             << "Mode=" << (int)m_autoConversionMode;
+}
+
 bool ColorProfileManager::isMismatch(const ColorProfile& imageProfile) const {
     if (!imageProfile.isValid()) return false;
 
@@ -293,32 +336,6 @@ bool ColorProfileManager::isMismatch(const ColorProfile& imageProfile) const {
     }
 
     return (imageProfile != workspace);
-}
-
-bool ColorProfileManager::checkMismatchAndWarn(const ColorProfile& imageProfile, const QString& imageName) {
-    if (!imageProfile.isValid()) return false;
-
-    ColorProfile workspace;
-    {
-        QMutexLocker lock(&m_mutex);
-        workspace = m_workspaceProfile;
-    }
-
-    if (imageProfile != workspace) {
-        // If the image's profile has already been handled in this session, don't warn again
-        // This prevents the repetitive dialog from appearing every time the view is switched
-        // NOTE: The colorProfileHandled flag is set AFTER a user accepts the conversion
-        // Check it HERE to avoid re-showing the warning for the same image
-        // If it doesn't match, and it hasn't been explicitly handled, emit the signal
-        
-        // Emit signal so the UI (e.g., MainWindow) can show a QMessageBox prompt
-        emit profileMismatchDetected(imageName, imageProfile.name(), workspace.name());
-        
-        qWarning() << "[ColorProfileManager]" << tr("Color profile mismatch detected for image:") << imageName;
-        return true;
-    }
-    
-    return false;
 }
 
 bool ColorProfileManager::convertToWorkspace(ImageBuffer& buffer, const ColorProfile& sourceProfile) {

@@ -152,6 +152,7 @@ private:
     QCheckBox* m_drizzleCheck;
     QDoubleSpinBox* m_drizzleScale;
     QDoubleSpinBox* m_drizzlePixFrac;
+    QCheckBox* m_drizzleFastCheck;
 
     // Plotting
     QTabWidget* m_tabWidget;

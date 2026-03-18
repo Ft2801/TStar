@@ -225,6 +225,12 @@ QByteArray XISFWriter::buildHeader(const ImageBuffer& buffer, ImageBuffer::BitDe
     
     // Add FITS keywords from metadata
     addFITSKeywords(doc, img, buffer.metadata());
+
+    if (!buffer.metadata().iccData.isEmpty()) {
+        QDomElement icc = doc.createElement("ICCProfile");
+        icc.appendChild(doc.createTextNode(QString::fromLatin1(buffer.metadata().iccData.toBase64())));
+        img.appendChild(icc);
+    }
     
     // Add file-level Metadata element
     QDomElement metadata = doc.createElement("Metadata");

@@ -1,0 +1,26 @@
+[
+  {
+    "type": "OSC_LPF",
+    "manufacturer": "Standard",
+    "model": "IR_Cut",
+    "name": "IR Cut Filter (Standard)",
+    "dataSource": "Typical CMOS IR Cutoff",
+    "comment": "Infrared cutoff filter to reduce IR contamination in color imaging",
+    "transmission_sampleddata": {
+      "wavelengths_nm": [400, 500, 600, 700, 800, 900, 1000, 1100],
+      "transmission": [0.95, 0.96, 0.97, 0.96, 0.30, 0.05, 0.02, 0.01]
+    }
+  },
+  {
+    "type": "OSC_LPF",
+    "manufacturer": "Standard",
+    "model": "No_Filter",
+    "name": "No Filter (Unfiltered)",
+    "dataSource": "Unfiltered CMOS Response",
+    "comment": "No LPF - raw camera response including IR",
+    "transmission_sampleddata": {
+      "wavelengths_nm": [300, 400, 500, 600, 700, 800, 900, 1000, 1100],
+      "transmission": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    }
+  }
+]

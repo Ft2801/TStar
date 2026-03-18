@@ -14,6 +14,7 @@ public:
         double scaleFactor = 2.0;    // Output upscale factor
         bool useWeightMaps = true;   // Use per-pixel weight maps
         int kernelType = 0;          // 0=point, 1=Gaussian, 2=Lanczos
+        bool fastMode = false;       // Optimized 1x point kernel
     };
     
     struct DrizzleWeight {
@@ -44,6 +45,16 @@ public:
      * @param params Drizzle parameters
      */
     void drizzleFrame(const ImageBuffer& input,
+                             const RegistrationData& reg,
+                             std::vector<double>& accum,
+                             std::vector<double>& weightAccum,
+                             int outputWidth, int outputHeight,
+                             const DrizzleParams& params);
+
+    /**
+     * @brief Fast Drizzle for 1x point kernel
+     */
+    void fastDrizzleFrame(const ImageBuffer& input,
                              const RegistrationData& reg,
                              std::vector<double>& accum,
                              std::vector<double>& weightAccum,

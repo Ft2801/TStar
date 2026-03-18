@@ -70,9 +70,11 @@ public:
     void setAutoConversionMode(AutoConversionMode mode);
     AutoConversionMode autoConversionMode() const;
 
+    // Reload settings from QSettings
+    void syncSettings();
+
     // Image operations & Validation
     bool isMismatch(const ColorProfile& imageProfile) const;
-    bool checkMismatchAndWarn(const ColorProfile& imageProfile, const QString& imageName);
     bool convertToWorkspace(ImageBuffer& buffer, const ColorProfile& sourceProfile);
     bool convertProfile(ImageBuffer& buffer, const ColorProfile& sourceProfile, const ColorProfile& targetProfile);
 
@@ -83,7 +85,6 @@ public:
 
 signals:
     void workspaceProfileChanged(const ColorProfile& newProfile);
-    void profileMismatchDetected(const QString& imageName, const QString& imageProfileName, const QString& workspaceProfileName);
     void conversionStarted(quint64 taskId);
     void conversionFinished(quint64 taskId);
     void conversionFailed(quint64 taskId, const QString& error);

@@ -13,17 +13,17 @@
 #include <QCoreApplication>
 #include "network/ModelDownloader.h"
 #include "network/AstapDownloader.h"
-SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, tr("Settings"), 500, 400) {
+
+SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, tr("Settings"), 650, 450) {
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     
-    // --- Top Checkbox for Updates (before any groups) ---
-    m_checkUpdates = new QCheckBox(tr("Check for updates on startup"));
-    mainLayout->addWidget(m_checkUpdates);
-    
-    // Add separator/spacing
-    mainLayout->addSpacing(5);
-    
+    // Layout a due colonne
+    QHBoxLayout* columnsLayout = new QHBoxLayout();
+    QVBoxLayout* leftColumn = new QVBoxLayout();
+    QVBoxLayout* rightColumn = new QVBoxLayout();
+
+
     // --- General Group ---
     QGroupBox* generalGroup = new QGroupBox(tr("General"), this);
     QFormLayout* generalForm = new QFormLayout(generalGroup);
@@ -52,8 +52,26 @@ SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, tr("Setting
     m_autoConversionCombo->addItem(tr("Always"), "Always");
     generalForm->addRow(tr("Auto-Convert Color Profiles:"), m_autoConversionCombo);
 
-    mainLayout->addWidget(generalGroup);
+    leftColumn->addWidget(generalGroup);
     
+    // --- Display Group ---
+    QGroupBox* displayGroup = new QGroupBox(tr("Display"), this);
+    QFormLayout* displayForm = new QFormLayout(displayGroup);
+
+    m_defaultStretchCombo = new QComboBox();
+    m_defaultStretchCombo->addItem(tr("Linear"), "Linear");
+    m_defaultStretchCombo->addItem(tr("Auto Stretch"), "AutoStretch");
+    m_defaultStretchCombo->addItem(tr("Histogram"), "Histogram");
+    m_defaultStretchCombo->addItem(tr("ArcSinh"), "ArcSinh");
+    m_defaultStretchCombo->addItem(tr("Square Root"), "Sqrt");
+    m_defaultStretchCombo->addItem(tr("Logarithmic"), "Log");
+    displayForm->addRow(tr("Default Display Stretch:"), m_defaultStretchCombo);
+
+    m_24bitStfCheck = new QCheckBox(tr("24-bit Autostretch (Smoother gradients)"));
+    displayForm->addRow("", m_24bitStfCheck);
+
+    leftColumn->addWidget(displayGroup);
+
     // --- Paths & Integrations Group ---
     QGroupBox* pathsGroup = new QGroupBox(tr("Paths and Integrations"), this);
     QFormLayout* form = new QFormLayout(pathsGroup);
@@ -93,10 +111,17 @@ SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, tr("Setting
     m_astapExtraArgs = new QLineEdit();
     m_astapExtraArgs->setPlaceholderText("-s 500 -log");
     form->addRow(tr("ASTAP Extra Args:"), m_astapExtraArgs);
-
     
-    // --- Layout Assembly ---
-    mainLayout->addWidget(pathsGroup);
+    leftColumn->addWidget(pathsGroup);
+    leftColumn->addStretch();
+
+    // --- Updates Group ---
+    QGroupBox* updatesGroup = new QGroupBox(tr("Updates"), this);
+    QVBoxLayout* updatesLayout = new QVBoxLayout(updatesGroup);
+    m_checkUpdates = new QCheckBox(tr("Check for updates on startup"));
+    updatesLayout->addWidget(m_checkUpdates);
+    
+    rightColumn->addWidget(updatesGroup);
 
     // --- Cosmic Clarity Models Group ---
     QGroupBox* modelsGroup = new QGroupBox(tr("Cosmic Clarity models"), this);
@@ -109,7 +134,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, tr("Setting
     connect(m_btnDownloadModels, &QPushButton::clicked, this, &SettingsDialog::downloadModels);
     modelsLayout->addWidget(m_btnDownloadModels);
 
-    mainLayout->addWidget(modelsGroup);
+    rightColumn->addWidget(modelsGroup);
 
     // --- ASTAP Database Group ---
     QGroupBox* astapGroup = new QGroupBox(tr("ASTAP Star Database"), this);
@@ -122,7 +147,12 @@ SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, tr("Setting
     connect(m_btnDownloadAstap, &QPushButton::clicked, this, &SettingsDialog::downloadAstapCatalog);
     astapLayout->addWidget(m_btnDownloadAstap);
 
-    mainLayout->addWidget(astapGroup);
+    rightColumn->addWidget(astapGroup);
+    rightColumn->addStretch(); 
+
+    columnsLayout->addLayout(leftColumn);
+    columnsLayout->addLayout(rightColumn);
+    mainLayout->addLayout(columnsLayout);
 
     refreshModelsStatus();
     refreshAstapStatus();
@@ -162,19 +192,13 @@ SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, tr("Setting
 
     m_checkUpdates->setChecked(m_settings.value("general/check_updates", true).toBool());
 
-    // --- Display Group ---
-    QGroupBox* displayGroup = new QGroupBox(tr("Display"), this);
-    QFormLayout* displayForm = new QFormLayout(displayGroup);
+    // Load default stretch mode preference
+    QString savedStretch = m_settings.value("display/default_stretch", "Linear").toString();
+    idx = m_defaultStretchCombo->findData(savedStretch);
+    if (idx != -1) m_defaultStretchCombo->setCurrentIndex(idx);
 
-    m_24bitStfCheck = new QCheckBox(tr("24-bit Autostretch (Smoother gradients)"));
-    // Default to true as requested
+    // Default to true 
     m_24bitStfCheck->setChecked(m_settings.value("display/24bit_stf", true).toBool());
-    
-    displayForm->addRow("", m_24bitStfCheck);
-
-    // Insert Display group after General group (index 1)
-    mainLayout->insertWidget(1, displayGroup);
-
 }
 
 void SettingsDialog::pickStarNetPath() {
@@ -194,7 +218,6 @@ void SettingsDialog::pickAstapPath() {
         m_settings.sync();
     }
 }
-
 
 void SettingsDialog::pickGraXpertPath() {
     QString path = QFileDialog::getOpenFileName(this, tr("Select GraXpert Executable"), "", tr("Executables (*.exe);;All Files (*)"));
@@ -318,6 +341,10 @@ void SettingsDialog::saveSettings() {
     m_settings.setValue("general/check_updates", m_checkUpdates->isChecked());
     m_settings.setValue("display/24bit_stf", m_24bitStfCheck->isChecked());
     
+    // Save default stretch mode
+    QString newStretch = m_defaultStretchCombo->currentData().toString();
+    m_settings.setValue("display/default_stretch", newStretch);
+
     // Save workspace color profile preference
     QString newProfile = m_workspaceProfileCombo->currentData().toString();
     m_settings.setValue("color/workspace_profile", newProfile);

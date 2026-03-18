@@ -1,4 +1,4 @@
-﻿
+
 #include "StackingEngine.h"
 
 
@@ -1564,6 +1564,7 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args) {
     dParams.dropSize = args.params.drizzlePixFrac;
     dParams.kernelType = static_cast<int>(args.params.drizzleKernel);
     dParams.useWeightMaps = true;
+    dParams.fastMode = args.params.drizzleFast;
 
     drizzle.initialize(args.sequence->width(), args.sequence->height(),
                        args.sequence->channels(),
@@ -1572,9 +1573,7 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args) {
     // Pass 1 Result (Reference Stack) for rejection
     ImageBuffer referenceStack;
     if (args.params.hasRejection() && args.result.isValid()) {
-         referenceStack = args.result; // Copy or move? Move is safer since we overwrite args.result later
-         // But wait, args.result might be needed if we fail?
-         // Let's keep a copy.
+         referenceStack = args.result;
     }
 
     // 2. Iterate input images
@@ -1626,7 +1625,6 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args) {
              std::memset(maskData, 0, sizeof(float) * buffer.width() * buffer.height());
              
              // Check each pixel against reference
-             // Need to handle registration shift for comparison!
              int shiftX = 0, shiftY = 0;
              if (reg.hasRegistration) {
                  shiftX = static_cast<int>(std::round(reg.shiftX));

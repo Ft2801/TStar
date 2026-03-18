@@ -19,6 +19,7 @@
 #define TAG_PlanarConfiguration 284
 #define TAG_ResolutionUnit 296
 #define TAG_SampleFormat 339
+#define TAG_ICCProfile 34675
 
 struct TiffEntry {
     uint16_t tag;
@@ -32,7 +33,7 @@ void writeEntry(QDataStream& out, uint16_t tag, uint16_t type, uint32_t count, u
     out << tag << type << count << value;
 }
 
-bool SimpleTiffWriter::write(const QString& filename, int width, int height, int channels, Format fmt, const std::vector<float>& data, QString* errorMsg) {
+bool SimpleTiffWriter::write(const QString& filename, int width, int height, int channels, Format fmt, const std::vector<float>& data, const QByteArray& iccData, QString* errorMsg) {
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly)) {
         if (errorMsg) *errorMsg = QCoreApplication::translate("SimpleTiffWriter", "Could not open file for writing.");
@@ -88,7 +89,7 @@ bool SimpleTiffWriter::write(const QString& filename, int width, int height, int
     // IFD: 2 + numEntries*12 + 4
     // Values that don't fit in 4 bytes (e.g. bitsPerSample array, XRed/YRes, Data) go after IFD.
     
-    int numEntries = 12;
+    int numEntries = 12 + (iccData.isEmpty() ? 0 : 1);
     uint32_t ifdSize = 2 + numEntries * 12 + 4;
     uint32_t extraOffset = ifdOffset + ifdSize;
     
@@ -104,6 +105,12 @@ bool SimpleTiffWriter::write(const QString& filename, int width, int height, int
     extraOffset += 8;
     uint32_t yResOffset = extraOffset;
     extraOffset += 8;
+
+    uint32_t iccOffset = 0;
+    if (!iccData.isEmpty()) {
+        iccOffset = extraOffset;
+        extraOffset += static_cast<uint32_t>(iccData.size());
+    }
     
     // Strip Data
     uint32_t stripOffset = extraOffset;
@@ -140,6 +147,9 @@ bool SimpleTiffWriter::write(const QString& filename, int width, int height, int
     writeEntry(out, TAG_YResolution, 5, 1, yResOffset);
     // 12. SampleFormat
     writeEntry(out, TAG_SampleFormat, 3, 1, sampleFormat);
+    if (!iccData.isEmpty()) {
+        writeEntry(out, TAG_ICCProfile, 7, static_cast<uint32_t>(iccData.size()), iccOffset);
+    }
     
     out << (uint32_t)0; // Next IFD
     
@@ -154,6 +164,10 @@ bool SimpleTiffWriter::write(const QString& filename, int width, int height, int
     out << (uint32_t)72 << (uint32_t)1;
     // YRes
     out << (uint32_t)72 << (uint32_t)1;
+
+    if (!iccData.isEmpty()) {
+        out.writeRawData(iccData.constData(), iccData.size());
+    }
     
     // Strip Data
     out.writeRawData(dataBuf.data(), dataBuf.size());

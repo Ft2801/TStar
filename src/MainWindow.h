@@ -90,7 +90,7 @@ public:
     void startLongProcess() override;
     void endLongProcess() override;
     CustomMdiSubWindow* createNewImageWindow(const ImageBuffer& buffer, const QString& title,
-                              ImageBuffer::DisplayMode mode = ImageBuffer::Display_Linear,
+                              ImageBuffer::DisplayMode mode = static_cast<ImageBuffer::DisplayMode>(-1),
                               float autoStretchMedian = 0.25f, bool displayLinked = true);
     void pushUndo(); // Call before destructive actions
     
@@ -107,6 +107,7 @@ public:
     ImageBuffer::DisplayMode displayMode() const { return m_displayMode; }
     bool displayLinked() const { return m_displayLinked; }
     void loadWorkspaceProjectAtStartup(const QString& projectFilePath);
+    ImageBuffer::DisplayMode getDefaultDisplayMode() const;
 
 private slots:
     void undo();
@@ -165,7 +166,6 @@ private slots:
     void openTemperatureTintDialog();
     void openMagentaCorrectionDialog();
     void openColorProfileDialog();
-    void handleColorProfileMismatch(const QString& imageName, const QString& imageProfile, const QString& workspaceProfile);
     
     // Stacking Suite
     void openStackingDialog();
@@ -208,6 +208,7 @@ private slots:
     void applyCurvesPreview(const std::vector<std::vector<float>>& lut);
     void applyCurves(const SplineData& spline, const bool channels[3]);
 
+    void checkAndHandleColorProfile(ImageBuffer& buffer, const QString& title);
     void updateActiveImage(); // Public wrapper to refresh viewer
 
 private:

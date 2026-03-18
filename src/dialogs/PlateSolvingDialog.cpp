@@ -101,8 +101,8 @@ PlateSolvingDialog::PlateSolvingDialog(QWidget* parent) : DialogBase(parent, tr(
     QHBoxLayout* btnLay = new QHBoxLayout();
     btnLay->setContentsMargins(0, 0, 0, 0);
     btnLay->setSpacing(6);
-    m_solveBtn = new QPushButton(tr("Solve"), this);
     m_cancelBtn = new QPushButton(tr("Cancel"), this);
+    m_solveBtn = new QPushButton(tr("Solve"), this);
     m_cancelBtn->setEnabled(false);
 
     QPushButton* closeBtn = new QPushButton(tr("Close"), this);

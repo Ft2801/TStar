@@ -2,6 +2,7 @@
 #define SIMPLETIFFWRITER_H
 
 #include <QString>
+#include <QByteArray>
 #include <vector>
 
 class SimpleTiffWriter {
@@ -13,7 +14,7 @@ public:
         Format_float32
     };
 
-    static bool write(const QString& filename, int width, int height, int channels, Format fmt, const std::vector<float>& data, QString* errorMsg = nullptr);
+    static bool write(const QString& filename, int width, int height, int channels, Format fmt, const std::vector<float>& data, const QByteArray& iccData = QByteArray(), QString* errorMsg = nullptr);
 };
 
 #endif // SIMPLETIFFWRITER_H

@@ -225,26 +225,41 @@ bool ScriptParser::parseTokens(const QStringList& tokens, ScriptCommand& cmd) {
     cmd.name = tokens[0].toLower();
     
     for (int i = 1; i < tokens.size(); ++i) {
-        const QString& token = tokens[i];
+        QString token = tokens[i];
         
-        if (token.startsWith("--")) {
-            // Long option: --name=value or --name
-            QString opt = token.mid(2);
+        if (token.startsWith('-') && token.length() > 1) {
+            int prefixLen = token.startsWith("--") ? 2 : 1;
+            QString opt = token.mid(prefixLen);
             int eqIdx = opt.indexOf('=');
+            
             if (eqIdx > 0) {
+                // --name=value or -n=value
                 cmd.options[opt.left(eqIdx)] = opt.mid(eqIdx + 1);
             } else {
-                cmd.options[opt] = QString();
+                // Check if next token is '=' or a value
+                if (i + 1 < tokens.size()) {
+                    QString next = tokens[i+1];
+                    if (next == "=") {
+                        if (i + 2 < tokens.size()) {
+                            cmd.options[opt] = tokens[i+2];
+                            i += 2;
+                        } else {
+                            cmd.options[opt] = "";
+                            i += 1;
+                        }
+                    } else if (!next.startsWith('-')) {
+                        cmd.options[opt] = next;
+                        i++;
+                    } else {
+                        cmd.options[opt] = "";
+                    }
+                } else {
+                    cmd.options[opt] = "";
+                }
             }
-        } else if (token.startsWith('-') && token.length() > 1) {
-            // Short option: -n or -n=value
-            QString opt = token.mid(1);
-            int eqIdx = opt.indexOf('=');
-            if (eqIdx > 0) {
-                cmd.options[opt.left(eqIdx)] = opt.mid(eqIdx + 1);
-            } else {
-                cmd.options[opt] = QString();
-            }
+        } else if (token == "=") {
+            // Skip stray equals
+            continue;
         } else {
             // Positional argument
             cmd.args.append(token);

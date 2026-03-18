@@ -1,0 +1,50 @@
+[
+  {
+    "type": "MONO_FILTER",
+    "manufacturer": "Narrowband",
+    "model": "Ha",
+    "name": "Hydrogen-alpha (Ha) Filter",
+    "dataSource": "Narrowband Imaging Standard",
+    "comment": "H-alpha emission line filter centered at 656.3nm with 3nm or 6nm FWHM",
+    "bandpass": {
+      "center_nm": 656.3,
+      "fwhm_nm": 6.0
+    },
+    "transmission_sampleddata": {
+      "wavelengths_nm": [650, 654, 656, 656.3, 658, 662, 670],
+      "transmission": [0.01, 0.50, 0.95, 0.99, 0.95, 0.50, 0.01]
+    }
+  },
+  {
+    "type": "MONO_FILTER",
+    "manufacturer": "Narrowband",
+    "model": "OIII",
+    "name": "Oxygen-III (OIII) Filter",
+    "dataSource": "Narrowband Imaging Standard",
+    "comment": "OIII emission line filter centered at 500.7nm with 3nm or 6nm FWHM",
+    "bandpass": {
+      "center_nm": 500.7,
+      "fwhm_nm": 6.0
+    },
+    "transmission_sampleddata": {
+      "wavelengths_nm": [495, 499, 500.7, 501, 503, 507, 515],
+      "transmission": [0.01, 0.50, 0.99, 0.95, 0.50, 0.15, 0.01]
+    }
+  },
+  {
+    "type": "MONO_FILTER",
+    "manufacturer": "Narrowband",
+    "model": "SII",
+    "name": "Sulfur-II (SII) Filter",
+    "dataSource": "Narrowband Imaging Standard",
+    "comment": "SII emission line filter centered at 671.6nm with 3nm or 6nm FWHM",
+    "bandpass": {
+      "center_nm": 671.6,
+      "fwhm_nm": 6.0
+    },
+    "transmission_sampleddata": {
+      "wavelengths_nm": [665, 669, 671, 671.6, 673, 677, 685],
+      "transmission": [0.01, 0.50, 0.95, 0.99, 0.95, 0.50, 0.01]
+    }
+  }
+]

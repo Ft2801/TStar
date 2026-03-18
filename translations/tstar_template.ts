@@ -967,7 +967,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Catalog Background Extraction (MARS-like)</source>
+            <source>Catalog Background Extraction</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1056,6 +1056,10 @@
         </message>
         <message>
             <source>Requesting reference survey from HiPS...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Running CBE...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1262,19 +1266,19 @@
     <context>
         <name>ColorProfileManager</name>
         <message>
-            <source>Color profile mismatch detected for image:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Converting color profile...</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Embedded ICC Profile</source>
+            <source>Invalid ICC Profile</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Invalid profiles provided for conversion.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No Embedded Profile</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1283,6 +1287,10 @@
         </message>
         <message>
             <source>Successfully converted buffer from %1 to %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Unknown</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4816,11 +4824,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Catalog Background Extraction (CBE)</source>
+            <source>Catalog Background Extraction</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Catalog Background Extraction (MARS-like)</source>
+            <source>Catalog Background Extraction (CBE)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5700,7 +5708,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Project created: %1</source>
+            <source>Project created and activated: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -6009,10 +6017,6 @@
         </message>
         <message>
             <source>The following project files referencing this workspace were found: %1 Delete these files?</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>The image '%1' has a color profile (%2) that differs from the workspace profile (%3). Would you like to convert it to the workspace profile?</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9024,7 +9028,35 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Catalog Download Error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Catalog error: </source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Catalog loaded (%1 stars). Running Calibration...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Data directory not configured.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Embedded catalog not found. Querying Gaia DR3 via VizieR (this may take a moment)...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Empty Catalog</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9044,11 +9076,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Image must be plate solved first.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Limit to mag &lt;</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Magnitude limit:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Matching stars and solving color matrix...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9104,6 +9144,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Running SPCC...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Running SPCC…</source>
             <translation type="unfinished" />
         </message>
@@ -9117,6 +9161,10 @@
         </message>
         <message>
             <source>Sensor &amp; Filter Profile</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Spectrophotometric Color Calibration</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9141,6 +9189,14 @@
         </message>
         <message>
             <source>Use full 3×3 colour matrix (vs. diagonal)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Using embedded Gaia catalog...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>WARNING: Gaia query returned 0 stars. Check image coordinates.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9597,7 +9653,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>ArcSinh</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Ask</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Auto Stretch</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9626,6 +9690,10 @@
         </message>
         <message>
             <source>Cosmic Clarity models: not installed</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Default Display Stretch:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9673,11 +9741,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Histogram</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Language:</source>
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Linear</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Linear RGB</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Logarithmic</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9729,11 +9809,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Square Root</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>StarNet Executable:</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>System Default</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Updates</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9932,6 +10020,14 @@
         </message>
         <message>
             <source>Starting pipeline for: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>save: failed to write %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>save: no filename specified (use positional arg or -out=...)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10143,6 +10239,10 @@
         </message>
         <message>
             <source>Failed to compute shifts. Check DATE-OBS headers.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Fast (1x)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10431,6 +10531,10 @@
         </message>
         <message>
             <source>Sum</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Use fast drizzle (optimal for 1x scale)</source>
             <translation type="unfinished" />
         </message>
         <message>

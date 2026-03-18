@@ -3,13 +3,16 @@ TStar Changelog
 
 Version 1.8.0
 -------------
-- Implemented RawEditor (Lightroom style proprietary light and color editor)
+- Implemented RawEditor (Lightroom style light and color editor)
 - Implemented ASTAP professional plate solver and catalog downloader
 - Implemented spectrophotometric color calibration
 - Implemented TGV denoise
 - Implemented classic deconvolution
 - Implemented professional workspace color management
 - Integration of local database files for constellations and catalogs
+- Added fast drizzle mode in the stacking suite
+- Added default display stretch mode in the settings
+- Refactoring of the settings dialog
 - Minor bugfixes
 
 Version 1.7.10

@@ -16,12 +16,13 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QApplication>
+#include <QProgressDialog>
 #include <QtConcurrent>
 
 CBEDialog::CBEDialog(QWidget* pParent, ImageViewer* viewer, const ImageBuffer& buffer)
     : DialogBase(pParent), m_viewer(viewer), m_originalBuffer(buffer)
 {
-    setWindowTitle(tr("Catalog Background Extraction (MARS-like)"));
+    setWindowTitle(tr("Catalog Background Extraction"));
     setMinimumWidth(380);
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -208,7 +209,6 @@ void CBEDialog::onHiPSImageReady(const ImageBuffer& refImg) {
         cb->logMessage(tr("Reference received (%1x%2, %3ch). Running gradient extraction...")
                            .arg(refImg.width()).arg(refImg.height()).arg(refImg.channels()), 0);
     }
-
     // Capture options for the worker thread
     Background::CatalogGradientExtractor::Options opts;
     opts.blurScale         = m_spinScale->value();
@@ -263,13 +263,23 @@ void CBEDialog::onHiPSImageReady(const ImageBuffer& refImg) {
             cb->logMessage(tr("Reference alignment cancelled. Background extraction aborted."), 2);
         m_btnApply->setEnabled(true);
         unsetCursor();
+        if (m_busyDialog) m_busyDialog->hide();
         return;
     }
 
     // Capture the manually aligned buffer
     ref = alignDlg.getAlignedBuffer();
 
-    // Run extraction on a background thread to keep the UI responsive
+    if (!m_busyDialog) {
+        m_busyDialog = new QProgressDialog(tr("Running CBE..."), QString(), 0, 0, this);
+        m_busyDialog->setWindowTitle(tr("Catalog Background Extraction"));
+        m_busyDialog->setWindowModality(Qt::WindowModal);
+        m_busyDialog->setCancelButton(nullptr);
+        m_busyDialog->setMinimumDuration(0);
+    }
+    m_busyDialog->setLabelText(tr("Running CBE..."));
+    m_busyDialog->show();
+
     auto future = QtConcurrent::run([target, ref, opts]() mutable -> QPair<bool, ImageBuffer> {
         bool ok = Background::CatalogGradientExtractor::extract(target, ref, opts);
         return qMakePair(ok, target);
@@ -294,6 +304,7 @@ void CBEDialog::onHiPSImageReady(const ImageBuffer& refImg) {
 
         m_btnApply->setEnabled(true);
         unsetCursor();
+        if (m_busyDialog) m_busyDialog->hide();
     });
     watcher->setFuture(future);
 }
@@ -306,4 +317,5 @@ void CBEDialog::onHiPSError(const QString& err) {
     QMessageBox::critical(this, tr("HiPS Error"), err);
     m_btnApply->setEnabled(true);
     unsetCursor();
+    if (m_busyDialog) m_busyDialog->hide();
 }

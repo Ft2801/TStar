@@ -488,6 +488,8 @@ TRANSLATIONS = {
     "Error: Image closed.": {'it': 'Errore: Immagine chiusa.', 'es': 'Error: Imagen cerrada.', 'fr': 'Erreur : Image fermée.', 'de': 'Fehler: Bild geschlossen.'},
 
     "Error: No valid image.": {'it': 'Errore: Nessuna immagine valida.', 'es': 'Error: Sin imagen válida.', 'fr': 'Erreur : Aucune image valide.', 'de': 'Fehler: Kein gültiges Bild.'},
+    
+    "Unknown": {'it': 'Sconosciuto', 'es': 'Desconocido', 'fr': 'Inconnu', 'de': 'Unbekannt'},
 
     "Evaluating Model (Channel %1)...": {'it': 'Valutazione Modello (Canale %1)...', 'es': 'Evaluando Modelo (Canal %1)...', 'fr': 'Évaluation Modèle (Canal %1)...', 'de': 'Werte Modell aus (Kanal %1)...'},
 
@@ -3050,7 +3052,7 @@ TRANSLATIONS = {
     " px": {'it': ' px', 'es': ' px', 'fr': ' px', 'de': ' px'},
     "Background extracted successfully.": {'it': 'Sfondo estratto con successo.', 'es': 'Fondo extraído con éxito.', 'fr': 'Fond extrait avec succès.', 'de': 'Hintergrund erfolgreich extrahiert.'},
     "Cache Cleared": {'it': 'Cache svuotata', 'es': 'Caché borrada', 'fr': 'Cache vidé', 'de': 'Cache geleert'},
-    "Catalog Background Extraction (MARS-like)": {'it': 'Estrazione Sfondo da Catalogo (tipo MARS)', 'es': 'Extracción de Fondo por Catálogo (tipo MARS)', 'fr': 'Extraction de Fond par Catalogue (type MARS)', 'de': 'Katalog-Hintergrundextraktion (MARS-ähnlich)'},
+    "Catalog Background Extraction": {'it': 'Estrazione Sfondo da Catalogo', 'es': 'Extracción de Fondo por Catálogo', 'fr': 'Extraction de Fond par Catalogue', 'de': 'Katalog-Hintergrundextraktion'},
     "Catalog Background Extraction tool active.": {'it': 'Strumento Estrazione Sfondo da Catalogo attivo.', 'es': 'Herramienta Extracción de Fondo por Catálogo activa.', 'fr': 'Outil Extraction de Fond par Catalogue actif.', 'de': 'Katalog-Hintergrundextraktions-Werkzeug aktiv.'},
     "Catalog download failed: %1": {'it': 'Download catalogo fallito: %1', 'es': 'Descarga de catálogo fallida: %1', 'fr': 'Échec du téléchargement du catalogue : %1', 'de': 'Katalog-Download fehlgeschlagen: %1'},
     "Clear Cache": {'it': 'Svuota Cache', 'es': 'Borrar Caché', 'fr': 'Vider le cache', 'de': 'Cache leeren'},
@@ -3704,5 +3706,51 @@ TRANSLATIONS = {
 
     "Workspace Color Profile:": {'it': 'Profilo Colore Workspace:', 'es': 'Perfil de Color de Workspace:', 'fr': "Profil de Couleur de l'Espace :", 'de': 'Arbeitsbereich-Farbprofil:'},
 
-    "sRGB IEC61966-2.1": {'it': 'sRGB IEC61966-2.1', 'es': 'sRGB IEC61966-2.1', 'fr': 'sRGB IEC61966-2.1', 'de': 'sRGB IEC61966-2.1'}
+    "sRGB IEC61966-2.1": {'it': 'sRGB IEC61966-2.1', 'es': 'sRGB IEC61966-2.1', 'fr': 'sRGB IEC61966-2.1', 'de': 'sRGB IEC61966-2.1'},
+
+    "Invalid ICC Profile": {'it': 'Profilo ICC non valido', 'es': 'Perfil ICC no válido', 'fr': 'Profil ICC invalide', 'de': 'Ungültiges ICC-Profil'},
+
+    "Default Display Stretch:": {'it': 'Display Stretch Predefinito:', 'es': 'Display Stretch Predeterminado:', 'fr': 'Display Stretch par Défaut :', 'de': 'Standard Display Stretch:'},
+
+    "Updates": {'it': 'Aggiornamenti', 'es': 'Actualizaciones', 'fr': 'Mises à jour', 'de': 'Aktualisierungen'},
+
+    "save: failed to write %1": {'it': 'salvataggio: impossibile scrivere %1', 'es': 'guardar: error al escribir %1', 'fr': 'sauvegarde : échec de l\'écriture de %1', 'de': 'speichern: Fehler beim Schreiben von %1'},
+
+    "save: no filename specified (use positional arg or -out=...)": {'it': 'salvataggio: nessun nome file specificato (usa argomento posizionale o -out=...)', 'es': 'guardar: no se especificó un nombre de archivo (usa argumento posicional o -out=...)', 'fr': 'sauvegarde : aucun nom de fichier spécifié (utilisez un argument positionnel ou -out=...)', 'de': 'speichern: kein Dateiname angegeben (Positionsargument oder -out=... verwenden)'},
+
+    "Fast (1x)": {'it': 'Veloce (1x)', 'es': 'Rápido (1x)', 'fr': 'Rapide (1x)', 'de': 'Schnell (1x)'},
+
+    "Project created and activated: %1": {'it': 'Progetto creato e attivato: %1', 'es': 'Proyecto creado y activado: %1', 'fr': 'Projet créé et activé : %1', 'de': 'Projekt erstellt und aktiviert: %1'},
+
+    "Use fast drizzle (optimal for 1x scale)": {'it': 'Usa drizzle veloce (ottimale per scala 1x)', 'es': 'Usar drizzle rápido (óptimo para escala 1x)', 'fr': 'Utiliser drizzle rapide (optimal pour une échelle 1x)', 'de': 'Schnelles Drizzle verwenden (optimal für 1x Skalierung)'},
+
+    "Catalog Background Extraction": {'it': 'Estrazione Sfondo da Catalogo', 'es': 'Extracción de Fondo de Catálogo', 'fr': 'Extraction de Fond de Catalogue', 'de': 'Katalog-Hintergrundextraktion'},
+
+    "Running CBE...": {'it': 'Esecuzione CBE...', 'es': 'Ejecutando CBE...', 'fr': 'Exécution de CBE...', 'de': 'CBE wird ausgeführt...'},
+
+    "No Embedded Profile": {'it': 'Nessun Profilo Integrato', 'es': 'Ningún Perfil Incrustado', 'fr': 'Aucun Profil Intégré', 'de': 'Kein Eingebettetes Profil'},
+
+    "Catalog Download Error": {'it': 'Errore Download Catalogo', 'es': 'Error de Descarga de Catálogo', 'fr': 'Erreur de Téléchargement du Catalogue', 'de': 'Katalog-Download-Fehler'},
+
+    "Catalog error:": {'it': 'Errore catalogo:', 'es': 'Error de catálogo:', 'fr': 'Erreur de catalogue :', 'de': 'Katalogfehler:'},
+
+    "Catalog loaded (%1 stars). Running Calibration...": {'it': 'Catalogo caricato (%1 stelle). Calibrazione in corso...', 'es': 'Catálogo cargado (%1 estrellas). Ejecutando calibración...', 'fr': 'Catalogue chargé (%1 étoiles). Étalonnage en cours...', 'de': 'Katalog geladen (%1 Sterne). Kalibrierung läuft...'},
+
+    "Data directory not configured.": {'it': 'Cartella dati non configurata.', 'es': 'Directorio de datos no configurado.', 'fr': 'Répertoire de données non configuré.', 'de': 'Datenverzeichnis nicht konfiguriert.'},
+
+    "Embedded catalog not found. Downloading Gaia DR3 (this may take a moment)...": {'it': 'Catalogo integrato non trovato. Download di Gaia DR3 (potrebbe richiedere un momento)...', 'es': 'Catálogo incrustado no encontrado. Descargando Gaia DR3 (esto puede tardar un momento)...', 'fr': 'Catalogue intégré introuvable. Téléchargement de Gaia DR3 (cela peut prendre un moment)...', 'de': 'Eingebetteter Katalog nicht gefunden. Gaia DR3 wird heruntergeladen (dies kann einen Moment dauern)...'},
+
+    "Empty Catalog": {'it': 'Catalogo Vuoto', 'es': 'Catálogo Vacío', 'fr': 'Catalogue Vide', 'de': 'Leerer Katalog'},
+
+    "Matching stars and solving color matrix...": {'it': 'Abbinamento stelle e risoluzione matrice colore...', 'es': 'Emparejando estrellas y resolviendo matriz de color...', 'fr': 'Appariement des étoiles et résolution de la matrice de couleurs...', 'de': 'Sterne abgleichen und Farbmatrix lösen...'},
+
+    "Missing Pickles spectral library at %1/spcc/pickles_spectra.bin": {'it': 'Libreria spettrale Pickles mancante in %1/spcc/pickles_spectra.bin', 'es': 'Falta la biblioteca espectral Pickles en %1/spcc/pickles_spectra.bin', 'fr': 'Bibliothèque spectrale Pickles manquante dans %1/spcc/pickles_spectra.bin', 'de': 'Fehlende Pickles-Spektralbibliothek unter %1/spcc/pickles_spectra.bin'},
+
+    "Running SPCC...": {'it': 'Esecuzione SPCC...', 'es': 'Ejecutando SPCC...', 'fr': 'Exécution de SPCC...', 'de': 'SPCC wird ausgeführt...'},
+
+    "Using embedded Gaia catalog...": {'it': 'Utilizzo catalogo Gaia integrato...', 'es': 'Usando catálogo Gaia incrustado...', 'fr': 'Utilisation du catalogue Gaia intégré...', 'de': 'Verwendung des eingebetteten Gaia-Katalogs...'},
+
+    "WARNING: Gaia query returned 0 stars. Check image coordinates.": {'it': "ATTENZIONE: la query Gaia ha restituito 0 stelle. Controlla le coordinate dell'immagine.", 'es': "ADVERTENCIA: la consulta a Gaia devolvió 0 estrellas. Compruebe las coordenadas de la imagen.", 'fr': "ATTENTION : la requête Gaia a retourné 0 étoile. Vérifiez les coordonnées de l'image.", 'de': "WARNUNG: Gaia-Abfrage ergab 0 Sterne. Bildkoordinaten überprüfen."},
+
+    "Embedded catalog not found. Querying Gaia DR3 via VizieR (this may take a moment)...": {'it': 'Catalogo integrato non trovato. Query a Gaia DR3 via VizieR (potrebbe richiedere un momento)...', 'es': 'Catálogo incrustado no encontrado. Consultando Gaia DR3 a través de VizieR (esto puede tardar un momento)...', 'fr': 'Catalogue intégré introuvable. Interrogation de Gaia DR3 via VizieR (cela peut prendre un moment)...', 'de': 'Eingebetteter Katalog nicht gefunden. Abfrage von Gaia DR3 über VizieR (dies kann einen Moment dauern)...'},
 }

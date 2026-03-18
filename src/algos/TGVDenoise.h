@@ -23,6 +23,7 @@
 #define TGVDENOISE_H
 
 #include <cstddef>
+#include <functional>
 #include <vector>
 #include "ImageBuffer.h"   // float* data, width, height, channels
 
@@ -43,6 +44,9 @@ struct TGVParams {
 
     // Channel coupling
     bool   perChannel = true; ///< process each channel independently (recommended)
+
+    // Optional progress callback (0..100, status text)
+    std::function<void(int, const QString&)> progressCallback;
 };
 
 // ─── Result ──────────────────────────────────────────────────────────────────

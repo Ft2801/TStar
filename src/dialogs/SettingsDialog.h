@@ -38,6 +38,7 @@ private:
     QComboBox* m_langCombo;
     QComboBox* m_workspaceProfileCombo;
     QComboBox* m_autoConversionCombo;
+    QComboBox* m_defaultStretchCombo;
     class QCheckBox* m_checkUpdates;
     class QCheckBox* m_24bitStfCheck;
     QLineEdit* m_astapExtraArgs;

@@ -245,11 +245,25 @@ bool StackingCommands::cmdSave(const ScriptCommand& cmd) {
         return false;
     }
     
-    QString path = resolvePath(cmd.args[0]);
+    QString path;
+    if (cmd.args.size() > 0) {
+        path = resolvePath(cmd.args[0]);
+    } else {
+        path = cmd.option("out", cmd.option("output", ""));
+        if (path.isEmpty()) {
+             if (s_runner) s_runner->logMessage(QObject::tr("save: no filename specified (use positional arg or -out=...)"), "red");
+             return false;
+        }
+        path = resolvePath(path);
+    }
+    
     int bits = cmd.hasOption("32b") ? 32 : (cmd.hasOption("16b") ? 16 : 32);
     
-    if (!Stacking::FitsIO::write(path, *s_currentImage, bits))
+    QString error;
+    if (!Stacking::FitsIO::write(path, *s_currentImage, bits)) {
+        if (s_runner) s_runner->logMessage(QObject::tr("save: failed to write %1").arg(path), "red");
         return false;
+    }
 
     // Track the basename so subsequent commands can reference the saved file
     s_currentFilename = QFileInfo(path).fileName();
@@ -395,6 +409,7 @@ bool StackingCommands::cmdStack(const ScriptCommand& cmd) {
     
     // Drizzle options
     params.drizzle = cmd.hasOption("drizzle");
+    params.drizzleFast = cmd.hasOption("fast_drizzle") || cmd.hasOption("fast");
     if (cmd.hasOption("scale")) {
         params.drizzleScale = cmd.option("scale").toDouble();
     }
@@ -408,7 +423,7 @@ bool StackingCommands::cmdStack(const ScriptCommand& cmd) {
     }
     
     // Output filename
-    QString output = cmd.option("output", prefix + "_stacked.fit");
+    QString output = cmd.option("out", cmd.option("output", prefix + "_stacked.fit"));
     params.outputFilename = resolvePath(output);
     
     // Reuse Logic Applied Above

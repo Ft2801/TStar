@@ -967,8 +967,8 @@
             <translation type="finished">Caché borrada</translation>
         </message>
         <message>
-            <source>Catalog Background Extraction (MARS-like)</source>
-            <translation type="finished">Extracción de Fondo por Catálogo (tipo MARS)</translation>
+            <source>Catalog Background Extraction</source>
+            <translation type="finished">Extracción de Fondo de Catálogo</translation>
         </message>
         <message>
             <source>Catalog Background Extraction tool active.</source>
@@ -1057,6 +1057,10 @@
         <message>
             <source>Requesting reference survey from HiPS...</source>
             <translation type="finished">Solicitando sondeo de referencia a HiPS...</translation>
+        </message>
+        <message>
+            <source>Running CBE...</source>
+            <translation type="finished">Ejecutando CBE...</translation>
         </message>
         <message>
             <source>Smoothing Scale:</source>
@@ -1262,20 +1266,20 @@
     <context>
         <name>ColorProfileManager</name>
         <message>
-            <source>Color profile mismatch detected for image:</source>
-            <translation type="finished">Incompatibilidad de perfil de color detectada para la imagen:</translation>
-        </message>
-        <message>
             <source>Converting color profile...</source>
             <translation type="finished">Convirtiendo perfil de color...</translation>
         </message>
         <message>
-            <source>Embedded ICC Profile</source>
-            <translation type="finished">Perfil ICC Incrustado</translation>
+            <source>Invalid ICC Profile</source>
+            <translation type="finished">Perfil ICC no válido</translation>
         </message>
         <message>
             <source>Invalid profiles provided for conversion.</source>
             <translation type="finished">Perfiles no válidos proporcionados para la conversión.</translation>
+        </message>
+        <message>
+            <source>No Embedded Profile</source>
+            <translation type="finished">Ningún Perfil Incrustado</translation>
         </message>
         <message>
             <source>Successfully converted buffer from</source>
@@ -1284,6 +1288,10 @@
         <message>
             <source>Successfully converted buffer from %1 to %2</source>
             <translation type="finished">Búfer convertito con éxito de %1 a %2</translation>
+        </message>
+        <message>
+            <source>Unknown</source>
+            <translation type="finished">Desconocido</translation>
         </message>
         <message>
             <source>Unknown Profile</source>
@@ -4818,12 +4826,12 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">No se puede restaurar "%1": faltan la instantánea y la imagen de origen.</translation>
         </message>
         <message>
-            <source>Catalog Background Extraction (CBE)</source>
-            <translation type="finished">Extracción de Fondo por Catálogo (CBE)</translation>
+            <source>Catalog Background Extraction</source>
+            <translation type="finished">Extracción de Fondo de Catálogo</translation>
         </message>
         <message>
-            <source>Catalog Background Extraction (MARS-like)</source>
-            <translation type="finished">Extracción de Fondo por Catálogo (tipo MARS)</translation>
+            <source>Catalog Background Extraction (CBE)</source>
+            <translation type="finished">Extracción de Fondo por Catálogo (CBE)</translation>
         </message>
         <message>
             <source>Channel Operations</source>
@@ -5702,8 +5710,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Gestión del proyecto Workspace</translation>
         </message>
         <message>
-            <source>Project created: %1</source>
-            <translation type="finished">Proyecto creado: %1</translation>
+            <source>Project created and activated: %1</source>
+            <translation type="finished">Proyecto creado y activado: %1</translation>
         </message>
         <message>
             <source>Project is Empty</source>
@@ -6013,10 +6021,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>The following project files referencing this workspace were found: %1 Delete these files?</source>
             <translation type="finished">Se encontraron los siguientes archivos de proyecto que hacen referencia a este workspace: %1 ¿Eliminar estos archivos?</translation>
-        </message>
-        <message>
-            <source>The image '%1' has a color profile (%2) that differs from the workspace profile (%3). Would you like to convert it to the workspace profile?</source>
-            <translation type="finished">La imagen '%1' tiene un perfil de color (%2) que difiere del perfil del espacio de trabajo (%3). ¿Desea convertirla al perfil del espacio de trabajo?</translation>
         </message>
         <message>
             <source>The workspace contains no images. Save an empty project anyway?</source>
@@ -9027,8 +9031,36 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Cámara / Sensor:</translation>
         </message>
         <message>
+            <source>Catalog Download Error</source>
+            <translation type="finished">Error de Descarga de Catálogo</translation>
+        </message>
+        <message>
+            <source>Catalog error: </source>
+            <translation type="finished">Error de catálogo:</translation>
+        </message>
+        <message>
+            <source>Catalog loaded (%1 stars). Running Calibration...</source>
+            <translation type="finished">Catálogo cargado (%1 estrellas). Ejecutando calibración...</translation>
+        </message>
+        <message>
             <source>Close</source>
             <translation type="finished">Cerrar</translation>
+        </message>
+        <message>
+            <source>Data directory not configured.</source>
+            <translation type="finished">Directorio de datos no configurado.</translation>
+        </message>
+        <message>
+            <source>Embedded catalog not found. Querying Gaia DR3 via VizieR (this may take a moment)...</source>
+            <translation type="finished">Catálogo incrustado no encontrado. Consultando Gaia DR3 a través de VizieR (esto puede tardar un momento)...</translation>
+        </message>
+        <message>
+            <source>Empty Catalog</source>
+            <translation type="finished">Catálogo Vacío</translation>
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="finished">Error</translation>
         </message>
         <message>
             <source>Failed: </source>
@@ -9047,12 +9079,20 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">G_out</translation>
         </message>
         <message>
+            <source>Image must be plate solved first.</source>
+            <translation type="finished">La imagen debe ser resuelta astrométricamente primero.</translation>
+        </message>
+        <message>
             <source>Limit to mag &lt;</source>
             <translation type="finished">Limitar a mag &lt;</translation>
         </message>
         <message>
             <source>Magnitude limit:</source>
             <translation type="finished">Límite de magnitud:</translation>
+        </message>
+        <message>
+            <source>Matching stars and solving color matrix...</source>
+            <translation type="finished">Emparejando estrellas y resolviendo matriz de color...</translation>
         </message>
         <message>
             <source>Max stars:</source>
@@ -9107,6 +9147,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Ejecutar SPCC</translation>
         </message>
         <message>
+            <source>Running SPCC...</source>
+            <translation type="finished">Ejecutando SPCC...</translation>
+        </message>
+        <message>
             <source>Running SPCC…</source>
             <translation type="finished">Ejecutando SPCC…</translation>
         </message>
@@ -9121,6 +9165,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Sensor &amp; Filter Profile</source>
             <translation type="finished">Perfil de sensor y filtro</translation>
+        </message>
+        <message>
+            <source>Spectrophotometric Color Calibration</source>
+            <translation type="finished">Calibración de color espectrofotométrica</translation>
         </message>
         <message>
             <source>Spectrophotometric Color Calibration (SPCC)</source>
@@ -9145,6 +9193,14 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Use full 3×3 colour matrix (vs. diagonal)</source>
             <translation type="finished">Usar matriz de color 3×3 completa (vs diagonal)</translation>
+        </message>
+        <message>
+            <source>Using embedded Gaia catalog...</source>
+            <translation type="finished">Usando catálogo Gaia incrustado...</translation>
+        </message>
+        <message>
+            <source>WARNING: Gaia query returned 0 stars. Check image coordinates.</source>
+            <translation type="finished">ADVERTENCIA: la consulta a Gaia devolvió 0 estrellas. Compruebe las coordenadas de la imagen.</translation>
         </message>
         <message>
             <source>White balance:</source>
@@ -9600,8 +9656,16 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Siempre</translation>
         </message>
         <message>
+            <source>ArcSinh</source>
+            <translation type="finished">ArcSinh</translation>
+        </message>
+        <message>
             <source>Ask</source>
             <translation type="finished">Preguntar</translation>
+        </message>
+        <message>
+            <source>Auto Stretch</source>
+            <translation type="finished">Auto-Stretch</translation>
         </message>
         <message>
             <source>Auto-Convert Color Profiles:</source>
@@ -9630,6 +9694,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Cosmic Clarity models: not installed</source>
             <translation type="finished">Modelos Cosmic Clarity: no instalados</translation>
+        </message>
+        <message>
+            <source>Default Display Stretch:</source>
+            <translation type="finished">Display Stretch Predeterminado:</translation>
         </message>
         <message>
             <source>Default system path</source>
@@ -9676,12 +9744,24 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Ejecutable GraXpert:</translation>
         </message>
         <message>
+            <source>Histogram</source>
+            <translation type="finished">Histograma</translation>
+        </message>
+        <message>
             <source>Language:</source>
             <translation type="finished">Idioma:</translation>
         </message>
         <message>
+            <source>Linear</source>
+            <translation type="finished">Lineal</translation>
+        </message>
+        <message>
             <source>Linear RGB</source>
             <translation type="finished">RGB Lineal</translation>
+        </message>
+        <message>
+            <source>Logarithmic</source>
+            <translation type="finished">Logarítmico</translation>
         </message>
         <message>
             <source>Models downloaded and installed successfully.</source>
@@ -9732,12 +9812,20 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Ajustes</translation>
         </message>
         <message>
+            <source>Square Root</source>
+            <translation type="finished">Raíz Cuadrada</translation>
+        </message>
+        <message>
             <source>StarNet Executable:</source>
             <translation type="finished">Ejecutable StarNet:</translation>
         </message>
         <message>
             <source>System Default</source>
             <translation type="finished">Predeterminado del Sistema</translation>
+        </message>
+        <message>
+            <source>Updates</source>
+            <translation type="finished">Actualizaciones</translation>
         </message>
         <message>
             <source>Workspace Color Profile:</source>
@@ -9936,6 +10024,14 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Starting pipeline for: %1</source>
             <translation type="finished">Iniciando pipeline para: %1</translation>
+        </message>
+        <message>
+            <source>save: failed to write %1</source>
+            <translation type="finished">guardar: error al escribir %1</translation>
+        </message>
+        <message>
+            <source>save: no filename specified (use positional arg or -out=...)</source>
+            <translation type="finished">guardar: no se especificó un nombre de archivo (usa argumento posicional o -out=...)</translation>
         </message>
         <message>
             <source>save: no image loaded</source>
@@ -10147,6 +10243,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Failed to compute shifts. Check DATE-OBS headers.</source>
             <translation type="finished">Fallo al calcular desplazamientos. Revise cabeceras DATE-OBS.</translation>
+        </message>
+        <message>
+            <source>Fast (1x)</source>
+            <translation type="finished">Rápido (1x)</translation>
         </message>
         <message>
             <source>Fast normalization</source>
@@ -10435,6 +10535,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Sum</source>
             <translation type="finished">Suma</translation>
+        </message>
+        <message>
+            <source>Use fast drizzle (optimal for 1x scale)</source>
+            <translation type="finished">Usar drizzle rápido (óptimo para escala 1x)</translation>
         </message>
         <message>
             <source>VNG (Best)</source>

@@ -181,6 +181,8 @@ void ColorProfileDialog::applyChanges() {
     } else {
         // ASSIGN: Just update the interpretation without changing pixels
         ImageBuffer::Metadata meta = m_activeBuffer->metadata();
+        meta.iccProfileName = targetProfile.name();
+        meta.iccProfileType = static_cast<int>(targetProfile.type());
         
         if (targetProfile.type() == core::StandardProfile::Custom) {
             meta.iccData = targetProfile.iccData();

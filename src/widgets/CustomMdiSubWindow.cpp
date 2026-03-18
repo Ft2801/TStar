@@ -2,7 +2,6 @@
 #include "ImageViewer.h"
 #include "MainWindowCallbacks.h"
 #include "Icons.h"
-#include "core/DpiHelper.h"
 #include <QStyle>
 #include <QMenu>
 #include <QScreen>
@@ -30,12 +29,25 @@
 #include <QTimer>
 #include <QElapsedTimer>
 
+namespace FixedUI {
+    constexpr int sidebarWidth = 26;
+    constexpr int titleBarHeight = 30;
+    constexpr int buttonSize = 24;
+    constexpr int iconSize = 16;
+    constexpr int dragPixmapSize = 32;
+    constexpr int minShadedWidth = 200;
+    constexpr int borderWidth = 2;
+    constexpr int minWindowWidth = 200;
+    constexpr int minWindowHeight = 150;
+    constexpr int resizeMargin = 8;
+}
 
-// Helper to create QIcon from SVG string (DPI-aware)
+// Helper to create QIcon from SVG string
 static QIcon iconFromSvg(const QString& svg, QWidget* widget = nullptr) {
+    Q_UNUSED(widget);
     QByteArray ba = svg.toUtf8();
     QSvgRenderer renderer(ba);
-    int size = DpiHelper::iconPixmapSize(widget);
+    int size = FixedUI::iconSize;
     QPixmap pix(size, size);
     pix.fill(Qt::transparent);
     QPainter painter(&pix);
@@ -45,7 +57,7 @@ static QIcon iconFromSvg(const QString& svg, QWidget* widget = nullptr) {
 
 // --- NameStrip ---
 NameStrip::NameStrip(QWidget *parent) : QWidget(parent) {
-    setFixedWidth(DpiHelper::sidebarWidth(this));
+    setFixedWidth(FixedUI::sidebarWidth);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
     setCursor(Qt::OpenHandCursor);
     setAcceptDrops(true);
@@ -143,7 +155,7 @@ void NameStrip::mouseMoveEvent(QMouseEvent *event) {
         mimeData->setData("application/x-tstar-duplicate", ptrData);
         drag->setMimeData(mimeData);
         
-        int dragSize = DpiHelper::dragPixmapSize(this);
+        int dragSize = FixedUI::dragPixmapSize;
         QPixmap pix(dragSize, dragSize);
         pix.fill(Qt::cyan); // Cyan for duplicate
         drag->setPixmap(pix);
@@ -153,7 +165,7 @@ void NameStrip::mouseMoveEvent(QMouseEvent *event) {
 
 // --- LinkStrip ---
 LinkStrip::LinkStrip(QWidget *parent) : QWidget(parent) {
-    setFixedWidth(DpiHelper::sidebarWidth(this));
+    setFixedWidth(FixedUI::sidebarWidth);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setCursor(Qt::OpenHandCursor);
     setAcceptDrops(true);
@@ -210,7 +222,7 @@ void LinkStrip::mouseMoveEvent(QMouseEvent *event) {
         QByteArray ptrData = QByteArray::number((quintptr)sourceWin, 16);
         mimeData->setData("application/x-tstar-link", ptrData);
         drag->setMimeData(mimeData);
-        int dragSize = DpiHelper::dragPixmapSize(this);
+        int dragSize = FixedUI::dragPixmapSize;
         QPixmap pix(dragSize, dragSize);
         pix.fill(Qt::green);
         drag->setPixmap(pix);
@@ -240,8 +252,6 @@ void LinkStrip::dragMoveEvent(QDragMoveEvent *event) {
     }
 }
 
-
-
 void LinkStrip::dropEvent(QDropEvent *event) {
     QWidget* widget = this;
     while(widget && !widget->inherits("CustomMdiSubWindow")) {
@@ -253,7 +263,7 @@ void LinkStrip::dropEvent(QDropEvent *event) {
 
 // --- AdaptStrip ---
 AdaptStrip::AdaptStrip(QWidget *parent) : QWidget(parent) {
-    setFixedWidth(DpiHelper::sidebarWidth(this));
+    setFixedWidth(FixedUI::sidebarWidth);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setCursor(Qt::OpenHandCursor);
     setAcceptDrops(true);
@@ -301,7 +311,7 @@ void AdaptStrip::mouseMoveEvent(QMouseEvent *event) {
         mimeData->setData("application/x-tstar-adapt", ptrData);
         drag->setMimeData(mimeData);
         
-        int dragSize = DpiHelper::dragPixmapSize(this);
+        int dragSize = FixedUI::dragPixmapSize;
         QPixmap pix(dragSize, dragSize);
         pix.fill(Qt::yellow);
         drag->setPixmap(pix);
@@ -336,14 +346,14 @@ void AdaptStrip::dropEvent(QDropEvent *event) {
 
 CustomTitleBar::CustomTitleBar(QWidget *parent) : QWidget(parent) {
     setAttribute(Qt::WA_StyledBackground, true); // Ensure background is painted
-    setFixedHeight(DpiHelper::titleBarHeight(this));
+    setFixedHeight(FixedUI::titleBarHeight);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     m_active = false;
     
     QHBoxLayout* layout = new QHBoxLayout(this);
-    int margin = DpiHelper::scale(5, this);
-    layout->setContentsMargins(margin, 0, margin, DpiHelper::scale(4, this));
-    layout->setSpacing(DpiHelper::scale(4, this));
+    int margin = 5;
+    layout->setContentsMargins(margin, 0, margin, 4);
+    layout->setSpacing(4);
     
     m_titleLabel = new QLabel("", this);
     m_titleLabel->setStyleSheet("color: #ddd; font-weight: bold; font-family: 'Segoe UI'; font-size: 11px; background: transparent;");
@@ -353,8 +363,8 @@ CustomTitleBar::CustomTitleBar(QWidget *parent) : QWidget(parent) {
     m_zoomLabel->setStyleSheet("QLabel { color: #aaa; font-family: 'Segoe UI'; font-size: 10px; background-color: transparent; margin-right: 5px; border: none; }");
     m_zoomLabel->setVisible(false); // Hide initially
     
-    int btnSize = DpiHelper::buttonSize(this);
-    int icnSize = DpiHelper::iconSize(this);
+    int btnSize = FixedUI::buttonSize;
+    int icnSize = FixedUI::iconSize;
     auto configBtn = [&](QPushButton* btn, const QString& svg, const QString& hoverColor) {
         btn->setFixedSize(btnSize, btnSize);
         btn->setIcon(iconFromSvg(svg, this));
@@ -395,9 +405,9 @@ void CustomTitleBar::setTitle(const QString& title) {
     if (m_shaded) {
         // Elide title to fit fixed shaded width
         QFontMetrics fm(m_titleLabel->font());
-        int btnSize = DpiHelper::buttonSize(this);
-        int buttonsW = 3 * btnSize + DpiHelper::scale(20, this);
-        int available = 1.5 * DpiHelper::minShadedWidth(this) - buttonsW - DpiHelper::scale(16, this);
+        int btnSize = FixedUI::buttonSize;
+        int buttonsW = 3 * btnSize + 20;
+        int available = 1.5 * FixedUI::minShadedWidth - buttonsW - 16;
         m_titleLabel->setText(fm.elidedText(title, Qt::ElideRight, std::max(available, 20)));
     } else {
         m_titleLabel->setText(title);
@@ -503,7 +513,6 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
                 setMaximumHeight(16777215);
                 setMinimumHeight(0);
                 m_titleBar->show();
-                // Content area shown below/resized by setGeometry
             }
 
             showNormal();
@@ -512,10 +521,8 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
             
             // Restore valid normal geometry if available
             if (!m_validNormalGeometry.isNull()) {
-                // qDebug() << "  -> Restoring valid normal geometry:" << m_validNormalGeometry;
                 setGeometry(m_validNormalGeometry);
             } else {
-                // qDebug() << "  -> WARNING: No valid normal geometry, using fallback";
                 resize(800, 600); // Reasonable fallback
                 // Center on screen
                 if (QMdiArea* area = mdiArea()) {
@@ -536,7 +543,6 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
             // Save valid normal geometry before maximizing
             if (!m_shaded) {
                 m_validNormalGeometry = geometry();
-                // qDebug() << "  -> Saved Normal Geometry:" << m_validNormalGeometry;
             }
 
             // If shaded, we need to unshade first with robust logic
@@ -549,9 +555,6 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
                 setMinimumHeight(0);
                 m_titleBar->show();
                 m_contentArea->show();
-                
-                 // Robust Unshade-to-Maximize:
-                 // DO NOT call showNormal() here as it might reset geometry to Shaded size
                  
                  // 2. Expand to full viewport to ensure maximize works visually
                  if (QMdiArea* area = mdiArea()) {
@@ -568,16 +571,15 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
                      m_titleBar->setMaximized(true);
                      if (m_contentArea) {
                          m_contentArea->show();
-                         m_contentArea->resize(width(), height() - m_titleBar->height()); // Explicit resize help
+                         m_contentArea->resize(width(), height() - m_titleBar->height()); 
                      }
                      
                      if (ImageViewer* v = viewer()) {
                          v->fitToWindow();
-                         // Double tap fit to window to handle layout latency
                          QTimer::singleShot(10, v, &ImageViewer::fitToWindow);
                      }
                  });
-                 return; // Async completion
+                 return; 
             }
             
             showMaximized();
@@ -599,7 +601,7 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
     
     // Left Strip Container
     QWidget* leftStrip = new QWidget(m_contentArea);
-    leftStrip->setFixedWidth(DpiHelper::sidebarWidth(this));
+    leftStrip->setFixedWidth(FixedUI::sidebarWidth);
     QVBoxLayout* leftLayout = new QVBoxLayout(leftStrip);
     leftLayout->setContentsMargins(0, 0, 0, 0);
     leftLayout->setSpacing(0);
@@ -609,15 +611,9 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
     
     m_linkStrip = new LinkStrip(leftStrip);
     connect(m_linkStrip, &LinkStrip::linkToggled, [this](){
-        // Unlink this viewer from the group:
-        // 1. Disconnect it from every other linked viewer (both directions).
-        // 2. Mark it as unlinked.
-        // 3. For each remaining viewer in the group, mark it unlinked too
-        //    if it has no more linked partners.
         ImageViewer* v = m_contentArea->findChild<ImageViewer*>();
         if (v && v->isLinked()) {
             if (QMdiArea* area = mdiArea()) {
-                // Collect all OTHER currently-linked viewers
                 QVector<QPair<ImageViewer*, CustomMdiSubWindow*>> others;
                 for (QMdiSubWindow* sub : area->subWindowList()) {
                     if (sub == this) continue;
@@ -628,17 +624,13 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
                         others.append({ov, otherWin});
                 }
 
-                // Disconnect v from every other linked viewer
                 for (auto& p : others) {
                     disconnect(v,       &ImageViewer::viewChanged, p.first, &ImageViewer::syncView);
                     disconnect(p.first, &ImageViewer::viewChanged, v,       &ImageViewer::syncView);
                 }
 
-                // Mark v as unlinked
-                v->setLinked(false);   // also emits unlinked → strip auto-updated
+                v->setLinked(false);
 
-                // For each remaining viewer: if it's now isolated (no other linked
-                // peer exists besides itself), mark it unlinked too
                 for (auto& p : others) {
                     bool hasPeer = false;
                     for (auto& q : others) {
@@ -661,7 +653,7 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget *parent) : QMdiSubWindow(parent) 
     leftLayout->addWidget(m_nameStrip);
     leftLayout->addWidget(m_linkStrip);
     leftLayout->addWidget(m_adaptStrip);
-    leftLayout->addStretch();  // Push all three strips to top
+    leftLayout->addStretch();  
     
     m_contentLayout->addWidget(leftStrip);
     m_mainLayout->addWidget(m_contentArea, 1);
@@ -678,8 +670,6 @@ void CustomMdiSubWindow::installRecursiveFilter(QWidget* w) {
     w->setMouseTracking(true);
     w->setAttribute(Qt::WA_Hover);
     
-    // Special handling for QAbstractScrollArea (like QGraphicsView)
-    // The viewport is a separate widget that needs the filter too
     if (QAbstractScrollArea* scrollArea = qobject_cast<QAbstractScrollArea*>(w)) {
         if (QWidget* vp = scrollArea->viewport()) {
             vp->installEventFilter(this);
@@ -726,9 +716,8 @@ void CustomMdiSubWindow::mouseMoveEvent(QMouseEvent *event) {
             newGeom.setBottom(m_dragStartGeometry.bottom() + delta.y());
         }
 
-        // Enforce minimum size (DPI-aware)
-        int minW = DpiHelper::minWindowWidth(this);
-        int minH = DpiHelper::minWindowHeight(this);
+        int minW = FixedUI::minWindowWidth;
+        int minH = FixedUI::minWindowHeight;
         if (newGeom.width() < minW) {
             if (m_activeEdges & Left) newGeom.setLeft(newGeom.right() - minW);
             else newGeom.setRight(newGeom.left() + minW);
@@ -764,7 +753,7 @@ void CustomMdiSubWindow::leaveEvent(QEvent *event) {
 
 int CustomMdiSubWindow::getResizeEdge(const QPoint& pos) {
     int edge = None;
-    int margin = DpiHelper::resizeMargin(this);
+    int margin = FixedUI::resizeMargin;
     if (pos.x() < margin) edge |= Left;
     if (pos.x() > width() - margin) edge |= Right;
     if (pos.y() < margin) edge |= Top;
@@ -804,10 +793,8 @@ void CustomMdiSubWindow::showNormal() {
 }
 
 void CustomMdiSubWindow::toggleShade() {
-    // Guard against rapid successive calls (e.g., from double-click triggering twice)
     static QElapsedTimer lastCallTimer;
     if (lastCallTimer.isValid() && lastCallTimer.elapsed() < 200) {
-        // qDebug() << "toggleShade: BLOCKED (too rapid, elapsed=" << lastCallTimer.elapsed() << "ms)";
         return;
     }
     lastCallTimer.start();
@@ -815,46 +802,34 @@ void CustomMdiSubWindow::toggleShade() {
     m_shaded = !m_shaded;
     m_titleBar->setShaded(m_shaded);
     
-    // qDebug() << "toggleShade: m_shaded now =" << m_shaded << ", m_isMaximized =" << m_isMaximized << ", m_wasMaximized =" << m_wasMaximized;
-    
     QPoint center = geometry().center();
     
     if (m_shaded) {
-        // Save valid normal geometry if we are shading from a normal state
         if (!m_isMaximized) {
             m_validNormalGeometry = geometry();
         }
 
-        m_wasMaximized = m_isMaximized; // Use our manual flag, not isMaximized()
+        m_wasMaximized = m_isMaximized; 
         m_originalHeight = height();
         m_originalWidth = width(); 
-        
-        qDebug() << "  SHADING: saving m_wasMaximized =" << m_wasMaximized << ", originalSize =" << m_originalWidth << "x" << m_originalHeight;
 
-        // Capture thumbnail BEFORE hiding content area - grab only the image viewport!
         ImageViewer* v = viewer();
         QPixmap thumb = (v && v->viewport()) 
                         ? v->viewport()->grab() 
                         : (m_contentArea->isVisible() ? m_contentArea->grab() : QPixmap());
         
         m_contentArea->hide();
-        int newH = m_titleBar->height() + DpiHelper::borderWidth(this);
+        int newH = m_titleBar->height() + FixedUI::borderWidth;
         
-        // Use a fixed shaded width for all windows so the UI stays uniform
-        // regardless of filename/title length (Task 2: fixed-width collapsed bar)
-        int totalW = 1.5 * DpiHelper::minShadedWidth(this); 
+        int totalW = 1.5 * FixedUI::minShadedWidth; 
         
-        // Center Collapse Implementation (Horizontal Center, Vertical Top)
         int newX = center.x() - totalW / 2;
-        int newY = geometry().top(); // Preserve Top
+        int newY = geometry().top(); 
         
         setGeometry(newX, newY, totalW, newH);
-        
-        // Notify interested parties (e.g. RightSidebarWidget)
         emit shadingChanged(true, thumb);
         
     } else {
-        // Restore
         setMinimumWidth(0);
         setMaximumWidth(16777215);
         setMaximumHeight(16777215); 
@@ -863,17 +838,10 @@ void CustomMdiSubWindow::toggleShade() {
         m_titleBar->show();
         m_contentArea->show();
         
-        qDebug() << "  UNSHADING: m_wasMaximized =" << m_wasMaximized;
         bool restoreMax = m_wasMaximized;
-        
-        // Reset internal state to Normal first to avoid stuck flags
         if (isMaximized()) QMdiSubWindow::showNormal();
 
         if (restoreMax) {
-            qDebug() << "  -> Restoring geometry (FULL) before deferred showMaximized()";
-            
-            // Robustness: Use MDI viewport size to ensure we expand fully, 
-            // ignoring potentially corrupted m_originalWidth/Height
             if (QMdiArea* area = mdiArea()) {
                 if (QWidget* vp = area->viewport()) {
                     setGeometry(vp->rect());
@@ -881,22 +849,17 @@ void CustomMdiSubWindow::toggleShade() {
                     setGeometry(area->rect());
                 }
             } else {
-                 // Fallback
                  setGeometry(0, 0, 1920, 1080); 
             }
             
-            qDebug() << "  -> Deferring showMaximized()";
             QTimer::singleShot(50, this, [this](){
-                qDebug() << "  -> Calling showMaximized() (deferred)";
                 showMaximized();
                 if (m_contentArea) {
-                    m_contentArea->show(); // Ensure visible
+                    m_contentArea->show(); 
                     m_contentArea->resize(width(), height() - m_titleBar->height());
                 }
                 
-                // Double check size
                 if (width() < 500) {
-                    qDebug() << "  -> WARNING: Window still small after max (" << width() << "x" << height() << "), forcing resize";
                     if (QMdiArea* area = mdiArea()) setGeometry(area->viewport()->rect());
                 }
                 
@@ -906,14 +869,10 @@ void CustomMdiSubWindow::toggleShade() {
                 }
             });
         } else {
-            // Restore (Horizontal Center, Vertical Top)
             int newX = center.x() - m_originalWidth / 2;
-            int newY = geometry().top(); // Preserve Top
-            
-            qDebug() << "  -> Restoring to" << m_originalWidth << "x" << m_originalHeight;
+            int newY = geometry().top();
             setGeometry(newX, newY, m_originalWidth, m_originalHeight);
         }
-        // Notify interested parties (e.g. RightSidebarWidget)
         emit shadingChanged(false, QPixmap());
     }
 
@@ -927,7 +886,6 @@ bool CustomMdiSubWindow::event(QEvent *event) {
 bool CustomMdiSubWindow::eventFilter(QObject *obj, QEvent *event) {
     QWidget* sender = qobject_cast<QWidget*>(obj);
     
-    // Handle new children being added dynamically
     if (event->type() == QEvent::ChildAdded) {
         QChildEvent* ce = static_cast<QChildEvent*>(event);
         if (QWidget* cw = qobject_cast<QWidget*>(ce->child())) {
@@ -938,10 +896,8 @@ bool CustomMdiSubWindow::eventFilter(QObject *obj, QEvent *event) {
     if (!sender || (!m_container->isAncestorOf(sender) && sender != m_container)) 
         return QMdiSubWindow::eventFilter(obj, event);
 
-    // Avoid resizing when interacting with standard buttons
     if (qobject_cast<QPushButton*>(sender)) return false;
 
-    // Use global->local mapping for accurate coordinate translation
     auto mapToSubWindow = [this, sender](const QPoint& localPos) {
         return mapFromGlobal(sender->mapToGlobal(localPos));
     };
@@ -970,8 +926,8 @@ bool CustomMdiSubWindow::eventFilter(QObject *obj, QEvent *event) {
             if (m_activeEdges & Top) newGeom.setTop(m_dragStartGeometry.top() + delta.y());
             else if (m_activeEdges & Bottom) newGeom.setBottom(m_dragStartGeometry.bottom() + delta.y());
 
-            int minW = DpiHelper::minWindowWidth(this);
-            int minH = DpiHelper::minWindowHeight(this);
+            int minW = FixedUI::minWindowWidth;
+            int minH = FixedUI::minWindowHeight;
             if (newGeom.width() < minW) {
                 if (m_activeEdges & Left) newGeom.setLeft(newGeom.right() - minW);
                 else newGeom.setRight(newGeom.left() + minW);
@@ -1009,8 +965,6 @@ bool CustomMdiSubWindow::eventFilter(QObject *obj, QEvent *event) {
             return true;
         }
     } else if (event->type() == QEvent::DragLeave) {
-        // Suppress "drag leave received before drag enter" debug warning from QGraphicsView
-        // caused by MDI window stealing drag events or hierarchy issues.
         event->accept();
         return true; 
     }
@@ -1020,14 +974,8 @@ bool CustomMdiSubWindow::eventFilter(QObject *obj, QEvent *event) {
 
 void CustomMdiSubWindow::setToolWindow(bool isTool) {
     m_isToolWindow = isTool;
-    // Hide leftStrip if tool
     if (m_nameStrip && m_nameStrip->parentWidget()) {
         m_nameStrip->parentWidget()->setVisible(!isTool);
-    }
-    
-    // Adjust title bar spacers based on window type
-    if (m_titleBar) {
-        // Center titles for consistency as requested
     }
 }
 
@@ -1048,12 +996,10 @@ void CustomMdiSubWindow::setWidget(QWidget *widget) {
     installRecursiveFilter(widget);
     if (ImageViewer* v = qobject_cast<ImageViewer*>(widget)) {
         adjustToImageSize();
-        // Sync LinkStrip when viewer unlinks
         connect(v, &ImageViewer::unlinked, [this](){
             if (m_linkStrip) m_linkStrip->setLinked(false);
         });
 
-        // Sync Modified Asterisk in Title
         connect(v, &ImageViewer::modifiedChanged, [this](bool mod){
             QString title = windowTitle();
             if (mod) {
@@ -1065,7 +1011,6 @@ void CustomMdiSubWindow::setWidget(QWidget *widget) {
             }
         });
         
-        // Sync Zoom Label
         connect(v, &ImageViewer::viewChanged, [this](float scale, float, float){
             if (m_titleBar) {
                 int percent = static_cast<int>(scale * 100.0f + 0.5f);
@@ -1073,13 +1018,10 @@ void CustomMdiSubWindow::setWidget(QWidget *widget) {
             }
         });
 
-        // Initial update
         if (m_titleBar) {
              int percent = static_cast<int>(v->getScale() * 100.0f + 0.5f);
              m_titleBar->setZoom(percent);
         }
-        
-        // Also sync if viewer becomes linked...
     }
 }
 
@@ -1093,9 +1035,9 @@ void CustomMdiSubWindow::adjustToImageSize() {
     const ImageBuffer& buf = v->getBuffer();
     if (!buf.isValid()) return;
     
-    int sidebar = DpiHelper::sidebarWidth(this);
-    int titleH = DpiHelper::titleBarHeight(this);
-    int border = DpiHelper::borderWidth(this);
+    int sidebar = FixedUI::sidebarWidth;
+    int titleH = FixedUI::titleBarHeight;
+    int border = FixedUI::borderWidth;
     
     int w = buf.width();
     int h = buf.height();
@@ -1118,14 +1060,13 @@ void CustomMdiSubWindow::requestRename() {
     if (ok && !text.isEmpty()) {
         setSubWindowTitle(text);
         if (ImageViewer* v = m_contentArea->findChild<ImageViewer*>()) {
-            // Also rename the buffer?
              v->getBuffer().setName(text); 
         }
     }
 }
 
 void CustomMdiSubWindow::setSubWindowTitle(const QString& title) {
-    setWindowTitle(title); // Call base QWidget method
+    setWindowTitle(title); 
     if (m_titleBar) m_titleBar->setTitle(title);
     if (m_nameStrip) {
         m_nameStrip->setTitle(title);
@@ -1137,7 +1078,6 @@ void CustomMdiSubWindow::setSubWindowTitle(const QString& title) {
 }
 
 void CustomMdiSubWindow::resizeEvent(QResizeEvent *event) {
-    // If shaded, we don't update m_originalWidth/Height
     QMdiSubWindow::resizeEvent(event);
     emit layoutChanged();
 }
@@ -1183,13 +1123,6 @@ void CustomMdiSubWindow::handleDrop(QDropEvent* event) {
                 ImageViewer* targetPtr = this->findChild<ImageViewer*>(); 
                 
                 if (sourcePtr && targetPtr) {
-                    // -------------------------------------------------------
-                    // Build the complete linked group:
-                    // • Always include source and target (even if already linked).
-                    // • Scan the entire MDI area and add every viewer that is
-                    //   currently linked (those belong to the same or another
-                    //   existing group that we're about to merge into one).
-                    // -------------------------------------------------------
                     struct Member { ImageViewer* viewer; CustomMdiSubWindow* win; };
                     QVector<Member> group;
                     group.append({sourcePtr, sourceWin});
@@ -1206,11 +1139,6 @@ void CustomMdiSubWindow::handleDrop(QDropEvent* event) {
                         }
                     }
 
-                    // -------------------------------------------------------
-                    // Full N×N mesh: connect EVERY pair bidirectionally.
-                    // Qt::UniqueConnection is a no-op when the same pair was
-                    // already connected, so this is safe to call repeatedly.
-                    // -------------------------------------------------------
                     for (int i = 0; i < group.size(); ++i) {
                         for (int j = i + 1; j < group.size(); ++j) {
                             connect(group[i].viewer, &ImageViewer::viewChanged,
@@ -1222,40 +1150,23 @@ void CustomMdiSubWindow::handleDrop(QDropEvent* event) {
                         }
                     }
 
-                    // -------------------------------------------------------
-                    // Sync all members to source's current position.
-                    // -------------------------------------------------------
                     float srcScale = sourcePtr->getScale();
                     float srcH     = sourcePtr->getHBarLoc();
                     float srcV     = sourcePtr->getVBarLoc();
                     for (int i = 1; i < group.size(); ++i)
                         group[i].viewer->syncView(srcScale, srcH, srcV);
 
-                    // -------------------------------------------------------
-                    // Mark every member as linked and show the green strip.
-                    // -------------------------------------------------------
                     for (auto& m : group) {
                         m.viewer->setLinked(true);
                         if (m.win->m_linkStrip) m.win->m_linkStrip->setLinked(true);
                     }
 
-                    // -------------------------------------------------------
-                    // Destruction handlers: for every NEWLY connected pair
-                    // (i,j), register lambdas so that when one member is
-                    // destroyed the other is updated if it has no more links.
-                    //
-                    // We only register for pairs that include the SOURCE
-                    // (group[0]) because the other pairs (between existing
-                    // group members) already had their handlers registered
-                    // during previous drops.
-                    // -------------------------------------------------------
                     QPointer<CustomMdiSubWindow> sourceWinSafe = sourceWin;
                     for (int i = 1; i < group.size(); ++i) {
                         QPointer<ImageViewer>        partnerSafe    = group[i].viewer;
                         QPointer<CustomMdiSubWindow> partnerWinSafe = group[i].win;
                         QPointer<ImageViewer>        srcSafe        = sourcePtr;
 
-                        // When source is destroyed  → clear partner if isolated
                         connect(sourcePtr, &QObject::destroyed,
                                 [partnerSafe, partnerWinSafe, srcSafe]() {
                             if (!partnerSafe) return;
@@ -1276,7 +1187,6 @@ void CustomMdiSubWindow::handleDrop(QDropEvent* event) {
                             }
                         });
 
-                        // When partner is destroyed → clear source if isolated
                         connect(group[i].viewer, &QObject::destroyed,
                                 [srcSafe, sourceWinSafe, partnerSafe]() {
                             if (!srcSafe) return;
@@ -1307,7 +1217,6 @@ void CustomMdiSubWindow::handleDrop(QDropEvent* event) {
         if (ok) {
             CustomMdiSubWindow* source = reinterpret_cast<CustomMdiSubWindow*>(ptr);
             if (source && source != this) {
-                 // Adapt this window's size to source window's size
                  if (source->isMaximized()) showMaximized();
                  else {
                      showNormal();
@@ -1327,15 +1236,12 @@ bool CustomMdiSubWindow::canClose() {
         return true;
     }
 
-    // Skip unsaved changes check for tool windows - their internal viewers are just for preview
     if (m_isToolWindow) {
         return true;
     }
     
-    // Check for unsaved changes if this window contains an ImageViewer
     ImageViewer* v = viewer();
     if (v) {
-        // Find MainWindowCallbacks by traversing up the parent hierarchy
         MainWindowCallbacks* mw = nullptr;
         QWidget* p = this;
         while (p) {
@@ -1377,7 +1283,6 @@ void CustomMdiSubWindow::animateClose() {
         m_anim = nullptr;
     }
 
-    // Ensure opacity effect exists
     if (!m_effect) {
         m_effect = new QGraphicsOpacityEffect(this);
         setGraphicsEffect(m_effect);
@@ -1421,14 +1326,11 @@ void CustomMdiSubWindow::showEvent(QShowEvent* event) {
     startFadeIn();
 }
 
-
-
 void CustomMdiSubWindow::startFadeIn() {
     if (m_anim) {
         m_anim->stop();
         delete m_anim;
     }
-    // Ensure effect exists
     if (!m_effect) {
         m_effect = new QGraphicsOpacityEffect(this);
         setGraphicsEffect(m_effect);
@@ -1441,7 +1343,6 @@ void CustomMdiSubWindow::startFadeIn() {
     m_anim->setEndValue(1.0);
     m_anim->setEasingCurve(QEasingCurve::OutQuad);
     
-    // Remove effect after animation to avoid GPU overhead
     connect(m_anim, &QPropertyAnimation::finished, this, [this](){
         setGraphicsEffect(nullptr);
         m_effect = nullptr;

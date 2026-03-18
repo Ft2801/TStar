@@ -489,6 +489,10 @@ void StackingDialog::setupParametersGroup() {
     m_drizzlePixFrac->setPrefix(tr("PixFrac: "));
     drizzleLayout->addWidget(m_drizzlePixFrac);
     
+    m_drizzleFastCheck = new QCheckBox(tr("Fast (1x)"), this);
+    m_drizzleFastCheck->setToolTip(tr("Use fast drizzle (optimal for 1x scale)"));
+    drizzleLayout->addWidget(m_drizzleFastCheck);
+    
     layout->addLayout(drizzleLayout, row++, 1);
 
     connect(m_drizzleCheck, &QCheckBox::toggled, this, &StackingDialog::updateParameterVisibility);
@@ -1015,6 +1019,7 @@ Stacking::StackingParams StackingDialog::gatherParams() const {
     params.drizzle = m_drizzleCheck->isChecked();
     params.drizzleScale = m_drizzleScale->value();
     params.drizzlePixFrac = m_drizzlePixFrac->value();
+    params.drizzleFast = m_drizzleFastCheck->isChecked();
     
     params.filter = static_cast<Stacking::ImageFilter>(
         m_filterCombo->currentData().toInt());

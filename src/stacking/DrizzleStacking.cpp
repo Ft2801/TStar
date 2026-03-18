@@ -230,6 +230,50 @@ void DrizzleStacking::drizzleFrame(
     }
 }
 
+void DrizzleStacking::fastDrizzleFrame(const ImageBuffer& input,
+                                      const RegistrationData& reg,
+                                      std::vector<double>& accum,
+                                      std::vector<double>& weightAccum,
+                                      int outputWidth, int outputHeight,
+                                      const DrizzleParams& params) {
+    int w = input.width();
+    int h = input.height();
+    int channels = input.channels();
+    double scale = params.scaleFactor;
+    size_t outPixels = static_cast<size_t>(outputWidth) * outputHeight;
+
+    #pragma omp parallel for collapse(2)
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
+            // Find transformed center of input pixel
+            double cxIn = static_cast<double>(x) + 0.5;
+            double cyIn = static_cast<double>(y) + 0.5;
+            
+            QPointF centerOut = reg.transform(cxIn, cyIn);
+            double tx = centerOut.x() * scale;
+            double ty = centerOut.y() * scale;
+            
+            // Nearest neighbor output pixel
+            int ox = static_cast<int>(std::floor(tx));
+            int oy = static_cast<int>(std::floor(ty));
+            
+            if (ox >= 0 && ox < outputWidth && oy >= 0 && oy < outputHeight) {
+                size_t idx = static_cast<size_t>(oy) * outputWidth + ox;
+                double weight = 1.0; // Point kernel unit weight
+                
+                for (int c = 0; c < channels; c++) {
+                    double val = static_cast<double>(input.value(x, y, c)) * weight;
+                    #pragma omp atomic
+                    accum[c * outPixels + idx] += val;
+                }
+                
+                #pragma omp atomic
+                weightAccum[idx] += weight;
+            }
+        }
+    }
+}
+
 // Helper Implementations
 
 double DrizzleStacking::computePolygonArea(const Polygon& p) {
@@ -875,7 +919,11 @@ void DrizzleStacking::addImage(
     // drizzleFrame takes params.scaleFactor and applies it.
     // So reg should be the original registration (Image -> Reference).
     
-    drizzleFrame(img, reg, m_accum, m_weightAccum, m_outWidth, m_outHeight, m_params);
+    if (m_params.fastMode) {
+        fastDrizzleFrame(img, reg, m_accum, m_weightAccum, m_outWidth, m_outHeight, m_params);
+    } else {
+        drizzleFrame(img, reg, m_accum, m_weightAccum, m_outWidth, m_outHeight, m_params);
+    }
 }
 
 bool DrizzleStacking::resolve(ImageBuffer& output) {

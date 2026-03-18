@@ -89,7 +89,7 @@ void NewProjectDialog::setupUI() {
 void NewProjectDialog::onBrowse() {
     QString dir = QFileDialog::getExistingDirectory(this,
         tr("Select Project Location"),
-        QDir::homePath());
+        QDir::currentPath());
     
     if (!dir.isEmpty()) {
         m_pathEdit->setText(dir);
