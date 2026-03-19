@@ -24,7 +24,7 @@ public:
     virtual class ImageViewer* getCurrentViewer() = 0;
     
     // Create new image window with result
-    virtual void createResultWindow(const ImageBuffer& buffer, const QString& title) = 0;
+    virtual void createResultWindow(const ImageBuffer& buffer, const QString& title, int mode = -1, float median = 0.25f, bool linked = true) = 0;
     
     // Log message to main window
     virtual void logMessage(const QString& message, int severity, bool showPopup = false) = 0;

@@ -30,7 +30,7 @@ ImageViewer::ImageViewer(QWidget* parent) : QGraphicsView(parent) {
     setDragMode(QGraphicsView::ScrollHandDrag);
     setBackgroundBrush(QBrush(QColor(30, 30, 30)));
     setFrameShape(QFrame::NoFrame);
-    setAlignment(Qt::AlignCenter); // Center the image as requested
+    setAlignment(Qt::AlignCenter); // Center the image
     setMouseTracking(true); // Enable mouse tracking for pixel info
     
     

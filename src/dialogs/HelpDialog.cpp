@@ -14,7 +14,7 @@ HelpDialog::HelpDialog(QWidget *parent) : DialogBase(parent, tr("Help & Tutorial
 
 void HelpDialog::setupUI()
 {
-    // Fixed size as requested: 800x600
+    // Fixed size
     resize(800, 600);
     
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -396,6 +396,14 @@ QString HelpDialog::buildHelpContent()
     
     html += "<h3>" + tr("Star Recomposition") + "</h3>";
     html += "<p>" + tr("Blends starless and star-only images with adjustable parameters.") + "</p>";
+
+    html += "<h3>" + tr("Image Blending") + "</h3>";
+    html += "<p>" + tr("Advanced tool to blend two images (Base and Top) with various Photoshop-style blending modes and range masking:") + "</p>";
+    html += "<ul>";
+    html += "<li><b>" + tr("Supported Modes:") + "</b> " + tr("Normal, Multiply, Screen, Overlay, Add, Subtract, Difference, Soft Light, Hard Light.") + "</li>";
+    html += "<li><b>" + tr("Range Masking:") + "</b> " + tr("Control the range of pixels from the top image that are applied using Low/High range and feathering.") + "</li>";
+    html += "<li><b>" + tr("Channel Choice:") + "</b> " + tr("Select specific channels (R, G, B, or All) when blending a monochrome image onto a color one.") + "</li>";
+    html += "</ul>";
     
     html += "<h3>" + tr("Debayer") + "</h3>";
     html += "<p>" + tr("Converts RAW Bayer pattern images to full color.") + "</p>";

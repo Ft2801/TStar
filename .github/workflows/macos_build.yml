@@ -316,11 +316,12 @@ jobs:
         run: |
           mkdir -p build/TStar.app/Contents/MacOS
           curl -L -o astap_cli.zip "https://downloads.sourceforge.net/project/astap-program/macOS%20installer/astap_command-line_version_macOS_M1.zip"
-          unzip -o astap_cli.zip -d build/TStar.app/Contents/MacOS/
-          if [ -f build/TStar.app/Contents/MacOS/astap_cli ]; then
-            mv build/TStar.app/Contents/MacOS/astap_cli build/TStar.app/Contents/MacOS/astap
-          fi
-          chmod +x build/TStar.app/Contents/MacOS/astap
+          unzip -o -j astap_cli.zip -d build/TStar.app/Contents/MacOS/
+          cd build/TStar.app/Contents/MacOS/
+          if [ -f astap_cli ]; then mv astap_cli astap; fi
+          # Fallback if filename in zip is different
+          [ -f astap ] || find . -name "astap*" -type f -exec mv {} astap \;
+          chmod +x astap
 
       # ===========================
       # 8. Package Distribution
@@ -567,11 +568,12 @@ jobs:
         run: |
           mkdir -p build/TStar.app/Contents/MacOS
           curl -L -o astap_cli.zip "https://downloads.sourceforge.net/project/astap-program/macOS%20installer/astap_command-line_version_macOS.zip"
-          unzip -o astap_cli.zip -d build/TStar.app/Contents/MacOS/
-          if [ -f build/TStar.app/Contents/MacOS/astap_cli ]; then
-            mv build/TStar.app/Contents/MacOS/astap_cli build/TStar.app/Contents/MacOS/astap
-          fi
-          chmod +x build/TStar.app/Contents/MacOS/astap
+          unzip -o -j astap_cli.zip -d build/TStar.app/Contents/MacOS/
+          cd build/TStar.app/Contents/MacOS/
+          if [ -f astap_cli ]; then mv astap_cli astap; fi
+          # Fallback if filename in zip is different
+          [ -f astap ] || find . -name "astap*" -type f -exec mv {} astap \;
+          chmod +x astap
 
       # ===========================
       # 8. Package Distribution

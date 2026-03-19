@@ -91,11 +91,10 @@ void MaskGenerationDialog::setupUI() {
     
     mainLayout->addLayout(modeBar);
     
-    // --- 2. Canvas ---
     // Generate preview image for background
-    QImage bg = m_sourceImage.getDisplayImage(ImageBuffer::Display_AutoStretch, true); // AutoStretch by default for visibility
+    QImage bg = m_sourceImage.getDisplayImage(ImageBuffer::Display_Linear, true); // Linear by default for accuracy
     m_canvas = new MaskCanvas(bg, this);
-    m_canvas->setFixedHeight(400); // Fixed height as requested by the user
+    m_canvas->setFixedHeight(400); // Fixed height
     m_canvas->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     connect(m_canvas, &MaskCanvas::maskContentChanged, this, &MaskGenerationDialog::updateLivePreview);
     mainLayout->addWidget(m_canvas);
@@ -232,7 +231,7 @@ void MaskGenerationDialog::setupUI() {
     m_previewStretchCombo->addItem(tr("ArcSinh"), ImageBuffer::Display_ArcSinh);
     m_previewStretchCombo->addItem(tr("Sqrt"), ImageBuffer::Display_Sqrt);
     m_previewStretchCombo->addItem(tr("Log"), ImageBuffer::Display_Log);
-    m_previewStretchCombo->setCurrentIndex(1); // Default to AutoStretch
+    m_previewStretchCombo->setCurrentIndex(0); // Default to Linear
     // Generate downsampled data for preview
     // Max dimension ~ 256px for ultra fast preview (blur is O(R^2) or O(N), but smaller N is better)
     // 512px is good balance.

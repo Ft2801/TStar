@@ -98,7 +98,7 @@ public:
     // MainWindowCallbacks Implementation
     ImageBuffer* getCurrentImageBuffer() override;
     ImageViewer* getCurrentViewer() override;
-    void createResultWindow(const ImageBuffer& buffer, const QString& title) override;
+    void createResultWindow(const ImageBuffer& buffer, const QString& title, int mode = -1, float median = 0.25f, bool linked = true) override;
     void logMessage(const QString& message, int severity, bool showPopup = false) override;
     bool isViewerInUse(class ImageViewer* viewer, QString* toolName = nullptr) const override;
     
@@ -128,6 +128,7 @@ private slots:
     void openRARDialog();
     void openStarStretchDialog();
     void openStarRecompositionDialog();
+    void openImageBlendingDialog();
     void openPerfectPaletteDialog();
     void applyGeometry(const QString& operation);
     void applyGeometry(const QString& name, std::function<void(ImageBuffer&)> func);
@@ -311,6 +312,7 @@ private:
     QPointer<class RARDialog> m_rarDlg;
     QPointer<class StarStretchDialog> m_starStretchDlg;
     QPointer<class StarRecompositionDialog> m_starRecompDlg;
+    QPointer<class ImageBlendingDialog> m_imageBlendingDlg;
     QPointer<class PerfectPaletteDialog> m_ppDialog;
     QPointer<class PlateSolvingDialog> m_plateSolveDlg;
     QPointer<class PCCDialog> m_pccDlg;

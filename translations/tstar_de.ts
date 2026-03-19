@@ -3329,6 +3329,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Erweitertes Streckungswerkzeug mit voller Kontrolle:</translation>
         </message>
         <message>
+            <source>Advanced tool to blend two images (Base and Top) with various Photoshop-style blending modes and range masking:</source>
+            <translation type="finished">Erweitertes Werkzeug zum Mischen zweier Bilder (Basis und Oben) mit verschiedenen Überblendmodi im Photoshop-Stil und Bereichsmaskierung:</translation>
+        </message>
+        <message>
             <source>After stacking, the result is ready for post-processing:</source>
             <translation type="finished">Nach dem Stacking ist das Ergebnis zur Nachbearbeitung bereit:</translation>
         </message>
@@ -3509,6 +3513,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Katalog-Hintergrundextraktion (CBE)</translation>
         </message>
         <message>
+            <source>Channel Choice:</source>
+            <translation type="finished">Kanalauswahl:</translation>
+        </message>
+        <message>
             <source>Channel Mode:</source>
             <translation type="finished">Kanalmodus:</translation>
         </message>
@@ -3651,6 +3659,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Contrast Limited Adaptive Histogram Equalization. Enhances local contrast in different regions of the image:</source>
             <translation type="finished">Kontrastbegrenzte Adaptive Histogramm-Egalisierung. Verbessert den lokalen Kontrast in verschiedenen Bereichen des Bildes:</translation>
+        </message>
+        <message>
+            <source>Control the range of pixels from the top image that are applied using Low/High range and feathering.</source>
+            <translation type="finished">Steuern Sie den Bereich der Pixel des oberen Bildes, die mithilfe des niedrigen/hohen Bereichs und der weichen Kante angewendet werden.</translation>
         </message>
         <message>
             <source>Controls contrast amplification. Higher values increase contrast but may introduce noise.</source>
@@ -3870,7 +3882,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>Feathering:</source>
-            <translation type="finished">Feathering:</translation>
+            <translation type="finished">Weiche Kante:</translation>
         </message>
         <message>
             <source>First image in sequence used as reference (or manually selected)</source>
@@ -3951,6 +3963,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Image Annotator</source>
             <translation type="finished">Bild-Annotator</translation>
+        </message>
+        <message>
+            <source>Image Blending</source>
+            <translation type="finished">Bildmischung</translation>
         </message>
         <message>
             <source>Image Calibration</source>
@@ -4165,6 +4181,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Nichtlineare Streckung die Sternfarben erhält</translation>
         </message>
         <message>
+            <source>Normal, Multiply, Screen, Overlay, Add, Subtract, Difference, Soft Light, Hard Light.</source>
+            <translation type="finished">Normal, Multiplizieren, Negativ Multiplizieren, Ineinanderkopieren, Addieren, Subtrahieren, Differenz, Weiches Licht, Hartes Licht.</translation>
+        </message>
+        <message>
             <source>Normalization Mode:</source>
             <translation type="finished">Normalisierungsmodus:</translation>
         </message>
@@ -4329,6 +4349,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">RAW zu FITS:</translation>
         </message>
         <message>
+            <source>Range Masking:</source>
+            <translation type="finished">Bereichsmaskierung:</translation>
+        </message>
+        <message>
             <source>Raw pixel values without stretch</source>
             <translation type="finished">Rohpixelwerte ohne Streckung</translation>
         </message>
@@ -4473,6 +4497,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Wählen Sie einen Bereich reinen Hintergrunds</translation>
         </message>
         <message>
+            <source>Select specific channels (R, G, B, or All) when blending a monochrome image onto a color one.</source>
+            <translation type="finished">Wählen Sie bestimmte Kanäle (R, G, B oder Alle) beim Mischen eines Monochrom-Bildes auf ein Farbbild aus.</translation>
+        </message>
+        <message>
             <source>Select two views from the dropdown menus</source>
             <translation type="finished">Wählen Sie zwei Ansichten aus den Dropdown-Menüs aus</translation>
         </message>
@@ -4603,6 +4631,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Subtracts a scaled continuum image (or RGB channel) from narrowband data</source>
             <translation type="finished">Subtrahiert ein skaliertes Kontinuumsbild (oder RGB-Kanal) von Schmalbanddaten</translation>
+        </message>
+        <message>
+            <source>Supported Modes:</source>
+            <translation type="finished">Unterstützte Modi:</translation>
         </message>
         <message>
             <source>Supports ASTAP integration for professional solving and automatic database path handling</source>
@@ -4941,6 +4973,141 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Zoom:</source>
             <translation type="finished">Zoom:</translation>
+        </message>
+    </context>
+    <context>
+        <name>ImageBlendingDialog</name>
+        <message>
+            <source>Add</source>
+            <translation type="finished">Addieren</translation>
+        </message>
+        <message>
+            <source>All / RGB</source>
+            <translation type="finished">Alle / RGB</translation>
+        </message>
+        <message>
+            <source>Apply</source>
+            <translation type="finished">Anwenden</translation>
+        </message>
+        <message>
+            <source>Base Image:</source>
+            <translation type="finished">Basisbild:</translation>
+        </message>
+        <message>
+            <source>Blended</source>
+            <translation type="finished">Gemischt</translation>
+        </message>
+        <message>
+            <source>Blending</source>
+            <translation type="finished">Mischen</translation>
+        </message>
+        <message>
+            <source>Blue</source>
+            <translation type="finished">Blau</translation>
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="finished">Abbrechen</translation>
+        </message>
+        <message>
+            <source>Channel (Mono Top):</source>
+            <translation type="finished">Kanal (Mono Oben):</translation>
+        </message>
+        <message>
+            <source>Difference</source>
+            <translation type="finished">Differenz</translation>
+        </message>
+        <message>
+            <source>Dimensions Mismatch</source>
+            <translation type="finished">Größenabweichung</translation>
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="finished">Fehler</translation>
+        </message>
+        <message>
+            <source>Feathering:</source>
+            <translation type="finished">Weiche Kante:</translation>
+        </message>
+        <message>
+            <source>Green</source>
+            <translation type="finished">Grün</translation>
+        </message>
+        <message>
+            <source>Hard Light</source>
+            <translation type="finished">Hartes Licht</translation>
+        </message>
+        <message>
+            <source>High Range:</source>
+            <translation type="finished">Hoher Bereich:</translation>
+        </message>
+        <message>
+            <source>High Res (2048px)</source>
+            <translation type="finished">Hohe Auflösung (2048px)</translation>
+        </message>
+        <message>
+            <source>Image Blending</source>
+            <translation type="finished">Bildmischung</translation>
+        </message>
+        <message>
+            <source>Low Range:</source>
+            <translation type="finished">Niedriger Bereich:</translation>
+        </message>
+        <message>
+            <source>Mode:</source>
+            <translation type="finished">Modus:</translation>
+        </message>
+        <message>
+            <source>Multiply</source>
+            <translation type="finished">Multiplizieren</translation>
+        </message>
+        <message>
+            <source>Normal</source>
+            <translation type="finished">Normal</translation>
+        </message>
+        <message>
+            <source>Opacity:</source>
+            <translation type="finished">Deckkraft:</translation>
+        </message>
+        <message>
+            <source>Overlay</source>
+            <translation type="finished">Ineinanderkopieren</translation>
+        </message>
+        <message>
+            <source>Preview Options</source>
+            <translation type="finished">Vorschau-Optionen</translation>
+        </message>
+        <message>
+            <source>Range Mask</source>
+            <translation type="finished">Bereichsmaske</translation>
+        </message>
+        <message>
+            <source>Red</source>
+            <translation type="finished">Rot</translation>
+        </message>
+        <message>
+            <source>Screen</source>
+            <translation type="finished">Negativ Multiplizieren</translation>
+        </message>
+        <message>
+            <source>Selection</source>
+            <translation type="finished">Auswahl</translation>
+        </message>
+        <message>
+            <source>Show Preview</source>
+            <translation type="finished">Vorschau anzeigen</translation>
+        </message>
+        <message>
+            <source>Soft Light</source>
+            <translation type="finished">Weiches Licht</translation>
+        </message>
+        <message>
+            <source>Subtract</source>
+            <translation type="finished">Subtrahieren</translation>
+        </message>
+        <message>
+            <source>Top Image:</source>
+            <translation type="finished">Oberes Bild:</translation>
         </message>
     </context>
     <context>
@@ -5614,6 +5781,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
             <translation type="finished">Bild-Annotator</translation>
         </message>
         <message>
+            <source>Image Blending</source>
+            <translation type="finished">Bildmischung</translation>
+        </message>
+        <message>
             <source>Image already has multiple channels.</source>
             <translation type="finished">Das Bild hat bereits mehrere Kanäle.</translation>
         </message>
@@ -5976,6 +6147,10 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Opening Histogram Transformation...</source>
             <translation type="finished">Öffne Histogrammtransformation...</translation>
+        </message>
+        <message>
+            <source>Opening Image Blending...</source>
+            <translation type="finished">Bildmischung wird geöffnet...</translation>
         </message>
         <message>
             <source>Opening Magenta Correction Tool...</source>
@@ -7381,7 +7556,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>Add</source>
-            <translation type="finished">Hinzufügen</translation>
+            <translation type="finished">Addieren</translation>
         </message>
         <message>
             <source>Apply to Current View</source>
@@ -7697,7 +7872,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>Screen</source>
-            <translation type="finished">Bildschirm</translation>
+            <translation type="finished">Negativ Multiplizieren</translation>
         </message>
         <message>
             <source>Select %1 File</source>
@@ -9952,7 +10127,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>Add</source>
-            <translation type="finished">Hinzufügen</translation>
+            <translation type="finished">Addieren</translation>
         </message>
         <message>
             <source>Cannot open script file: %1</source>
@@ -11522,7 +11697,7 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         </message>
         <message>
             <source>Halo removal parameters</source>
-            <translation type="finished">Parameter zur Halo-Entfernung</translation>
+            <translation type="finished">Halo-Entfernungsparameter</translation>
         </message>
         <message>
             <source>Linear data</source>

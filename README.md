@@ -67,6 +67,7 @@ Tools to transform raw linear data into viewable images.
 *   **Debayer**: Convert RAW Bayer pattern images to full color.
 *   **Extract / Recombine Luminance**: Independent extraction and blending of the luminance channel.
 *   **Remove Pedestal**: Automatically detects and subtracts the minimum pixel value (black floor).
+*   **Image Blending**: Advanced tool to merge two images with Photoshop-style blending modes and range/feathering masks.
 *   **Star Recomposition**: Advanced tool to merge starless and stars images back together with blending modes.
 *   **Perfect Palette Picker**: Mapping narrowband data (SHO, HOO, etc.) to artistic color palettes with real-time preview.
 *   **Continuum Subtraction**: Enhances narrowband details by subtracting broadband continuum/star light.

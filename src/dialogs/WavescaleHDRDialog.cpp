@@ -335,7 +335,7 @@ void WavescaleHDRDialog::createUI() {
     // Controls should have enough space so sliders are wide enough
     QWidget* rightContainer = new QWidget(this);
     rightContainer->setLayout(rightLayout);
-    rightContainer->setMinimumWidth(400); // Increased from 300 as requested for wider controls
+    rightContainer->setMinimumWidth(400);
     
     QGroupBox* grp = new QGroupBox(tr("HDR Controls"), this);
     QFormLayout* form = new QFormLayout(grp);

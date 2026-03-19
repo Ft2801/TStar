@@ -3329,6 +3329,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Herramienta de estiramiento avanzada con control total:</translation>
         </message>
         <message>
+            <source>Advanced tool to blend two images (Base and Top) with various Photoshop-style blending modes and range masking:</source>
+            <translation type="finished">Herramienta avanzada para fusionar dos imágenes (Base y Top) con varios modos de fusión estilo Photoshop y máscara de rango:</translation>
+        </message>
+        <message>
             <source>After stacking, the result is ready for post-processing:</source>
             <translation type="finished">Después del apilamiento, el resultado está listo para post-procesamiento:</translation>
         </message>
@@ -3509,6 +3513,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Extracción de Fondo por Catálogo (CBE)</translation>
         </message>
         <message>
+            <source>Channel Choice:</source>
+            <translation type="finished">Elección de Canal:</translation>
+        </message>
+        <message>
             <source>Channel Mode:</source>
             <translation type="finished">Modo de Canal:</translation>
         </message>
@@ -3651,6 +3659,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Contrast Limited Adaptive Histogram Equalization. Enhances local contrast in different regions of the image:</source>
             <translation type="finished">Ecualización Adaptativa del Histograma con Contraste Limitado. Mejora el contraste local en diferentes regiones de la imagen:</translation>
+        </message>
+        <message>
+            <source>Control the range of pixels from the top image that are applied using Low/High range and feathering.</source>
+            <translation type="finished">Controla el rango de píxeles de la imagen superior que se aplican mediante el rango Bajo/Alto y el desvanecimiento.</translation>
         </message>
         <message>
             <source>Controls contrast amplification. Higher values increase contrast but may introduce noise.</source>
@@ -3870,7 +3882,7 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         </message>
         <message>
             <source>Feathering:</source>
-            <translation type="finished">Suavizado:</translation>
+            <translation type="finished">Desvanecimiento:</translation>
         </message>
         <message>
             <source>First image in sequence used as reference (or manually selected)</source>
@@ -3951,6 +3963,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Image Annotator</source>
             <translation type="finished">Anotador de Imágenes</translation>
+        </message>
+        <message>
+            <source>Image Blending</source>
+            <translation type="finished">Fusión de Imágenes</translation>
         </message>
         <message>
             <source>Image Calibration</source>
@@ -4165,6 +4181,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Estiramiento no lineal que preserva los colores de las estrellas</translation>
         </message>
         <message>
+            <source>Normal, Multiply, Screen, Overlay, Add, Subtract, Difference, Soft Light, Hard Light.</source>
+            <translation type="finished">Normal, Multiplicar, Trama, Superponer, Añadir, Restar, Diferencia, Luz Suave, Luz Fuerte.</translation>
+        </message>
+        <message>
             <source>Normalization Mode:</source>
             <translation type="finished">Modo de Normalización:</translation>
         </message>
@@ -4329,6 +4349,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">RAW a FITS:</translation>
         </message>
         <message>
+            <source>Range Masking:</source>
+            <translation type="finished">Máscara de Rango:</translation>
+        </message>
+        <message>
             <source>Raw pixel values without stretch</source>
             <translation type="finished">Valores de píxeles sin estirar</translation>
         </message>
@@ -4473,6 +4497,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Selecciona una región de fondo puro</translation>
         </message>
         <message>
+            <source>Select specific channels (R, G, B, or All) when blending a monochrome image onto a color one.</source>
+            <translation type="finished">Selecciona canales específicos (R, G, B o Todos) al fusionar una imagen monocromática sobre una en color.</translation>
+        </message>
+        <message>
             <source>Select two views from the dropdown menus</source>
             <translation type="finished">Seleccione dos vistas de los menús desplegables</translation>
         </message>
@@ -4603,6 +4631,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Subtracts a scaled continuum image (or RGB channel) from narrowband data</source>
             <translation type="finished">Resta una imagen continua escalada (o canal RGB) de datos de banda estrecha</translation>
+        </message>
+        <message>
+            <source>Supported Modes:</source>
+            <translation type="finished">Modos Soportados:</translation>
         </message>
         <message>
             <source>Supports ASTAP integration for professional solving and automatic database path handling</source>
@@ -4941,6 +4973,141 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Zoom:</source>
             <translation type="finished">Zoom:</translation>
+        </message>
+    </context>
+    <context>
+        <name>ImageBlendingDialog</name>
+        <message>
+            <source>Add</source>
+            <translation type="finished">Añadir</translation>
+        </message>
+        <message>
+            <source>All / RGB</source>
+            <translation type="finished">Todos / RGB</translation>
+        </message>
+        <message>
+            <source>Apply</source>
+            <translation type="finished">Aplicar</translation>
+        </message>
+        <message>
+            <source>Base Image:</source>
+            <translation type="finished">Imagen Base:</translation>
+        </message>
+        <message>
+            <source>Blended</source>
+            <translation type="finished">Fusionada</translation>
+        </message>
+        <message>
+            <source>Blending</source>
+            <translation type="finished">Fusión</translation>
+        </message>
+        <message>
+            <source>Blue</source>
+            <translation type="finished">Azul</translation>
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="finished">Cancelar</translation>
+        </message>
+        <message>
+            <source>Channel (Mono Top):</source>
+            <translation type="finished">Canal (Top Mono):</translation>
+        </message>
+        <message>
+            <source>Difference</source>
+            <translation type="finished">Diferencia</translation>
+        </message>
+        <message>
+            <source>Dimensions Mismatch</source>
+            <translation type="finished">Diferencia de dimensiones</translation>
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="finished">Error</translation>
+        </message>
+        <message>
+            <source>Feathering:</source>
+            <translation type="finished">Desvanecimiento:</translation>
+        </message>
+        <message>
+            <source>Green</source>
+            <translation type="finished">Verde</translation>
+        </message>
+        <message>
+            <source>Hard Light</source>
+            <translation type="finished">Luz Fuerte</translation>
+        </message>
+        <message>
+            <source>High Range:</source>
+            <translation type="finished">Rango Alto:</translation>
+        </message>
+        <message>
+            <source>High Res (2048px)</source>
+            <translation type="finished">Alta Resolución (2048px)</translation>
+        </message>
+        <message>
+            <source>Image Blending</source>
+            <translation type="finished">Fusión de Imágenes</translation>
+        </message>
+        <message>
+            <source>Low Range:</source>
+            <translation type="finished">Rango Bajo:</translation>
+        </message>
+        <message>
+            <source>Mode:</source>
+            <translation type="finished">Modo:</translation>
+        </message>
+        <message>
+            <source>Multiply</source>
+            <translation type="finished">Multiplicar</translation>
+        </message>
+        <message>
+            <source>Normal</source>
+            <translation type="finished">Normal</translation>
+        </message>
+        <message>
+            <source>Opacity:</source>
+            <translation type="finished">Opacidad:</translation>
+        </message>
+        <message>
+            <source>Overlay</source>
+            <translation type="finished">Superponer</translation>
+        </message>
+        <message>
+            <source>Preview Options</source>
+            <translation type="finished">Opciones de Vista Previa</translation>
+        </message>
+        <message>
+            <source>Range Mask</source>
+            <translation type="finished">Máscara de Rango</translation>
+        </message>
+        <message>
+            <source>Red</source>
+            <translation type="finished">Rojo</translation>
+        </message>
+        <message>
+            <source>Screen</source>
+            <translation type="finished">Trama</translation>
+        </message>
+        <message>
+            <source>Selection</source>
+            <translation type="finished">Selección</translation>
+        </message>
+        <message>
+            <source>Show Preview</source>
+            <translation type="finished">Mostrar Vista Previa</translation>
+        </message>
+        <message>
+            <source>Soft Light</source>
+            <translation type="finished">Luz Suave</translation>
+        </message>
+        <message>
+            <source>Subtract</source>
+            <translation type="finished">Restar</translation>
+        </message>
+        <message>
+            <source>Top Image:</source>
+            <translation type="finished">Immagine Superior:</translation>
         </message>
     </context>
     <context>
@@ -5614,6 +5781,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Anotador de Imágenes</translation>
         </message>
         <message>
+            <source>Image Blending</source>
+            <translation type="finished">Fusión de Imágenes</translation>
+        </message>
+        <message>
             <source>Image already has multiple channels.</source>
             <translation type="finished">La imagen ya tiene múltiples canales.</translation>
         </message>
@@ -5976,6 +6147,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Opening Histogram Transformation...</source>
             <translation type="finished">Abriendo Transformación de Histograma...</translation>
+        </message>
+        <message>
+            <source>Opening Image Blending...</source>
+            <translation type="finished">Abriendo Fusión de Imágenes...</translation>
         </message>
         <message>
             <source>Opening Magenta Correction Tool...</source>

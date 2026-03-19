@@ -437,7 +437,11 @@ ASTAP_DST_DIR="$RESOURCES_DIR/deps"
 ensure_dir "$ASTAP_DST_DIR"
 
 ASTAP_SRC=""
-if [ -x "/Applications/ASTAP.app/Contents/MacOS/astap" ]; then
+# First check if already bundled by workflow in Contents/MacOS
+if [ -x "$DIST_DIR/Contents/MacOS/astap" ]; then
+    ASTAP_SRC="$DIST_DIR/Contents/MacOS/astap"
+    echo "  - Using pre-bundled ASTAP from Contents/MacOS"
+elif [ -x "/Applications/ASTAP.app/Contents/MacOS/astap" ]; then
     ASTAP_SRC="/Applications/ASTAP.app/Contents/MacOS/astap"
 elif [ -x "/usr/local/bin/astap" ]; then
     ASTAP_SRC="/usr/local/bin/astap"

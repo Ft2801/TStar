@@ -3327,6 +3327,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Advanced tool to blend two images (Base and Top) with various Photoshop-style blending modes and range masking:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>After stacking, the result is ready for post-processing:</source>
             <translation type="unfinished" />
         </message>
@@ -3507,6 +3511,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Channel Choice:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Channel Mode:</source>
             <translation type="unfinished" />
         </message>
@@ -3648,6 +3656,10 @@
         </message>
         <message>
             <source>Contrast Limited Adaptive Histogram Equalization. Enhances local contrast in different regions of the image:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Control the range of pixels from the top image that are applied using Low/High range and feathering.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3951,6 +3963,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Image Blending</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Image Calibration</source>
             <translation type="unfinished" />
         </message>
@@ -4163,6 +4179,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Normal, Multiply, Screen, Overlay, Add, Subtract, Difference, Soft Light, Hard Light.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Normalization Mode:</source>
             <translation type="unfinished" />
         </message>
@@ -4327,6 +4347,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Range Masking:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Raw pixel values without stretch</source>
             <translation type="unfinished" />
         </message>
@@ -4471,6 +4495,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Select specific channels (R, G, B, or All) when blending a monochrome image onto a color one.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Select two views from the dropdown menus</source>
             <translation type="unfinished" />
         </message>
@@ -4600,6 +4628,10 @@
         </message>
         <message>
             <source>Subtracts a scaled continuum image (or RGB channel) from narrowband data</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Supported Modes:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4938,6 +4970,141 @@
         </message>
         <message>
             <source>Zoom:</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>ImageBlendingDialog</name>
+        <message>
+            <source>Add</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>All / RGB</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Apply</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Base Image:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Blended</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Blending</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Blue</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Channel (Mono Top):</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Difference</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Dimensions Mismatch</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Feathering:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Green</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Hard Light</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>High Range:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>High Res (2048px)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image Blending</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Low Range:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Mode:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Multiply</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Normal</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opacity:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Overlay</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preview Options</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Range Mask</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Red</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Screen</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Selection</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Show Preview</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Soft Light</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Subtract</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Top Image:</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -5612,6 +5779,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Image Blending</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Image already has multiple channels.</source>
             <translation type="unfinished" />
         </message>
@@ -5973,6 +6144,10 @@
         </message>
         <message>
             <source>Opening Histogram Transformation...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening Image Blending...</source>
             <translation type="unfinished" />
         </message>
         <message>

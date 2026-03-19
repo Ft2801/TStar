@@ -530,6 +530,8 @@ set(TSTAR_SOURCES
     src/algos/StarStretchRunner.h
     src/algos/StarRecompositionRunner.cpp
     src/algos/StarRecompositionRunner.h
+    src/algos/ImageBlendingRunner.cpp
+    src/algos/ImageBlendingRunner.h
     src/algos/PerfectPaletteRunner.cpp
     src/algos/PerfectPaletteRunner.h
     src/algos/StatisticalStretch.cpp
@@ -632,6 +634,8 @@ set(TSTAR_SOURCES
     src/dialogs/StarStretchDialog.h
     src/dialogs/StarRecompositionDialog.cpp
     src/dialogs/StarRecompositionDialog.h
+    src/dialogs/ImageBlendingDialog.cpp
+    src/dialogs/ImageBlendingDialog.h
     src/dialogs/AstroSpikeDialog.cpp
     src/dialogs/AstroSpikeDialog.h
     src/dialogs/RawEditorDialog.cpp

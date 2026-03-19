@@ -829,7 +829,7 @@ void GHSDialog::resetIntensity() {
     
     m_dSpin->setValue(0.0);
     m_bSpin->setValue(0.0); // Reset B to neutral (0.0)
-    m_bpSpin->setValue(0.0); // Reset BP as requested
+    m_bpSpin->setValue(0.0); // Reset BP
     
     m_dSpin->blockSignals(false);
     m_bSpin->blockSignals(false);

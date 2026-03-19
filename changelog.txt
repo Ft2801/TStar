@@ -11,6 +11,7 @@ Version 1.8.0
 - Implemented star halo removal tool
 - Implemented morphological operations tool
 - Implemented linear fit for RGB recomposition
+- Implemented image blending tool
 - Integration of local database files for constellations and catalogs
 - Added fast drizzle mode in the stacking suite
 - Added default display stretch mode in the settings

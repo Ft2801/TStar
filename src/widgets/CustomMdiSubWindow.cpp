@@ -442,7 +442,6 @@ void CustomTitleBar::setZoom(int percent) {
 
 void CustomTitleBar::setMaximized(bool maximized) {
     m_maximized = maximized;
-    // User requested swap: use arrows (RESTORE) for 'to maximize' and square (MAXIMIZE) for 'to restore'
     m_maxBtn->setIcon(iconFromSvg(m_maximized ? Icons::WIN_MAXIMIZE : Icons::WIN_RESTORE));
 }
 

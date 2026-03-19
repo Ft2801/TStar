@@ -65,6 +65,7 @@
 #include "dialogs/ChannelCombinationDialog.h"
 #include "dialogs/StarStretchDialog.h"
 #include "dialogs/StarRecompositionDialog.h"
+#include "dialogs/ImageBlendingDialog.h"
 #include "dialogs/PerfectPaletteDialog.h"
 #include "dialogs/PlateSolvingDialog.h"
 #include "dialogs/PCCDialog.h"
@@ -1198,6 +1199,13 @@ MainWindow::MainWindow(QWidget *parent)
     // --- D. Channels ---
     QMenu* chanMenu = processMenu->addMenu(tr("Channel Operations"));
     addMenuAction(chanMenu, tr("Extract Channels"), "", &MainWindow::extractChannels);
+    addMenuAction(chanMenu, tr("Combine Channels"), "", [this](){
+        if (activateTool(tr("Combine Channels"))) return;
+        combineChannels();
+    });
+    addMenuAction(chanMenu, tr("Align Channels"), "", [this](){
+        openAlignChannelsDialog();
+    });
     addMenuAction(chanMenu, tr("Extract Luminance"), "", [this](){
         openExtractLuminanceDialog();
     });
@@ -1206,16 +1214,12 @@ MainWindow::MainWindow(QWidget *parent)
     });
     addMenuAction(chanMenu, tr("Remove Pedestal (Auto)"), "", [this](){
         removePedestal();
-    });
-    addMenuAction(chanMenu, tr("Combine Channels"), "", [this](){
-        if (activateTool(tr("Combine Channels"))) return;
-        combineChannels();
-    });
-    addMenuAction(chanMenu, tr("Align Channels"), "", [this](){
-        openAlignChannelsDialog();
     });    
     addMenuAction(chanMenu, tr("Star Recomposition"), "", [this](){
         openStarRecompositionDialog();
+    });
+    addMenuAction(chanMenu, tr("Image Blending"), "", [this](){
+        openImageBlendingDialog();
     });
     addMenuAction(chanMenu, tr("Perfect Palette Picker"), "", [this](){
         openPerfectPaletteDialog();
@@ -2458,7 +2462,7 @@ void MainWindow::openStretchDialog() {
         QWidget* p = m_stretchDlg->parentWidget();
         while (p && !qobject_cast<CustomMdiSubWindow*>(p)) p = p->parentWidget();
         if (auto sub = qobject_cast<CustomMdiSubWindow*>(p)) {
-            centerToolWindow(sub); // User requested precise centering
+            centerToolWindow(sub);
             sub->showNormal();
             sub->raise();
             sub->activateWindow();
@@ -3148,6 +3152,24 @@ void MainWindow::openStarStretchDialog() {
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     
     setupToolSubwindow(nullptr, dlg, tr("Star Stretch"));
+}
+
+void MainWindow::openImageBlendingDialog() {
+    ImageViewer* v = currentViewer();
+    if (m_imageBlendingDlg) {
+        m_imageBlendingDlg->raise();
+        m_imageBlendingDlg->activateWindow();
+        if (v) m_imageBlendingDlg->setViewer(v);
+        return;
+    }
+
+    log(tr("Opening Image Blending..."), Log_Action, true);
+    auto dlg = new ImageBlendingDialog(this);
+    m_imageBlendingDlg = dlg;
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    if (v) dlg->setViewer(v);
+
+    setupToolSubwindow(nullptr, dlg, tr("Image Blending"));
 }
 
 void MainWindow::openStarRecompositionDialog() {
@@ -3928,7 +3950,7 @@ void MainWindow::startFadeOut() {
     connect(m_anim, &QPropertyAnimation::finished, this, [this](){
         m_isClosing = true;
         close();
-        // Force exit processes as requested to prevent hanging threads
+        // Force exit processes to prevent hanging threads
         std::exit(0); 
     });
     m_anim->start();
@@ -4751,15 +4773,22 @@ ImageViewer* MainWindow::getCurrentViewer() {
     return currentViewer();
 }
 
-void MainWindow::createResultWindow(const ImageBuffer& buffer, const QString& title) {
+void MainWindow::createResultWindow(const ImageBuffer& buffer, const QString& title, int mode, float median, bool linked) {
     ImageViewer* src = currentViewer();
-    auto mode   = src ? src->getDisplayMode()       : m_displayMode;
-    auto median = src ? src->getAutoStretchMedian() : 0.25f;
-    auto linked = src ? src->isDisplayLinked()      : m_displayLinked;
+    ImageBuffer::DisplayMode dMode;
+    if (mode == -1) {
+        dMode = src ? src->getDisplayMode() : getDefaultDisplayMode();
+    } else {
+        dMode = static_cast<ImageBuffer::DisplayMode>(mode);
+    }
+    
+    float dMedian = (mode == -1 && src) ? src->getAutoStretchMedian() : median;
+    bool dLinked = (mode == -1 && src) ? src->isDisplayLinked() : linked;
+
     QString childTitle = (title.startsWith('_') && src)
                          ? buildChildTitle(src->windowTitle(), title)
                          : title;
-    createNewImageWindow(buffer, childTitle, mode, median, linked);
+    createNewImageWindow(buffer, childTitle, dMode, dMedian, dLinked);
 }
 
 void MainWindow::logMessage(const QString& message, int severity, bool showPopup) {

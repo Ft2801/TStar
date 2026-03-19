@@ -149,9 +149,7 @@ void SidebarWidget::createTab(const QString& name, [[maybe_unused]] const QStrin
     VerticalButton* btn = new VerticalButton(name, this);
     btn->setCheckable(true);
     btn->setToolTip(name);
-    
-    // Prioritize vertical text as requested ("console" and "header viewer")
-    
+        
     btn->setFixedSize(30, 120); // Taller for vertical text
     
     // Stylesheet might conflict with custom paint? 
