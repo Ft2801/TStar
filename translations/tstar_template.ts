@@ -2304,7 +2304,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Deconvolution completed.\nSaved: %1</source>
+            <source>Deconvolution completed. Saved: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3255,7 +3255,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Add object labels and annotations using catalog data.</source>
+            <source>Accelerated drizzle integration mode for faster reconstruction when undersampled data benefits from drizzle.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3411,6 +3411,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Automatic catalogs: Messier, NGC, IC, LdN, Sh2, Stars, and Constellations</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Automatic histogram stretch for best visibility</source>
             <translation type="unfinished" />
         </message>
@@ -3487,6 +3491,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Can use bundled/local solver resources and catalog data for robust plate solutions</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Catalog Background Extraction (CBE)</source>
             <translation type="unfinished" />
         </message>
@@ -3556,6 +3564,10 @@
         </message>
         <message>
             <source>Closing Project: Use File &gt; Close Project to deactivate the current project</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Collapse (shade) views to title bars and monitor them from the right-side preview panel</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3811,6 +3823,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Exposure, contrast, highlights, shadows, whites, and blacks controls</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Extract Channels</source>
             <translation type="unfinished" />
         </message>
@@ -3828,6 +3844,10 @@
         </message>
         <message>
             <source>FITS keywords and image properties are automatically transferred to preserve EXIF data</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Fast Drizzle:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3983,6 +4003,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Lightroom-style RAW editor for fast global light/color adjustments:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Linear:</source>
             <translation type="unfinished" />
         </message>
@@ -4012,6 +4036,14 @@
         </message>
         <message>
             <source>Maintains fine structures while removing color cast</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Manual + automatic annotation system for scientific overlays and presentation exports:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Manual drawing tools: circles, rectangles, arrows, and text labels</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4135,11 +4167,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Open multiple image views in independent subwindows with preserved image aspect ratio</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Opening an Existing Project</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Optional Normalization: Flat field normalization normalizes the flat frame before division</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Optional WCS RA/Dec grid overlay with dynamic spacing</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4152,6 +4192,10 @@
         </message>
         <message>
             <source>Optionally creates a star-only mask</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Optionally hide minimized/collapsed views from the workspace while keeping quick preview access</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4248,6 +4292,10 @@
         </message>
         <message>
             <source>Protection</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>RAW Editor</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4359,6 +4407,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>SPCC (Spectrophotometric Color Calibration)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Saturation</source>
             <translation type="unfinished" />
         </message>
@@ -4376,6 +4428,10 @@
         </message>
         <message>
             <source>Scaling:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Scientific color calibration based on spectral response curves and stellar photometry:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4475,6 +4531,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Star Halo Removal</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Star Recomposition</source>
             <translation type="unfinished" />
         </message>
@@ -4523,11 +4583,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Supports ASTAP integration for professional solving and automatic database path handling</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Supports Ha/OIII/SII with multiple blend and lightness modes</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Supports all major RAW formats (Canon, Nikon, Sony, etc.)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Supports model fitting and optional chromatic gradient correction</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4548,6 +4616,10 @@
         </message>
         <message>
             <source>TStar includes a comprehensive pipeline for preprocessing and stacking astronomical images. Follow these steps in order: Conversion → Calibration → Registration → Stacking.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>TStar includes workspace-level color management to keep display and processing behavior consistent across tools and sessions.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4572,6 +4644,10 @@
         </message>
         <message>
             <source>The tool will balance RGB channels</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Tile views automatically (grid, horizontal, vertical) for side-by-side analysis</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4607,6 +4683,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Tool to detect and subtract halos around bright stars, improving image clarity and preventing halo overlaps.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Transformation:</source>
             <translation type="unfinished" />
         </message>
@@ -4615,7 +4695,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Undo/Redo editing workflow with persistent annotations across reopen</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Undo/Redo:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Use Save with Burn Annotations to imprint overlays into exported display images</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4628,6 +4716,10 @@
         </message>
         <message>
             <source>Use the dropdown menu in the toolbar to change visualization:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Use the magnifier (cursor-following loupe) for precise focus checks while navigating</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4655,11 +4747,19 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Uses spectral database data (filters, sensors, SED curves) for physically grounded calibration</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Uses wavelet decomposition to process different structural scales</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Utilities</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>View Management</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4687,6 +4787,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>White balance and color controls integrated with the TStar workflow</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Winsorized Sigma:</source>
             <translation type="unfinished" />
         </message>
@@ -4696,6 +4800,14 @@
         </message>
         <message>
             <source>Works best when combined with Background Neutralization for optimal color balance</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Works with plate-solved images and measured star photometry</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Workspace Color Management</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5908,6 +6020,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Opening Star Halo Removal...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Opening Star Recomposition...</source>
             <translation type="unfinished" />
         </message>
@@ -6273,6 +6389,14 @@
         </message>
         <message>
             <source>Star Analysis</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Star Halo Removal</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Star Halo Removal applied.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9544,7 +9668,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>tstar_data.fits could not be loaded from:\n%1</source>
+            <source>tstar_data.fits could not be loaded from: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11224,6 +11348,85 @@
         </message>
         <message>
             <source>theta</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>StarHaloRemovalDialog</name>
+        <message>
+            <source>%1 [Star Halo Removal]</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>+</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>-</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Apply</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Apply to:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Create new view</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Fit</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Halo removal parameters</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Linear data</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No Image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Overwrite active view</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Please select an image first.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preview</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reduction:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reset</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Star Halo Removal</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Star Halo Removal applied.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Zoom: Ctrl+Wheel</source>
             <translation type="unfinished" />
         </message>
     </context>

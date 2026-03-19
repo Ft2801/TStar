@@ -467,7 +467,7 @@ void RawEditorDialog::connectControl(RawEditorControl& ctrl) {
 
     // On slider release: trigger immediate preview with latest params on downsampled buffer.
     // Combined with maxDim=2048px cache, this gives instant visual feedback.
-    connect(slider, &QSlider::sliderReleased, this, [this, paramPtr](void) {
+    connect(slider, &QSlider::sliderReleased, this, [this](void) {
         // Update param if needed (value already set by valueChanged lambda above)
         onParamChanged();
     });

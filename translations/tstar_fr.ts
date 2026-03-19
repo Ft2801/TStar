@@ -2304,7 +2304,7 @@
             <translation type="finished">Déconvolution</translation>
         </message>
         <message>
-            <source>Deconvolution completed.\nSaved: %1</source>
+            <source>Deconvolution completed. Saved: %1</source>
             <translation type="finished">Déconvolution terminée. Enregistré : %1</translation>
         </message>
         <message>
@@ -3257,8 +3257,8 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Correcteur d'Aberrations (RAR)</translation>
         </message>
         <message>
-            <source>Add object labels and annotations using catalog data.</source>
-            <translation type="finished">Ajoutez des étiquettes et annotations en utilisant les données du catalogue.</translation>
+            <source>Accelerated drizzle integration mode for faster reconstruction when undersampled data benefits from drizzle.</source>
+            <translation type="finished">Mode d'intégration drizzle accéléré pour une reconstruction plus rapide lorsque les données sous-échantillonnées bénéficient du drizzle.</translation>
         </message>
         <message>
             <source>Adds WCS (World Coordinate System) metadata</source>
@@ -3413,6 +3413,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Automatiser les flux de traitement d'images complexes en plusieurs étapes</translation>
         </message>
         <message>
+            <source>Automatic catalogs: Messier, NGC, IC, LdN, Sh2, Stars, and Constellations</source>
+            <translation type="finished">Catalogues automatiques : Messier, NGC, IC, LdN, Sh2, Étoiles et Constellations</translation>
+        </message>
+        <message>
             <source>Automatic histogram stretch for best visibility</source>
             <translation type="finished">Étirement automatique de l'histogramme pour une meilleure visibilité</translation>
         </message>
@@ -3489,6 +3493,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Flux de travail d'étalonnage :</translation>
         </message>
         <message>
+            <source>Can use bundled/local solver resources and catalog data for robust plate solutions</source>
+            <translation type="finished">Peut utiliser des ressources de solveur locales/intégrées et des données de catalogue pour des résolutions astrométriques robustes</translation>
+        </message>
+        <message>
             <source>Catalog Background Extraction (CBE)</source>
             <translation type="finished">Extraction de Fond par Catalogue (CBE)</translation>
         </message>
@@ -3559,6 +3567,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Closing Project: Use File &gt; Close Project to deactivate the current project</source>
             <translation type="finished">Fermeture du Projet : Utilisez Fichier &gt; Fermer Projet pour désactiver le projet actuel</translation>
+        </message>
+        <message>
+            <source>Collapse (shade) views to title bars and monitor them from the right-side preview panel</source>
+            <translation type="finished">Réduisez (enroulez) les vues sur les barres de titre et surveillez-les depuis le panneau d'aperçu de droite</translation>
         </message>
         <message>
             <source>Color Boost:</source>
@@ -3813,6 +3825,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Exporter les couches individuelles vers de nouvelles fenêtres</translation>
         </message>
         <message>
+            <source>Exposure, contrast, highlights, shadows, whites, and blacks controls</source>
+            <translation type="finished">Contrôles d'exposition, contraste, hautes lumières, ombres, blancs et noirs</translation>
+        </message>
+        <message>
             <source>Extract Channels</source>
             <translation type="finished">Extraire Canaux</translation>
         </message>
@@ -3831,6 +3847,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>FITS keywords and image properties are automatically transferred to preserve EXIF data</source>
             <translation type="finished">Les mots-clés FITS et les propriétés de l'image sont automatiquement transférés pour préserver les données EXIF</translation>
+        </message>
+        <message>
+            <source>Fast Drizzle:</source>
+            <translation type="finished">Fast Drizzle :</translation>
         </message>
         <message>
             <source>Fast normalization or K-Sigma-based normalization per frame</source>
@@ -3985,6 +4005,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Raccourcis Clavier</translation>
         </message>
         <message>
+            <source>Lightroom-style RAW editor for fast global light/color adjustments:</source>
+            <translation type="finished">Éditeur RAW de style Lightroom pour des réglages globaux rapides de lumière/couleur :</translation>
+        </message>
+        <message>
             <source>Linear:</source>
             <translation type="finished">Linéaire :</translation>
         </message>
@@ -4015,6 +4039,14 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Maintains fine structures while removing color cast</source>
             <translation type="finished">Maintient les structures fines tout en supprimant la dominante de couleur</translation>
+        </message>
+        <message>
+            <source>Manual + automatic annotation system for scientific overlays and presentation exports:</source>
+            <translation type="finished">Système d'annotation manuel + automatique pour superpositions scientifiques et exports de présentation :</translation>
+        </message>
+        <message>
+            <source>Manual drawing tools: circles, rectangles, arrows, and text labels</source>
+            <translation type="finished">Outils de dessin manuel : cercles, rectangles, flèches et étiquettes texte</translation>
         </message>
         <message>
             <source>Manual histogram stretch with shadows, midtones, and highlights controls.</source>
@@ -4137,12 +4169,20 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Ouvrir fichier</translation>
         </message>
         <message>
+            <source>Open multiple image views in independent subwindows with preserved image aspect ratio</source>
+            <translation type="finished">Ouvrez plusieurs vues d'image dans des sous-fenêtres indépendantes avec conservation du ratio</translation>
+        </message>
+        <message>
             <source>Opening an Existing Project</source>
             <translation type="finished">Ouverture d'un projet existant</translation>
         </message>
         <message>
             <source>Optional Normalization: Flat field normalization normalizes the flat frame before division</source>
             <translation type="finished">Normalisation optionnelle : La normalisation du champ plat normalise l'image plate avant la division</translation>
+        </message>
+        <message>
+            <source>Optional WCS RA/Dec grid overlay with dynamic spacing</source>
+            <translation type="finished">Superposition facultative de grille WCS RA/Dec avec espacement dynamique</translation>
         </message>
         <message>
             <source>Optional green noise removal during the stretch.</source>
@@ -4155,6 +4195,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Optionally creates a star-only mask</source>
             <translation type="finished">Crée optionnellement un masque d'étoiles uniquement</translation>
+        </message>
+        <message>
+            <source>Optionally hide minimized/collapsed views from the workspace while keeping quick preview access</source>
+            <translation type="finished">Masquez éventuellement les vues minimisées/réduites de l'espace de travail tout en conservant l'accès rapide à l'aperçu</translation>
         </message>
         <message>
             <source>Or use File &gt; Recent Projects to quickly access recently opened projects</source>
@@ -4251,6 +4295,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Protection</source>
             <translation type="finished">Protection</translation>
+        </message>
+        <message>
+            <source>RAW Editor</source>
+            <translation type="finished">Éditeur RAW</translation>
         </message>
         <message>
             <source>RAW to FITS Converter</source>
@@ -4361,6 +4409,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">SCNR :</translation>
         </message>
         <message>
+            <source>SPCC (Spectrophotometric Color Calibration)</source>
+            <translation type="finished">SPCC (Calibration Couleur Spectrophotométrique)</translation>
+        </message>
+        <message>
             <source>Saturation</source>
             <translation type="finished">Saturation</translation>
         </message>
@@ -4379,6 +4431,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Scaling:</source>
             <translation type="finished">Mise à l'échelle :</translation>
+        </message>
+        <message>
+            <source>Scientific color calibration based on spectral response curves and stellar photometry:</source>
+            <translation type="finished">Calibration couleur scientifique basée sur les courbes de réponse spectrale et la photométrie stellaire :</translation>
         </message>
         <message>
             <source>Script Runner</source>
@@ -4477,6 +4533,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Détection d'Étoiles :</translation>
         </message>
         <message>
+            <source>Star Halo Removal</source>
+            <translation type="finished">Suppression des Halos d'Étoiles</translation>
+        </message>
+        <message>
             <source>Star Recomposition</source>
             <translation type="finished">Recomposition des Étoiles</translation>
         </message>
@@ -4525,12 +4585,20 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Soustrait une image continue mise à l'échelle (ou canal RGB) des données à bande étroite</translation>
         </message>
         <message>
+            <source>Supports ASTAP integration for professional solving and automatic database path handling</source>
+            <translation type="finished">Prend en charge l'intégration ASTAP pour une résolution professionnelle et la gestion automatique des chemins de base de données</translation>
+        </message>
+        <message>
             <source>Supports Ha/OIII/SII with multiple blend and lightness modes</source>
             <translation type="finished">Prend en charge Ha/OIII/SII avec plusieurs modes de fusion et de luminosité</translation>
         </message>
         <message>
             <source>Supports all major RAW formats (Canon, Nikon, Sony, etc.)</source>
             <translation type="finished">Prend en charge tous les principaux formats RAW (Canon, Nikon, Sony, etc.)</translation>
+        </message>
+        <message>
+            <source>Supports model fitting and optional chromatic gradient correction</source>
+            <translation type="finished">Prend en charge l'ajustement de modèle et la correction optionnelle du gradient chromatique</translation>
         </message>
         <message>
             <source>Supports translation, rotation, and scale correction</source>
@@ -4551,6 +4619,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>TStar includes a comprehensive pipeline for preprocessing and stacking astronomical images. Follow these steps in order: Conversion → Calibration → Registration → Stacking.</source>
             <translation type="finished">TStar inclut un pipeline complet pour le prétraitement et l'empilement d'images astronomiques. Suivez ces étapes dans l'ordre : Conversion → Étalonnage → Enregistrement → Empilement.</translation>
+        </message>
+        <message>
+            <source>TStar includes workspace-level color management to keep display and processing behavior consistent across tools and sessions.</source>
+            <translation type="finished">TStar inclut une gestion des couleurs au niveau de l'espace de travail pour garder un comportement d'affichage et de traitement cohérent entre outils et sessions.</translation>
         </message>
         <message>
             <source>TStar supports FITS, XISF, TIFF, and PNG image formats commonly used in astrophotography.</source>
@@ -4575,6 +4647,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>The tool will balance RGB channels</source>
             <translation type="finished">L'outil équilibrera les canaux RGB</translation>
+        </message>
+        <message>
+            <source>Tile views automatically (grid, horizontal, vertical) for side-by-side analysis</source>
+            <translation type="finished">Disposez automatiquement les vues (grille, horizontal, vertical) pour une analyse côte à côte</translation>
         </message>
         <message>
             <source>Tip: Create separate master frames for each filter (e.g., L, R, G, B, Ha, OIII, SII)</source>
@@ -4609,6 +4685,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Activer/désactiver la visualisation du masque</translation>
         </message>
         <message>
+            <source>Tool to detect and subtract halos around bright stars, improving image clarity and preventing halo overlaps.</source>
+            <translation type="finished">Outil pour détecter et soustraire les halos autour des étoiles brillantes, améliorant la clarté de l'image.</translation>
+        </message>
+        <message>
             <source>Transformation:</source>
             <translation type="finished">Transformation :</translation>
         </message>
@@ -4617,8 +4697,16 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Annuler</translation>
         </message>
         <message>
+            <source>Undo/Redo editing workflow with persistent annotations across reopen</source>
+            <translation type="finished">Flux d'édition Annuler/Rétablir avec annotations persistantes après réouverture</translation>
+        </message>
+        <message>
             <source>Undo/Redo:</source>
             <translation type="finished">Annuler/Rétablir :</translation>
+        </message>
+        <message>
+            <source>Use Save with Burn Annotations to imprint overlays into exported display images</source>
+            <translation type="finished">Utilisez Enregistrer avec Burn Annotations pour imprimer les superpositions dans les images exportées</translation>
         </message>
         <message>
             <source>Use Smoothness to feather the selection edges</source>
@@ -4631,6 +4719,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Use the dropdown menu in the toolbar to change visualization:</source>
             <translation type="finished">Utilisez le menu déroulant dans la barre d'outils pour changer la visualisation :</translation>
+        </message>
+        <message>
+            <source>Use the magnifier (cursor-following loupe) for precise focus checks while navigating</source>
+            <translation type="finished">Utilisez la loupe (suivi du curseur) pour des vérifications de mise au point précises pendant la navigation</translation>
         </message>
         <message>
             <source>Use variables like $T (target), $R, $G, $B</source>
@@ -4657,12 +4749,20 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Utilise des étoiles de référence pour une calibration précise des couleurs</translation>
         </message>
         <message>
+            <source>Uses spectral database data (filters, sensors, SED curves) for physically grounded calibration</source>
+            <translation type="finished">Utilise des données de base spectrale (filtres, capteurs, courbes SED) pour une calibration physiquement fondée</translation>
+        </message>
+        <message>
             <source>Uses wavelet decomposition to process different structural scales</source>
             <translation type="finished">Utilise décomposition en ondelettes pour traiter différentes échelles structurelles</translation>
         </message>
         <message>
             <source>Utilities</source>
             <translation type="finished">Utilitaires</translation>
+        </message>
+        <message>
+            <source>View Management</source>
+            <translation type="finished">Gestion des Vues</translation>
         </message>
         <message>
             <source>View and edit FITS header metadata.</source>
@@ -4689,6 +4789,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Bienvenue dans TStar ! Ce guide couvre toutes les fonctionnalités et outils disponibles dans l'application.</translation>
         </message>
         <message>
+            <source>White balance and color controls integrated with the TStar workflow</source>
+            <translation type="finished">Balance des blancs et contrôles couleur intégrés au flux de travail TStar</translation>
+        </message>
+        <message>
             <source>Winsorized Sigma:</source>
             <translation type="finished">Winsorized Sigma:</translation>
         </message>
@@ -4699,6 +4803,14 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Works best when combined with Background Neutralization for optimal color balance</source>
             <translation type="finished">Fonctionne mieux lorsqu'il est combiné avec la Neutralisation de Fond pour équilibre de couleur optimal</translation>
+        </message>
+        <message>
+            <source>Works with plate-solved images and measured star photometry</source>
+            <translation type="finished">Fonctionne avec des images résolues astrométriquement et une photométrie stellaire mesurée</translation>
+        </message>
+        <message>
+            <source>Workspace Color Management</source>
+            <translation type="finished">Gestion des Couleurs de l'Espace de Travail</translation>
         </message>
         <message>
             <source>Workspace Projects</source>
@@ -5910,6 +6022,10 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">Ouverture dialogue empilement...</translation>
         </message>
         <message>
+            <source>Opening Star Halo Removal...</source>
+            <translation type="finished">Ouverture de Star Halo Removal...</translation>
+        </message>
+        <message>
             <source>Opening Star Recomposition...</source>
             <translation type="finished">Ouverture Recomposition Stellaire...</translation>
         </message>
@@ -6277,6 +6393,14 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Star Analysis</source>
             <translation type="finished">Analyse des Étoiles</translation>
+        </message>
+        <message>
+            <source>Star Halo Removal</source>
+            <translation type="finished">Suppression des Halos d'Étoiles</translation>
+        </message>
+        <message>
+            <source>Star Halo Removal applied.</source>
+            <translation type="finished">Star Halo Removal appliqué.</translation>
         </message>
         <message>
             <source>Star Recomposition</source>
@@ -9547,7 +9671,7 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
             <translation type="finished">pente-seule</translation>
         </message>
         <message>
-            <source>tstar_data.fits could not be loaded from:\n%1</source>
+            <source>tstar_data.fits could not be loaded from: %1</source>
             <translation type="finished">tstar_data.fits n'a pas pu être chargé depuis : %1</translation>
         </message>
         <message>
@@ -11228,6 +11352,85 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>theta</source>
             <translation type="finished">theta</translation>
+        </message>
+    </context>
+    <context>
+        <name>StarHaloRemovalDialog</name>
+        <message>
+            <source>%1 [Star Halo Removal]</source>
+            <translation type="finished">%1 [Suppression de Halo Stellaire]</translation>
+        </message>
+        <message>
+            <source>+</source>
+            <translation type="finished">+</translation>
+        </message>
+        <message>
+            <source>-</source>
+            <translation type="finished">-</translation>
+        </message>
+        <message>
+            <source>Apply</source>
+            <translation type="finished">Appliquer</translation>
+        </message>
+        <message>
+            <source>Apply to:</source>
+            <translation type="finished">Appliquer à :</translation>
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="finished">Annuler</translation>
+        </message>
+        <message>
+            <source>Create new view</source>
+            <translation type="finished">Créer une nouvelle vue</translation>
+        </message>
+        <message>
+            <source>Fit</source>
+            <translation type="finished">Ajuster</translation>
+        </message>
+        <message>
+            <source>Halo removal parameters</source>
+            <translation type="finished">Paramètres de suppression de halo</translation>
+        </message>
+        <message>
+            <source>Linear data</source>
+            <translation type="finished">Données linéaires</translation>
+        </message>
+        <message>
+            <source>No Image</source>
+            <translation type="finished">Aucune Image</translation>
+        </message>
+        <message>
+            <source>Overwrite active view</source>
+            <translation type="finished">Écraser la vue active</translation>
+        </message>
+        <message>
+            <source>Please select an image first.</source>
+            <translation type="finished">Veuillez d'abord sélectionner une image.</translation>
+        </message>
+        <message>
+            <source>Preview</source>
+            <translation type="finished">Aperçu</translation>
+        </message>
+        <message>
+            <source>Reduction:</source>
+            <translation type="finished">Réduction :</translation>
+        </message>
+        <message>
+            <source>Reset</source>
+            <translation type="finished">Réinitialiser</translation>
+        </message>
+        <message>
+            <source>Star Halo Removal</source>
+            <translation type="finished">Suppression des Halos d'Étoiles</translation>
+        </message>
+        <message>
+            <source>Star Halo Removal applied.</source>
+            <translation type="finished">Star Halo Removal appliqué.</translation>
+        </message>
+        <message>
+            <source>Zoom: Ctrl+Wheel</source>
+            <translation type="finished">Zoom : Ctrl+Molette</translation>
         </message>
     </context>
     <context>

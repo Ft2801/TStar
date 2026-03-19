@@ -191,7 +191,6 @@ void CropRotateDialog::onBatchApply() {
         }
     }
 
-    int count = 0;
     for (auto* csw : targetWindows) {
         if (ImageViewer* v = csw->viewer()) {
             v->pushUndo();
@@ -201,7 +200,6 @@ void CropRotateDialog::onBatchApply() {
             
             // Ensure crop mode is kept off or consistent
             v->setCropMode(false); 
-            count++;
         }
     }
     

@@ -114,6 +114,7 @@
 #include "dialogs/RecombineLuminanceDialog.h"
 #include "dialogs/CorrectionBrushDialog.h"
 #include "dialogs/ClaheDialog.h"
+#include "dialogs/StarHaloRemovalDialog.h"
 #include "dialogs/AberrationInspectorDialog.h"
 #include "dialogs/SelectiveColorDialog.h"
 #include "dialogs/TemperatureTintDialog.h"
@@ -1261,6 +1262,9 @@ MainWindow::MainWindow(QWidget *parent)
     });
     addMenuAction(utilMenu, tr("CLAHE"), "", [this](){
         openClaheDialog();
+    });
+    addMenuAction(utilMenu, tr("Star Halo Removal"), "", [this](){
+        openStarHaloRemovalDialog();
     });
     addMenuAction(utilMenu, tr("Aberration Inspector (9-Points)"), "", [this](){
         openAberrationInspectorDialog();
@@ -4597,6 +4601,33 @@ void MainWindow::openClaheDialog() {
     
     // Update when active image changes
     connect(m_mdiArea, &QMdiArea::subWindowActivated, dlg, [this, dlg](QMdiSubWindow*){
+        if (currentViewer() && currentViewer()->getBuffer().isValid()) {
+            dlg->setSource(currentViewer()->getBuffer());
+        }
+    });
+}
+
+void MainWindow::openStarHaloRemovalDialog() {
+    if (!currentViewer()) {
+        QMessageBox::warning(this, tr("No Image"), tr("Please select an image first."));
+        return;
+    }
+
+    log(tr("Opening Star Halo Removal..."), Log_Action, true);
+
+    auto* dlg = new StarHaloRemovalDialog(this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, dlg, tr("Star Halo Removal"));
+    sub->resize(930, 690);
+    centerToolWindow(sub);
+
+    connect(dlg, &QDialog::accepted, this, [this]() {
+        log(tr("Star Halo Removal applied."), Log_Success, true);
+    });
+
+    connect(m_mdiArea, &QMdiArea::subWindowActivated, dlg, [this, dlg](QMdiSubWindow*) {
         if (currentViewer() && currentViewer()->getBuffer().isValid()) {
             dlg->setSource(currentViewer()->getBuffer());
         }

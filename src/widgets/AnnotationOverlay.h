@@ -116,6 +116,7 @@ private:
     void drawArrow(QPainter& painter, const Annotation& ann, const QPen& pen);
     void drawWCSObjects(QPainter& painter);
     void drawWCSGrid(QPainter& painter);
+    void drawWCSGridToImage(QPainter& painter, const QRectF& imageRect, double scaleM);
     QPointF mapToImage(const QPointF& widgetPos) const;
     QPointF mapFromImage(const QPointF& imagePos) const;
 

@@ -21,6 +21,21 @@
 #include <QShortcut>
 #include <QKeySequence>
 
+#include <algorithm>
+#include <cmath>
+
+namespace {
+double histogramZoomScaleFromLevel(int level) {
+    const int clamped = std::clamp(level, 1, 100);
+    const double t = static_cast<double>(clamped - 1) / 99.0;
+    return std::exp(std::log(100.0) * t);
+}
+
+QString histogramZoomLabelFromLevel(int level) {
+    return QString::number(histogramZoomScaleFromLevel(level), 'f', 2) + "x";
+}
+}
+
 
 GHSDialog::GHSDialog(QWidget *parent) : DialogBase(parent, tr("Generalized Hyperbolic Stretch (GHT)"), 440, 600), m_previewPending(false), m_activeViewer(nullptr), m_applied(false) {
     // Interaction
@@ -84,7 +99,7 @@ void GHSDialog::setupUI() {
     m_zoomOutBtn->setAutoRepeatInterval(50);
     histoToolbar->addWidget(m_zoomOutBtn);
     
-    m_zoomLabel = new QLabel("1x");
+    m_zoomLabel = new QLabel(histogramZoomLabelFromLevel(m_zoomLevel));
     m_zoomLabel->setMinimumWidth(35);
     m_zoomLabel->setAlignment(Qt::AlignCenter);
     histoToolbar->addWidget(m_zoomLabel);
@@ -458,20 +473,20 @@ void GHSDialog::connectSignals() {
     connect(m_zoomInBtn, &QToolButton::clicked, [this](){
         if (m_zoomLevel < 100) {
             m_zoomLevel++;
-            m_zoomLabel->setText(QString("%1x").arg(m_zoomLevel));
+            m_zoomLabel->setText(histogramZoomLabelFromLevel(m_zoomLevel));
             onZoomChanged();
         }
     });
     connect(m_zoomOutBtn, &QToolButton::clicked, [this](){
         if (m_zoomLevel > 1) {
             m_zoomLevel--;
-            m_zoomLabel->setText(QString("%1x").arg(m_zoomLevel));
+            m_zoomLabel->setText(histogramZoomLabelFromLevel(m_zoomLevel));
             onZoomChanged();
         }
     });
     connect(m_zoomResetBtn, &QToolButton::clicked, [this](){ 
         m_zoomLevel = 1;
-        m_zoomLabel->setText("1x");
+        m_zoomLabel->setText(histogramZoomLabelFromLevel(m_zoomLevel));
         onZoomChanged();
     });
     connect(m_logScaleCheck, &QCheckBox::toggled, [this](bool checked){
@@ -942,12 +957,13 @@ void GHSDialog::onZoomChanged() {
     // Get viewport width or a default base
     int baseWidth = m_scrollArea ? m_scrollArea->viewport()->width() : 400;
     if (baseWidth < 100) baseWidth = 400;
-    
-    int newWidth = baseWidth * m_zoomLevel;
+
+    const double zoomScale = histogramZoomScaleFromLevel(m_zoomLevel);
+    const int newWidth = static_cast<int>(baseWidth * zoomScale);
     
     // If zoom is 1x, let it be resizable (fit to view)
     // If zoom > 1x, force fixed width
-    if (m_zoomLevel == 1) {
+    if (m_zoomLevel == 1 || zoomScale <= 1.001) {
         if (m_scrollArea) m_scrollArea->setWidgetResizable(true);
         m_histWidget->setMinimumWidth(0);
         m_histWidget->setMaximumWidth(16777215);

@@ -8,6 +8,7 @@ Version 1.8.0
 - Implemented spectrophotometric color calibration
 - Implemented professional workspace color management
 - Implemented automatic image annotator
+- Implemented star halo removal tool
 - Integration of local database files for constellations and catalogs
 - Added fast drizzle mode in the stacking suite
 - Added default display stretch mode in the settings

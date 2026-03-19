@@ -23,7 +23,11 @@ TStar is a powerful, C++17/Qt6-based image processing platform explicitly design
 
 *   **Native FITS Support**: Full compatibility with 8, 16, 32-bit integer and floating-point FITS files.
 *   **MDI Workspace**: Flexible Multi-Document Interface allowing simultaneous editing of multiple images.
-*   **Project Management**: Sidebar with Console logging and FITS Header inspection.
+*   **Project Management**: Full workspace projects with dedicated working directories and recent-project workflow. Sidebar with console logging and header inspector
+*   **Professional Astrometry**: Native + ASTAP plate solving with WCS-aware downstream tools.
+*   **Scientific Color Calibration**: PCC and SPCC workflows for physically grounded color correction.
+*   **Automatic Annotation Engine**: Catalog overlays (Messier/NGC/IC/LdN/Sh2/Stars/Constellations) with optional WCS grid.
+*   **Advanced View Management**: Aspect-ratio-aware subwindows, tiling modes, collapsed-view previews, and magnifier.
 *   **Cross-Platform**: Fully supported on Windows, macOS (Intel & Apple Silicon), with optimized performance.
 
 ## Tools & Functionalities
@@ -39,14 +43,17 @@ Tools to transform raw linear data into viewable images.
 
 ### 2. Color Calibration & Correction
 *   **Photometric Color Calibration (PCC)**: Solves the image plate and calibrates colors based on Gaia/APASS photometric star catalogs.
+*   **Spectrophotometric Color Calibration (SPCC)**: Spectral-response based calibration using SED/filter/sensor data for physically coherent color rendering.
 *   **PCC Distribution**: Visualizes the color distribution of stars after calibration.
 *   **Catalog Background Extraction (CBE)**: Advanced background extraction using catalog reference images (DSS2, etc.) for highly accurate gradient models.
 *   **Auto Background Extraction (ABE)**: Models and removes light pollution gradients using polynomial or RBF interpolation.
 *   **Background Neutralization**: Removes color casts by aligning background channels.
 *   **Temperature / Tint**: Adjust manual white balance by shifting color tones and green/magenta tints.
+*   **Magenta Correction**: Dedicated magenta cast suppression for deep-sky workflows.
 *   **Selective Color Correction**: Precise adjustment of CMY/RGB/L/S/C within specific hue ranges.
 *   **SCNR (Subtractive Chromatic Noise Reduction)**: Removes generic Green/Magenta color noise.
 *   **Saturation**: Adjust color intensity with luminance preservation options.
+*   **Workspace Color Management**: Consistent color behavior across tools/sessions in the project workspace.
 
 ### 3. AI & Restoration
 *   **Cosmic Clarity**: Deep-learning based noise reduction and sharpening.
@@ -76,20 +83,32 @@ Tools to transform raw linear data into viewable images.
 *   **Image Calibration**: Calibrate raw light frames using master Bias, Dark, and Flat frames.
 *   **Image Registration**: Star-based alignment with sub-pixel accuracy (translation, rotation, scale).
 *   **Image Stacking**: Noise reduction using Average, Median, Kappa-Sigma, or Winsorized Sigma stacking.
+*   **Fast Drizzle Mode**: Accelerated drizzle option for undersampled datasets.
 
 ### 7. Utilities & Effects
-*   **Plate Solving**: Native astrometric solver to determine image coordinates (WCS metadata).
+*   **Plate Solving**: Native + ASTAP astrometric solving for WCS metadata, with catalog/database-aware workflows.
 *   **PixelMath**: Powerful expression engine for arithmetic operations between images.
 *   **Star Analysis**: Measure FWHM, eccentricity, and other star profile metrics.
-*   **Image Annotator**: Add object labels using catalog data.
+*   **Star Halo Removal**: Tool to detect and subtract halos around bright stars, improving image clarity.
+*   **Image Annotator**: Manual + automatic annotation tool with catalog overlays and optional WCS RA/Dec grid; supports burn-in export.
 *   **CLAHE**: Contrast Limited Adaptive Histogram Equalization for local contrast enhancement.
 *   **Wavescale HDR**: Multiscale High Dynamic Range compression.
 *   **Aberration Inspector**: 3x3 grid display for evaluating optical quality across the field.
+*   **Blink Comparator**: Fast visual alternation between two views for registration/noise/detail checks.
 *   **Correction Brush**: Interactive artifact removal using Content-Aware AI or standard median sampling.
 *   **Rotate & Crop**: Precision cropping with aspect ratio constraints and batch processing support.
 *   **RAW to FITS Converter**: Batch convert camera RAW files (Canon, Nikon, Sony, etc.) to FITS.
 *   **FITS Header Editor**: View and modify FITS metadata keywords.
+*   **RAW Editor**: Lightroom-style light/color controls for image development.
 *   **AstroSpike**: Generates artificial diffraction spikes for aesthetic effect.
+
+### 9. Workspace & Views
+*   **Workspace Projects**: Per-project working directory, state persistence, and recent projects.
+*   **Aspect Ratio Aware Windows**: New views open with image-native proportions.
+*   **Tiling Modes**: Tile all views (grid, horizontal, vertical).
+*   **Collapsed View Previews**: Right panel thumbnails for minimized/shaded windows.
+*   **Hide Minimized Views Toggle**: Keep workspace clean while preserving quick access.
+*   **Cursor Magnifier**: Follow-cursor loupe for precise focus/detail checks.
 
 ### 8. Scripting & Automation
 *   **TStar Scripts**: Built-in processing workflows for common tasks.

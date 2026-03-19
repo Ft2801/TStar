@@ -130,6 +130,15 @@ QString HelpDialog::buildHelpContent()
     html += "<li><b>" + tr("Undo/Redo:") + "</b> " + tr("Ctrl+Z / Ctrl+Shift+Z") + "</li>";
     html += "</ul>";
 
+    html += "<h3>" + tr("View Management") + "</h3>";
+    html += "<ul>";
+    html += "<li>" + tr("Open multiple image views in independent subwindows with preserved image aspect ratio") + "</li>";
+    html += "<li>" + tr("Tile views automatically (grid, horizontal, vertical) for side-by-side analysis") + "</li>";
+    html += "<li>" + tr("Collapse (shade) views to title bars and monitor them from the right-side preview panel") + "</li>";
+    html += "<li>" + tr("Optionally hide minimized/collapsed views from the workspace while keeping quick preview access") + "</li>";
+    html += "<li>" + tr("Use the magnifier (cursor-following loupe) for precise focus checks while navigating") + "</li>";
+    html += "</ul>";
+
     // Display Modes
     html += "<h2>" + tr("Display Modes") + "</h2>";
     html += "<p>" + tr("Use the dropdown menu in the toolbar to change visualization:") + "</p>";
@@ -213,9 +222,20 @@ QString HelpDialog::buildHelpContent()
     
     html += "<h3>" + tr("SCNR (Selective Color Noise Reduction)") + "</h3>";
     html += "<p>" + tr("Removes green color cast common in OSC/DSLR images.") + "</p>";
+
+    html += "<h3>" + tr("SPCC (Spectrophotometric Color Calibration)") + "</h3>";
+    html += "<p>" + tr("Scientific color calibration based on spectral response curves and stellar photometry:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Uses spectral database data (filters, sensors, SED curves) for physically grounded calibration") + "</li>";
+    html += "<li>" + tr("Works with plate-solved images and measured star photometry") + "</li>";
+    html += "<li>" + tr("Supports model fitting and optional chromatic gradient correction") + "</li>";
+    html += "</ul>";
     
     html += "<h3>" + tr("Saturation") + "</h3>";
     html += "<p>" + tr("Adjust color saturation with protection for highlights and shadows.") + "</p>";
+
+    html += "<h3>" + tr("Workspace Color Management") + "</h3>";
+    html += "<p>" + tr("TStar includes workspace-level color management to keep display and processing behavior consistent across tools and sessions.") + "</p>";
 
     html += "<h3>" + tr("Catalog Background Extraction (CBE)") + "</h3>";
     html += "<p>" + tr("Advanced background extraction using catalog reference images:") + "</p>";
@@ -339,6 +359,7 @@ QString HelpDialog::buildHelpContent()
     html += "<li><b>" + tr("Normalization Mode:") + "</b> " + tr("Fast normalization or K-Sigma-based normalization per frame") + "</li>";
     html += "<li><b>" + tr("Feathering:") + "</b> " + tr("Blend overlapping image edges smoothly to reduce seaming artifacts") + "</li>";
     html += "<li><b>" + tr("Percent Rejection:") + "</b> " + tr("Simple rejection of brightest/darkest N%% of pixels") + "</li>";
+    html += "<li><b>" + tr("Fast Drizzle:") + "</b> " + tr("Accelerated drizzle integration mode for faster reconstruction when undersampled data benefits from drizzle.") + "</li>";
     html += "</ul>";
     html += "<p>" + tr("Stacking Workflow:") + "</p>";
     html += "<ol>";
@@ -441,6 +462,8 @@ QString HelpDialog::buildHelpContent()
     html += "<ul>";
     html += "<li>" + tr("Adds WCS (World Coordinate System) metadata") + "</li>";
     html += "<li>" + tr("Required for PCC and annotation tools") + "</li>";
+    html += "<li>" + tr("Supports ASTAP integration for professional solving and automatic database path handling") + "</li>";
+    html += "<li>" + tr("Can use bundled/local solver resources and catalog data for robust plate solutions") + "</li>";
     html += "</ul>";
     
     html += "<h3>" + tr("Pixel Math") + "</h3>";
@@ -457,7 +480,14 @@ QString HelpDialog::buildHelpContent()
     html += "<p>" + tr("View and edit FITS header metadata.") + "</p>";
     
     html += "<h3>" + tr("Image Annotator") + "</h3>";
-    html += "<p>" + tr("Add object labels and annotations using catalog data.") + "</p>";
+    html += "<p>" + tr("Manual + automatic annotation system for scientific overlays and presentation exports:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Automatic catalogs: Messier, NGC, IC, LdN, Sh2, Stars, and Constellations") + "</li>";
+    html += "<li>" + tr("Optional WCS RA/Dec grid overlay with dynamic spacing") + "</li>";
+    html += "<li>" + tr("Manual drawing tools: circles, rectangles, arrows, and text labels") + "</li>";
+    html += "<li>" + tr("Undo/Redo editing workflow with persistent annotations across reopen") + "</li>";
+    html += "<li>" + tr("Use Save with Burn Annotations to imprint overlays into exported display images") + "</li>";
+    html += "</ul>";
 
     html += "<h3>" + tr("CLAHE") + "</h3>";
     html += "<p>" + tr("Contrast Limited Adaptive Histogram Equalization. Enhances local contrast in different regions of the image:") + "</p>";
@@ -501,6 +531,9 @@ QString HelpDialog::buildHelpContent()
     html += "<li>" + tr("Rotate by any angle in degrees") + "</li>";
     html += "<li>" + tr("Batch Crop: applies the same crop to all currently open images") + "</li>";
     html += "</ul>";
+    
+    html += "<h3>" + tr("Star Halo Removal") + "</h3>";
+    html += "<p>" + tr("Tool to detect and subtract halos around bright stars, improving image clarity and preventing halo overlaps.") + "</p>";
 
     html += "<h3>" + tr("RAW to FITS Converter") + "</h3>";
     html += "<p>" + tr("Batch converts camera RAW files to FITS format:") + "</p>";
@@ -524,6 +557,13 @@ QString HelpDialog::buildHelpContent()
     
     html += "<h3>" + tr("AstroSpike") + "</h3>";
     html += "<p>" + tr("Adds artificial diffraction spikes to bright stars for aesthetic effect.") + "</p>";
+
+    html += "<h3>" + tr("RAW Editor") + "</h3>";
+    html += "<p>" + tr("Lightroom-style RAW editor for fast global light/color adjustments:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Exposure, contrast, highlights, shadows, whites, and blacks controls") + "</li>";
+    html += "<li>" + tr("White balance and color controls integrated with the TStar workflow") + "</li>";
+    html += "</ul>";
 
     // Scripting & Automation
     html += "<h2>" + tr("Scripting & Automation") + "</h2>";

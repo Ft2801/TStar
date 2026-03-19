@@ -160,6 +160,7 @@ private slots:
     void openCorrectionBrushDialog();
     void removePedestal();
     void openClaheDialog();
+    void openStarHaloRemovalDialog();
     void openAberrationInspectorDialog();
     void openSelectiveColorDialog();
     void openTemperatureTintDialog();

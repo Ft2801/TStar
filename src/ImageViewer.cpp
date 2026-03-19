@@ -838,6 +838,11 @@ void ImageViewer::zoomOut() {
 void ImageViewer::fitToWindow() {
     if (!m_imageItem->pixmap().isNull()) {
         fitInView(m_imageItem, Qt::KeepAspectRatio);
+
+        // Keep a small safety margin so fitted images are slightly smaller than the viewport.
+        // This improves readability and avoids edge-to-edge rendering in subwindows.
+        scale(0.98, 0.98);
+
         m_scaleFactor = transform().m11();
 
         if (m_scaleFactor > 120.0) {

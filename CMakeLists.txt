@@ -697,6 +697,8 @@ set(TSTAR_SOURCES
     src/dialogs/HelpDialog.h
     src/dialogs/ClaheDialog.cpp
     src/dialogs/ClaheDialog.h
+    src/dialogs/StarHaloRemovalDialog.cpp
+    src/dialogs/StarHaloRemovalDialog.h
     src/dialogs/SelectiveColorDialog.cpp
     src/dialogs/SelectiveColorDialog.h
     src/dialogs/TemperatureTintDialog.cpp
@@ -979,6 +981,7 @@ target_link_libraries(TStar PRIVATE
     ${CFITSIO_LIBRARY}
     ${GSL_LIBRARIES}
     ${OpenCV_LIBS}
+    ${TSTAR_LIBS}
 )
 
 # OpenMP

@@ -15,6 +15,18 @@
 
 static constexpr float AS_DEFAULT_TARGET_BACKGROUND = 0.25f;
 
+namespace {
+double histogramZoomScaleFromLevel(int level) {
+    const int clamped = std::clamp(level, 1, 100);
+    const double t = static_cast<double>(clamped - 1) / 99.0;
+    return std::exp(std::log(100.0) * t);
+}
+
+QString histogramZoomLabelFromLevel(int level) {
+    return QString::number(histogramZoomScaleFromLevel(level), 'f', 2) + "x";
+}
+}
+
 HistogramStretchDialog::HistogramStretchDialog(ImageViewer* viewer, QWidget* parent)
     : DialogBase(parent, tr("Histogram Transformation"), 700, 600), m_viewer(nullptr), m_applied(false)
 {
@@ -90,7 +102,7 @@ void HistogramStretchDialog::setupUI() {
     m_zoomOutBtn->setAutoRepeatInterval(50);  // Repeat every 50ms
     histoToolbar->addWidget(m_zoomOutBtn);
     
-    m_zoomLabel = new QLabel("1x");
+    m_zoomLabel = new QLabel(histogramZoomLabelFromLevel(m_zoomLevel));
     m_zoomLabel->setMinimumWidth(35);
     m_zoomLabel->setAlignment(Qt::AlignCenter);
     histoToolbar->addWidget(m_zoomLabel);
@@ -282,13 +294,13 @@ void HistogramStretchDialog::setupUI() {
 
     // Zoom connections
     connect(m_zoomInBtn, &QToolButton::clicked, [this](){
-        if (m_zoomLevel < 100) { m_zoomLevel++; m_zoomLabel->setText(QString("%1x").arg(m_zoomLevel)); onZoomChanged(); }
+        if (m_zoomLevel < 100) { m_zoomLevel++; m_zoomLabel->setText(histogramZoomLabelFromLevel(m_zoomLevel)); onZoomChanged(); }
     });
     connect(m_zoomOutBtn, &QToolButton::clicked, [this](){
-        if (m_zoomLevel > 1) { m_zoomLevel--; m_zoomLabel->setText(QString("%1x").arg(m_zoomLevel)); onZoomChanged(); }
+        if (m_zoomLevel > 1) { m_zoomLevel--; m_zoomLabel->setText(histogramZoomLabelFromLevel(m_zoomLevel)); onZoomChanged(); }
     });
     connect(m_zoomResetBtn, &QToolButton::clicked, [this](){
-        m_zoomLevel = 1; m_zoomLabel->setText("1x"); onZoomChanged();
+        m_zoomLevel = 1; m_zoomLabel->setText(histogramZoomLabelFromLevel(m_zoomLevel)); onZoomChanged();
     });
 
     // Sync scrollbar
@@ -684,9 +696,10 @@ float HistogramStretchDialog::computeMAD(const float* data, size_t n, float medi
 void HistogramStretchDialog::onZoomChanged() {
     int baseWidth = m_scrollArea->viewport()->width();
     if (baseWidth < 100) baseWidth = 400;
-    int newWidth = baseWidth * m_zoomLevel;
+    const double zoomScale = histogramZoomScaleFromLevel(m_zoomLevel);
+    const int newWidth = static_cast<int>(baseWidth * zoomScale);
 
-    if (m_zoomLevel == 1) {
+    if (m_zoomLevel == 1 || zoomScale <= 1.001) {
         m_scrollArea->setWidgetResizable(true);
         m_histogram->setMinimumWidth(0);
         m_histogram->setMaximumWidth(16777215);
