@@ -567,7 +567,8 @@ jobs:
       - name: Bundle ASTAP (Intel)
         run: |
           mkdir -p build/TStar.app/Contents/MacOS
-          curl -L -o astap_cli.zip "https://downloads.sourceforge.net/project/astap-program/macOS%20installer/astap_command-line_version_macOS.zip"
+          # L'URL è stato aggiornato con _x86_64.zip
+          curl -L -o astap_cli.zip "https://downloads.sourceforge.net/project/astap-program/macOS%20installer/astap_command-line_version_macOS_x86_64.zip"
           unzip -o -j astap_cli.zip -d build/TStar.app/Contents/MacOS/
           cd build/TStar.app/Contents/MacOS/
           if [ -f astap_cli ]; then mv astap_cli astap; fi
