@@ -60,6 +60,7 @@
 #include "dialogs/RARDialog.h"
 #include "dialogs/RawEditorDialog.h"
 #include "dialogs/AstroSpikeDialog.h"
+#include "dialogs/MorphologyDialog.h"
 #include "dialogs/SaturationDialog.h"
 #include "dialogs/ChannelCombinationDialog.h"
 #include "dialogs/StarStretchDialog.h"
@@ -1265,6 +1266,9 @@ MainWindow::MainWindow(QWidget *parent)
     });
     addMenuAction(utilMenu, tr("Star Halo Removal"), "", [this](){
         openStarHaloRemovalDialog();
+    });
+    addMenuAction(utilMenu, tr("Morphology"), "", [this](){
+        openMorphologyDialog();
     });
     addMenuAction(utilMenu, tr("Aberration Inspector (9-Points)"), "", [this](){
         openAberrationInspectorDialog();
@@ -4632,6 +4636,49 @@ void MainWindow::openStarHaloRemovalDialog() {
             dlg->setSource(currentViewer()->getBuffer());
         }
     });
+}
+
+void MainWindow::openMorphologyDialog() {
+    if (!currentViewer()) {
+        QMessageBox::warning(this, tr("No Image"), tr("Please select an image first."));
+        return;
+    }
+
+    if (m_morphologyDlg) {
+        m_morphologyDlg->raise();
+        m_morphologyDlg->activateWindow();
+        m_morphologyDlg->setSource(currentViewer()->getBuffer());
+        return;
+    }
+
+    log(tr("Opening Morphology Tool..."), Log_Action, true);
+
+    auto* dlg = new MorphologyDialog(this);
+    m_morphologyDlg = dlg;
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+
+    CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
+    setupToolSubwindow(sub, dlg, tr("Morphology"));
+    sub->resize(930, 690);
+    centerToolWindow(sub);
+
+    connect(dlg, &QDialog::accepted, this, [this]() {
+        log(tr("Morphology applied."), Log_Success, true);
+    });
+
+    connect(dlg, &QObject::destroyed, this, [this]() {
+        m_morphologyDlg = nullptr;
+    });
+
+    connect(m_mdiArea, &QMdiArea::subWindowActivated, dlg, [this, dlg](QMdiSubWindow*) {
+        if (currentViewer() && currentViewer()->getBuffer().isValid()) {
+            dlg->setSource(currentViewer()->getBuffer());
+        }
+    });
+
+    if (currentViewer()) {
+        dlg->setSource(currentViewer()->getBuffer());
+    }
 }
 
 void MainWindow::openAberrationInspectorDialog() {

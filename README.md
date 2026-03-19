@@ -63,6 +63,7 @@ Tools to transform raw linear data into viewable images.
 
 ### 4. Channel Management
 *   **Extract / Combine Channels**: Split RGB into Mono or combine Mono into RGB.
+*   **Linear Fit**: Equalize RGB channel intensities by matching medians.
 *   **Debayer**: Convert RAW Bayer pattern images to full color.
 *   **Extract / Recombine Luminance**: Independent extraction and blending of the luminance channel.
 *   **Remove Pedestal**: Automatically detects and subtracts the minimum pixel value (black floor).
@@ -90,6 +91,7 @@ Tools to transform raw linear data into viewable images.
 *   **PixelMath**: Powerful expression engine for arithmetic operations between images.
 *   **Star Analysis**: Measure FWHM, eccentricity, and other star profile metrics.
 *   **Star Halo Removal**: Tool to detect and subtract halos around bright stars, improving image clarity.
+*   **Morphology**: Modify shape and size of image structures (Erosion, Dilation, etc.).
 *   **Image Annotator**: Manual + automatic annotation tool with catalog overlays and optional WCS RA/Dec grid; supports burn-in export.
 *   **CLAHE**: Contrast Limited Adaptive Histogram Equalization for local contrast enhancement.
 *   **Wavescale HDR**: Multiscale High Dynamic Range compression.

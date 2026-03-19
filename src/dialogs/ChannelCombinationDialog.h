@@ -29,6 +29,7 @@ private:
     QComboBox* m_comboR;
     QComboBox* m_comboG;
     QComboBox* m_comboB;
+    class QCheckBox* m_checkLinearFit = nullptr;
     
     std::vector<ChannelSource> m_sources;
     ImageBuffer m_result;

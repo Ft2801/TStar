@@ -391,6 +391,9 @@ QString HelpDialog::buildHelpContent()
     html += "<h3>" + tr("Combine Channels") + "</h3>";
     html += "<p>" + tr("Combines separate channel images into one RGB image.") + "</p>";
     
+    html += "<h3>" + tr("Linear Fit") + "</h3>";
+    html += "<p>" + tr("Equalizes the intensity of RGB channels by matching their medians. This is essential for achieving a neutral color balance before combining separate channels into a color image.") + "</p>";
+    
     html += "<h3>" + tr("Star Recomposition") + "</h3>";
     html += "<p>" + tr("Blends starless and star-only images with adjustable parameters.") + "</p>";
     
@@ -534,6 +537,9 @@ QString HelpDialog::buildHelpContent()
     
     html += "<h3>" + tr("Star Halo Removal") + "</h3>";
     html += "<p>" + tr("Tool to detect and subtract halos around bright stars, improving image clarity and preventing halo overlaps.") + "</p>";
+
+    html += "<h3>" + tr("Morphology") + "</h3>";
+    html += "<p>" + tr("Applies morphological operations (Erosion, Dilation, Opening, Closing) to modify the shape and size of structures in the image, such as stars. Useful for star reduction or enhancing fine details.") + "</p>";
 
     html += "<h3>" + tr("RAW to FITS Converter") + "</h3>";
     html += "<p>" + tr("Batch converts camera RAW files to FITS format:") + "</p>";

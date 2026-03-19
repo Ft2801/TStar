@@ -60,6 +60,7 @@ class NBtoRGBStarsDialog;
 // class DeconvolutionDialog;
 struct Annotation;
 class BlinkComparatorDialog;
+class MorphologyDialog;
 
 // Background image loading result - for thread-safe queue communication
 enum ImageLoadLogLevel {
@@ -161,6 +162,7 @@ private slots:
     void removePedestal();
     void openClaheDialog();
     void openStarHaloRemovalDialog();
+    void openMorphologyDialog();
     void openAberrationInspectorDialog();
     void openSelectiveColorDialog();
     void openTemperatureTintDialog();
@@ -329,6 +331,7 @@ private:
     QPointer<class BlinkComparatorDialog> m_blinkComparatorDlg;
     QPointer<class SettingsDialog> m_settingsDlg;
     QPointer<class ColorProfileDialog> m_colorProfileDlg;
+    QPointer<class MorphologyDialog> m_morphologyDlg;
     
 public:
     // Persisted annotations across dialog destruction

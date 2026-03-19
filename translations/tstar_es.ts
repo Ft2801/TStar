@@ -1185,6 +1185,10 @@
             <translation type="finished">Incompleto</translation>
         </message>
         <message>
+            <source>Linear Fit (Match medians)</source>
+            <translation type="finished">Ajuste Lineal (Ajustar medianas)</translation>
+        </message>
+        <message>
             <source>None</source>
             <translation type="finished">Ninguno</translation>
         </message>
@@ -2365,7 +2369,7 @@
         </message>
         <message>
             <source>Iterations:</source>
-            <translation type="finished">Iterazioni:</translation>
+            <translation type="finished">Iteraciones:</translation>
         </message>
         <message>
             <source>Kappa (ratio clamp):</source>
@@ -3369,6 +3373,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Aplica el rechazo Kappa-Sigma varias veces para una eliminación agresiva de valores atípicos.</translation>
         </message>
         <message>
+            <source>Applies morphological operations (Erosion, Dilation, Opening, Closing) to modify the shape and size of structures in the image, such as stars. Useful for star reduction or enhancing fine details.</source>
+            <translation type="finished">Aplica operaciones morfológicas (Erosión, Dilatación, Apertura, Cierre) para modificar la forma y el tamaño de las estructuras en la imagen, como las estrellas. Útil para la reducción estelar o para realzar detalles finos.</translation>
+        </message>
+        <message>
             <source>Apply Calibration: The Calibration Dialog applies masters in the correct order</source>
             <translation type="finished">Aplicar Calibración: El diálogo de Calibración aplica los maestros en el orden correcto</translation>
         </message>
@@ -3817,6 +3825,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Ingresa el nombre del proyecto y selecciona la ubicación del directorio</translation>
         </message>
         <message>
+            <source>Equalizes the intensity of RGB channels by matching their medians. This is essential for achieving a neutral color balance before combining separate channels into a color image.</source>
+            <translation type="finished">Ecualiza la intensidad de los canales RGB haciendo coincidir sus medianas. Esto es esencial para lograr un equilibrio de color neutro antes de combinar canales por separado en una imagen a color.</translation>
+        </message>
+        <message>
             <source>Execute Stack: Combine and output final integrated image</source>
             <translation type="finished">Ejecutar Stack: Combina y genera la imagen integrada final</translation>
         </message>
@@ -4009,6 +4021,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Editor RAW estilo Lightroom para ajustes globales rápidos de luz/color:</translation>
         </message>
         <message>
+            <source>Linear Fit</source>
+            <translation type="finished">Ajuste Lineal</translation>
+        </message>
+        <message>
             <source>Linear:</source>
             <translation type="finished">Lineal:</translation>
         </message>
@@ -4107,6 +4123,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>More powerful than traditional ABE</source>
             <translation type="finished">Más potente que el ABE tradicional</translation>
+        </message>
+        <message>
+            <source>Morphology</source>
+            <translation type="finished">Morfología</translation>
         </message>
         <message>
             <source>Mouse wheel or Ctrl + and Ctrl -</source>
@@ -5726,6 +5746,14 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Mono</translation>
         </message>
         <message>
+            <source>Morphology</source>
+            <translation type="finished">Morfología</translation>
+        </message>
+        <message>
+            <source>Morphology applied.</source>
+            <translation type="finished">Morfología aplicada.</translation>
+        </message>
+        <message>
             <source>Multiscale Decomposition</source>
             <translation type="finished">Descomposición multiscala</translation>
         </message>
@@ -5952,6 +5980,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Opening Magenta Correction Tool...</source>
             <translation type="finished">Abriendo herramienta de corrección Magenta...</translation>
+        </message>
+        <message>
+            <source>Opening Morphology Tool...</source>
+            <translation type="finished">Abriendo Herramienta Morfología...</translation>
         </message>
         <message>
             <source>Opening Multiscale Decomposition...</source>
@@ -6898,6 +6930,105 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Primary failed. Trying backup (Google Drive)…</source>
             <translation type="finished">Fallo en la fuente primaria. Probando el backup (Google Drive)…</translation>
+        </message>
+    </context>
+    <context>
+        <name>MorphologyDialog</name>
+        <message>
+            <source>%1 [Morphology]</source>
+            <translation type="finished">%1 [Morfología]</translation>
+        </message>
+        <message>
+            <source>+</source>
+            <translation type="finished">+</translation>
+        </message>
+        <message>
+            <source>-</source>
+            <translation type="finished">-</translation>
+        </message>
+        <message>
+            <source>Apply</source>
+            <translation type="finished">Aplicar</translation>
+        </message>
+        <message>
+            <source>Apply to:</source>
+            <translation type="finished">Aplicar a:</translation>
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="finished">Cancelar</translation>
+        </message>
+        <message>
+            <source>Closing</source>
+            <translation type="finished">Cierre</translation>
+        </message>
+        <message>
+            <source>Create new view</source>
+            <translation type="finished">Crear nueva vista</translation>
+        </message>
+        <message>
+            <source>Dilation</source>
+            <translation type="finished">Dilatación</translation>
+        </message>
+        <message>
+            <source>Erosion</source>
+            <translation type="finished">Erosión</translation>
+        </message>
+        <message>
+            <source>Fit</source>
+            <translation type="finished">Ajustar</translation>
+        </message>
+        <message>
+            <source>Iterations:</source>
+            <translation type="finished">Iteraciones:</translation>
+        </message>
+        <message>
+            <source>Kernel size:</source>
+            <translation type="finished">Tamaño del kernel:</translation>
+        </message>
+        <message>
+            <source>Morphological Operations</source>
+            <translation type="finished">Operaciones Morfológicas</translation>
+        </message>
+        <message>
+            <source>Morphological Parameters</source>
+            <translation type="finished">Parámetros Morfológicos</translation>
+        </message>
+        <message>
+            <source>Morphological operations applied.</source>
+            <translation type="finished">Operaciones morfológicas applicadas.</translation>
+        </message>
+        <message>
+            <source>No Image</source>
+            <translation type="finished">Sin Imagen</translation>
+        </message>
+        <message>
+            <source>Opening</source>
+            <translation type="finished">Apertura</translation>
+        </message>
+        <message>
+            <source>Operation:</source>
+            <translation type="finished">Operación:</translation>
+        </message>
+        <message>
+            <source>Overwrite active view</source>
+            <translation type="finished">Sobrescribir vista activa</translation>
+        </message>
+        <message>
+            <source>Please select an image first.</source>
+            <translation type="finished">Por favor, seleccione una imagen primero.</translation>
+        </message>
+        <message>
+            <source>Preview</source>
+            <translation type="finished">Previsualización</translation>
+        </message>
+        <message>
+            <source>Reset</source>
+            <translation type="finished">Restablecer</translation>
+        </message>
+        <message>
+            <source>Zoom: Ctrl+Wheel</source>
+            <translation type="finished">Zoom: Ctrl+Rueda</translation>
         </message>
     </context>
     <context>

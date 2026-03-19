@@ -9,11 +9,14 @@ Version 1.8.0
 - Implemented professional workspace color management
 - Implemented automatic image annotator
 - Implemented star halo removal tool
+- Implemented morphological operations tool
+- Implemented linear fit for RGB recomposition
 - Integration of local database files for constellations and catalogs
 - Added fast drizzle mode in the stacking suite
 - Added default display stretch mode in the settings
 - Refactoring of the settings dialog
 - Subwindows won't scale up for scaled displays (150%, 200%, etc.)
+- Rewritten Starnet descreen function for better results
 - Minor bugfixes
 
 Version 1.7.10

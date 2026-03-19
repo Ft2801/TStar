@@ -155,8 +155,17 @@ void StarNetDialog::onRun() {
                                 const auto& od = input.data();
                                 const auto& sd = starless.data();
                                 for(size_t i=0; i<inputSize; ++i) {
-                                    float val = od[i] - sd[i]; 
-                                    maskData[i] = std::max(0.0f, val);
+                                    // Descreen formula: (original - starless) / (1 - starless)
+                                    // This is more vibrant and faithful than simple subtraction.
+                                    float sll = sd[i];
+                                    float orig = od[i];
+                                    float denom = 1.0f - sll;
+                                    float subtracted = orig - sll;
+                                    if (denom > 1e-6f) {
+                                        maskData[i] = std::max(0.0f, std::min(1.0f, subtracted / denom));
+                                    } else {
+                                        maskData[i] = std::max(0.0f, std::min(1.0f, subtracted));
+                                    }
                                 }
                                 mask.setData(input.width(), input.height(), input.channels(), maskData);
                                 mw->createResultWindow(mask, "_starmask");

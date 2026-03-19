@@ -2,6 +2,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QMessageBox>
+#include <QCheckBox>
 #include "../algos/ChannelOps.h"
 #include <QIcon>
 
@@ -27,6 +28,10 @@ ChannelCombinationDialog::ChannelCombinationDialog(const std::vector<ChannelSour
     addChannelRow(tr("Red:"), &m_comboR);
     addChannelRow(tr("Green:"), &m_comboG);
     addChannelRow(tr("Blue:"), &m_comboB);
+
+    m_checkLinearFit = new QCheckBox(tr("Linear Fit (Match medians)"));
+    m_checkLinearFit->setChecked(false);
+    mainLayout->addWidget(m_checkLinearFit);
 
     // Auto-select if names match?
     // E.g. if we find "R", "G", "B" or "_R", "_G", "_B" suffix
@@ -64,6 +69,20 @@ void ChannelCombinationDialog::onApply() {
     ImageBuffer bufR = m_sources[idxR].buffer;
     ImageBuffer bufG = m_sources[idxG].buffer;
     ImageBuffer bufB = m_sources[idxB].buffer;
+
+    // --- LINEAR FIT (Equalize medians before combination) ---
+    if (m_checkLinearFit && m_checkLinearFit->isChecked()) {
+        float medR = bufR.getChannelMedian(0);
+        float medG = bufG.getChannelMedian(0); // If sources are mono, index is 0
+        float medB = bufB.getChannelMedian(0);
+
+        float targetMed = std::max({medR, medG, medB});
+        if (targetMed > 0) {
+            if (medR > 1e-7f) bufR.multiply(targetMed / medR);
+            if (medG > 1e-7f) bufG.multiply(targetMed / medG);
+            if (medB > 1e-7f) bufB.multiply(targetMed / medB);
+        }
+    }
 
     // Validate dimensions
     if (bufR.width() != bufG.width() || bufR.height() != bufG.height() || 

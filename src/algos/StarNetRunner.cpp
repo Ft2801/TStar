@@ -228,7 +228,18 @@ void StarNetWorker::process(const ImageBuffer& input, const StarNetParams& param
     
     MTFParams mtfP;
     bool didStretch = false;
+    float globalScale = 1.0f;
+
     if (params.isLinear) {
+        // Find global max to prevent clipping
+        float maxVal = 0.0f;
+        for (float v : working.data()) if (v > maxVal) maxVal = v;
+        if (maxVal > 1.0f) {
+            globalScale = maxVal;
+            emit processOutput(QString("Image peak %1 > 1.0. Scaling down to preserve highlights...").arg(globalScale));
+            for (float& v : working.data()) v /= globalScale;
+        }
+
         emit processOutput("Linear data detected. Calculating Auto-Stretch parameters...");
         mtfP = computeMtfParams(working);
         applyMtf(working, mtfP);
@@ -490,6 +501,11 @@ void StarNetWorker::process(const ImageBuffer& input, const StarNetParams& param
     if (didStretch) {
         emit processOutput("Inverting Auto-Stretch...");
         invertMtf(starlessLocal, mtfP);
+        
+        if (globalScale > 1.0f) {
+            emit processOutput(QString("Reversing global scaling (x%1)...").arg(globalScale));
+            for (float& v : starlessLocal.data()) v *= globalScale;
+        }
     }
     
     // Crop back if padded

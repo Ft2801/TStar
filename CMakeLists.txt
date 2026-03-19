@@ -699,6 +699,8 @@ set(TSTAR_SOURCES
     src/dialogs/ClaheDialog.h
     src/dialogs/StarHaloRemovalDialog.cpp
     src/dialogs/StarHaloRemovalDialog.h
+    src/dialogs/MorphologyDialog.cpp
+    src/dialogs/MorphologyDialog.h
     src/dialogs/SelectiveColorDialog.cpp
     src/dialogs/SelectiveColorDialog.h
     src/dialogs/TemperatureTintDialog.cpp

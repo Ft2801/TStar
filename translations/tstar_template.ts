@@ -1185,6 +1185,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Linear Fit (Match medians)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>None</source>
             <translation type="unfinished" />
         </message>
@@ -3367,6 +3371,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Applies morphological operations (Erosion, Dilation, Opening, Closing) to modify the shape and size of structures in the image, such as stars. Useful for star reduction or enhancing fine details.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Apply Calibration: The Calibration Dialog applies masters in the correct order</source>
             <translation type="unfinished" />
         </message>
@@ -3815,6 +3823,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Equalizes the intensity of RGB channels by matching their medians. This is essential for achieving a neutral color balance before combining separate channels into a color image.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Execute Stack: Combine and output final integrated image</source>
             <translation type="unfinished" />
         </message>
@@ -4007,6 +4019,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Linear Fit</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Linear:</source>
             <translation type="unfinished" />
         </message>
@@ -4104,6 +4120,10 @@
         </message>
         <message>
             <source>More powerful than traditional ABE</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Morphology</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5724,6 +5744,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Morphology</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Morphology applied.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Multiscale Decomposition</source>
             <translation type="unfinished" />
         </message>
@@ -5949,6 +5977,10 @@
         </message>
         <message>
             <source>Opening Magenta Correction Tool...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening Morphology Tool...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -6894,6 +6926,105 @@
         </message>
         <message>
             <source>Primary failed. Trying backup (Google Drive)…</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>MorphologyDialog</name>
+        <message>
+            <source>%1 [Morphology]</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>+</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>-</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Apply</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Apply to:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Closing</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Create new view</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Dilation</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Erosion</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Fit</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Iterations:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Kernel size:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Morphological Operations</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Morphological Parameters</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Morphological operations applied.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No Image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Operation:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Overwrite active view</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Please select an image first.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preview</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reset</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Zoom: Ctrl+Wheel</source>
             <translation type="unfinished" />
         </message>
     </context>
