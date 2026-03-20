@@ -1764,6 +1764,16 @@ bool ImageBuffer::save(const QString& filePath, const QString& format, BitDepth 
             status = 0;
         }
 
+        // Write Exposure and Temperature explicitly
+        if (m_meta.exposure > 0) {
+            fits_update_key(fptr, TDOUBLE, "EXPTIME", (void*)&m_meta.exposure, "Exposure time in seconds", &status);
+            status = 0;
+        }
+        if (m_meta.ccdTemp != 0) {
+            fits_update_key(fptr, TDOUBLE, "CCD-TEMP", (void*)&m_meta.ccdTemp, "Sensor temperature in C", &status);
+            status = 0;
+        }
+
         if (!iccToEmbed.isEmpty()) {
             long iccAxes[1] = { static_cast<long>(iccToEmbed.size()) };
             if (fits_create_img(fptr, BYTE_IMG, 1, iccAxes, &status) == 0) {

@@ -49,6 +49,8 @@ QString AstapSolver::getAstapDatabasePath() {
         astapDir + "/../Databases",
         astapDir + "/../Resources/deps/Databases",
         astapDir + "/../Resources/Databases",
+        "/usr/local/opt/astap/share/astap/Databases",
+        "/usr/local/opt/astap/Databases",
         "/Library/ASTAP/Databases"
     };
     for (const auto& p : potential) {
@@ -123,6 +125,9 @@ QString AstapSolver::getAstapExecutable() {
     if (QFile::exists("/Applications/ASTAP.app/Contents/MacOS/astap")) {
         return "/Applications/ASTAP.app/Contents/MacOS/astap";
     }
+    // Homebrew formula install (brew install astap)
+    if (QFile::exists("/usr/local/opt/astap/bin/astap")) return "/usr/local/opt/astap/bin/astap";
+    if (QFile::exists("/usr/local/opt/astap/astap")) return "/usr/local/opt/astap/astap";
     if (QFile::exists("/usr/local/bin/astap")) return "/usr/local/bin/astap";
     if (QFile::exists("/opt/homebrew/bin/astap")) return "/opt/homebrew/bin/astap";
 #else

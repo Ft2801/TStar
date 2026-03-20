@@ -1,6 +1,5 @@
 # OSC Preprocessing with Ha Extraction Script
 
-requires 1.0
 
 # Convert Bias
 cd biases

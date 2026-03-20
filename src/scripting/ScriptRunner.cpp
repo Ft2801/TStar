@@ -9,6 +9,8 @@
 #include "../core/ThreadState.h"
 #include <cstdlib>
 #include <functional>
+#include "StackingCommands.h"
+#include <QRegularExpression>
 
 namespace Scripting {
 
@@ -208,31 +210,99 @@ bool ScriptRunner::executeCommand(const ScriptCommand& cmd) {
         return false;
     }
     
+    // Perform variable substitution in arguments and options
+    ScriptCommand processedCmd = cmd;
+    for (int i = 0; i < processedCmd.args.size(); ++i) {
+        processedCmd.args[i] = substituteVariables(processedCmd.args[i]);
+    }
+    for (auto it = processedCmd.options.begin(); it != processedCmd.options.end(); ++it) {
+        it.value() = substituteVariables(it.value());
+    }
+
     // Validate arguments
-    if (!validateCommand(cmd)) {
-        emit commandFinished(cmd.name, false);
+    if (!validateCommand(processedCmd)) {
+        emit commandFinished(processedCmd.name, false);
         return false;
     }
     
     // Execute handler
     bool success = false;
     try {
-        success = def->handler(cmd);
+        success = def->handler(processedCmd);
         
         // Process any pending events to keep UI responsive
         // and allow OS/heap to optimize memory layout
         QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
     } catch (const std::exception& e) {
-        setError(tr("Exception in %1: %2").arg(cmd.name, e.what()), cmd.lineNumber);
+        setError(tr("Exception in %1: %2").arg(processedCmd.name, e.what()), processedCmd.lineNumber);
         success = false;
     }
     
     if (!success && m_lastError.isEmpty()) {
-        setError(tr("Command failed: %1").arg(cmd.name), cmd.lineNumber);
+        setError(tr("Command failed: %1").arg(processedCmd.name), processedCmd.lineNumber);
     }
     
-    emit commandFinished(cmd.name, success);
+    emit commandFinished(processedCmd.name, success);
     return success;
+}
+
+QString ScriptRunner::substituteVariables(const QString& text) const {
+    QString result = text;
+    
+    // Helper lambda for resolving a single variable name
+    auto resolve = [&](const QString& name) -> QString {
+        // 1. Check local script variables
+        if (m_variables.contains(name)) return m_variables[name];
+        
+        // 2. Check dynamic variables from current image
+        // We use a late binding to StackingCommands here
+        // (Assuming StackingCommands is the provider for curr image)
+        // Since we can't easily include StackingCommands.h here without circularity,
+        // we'll rely on ImageBuffer structure if we had access, or just metadata.
+        
+        // Let's try to get it from a static accessor if possible or just use a placeholder
+        // that the command handlers will handle? No, substitution should be here.
+        
+        // In this project, StackingCommands::getCurrentImage() is the way.
+        const ImageBuffer* img = StackingCommands::getCurrentImage();
+        if (img && img->isValid()) {
+            if (name == "FILTER") return img->getHeaderValue("FILTER");
+            if (name == "EXPTIME") return img->getHeaderValue("EXPTIME");
+            if (name == "DATE") return img->getHeaderValue("DATE-OBS");
+            if (name == "OBJECT") return img->getHeaderValue("OBJECT");
+            if (name == "INSTRUME") return img->getHeaderValue("INSTRUME");
+            if (name == "LIVETIME") return img->getHeaderValue("EXPTIME"); // Alias
+        }
+        
+        return "";
+    };
+
+    // ${variable} syntax
+    QRegularExpression bracePattern("\\$\\{([^}]+)\\}");
+    int offset = 0;
+    QRegularExpressionMatchIterator it = bracePattern.globalMatch(result);
+    while (it.hasNext()) {
+        QRegularExpressionMatch match = it.next();
+        QString varName = match.captured(1);
+        QString val = resolve(varName);
+        if (!val.isEmpty()) {
+            result.replace(match.captured(0), val);
+        }
+    }
+    
+    // $variable syntax (word boundary)
+    QRegularExpression simplePattern("\\$([A-Za-z_][A-Za-z0-9_]*)");
+    it = simplePattern.globalMatch(result);
+    while (it.hasNext()) {
+        QRegularExpressionMatch match = it.next();
+        QString varName = match.captured(1);
+        QString val = resolve(varName);
+        if (!val.isEmpty()) {
+            result.replace(match.captured(0), val);
+        }
+    }
+    
+    return result;
 }
 
 //=============================================================================

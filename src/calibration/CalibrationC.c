@@ -494,15 +494,10 @@ float find_optimal_dark_scale_c(const float* light, const float* dark,
     float c = b - gr * (b - a);
     float d = a + gr * (b - a);
     
-    if (roi_w <= 0 || roi_h <= 0) {
-        roi_w = 512; roi_h = 512;
-        roi_x = (width - roi_w) / 2;
-        roi_y = (height - roi_h) / 2;
-        if (roi_x < 0) roi_x = 0;
-        if (roi_y < 0) roi_y = 0;
-        if (roi_w > width) roi_w = width;
-        if (roi_h > height) roi_h = height;
-    }
+    if (roi_x < 0) roi_x = 0;
+    if (roi_y < 0) roi_y = 0;
+    if (roi_x + roi_w > width) roi_w = width - roi_x;
+    if (roi_y + roi_h > height) roi_h = height - roi_y;
 
     float fc = evaluate_uncalibrated_noise(light, dark, width, height, channels, c, roi_x, roi_y, roi_w, roi_h);
     float fd = evaluate_uncalibrated_noise(light, dark, width, height, channels, d, roi_x, roi_y, roi_w, roi_h);

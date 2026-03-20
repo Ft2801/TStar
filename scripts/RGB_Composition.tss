@@ -1,6 +1,5 @@
 # RGB Composition Script
 
-requires 1.0
 
 # Convert input images (R, G, B) to sequence
 # Assumes files named R, G, B or similar in current dir

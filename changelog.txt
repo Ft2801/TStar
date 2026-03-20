@@ -18,6 +18,7 @@ Version 1.8.0
 - Refactoring of the settings dialog
 - Subwindows won't scale up for scaled displays (150%, 200%, etc.)
 - Rewritten Starnet descreen function for better results
+- Various fixes in the stacking suite
 - Minor bugfixes
 
 Version 1.7.10

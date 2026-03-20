@@ -26,12 +26,10 @@ float CalibrationEngine::findOptimalDarkScale(const ImageBuffer& light,
     const float* lightData = light.data().data();
     const float* darkData = masterDark.data().data();
 
-    // Use default ROI if not optimizing for specific area?
-    // C function calculates center ROI if passed 0.
-    // But we might want use params logic.
-    int sz = 512;
-    int roi_x = (w - sz) / 2;
-    int roi_y = (h - sz) / 2;
+    // Clamp ROI size to image dimensions
+    int sz = std::min({512, w, h});
+    int roi_x = std::max(0, (w - sz) / 2);
+    int roi_y = std::max(0, (h - sz) / 2);
     
     return find_optimal_dark_scale_c(lightData, darkData, w, h, channels,
                                      params.K_min, params.K_max,

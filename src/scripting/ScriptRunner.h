@@ -143,6 +143,11 @@ public:
      * This is used in tight loops to avoid Qt event processing overhead
      */
     void logMessageDirect(const QString& message, const QString& color);
+    
+    /**
+     * @brief Perform variable substitution ($VAR or ${VAR})
+     */
+    QString substituteVariables(const QString& text) const;
 
 signals:
     /**

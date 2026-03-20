@@ -316,11 +316,33 @@ bool PreprocessingEngine::subtractDark(ImageBuffer& image, double& K) {
         return false;
     }
     
+    // Default to 1.0
     K = 1.0;
+    
+    // Use exposure ratio if both exposure times are available
+    double lightExptime = image.metadata().exposure;
+    double darkExptime = m_masters.stats(MasterType::Dark).exposure;
+    
+    if (lightExptime > 0.0 && darkExptime > 0.0) {
+        K = lightExptime / darkExptime;
+    } else {
+        // If metadata is missing, we can't use ratio. 
+        // We log a warning but continue with 1.0 (or whatever optimization finds).
+        if (m_params.darkOptim.enabled) {
+            // Optimization might still work even without metadata
+        } else {
+             emit logMessage(tr("Warning: Missing exposure time metadata. Using scaling factor 1.0."), "orange");
+        }
+    }
     
     // Optionally optimize dark scaling
     if (m_params.darkOptim.enabled) {
+        // We could use K (exposure ratio) as a hint (K_min/K_max) or just let it search
+        // For now, let's keep the user's min/max hints but log what we're doing.
         K = Calibration::CalibrationEngine::findOptimalDarkScale(image, *dark, m_params.darkOptim);
+        emit logMessage(tr("Numerical dark optimization found factor K = %1").arg(K, 0, 'f', 4), "neutral");
+    } else if (lightExptime > 0.0 && darkExptime > 0.0) {
+        emit logMessage(tr("Scaling dark by exposure ratio K = %1 (%2s / %3s)").arg(K, 0, 'f', 4).arg(lightExptime).arg(darkExptime), "neutral");
     }
     
     // Apply dark subtraction and add pedestal

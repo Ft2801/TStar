@@ -76,6 +76,9 @@ private:
     static bool cmdStack(const ScriptCommand& cmd);
     static bool cmdCalibrate(const ScriptCommand& cmd);
     static bool cmdRegister(const ScriptCommand& cmd);
+    static bool cmdNewProject(const ScriptCommand& cmd);
+    static bool cmdConvertAll(const ScriptCommand& cmd);
+    static bool cmdAutoStack(const ScriptCommand& cmd);
     
     static bool cmdSetMaster(const ScriptCommand& cmd);
     static bool cmdDebayer(const ScriptCommand& cmd);
@@ -87,10 +90,15 @@ private:
     static bool cmdPixelMath(const ScriptCommand& cmd);
     static bool cmdStarNet(const ScriptCommand& cmd);
     
-    // Phase 5: Project Commands
-    static bool cmdNewProject(const ScriptCommand& cmd);
-    static bool cmdConvertAll(const ScriptCommand& cmd);
-    static bool cmdAutoStack(const ScriptCommand& cmd);
+    // Project commands
+    static bool cmdSeqApplyReg(const ScriptCommand& cmd);
+    static bool cmdRotate(const ScriptCommand& cmd);
+    static bool cmdResample(const ScriptCommand& cmd);
+    static bool cmdUpdateKey(const ScriptCommand& cmd);
+    static bool cmdCrop(const ScriptCommand& cmd);
+    static bool cmdStat(const ScriptCommand& cmd);
+    static bool cmdThreshold(const ScriptCommand& cmd);
+    static bool cmdMath(const ScriptCommand& cmd);
     
     // Helper functions
     static QString resolvePath(const QString& path);

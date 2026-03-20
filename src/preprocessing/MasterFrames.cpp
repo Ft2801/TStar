@@ -11,6 +11,7 @@
 #include "../stacking/StackingEngine.h"
 #include "../stacking/StackingSequence.h"
 #include "../stacking/Statistics.h"
+#include "../io/FitsLoader.h"
 #include <QDateTime>
 #include <QDir>
 
@@ -254,6 +255,17 @@ bool MasterFrames::createMasterDark(
             return false;
         }
     }
+
+    // Get stats for the first file to preserve exposure time
+    double firstExposure = 0.0;
+    double firstTemp = 0.0;
+    {
+        ImageBuffer firstBuf;
+        if (FitsLoader::loadMetadata(files.first(), firstBuf)) {
+            firstExposure = firstBuf.metadata().exposure;
+            firstTemp = firstBuf.metadata().ccdTemp;
+        }
+    }
     
     // Create stacking sequence
     Stacking::ImageSequence sequence;
@@ -298,6 +310,11 @@ bool MasterFrames::createMasterDark(
         QDir(tempDirPath).removeRecursively();
     }
     
+    // StackingEngine sums exposure time, but for a Master Dark we want the 
+    // exposure of a single frame.
+    args.result.metadata().exposure = firstExposure;
+    args.result.metadata().ccdTemp = firstTemp;
+    
     // Save result
     return Stacking::FitsIO::write(output, args.result, 32);
 }
@@ -335,6 +352,17 @@ bool MasterFrames::createMasterFlat(
                                       QObject::tr("Calibrating flat frame"))) {
             QDir(tempDirPath).removeRecursively();
             return false;
+        }
+    }
+    
+    // Get stats for the first file to preserve metadata
+    double firstExposure = 0.0;
+    double firstTemp = 0.0;
+    {
+        ImageBuffer firstBuf;
+        if (FitsLoader::loadMetadata(files.first(), firstBuf)) {
+            firstExposure = firstBuf.metadata().exposure;
+            firstTemp = firstBuf.metadata().ccdTemp;
         }
     }
     
@@ -381,6 +409,10 @@ bool MasterFrames::createMasterFlat(
     if (!tempDirPath.isEmpty()) {
         QDir(tempDirPath).removeRecursively();
     }
+
+    // Preserve metadata
+    args.result.metadata().exposure = firstExposure;
+    args.result.metadata().ccdTemp = firstTemp;
 
     float* flatData = args.result.data().data();
     

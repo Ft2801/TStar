@@ -1,6 +1,5 @@
 # Batch Stacking Script
 
-requires 1.0
 
 # Process multiple folders
 # Assumes logical structure lights001, lights002 etc.

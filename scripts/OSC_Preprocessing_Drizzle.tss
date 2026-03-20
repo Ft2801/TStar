@@ -1,6 +1,5 @@
 # OSC Preprocessing with Bayer Drizzle Script
 
-requires 1.0
 
 # Convert Bias
 cd biases

@@ -96,7 +96,7 @@ bool ScriptParser::parseLine(const QString& line, int lineNumber) {
         if (spaceIdx > 0) {
             QString varName = rest.left(spaceIdx).trimmed();
             QString varValue = rest.mid(spaceIdx + 1).trimmed();
-            varValue = substituteVariables(varValue);
+            // Defer substitution to runner
             m_variables[varName] = varValue;
             return true;
         }
@@ -132,31 +132,10 @@ void ScriptParser::setVariable(const QString& name, const QString& value) {
 }
 
 QString ScriptParser::substituteVariables(const QString& text) {
-    QString result = text;
-    
-    // ${variable} syntax
-    QRegularExpression bracePattern("\\$\\{([^}]+)\\}");
-    QRegularExpressionMatchIterator it = bracePattern.globalMatch(result);
-    while (it.hasNext()) {
-        QRegularExpressionMatch match = it.next();
-        QString varName = match.captured(1);
-        if (m_variables.contains(varName)) {
-            result.replace(match.captured(0), m_variables[varName]);
-        }
-    }
-    
-    // $variable syntax (word boundary)
-    QRegularExpression simplePattern("\\$([A-Za-z_][A-Za-z0-9_]*)");
-    it = simplePattern.globalMatch(result);
-    while (it.hasNext()) {
-        QRegularExpressionMatch match = it.next();
-        QString varName = match.captured(1);
-        if (m_variables.contains(varName)) {
-            result.replace(match.captured(0), m_variables[varName]);
-        }
-    }
-    
-    return result;
+    // We now defer most substitution to execution time in ScriptRunner.
+    // But we still handle simple 'set' expansion here for immediate variables
+    // if needed. For now, we return text as is to let ScriptRunner handle it.
+    return text;
 }
 
 //=============================================================================
