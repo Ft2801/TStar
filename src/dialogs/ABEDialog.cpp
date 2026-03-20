@@ -53,8 +53,6 @@ ABEDialog::ABEDialog(QWidget* parent, ImageViewer* viewer, const ImageBuffer& bu
     form->addRow(tr("Patch Size:"), m_spinPatch);
     form->addRow(m_checkRBF);
     form->addRow(tr("RBF Smooth:"), m_spinSmooth);
-    form->addRow(m_checkRBF);
-    form->addRow(tr("RBF Smooth:"), m_spinSmooth);
     form->addRow(m_checkNormalize);
     form->addRow(m_checkShowBG);
     

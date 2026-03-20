@@ -154,13 +154,14 @@ void RegistrationDialog::setupUI() {
     
     m_startBtn = new QPushButton(tr("Start Registration"), this);
     connect(m_startBtn, &QPushButton::clicked, this, &RegistrationDialog::onStartRegistration);
-    buttonLayout->addWidget(m_startBtn);
     
     m_cancelBtn = new QPushButton(tr("Cancel"), this);
     m_cancelBtn->setEnabled(false);
     connect(m_cancelBtn, &QPushButton::clicked, this, &RegistrationDialog::onCancel);
+
     buttonLayout->addWidget(m_cancelBtn);
-    
+    buttonLayout->addWidget(m_startBtn);
+        
     progLayout->addLayout(buttonLayout);
     
     mainLayout->addWidget(m_progressGroup);

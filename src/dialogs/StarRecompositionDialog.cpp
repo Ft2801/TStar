@@ -139,8 +139,8 @@ void StarRecompositionDialog::createUI() {
     QPushButton* btnCancel = new QPushButton(tr("Cancel"));
     
     btnLayout->addStretch();
-    btnLayout->addWidget(btnApply);
     btnLayout->addWidget(btnCancel);
+    btnLayout->addWidget(btnApply);
     ctrlLayout->addLayout(btnLayout);
     
     mainLayout->addLayout(ctrlLayout, 1);

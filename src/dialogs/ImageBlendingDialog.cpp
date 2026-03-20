@@ -125,8 +125,8 @@ void ImageBlendingDialog::createUI() {
     QHBoxLayout* btnLayout = new QHBoxLayout();
     QPushButton* btnApply = new QPushButton(tr("Apply"));
     QPushButton* btnCancel = new QPushButton(tr("Cancel"));
-    btnLayout->addWidget(btnApply);
     btnLayout->addWidget(btnCancel);
+    btnLayout->addWidget(btnApply);
     ctrlLayout->addLayout(btnLayout);
     
     mainLayout->addLayout(ctrlLayout, 0);

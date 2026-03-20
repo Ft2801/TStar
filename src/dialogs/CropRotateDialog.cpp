@@ -10,8 +10,9 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 
-CropRotateDialog::CropRotateDialog(QWidget* parent) : DialogBase(parent, tr("Rotate & Crop Tool"), 300, 200) {
+CropRotateDialog::CropRotateDialog(QWidget* parent) : DialogBase(parent, tr("Rotate & Crop Tool"), 350, 150) {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(11, 11, 11, 5);
     
     // Rotation Controls
     QHBoxLayout* spinLayout = new QHBoxLayout();
@@ -49,9 +50,9 @@ CropRotateDialog::CropRotateDialog(QWidget* parent) : DialogBase(parent, tr("Rot
     QPushButton* batchBtn = new QPushButton(tr("Batch Crop"));
     QPushButton* closeBtn = new QPushButton(tr("Close"));
     
-    btnLayout->addWidget(applyBtn);
-    btnLayout->addWidget(batchBtn);
     btnLayout->addWidget(closeBtn);
+    btnLayout->addWidget(batchBtn);
+    btnLayout->addWidget(applyBtn);
     mainLayout->addLayout(btnLayout);
     
     // Connections
@@ -75,8 +76,6 @@ CropRotateDialog::CropRotateDialog(QWidget* parent) : DialogBase(parent, tr("Rot
     
     connect(m_aspectCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CropRotateDialog::onRatioChanged);
     
-    resize(300, 200);
-
     // Ensure dialog is on screen (fix for macOS off-screen issue)
     if (parentWidget()) {
         move(parentWidget()->window()->geometry().center() - rect().center());

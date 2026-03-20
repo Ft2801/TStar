@@ -243,10 +243,10 @@ void SPCCDialog::buildUI() {
     }
     m_resetBtn = new QPushButton(tr("Reset"));
     m_closeBtn = new QPushButton(tr("Close"));
-    btnLayout->addWidget(m_runBtn);
-    btnLayout->addWidget(m_resetBtn);
-    btnLayout->addStretch();
     btnLayout->addWidget(m_closeBtn);
+    btnLayout->addStretch();
+    btnLayout->addWidget(m_resetBtn);
+    btnLayout->addWidget(m_runBtn);
     mainLayout->addLayout(btnLayout);
 
     // ── Status / progress ─────────────────────────────────────────────────────

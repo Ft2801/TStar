@@ -270,8 +270,8 @@ ContinuumSubtractionDialog::ContinuumSubtractionDialog(QWidget* parent)
     btnLayout->addWidget(clearBtn);
     btnLayout->addWidget(refreshBtn);
     btnLayout->addStretch(1);
-    btnLayout->addWidget(m_executeBtn);
     btnLayout->addWidget(closeBtn);
+    btnLayout->addWidget(m_executeBtn);
     mainLayout->addLayout(btnLayout);
 
     // Adjust to natural size then center within parent

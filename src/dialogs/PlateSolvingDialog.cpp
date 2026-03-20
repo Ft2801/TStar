@@ -110,8 +110,8 @@ PlateSolvingDialog::PlateSolvingDialog(QWidget* parent) : DialogBase(parent, tr(
 
     btnLay->addWidget(closeBtn);
     btnLay->addStretch();
-    btnLay->addWidget(m_solveBtn);
     btnLay->addWidget(m_cancelBtn);
+    btnLay->addWidget(m_solveBtn);
     mainLayout->addLayout(btnLay);
     
     // Objects

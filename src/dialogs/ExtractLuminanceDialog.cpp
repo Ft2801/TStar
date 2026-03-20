@@ -82,8 +82,8 @@ ExtractLuminanceDialog::ExtractLuminanceDialog(QWidget* parent) : DialogBase(par
     QPushButton* applyBtn = new QPushButton(tr("Extract"));
     QPushButton* closeBtn = new QPushButton(tr("Close"));
     btnLayout->addStretch();
-    btnLayout->addWidget(applyBtn);
     btnLayout->addWidget(closeBtn);
+    btnLayout->addWidget(applyBtn);
     mainLayout->addLayout(btnLayout);
     
     connect(m_methodCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExtractLuminanceDialog::onMethodChanged);

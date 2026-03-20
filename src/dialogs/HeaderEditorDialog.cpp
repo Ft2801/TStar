@@ -83,8 +83,8 @@ void HeaderEditorDialog::setupUI() {
     
     btnLayout->addWidget(m_delBtn);
     btnLayout->addStretch();
-    btnLayout->addWidget(m_saveBtn);
     btnLayout->addWidget(closeBtn);
+    btnLayout->addWidget(m_saveBtn);
     
     layout->addLayout(btnLayout);
 }

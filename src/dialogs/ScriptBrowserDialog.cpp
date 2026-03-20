@@ -60,6 +60,9 @@ void ScriptBrowserDialog::setupUI() {
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     buttonLayout->addStretch();
     
+    m_closeBtn = new QPushButton(tr("Close"));
+    buttonLayout->addWidget(m_closeBtn);
+    
     m_editBtn = new QPushButton(tr("Edit Script"));
     m_editBtn->setEnabled(false);
     buttonLayout->addWidget(m_editBtn);
@@ -69,8 +72,6 @@ void ScriptBrowserDialog::setupUI() {
     m_runBtn->setDefault(true);
     buttonLayout->addWidget(m_runBtn);
     
-    m_closeBtn = new QPushButton(tr("Close"));
-    buttonLayout->addWidget(m_closeBtn);
     mainLayout->addLayout(buttonLayout);
     
     // Connections

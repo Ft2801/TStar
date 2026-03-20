@@ -447,8 +447,8 @@ CorrectionBrushDialog::CorrectionBrushDialog(QWidget* parent) : DialogBase(paren
     btnLayout->addWidget(m_undoBtn);
     btnLayout->addWidget(m_redoBtn);
     btnLayout->addStretch();
-    btnLayout->addWidget(applyBtn);
     btnLayout->addWidget(closeBtn);
+    btnLayout->addWidget(applyBtn);
     mainLayout->addLayout(btnLayout);
     
     connect(m_undoBtn, &QPushButton::clicked, this, &CorrectionBrushDialog::onUndo);

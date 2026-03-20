@@ -47,8 +47,8 @@ ChannelCombinationDialog::ChannelCombinationDialog(const std::vector<ChannelSour
     QPushButton* btnOk = new QPushButton(tr("Apply"));
     QPushButton* btnCancel = new QPushButton(tr("Cancel"));
     btnLayout->addStretch();
-    btnLayout->addWidget(btnOk);
     btnLayout->addWidget(btnCancel);
+    btnLayout->addWidget(btnOk);
     mainLayout->addLayout(btnLayout);
 
     connect(btnOk, &QPushButton::clicked, this, &ChannelCombinationDialog::onApply);

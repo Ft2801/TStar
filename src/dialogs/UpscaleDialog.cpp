@@ -45,8 +45,8 @@ UpscaleDialog::UpscaleDialog(QWidget* parent) : DialogBase(parent, tr("Image Ups
     QPushButton* closeBtn = new QPushButton(tr("Close"));
     QPushButton* applyBtn = new QPushButton(tr("Apply"));
     
-    btnLayout->addWidget(applyBtn);
     btnLayout->addWidget(closeBtn);
+    btnLayout->addWidget(applyBtn);
     mainLayout->addLayout(btnLayout);
     
     // Connections

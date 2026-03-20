@@ -190,10 +190,10 @@ void DeconvolutionDialog::buildUI()
     layout->addLayout(row1);
 
     auto* row2 = new QHBoxLayout;
-    m_pushBtn    = new QPushButton(tr("Apply"));
     m_closeBtn   = new QPushButton(tr("Close"));
-    row2->addWidget(m_pushBtn);
+    m_pushBtn    = new QPushButton(tr("Apply"));
     row2->addWidget(m_closeBtn);
+    row2->addWidget(m_pushBtn);
     layout->addLayout(row2);
 
     layout->addStretch();

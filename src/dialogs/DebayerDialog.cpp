@@ -67,8 +67,8 @@ DebayerDialog::DebayerDialog(QWidget* parent)
     connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
     
     btnLayout->addStretch(1);
-    btnLayout->addWidget(m_applyBtn);
     btnLayout->addWidget(cancelBtn);
+    btnLayout->addWidget(m_applyBtn);
     mainLayout->addLayout(btnLayout);
 
 }

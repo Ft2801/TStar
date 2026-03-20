@@ -152,16 +152,16 @@ void ScriptDialog::setupUI() {
     
     QHBoxLayout* runButtons = new QHBoxLayout();
     runButtons->addStretch();
-    
-    m_runBtn = new QPushButton(tr("Run Script"), this);
-    m_runBtn->setMinimumWidth(120);
-    connect(m_runBtn, &QPushButton::clicked, this, &ScriptDialog::onRunScript);
-    runButtons->addWidget(m_runBtn);
-    
+        
     m_stopBtn = new QPushButton(tr("Stop"), this);
     m_stopBtn->setEnabled(false);
     connect(m_stopBtn, &QPushButton::clicked, this, &ScriptDialog::onStopScript);
     runButtons->addWidget(m_stopBtn);
+
+    m_runBtn = new QPushButton(tr("Run Script"), this);
+    m_runBtn->setMinimumWidth(120);
+    connect(m_runBtn, &QPushButton::clicked, this, &ScriptDialog::onRunScript);
+    runButtons->addWidget(m_runBtn);
     
     bottomLayout->addLayout(runButtons);
     

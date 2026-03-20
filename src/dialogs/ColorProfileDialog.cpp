@@ -87,8 +87,8 @@ void ColorProfileDialog::setupUI() {
     // --- Connections ---
     connect(m_btnBrowseProfile, &QPushButton::clicked, this, &ColorProfileDialog::browseCustomProfile);
     connect(m_targetProfileCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ColorProfileDialog::onTargetProfileChanged);
-    connect(m_btnApply, &QPushButton::clicked, this, &ColorProfileDialog::applyChanges);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+    connect(m_btnApply, &QPushButton::clicked, this, &ColorProfileDialog::applyChanges);
 }
 
 void ColorProfileDialog::loadCurrentInfo() {

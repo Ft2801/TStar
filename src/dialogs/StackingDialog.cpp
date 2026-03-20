@@ -559,15 +559,16 @@ void StackingDialog::setupProgressGroup() {
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     buttonLayout->addStretch();
     
-    m_startBtn = new QPushButton(tr("Start Stacking"), this);
-    m_startBtn->setMinimumWidth(120);
-    connect(m_startBtn, &QPushButton::clicked, this, &StackingDialog::onStartStacking);
-    buttonLayout->addWidget(m_startBtn);
-    
     m_cancelBtn = new QPushButton(tr("Cancel"), this);
     m_cancelBtn->setEnabled(false);
     connect(m_cancelBtn, &QPushButton::clicked, this, &StackingDialog::onCancel);
+    
+    m_startBtn = new QPushButton(tr("Start Stacking"), this);
+    m_startBtn->setMinimumWidth(120);
+    connect(m_startBtn, &QPushButton::clicked, this, &StackingDialog::onStartStacking);
+    
     buttonLayout->addWidget(m_cancelBtn);
+    buttonLayout->addWidget(m_startBtn);
     
     layout->addLayout(buttonLayout);
 }

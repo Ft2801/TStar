@@ -123,8 +123,8 @@ RARDialog::RARDialog(QWidget* parent) : DialogBase(parent, tr("Aberration Remove
     connect(btnClose, &QPushButton::clicked, this, &QDialog::close);
     
     btnLayout->addWidget(m_lblStatus, 1);
-    btnLayout->addWidget(btnRun);
     btnLayout->addWidget(btnClose);
+    btnLayout->addWidget(btnRun);
     layout->addLayout(btnLayout);
 }
 

@@ -268,9 +268,9 @@ void MultiscaleDecompDialog::buildUI() {
     m_btnClose = new QPushButton(tr("Close"));
 
     btnRow->addStretch(1);
-    btnRow->addWidget(m_btnApply);
-    btnRow->addWidget(m_btnNewDoc);
     btnRow->addWidget(m_btnClose);
+    btnRow->addWidget(m_btnNewDoc);
+    btnRow->addWidget(m_btnApply);
     rightLayout->addLayout(btnRow);
 
     splitter->addWidget(leftWidget);

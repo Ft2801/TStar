@@ -333,14 +333,15 @@ void PreprocessingDialog::setupProgressGroup() {
     QHBoxLayout* buttonRow = new QHBoxLayout();
     buttonRow->addStretch();
     
-    m_startBtn = new QPushButton(tr("Start Calibration"), this);
-    connect(m_startBtn, &QPushButton::clicked, this, &PreprocessingDialog::onStartCalibration);
-    buttonRow->addWidget(m_startBtn);
-    
     m_cancelBtn = new QPushButton(tr("Cancel"), this);
     m_cancelBtn->setEnabled(false);
     connect(m_cancelBtn, &QPushButton::clicked, this, &PreprocessingDialog::onCancel);
+    m_startBtn = new QPushButton(tr("Start Calibration"), this);
+    connect(m_startBtn, &QPushButton::clicked, this, &PreprocessingDialog::onStartCalibration);
+    
+
     buttonRow->addWidget(m_cancelBtn);
+    buttonRow->addWidget(m_startBtn);
     
     layout->addLayout(buttonRow);
 }

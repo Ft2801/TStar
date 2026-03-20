@@ -28,8 +28,8 @@ BinningDialog::BinningDialog(QWidget* parent) : DialogBase(parent, tr("Image Bin
     QPushButton* closeBtn = new QPushButton(tr("Close"));
     QPushButton* applyBtn = new QPushButton(tr("Apply"));
     
-    btnLayout->addWidget(applyBtn);
     btnLayout->addWidget(closeBtn);
+    btnLayout->addWidget(applyBtn);
     mainLayout->addLayout(btnLayout);
     
     connect(applyBtn, &QPushButton::clicked, this, &BinningDialog::onApply);

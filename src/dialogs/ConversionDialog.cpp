@@ -118,12 +118,13 @@ void ConversionDialog::setupUI() {
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     buttonLayout->addStretch();
     
+    m_closeBtn = new QPushButton(tr("Close"));
+    buttonLayout->addWidget(m_closeBtn);
+    
     m_convertBtn = new QPushButton(tr("Convert"));
     m_convertBtn->setDefault(true);
     buttonLayout->addWidget(m_convertBtn);
     
-    m_closeBtn = new QPushButton(tr("Close"));
-    buttonLayout->addWidget(m_closeBtn);
     mainLayout->addLayout(buttonLayout);
     
     // Connections
