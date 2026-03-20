@@ -61,9 +61,19 @@ SidebarWidget::SidebarWidget(QWidget* parent) : QWidget(parent) {
     m_widthAnim->setDuration(250);
     m_widthAnim->setEasingCurve(QEasingCurve::OutQuad);
     connect(m_widthAnim, &QVariantAnimation::valueChanged, [this](const QVariant& val){
-        m_contentContainer->setFixedWidth(val.toInt());
+        int w = val.toInt();
+        m_contentContainer->setFixedWidth(w);
         // Important: Since we are overlay/absolute, we must resize ourself to fit content
         resize(totalVisibleWidth(), height());
+        
+        // macOS: Force a repaint and layout update to prevent black/blank boxes during animation
+        if (m_stack) m_stack->update();
+        if (m_console) {
+            // Re-check headers or cast if needed, but since m_console is QTextEdit* it has viewport
+            m_console->update();
+        }
+        m_contentContainer->update();
+        update();
     });
     
     m_tabGroup = new QButtonGroup(this);
@@ -249,9 +259,16 @@ void SidebarWidget::setExpandedWidth(int width) {
          m_contentContainer->setFixedWidth(m_expandedWidth);
          // CRITICAL Fix: Resize the parent widget immediately to avoid clipping
          resize(totalVisibleWidth(), height());
+         if (m_stack) m_stack->update();
+         if (m_console) m_console->update();
+         m_contentContainer->update();
+         update();
     }
     // Sync stack width to ensure "slide" effect works
-    if (m_stack) m_stack->setMinimumWidth(m_expandedWidth);
+    if (m_stack) {
+        m_stack->setMinimumWidth(m_expandedWidth);
+        m_stack->update();
+    }
 }
 
 bool SidebarWidget::isInteracting() const {
