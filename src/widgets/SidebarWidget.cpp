@@ -152,6 +152,15 @@ void SidebarWidget::addPanel(const QString& name, const QString& iconPath, QWidg
     createTab(name, iconPath, id);
     m_idToName[id] = name;
     m_nameToId[name] = id;
+
+    // Keep stable lookup keys for call sites that use hardcoded English names.
+    if (name == "Console" || name == tr("Console")) {
+        m_nameToId["Console"] = id;
+        m_nameToId[tr("Console")] = id;
+    } else if (name == "Header" || name == tr("Header")) {
+        m_nameToId["Header"] = id;
+        m_nameToId[tr("Header")] = id;
+    }
 }
 
 void SidebarWidget::createTab(const QString& name, [[maybe_unused]] const QString& iconPath, int id) {

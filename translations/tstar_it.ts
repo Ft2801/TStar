@@ -631,12 +631,16 @@
     <context>
         <name>AstapSolver</name>
         <message>
+            <source>ASTAP Database found at: %1</source>
+            <translation type="finished">Database ASTAP trovato in: %1</translation>
+        </message>
+        <message>
             <source>ASTAP attempt: %1</source>
             <translation type="finished">Tentativo ASTAP: %1</translation>
         </message>
         <message>
-            <source>ASTAP executable not found. Please set the path in Settings.</source>
-            <translation type="finished">Eseguibile ASTAP non trovato. Imposta il percorso nelle Impostazioni.</translation>
+            <source>ASTAP executable not found.</source>
+            <translation type="finished">Eseguibile ASTAP non trovato.</translation>
         </message>
         <message>
             <source>ASTAP exit code: %1</source>
@@ -705,6 +709,10 @@
         <message>
             <source>Starting ASTAP Solver. Center: %1, %2 Radius: %3 deg</source>
             <translation type="finished">Avvio ASTAP Solver. Centro: %1, %2 Raggio: %3 gradi</translation>
+        </message>
+        <message>
+            <source>WARNING: ASTAP Database not found! Solving may fail.</source>
+            <translation type="finished">ATTENZIONE: Database ASTAP non trovato! La risoluzione potrebbe fallire.</translation>
         </message>
         <message>
             <source>blind solve</source>
@@ -990,6 +998,14 @@
         <message>
             <source>Image Binning</source>
             <translation type="finished">Binning Immagine</translation>
+        </message>
+        <message>
+            <source>No Image</source>
+            <translation type="finished">Nessuna Immagine</translation>
+        </message>
+        <message>
+            <source>Select image.</source>
+            <translation type="finished">Seleziona immagine.</translation>
         </message>
     </context>
     <context>
@@ -10641,8 +10657,8 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Download Database ASTAP</translation>
         </message>
         <message>
-            <source>ASTAP Executable:</source>
-            <translation type="finished">Eseguibile ASTAP:</translation>
+            <source>ASTAP Database Folder:</source>
+            <translation type="finished">Cartella Database ASTAP:</translation>
         </message>
         <message>
             <source>ASTAP Extra Args:</source>
@@ -10713,10 +10729,6 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Display Stretch Predefinito:</translation>
         </message>
         <message>
-            <source>Default system path</source>
-            <translation type="finished">Percorso di sistema predefinito</translation>
-        </message>
-        <message>
             <source>Display</source>
             <translation type="finished">Visualizzazione</translation>
         </message>
@@ -10735,10 +10747,6 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Downloading Cosmic Clarity models...</source>
             <translation type="finished">Download modelli Cosmic Clarity...</translation>
-        </message>
-        <message>
-            <source>Executables (*.app *.exe);;All Files (*)</source>
-            <translation type="finished">Eseguibili (*.app *.exe);;Tutti i file (*)</translation>
         </message>
         <message>
             <source>Executables (*.exe);;All Files (*)</source>
@@ -10789,6 +10797,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">OK</translation>
         </message>
         <message>
+            <source>Optional manual database folder (D50/D80/etc.)</source>
+            <translation type="finished">Cartella database manuale opzionale (D50/D80/etc.)</translation>
+        </message>
+        <message>
             <source>Paths and Integrations</source>
             <translation type="finished">Percorsi e Integrazioni</translation>
         </message>
@@ -10809,8 +10821,8 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Riavvio Richiesto</translation>
         </message>
         <message>
-            <source>Select ASTAP Executable</source>
-            <translation type="finished">Seleziona Eseguibile ASTAP</translation>
+            <source>Select ASTAP Database Folder</source>
+            <translation type="finished">Seleziona Cartella Database ASTAP</translation>
         </message>
         <message>
             <source>Select GraXpert Executable</source>
@@ -10858,6 +10870,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Console</source>
             <translation type="finished">Console</translation>
+        </message>
+        <message>
+            <source>Header</source>
+            <translation type="finished">Header</translation>
         </message>
     </context>
     <context>
@@ -12559,6 +12575,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>New Width:</source>
             <translation type="finished">Nuova Larghezza:</translation>
+        </message>
+        <message>
+            <source>No Image</source>
+            <translation type="finished">Nessuna Immagine</translation>
+        </message>
+        <message>
+            <source>Select image.</source>
+            <translation type="finished">Seleziona immagine.</translation>
         </message>
     </context>
     <context>

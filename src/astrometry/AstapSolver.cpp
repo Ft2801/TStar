@@ -123,29 +123,6 @@ QString AstapSolver::getAstapDatabasePath() {
 
 QString AstapSolver::getAstapExecutable() {
     QSettings settings;
-    QString customPath = settings.value("paths/astap").toString();
-    if (!customPath.isEmpty() && (QFile::exists(customPath) || QDir(customPath).exists())) {
-        #ifdef Q_OS_MAC
-        // If user selected the .app bundle, point to the internal binary
-        if (customPath.endsWith(".app") || customPath.endsWith(".app/")) {
-            QString internal = customPath;
-            if (internal.endsWith("/")) internal.chop(1);
-            internal += "/Contents/MacOS/astap";
-            if (QFile::exists(internal)) return internal;
-        }
-        #endif
-
-        // Prefer CLI binary when a GUI binary is configured.
-        QFileInfo customInfo(customPath);
-        if (customInfo.fileName().compare("astap.exe", Qt::CaseInsensitive) == 0) {
-            QString cliSibling = customInfo.absolutePath() + "/astap_cli.exe";
-            if (QFile::exists(cliSibling)) {
-                return cliSibling;
-            }
-        }
-        return customPath;
-    }
-
 #ifdef Q_OS_WIN
     // Check bundled
     QString bundledCli = QCoreApplication::applicationDirPath() + "/deps/astap_cli.exe";
@@ -188,6 +165,36 @@ QString AstapSolver::getAstapExecutable() {
     if (QFile::exists("/opt/astap/astap")) return "/opt/astap/astap";
 #endif
 
+    // Legacy/manual override path: keep as fallback for compatibility.
+    QString customPath = settings.value("paths/astap").toString();
+    if (!customPath.isEmpty()) {
+        #ifdef Q_OS_MAC
+        // If user selected the .app bundle, convert to internal binary when possible.
+        if (customPath.endsWith(".app") || customPath.endsWith(".app/")) {
+            QString internal = customPath;
+            if (internal.endsWith("/")) internal.chop(1);
+            internal += "/Contents/MacOS/astap";
+            if (QFile::exists(internal)) return internal;
+        }
+        #endif
+
+        QFileInfo customInfo(customPath);
+
+        // Accept only files as executables. Directories are not valid executable paths.
+        if (!customInfo.exists() || !customInfo.isFile()) {
+            return "";
+        }
+
+        // Prefer CLI binary when a GUI binary is configured.
+        if (customInfo.fileName().compare("astap.exe", Qt::CaseInsensitive) == 0) {
+            QString cliSibling = customInfo.absolutePath() + "/astap_cli.exe";
+            if (QFile::exists(cliSibling)) {
+                return cliSibling;
+            }
+        }
+        return customPath;
+    }
+
     return "";
 }
 
@@ -226,7 +233,7 @@ void AstapSolver::solve(const ImageBuffer& image, double raHint, double decHint,
     QString astapExec = getAstapExecutable();
     if (astapExec.isEmpty()) {
         NativeSolveResult res;
-        res.errorMsg = tr("ASTAP executable not found. Please set the path in Settings.");
+        res.errorMsg = tr("ASTAP executable not found.");
         emit finished(res);
         return;
     }

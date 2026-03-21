@@ -473,6 +473,7 @@ MainWindow::MainWindow(QWidget *parent)
             m_lastActiveImageViewer->refreshDisplay(true);
         }
         log(tr("Color profile conversion finished successfully."), Log_Success);
+        showConsoleTemporarily(2000);
         
         // Refresh the dialog if it's open to show the NEW profile
         if (m_colorProfileDlg && m_colorProfileDlg->isVisible()) {
@@ -863,6 +864,7 @@ MainWindow::MainWindow(QWidget *parent)
             QSettings settings("TStar", "TStar");
             settings.setValue("General/LastWorkingDir", dir);
             log(tr("Home Directory changed to: %1").arg(dir), Log_Success);
+            showConsoleTemporarily(2000);
             
             // Also update ScriptRunner default CWD if available
             // (Note: ScriptRunner reads QDir::currentPath() by default now, so this is implicit)
@@ -1478,6 +1480,7 @@ MainWindow::MainWindow(QWidget *parent)
         UpdateChecker* checker = new UpdateChecker(this);
         connect(checker, &UpdateChecker::updateAvailable, this, [this](const QString& ver, const QString& body, const QString& url){
             log(tr("New version found: %1").arg(ver), Log_Success, true);
+            showConsoleTemporarily(2000);
             UpdateDialog dlg(this, ver, body, url);
             dlg.exec(); 
         });
@@ -1543,6 +1546,7 @@ void MainWindow::tileImageViews() {
     }
     
     log(tr("Tiled %1 images in %2x%3 layout.").arg(count).arg(cols).arg(rows), Log_Success, true);
+    showConsoleTemporarily(2000);
 }
 
 void MainWindow::tileImageViewsVertical() {
@@ -1569,6 +1573,7 @@ void MainWindow::tileImageViewsVertical() {
         if (auto* v = win->viewer()) QTimer::singleShot(50, v, &ImageViewer::fitToWindow);
     }
     log(tr("Arranged %1 images vertically.").arg(count), Log_Success, true);
+    showConsoleTemporarily(2000);
 }
 
 void MainWindow::tileImageViewsHorizontal() {
@@ -1595,6 +1600,7 @@ void MainWindow::tileImageViewsHorizontal() {
         if (auto* v = win->viewer()) QTimer::singleShot(50, v, &ImageViewer::fitToWindow);
     }
     log(tr("Arranged %1 images horizontally.").arg(count), Log_Success, true);
+    showConsoleTemporarily(2000);
 }
 
 void MainWindow::pushUndo() {
@@ -1616,6 +1622,7 @@ void MainWindow::undo() {
         v->undo();
         updateMenus();
         log("Undo performed", Log_Success);
+        showConsoleTemporarily(2000);
     } else {
         log("No active viewer for undo", Log_Warning);
     }
@@ -1628,6 +1635,7 @@ void MainWindow::redo() {
         v->redo();
         updateMenus();
         log("Redo performed", Log_Success);
+        showConsoleTemporarily(2000);
     } else {
         log("No active viewer for redo", Log_Warning);
     }
@@ -1683,6 +1691,7 @@ void MainWindow::onBurnDisplay() {
         if (originalFalseColor) extraStr += " + FalseColor";
         
         log(tr("Display burned to buffer (") + modeStr + extraStr + ")", Log_Success, true);
+        showConsoleTemporarily(2000);
         
         updateMenus();
     } else {
@@ -2155,13 +2164,16 @@ static QThreadPool* getImageLoadThreadPool() {
 // Process one loaded image from the queue (called by timer on UI thread)
 void MainWindow::processImageLoadQueue() {
     std::shared_ptr<ImageFileLoadResult> ptr;
+    bool isQueueNowEmpty = false;
     {
         QMutexLocker lock(&m_imageLoadMutex);
         if (m_imageLoadQueue.isEmpty()) {
             m_imageDisplayTimer->stop();
+            m_isLoadingBatch = false; // Batch load complete
             return;
         }
         ptr = m_imageLoadQueue.dequeue();
+        isQueueNowEmpty = m_imageLoadQueue.isEmpty();
     }
     
     if (ptr->success) {
@@ -2179,7 +2191,13 @@ void MainWindow::processImageLoadQueue() {
         else if (ptr->logLevel == ImageLog_Error) logType = Log_Error;
         log(ptr->logMsg, logType, ptr->logPopup);
     }
-    showConsoleTemporarily(2000);
+    
+    // Open console after the last (or only) image in batch is displayed
+    if (isQueueNowEmpty) {
+        m_imageDisplayTimer->stop();
+        m_isLoadingBatch = false;
+        showConsoleTemporarily(2000);
+    }
 }
 
 void MainWindow::openFile() {
@@ -2203,6 +2221,9 @@ void MainWindow::openFile() {
     QString startDir = getProjectWorkingDirectory();
     QStringList paths = QFileDialog::getOpenFileNames(this, tr("Open Image(s)"), startDir, filter);
     if (paths.isEmpty()) return;
+    
+    // Set flag: we're about to batch load files (console won't auto-open during this)
+    m_isLoadingBatch = true;
 
     // Persist the user's last chosen working directory immediately.
     const QString chosenDir = QFileInfo(paths.first()).absolutePath();
@@ -2417,6 +2438,7 @@ void MainWindow::extractChannels() {
         }
     }
     log("Extracted channels for " + baseTitle, Log_Success);
+    showConsoleTemporarily(2000);
 }
 
 void MainWindow::combineChannels() {
@@ -2447,6 +2469,7 @@ void MainWindow::combineChannels() {
         ImageBuffer result = dlg->getResult();
         createNewImageWindow(result, "Combined_RGB");
         log("Channels Combined", Log_Success);
+        showConsoleTemporarily(2000);
     });
     
     log(tr("Opening Combine Channels Tool..."), Log_Info, true);
@@ -2492,6 +2515,7 @@ void MainWindow::openStretchDialog() {
         
         connect(m_stretchDlg, &StretchDialog::applied, this, [this](const QString& msg){
             log(msg, Log_Success, true);
+            showConsoleTemporarily(2000);
         });
 
         log(tr("Opening Statistical Stretch..."), Log_Info, true);
@@ -2591,6 +2615,7 @@ void MainWindow::openCbeDialog() {
         resBuffer.setName(newName);
         createNewImageWindow(resBuffer, newName, srcMode, srcMedian, srcLinked);
         log(tr("CBE successful."), Log_Success, true);
+        showConsoleTemporarily(2000);
     });
 
     connect(dlg, &CBEDialog::progressMsg, this, [this](const QString& msg){ log(msg, Log_Info); });
@@ -2631,6 +2656,7 @@ void MainWindow::openAbeDialog() {
         // Updated: Preserve View!
         v->setBuffer(res, "ABE_Result", true); 
         log(tr("ABE applied."), Log_Success, true);
+        showConsoleTemporarily(2000);
     });
     
     // Logging connection
@@ -2664,6 +2690,7 @@ void MainWindow::openWavescaleHDRDialog() {
     connect(dlg, &WavescaleHDRDialog::applyInternal, [this](const ImageBuffer& res) {
         Q_UNUSED(res);
         log(tr("Wavescale HDR applied."), Log_Success);
+        showConsoleTemporarily(2000);
     });
     
     log(tr("Opened Wavescale HDR Tool."), Log_Action, true);
@@ -2695,6 +2722,7 @@ void MainWindow::openSaturationDialog() {
     // but dialog handles undo/buffer internally.
     connect(m_satDlg, &SaturationDialog::applyInternal, this, [this]([[maybe_unused]] const ImageBuffer::SaturationParams& params) {
         log(tr("Saturation applied permanently"), Log_Success, true);
+        showConsoleTemporarily(2000);
         if (m_satTarget) updateMenus();
     });
 
@@ -2733,6 +2761,7 @@ void MainWindow::openTemperatureTintDialog() {
 
     connect(m_tempTintDlg, &TemperatureTintDialog::applyInternal, this, [this]() {
         log(tr("Temperature / Tint applied permanently"), Log_Success, true);
+        showConsoleTemporarily(2000);
         updateMenus();
     });
 
@@ -2783,6 +2812,7 @@ void MainWindow::openMagentaCorrectionDialog() {
         v->getBuffer().applyMagentaCorrection(mod_b, threshold, starmask);
         v->setBuffer(v->getBuffer(), v->windowTitle(), true);
         log(tr("Magenta Correction applied."), Log_Success, true);
+        showConsoleTemporarily(2000);
     });
 
     log(tr("Opening Magenta Correction Tool..."), Log_Info, true);
@@ -2849,6 +2879,7 @@ void MainWindow::openSCNRDialog() {
         // Updated: Preserve View!
         v->setBuffer(v->getBuffer(), v->windowTitle(), true);
         log(tr("SCNR applied."), Log_Success, true);
+        showConsoleTemporarily(2000);
     });
     
     log(tr("Opening SCNR Tool..."), Log_Info, true);
@@ -2955,8 +2986,8 @@ void MainWindow::log(const QString& msg, LogType type, bool autoShow, bool isTra
         p->setStyleSheet("background-color: transparent; border: none;");
     }
 
-    // Auto-Show logic
-    if (autoShow) {
+    // Auto-open logic: explicit requests only. Suppress during batch load to avoid lag.
+    if (autoShow && !m_isLoadingBatch) {
         showConsoleTemporarily(2000);
     }
 }
@@ -3065,6 +3096,7 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event) {
                                  sourceViewer->getAutoStretchMedian(),
                                  sourceViewer->isDisplayLinked());
                              log(tr("View Duplicated: ") + newTitle, Log_Success);
+                             showConsoleTemporarily(2000);
                          }
                     }
                 }
@@ -3244,6 +3276,7 @@ void MainWindow::applyGeometry(const QString& op) {
         
         updateDisplay();
         log(tr("Geometry applied: ") + op, Log_Success);
+        showConsoleTemporarily(2000);
     }
 }
 
@@ -3254,6 +3287,7 @@ void MainWindow::applyGeometry(const QString& name, std::function<void(ImageBuff
         func(v->getBuffer());
         updateDisplay();
         log(tr("Geometry applied: ") + name, Log_Success);
+        showConsoleTemporarily(2000);
     }
 }
 
@@ -3328,6 +3362,7 @@ void MainWindow::openGHSDialog() {
 
     connect(m_ghsDlg, &GHSDialog::applied, this, [this](const QString& msg){
         log(msg, Log_Success, true);
+        showConsoleTemporarily(2000);
     });
     
     if (viewer) m_ghsDlg->setTarget(viewer);
@@ -3434,6 +3469,7 @@ void MainWindow::openPlateSolvingDialog() {
                 pushUndo(); // Save undo state before modifying metadata
                 viewer->getBuffer().setMetadata(meta);
                 log(tr("Plate Solved! Center: RA %1, Dec %2").arg(meta.ra).arg(meta.dec), Log_Success, true);
+                showConsoleTemporarily(2000);
             }
         }
         sub->close();
@@ -3475,6 +3511,7 @@ void MainWindow::openPCCDialog() {
              log(tr("PCC Applied: R=%1 G=%2 B=%3 (BG: %4, %5, %6)")
                  .arg(res.R_factor).arg(res.G_factor).arg(res.B_factor)
                  .arg(res.bg_r).arg(res.bg_g).arg(res.bg_b), Log_Success, true);
+             showConsoleTemporarily(2000);
          }
          sub->close();
     });
@@ -3621,6 +3658,7 @@ void MainWindow::applyCurves(const SplineData& spline, const bool channels[3]) {
         m_curvesTarget->setImage(newImg, true);
         
         log(tr("Curves applied to %1.").arg(m_curvesTarget->windowTitle()), Log_Success, true);
+        showConsoleTemporarily(2000);
     }
 }
 
@@ -3681,6 +3719,7 @@ void MainWindow::openBackgroundNeutralizationDialog() {
         // Updated: Preserve View!
         v->setBuffer(buf, v->windowTitle(), true); 
         log(tr("Background Neutralization applied."), Log_Success, true);
+        showConsoleTemporarily(2000);
     });
 }
     
@@ -3750,6 +3789,7 @@ void MainWindow::openPixelMathDialog() {
             if (PixelMathDialog::evaluateExpression(expr, v->getBuffer(), imgs, rescale, &err)) {
                 updateActiveImage();
                 log(tr("PixelMath Applied") + QString(rescale ? tr(" (Rescaled)") : "") + ": " + expr.left(40) + "...", Log_Success, true);
+                showConsoleTemporarily(2000);
             } else {
                 QMessageBox::critical(this, tr("PixelMath Error"), err);
                 undo();
@@ -3856,6 +3896,7 @@ void MainWindow::onSettingsAction() {
             }
         }
         log(tr("Settings applied. Display refreshed."), Log_Success);
+        showConsoleTemporarily(2000);
     });
     
     // Clean up when dialog closes
@@ -3894,6 +3935,7 @@ void MainWindow::openArcsinhStretchDialog() {
     
     connect(dlg, &QDialog::accepted, this, [this, viewer](){
         log(tr("Arcsinh Stretch Applied to %1").arg(viewer->windowTitle()), Log_Success, true);
+        showConsoleTemporarily(2000);
     });
 
     CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, dlg, tr("Arcsinh Stretch"));
@@ -3928,6 +3970,7 @@ void MainWindow::openHistogramStretchDialog() {
     // Log when applied
     connect(dlg, &HistogramStretchDialog::applied, this, [this](){
         log(tr("Histogram Transformation applied."), Log_Success, true);
+        showConsoleTemporarily(2000);
     });
     
     CustomMdiSubWindow* sub = new CustomMdiSubWindow(m_mdiArea);
@@ -4119,6 +4162,7 @@ void MainWindow::checkAndHandleColorProfile(ImageBuffer& buffer, const QString& 
             m.colorProfileHandled = true;
             buffer.setMetadata(m);
             log(tr("Auto-converted image '%1' to workspace profile.").arg(title), Log_Success);
+            showConsoleTemporarily(2000);
         } else if (mode == core::AutoConversionMode::Ask) {
             // Direct call to QMessageBox here to ensure it's synchronous and happens BEFORE window creation
             QMessageBox::StandardButton reply = QMessageBox::question(this, tr("Color Profile Mismatch"),
@@ -4133,6 +4177,7 @@ void MainWindow::checkAndHandleColorProfile(ImageBuffer& buffer, const QString& 
                 m.colorProfileHandled = true;
                 buffer.setMetadata(m);
                 log(tr("Converted image '%1' to workspace profile.").arg(title), Log_Success);
+                showConsoleTemporarily(2000);
             } else {
                 ImageBuffer::Metadata m = buffer.metadata();
                 m.colorProfileHandled = true;
@@ -4326,6 +4371,7 @@ void MainWindow::createMaskAction() {
              }
              updateActiveImage();
              log(tr("Mask Created and Applied."), Log_Success);
+             showConsoleTemporarily(2000);
         }
     } else {
         QMessageBox::warning(this, tr("No Image"), tr("Open an image first."));
@@ -4394,6 +4440,7 @@ void MainWindow::applyMaskAction() {
                 }
                 updateActiveImage();
                 log(tr("Mask Applied: %1").arg(mask.name), Log_Success);
+                showConsoleTemporarily(2000);
             }
         }
     } else {
@@ -4615,6 +4662,7 @@ void MainWindow::openExtractLuminanceDialog() {
     
     connect(dlg, &QDialog::accepted, this, [this](){
         log(tr("Luminance extracted."), Log_Success, true);
+        showConsoleTemporarily(2000);
     });
 }
 
@@ -4636,6 +4684,7 @@ void MainWindow::openRecombineLuminanceDialog() {
     
     connect(dlg, &QDialog::accepted, this, [this](){
         log(tr("Luminance recombined."), Log_Success, true);
+        showConsoleTemporarily(2000);
     });
 }
 
@@ -4657,6 +4706,7 @@ void MainWindow::openCorrectionBrushDialog() {
     
     connect(dlg, &QDialog::accepted, this, [this](){
         log(tr("Correction brush applied."), Log_Success, true);
+        showConsoleTemporarily(2000);
     });
     
     // Update when active image changes
@@ -4675,6 +4725,7 @@ void MainWindow::removePedestal() {
     ChannelOps::removePedestal(v->getBuffer());
     v->refreshDisplay();
     log(tr("Pedestal removed."), Log_Success, true);
+    showConsoleTemporarily(2000);
 }
 
 void MainWindow::openClaheDialog() {
@@ -4695,6 +4746,7 @@ void MainWindow::openClaheDialog() {
     
     connect(dlg, &QDialog::accepted, this, [this](){
         log(tr("CLAHE applied."), Log_Success, true);
+        showConsoleTemporarily(2000);
     });
     
     // Update when active image changes
@@ -4723,6 +4775,7 @@ void MainWindow::openStarHaloRemovalDialog() {
 
     connect(dlg, &QDialog::accepted, this, [this]() {
         log(tr("Star Halo Removal applied."), Log_Success, true);
+        showConsoleTemporarily(2000);
     });
 
     connect(m_mdiArea, &QMdiArea::subWindowActivated, dlg, [this, dlg](QMdiSubWindow*) {
@@ -4758,6 +4811,7 @@ void MainWindow::openMorphologyDialog() {
 
     connect(dlg, &QDialog::accepted, this, [this]() {
         log(tr("Morphology applied."), Log_Success, true);
+        showConsoleTemporarily(2000);
     });
 
     connect(dlg, &QObject::destroyed, this, [this]() {
@@ -4823,6 +4877,7 @@ void MainWindow::openSelectiveColorDialog() {
     
     connect(dlg, &QDialog::accepted, this, [this](){
         log(tr("Selective Color Correction applied."), Log_Success, true);
+        showConsoleTemporarily(2000);
     });
     
     // Update when active image changes
@@ -5370,6 +5425,7 @@ bool MainWindow::saveWorkspaceProjectTo(const QString& projectFilePath) {
     
     m_workspaceProject.dirty = false;
     log(tr("Workspace project saved: %1").arg(projectFilePath), Log_Success, true);
+    showConsoleTemporarily(2000);
     m_restoringWorkspaceProject = false;
 
     return true;
@@ -5417,6 +5473,7 @@ bool MainWindow::loadWorkspaceProjectFrom(const QString& projectFilePath) {
     m_workspaceProject.untitled = false;
     m_workspaceProject.filePath = projectFilePath;
     m_workspaceProject.displayName = fi.completeBaseName();
+    showConsoleTemporarily(2000);
     log(tr("Workspace project loaded: %1").arg(projectFilePath), Log_Success, true);
     m_restoringWorkspaceProject = false;
     return true;
@@ -5477,6 +5534,7 @@ void MainWindow::newWorkspaceProject() {
     m_workspaceProject.filePath.clear();
     m_workspaceProject.displayName = tr("Untitled Workspace Project");
     log(tr("New workspace project created."), Log_Success, true);
+    showConsoleTemporarily(2000);
     m_restoringWorkspaceProject = false;
 }
 
@@ -5723,6 +5781,7 @@ void MainWindow::openNewProjectDialog() {
             QSettings settings("TStar", "TStar");
             settings.setValue("General/LastWorkingDir", dir);
             log(tr("Project created and activated: %1").arg(dir), Log_Success, true);
+            showConsoleTemporarily(2000);
             delete project;
         } else {
             log(tr("Failed to create project."), Log_Error, true);
@@ -5748,6 +5807,7 @@ void MainWindow::openExistingProject() {
     
     if (!projectFile.isEmpty() && project.load(projectFile)) {
         log(tr("Project loaded: %1").arg(project.name()), Log_Success, true);
+        showConsoleTemporarily(2000);
         // Open StackingDialog with this project
         StackingDialog dlg(this);
         dlg.exec();

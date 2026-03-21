@@ -631,12 +631,16 @@
     <context>
         <name>AstapSolver</name>
         <message>
+            <source>ASTAP Database found at: %1</source>
+            <translation type="finished">Base de datos ASTAP encontrada en: %1</translation>
+        </message>
+        <message>
             <source>ASTAP attempt: %1</source>
             <translation type="finished">Intento de ASTAP: %1</translation>
         </message>
         <message>
-            <source>ASTAP executable not found. Please set the path in Settings.</source>
-            <translation type="finished">Ejecutable ASTAP no encontrado. Configure la ruta en Ajustes.</translation>
+            <source>ASTAP executable not found.</source>
+            <translation type="finished">Ejecutable ASTAP no encontrado.</translation>
         </message>
         <message>
             <source>ASTAP exit code: %1</source>
@@ -676,7 +680,7 @@
         </message>
         <message>
             <source>Failed to parse ASTAP output files.</source>
-            <translation type="finished">Error al analizzare i file di output di ASTAP.</translation>
+            <translation type="finished">Error al analizar los file de output de ASTAP.</translation>
         </message>
         <message>
             <source>Failed to save temporary image.</source>
@@ -705,6 +709,10 @@
         <message>
             <source>Starting ASTAP Solver. Center: %1, %2 Radius: %3 deg</source>
             <translation type="finished">Iniciando ASTAP Solver. Centro: %1, %2 Radio: %3 grados</translation>
+        </message>
+        <message>
+            <source>WARNING: ASTAP Database not found! Solving may fail.</source>
+            <translation type="finished">ADVERTENCIA: ¡Base de datos ASTAP no encontrada! La resolución puede fallar.</translation>
         </message>
         <message>
             <source>blind solve</source>
@@ -990,6 +998,14 @@
         <message>
             <source>Image Binning</source>
             <translation type="finished">Binning de Imagen</translation>
+        </message>
+        <message>
+            <source>No Image</source>
+            <translation type="finished">Sin Imagen</translation>
+        </message>
+        <message>
+            <source>Select image.</source>
+            <translation type="finished">Seleccione imagen.</translation>
         </message>
     </context>
     <context>
@@ -10641,8 +10657,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Descarga de Base de Datos ASTAP</translation>
         </message>
         <message>
-            <source>ASTAP Executable:</source>
-            <translation type="finished">Ejecutable ASTAP:</translation>
+            <source>ASTAP Database Folder:</source>
+            <translation type="finished">Carpeta de Base de Datos ASTAP:</translation>
         </message>
         <message>
             <source>ASTAP Extra Args:</source>
@@ -10713,10 +10729,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Display Stretch Predeterminado:</translation>
         </message>
         <message>
-            <source>Default system path</source>
-            <translation type="finished">Ruta predeterminada del sistema</translation>
-        </message>
-        <message>
             <source>Display</source>
             <translation type="finished">Visualización</translation>
         </message>
@@ -10735,10 +10747,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Downloading Cosmic Clarity models...</source>
             <translation type="finished">Descargando modelos Cosmic Clarity...</translation>
-        </message>
-        <message>
-            <source>Executables (*.app *.exe);;All Files (*)</source>
-            <translation type="finished">Ejecutables (*.app *.exe);;Todos los Archivos (*)</translation>
         </message>
         <message>
             <source>Executables (*.exe);;All Files (*)</source>
@@ -10789,6 +10797,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">OK</translation>
         </message>
         <message>
+            <source>Optional manual database folder (D50/D80/etc.)</source>
+            <translation type="finished">Carpeta de base de datos manual opcional (D50/D80/etc.)</translation>
+        </message>
+        <message>
             <source>Paths and Integrations</source>
             <translation type="finished">Rutas e Integraciones</translation>
         </message>
@@ -10809,8 +10821,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Reinicio Requerido</translation>
         </message>
         <message>
-            <source>Select ASTAP Executable</source>
-            <translation type="finished">Seleccionar Ejecutable ASTAP</translation>
+            <source>Select ASTAP Database Folder</source>
+            <translation type="finished">Seleccionar Carpeta de Base de Datos ASTAP</translation>
         </message>
         <message>
             <source>Select GraXpert Executable</source>
@@ -10858,6 +10870,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Console</source>
             <translation type="finished">Consola</translation>
+        </message>
+        <message>
+            <source>Header</source>
+            <translation type="finished">Cabecera</translation>
         </message>
     </context>
     <context>
@@ -12559,6 +12575,14 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>New Width:</source>
             <translation type="finished">Nueva Anchura:</translation>
+        </message>
+        <message>
+            <source>No Image</source>
+            <translation type="finished">Sin Imagen</translation>
+        </message>
+        <message>
+            <source>Select image.</source>
+            <translation type="finished">Seleccione imagen.</translation>
         </message>
     </context>
     <context>

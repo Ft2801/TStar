@@ -631,11 +631,15 @@
     <context>
         <name>AstapSolver</name>
         <message>
+            <source>ASTAP Database found at: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>ASTAP attempt: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>ASTAP executable not found. Please set the path in Settings.</source>
+            <source>ASTAP executable not found.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -704,6 +708,10 @@
         </message>
         <message>
             <source>Starting ASTAP Solver. Center: %1, %2 Radius: %3 deg</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>WARNING: ASTAP Database not found! Solving may fail.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -989,6 +997,14 @@
         </message>
         <message>
             <source>Image Binning</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No Image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select image.</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -10638,7 +10654,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>ASTAP Executable:</source>
+            <source>ASTAP Database Folder:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10710,10 +10726,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Default system path</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Display</source>
             <translation type="unfinished" />
         </message>
@@ -10731,10 +10743,6 @@
         </message>
         <message>
             <source>Downloading Cosmic Clarity models...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Executables (*.app *.exe);;All Files (*)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10786,6 +10794,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Optional manual database folder (D50/D80/etc.)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Paths and Integrations</source>
             <translation type="unfinished" />
         </message>
@@ -10806,7 +10818,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Select ASTAP Executable</source>
+            <source>Select ASTAP Database Folder</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10854,6 +10866,10 @@
         </message>
         <message>
             <source>Console</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Header</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -12555,6 +12571,14 @@
         </message>
         <message>
             <source>New Width:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No Image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select image.</source>
             <translation type="unfinished" />
         </message>
     </context>

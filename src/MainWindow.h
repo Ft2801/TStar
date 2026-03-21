@@ -291,6 +291,7 @@ private:
     // Console Logic for Process Feedback (Moved to Sidebar)
     bool m_wasConsoleOpen = false; // Remembers state before process started
     bool m_isConsoleTempOpen = false; // True if opened by timer/auto
+    bool m_isLoadingBatch = false; // Suppress console auto-open during batch file load
     QTimer* m_tempConsoleTimer = nullptr;
     
     QPointer<class GHSDialog> m_ghsDlg;

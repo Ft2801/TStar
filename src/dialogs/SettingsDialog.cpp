@@ -11,6 +11,8 @@
 #include <QCheckBox>
 #include <QProgressDialog>
 #include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
 #include "network/ModelDownloader.h"
 #include "network/AstapDownloader.h"
 
@@ -97,16 +99,16 @@ SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, tr("Setting
     rowSN->addWidget(btnSN);
     form->addRow(tr("StarNet Executable:"), rowSN);
 
-    // ASTAP
+    // ASTAP Database (CLI is bundled with the app)
     m_astapPath = new QLineEdit();
-    m_astapPath->setPlaceholderText(tr("Default system path"));
+    m_astapPath->setPlaceholderText(tr("Optional manual database folder (D50/D80/etc.)"));
     QPushButton* btnAstap = new QPushButton(tr("Browse..."));
     connect(btnAstap, &QPushButton::clicked, this, &SettingsDialog::pickAstapPath);
 
     QHBoxLayout* rowAstap = new QHBoxLayout();
     rowAstap->addWidget(m_astapPath);
     rowAstap->addWidget(btnAstap);
-    form->addRow(tr("ASTAP Executable:"), rowAstap);
+    form->addRow(tr("ASTAP Database Folder:"), rowAstap);
 
     m_astapExtraArgs = new QLineEdit();
     m_astapExtraArgs->setPlaceholderText("-s 500 -log");
@@ -173,7 +175,15 @@ SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, tr("Setting
     // --- Load Settings ---
     m_graxpertPath->setText(m_settings.value("paths/graxpert").toString());
     m_starnetPath->setText(m_settings.value("paths/starnet").toString());
-    m_astapPath->setText(m_settings.value("paths/astap").toString());
+    QString astapDbPath = m_settings.value("paths/astap_database").toString();
+    if (astapDbPath.isEmpty()) {
+        const QString legacyAstapPath = m_settings.value("paths/astap").toString();
+        QFileInfo legacyInfo(legacyAstapPath);
+        if (legacyInfo.exists() && legacyInfo.isDir()) {
+            astapDbPath = legacyInfo.absoluteFilePath();
+        }
+    }
+    m_astapPath->setText(astapDbPath);
     m_astapExtraArgs->setText(m_settings.value("paths/astap_extra").toString());
     
     QString savedLang = m_settings.value("general/language", "System").toString();
@@ -211,10 +221,15 @@ void SettingsDialog::pickStarNetPath() {
 }
 
 void SettingsDialog::pickAstapPath() {
-    QString path = QFileDialog::getOpenFileName(this, tr("Select ASTAP Executable"), "", tr("Executables (*.app *.exe);;All Files (*)"));
+    QString startDir = m_astapPath->text().trimmed();
+    if (startDir.isEmpty()) {
+        startDir = QDir::homePath();
+    }
+
+    QString path = QFileDialog::getExistingDirectory(this, tr("Select ASTAP Database Folder"), startDir);
     if (!path.isEmpty()) {
         m_astapPath->setText(path);
-        m_settings.setValue("paths/astap", path);
+        m_settings.setValue("paths/astap_database", path);
         m_settings.sync();
     }
 }
@@ -332,7 +347,9 @@ void SettingsDialog::refreshModelsStatus() {
 void SettingsDialog::saveSettings() {
     m_settings.setValue("paths/graxpert", m_graxpertPath->text());
     m_settings.setValue("paths/starnet", m_starnetPath->text());
-    m_settings.setValue("paths/astap", m_astapPath->text());
+    m_settings.setValue("paths/astap_database", m_astapPath->text());
+    // Legacy executable setting is no longer exposed in UI; prefer bundled CLI.
+    m_settings.remove("paths/astap");
     m_settings.setValue("paths/astap_extra", m_astapExtraArgs->text());
 
     QString oldLang = m_settings.value("general/language", "System").toString();
@@ -388,7 +405,7 @@ void SettingsDialog::refreshAstapStatus() {
     };
 
     // 1. Check custom path first
-    QString customPath = m_astapPath ? m_astapPath->text() : "";
+    QString customPath = m_astapPath ? m_astapPath->text().trimmed() : "";
     if (!customPath.isEmpty()) {
         QFileInfo info(customPath);
         QString dirToCheck = info.isDir() ? info.absoluteFilePath() : info.absolutePath();
@@ -405,6 +422,16 @@ void SettingsDialog::refreshAstapStatus() {
             QCoreApplication::applicationDirPath() + "/deps",
             QCoreApplication::applicationDirPath()
         };
+#ifdef Q_OS_MAC
+        paths << "/usr/local/opt/astap"
+              << "/usr/local/opt/astap/Databases"
+              << "/opt/homebrew/opt/astap"
+              << "/opt/homebrew/opt/astap/Databases"
+              << "/Applications/ASTAP.app/Contents/MacOS/Databases"
+              << "/Applications/ASTAP.app/Contents/Resources/Databases"
+              << (QDir::homePath() + "/Library/Application Support/ASTAP")
+              << (QDir::homePath() + "/Library/Application Support/ASTAP/Databases");
+#endif
         for (const QString& p : paths) {
             if (checkDirRecursive(p)) {
                 installed = true;
