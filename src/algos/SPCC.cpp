@@ -198,15 +198,19 @@ bool SPCC::loadTStarFits(const QString& dataPath, SPCCDataStore& out) {
             status = 0; continue;
         }
 
-        // Locate value column: FLUX for SED, THROUGHPUT for FILTER/SENSOR
+        // Locate value column: FLUX for SED, QE or THROUGHPUT for SENSOR, THROUGHPUT for FILTER
         int col_val = 0;
-        const char* val_col = (ctype_up == "SED") ? "FLUX" : "THROUGHPUT";
+        const char* val_col = (ctype_up == "SED") ? "FLUX" : (ctype_up == "SENSOR" ? "QE" : "THROUGHPUT");
         if (fits_get_colnum(fptr, CASEINSEN, (char*)val_col, &col_val, &status)) {
-            // Fallback: try the other column name
+            // Fallback: try the other common column names
             status = 0;
-            const char* alt = (ctype_up == "SED") ? "THROUGHPUT" : "FLUX";
-            if (fits_get_colnum(fptr, CASEINSEN, (char*)alt, &col_val, &status)) {
-                status = 0; continue;
+            const char* alt1 = (ctype_up == "SED") ? "THROUGHPUT" : "THROUGHPUT";
+            const char* alt2 = (ctype_up == "SENSOR") ? "FLUX" : "QE";
+            if (fits_get_colnum(fptr, CASEINSEN, (char*)alt1, &col_val, &status)) {
+                status = 0;
+                if (fits_get_colnum(fptr, CASEINSEN, (char*)alt2, &col_val, &status)) {
+                    status = 0; continue;
+                }
             }
         }
 
@@ -443,6 +447,7 @@ void SPCC::buildSystemThroughput(const SPCCDataStore& store,
                                   const QString& sensorName,
                                   const QString& lp1Name,
                                   const QString& lp2Name,
+                                  const QString& channel,
                                   double T_sys[WL_GRID_LEN]) {
     // Initialize to 1.0
     for (int i = 0; i < WL_GRID_LEN; ++i) T_sys[i] = 1.0;
@@ -451,6 +456,10 @@ void SPCC::buildSystemThroughput(const SPCCDataStore& store,
                                const QString& name) {
         if (name == "(None)" || name.isEmpty()) return;
         const SPCCObject* obj = findCurve(list, name);
+        if (!obj && !channel.isEmpty()) {
+            // Try with channel suffix (e.g. "Sony IMX678 Red")
+            obj = findCurve(list, name + " " + channel);
+        }
         if (!obj || !obj->arrays_loaded) {
             qCWarning(lcSPCC) << "Curve not found in database:" << name;
             return;
@@ -1074,9 +1083,9 @@ SPCCResult SPCC::calibrateWithStarList(const ImageBuffer& buf,
     progress(5, "Building system throughput curves...");
 
     double T_sys_R[WL_GRID_LEN], T_sys_G[WL_GRID_LEN], T_sys_B[WL_GRID_LEN];
-    buildSystemThroughput(store, params.rFilter, params.sensor, params.lpFilter1, params.lpFilter2, T_sys_R);
-    buildSystemThroughput(store, params.gFilter, params.sensor, params.lpFilter1, params.lpFilter2, T_sys_G);
-    buildSystemThroughput(store, params.bFilter, params.sensor, params.lpFilter1, params.lpFilter2, T_sys_B);
+    buildSystemThroughput(store, params.rFilter, params.sensor, params.lpFilter1, params.lpFilter2, "Red",   T_sys_R);
+    buildSystemThroughput(store, params.gFilter, params.sensor, params.lpFilter1, params.lpFilter2, "Green", T_sys_G);
+    buildSystemThroughput(store, params.bFilter, params.sensor, params.lpFilter1, params.lpFilter2, "Blue",  T_sys_B);
 
     // ─────────────────────────────────────────────────────────────────────────
     // 3. Integrate the reference SED against each channel's T_sys

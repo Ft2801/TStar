@@ -301,6 +301,7 @@ public:
                                       const QString& sensorName,
                                       const QString& lp1Name,
                                       const QString& lp2Name,
+                                      const QString& channel,
                                       double T_sys[WL_GRID_LEN]);
 
     // ── Pickles spectral type matching ────────────────────────────────────────

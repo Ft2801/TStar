@@ -1,0 +1,33 @@
+[
+    {
+        "model": "100%_QE_CURVE",
+        "name": "100%_QE_CURVE",
+        "type": "OSC_SENSOR",
+        "dataQualityMarker": 2,
+        "dataSource": "Extracted from SASP_data.fits",
+        "manufacturer": "Various",
+        "version": 1,
+        "wavelength": {
+            "value": [
+                1.0,
+                500.0,
+                1000.0,
+                1500.0,
+                2000.0,
+                2500.0
+            ],
+            "units": "nm"
+        },
+        "values": {
+            "value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "range": 1
+        }
+    }
+]

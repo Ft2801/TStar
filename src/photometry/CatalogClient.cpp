@@ -9,10 +9,11 @@
 
 // VizieR mirror servers (fallback chain for robustness)
 static const QStringList VIZIER_MIRRORS = {
-    "https://vizier.cds.unistra.fr/viz-bin/votable",   // Primary (France)
-    "https://vizier.u-strasbg.fr/viz-bin/votable",     // Mirror (France, alt. domain)
-    "https://vizier.iucaa.in/viz-bin/votable",         // Mirror (India)
+    "https://vizier.u-strasbg.fr/viz-bin/votable",     // Primary/Reliable (France)
+    "https://vizier.cds.unistra.fr/viz-bin/votable",   // Main CDS
     "https://vizier.nao.ac.jp/viz-bin/votable",        // Mirror (Japan)
+    "https://vizier.iucaa.in/viz-bin/votable",         // Mirror (India)
+    "http://vizier.cfa.harvard.edu/viz-bin/votable"    // Mirror (USA, might require http)
 };
 
 static double gaiaBpRpToBV(double bprp) {
@@ -94,9 +95,8 @@ void CatalogClient::sendGaia() {
     query.addQueryItem("-c.rm", QString::number(m_lastQueryRadius * 60.0)); // arcmin
     query.addQueryItem("-out", "RA_ICRS,DE_ICRS,Gmag,BPmag,RPmag,teff_gspphot");
     query.addQueryItem("-out.max", "3000");
-    query.addQueryItem("-sort", "Gmag");   // sort brightest-first so the 3000-star limit
-                                           // retains the most useful stars for plate solving
-    query.addQueryItem("Gmag", "<17");
+    query.addQueryItem("-sort", "Gmag");
+    query.addQueryItem("Gmag", "2..17"); // Explicit range for better filtering
     
     url.setQuery(query);
     
@@ -127,6 +127,7 @@ void CatalogClient::onReply(QNetworkReply* reply) {
     }
     
     QByteArray data = reply->readAll();
+    qDebug() << "[CatalogClient] Response sample (200 bytes):" << data.left(200);
     
     // Detect HTML error pages (VizieR returns HTML for errors, not XML)
     QString dataStr = QString::fromUtf8(data);

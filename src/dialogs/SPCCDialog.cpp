@@ -326,8 +326,18 @@ void SPCCDialog::populateCombosFromFits() {
     // Sensors
     m_sensorCombo->clear();
     m_sensorCombo->addItem(none);
-    for (const SPCCObject& o : m_store.sensor_list)
-        m_sensorCombo->addItem(o.name);
+    QStringList added;
+    for (const SPCCObject& o : m_store.sensor_list) {
+        QString displayName = o.name;
+        if (o.type == OSC_SENSOR) {
+            // Strip channel suffix if present (e.g. "Sony IMX678 Red" -> "Sony IMX678")
+            displayName.remove(QRegularExpression("\\s+(Red|Green|Blue|R|G|B)$"));
+        }
+        if (!added.contains(displayName)) {
+            m_sensorCombo->addItem(displayName);
+            added << displayName;
+        }
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
