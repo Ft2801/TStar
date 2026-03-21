@@ -51,8 +51,8 @@ void CatalogClient::sendAPASS() {
     emit mirrorStatus(tr("Querying APASS on %1...").arg(url.host()));
     QUrlQuery query;
     query.addQueryItem("-source", "II/336/apass9"); 
-    query.addQueryItem("-c", QString("%1 %2").arg(m_lastQueryRa).arg(m_lastQueryDec));
-    query.addQueryItem("-c.rm", QString::number(m_lastQueryRadius * 60.0));
+    query.addQueryItem("-c", QString::number(m_lastQueryRa, 'f', 6) + " " + QString::number(m_lastQueryDec, 'f', 6));
+    query.addQueryItem("-c.rm", QString::number(m_lastQueryRadius * 60.0, 'f', 2));
     query.addQueryItem("-out", "RAJ2000,DEJ2000,Bmag,Vmag");
     query.addQueryItem("-out.max", "2000");
     url.setQuery(query);
@@ -98,8 +98,8 @@ void CatalogClient::sendGaia() {
     
     QUrlQuery query;
     query.addQueryItem("-source", "I/355/gaiadr3"); 
-    query.addQueryItem("-c", QString("%1 %2").arg(m_lastQueryRa).arg(m_lastQueryDec));
-    query.addQueryItem("-c.rm", QString::number(m_lastQueryRadius * 60.0)); // arcmin
+    query.addQueryItem("-c", QString::number(m_lastQueryRa, 'f', 6) + " " + QString::number(m_lastQueryDec, 'f', 6));
+    query.addQueryItem("-c.rm", QString::number(m_lastQueryRadius * 60.0, 'f', 2)); // arcmin
     query.addQueryItem("-out", "RA_ICRS,DE_ICRS,Gmag,BPmag,RPmag,teff_gspphot");
     query.addQueryItem("-out.max", "3000");
     query.addQueryItem("-sort", "Gmag");

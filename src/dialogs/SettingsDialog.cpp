@@ -15,6 +15,7 @@
 #include <QFileInfo>
 #include "network/ModelDownloader.h"
 #include "network/AstapDownloader.h"
+#include "astrometry/AstapSolver.h"
 
 SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, tr("Settings"), 650, 450) {
 
@@ -109,6 +110,8 @@ SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, tr("Setting
     rowAstap->addWidget(m_astapPath);
     rowAstap->addWidget(btnAstap);
     form->addRow(tr("ASTAP Database Folder:"), rowAstap);
+
+    connect(m_astapPath, &QLineEdit::textChanged, this, &SettingsDialog::refreshAstapStatus);
 
     m_astapExtraArgs = new QLineEdit();
     m_astapExtraArgs->setPlaceholderText("-s 500 -log");
@@ -382,67 +385,12 @@ void SettingsDialog::saveSettings() {
 }
 
 void SettingsDialog::refreshAstapStatus() {
-    bool installed = false;
+    QString currentUiPath = m_astapPath ? m_astapPath->text().trimmed() : "";
+    QString dbPath = AstapSolver::getAstapDatabasePath(currentUiPath);
     
-    auto checkDirRecursive = [](const QString& path) -> bool {
-        QDir dir(path);
-        if (!dir.exists()) return false;
-        
-        QStringList filters;
-        filters << "*.290" << "*.50" << "*.g17" << "*.g18" << "*.h17" << "*.h18" << "*.290c" << "*.50c" << "*.opt" << "d50_*" << "d05_*" << "h17_*" << "h18_*" << "w08_*";
-        
-        // 1. Check current dir
-        if (!dir.entryList(filters, QDir::Files).isEmpty()) return true;
-        
-        // 2. Check all subdirs (non-recursive, just one level)
-        QStringList subDirs = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-        for (const QString& sub : subDirs) {
-            QDir d(dir.absoluteFilePath(sub));
-            if (!d.entryList(filters, QDir::Files).isEmpty()) return true;
-        }
-        
-        return false;
-    };
-
-    // 1. Check custom path first
-    QString customPath = m_astapPath ? m_astapPath->text().trimmed() : "";
-    if (!customPath.isEmpty()) {
-        QFileInfo info(customPath);
-        QString dirToCheck = info.isDir() ? info.absoluteFilePath() : info.absolutePath();
-        if (checkDirRecursive(dirToCheck)) {
-            installed = true;
-        }
-    }
-
-    // 2. Default check paths
-    if (!installed) {
-        QStringList paths = {
-            "C:/Program Files/astap",
-            "C:/Program Files (x86)/astap",
-            QCoreApplication::applicationDirPath() + "/deps",
-            QCoreApplication::applicationDirPath()
-        };
-#ifdef Q_OS_MAC
-        paths << "/usr/local/opt/astap"
-              << "/usr/local/opt/astap/Databases"
-              << "/opt/homebrew/opt/astap"
-              << "/opt/homebrew/opt/astap/Databases"
-              << "/Applications/ASTAP.app/Contents/MacOS/Databases"
-              << "/Applications/ASTAP.app/Contents/Resources/Databases"
-              << (QDir::homePath() + "/Library/Application Support/ASTAP")
-              << (QDir::homePath() + "/Library/Application Support/ASTAP/Databases");
-#endif
-        for (const QString& p : paths) {
-            if (checkDirRecursive(p)) {
-                installed = true;
-                break;
-            }
-        }
-    }
-
-    if (installed) {
+    if (!dbPath.isEmpty()) {
         m_lblAstapStatus->setText(tr("ASTAP Star Database: installed"));
     } else {
         m_lblAstapStatus->setText(tr("ASTAP Star Database: not installed"));
     }
-}
+}

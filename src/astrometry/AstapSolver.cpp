@@ -26,97 +26,148 @@ AstapSolver::~AstapSolver() {
 }
 
 // Helper to check if a directory contains ASTAP catalog files
-static bool containsAstapCatalogs(const QString& path) {
+bool AstapSolver::containsAstapCatalogs(const QString& path) {
     QDir dir(path);
     if (!dir.exists()) return false;
     
     // ASTAP catalogs use various extensions: .dat, .290, or numeric sky-zone suffixes (e.g. .1476)
-    // Common prefixes: d (Gaia), h (Hyghen), g (Hyperleda), q (Quasars), tyc (Tycho)
+    // Common prefixes: d (Gaia), h (Hyghen), g (Hyperleda), q (Quasars), tyc (Tycho), w (UCAC4)
     QStringList filters;
-    filters << "d*.*" << "h*.*" << "g*.*" << "q*.*" << "tyc*.*" << "*.290" << "*.dat";
+    filters << "d*.*" << "h*.*" << "g*.*" << "q*.*" << "tyc*.*" << "w*.*" 
+            << "*.290" << "*.50" << "*.g17" << "*.g18" << "*.h17" << "*.h18" 
+            << "*.290c" << "*.50c" << "*.opt" << "*.dat"
+            << "d50_*" << "d05_*" << "h17_*" << "h18_*" << "w08_*";
     
-    QStringList files = dir.entryList(filters, QDir::Files);
-    for (const auto& f : files) {
-        QFileInfo info(f);
-        QString ext = info.suffix();
-        
-        // Standard extensions
-        if (ext == "dat" || ext == "290") return true;
-        
-        // Numeric sky-zone extensions (like .1476)
-        if (!ext.isEmpty()) {
-            bool ok = false;
-            ext.toInt(&ok);
-            if (ok) return true;
-        }
+    auto checkInDir = [&](const QDir& d) -> bool {
+        QStringList files = d.entryList(filters, QDir::Files);
+        for (const auto& f : files) {
+            QFileInfo info(f);
+            QString ext = info.suffix();
+            
+            // Standard extensions
+            if (ext == "dat" || ext == "290" || ext == "50" || ext == "opt" || 
+                ext.endsWith("c") || ext.startsWith("g") || ext.startsWith("h")) return true;
+            
+            // Numeric sky-zone extensions (like .1476)
+            if (!ext.isEmpty()) {
+                bool ok = false;
+                ext.toInt(&ok);
+                if (ok) return true;
+            }
 
-        // Specific prefixes known to be ASTAP (D05, D20, D50, D80, H17, H18, Hyperleda, Quasars, Tycho)
-        if (f.startsWith("d05_") || f.startsWith("d20_") || f.startsWith("d50_") || f.startsWith("d80_") || 
-            f.startsWith("h18_") || f.startsWith("h17_") || f.startsWith("g_") || f.startsWith("q_") || f.startsWith("tyc_")) {
-            return true;
+            // Specific prefixes known to be ASTAP
+            if (f.startsWith("d") || f.startsWith("h") || f.startsWith("g") || 
+                f.startsWith("q") || f.startsWith("tyc") || f.startsWith("w")) {
+                return true;
+            }
         }
+        return false;
+    };
+
+    // 1. Check current directory
+    if (checkInDir(dir)) return true;
+    
+    // 2. Check all subdirectories (one level deep)
+    QStringList subDirs = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    for (const QString& sub : subDirs) {
+        if (checkInDir(QDir(dir.absoluteFilePath(sub)))) return true;
     }
     
     return false;
 }
 
-QString AstapSolver::getAstapDatabasePath() {
+QString AstapSolver::getAstapDatabasePath(const QString& overridePath) {
     QSettings settings;
-    QString customDb = settings.value("paths/astap_database").toString();
-    if (!customDb.isEmpty() && QDir(customDb).exists()) {
-        return customDb;
-    }
-
-    QString astapExec = getAstapExecutable();
+    QString customDb = overridePath.isEmpty() ? 
+        settings.value("paths/astap_database").toString().trimmed() : overridePath.trimmed();
     
-    // 1. Check folder alongside executable
-    if (!astapExec.isEmpty()) {
-        QFileInfo exeInfo(astapExec);
-        QString astapDir = exeInfo.absolutePath();
-        if (containsAstapCatalogs(astapDir)) return astapDir;
-        if (containsAstapCatalogs(astapDir + "/Databases")) return QDir(astapDir + "/Databases").absolutePath();
-        
-        #ifdef Q_OS_MAC
-        // On macOS, if it's in MacOS/, check Resources and deps too
-        if (astapDir.endsWith("/Contents/MacOS")) {
-            QStringList macPotentials;
-            macPotentials << astapDir + "/../Resources/Databases"
-                          << astapDir + "/../Resources/deps/Databases"
-                          << astapDir + "/../Resources/data"
-                          << astapDir + "/../Databases"
-                          << astapDir + "/../Resources";
-            for (const auto& p : macPotentials) {
+    // Helper to validate and optionally resolve .app bundles
+    auto validateAndResolve = [&](const QString& path) -> QString {
+        if (path.isEmpty()) return "";
+        QDir dir(path);
+        if (!dir.exists()) return "";
+
+#ifdef Q_OS_MAC
+        // On macOS, if the path is a .app bundle, check internal common locations
+        if (path.endsWith(".app") || path.endsWith(".app/")) {
+            QString base = path;
+            if (base.endsWith("/")) base.chop(1);
+            QStringList internalPotentials;
+            internalPotentials << base + "/Contents/Resources/Databases"
+                              << base + "/Contents/MacOS/Databases"
+                              << base + "/Contents/Resources"
+                              << base + "/Contents/MacOS";
+            for (const auto& p : internalPotentials) {
                 if (containsAstapCatalogs(p)) return QDir(p).absolutePath();
             }
         }
-        #endif
+#endif
+
+        if (containsAstapCatalogs(path)) return QDir(path).absolutePath();
+        
+        // Check "Databases" subfolder
+        QString dbSub = path + "/Databases";
+        if (containsAstapCatalogs(dbSub)) return QDir(dbSub).absolutePath();
+
+        return "";
+    };
+
+    // 1. Try custom database path first, but validate/resolve it
+    QString resolvedCustom = validateAndResolve(customDb);
+    if (!resolvedCustom.isEmpty()) return resolvedCustom;
+
+    // 2. Try to find catalogs alongside the detected executable
+    QString astapExec = getAstapExecutable();
+    if (!astapExec.isEmpty()) {
+        QFileInfo exeInfo(astapExec);
+        QString astapDir = exeInfo.absolutePath();
+        
+        if (containsAstapCatalogs(astapDir)) return QDir(astapDir).absolutePath();
+        if (containsAstapCatalogs(astapDir + "/Databases")) return QDir(astapDir + "/Databases").absolutePath();
+
+#ifdef Q_OS_MAC
+        // If the executable is deep in a bundle, also check bundle-relative Resources
+        if (astapDir.endsWith("/Contents/MacOS") || astapDir.endsWith("/Contents/Resources/deps")) {
+            QString contentsDir = astapDir.contains("/Resources/deps") ? 
+                QDir(astapDir + "/../..").absolutePath() : QDir(astapDir + "/..").absolutePath();
+            
+            QStringList bundlePotentials;
+            bundlePotentials << contentsDir + "/Resources/Databases"
+                            << contentsDir + "/Resources/deps/Databases"
+                            << contentsDir + "/Resources";
+            for (const auto& p : bundlePotentials) {
+                if (containsAstapCatalogs(p)) return QDir(p).absolutePath();
+            }
+        }
+#endif
     }
 
-    // 2. Check standard installation paths
+    // 3. Search multiple potential default locations (Synchronized with SettingsDialog)
     QStringList potentials;
 #ifdef Q_OS_WIN
     potentials << "C:/Program Files/astap" 
                << "C:/Program Files (x86)/astap" 
                << "C:/ASTAP"
-               << QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/ASTAP";
-#elif defined(Q_OS_MAC)
-    potentials << "/Library/ASTAP/Databases" 
-               << "/opt/astap/Databases"
-               << "/opt/astap"
-               << "/usr/local/opt/astap/Databases"
-               << "/usr/local/opt/astap/share/astap/Databases"
                << QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/ASTAP"
+               << QCoreApplication::applicationDirPath() + "/deps"
+               << QCoreApplication::applicationDirPath();
+#elif defined(Q_OS_MAC)
+    QString appDir = QCoreApplication::applicationDirPath(); // Contents/MacOS
+    potentials << appDir + "/../Resources/deps/Databases"
+               << appDir + "/../Resources/deps"
+               << appDir + "/deps" // In case it's flat
+               << "/usr/local/opt/astap/Databases"
+               << "/usr/local/opt/astap"
+               << "/opt/homebrew/opt/astap/Databases"
+               << "/opt/homebrew/opt/astap"
+               << "/Applications/ASTAP.app"
                << QDir::homePath() + "/Library/Application Support/ASTAP/Databases"
-               << QDir::homePath() + "/Library/Application Support/ASTAP"
-               << "/Library/Application Support/ASTAP/Databases"
-               << "/Library/Application Support/ASTAP"
-               << "/Applications/ASTAP.app/Contents/MacOS/Databases"
-               << "/Applications/ASTAP.app/Contents/Resources/Databases";
+               << QDir::homePath() + "/Library/Application Support/ASTAP";
 #endif
 
-    for (const auto& p : potentials) {
-        if (containsAstapCatalogs(p)) return QDir(p).absolutePath();
-        if (containsAstapCatalogs(p + "/Databases")) return QDir(p + "/Databases").absolutePath();
+    for (const QString& p : potentials) {
+        QString res = validateAndResolve(p);
+        if (!res.isEmpty()) return res;
     }
 
     return "";

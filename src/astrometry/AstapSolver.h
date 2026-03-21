@@ -19,14 +19,16 @@ public:
     void solve(const ImageBuffer& image, double raHint, double decHint, double radiusDeg, double pixelScale);
     void cancelSolve();
 
+    static QString getAstapExecutable();
+    static QString getAstapDatabasePath(const QString& overridePath = QString());
+    static bool containsAstapCatalogs(const QString& path);
+
 signals:
     void logMessage(const QString& msg);
     void finished(const NativeSolveResult& result);
 
 private:
     bool terminateAstapProcess(QProcess& process, int terminateWaitMs);
-    QString getAstapExecutable();
-    QString getAstapDatabasePath();
     bool parseAstapWCS(const QString& wcsFile, int imageHeight, NativeSolveResult& res);
     bool parseAstapIni(const QString& iniFile, int imageHeight, NativeSolveResult& res);
 
