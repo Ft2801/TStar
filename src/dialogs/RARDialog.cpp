@@ -260,6 +260,10 @@ void RARDialog::onRun() {
         return;
     }
     
+    // Pre-capture the source title so the result window is named correctly
+    // on all platforms regardless of focus changes during the background run.
+    const QString rarTitle = MainWindowCallbacks::buildChildTitle(viewer->windowTitle(), "_rar");
+
     MainWindowCallbacks* mw = getCallbacks();
     if (mw) {
         mw->startLongProcess();
@@ -298,7 +302,7 @@ void RARDialog::onRun() {
     
     if (success) {
         if (MainWindowCallbacks* mw = getCallbacks()) {
-            mw->createResultWindow(output, "_rar");
+            mw->createResultWindow(output, rarTitle);
             mw->logMessage(tr("Aberration Removal Complete."), 1, true);
         }
         accept();

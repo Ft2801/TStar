@@ -326,12 +326,16 @@ bool SPCC::loadTStarDatabase(const QString& dbPath, SPCCDataStore& out) {
                 // Values
                 QJsonObject valObj = jobj.value("values").toObject();
                 QJsonArray  valArr = valObj.value("value").toArray();
+                // "range" indicates the full-scale value of the data (e.g. 100 means
+                // values are percentages 0-100 and must be divided by 100 to get 0-1).
+                const double valRange = valObj.value("range").toDouble(1.0);
+                const double normFactor = (valRange > 1.0) ? (1.0 / valRange) : 1.0;
 
                 if (wlArr.isEmpty() || valArr.isEmpty() || wlArr.size() != valArr.size()) continue;
 
                 for (int j = 0; j < wlArr.size(); ++j) {
                     obj.x.push_back(wlArr[j].toDouble());
-                    obj.y.push_back(valArr[j].toDouble());
+                    obj.y.push_back(valArr[j].toDouble() * normFactor);
                 }
 
                 // If units are nm, convert to Angstrom
@@ -1077,12 +1081,18 @@ SPCCResult SPCC::calibrateWithStarList(const ImageBuffer& buf,
     };
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 1. Load tstar_data.fits
+    // 1. Load spectral database (FITS + JSON)
+    // The UI populates filter/sensor combos from both tstar_data.fits and the
+    // TStar-spcc-database JSON files, so calibration must load both sources to
+    // ensure every user-selected entry can be found by buildSystemThroughput().
     // ─────────────────────────────────────────────────────────────────────────
-    progress(2, "Loading spectral database (tstar_data.fits)...");
+    progress(2, "Loading spectral database...");
     SPCCDataStore store;
-    if (!loadTStarFits(params.dataPath, store)) {
-        result.error_msg = "Failed to load tstar_data.fits from: " + params.dataPath;
+    bool fitsOk = loadTStarFits(params.dataPath, store);
+    // Always attempt to load the JSON database (complements and/or replaces FITS entries)
+    bool dbOk = loadTStarDatabase(params.dataPath + "/TStar-spcc-database", store);
+    if (!fitsOk && !dbOk) {
+        result.error_msg = "Failed to load spectral database from: " + params.dataPath;
         return result;
     }
 

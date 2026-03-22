@@ -325,7 +325,10 @@ void ImageBlendingDialog::onApply() {
             auto mode = static_cast<int>(baseV->getDisplayMode());
             float median = baseV->getAutoStretchMedian();
             bool linked = baseV->isDisplayLinked();
-            mw->createResultWindow(result, tr("Blended"), mode, median, linked);
+            // Use the base image's title as prefix so the result is identifiable.
+            const QString blendTitle = MainWindowCallbacks::buildChildTitle(
+                baseV->windowTitle(), "_blended");
+            mw->createResultWindow(result, blendTitle, mode, median, linked);
         }
         accept();
     } else {

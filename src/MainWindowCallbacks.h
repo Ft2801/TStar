@@ -43,6 +43,33 @@ public:
         (void)vi; (void)toolName; 
         return false; 
     }
+
+    // ── Utility helpers ───────────────────────────────────────────────────────
+
+    /// Build a child window title by appending @p suffix to @p parentTitle,
+    /// stripping any trailing '*' and known image-file extensions first.
+    /// Dialogs should call this BEFORE starting background work (capturing the
+    /// viewer title while it is still valid) rather than relying on the current
+    /// viewer at the time the result window is created.
+    static QString buildChildTitle(const QString& parentTitle, const QString& suffix) {
+        QString t = parentTitle;
+        if (t.endsWith(QLatin1Char('*'))) t.chop(1);
+        // Strip known image-file extensions so they don't end up in the title.
+        static const char* const kExts[] = {
+            "fits","fit","tif","tiff","png","jpg","jpeg","xisf","bmp", nullptr
+        };
+        const int dot = t.lastIndexOf(QLatin1Char('.'));
+        if (dot >= 0) {
+            const QString ext = t.mid(dot + 1).toLower();
+            for (int i = 0; kExts[i]; ++i) {
+                if (ext == QLatin1String(kExts[i])) {
+                    t = t.left(dot);
+                    break;
+                }
+            }
+        }
+        return t.trimmed() + suffix;
+    }
 };
 
 #endif // MAINWINDOW_CALLBACKS_H
