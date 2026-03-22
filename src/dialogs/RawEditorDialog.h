@@ -77,10 +77,14 @@ protected:
 
 private:
     void zoomToPoint(float factor, QPointF viewPos);
+    
     QImage m_image;
     QImage m_originalImage;
+    
+    // Shared zoom/pan state for both images (keeps them synchronized)
     float  m_zoom = 1.0f;
     QPointF m_panOffset;
+    
     QPointF m_lastMousePos;
     bool    m_dragging = false;
     bool    m_showOriginal = false;
@@ -168,6 +172,9 @@ private:
     // If parameters change while worker is running, queue exactly one rerender
     // with latest values after current render completes.
     bool m_previewQueued = false;
+
+    // Flag to track if we're in undo/redo mode to avoid creating duplicate history entries
+    bool m_inUndoRedo = false;
 
     bool m_blockSignals = false;
 };

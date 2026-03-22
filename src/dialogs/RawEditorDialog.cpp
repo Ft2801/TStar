@@ -167,7 +167,11 @@ RawEditorCanvas::RawEditorCanvas(QWidget* parent) : QWidget(parent) {
 
 void RawEditorCanvas::setImage(const QImage& img) {
     m_image = img;
-    if (m_fitOnNext) { fitToView(); m_fitOnNext = false; }
+    if (m_fitOnNext) { 
+        m_showOriginal = false;  // Ensure we're in preview mode
+        fitToView(); 
+        m_fitOnNext = false; 
+    }
     update();
 }
 
@@ -176,19 +180,37 @@ void RawEditorCanvas::setOriginalImage(const QImage& img) {
 }
 
 void RawEditorCanvas::setShowOriginal(bool show) {
+    if (m_showOriginal == show) return;  // No change
     m_showOriginal = show;
     update();
 }
 
 void RawEditorCanvas::fitToView() {
-    if (m_image.isNull()) return;
-    float scaleX = static_cast<float>(width()) / m_image.width();
-    float scaleY = static_cast<float>(height()) / m_image.height();
-    m_zoom = std::min(scaleX, scaleY) * 0.95f;
+    // Fit image to canvas maintaining aspect ratio
+    // Use canvas dimensions, not image dimensions, for consistent zoom
+    const QImage& img = (m_showOriginal && !m_originalImage.isNull()) ? m_originalImage : m_image;
+    if (img.isNull()) return;
+    
+    if (img.width() <= 0 || img.height() <= 0) return;
+    
+    // Calculate zoom so image fits in canvas with 95% margin
+    // Add 10 pixels margin for safety
+    float maxWidth = static_cast<float>(width() - 20);
+    float maxHeight = static_cast<float>(height() - 20);
+    
+    float zoomX = maxWidth / img.width();
+    float zoomY = maxHeight / img.height();
+    m_zoom = std::min(zoomX, zoomY);
+    m_zoom = std::clamp(m_zoom, 0.05f, 1.0f);  // Cap at 1.0 so downsampled preview doesn't over-magnify
+    
+    // Center image
+    float drawWidth = img.width() * m_zoom;
+    float drawHeight = img.height() * m_zoom;
     m_panOffset = QPointF(
-        (width() - m_image.width() * m_zoom) / 2.0f,
-        (height() - m_image.height() * m_zoom) / 2.0f
+        (width() - drawWidth) / 2.0f,
+        (height() - drawHeight) / 2.0f
     );
+    
     emit zoomChanged(m_zoom);
     update();
 }
@@ -275,11 +297,17 @@ RawEditorDialog::RawEditorDialog(ImageViewer* viewer, QWidget* parent)
     pushHistory(); // Initial state
     requestPreview();
 
-    // Generate original preview for compare
+    // Generate original preview for compare (with SAME scaling as worker preview)
     if (m_viewer && m_viewer->getBuffer().isValid()) {
         const auto& buf = m_viewer->getBuffer();
         int w = buf.width(), h = buf.height(), ch = buf.channels();
+        
+        // Apply SAME scale factor as worker (max 2048px)
         float sf = 1.0f;
+        const int maxDim = 2048;
+        if (maxDim > 0 && (w > maxDim || h > maxDim))
+            sf = static_cast<float>(maxDim) / std::max(w, h);
+        
         int pw = std::max(1, static_cast<int>(w * sf));
         int ph = std::max(1, static_cast<int>(h * sf));
 
@@ -682,6 +710,9 @@ QWidget* RawEditorDialog::buildControlPanel() {
 void RawEditorDialog::onParamChanged() {
     // Direct request: no debounce, no delay. Instant preview on 2048px downsampled buffer.
     // Worker will render and emit previewReady() as soon as possible.
+    if (!m_inUndoRedo) {
+        // If explicitly changed (not via undo/redo), flag for history save after preview
+    }
     requestPreview();
 }
 
@@ -700,6 +731,17 @@ void RawEditorDialog::requestPreview() {
 
 void RawEditorDialog::onPreviewReady(const QImage& img) {
     m_canvas->setImage(img);
+    
+    // If this preview came from normal parameter changes (not undo/redo),
+    // save it to history so user can undo back to this state
+    if (!m_inUndoRedo) {
+        // Only save if state has actually changed from last history entry
+        if (m_historyIndex < 0 || m_history[m_historyIndex] != m_params) {
+            pushHistory();
+        }
+    }
+    m_inUndoRedo = false;  // Reset flag for next change
+    
     if (m_previewQueued) {
         m_previewQueued = false;
         requestPreview();
@@ -763,6 +805,7 @@ void RawEditorDialog::pushHistory() {
 
 void RawEditorDialog::onUndo() {
     if (m_historyIndex <= 0) return;
+    m_inUndoRedo = true;  // Prevent history save on preview
     // Save current state if at the end
     if (m_historyIndex == m_history.size() - 1) {
         // Ensure current params are saved
@@ -780,6 +823,7 @@ void RawEditorDialog::onUndo() {
 
 void RawEditorDialog::onRedo() {
     if (m_historyIndex >= m_history.size() - 1) return;
+    m_inUndoRedo = true;  // Prevent history save on preview
     m_historyIndex++;
     m_params = m_history[m_historyIndex];
     updateControlsFromParams();

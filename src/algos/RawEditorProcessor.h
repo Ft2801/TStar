@@ -15,6 +15,10 @@ namespace RawEditor {
 struct CurvePoint {
     float x = 0.0f;
     float y = 0.0f;
+    
+    bool operator==(const CurvePoint& other) const {
+        return x == other.x && y == other.y;
+    }
 };
 
 // ─── HSL Color Adjustment (per color range) ───────────────────────────────────
@@ -22,6 +26,10 @@ struct HslAdjustment {
     float hue        = 0.0f;   // -1 to +1
     float saturation = 0.0f;   // -1 to +1
     float luminance  = 0.0f;   // -1 to +1
+    
+    bool operator==(const HslAdjustment& other) const {
+        return hue == other.hue && saturation == other.saturation && luminance == other.luminance;
+    }
 };
 
 // ─── HSL Range Definition ─────────────────────────────────────────────────────
@@ -47,6 +55,10 @@ struct ColorGradeSettings {
     float hue        = 0.0f;   // 0–360
     float saturation = 0.0f;   // 0–1
     float luminance  = 0.0f;   // -1 to +1
+    
+    bool operator==(const ColorGradeSettings& other) const {
+        return hue == other.hue && saturation == other.saturation && luminance == other.luminance;
+    }
 };
 
 // ─── All Parameters ──────────────────────────────────────────────────────────
@@ -116,6 +128,57 @@ struct Params {
 
     // Check if all values are at default (no-op)
     bool isIdentity() const;
+    
+    // Comparison operator for undo/redo history tracking
+    bool operator==(const Params& other) const {
+        return exposure == other.exposure &&
+               brightness == other.brightness &&
+               contrast == other.contrast &&
+               highlights == other.highlights &&
+               shadows == other.shadows &&
+               whites == other.whites &&
+               blacks == other.blacks &&
+               temperature == other.temperature &&
+               tint == other.tint &&
+               saturation == other.saturation &&
+               vibrance == other.vibrance &&
+               redHue == other.redHue &&
+               greenHue == other.greenHue &&
+               blueHue == other.blueHue &&
+               redSat == other.redSat &&
+               greenSat == other.greenSat &&
+               blueSat == other.blueSat &&
+               shadowsTint == other.shadowsTint &&
+               hsl == other.hsl &&
+               colorGradingShadows == other.colorGradingShadows &&
+               colorGradingMidtones == other.colorGradingMidtones &&
+               colorGradingHighlights == other.colorGradingHighlights &&
+               colorGradingBlending == other.colorGradingBlending &&
+               colorGradingBalance == other.colorGradingBalance &&
+               sharpness == other.sharpness &&
+               clarity == other.clarity &&
+               structure == other.structure &&
+               dehaze == other.dehaze &&
+               lumaNR == other.lumaNR &&
+               colorNR == other.colorNR &&
+               caRedCyan == other.caRedCyan &&
+               caBlueYellow == other.caBlueYellow &&
+               vignetteAmount == other.vignetteAmount &&
+               vignetteMidpoint == other.vignetteMidpoint &&
+               vignetteRoundness == other.vignetteRoundness &&
+               vignetteFeather == other.vignetteFeather &&
+               grainAmount == other.grainAmount &&
+               grainSize == other.grainSize &&
+               grainRoughness == other.grainRoughness &&
+               lumaCurve == other.lumaCurve &&
+               redCurve == other.redCurve &&
+               greenCurve == other.greenCurve &&
+               blueCurve == other.blueCurve;
+    }
+    
+    bool operator!=(const Params& other) const {
+        return !(*this == other);
+    }
 };
 
 // ─── Processor Class ──────────────────────────────────────────────────────────
