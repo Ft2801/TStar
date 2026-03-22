@@ -107,6 +107,11 @@ void StarNetDialog::onRun() {
         return;
     }
     
+    // Pre-capture the source title so the result windows are named correctly
+    // on all platforms regardless of focus changes during the background run.
+    const QString starlessTitle = MainWindowCallbacks::buildChildTitle(viewer->windowTitle(), "_starless");
+    const QString starmaskTitle = MainWindowCallbacks::buildChildTitle(viewer->windowTitle(), "_starmask");
+
     QProgressDialog* pd = new QProgressDialog(tr("Running StarNet++..."), tr("Cancel"), 0, 0, this);
     pd->setWindowModality(Qt::WindowModal);
     pd->setMinimumDuration(0);
@@ -142,7 +147,7 @@ void StarNetDialog::onRun() {
                          mw->logMessage(tr("ERR: StarNet result is empty!"), 3, true);
                          QMessageBox::critical(this, tr("Error"), tr("StarNet produced an empty image."));
                     } else {
-                        mw->createResultWindow(starless, "_starless");
+                        mw->createResultWindow(starless, starlessTitle);
                         if (params.generateMask) {
                             mw->logMessage(tr("Generating Star Mask..."), 0, false);
                             if (input.width() != starless.width() || input.height() != starless.height()) {
@@ -168,7 +173,7 @@ void StarNetDialog::onRun() {
                                     }
                                 }
                                 mask.setData(input.width(), input.height(), input.channels(), maskData);
-                                mw->createResultWindow(mask, "_starmask");
+                                mw->createResultWindow(mask, starmaskTitle);
                             }
                         }
                     }
