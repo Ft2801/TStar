@@ -6,6 +6,7 @@
 #include <QXmlStreamReader>
 #include <QDebug>
 #include <QTimer>
+#include <algorithm>
 
 // VizieR mirror servers (diverse global list)
 static const QStringList VIZIER_MIRRORS = {
@@ -59,6 +60,7 @@ void CatalogClient::sendAPASS() {
     
     QNetworkRequest req(url);
     req.setHeader(QNetworkRequest::UserAgentHeader, "TStar-CatalogClient");
+    req.setAttribute(QNetworkRequest::Http2AllowedAttribute, false);
     QNetworkReply* reply = m_manager->get(req);
     
     // Timeout mechanism - 15 seconds per mirror
@@ -104,7 +106,8 @@ void CatalogClient::sendGaia() {
     query.addQueryItem("-c", QString::number(m_lastQueryRa, 'f', 6) + " " + QString::number(m_lastQueryDec, 'f', 6));
     query.addQueryItem("-c.rm", QString::number(m_lastQueryRadius * 60.0, 'f', 2)); // arcmin
     query.addQueryItem("-out", "RA_ICRS,DE_ICRS,Gmag,BPmag,RPmag,teff_gspphot");
-    query.addQueryItem("-out.max", "3000");
+    const int outMax = (m_lastQueryRadius > 2.0) ? 1800 : 3000;
+    query.addQueryItem("-out.max", QString::number(outMax));
     query.addQueryItem("-sort", "Gmag");
     query.addQueryItem("Gmag", "<20"); // Allow fainter stars
     
@@ -112,10 +115,12 @@ void CatalogClient::sendGaia() {
     
     QNetworkRequest req(url);
     req.setHeader(QNetworkRequest::UserAgentHeader, "TStar-CatalogClient");
+    req.setAttribute(QNetworkRequest::Http2AllowedAttribute, false);
     QNetworkReply* reply = m_manager->get(req);
     
-    // Timeout: 15 seconds per mirror attempt
-    QTimer::singleShot(15000, reply, [this, reply]() {
+    // Adaptive timeout: wider fields need more time on VizieR.
+    const int timeoutMs = (m_lastQueryRadius > 2.0) ? 30000 : 20000;
+    QTimer::singleShot(timeoutMs, reply, [this, reply]() {
         if (reply->isRunning()) {
             qWarning() << "VizieR Gaia timeout on mirror" << s_currentMirrorIndex;
             reply->abort();
@@ -136,7 +141,10 @@ void CatalogClient::onReply(QNetworkReply* reply) {
         int httpCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
         
         qWarning() << "[CatalogClient] Mirror" << s_currentMirrorIndex << "failed:" << errStr << "(HTTP" << httpCode << ")";
-        emit mirrorStatus(tr("Mirror %1 failed (HTTP %2). Retrying...").arg(s_currentMirrorIndex).arg(httpCode));
+        emit mirrorStatus(tr("Mirror %1 failed (%2, HTTP %3). Retrying...")
+                          .arg(s_currentMirrorIndex)
+                          .arg(errStr)
+                          .arg(httpCode));
         
         retryWithNextMirror();
         return;
@@ -284,6 +292,20 @@ void CatalogClient::onReply(QNetworkReply* reply) {
 
 void CatalogClient::retryWithNextMirror() {
     s_currentMirrorIndex++;
+
+    // For Gaia DR3, if all mirrors failed at a large radius, retry once more
+    // from the first mirror with a smaller query radius before giving up.
+    if (m_lastQueryType == "GAIA" &&
+        s_currentMirrorIndex >= VIZIER_MIRRORS.size() &&
+        m_lastQueryRadius > 1.0) {
+        const double oldRadius = m_lastQueryRadius;
+        m_lastQueryRadius = std::max(1.0, m_lastQueryRadius * 0.6);
+        s_currentMirrorIndex = 0;
+        emit mirrorStatus(tr("All Gaia mirrors failed at %1 deg; retrying at %2 deg...")
+                          .arg(oldRadius, 0, 'f', 2)
+                          .arg(m_lastQueryRadius, 0, 'f', 2));
+    }
+
     if (m_lastQueryType == "GAIA") sendGaia();
     else if (m_lastQueryType == "APASS") sendAPASS();
 }

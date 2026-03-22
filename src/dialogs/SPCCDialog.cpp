@@ -521,20 +521,12 @@ void SPCCDialog::onFetchStars() {
         center_dec = meta.dec;
     }
 
-    // Determine FOV footprint to avoid downloading too much/little 
-    double fovX, fovY;
-    double searchRadius = 1.0;
-    if (WCSUtils::getFieldOfView(meta, m_viewer->getBuffer().width(), m_viewer->getBuffer().height(), fovX, fovY)) {
-        searchRadius = std::max(fovX, fovY) / 2.0 * 1.2; // Add 20% margin
-    }
-
-    // CAP search radius for Gaia DR3 online query to avoid server timeouts.
-    if (searchRadius > 3.0) {
-        searchRadius = 3.0;
-        m_statusLabel->setText(tr("Querying star catalog (Gaia DR3)..."));
-    }
+    // Use fixed 1.0 deg radius for Gaia DR3 (consistent with PCC).
+    // This balances catalog completeness with VizieR server reliability.
+    const double searchRadius = 1.0;
 
     // Call the catalog client.
+    m_statusLabel->setText(tr("Querying star catalog (Gaia DR3)..."));
     m_catalog->queryGaiaDR3(center_ra, center_dec, searchRadius);
 }
 

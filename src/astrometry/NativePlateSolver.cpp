@@ -89,14 +89,15 @@ void NativePlateSolver::fetchCatalog() {
         client->deleteLater();
     });
 
-    // CAP search radius for Gaia DR3 online query to avoid server timeouts.
-    // 15 degrees is too much for VizieR; we recommend ASTAP for wide fields.
-    double cappedRadius = std::min(m_radius, 3.0);
-    if (cappedRadius < m_radius) {
-        emit logMessage(tr("Search radius capped to 3.0 deg for Gaia DR3 (online). Use ASTAP for wider searches."));
+    // Use fixed 1.0 deg radius for Gaia DR3 (consistent with PCC).
+    // This balances catalog completeness with VizieR server reliability.
+    // For wider fields, ASTAP is recommended as a fallback.
+    const double gaia_radius = 1.0;
+    if (m_radius > 3.0) {
+        emit logMessage(tr("Search radius %1 deg > 3.0 deg: using Gaia 1.0 deg for online query. Recommend ASTAP for wide fields.").arg(m_radius));
     }
 
-    client->queryGaiaDR3(m_raHint, m_decHint, cappedRadius);
+    client->queryGaiaDR3(m_raHint, m_decHint, gaia_radius);
 }
 
 bool NativePlateSolver::checkTransSanity(const GenericTrans& trans) {
