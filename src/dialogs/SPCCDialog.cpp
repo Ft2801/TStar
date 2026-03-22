@@ -528,6 +528,12 @@ void SPCCDialog::onFetchStars() {
         searchRadius = std::max(fovX, fovY) / 2.0 * 1.2; // Add 20% margin
     }
 
+    // CAP search radius for Gaia DR3 online query to avoid server timeouts.
+    if (searchRadius > 3.0) {
+        searchRadius = 3.0;
+        m_statusLabel->setText(tr("Querying star catalog (Gaia DR3)..."));
+    }
+
     // Call the catalog client.
     m_catalog->queryGaiaDR3(center_ra, center_dec, searchRadius);
 }

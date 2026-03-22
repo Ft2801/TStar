@@ -10,11 +10,11 @@
 // VizieR mirror servers (diverse global list)
 static const QStringList VIZIER_MIRRORS = {
     "https://vizier.u-strasbg.fr/viz-bin/votable",     // Strasbourg (France) - Primary
+    "https://vizier.cds.unistra.fr/viz-bin/votable",    // Strasbourg (Backup Alias)
+    "https://vizier.cfa.harvard.edu/viz-bin/votable",  // Harvard (USA)
     "https://vizier.nao.ac.jp/viz-bin/votable",        // Tokyo (Japan)
     "https://vizier.iucaa.in/viz-bin/votable",         // Pune (India)
-    "https://vizier.cfa.harvard.edu/viz-bin/votable",  // Harvard (USA)
-    "http://vizier.china-vo.org/viz-bin/votable",      // China-VO (China)
-    "https://vizier.cds.unistra.fr/viz-bin/votable"    // Strasbourg (Backup Alias)
+    "http://vizier.china-vo.org/viz-bin/votable"       // China-VO (China)
 };
 
 // Initialize shared mirror index
@@ -76,7 +76,10 @@ void CatalogClient::sendAPASS() {
 }
 
 void CatalogClient::queryGaiaDR3(double ra, double dec, double radiusDeg) {
-    m_lastQueryRa = ra; m_lastQueryDec = dec; m_lastQueryRadius = radiusDeg;
+    // CAP search radius to avoid server timeouts on VizieR mirrors (online)
+    double cappedRadius = std::min(radiusDeg, 3.0);
+    
+    m_lastQueryRa = ra; m_lastQueryDec = dec; m_lastQueryRadius = cappedRadius;
     m_lastQueryType = "GAIA";
     
     if (s_currentMirrorIndex >= VIZIER_MIRRORS.size()) s_currentMirrorIndex = 0;
