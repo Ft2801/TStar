@@ -5,6 +5,7 @@
 
 #include "FitsLoaderCWrapper.h"
 #include "FitsLoaderC.h"
+#include "FitsLoader.h"
 #include <QDebug>
 #include <cstring>
 
@@ -34,6 +35,9 @@ bool FitsLoaderCWrapper::loadFitsC(const QString& filepath, ImageBuffer& out_buf
 
     // Create ImageBuffer with C-loaded data
     out_buffer.setData(c_img.width, c_img.height, c_img.channels, buffer_data);
+
+    // Extract metadata using the standard FITS metadata reader
+    FitsLoader::loadMetadata(filepath, out_buffer);
 
     // Free C image (but keep the data pointer we just copied)
     fitsimg_free_c(&c_img);
@@ -76,6 +80,10 @@ int FitsLoaderCWrapper::loadFitsBatchC(const QStringList& filepaths, std::vector
 
             ImageBuffer img_buf;
             img_buf.setData(c_images[i].width, c_images[i].height, c_images[i].channels, buffer_data);
+            
+            // Extract metadata for each batched file
+            FitsLoader::loadMetadata(filepaths[i], img_buf);
+            
             out_buffers.push_back(img_buf);
         }
     }

@@ -240,6 +240,9 @@ int RegistrationEngine::registerSequence(ImageSequence& sequence, int referenceI
             }
         }
 
+        // Copy metadata before releasing input to retain FITS WCS details inside registered files
+        warped.setMetadata(imgBuffer.metadata());
+
         // Input buffer no longer needed — free before I/O to minimise peak RAM.
         imgBuffer = ImageBuffer();
 

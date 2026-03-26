@@ -70,6 +70,10 @@ bool TriangleMatcher::gaussSolve(std::vector<std::vector<double>>& matrix, int n
             sum -= matrix[i][j] * vector[j];
         }
         vector[i] = sum / matrix[i][i];
+
+        if (std::isnan(vector[i]) || std::isinf(vector[i])) {
+            return false;
+        }
     }
 
     return true;
