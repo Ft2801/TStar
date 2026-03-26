@@ -66,17 +66,30 @@ ImageBuffer::ImageBuffer(const ImageBuffer& other)
 // Custom copy assignment to handle non-copyable mutex
 ImageBuffer& ImageBuffer::operator=(const ImageBuffer& other) {
     if (this != &other) {
-        m_width = other.m_width;
-        m_height = other.m_height;
+        // If this buffer was previously swapped, clean up its swap file before overwriting.
+        if (m_isSwapped && !m_swapFile.isEmpty()) {
+            QFile::remove(m_swapFile);
+            m_swapFile.clear();
+        }
+        m_isSwapped = false;
+
+        m_width    = other.m_width;
+        m_height   = other.m_height;
         m_channels = other.m_channels;
-        m_data = other.m_data;
-        m_meta = other.m_meta;
-        m_name = other.m_name;
+        m_meta     = other.m_meta;
+        m_name     = other.m_name;
         m_modified = other.m_modified;
-        m_mask = other.m_mask;
-        m_hasMask = other.m_hasMask;
+        m_mask     = other.m_mask;
+        m_hasMask  = other.m_hasMask;
+
         // Keep existing mutex or create new one
         if (!m_mutex) m_mutex = std::make_unique<QReadWriteLock>(QReadWriteLock::Recursive);
+
+        // If the source is currently swapped out, force a swap-in so we get the real data.
+        if (other.m_isSwapped) {
+            const_cast<ImageBuffer&>(other).forceSwapIn();
+        }
+        m_data = other.m_data;
     }
     return *this;
 }

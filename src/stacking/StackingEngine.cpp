@@ -1716,26 +1716,100 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args) {
 
 void StackingEngine::updateMetadata(StackingArgs& args) {
     auto& meta = args.result.metadata();
-    
-    // Stack count
-    meta.stackCount = args.nbImagesToStack;
-    
-    // Total exposure
+
+    // Compute total exposure first
     double totalExposure = 0.0;
     for (int idx : args.imageIndices) {
         totalExposure += args.sequence->image(idx).exposure;
     }
-    meta.exposure = totalExposure;
-    
-    // Copy other metadata from reference image
+
+    // Copy all metadata from the reference image so the stacked result retains
+    // instrument, WCS, and header information from the best frame.
     int refIdx = args.params.refImageIndex;
     if (refIdx >= 0 && refIdx < args.sequence->count()) {
         const auto& refMeta = args.sequence->image(refIdx).metadata;
-        meta.focalLength = refMeta.focalLength;
-        meta.pixelSize = refMeta.pixelSize;
-        meta.ra = refMeta.ra;
+
+        // Copy raw FITS header cards verbatim — these form the basis of the saved header
+        meta.rawHeaders = refMeta.rawHeaders;
+
+        // Instrument / optics
+        meta.focalLength  = refMeta.focalLength;
+        meta.pixelSize    = refMeta.pixelSize;
+        meta.ccdTemp      = refMeta.ccdTemp;
+        meta.bayerPattern = refMeta.bayerPattern;
+        meta.isMono       = refMeta.isMono;
+        meta.bitDepth     = refMeta.bitDepth;
+
+        // Object / observation info
+        meta.objectName = refMeta.objectName;
+        meta.dateObs    = refMeta.dateObs;
+
+        // Sky coordinates
+        meta.ra  = refMeta.ra;
         meta.dec = refMeta.dec;
-        // Copy WCS if present...
+
+        // Full WCS
+        meta.crpix1  = refMeta.crpix1;
+        meta.crpix2  = refMeta.crpix2;
+        meta.cd1_1   = refMeta.cd1_1;
+        meta.cd1_2   = refMeta.cd1_2;
+        meta.cd2_1   = refMeta.cd2_1;
+        meta.cd2_2   = refMeta.cd2_2;
+        meta.ctype1  = refMeta.ctype1;
+        meta.ctype2  = refMeta.ctype2;
+        meta.equinox = refMeta.equinox;
+        meta.lonpole = refMeta.lonpole;
+        meta.latpole = refMeta.latpole;
+
+        // SIP distortion coefficients
+        meta.sipOrderA  = refMeta.sipOrderA;
+        meta.sipOrderB  = refMeta.sipOrderB;
+        meta.sipOrderAP = refMeta.sipOrderAP;
+        meta.sipOrderBP = refMeta.sipOrderBP;
+        meta.sipCoeffs  = refMeta.sipCoeffs;
+
+        // Color profile
+        meta.iccData         = refMeta.iccData;
+        meta.iccProfileName  = refMeta.iccProfileName;
+        meta.iccProfileType  = refMeta.iccProfileType;
+    }
+
+    // Override stacking-specific values that differ from any individual frame
+    meta.stackCount = args.nbImagesToStack;
+    meta.exposure   = totalExposure;
+
+    // Keep rawHeaders consistent: update EXPTIME / EXPOSURE and add STACKCNT
+    bool foundExptime = false;
+    for (auto& card : meta.rawHeaders) {
+        if (card.key.compare("EXPTIME", Qt::CaseInsensitive) == 0 ||
+            card.key.compare("EXPOSURE", Qt::CaseInsensitive) == 0) {
+            card.value   = QString::number(totalExposure, 'f', 6);
+            card.comment = "Total stacked exposure [s]";
+            foundExptime = true;
+        }
+    }
+    if (!foundExptime && totalExposure > 0.0) {
+        ImageBuffer::Metadata::HeaderCard card;
+        card.key     = "EXPTIME";
+        card.value   = QString::number(totalExposure, 'f', 6);
+        card.comment = "Total stacked exposure [s]";
+        meta.rawHeaders.push_back(card);
+    }
+
+    bool foundStackCnt = false;
+    for (auto& card : meta.rawHeaders) {
+        if (card.key.compare("STACKCNT", Qt::CaseInsensitive) == 0) {
+            card.value   = QString::number(args.nbImagesToStack);
+            card.comment = "Number of stacked frames";
+            foundStackCnt = true;
+        }
+    }
+    if (!foundStackCnt) {
+        ImageBuffer::Metadata::HeaderCard card;
+        card.key     = "STACKCNT";
+        card.value   = QString::number(args.nbImagesToStack);
+        card.comment = "Number of stacked frames";
+        meta.rawHeaders.push_back(card);
     }
 }
 

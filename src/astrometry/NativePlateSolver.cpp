@@ -449,7 +449,12 @@ int NativePlateSolver::matchCatalog(const std::vector<MatchStar>& imgStars, int 
 // ==========================================================================
 // processSolving — Main pipeline after catalog received
 // ==========================================================================
-void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars) {
+void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars,
+                                        const ImageBuffer&             image,
+                                        const std::vector<CatalogStar>& catalogStars,
+                                        double raHint, double decHint,
+                                        double pixelScale)
+{
     if (catStars.size() < 10) {
         NativeSolveResult res;
         res.errorMsg = tr("Not enough catalog stars found (%1).").arg(catStars.size());
@@ -460,7 +465,7 @@ void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars) {
     emit logMessage(tr("Detecting Image Stars..."));
     StarDetector detector;
     detector.setMaxStars(500);
-    std::vector<DetectedStar> detected = detector.detect(m_image);
+    std::vector<DetectedStar> detected = detector.detect(image);
     emit logMessage(tr("Detected %1 stars in image.").arg(detected.size()));
 
     if (detected.size() < 5) {
@@ -471,8 +476,8 @@ void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars) {
     }
 
     // Center and flip Y — image stars in centered coordinates
-    double imgCenterX = m_image.width() * 0.5;
-    double imgCenterY = m_image.height() * 0.5;
+    double imgCenterX = image.width()  * 0.5;
+    double imgCenterY = image.height() * 0.5;
 
     std::vector<MatchStar> imgMatchStars;
     for(const auto& s : detected) {
@@ -502,8 +507,8 @@ void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars) {
     double finalRA, finalDec;
 
     int result = matchCatalog(imgMatchStars, (int)imgMatchStars.size(),
-                              catStars, m_pixelScale,
-                              m_raHint, m_decHint,
+                              catStars, pixelScale,
+                              raHint, decHint,
                               bestTrans, finalRA, finalDec);
 
     NativeSolveResult res;
@@ -514,8 +519,8 @@ void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars) {
         emit logMessage(tr("Match Success! Computing WCS..."));
 
         // WCS: After convergence, CRVAL = converged center, CD = trans coeffs
-        if (WcsSolver::computeWcs(bestTrans, finalRA, finalDec, 
-                                  m_image.width(), m_image.height(),
+        if (WcsSolver::computeWcs(bestTrans, finalRA, finalDec,
+                                  image.width(), image.height(),
                                   res.crpix1, res.crpix2,
                                   res.crval1, res.crval2, res.cd)) {
             emit logMessage(tr("WCS computed: CRPIX=(%1, %2) CRVAL=(%3, %4)")
@@ -532,15 +537,30 @@ void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars) {
         res.errorMsg = tr("Matching failed. No valid solution found.");
     }
 
-    res.catalogStars = m_catalogStars;
+    res.catalogStars = catalogStars;
     emit finished(res);
 }
 
 void NativePlateSolver::onCatalogReceived(const std::vector<MatchStar>& catalogStars) {
     emit logMessage(tr("Catalog received. Found %1 stars.").arg(catalogStars.size()));
 
-    (void)QtConcurrent::run([this, catalogStars]() {
-        processSolving(catalogStars);
+    // Capture member data by value so the background thread does not access
+    // member variables through `this` — the QObject may be destroyed (or its
+    // parent dialog hidden/closed) while the thread is still running.
+    ImageBuffer              imageSnapshot   = m_image;
+    double                   pixelScale      = m_pixelScale;
+    double                   raHint          = m_raHint;
+    double                   decHint         = m_decHint;
+    std::vector<CatalogStar> rawCatalogStars = m_catalogStars;
+
+    (void)QtConcurrent::run([this,
+                              catalogStars,
+                              imageSnapshot   = std::move(imageSnapshot),
+                              rawCatalogStars = std::move(rawCatalogStars),
+                              pixelScale,
+                              raHint,
+                              decHint]() mutable {
+        processSolving(catalogStars, imageSnapshot, rawCatalogStars, raHint, decHint, pixelScale);
     });
 }
 

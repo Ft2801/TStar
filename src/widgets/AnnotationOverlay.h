@@ -65,6 +65,15 @@ public:
         Text
     };
 
+    // Compass anchor position on the image
+    enum class CompassPosition {
+        Center      = 0,
+        TopLeft     = 1,
+        TopRight    = 2,
+        BottomLeft  = 3,
+        BottomRight = 4
+    };
+
     explicit AnnotationOverlay(ImageViewer* parent);
     ~AnnotationOverlay();
 
@@ -87,6 +96,8 @@ public:
     // Compass Annotations
     void setCompassVisible(bool visible);
     bool compassVisible() const { return m_compassVisible; }
+    void setCompassPosition(CompassPosition pos);
+    CompassPosition compassPosition() const { return m_compassPosition; }
 
     // Save/Restore states
     void setWCSObjects(const QVector<CatalogObject>& objects);
@@ -144,6 +155,7 @@ private:
     bool m_wcsObjectsVisible = false;
     bool m_wcsGridVisible = false;
     bool m_compassVisible = false;
+    CompassPosition m_compassPosition = CompassPosition::Center;
 
     // Interaction state;
 };

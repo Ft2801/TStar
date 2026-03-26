@@ -124,6 +124,28 @@ void AnnotationOverlay::setCompassVisible(bool visible) {
     }
 }
 
+void AnnotationOverlay::setCompassPosition(CompassPosition pos) {
+    if (m_compassPosition != pos) {
+        m_compassPosition = pos;
+        update();
+    }
+}
+
+// Returns the image-space anchor point for the compass given the current position setting.
+// The anchor is placed with a margin relative to the compass arm length so the arrows
+// always remain fully inside the image.
+static QPointF compassAnchorInImage(AnnotationOverlay::CompassPosition pos, int w, int h) {
+    // margin ≈ 1.5× the arm length (arm = h/20)
+    double margin = h / 13.0;
+    switch (pos) {
+    case AnnotationOverlay::CompassPosition::TopLeft:     return QPointF(margin,       margin);
+    case AnnotationOverlay::CompassPosition::TopRight:    return QPointF(w - margin,   margin);
+    case AnnotationOverlay::CompassPosition::BottomLeft:  return QPointF(margin,       h - margin);
+    case AnnotationOverlay::CompassPosition::BottomRight: return QPointF(w - margin,   h - margin);
+    default: /* Center */                                 return QPointF(w / 2.0,      h / 2.0);
+    }
+}
+
 void AnnotationOverlay::drawWCSGrid(QPainter& painter) {
     if (!m_viewer) return;
     auto meta = m_viewer->getBuffer().metadata();
@@ -870,19 +892,22 @@ void AnnotationOverlay::drawCompass(QPainter& painter) {
     
     int w = m_viewer->getBuffer().width();
     int h = m_viewer->getBuffer().height();
+
+    // Anchor point in image coordinates (depends on m_compassPosition)
+    QPointF anchorImg = compassAnchorInImage(m_compassPosition, w, h);
+
+    double anchorRa, anchorDec;
+    if (!WCSUtils::pixelToWorld(meta, anchorImg.x(), anchorImg.y(), anchorRa, anchorDec)) return;
     
-    double centerRa, centerDec;
-    if (!WCSUtils::pixelToWorld(meta, w/2.0, h/2.0, centerRa, centerDec)) return;
-    
-    if (90.0 - std::abs(centerDec) < 2.78e-3) return; // center is too close to a pole
+    if (90.0 - std::abs(anchorDec) < 2.78e-3) return; // anchor too close to a pole
     
     double northPixX, northPixY, eastPixX, eastPixY;
-    if (!WCSUtils::worldToPixel(meta, centerRa, centerDec + 0.1, northPixX, northPixY)) return;
-    if (!WCSUtils::worldToPixel(meta, centerRa + 0.1, centerDec, eastPixX, eastPixY)) return;
+    if (!WCSUtils::worldToPixel(meta, anchorRa, anchorDec + 0.1, northPixX, northPixY)) return;
+    if (!WCSUtils::worldToPixel(meta, anchorRa + 0.1, anchorDec, eastPixX, eastPixY)) return;
     
-    QPointF centerWidgetPos = mapFromImage(QPointF(w/2.0, h/2.0));
-    QPointF northWidgetPos = mapFromImage(QPointF(northPixX, northPixY));
-    QPointF eastWidgetPos = mapFromImage(QPointF(eastPixX, eastPixY));
+    QPointF centerWidgetPos = mapFromImage(anchorImg);
+    QPointF northWidgetPos  = mapFromImage(QPointF(northPixX, northPixY));
+    QPointF eastWidgetPos   = mapFromImage(QPointF(eastPixX,  eastPixY));
     
     double angleN = std::atan2(northWidgetPos.y() - centerWidgetPos.y(), 
                                northWidgetPos.x() - centerWidgetPos.x());
@@ -933,7 +958,7 @@ void AnnotationOverlay::drawCompass(QPainter& painter) {
     
     painter.drawLine(QPointF(0, 0), QPointF(len_scaled / 2.0, 0));
     
-    painter.translate(len_scaled, -0.1 * len_scaled); // siril positions "E" at len distance
+    painter.translate(len_scaled, -0.1 * len_scaled);
     painter.rotate(-angleE * 180.0 / M_PI);
     
     QRectF textBoundsE = fm.boundingRect("E");
@@ -950,19 +975,22 @@ void AnnotationOverlay::drawCompassToImage(QPainter& painter, const QRectF& imag
     
     int w = m_viewer->getBuffer().width();
     int h = m_viewer->getBuffer().height();
+
+    // Anchor point in image coordinates (depends on m_compassPosition)
+    QPointF anchorImg = compassAnchorInImage(m_compassPosition, w, h);
+
+    double anchorRa, anchorDec;
+    if (!WCSUtils::pixelToWorld(meta, anchorImg.x(), anchorImg.y(), anchorRa, anchorDec)) return;
     
-    double centerRa, centerDec;
-    if (!WCSUtils::pixelToWorld(meta, w/2.0, h/2.0, centerRa, centerDec)) return;
-    
-    if (90.0 - std::abs(centerDec) < 2.78e-3) return; // center is too close to a pole
+    if (90.0 - std::abs(anchorDec) < 2.78e-3) return; // anchor too close to a pole
     
     double northPixX, northPixY, eastPixX, eastPixY;
-    if (!WCSUtils::worldToPixel(meta, centerRa, centerDec + 0.1, northPixX, northPixY)) return;
-    if (!WCSUtils::worldToPixel(meta, centerRa + 0.1, centerDec, eastPixX, eastPixY)) return;
+    if (!WCSUtils::worldToPixel(meta, anchorRa, anchorDec + 0.1, northPixX, northPixY)) return;
+    if (!WCSUtils::worldToPixel(meta, anchorRa + 0.1, anchorDec, eastPixX, eastPixY)) return;
     
     // When drawing directly to image, scaleM compensates for painter zoom.
     // The image pixel coordinates act as the base geometry.
-    QPointF centerImagePos(w/2.0, h/2.0);
+    QPointF centerImagePos = anchorImg;
     QPointF northImagePos(northPixX, northPixY);
     QPointF eastImagePos(eastPixX, eastPixY);
     

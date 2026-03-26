@@ -49,7 +49,11 @@ private:
 
     // Internal methods
     void fetchCatalog();
-    void processSolving(const std::vector<MatchStar>& catStars);
+    void processSolving(const std::vector<MatchStar>& catStars,
+                        const ImageBuffer&             image,
+                        const std::vector<CatalogStar>& catalogStars,
+                        double raHint, double decHint,
+                        double pixelScale);
 
     // Core solver 
     //

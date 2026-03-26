@@ -94,6 +94,7 @@ private:
     // WCS Grid and Compass Filter
     QCheckBox* m_chkWcsGrid;
     QCheckBox* m_chkCompass;
+    QComboBox* m_cmbCompassPosition;
 
     // Options
     QComboBox* m_colorCombo;

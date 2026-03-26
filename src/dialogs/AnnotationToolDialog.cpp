@@ -167,6 +167,17 @@ AnnotationToolDialog::AnnotationToolDialog(QWidget* parent)
     m_chkWcsGrid->setChecked(true);
     m_chkCompass->setChecked(true);
     
+    // Compass position dropdown
+    m_cmbCompassPosition = new QComboBox();
+    m_cmbCompassPosition->addItem(tr("Center"),       static_cast<int>(AnnotationOverlay::CompassPosition::Center));
+    m_cmbCompassPosition->addItem(tr("Top Left"),     static_cast<int>(AnnotationOverlay::CompassPosition::TopLeft));
+    m_cmbCompassPosition->addItem(tr("Top Right"),    static_cast<int>(AnnotationOverlay::CompassPosition::TopRight));
+    m_cmbCompassPosition->addItem(tr("Bottom Left"),  static_cast<int>(AnnotationOverlay::CompassPosition::BottomLeft));
+    m_cmbCompassPosition->addItem(tr("Bottom Right"), static_cast<int>(AnnotationOverlay::CompassPosition::BottomRight));
+    m_cmbCompassPosition->setCurrentIndex(0); // Center is default
+    m_cmbCompassPosition->setAccessibleName(tr("Compass position"));
+    m_cmbCompassPosition->setToolTip(tr("Choose where the compass is placed on the image"));
+    
     // Add checkboxes to grid
     catLayout->addWidget(m_chkMessier, 0, 0);
     catLayout->addWidget(m_chkNGC, 0, 1);
@@ -177,6 +188,7 @@ AnnotationToolDialog::AnnotationToolDialog(QWidget* parent)
     catLayout->addWidget(m_chkConstellations, 2, 0, 1, 2);
     catLayout->addWidget(m_chkWcsGrid, 3, 0, 1, 1);
     catLayout->addWidget(m_chkCompass, 3, 1, 1, 1);
+    catLayout->addWidget(m_cmbCompassPosition, 3, 2, 1, 1);
     
     m_btnAnnotate = new QPushButton(tr("Annotate Image"));
     catLayout->addWidget(m_btnAnnotate, 4, 0, 1, 3);
@@ -186,6 +198,8 @@ AnnotationToolDialog::AnnotationToolDialog(QWidget* parent)
     connect(m_btnAnnotate, &QPushButton::clicked, this, &AnnotationToolDialog::refreshAutomaticAnnotations);
     connect(m_chkWcsGrid, &QCheckBox::toggled, this, &AnnotationToolDialog::refreshAutomaticAnnotations);
     connect(m_chkCompass, &QCheckBox::toggled, this, &AnnotationToolDialog::refreshAutomaticAnnotations);
+    connect(m_cmbCompassPosition, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &AnnotationToolDialog::refreshAutomaticAnnotations);
 
     // Instruction for saving
     QLabel* tipLabel = new QLabel(tr("Tip: Annotations are saved as overlay. If you close the tool, annotations will disappear, and then reappear when you open this tool again. Open this tool to continue editing with full undo/redo support. To burn annotations into the image, use File > Save while the tool is open."));
@@ -411,8 +425,12 @@ void AnnotationToolDialog::refreshAutomaticAnnotations() {
     // Pass WCS Grid check state to overlay
     m_overlay->setWCSGridVisible(m_chkWcsGrid->isChecked());
     
-    // Pass Compass check state to overlay
+    // Pass Compass visibility and position to overlay
     m_overlay->setCompassVisible(m_chkCompass->isChecked());
+    {
+        int idx = m_cmbCompassPosition->currentData().toInt();
+        m_overlay->setCompassPosition(static_cast<AnnotationOverlay::CompassPosition>(idx));
+    }
 
     m_overlay->setWCSObjects(objects);
     m_overlay->setWCSObjectsVisible(true);

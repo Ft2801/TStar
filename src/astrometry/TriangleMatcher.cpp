@@ -362,6 +362,11 @@ bool TriangleMatcher::iterTrans(int nbright,
 
     if (nbright < required_pairs) return false;
 
+    // Validate that the index vectors are large enough to hold nbright entries.
+    // This guards against any caller that passes mismatched sizes.
+    if ((int)winnerIndexA.size() < nbright || (int)winnerIndexB.size() < nbright)
+        return false;
+
     // On first call (RECALC_NO), use only start_pairs best stars
     // On RECALC_YES, use all pairs
     int use_pairs;
@@ -389,10 +394,18 @@ bool TriangleMatcher::iterTrans(int nbright,
         // Compute residuals for all nr pairs
         std::vector<double> dist2(nr);
         for (int i = 0; i < nr; i++) {
+            int idxA = winnerIndexA[i];
+            int idxB = winnerIndexB[i];
+            // Skip pairs whose indices are out of bounds (defensive check)
+            if (idxA < 0 || idxA >= (int)starsA.size() ||
+                idxB < 0 || idxB >= (int)starsB.size()) {
+                dist2[i] = max_dist2_absolute + 1.0; // will be removed in step 1
+                continue;
+            }
             double newx, newy;
-            calcTransCoords(starsA[winnerIndexA[i]].x, starsA[winnerIndexA[i]].y, trans, newx, newy);
-            double dx = newx - starsB[winnerIndexB[i]].x;
-            double dy = newy - starsB[winnerIndexB[i]].y;
+            calcTransCoords(starsA[idxA].x, starsA[idxA].y, trans, newx, newy);
+            double dx = newx - starsB[idxB].x;
+            double dy = newy - starsB[idxB].y;
             dist2[i] = dx * dx + dy * dy;
         }
 
