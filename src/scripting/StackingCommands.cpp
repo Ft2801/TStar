@@ -1804,6 +1804,7 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd) {
             // Reuse buffer via thread_local to avoid frequent allocations
             static thread_local ImageBuffer threadBuffer;
             threadBuffer.resize(0, 0, 0); // Clear state but keep capacity
+            threadBuffer.setMetadata(ImageBuffer::Metadata()); // Clear metadata to avoid duplication
             
             bool loaded = false;
             
@@ -1943,6 +1944,28 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd) {
                                 threadBuffer.metadata().bayerPattern = bayerPat;
                                 threadBuffer.metadata().rawHeaders.push_back({"BAYERPAT", bayerPat, "Bayer Pattern"});
                                 threadBuffer.metadata().rawHeaders.push_back({"ROWORDER", "TOP-DOWN", "Row order of image data"});
+
+                                // Extract generic RAW metadata
+                                threadBuffer.metadata().exposure = lr->other.shutter;
+                                threadBuffer.metadata().focalLength = lr->other.focal_len;
+                                if (lr->other.timestamp > 0) {
+                                    QDateTime dt = QDateTime::fromSecsSinceEpoch(static_cast<qint64>(lr->other.timestamp), QTimeZone::utc());
+                                    threadBuffer.metadata().dateObs = dt.toString(Qt::ISODateWithMs);
+                                    threadBuffer.metadata().rawHeaders.push_back({"DATE-OBS", threadBuffer.metadata().dateObs, "Observation date"});
+                                }
+                                if (lr->other.iso_speed > 0.0f) {
+                                    threadBuffer.metadata().rawHeaders.push_back({"ISOSPEED", QString::number(static_cast<int>(lr->other.iso_speed)), "ISO speed"});
+                                }
+                                if (lr->other.shutter > 0.0f) {
+                                    threadBuffer.metadata().rawHeaders.push_back({"EXPTIME", QString::number(lr->other.shutter, 'f', 6), "Exposure time [s]"});
+                                }
+                                if (lr->other.aperture > 0.0f) {
+                                    threadBuffer.metadata().rawHeaders.push_back({"APERTURE", QString::number(lr->other.aperture, 'f', 1), "Aperture (f-number)"});
+                                }
+                                if (lr->other.focal_len > 0.0f) {
+                                    threadBuffer.metadata().rawHeaders.push_back({"FOCALLEN", QString::number(static_cast<int>(lr->other.focal_len)), "Focal length [mm]"});
+                                }
+
                             } // closes if (src)
                         } // closes else: CFA path
                     } // closes if (unpackRet == LIBRAW_SUCCESS || LIBRAW_DATA_ERROR)

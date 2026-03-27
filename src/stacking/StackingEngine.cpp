@@ -3,6 +3,7 @@
 
 
 #include <QDateTime>
+#include <set>
 #include <QDir>
 #include <QFileInfo>
 #include <algorithm>
@@ -1778,7 +1779,20 @@ void StackingEngine::updateMetadata(StackingArgs& args) {
     meta.stackCount = args.nbImagesToStack;
     meta.exposure   = totalExposure;
 
-    // Keep rawHeaders consistent: update EXPTIME / EXPOSURE and add STACKCNT
+    // Deduplicate rawHeaders: keep first occurrence of each key, remove duplicates
+    // This prevents header pollution in stacked FITS files when source had duplicates
+    std::set<QString> seenKeys;
+    std::vector<ImageBuffer::Metadata::HeaderCard> deduped;
+    for (const auto& card : meta.rawHeaders) {
+        QString key = card.key.trimmed().toUpper();
+        if (seenKeys.find(key) == seenKeys.end()) {
+            seenKeys.insert(key);
+            deduped.push_back(card);
+        }
+    }
+    meta.rawHeaders = deduped;
+
+    // Keep rawHeaders consistent: update ALL EXPTIME / EXPOSURE entries and add/update STACKCNT
     bool foundExptime = false;
     for (auto& card : meta.rawHeaders) {
         if (card.key.compare("EXPTIME", Qt::CaseInsensitive) == 0 ||

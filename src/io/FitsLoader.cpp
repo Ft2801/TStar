@@ -4,6 +4,7 @@
 #include <fitsio.h>
 #include <QDebug>
 #include <vector>
+#include <set>
 #include <algorithm>
 #include <QCoreApplication>
 #include <QRegularExpression>
@@ -170,31 +171,8 @@ bool FitsLoader::load(const QString& filePath, ImageBuffer& buffer, QString* err
     meta.filePath = filePath;
 
     
-    // Read ALL Header Keys
-    int nkeys = 0;
-    int morekeys = 0;
-    int status_meta = 0;
-    if (fits_get_hdrspace(fptr, &nkeys, &morekeys, &status_meta) == 0) {
-        for (int i = 1; i <= nkeys; ++i) { 
-            char card[FLEN_CARD];
-            if (fits_read_record(fptr, i, card, &status_meta) == 0) {
-                 // Parse key, value, and comment using fits_read_keyn
-                 char keyname[FLEN_KEYWORD], value[FLEN_VALUE], comm[FLEN_COMMENT];
-                 // Variable unused - removed
-                 if (fits_read_keyn(fptr, i, keyname, value, comm, &status_meta) == 0) {
-                     meta.rawHeaders.push_back({QString(keyname), QString(value), QString(comm)});
-                 } else {
-                     status_meta = 0; // reset
-                     // Maybe it's a comment or history line without value
-                     // Store raw card?
-                     meta.rawHeaders.push_back({QString("RAW"), QString::fromUtf8(card, 80).trimmed(), ""});
-                 }
-            } else {
-                status_meta = 0; 
-            }
-        }
-    }
-    
+    // Headers are already read by readCommonMetadata
+
     // Extract ICC profile if present (only if filePath is provided)
     if (!filePath.isEmpty()) {
         IccProfileExtractor::extractFromFile(filePath, meta.iccData);
@@ -698,7 +676,9 @@ bool FitsLoader::loadMetadata(const QString& filePath, ImageBuffer& buffer, QStr
     fits_close_file(fptr, &status);
 
     int nChannels = (naxis >= 3) ? naxes[2] : 1;
-    buffer = ImageBuffer(naxes[0], naxes[1], nChannels);
+    if (buffer.width() == 0 || buffer.height() == 0) {
+        buffer.resize(naxes[0], naxes[1], nChannels);
+    }
     
     // Extract ICC profile if present
     if (IccProfileExtractor::extractFromFile(filePath, meta.iccData)) {
@@ -870,5 +850,18 @@ void FitsLoader::readCommonMetadata(void* fitsptr, ImageBuffer::Metadata& meta) 
             }
         }
     }
+    
+    // Deduplicate rawHeaders: keep only first occurrence of each key
+    // This prevents FITS files with duplicate headers from polluting the metadata
+    std::set<QString> seenKeys;
+    std::vector<ImageBuffer::Metadata::HeaderCard> deduped;
+    for (const auto& card : meta.rawHeaders) {
+        QString key = card.key.trimmed().toUpper();
+        if (seenKeys.find(key) == seenKeys.end()) {
+            seenKeys.insert(key);
+            deduped.push_back(card);
+        }
+    }
+    meta.rawHeaders = deduped;
 }
 

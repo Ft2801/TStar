@@ -1,5 +1,9 @@
 #include "HeaderPanel.h"
 #include <QHeaderView>
+#include <QMenu>
+#include <QClipboard>
+#include <QApplication>
+#include <QAbstractItemModel>
 
 HeaderPanel::HeaderPanel(QWidget* parent) : QWidget(parent) {
     setupUI();
@@ -27,6 +31,7 @@ void HeaderPanel::setupUI() {
     m_table->verticalHeader()->setVisible(false);
     m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_table->setAlternatingRowColors(true);
+    m_table->setContextMenuPolicy(Qt::CustomContextMenu);
     m_table->setStyleSheet(
         "QTableWidget { background: #222; color: #ddd; gridline-color: #444; }"
         "QHeaderView::section { background: #333; color: #eee; padding: 4px; border: 1px solid #444; }"
@@ -43,6 +48,19 @@ void HeaderPanel::setupUI() {
     m_table->horizontalHeader()->setStretchLastSection(true);
     
     layout->addWidget(m_table, 1);
+    
+    // Connect context menu and keyboard shortcuts for copy
+    connect(m_table, &QTableWidget::customContextMenuRequested, this, [this](const QPoint& pos) {
+        QMenu menu;
+        menu.addAction(tr("Copy Selected"), this, &HeaderPanel::copySelectedToClipboard);
+        menu.exec(m_table->mapToGlobal(pos));
+    });
+    
+    // Ctrl+C shortcut
+    auto copyAction = new QAction(this);
+    copyAction->setShortcut(Qt::CTRL | Qt::Key_C);
+    m_table->addAction(copyAction);
+    connect(copyAction, &QAction::triggered, this, &HeaderPanel::copySelectedToClipboard);
 }
 
 void HeaderPanel::setMetadata(const ImageBuffer::Metadata& meta) {
@@ -93,4 +111,22 @@ void HeaderPanel::filterRows(const QString& text) {
         else if (m_table->item(i, 2)->text().toLower().contains(lower)) match = true;
         m_table->setRowHidden(i, !match);
     }
+}
+
+void HeaderPanel::copySelectedToClipboard() {
+    QModelIndexList selected = m_table->selectionModel()->selectedRows();
+    if (selected.isEmpty()) return;
+    
+    QString text;
+    for (const QModelIndex& index : selected) {
+        int row = index.row();
+        QString key = m_table->item(row, 0)->text();
+        QString value = m_table->item(row, 1)->text();
+        QString comment = m_table->item(row, 2)->text();
+        text += key + " = " + value;
+        if (!comment.isEmpty()) text += " / " + comment;
+        text += "\n";
+    }
+    
+    QApplication::clipboard()->setText(text);
 }

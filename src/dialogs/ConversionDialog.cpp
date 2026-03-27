@@ -289,6 +289,7 @@ void ConversionDialog::onConvert() {
         // Reuse thread-local buffer? Be careful with async if thread_local persists across different tasks incorrectly
         static thread_local ImageBuffer threadBuffer; 
         threadBuffer.resize(0, 0, 0);
+        threadBuffer.setMetadata(ImageBuffer::Metadata());
 
         if (ext == "fit" || ext == "fits" || ext == "fts") {
              loaded = Stacking::FitsIO::read(job.filePath, threadBuffer);
@@ -364,6 +365,24 @@ void ConversionDialog::onConvert() {
                              threadBuffer.metadata().bayerPattern = bayerPat;
                              threadBuffer.metadata().xisfProperties["BayerPattern"] = bayerPat;
                              threadBuffer.metadata().exposure = lr->other.shutter;
+                             threadBuffer.metadata().focalLength = lr->other.focal_len;
+                             if (lr->other.timestamp > 0) {
+                                 QDateTime dt = QDateTime::fromSecsSinceEpoch(static_cast<qint64>(lr->other.timestamp), QTimeZone::utc());
+                                 threadBuffer.metadata().dateObs = dt.toString(Qt::ISODateWithMs);
+                                 threadBuffer.metadata().rawHeaders.push_back({"DATE-OBS", threadBuffer.metadata().dateObs, "Observation date"});
+                             }
+                             if (lr->other.iso_speed > 0.0f) {
+                                 threadBuffer.metadata().rawHeaders.push_back({"ISOSPEED", QString::number(static_cast<int>(lr->other.iso_speed)), "ISO speed"});
+                             }
+                             if (lr->other.shutter > 0.0f) {
+                                 threadBuffer.metadata().rawHeaders.push_back({"EXPTIME", QString::number(lr->other.shutter, 'f', 6), "Exposure time [s]"});
+                             }
+                             if (lr->other.aperture > 0.0f) {
+                                 threadBuffer.metadata().rawHeaders.push_back({"APERTURE", QString::number(lr->other.aperture, 'f', 1), "Aperture (f-number)"});
+                             }
+                             if (lr->other.focal_len > 0.0f) {
+                                 threadBuffer.metadata().rawHeaders.push_back({"FOCALLEN", QString::number(static_cast<int>(lr->other.focal_len)), "Focal length [mm]"});
+                             }
                          }
                      }
                  }

@@ -22,6 +22,7 @@ public:
 private:
     void setupUI();
     void filterRows(const QString& text);
+    void copySelectedToClipboard();
     
     ImageBuffer::Metadata m_meta;
     QTableWidget* m_table;
