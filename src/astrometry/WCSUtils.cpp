@@ -38,10 +38,14 @@ void WCSUtils::cdToCdeltCrota(double cd1_1, double cd1_2, double cd2_1, double c
 }
 
 bool WCSUtils::hasValidWCS(const Metadata& meta) {
-    bool hasCoords = (meta.ra != 0 || meta.dec != 0);
+    // A non-degenerate CD matrix is the primary requirement for valid WCS.
+    // We intentionally do NOT require non-zero RA/Dec because RA=0 and Dec=0
+    // are perfectly valid astronomical coordinates (vernal equinox / celestial equator).
     double det = meta.cd1_1 * meta.cd2_2 - meta.cd1_2 * meta.cd2_1;
     bool hasMatrix = std::abs(det) > 1e-20;
-    return hasCoords && hasMatrix;
+    // CRPIX must have been parsed (at least one non-zero component)
+    bool hasCrpix = (meta.crpix1 != 0.0 || meta.crpix2 != 0.0);
+    return hasMatrix && hasCrpix;
 }
 
 double WCSUtils::pixelScale(const Metadata& meta) {

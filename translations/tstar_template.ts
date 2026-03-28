@@ -6834,6 +6834,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Rotate 180</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Rotate CCW</source>
             <translation type="unfinished" />
         </message>
@@ -9032,6 +9036,14 @@
         <name>Preprocessing</name>
         <message>
             <source>Bias subtraction failed</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Calibrated Master Flat using Master Bias</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Calibrated Master Flat using synthetic bias %1</source>
             <translation type="unfinished" />
         </message>
         <message>

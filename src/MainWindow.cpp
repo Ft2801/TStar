@@ -5043,6 +5043,15 @@ bool MainWindow::closeAllWorkspaceWindows() {
     return m_mdiArea->subWindowList().isEmpty();
 }
 
+void MainWindow::refreshHeaderPanel() {
+    // Re-sync the header panel to reflect the current active viewer's metadata.
+    // Called after batch operations that modify non-active windows.
+    ImageViewer* viewer = currentViewer();
+    if (viewer && m_headerPanel) {
+        m_headerPanel->setMetadata(viewer->getBuffer().metadata());
+    }
+}
+
 bool MainWindow::maybeSaveWorkspaceProject(const QString& reason) {
     if (!m_workspaceProject.active || !m_workspaceProject.dirty) return true;
 

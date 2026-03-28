@@ -13,6 +13,7 @@
 #include <QApplication>
 #include <algorithm>
 #include <QSettings>
+#include <QShortcut>
 
 //=============================================================================
 // CONSTRUCTOR / DESTRUCTOR
@@ -176,7 +177,11 @@ void StackingDialog::setupSequenceGroup() {
     connect(m_filterValue, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             this, [this](double) { applyCurrentFilter(); });
 
-        applyCurrentFilter();
+    // Keyboard shortcut: Ctrl+A (Windows/Linux) / Cmd+A (macOS) selects all images.
+    QShortcut* selectAllShortcut = new QShortcut(QKeySequence::SelectAll, this);
+    connect(selectAllShortcut, &QShortcut::activated, this, &StackingDialog::onSelectAll);
+
+    applyCurrentFilter();
 }
 
 void StackingDialog::setupCometTab() {

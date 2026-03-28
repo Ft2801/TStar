@@ -135,6 +135,14 @@ void CropRotateDialog::onApply() {
     
     m_viewer->pushUndo(tr("Crop"));
     m_viewer->getBuffer().cropRotated(cx, cy, w, h, angle);
+    
+    // Clear stale catalog stars — pixel coords are invalid after crop
+    {
+        ImageBuffer::Metadata meta = m_viewer->getBuffer().metadata();
+        meta.catalogStars.clear();
+        m_viewer->getBuffer().setMetadata(meta);
+    }
+    
     m_viewer->refreshDisplay(false); // Resets display mapping if needed
     m_viewer->fitToWindow();
     
@@ -201,6 +209,12 @@ void CropRotateDialog::onBatchApply() {
         if (ImageViewer* v = csw->viewer()) {
             v->pushUndo(tr("Crop"));
             v->getBuffer().cropRotated(cx, cy, w, h, angle);
+            
+            // Clear stale catalog stars — pixel coords are invalid after crop
+            ImageBuffer::Metadata meta = v->getBuffer().metadata();
+            meta.catalogStars.clear();
+            v->getBuffer().setMetadata(meta);
+            
             v->refreshDisplay(false);
             v->fitToWindow();
             
@@ -212,6 +226,8 @@ void CropRotateDialog::onBatchApply() {
     MainWindowCallbacks* cb = getCallbacks();
     if (cb) {
         cb->logMessage(tr("Batch Crop applied to %1 images.").arg(targetWindows.size()), 1, true);
+        // Force header panel refresh for the currently active viewer
+        cb->refreshHeaderPanel();
     }
     
     m_angleSpin->setValue(0);

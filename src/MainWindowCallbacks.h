@@ -44,6 +44,10 @@ public:
         return false; 
     }
 
+    // Refresh the FITS header panel to reflect the current active viewer.
+    // Call this after batch operations that modify non-active windows.
+    virtual void refreshHeaderPanel() {}
+
     // ── Utility helpers ───────────────────────────────────────────────────────
 
     /// Build a child window title by appending @p suffix to @p parentTitle,

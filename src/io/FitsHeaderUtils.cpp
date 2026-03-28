@@ -59,13 +59,12 @@ std::vector<FitsHeaderUtils::HeaderCard> FitsHeaderUtils::dropInvalidCards(
 }
 
 bool FitsHeaderUtils::hasValidWCS(const Metadata& meta) {
-    // Need reference pixel, coordinates, and non-singular CD matrix
-    bool hasCoords = (meta.ra != 0 || meta.dec != 0);
-    
+    // Require only a non-degenerate CD matrix and a parsed CRPIX.
+    // RA=0 / Dec=0 are valid coordinates and must not be rejected.
     double det = meta.cd1_1 * meta.cd2_2 - meta.cd1_2 * meta.cd2_1;
     bool hasMatrix = std::abs(det) > 1e-20;
-    
-    return hasCoords && hasMatrix;
+    bool hasCrpix = (meta.crpix1 != 0.0 || meta.crpix2 != 0.0);
+    return hasMatrix && hasCrpix;
 }
 
 std::vector<FitsHeaderUtils::HeaderCard> FitsHeaderUtils::buildWCSHeader(const Metadata& meta) {
