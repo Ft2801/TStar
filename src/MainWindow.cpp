@@ -3308,6 +3308,9 @@ void MainWindow::applyGeometry(const QString& op) {
         else if (op == "mirrorX") name = tr("Mirror H");
         else if (op == "mirrorY") name = tr("Mirror V");
         
+        int oldW = v->getBuffer().width();
+        int oldH = v->getBuffer().height();
+
         v->pushUndo(name);
         
         // Use OpenCV optimized calls directly via Buffer
@@ -3317,7 +3320,12 @@ void MainWindow::applyGeometry(const QString& op) {
         else if (op == "mirrorX") v->getBuffer().mirrorX();
         else if (op == "mirrorY") v->getBuffer().mirrorY();
         
-        updateDisplay();
+        if (v->getBuffer().width() != oldW || v->getBuffer().height() != oldH) {
+            v->refreshDisplay(false); // Do not preserve view if dimensions changed
+        } else {
+            v->refreshDisplay(true);
+        }
+
         log(tr("Geometry applied: ") + name, Log_Success);
         showConsoleTemporarily(2000);
     }
@@ -3325,9 +3333,18 @@ void MainWindow::applyGeometry(const QString& op) {
 
 void MainWindow::applyGeometry(const QString& name, std::function<void(ImageBuffer&)> func) {
     if (auto v = currentViewer()) {
+        int oldW = v->getBuffer().width();
+        int oldH = v->getBuffer().height();
+
         v->pushUndo(name);
         func(v->getBuffer());
-        updateDisplay();
+
+        if (v->getBuffer().width() != oldW || v->getBuffer().height() != oldH) {
+            v->refreshDisplay(false);
+        } else {
+            v->refreshDisplay(true);
+        }
+
         log(tr("Geometry applied: ") + name, Log_Success);
         showConsoleTemporarily(2000);
     }
