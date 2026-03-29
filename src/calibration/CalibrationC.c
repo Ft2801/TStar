@@ -239,47 +239,66 @@ void fix_bad_lines_c(float* image, int width, int height, int channels, int cfa_
             for (int p = 0; p < phases_y; ++p) {
                 int count = 0;
                 for (int y = p; y < height; y += phases_y) count++;
-                if (count < 5) continue;
-                
-                float* p_meds = (float*)malloc(count * sizeof(float));
+                if (count < 7) continue;
+
+                float* p_vals = (float*)malloc(count * sizeof(float));
+                float* abs_res = (float*)malloc((count - 2) * sizeof(float));
+                unsigned char* is_bad = (unsigned char*)calloc((size_t)count, sizeof(unsigned char));
+                if (!p_vals || !abs_res || !is_bad) {
+                    free(p_vals); free(abs_res); free(is_bad);
+                    continue;
+                }
+
                 int idx = 0;
-                for (int y = p; y < height; y += phases_y) p_meds[idx++] = row_meds[y];
-                
-                qsort(p_meds, count, sizeof(float), cmp_float);
-                float phase_median = p_meds[count/2];
-                
-                float* p_devs = (float*)malloc(count * sizeof(float));
-                for(int i=0; i<count; ++i) p_devs[i] = fabsf(p_meds[i] - phase_median);
-                qsort(p_devs, count, sizeof(float), cmp_float);
-                float phase_mad = p_devs[count/2];
-                float sigma = phase_mad * 1.4826f;
+                for (int y = p; y < height; y += phases_y) p_vals[idx++] = row_meds[y];
+
+                // Detect line outliers on the high-pass residual (local trend removed).
+                for (int i = 1; i < count - 1; ++i) {
+                    float local_ref = 0.5f * (p_vals[i - 1] + p_vals[i + 1]);
+                    abs_res[i - 1] = fabsf(p_vals[i] - local_ref);
+                }
+                qsort(abs_res, (size_t)(count - 2), sizeof(float), cmp_float);
+                float mad = abs_res[(count - 2) / 2];
+                float sigma = mad * 1.4826f;
                 if (sigma < 1e-6f) sigma = 1e-6f;
-                
-                free(p_meds); free(p_devs);
-                
-                float thresh = 6.0f * sigma; // 6 sigma is very safe for bad lines
-                for (int y = p; y < height; y += phases_y) {
-                    if (fabsf(row_meds[y] - phase_median) > thresh) {
-                        int prev_y = y - phases_y;
-                        int next_y = y + phases_y;
-                        
-                        while(prev_y >= 0 && fabsf(row_meds[prev_y] - phase_median) > thresh) prev_y -= phases_y;
-                        while(next_y < height && fabsf(row_meds[next_y] - phase_median) > thresh) next_y += phases_y;
-                        
-                        for (int x = 0; x < width; ++x) {
-                            float val1 = (prev_y >= 0) ? image[(prev_y * width + x) * channels + c] : -1;
-                            float val2 = (next_y < height) ? image[(next_y * width + x) * channels + c] : -1;
-                            
-                            if (val1 >= 0 && val2 >= 0) {
-                                image[(y * width + x) * channels + c] = (val1 + val2) * 0.5f;
-                            } else if (val1 >= 0) {
-                                image[(y * width + x) * channels + c] = val1;
-                            } else if (val2 >= 0) {
-                                image[(y * width + x) * channels + c] = val2;
-                            }
+
+                float thresh = 8.0f * sigma;
+                for (int i = 1; i < count - 1; ++i) {
+                    float local_ref = 0.5f * (p_vals[i - 1] + p_vals[i + 1]);
+                    if (fabsf(p_vals[i] - local_ref) > thresh) {
+                        is_bad[i] = 1;
+                    }
+                }
+
+                for (int i = 1; i < count - 1; ++i) {
+                    if (!is_bad[i]) continue;
+
+                    int prev_i = i - 1;
+                    int next_i = i + 1;
+                    while (prev_i >= 0 && is_bad[prev_i]) prev_i--;
+                    while (next_i < count && is_bad[next_i]) next_i++;
+
+                    int y = p + i * phases_y;
+                    int prev_y = (prev_i >= 0) ? (p + prev_i * phases_y) : -1;
+                    int next_y = (next_i < count) ? (p + next_i * phases_y) : -1;
+
+                    for (int x = 0; x < width; ++x) {
+                        float val1 = (prev_y >= 0) ? image[(prev_y * width + x) * channels + c] : -1.0f;
+                        float val2 = (next_y >= 0) ? image[(next_y * width + x) * channels + c] : -1.0f;
+
+                        if (val1 >= 0.0f && val2 >= 0.0f) {
+                            image[(y * width + x) * channels + c] = 0.5f * (val1 + val2);
+                        } else if (val1 >= 0.0f) {
+                            image[(y * width + x) * channels + c] = val1;
+                        } else if (val2 >= 0.0f) {
+                            image[(y * width + x) * channels + c] = val2;
                         }
                     }
                 }
+
+                free(p_vals);
+                free(abs_res);
+                free(is_bad);
             }
             free(row_meds);
         }
@@ -303,47 +322,65 @@ void fix_bad_lines_c(float* image, int width, int height, int channels, int cfa_
             for (int p = 0; p < phases_x; ++p) {
                 int count = 0;
                 for (int x = p; x < width; x += phases_x) count++;
-                if (count < 5) continue;
-                
-                float* p_meds = (float*)malloc(count * sizeof(float));
+                if (count < 7) continue;
+
+                float* p_vals = (float*)malloc(count * sizeof(float));
+                float* abs_res = (float*)malloc((count - 2) * sizeof(float));
+                unsigned char* is_bad = (unsigned char*)calloc((size_t)count, sizeof(unsigned char));
+                if (!p_vals || !abs_res || !is_bad) {
+                    free(p_vals); free(abs_res); free(is_bad);
+                    continue;
+                }
+
                 int idx = 0;
-                for (int x = p; x < width; x += phases_x) p_meds[idx++] = col_meds[x];
-                
-                qsort(p_meds, count, sizeof(float), cmp_float);
-                float phase_median = p_meds[count/2];
-                
-                float* p_devs = (float*)malloc(count * sizeof(float));
-                for(int i=0; i<count; ++i) p_devs[i] = fabsf(p_meds[i] - phase_median);
-                qsort(p_devs, count, sizeof(float), cmp_float);
-                float phase_mad = p_devs[count/2];
-                float sigma = phase_mad * 1.4826f;
+                for (int x = p; x < width; x += phases_x) p_vals[idx++] = col_meds[x];
+
+                for (int i = 1; i < count - 1; ++i) {
+                    float local_ref = 0.5f * (p_vals[i - 1] + p_vals[i + 1]);
+                    abs_res[i - 1] = fabsf(p_vals[i] - local_ref);
+                }
+                qsort(abs_res, (size_t)(count - 2), sizeof(float), cmp_float);
+                float mad = abs_res[(count - 2) / 2];
+                float sigma = mad * 1.4826f;
                 if (sigma < 1e-6f) sigma = 1e-6f;
-                
-                free(p_meds); free(p_devs);
-                
-                float thresh = 6.0f * sigma;
-                for (int x = p; x < width; x += phases_x) {
-                    if (fabsf(col_meds[x] - phase_median) > thresh) {
-                        int prev_x = x - phases_x;
-                        int next_x = x + phases_x;
-                        
-                        while(prev_x >= 0 && fabsf(col_meds[prev_x] - phase_median) > thresh) prev_x -= phases_x;
-                        while(next_x < width && fabsf(col_meds[next_x] - phase_median) > thresh) next_x += phases_x;
-                        
-                        for (int y = 0; y < height; ++y) {
-                            float val1 = (prev_x >= 0) ? image[(y * width + prev_x) * channels + c] : -1;
-                            float val2 = (next_x < width) ? image[(y * width + next_x) * channels + c] : -1;
-                            
-                            if (val1 >= 0 && val2 >= 0) {
-                                image[(y * width + x) * channels + c] = (val1 + val2) * 0.5f;
-                            } else if (val1 >= 0) {
-                                image[(y * width + x) * channels + c] = val1;
-                            } else if (val2 >= 0) {
-                                image[(y * width + x) * channels + c] = val2;
-                            }
+
+                float thresh = 8.0f * sigma;
+                for (int i = 1; i < count - 1; ++i) {
+                    float local_ref = 0.5f * (p_vals[i - 1] + p_vals[i + 1]);
+                    if (fabsf(p_vals[i] - local_ref) > thresh) {
+                        is_bad[i] = 1;
+                    }
+                }
+
+                for (int i = 1; i < count - 1; ++i) {
+                    if (!is_bad[i]) continue;
+
+                    int prev_i = i - 1;
+                    int next_i = i + 1;
+                    while (prev_i >= 0 && is_bad[prev_i]) prev_i--;
+                    while (next_i < count && is_bad[next_i]) next_i++;
+
+                    int x = p + i * phases_x;
+                    int prev_x = (prev_i >= 0) ? (p + prev_i * phases_x) : -1;
+                    int next_x = (next_i < count) ? (p + next_i * phases_x) : -1;
+
+                    for (int y = 0; y < height; ++y) {
+                        float val1 = (prev_x >= 0) ? image[(y * width + prev_x) * channels + c] : -1.0f;
+                        float val2 = (next_x >= 0) ? image[(y * width + next_x) * channels + c] : -1.0f;
+
+                        if (val1 >= 0.0f && val2 >= 0.0f) {
+                            image[(y * width + x) * channels + c] = 0.5f * (val1 + val2);
+                        } else if (val1 >= 0.0f) {
+                            image[(y * width + x) * channels + c] = val1;
+                        } else if (val2 >= 0.0f) {
+                            image[(y * width + x) * channels + c] = val2;
                         }
                     }
                 }
+
+                free(p_vals);
+                free(abs_res);
+                free(is_bad);
             }
             free(col_meds);
         }
