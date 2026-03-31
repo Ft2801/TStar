@@ -171,13 +171,13 @@ private:
     // Helper: fill a single triangle from distance matrix (port of set_triangle)
     void setTriangle(MatchTriangle& tri, const std::vector<MatchStar>& stars,
                      int s1, int s2, int s3,
-                     const std::vector<std::vector<double>>& distMatrix);
+                     const double* distMatrix, int numStars);
 
     // === Vote Matrix (make_vote_matrix) ===
-    std::vector<std::vector<int>> computeVotes(const std::vector<MatchTriangle>& triA,
-                                               const std::vector<MatchTriangle>& triB,
-                                               int numStarsA, int numStarsB,
-                                               double minScale, double maxScale);
+    std::vector<int> computeVotes(const std::vector<MatchTriangle>& triA,
+                                  const std::vector<MatchTriangle>& triB,
+                                  int numStarsA, int numStarsB,
+                                  double minScale, double maxScale);
 
     // === calc_trans_linear — Gauss elimination ===
     bool calcTransLinear(int nbright,
@@ -193,8 +193,8 @@ private:
 
     // === Gauss elimination solver ===
     // Solves in-place: matrix * x = vector, result stored in vector
-    static bool gaussSolve(std::vector<std::vector<double>>& matrix, int n,
-                           std::vector<double>& vector);
+    // matrix must be n*n flat array
+    static bool gaussSolve(double* matrix, int n, double* vector);
 };
 
 #endif // TRIANGLEMATCHER_H

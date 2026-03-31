@@ -254,13 +254,40 @@ void ImageViewer::setAspectRatio(float ratio) {
     // Auto-update existing crop if valid
     if (m_cropMode && m_cropItem->isVisible() && m_cropItem->rect().width() > 0 && ratio > 0.0f) {
         QRectF r = m_cropItem->rect();
-        float w = r.width(); // Preserve Width
-        float h = w / ratio;
+        float w = r.width(); 
+        float h = r.height();
+        
+        if (w / h > ratio) {
+            // too wide, adjust width
+            w = h * ratio;
+        } else {
+            // too tall, adjust height
+            h = w / ratio;
+        }
         
         QPointF c = r.center();
         QRectF newRect(0, 0, w, h);
         newRect.moveCenter(c);
         
+        // Clamp to image bounds (conservative check for unrotated rect)
+        if (m_imageItem) {
+            QRectF imgRect = m_imageItem->boundingRect();
+            if (newRect.width() > imgRect.width()) {
+                newRect.setWidth(imgRect.width());
+                newRect.setHeight(imgRect.width() / ratio);
+            }
+            if (newRect.height() > imgRect.height()) {
+                newRect.setHeight(imgRect.height());
+                newRect.setWidth(imgRect.height() * ratio);
+            }
+            // Re-center and clamp position
+            newRect.moveCenter(c);
+            if (newRect.left() < imgRect.left()) newRect.moveLeft(imgRect.left());
+            if (newRect.right() > imgRect.right()) newRect.moveRight(imgRect.right());
+            if (newRect.top() < imgRect.top()) newRect.moveTop(imgRect.top());
+            if (newRect.bottom() > imgRect.bottom()) newRect.moveBottom(imgRect.bottom());
+        }
+
         m_cropItem->setRect(newRect);
         m_cropItem->setTransformOriginPoint(newRect.center()); 
     }

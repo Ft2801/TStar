@@ -138,6 +138,7 @@ bool PreprocessingEngine::preprocessImage(const ImageBuffer& input, ImageBuffer&
     }
     
     // 1. Bias subtraction
+    if (isCancelled()) return false;
     if (m_params.useBias && m_masters.isLoaded(MasterType::Bias)) {
         if (!subtractBias(output)) {
             emit logMessage(tr("Bias subtraction failed"), "salmon");
@@ -145,6 +146,7 @@ bool PreprocessingEngine::preprocessImage(const ImageBuffer& input, ImageBuffer&
     }
     
     // 2. Dark subtraction (with optional optimization)
+    if (isCancelled()) return false;
     double darkK = 1.0;
     if (m_params.useDark && m_masters.isLoaded(MasterType::Dark)) {
         if (!subtractDark(output, darkK)) {
@@ -153,6 +155,7 @@ bool PreprocessingEngine::preprocessImage(const ImageBuffer& input, ImageBuffer&
     }
     
     // 3. Flat field correction
+    if (isCancelled()) return false;
     if (m_params.useFlat && m_masters.isLoaded(MasterType::Flat)) {
         const ImageBuffer* flat = m_masters.get(MasterType::Flat);
         // Use cached normalization

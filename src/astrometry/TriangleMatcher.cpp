@@ -41,8 +41,7 @@ static bool compareStarsMag(const MatchStar& a, const MatchStar& b) {
 // gaussSolve — Gaussian elimination with partial pivoting
 // Solves in-place: matrix[n][n] * x = vector[n], result -> vector
 // ============================================================================
-bool TriangleMatcher::gaussSolve(std::vector<std::vector<double>>& matrix, int n,
-                                  std::vector<double>& vector)
+bool TriangleMatcher::gaussSolve(double* matrix, int n, double* vector)
 {
     // Forward elimination with partial pivoting
     for (int i = 0; i < n; i++) {
@@ -50,41 +49,46 @@ bool TriangleMatcher::gaussSolve(std::vector<std::vector<double>>& matrix, int n
         double biggest = -1.0;
         int pivot_row = -1;
         for (int j = i; j < n; j++) {
-            if (std::abs(matrix[j][i]) > biggest) {
-                biggest = std::abs(matrix[j][i]);
+            double val = std::abs(matrix[j * n + i]);
+            if (val > biggest) {
+                biggest = val;
                 pivot_row = j;
             }
         }
-        if (biggest < GAUSS_MATRIX_TOL) {
-            return false; // Singular or near-singular
+        if (biggest < GAUSS_MATRIX_TOL || !std::isfinite(biggest)) {
+            return false; // Singular, near-singular, or NaN/Inf
         }
         // Swap rows if needed
         if (pivot_row != i) {
-            std::swap(matrix[i], matrix[pivot_row]);
+            for (int k = i; k < n; k++) {
+                std::swap(matrix[i * n + k], matrix[pivot_row * n + k]);
+            }
             std::swap(vector[i], vector[pivot_row]);
         }
         // Eliminate below
         for (int j = i + 1; j < n; j++) {
-            double factor = matrix[j][i] / matrix[i][i];
+            double factor = matrix[j * n + i] / matrix[i * n + i];
+            if (!std::isfinite(factor)) return false;
             for (int k = i + 1; k < n; k++) {
-                matrix[j][k] -= factor * matrix[i][k];
+                matrix[j * n + k] -= factor * matrix[i * n + k];
             }
             vector[j] -= factor * vector[i];
-            matrix[j][i] = 0.0;
+            matrix[j * n + i] = 0.0;
         }
     }
     // Back substitution
     for (int i = n - 1; i >= 0; i--) {
-        if (std::abs(matrix[i][i]) < GAUSS_MATRIX_TOL) {
+        double diag = matrix[i * n + i];
+        if (std::abs(diag) < GAUSS_MATRIX_TOL || !std::isfinite(diag)) {
             return false;
         }
         double sum = vector[i];
         for (int j = i + 1; j < n; j++) {
-            sum -= matrix[i][j] * vector[j];
+            sum -= matrix[i * n + j] * vector[j];
         }
-        vector[i] = sum / matrix[i][i];
+        vector[i] = sum / diag;
 
-        if (std::isnan(vector[i]) || std::isinf(vector[i])) {
+        if (!std::isfinite(vector[i])) {
             return false;
         }
     }
@@ -106,11 +110,11 @@ void TriangleMatcher::calcTransCoords(double x, double y, const GenericTrans& tr
 // ============================================================================
 void TriangleMatcher::setTriangle(MatchTriangle& tri, const std::vector<MatchStar>& stars,
                                    int s1, int s2, int s3,
-                                   const std::vector<std::vector<double>>& distMatrix)
+                                   const double* distMatrix, int n)
 {
-    double d12 = distMatrix[s1][s2];
-    double d23 = distMatrix[s2][s3];
-    double d13 = distMatrix[s1][s3];
+    double d12 = distMatrix[s1 * n + s2];
+    double d23 = distMatrix[s2 * n + s3];
+    double d13 = distMatrix[s1 * n + s3];
 
     double a = 0.0, b = 0.0, c = 0.0;
 
@@ -171,14 +175,14 @@ std::vector<MatchTriangle> TriangleMatcher::generateTriangles(const std::vector<
     if (n < 3) return triangles;
 
     // Step 1: Compute distance matrix (port of calc_distances)
-    std::vector<std::vector<double>> distMatrix(n, std::vector<double>(n, 0.0));
+    std::vector<double> distMatrix(n * n, 0.0);
     for (int i = 0; i < n - 1; i++) {
         for (int j = i + 1; j < n; j++) {
             double dx = stars[i].x - stars[j].x;
             double dy = stars[i].y - stars[j].y;
             double dist = std::sqrt(dx * dx + dy * dy);
-            distMatrix[i][j] = dist;
-            distMatrix[j][i] = dist;
+            distMatrix[i * n + j] = dist;
+            distMatrix[j * n + i] = dist;
         }
     }
 
@@ -192,7 +196,7 @@ std::vector<MatchTriangle> TriangleMatcher::generateTriangles(const std::vector<
             for (int k = j + 1; k < n; k++) {
                 MatchTriangle t;
                 t.id = triId++;
-                setTriangle(t, stars, i, j, k, distMatrix);
+                setTriangle(t, stars, i, j, k, distMatrix.data(), n);
                 triangles.push_back(t);
             }
         }
@@ -215,13 +219,13 @@ std::vector<MatchTriangle> TriangleMatcher::generateTriangles(const std::vector<
 // ============================================================================
 // computeVotes
 // ============================================================================
-std::vector<std::vector<int>> TriangleMatcher::computeVotes(
+std::vector<int> TriangleMatcher::computeVotes(
     const std::vector<MatchTriangle>& triA,
     const std::vector<MatchTriangle>& triB,
     int numStarsA, int numStarsB,
     double minScale, double maxScale)
 {
-    std::vector<std::vector<int>> votes(numStarsA, std::vector<int>(numStarsB, 0));
+    std::vector<int> votes(numStarsA * numStarsB, 0);
 
     double rad2 = m_triangleRadius * m_triangleRadius;
     bool useScaleFilter = (minScale > 0 && maxScale > 0);
@@ -258,23 +262,17 @@ std::vector<std::vector<int>> TriangleMatcher::computeVotes(
             // Vote for each vertex pair — with refined bounds checks 
             if (it->a_index >= 0 && it->a_index < numStarsA &&
                 tb.a_index >= 0 && tb.a_index < numStarsB) {
-                if (it->a_index < (int)votes.size() && tb.a_index < (int)votes[it->a_index].size()) {
-                    votes[it->a_index][tb.a_index]++;
-                }
+                votes[it->a_index * numStarsB + tb.a_index]++;
             }
 
             if (it->b_index >= 0 && it->b_index < numStarsA &&
                 tb.b_index >= 0 && tb.b_index < numStarsB) {
-                if (it->b_index < (int)votes.size() && tb.b_index < (int)votes[it->b_index].size()) {
-                    votes[it->b_index][tb.b_index]++;
-                }
+                votes[it->b_index * numStarsB + tb.b_index]++;
             }
 
             if (it->c_index >= 0 && it->c_index < numStarsA &&
                 tb.c_index >= 0 && tb.c_index < numStarsB) {
-                if (it->c_index < (int)votes.size() && tb.c_index < (int)votes[it->c_index].size()) {
-                    votes[it->c_index][tb.c_index]++;
-                }
+                votes[it->c_index * numStarsB + tb.c_index]++;
             }
         }
     }
@@ -332,21 +330,21 @@ bool TriangleMatcher::calcTransLinear(int nbright,
     }
 
     // Solve for x' coefficients
-    std::vector<std::vector<double>> matX = {
-        {sum1, sumx, sumy},
-        {sumx, sumx2, sumxy},
-        {sumy, sumxy, sumy2}
+    double matX[9] = {
+        sum1, sumx, sumy,
+        sumx, sumx2, sumxy,
+        sumy, sumxy, sumy2
     };
-    std::vector<double> vecX = {sumxp, sumxpx, sumxpy};
+    double vecX[3] = {sumxp, sumxpx, sumxpy};
     if (!gaussSolve(matX, 3, vecX)) return false;
 
     // Solve for y' coefficients
-    std::vector<std::vector<double>> matY = {
-        {sum1, sumx, sumy},
-        {sumx, sumx2, sumxy},
-        {sumy, sumxy, sumy2}
+    double matY[9] = {
+        sum1, sumx, sumy,
+        sumx, sumx2, sumxy,
+        sumy, sumxy, sumy2
     };
-    std::vector<double> vecY = {sumyp, sumypx, sumypy};
+    double vecY[3] = {sumyp, sumypx, sumypy};
     if (!gaussSolve(matY, 3, vecY)) return false;
 
     trans.x00 = vecX[0];
@@ -435,6 +433,9 @@ bool TriangleMatcher::iterTrans(int nbright,
                 i--;
             }
         }
+        winnerIndexA.resize(nr);
+        winnerIndexB.resize(nr);
+        dist2.resize(nr);
 
         // Step 2: Compute sigma at percentile (port of find_percentile)
         double sigma;
@@ -469,6 +470,9 @@ bool TriangleMatcher::iterTrans(int nbright,
                 i--;
             }
         }
+        winnerIndexA.resize(nr);
+        winnerIndexB.resize(nr);
+        dist2.resize(nr);
 
         // Check if no removals (all remaining are good)
         if (nb == 0) {
@@ -658,8 +662,9 @@ bool TriangleMatcher::solve(const std::vector<MatchStar>& imgStars,
 
         for (int i = 0; i < nA; i++) {
             for (int j = 0; j < nB; j++) {
-                if (votes[i][j] > max_vote) {
-                    max_vote = votes[i][j];
+                int voteCount = votes[i * nB + j];
+                if (voteCount > max_vote) {
+                    max_vote = voteCount;
                     max_i = i;
                     max_j = j;
                 }
@@ -674,13 +679,11 @@ bool TriangleMatcher::solve(const std::vector<MatchStar>& imgStars,
         winnerIndexB[k] = max_j;
 
         // Zero out row and column (star already used)
-        if (max_i >= 0 && max_i < (int)votes.size()) {
-            for (int j = 0; j < (int)votes[max_i].size(); j++) votes[max_i][j] = 0;
+        if (max_i >= 0 && max_i < nA) {
+            for (int j = 0; j < nB; j++) votes[max_i * nB + j] = 0;
         }
-        if (max_j >= 0) {
-            for (int i = 0; i < (int)votes.size(); i++) {
-                if (max_j < (int)votes[i].size()) votes[i][max_j] = 0;
-            }
+        if (max_j >= 0 && max_j < nB) {
+            for (int i = 0; i < nA; i++) votes[i * nB + max_j] = 0;
         }
     }
 

@@ -44,7 +44,7 @@ register pp_light -drizzle
 
 # Stack with Drizzle
 # Note: TStar's 'stack' command with -drizzle performs the drizzle integration
-stack pp_light -drizzle -scale=1.0 -pixfrac=1.0 -method=mean -rej=winsorized 3 3 -norm=addscale -output_norm -rgb_equal -32b -out=result
+stack r_pp_light -drizzle -scale=1.0 -pixfrac=1.0 -method=mean -rej=winsorized 3 3 -norm=addscale -output_norm -rgb_equal -32b -out=result
 
 # Finalize
 

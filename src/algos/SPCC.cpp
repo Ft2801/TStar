@@ -1122,6 +1122,7 @@ SPCCResult SPCC::calibrateWithStarList(const ImageBuffer& buf,
     // ─────────────────────────────────────────────────────────────────────────
     // 2. Build system throughput for R, G, B
     // ─────────────────────────────────────────────────────────────────────────
+    if (params.cancelFlag && params.cancelFlag->load()) { result.error_msg = "Cancelled"; return result; }
     progress(5, "Building system throughput curves...");
 
     double T_sys_R[WL_GRID_LEN], T_sys_G[WL_GRID_LEN], T_sys_B[WL_GRID_LEN];
@@ -1159,6 +1160,7 @@ SPCCResult SPCC::calibrateWithStarList(const ImageBuffer& buf,
     // ─────────────────────────────────────────────────────────────────────────
     // 4. Pre-compute Pickles template integrals for all unique spectral types
     // ─────────────────────────────────────────────────────────────────────────
+    if (params.cancelFlag && params.cancelFlag->load()) { result.error_msg = "Cancelled"; return result; }
     progress(10, "Pre-computing Pickles SED integrals...");
 
     const QStringList allSEDNames = availableSEDs(store);
@@ -1228,6 +1230,7 @@ SPCCResult SPCC::calibrateWithStarList(const ImageBuffer& buf,
     // ─────────────────────────────────────────────────────────────────────────
     // 6. Main matching loop: aperture photometry + ratio accumulation
     // ─────────────────────────────────────────────────────────────────────────
+    if (params.cancelFlag && params.cancelFlag->load()) { result.error_msg = "Cancelled"; return result; }
     progress(20, "Performing aperture photometry on matched stars...");
 
     std::vector<double> meas_RG, meas_BG, exp_RG, exp_BG;
@@ -1240,7 +1243,10 @@ SPCCResult SPCC::calibrateWithStarList(const ImageBuffer& buf,
     double minExpBG = 1e9, maxExpBG = -1e9;
 
     for (const StarRecord& sr : starRecords) {
+        if (params.cancelFlag && params.cancelFlag->load()) { result.error_msg = "Cancelled"; return result; }
+        
         // Determine aperture geometry mirroring Python:
+
         //   r  = clip(2.5 * a, 2.0, 12.0)
         //   rin  = clip(3.0 * r, 6.0, 40.0)
         //   rout = clip(5.0 * r, rin + 2.0, 60.0)
@@ -1395,6 +1401,7 @@ SPCCResult SPCC::calibrateWithStarList(const ImageBuffer& buf,
     // ─────────────────────────────────────────────────────────────────────────
     // 8. Apply colour model to the image
     // ─────────────────────────────────────────────────────────────────────────
+    if (params.cancelFlag && params.cancelFlag->load()) { result.error_msg = "Cancelled"; return result; }
     progress(75, "Applying colour calibration...");
 
     // Compute pivot values (median of each channel over the whole image)

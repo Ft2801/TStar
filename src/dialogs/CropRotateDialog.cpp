@@ -138,9 +138,8 @@ void CropRotateDialog::onApply() {
     
     // Clear stale catalog stars — pixel coords are invalid after crop
     {
-        ImageBuffer::Metadata meta = m_viewer->getBuffer().metadata();
-        meta.catalogStars.clear();
-        m_viewer->getBuffer().setMetadata(meta);
+        // Actually, CatalogStars store RA/Dec, so they are not tied directly to pixels.
+        // We do not clear them. But if we must update them, we'd do it here.
     }
     
     m_viewer->refreshDisplay(false); // Resets display mapping if needed
@@ -209,11 +208,6 @@ void CropRotateDialog::onBatchApply() {
         if (ImageViewer* v = csw->viewer()) {
             v->pushUndo(tr("Crop"));
             v->getBuffer().cropRotated(cx, cy, w, h, angle);
-            
-            // Clear stale catalog stars — pixel coords are invalid after crop
-            ImageBuffer::Metadata meta = v->getBuffer().metadata();
-            meta.catalogStars.clear();
-            v->getBuffer().setMetadata(meta);
             
             v->refreshDisplay(false);
             v->fitToWindow();

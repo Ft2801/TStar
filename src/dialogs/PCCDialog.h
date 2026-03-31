@@ -29,12 +29,15 @@ private slots:
     void onCatalogReady(const std::vector<CatalogStar>& stars);
     void onCatalogError(const QString& err);
     void onCalibrationFinished();
+    void onCancel();
 
 private:
     QPointer<ImageViewer> m_viewer;
     QLabel* m_status;
-    QCheckBox* m_chkNeutralizeBackground;
+    QCheckBox*    m_chkNeutralizeBackground;
     QPushButton* m_btnRun;
+    QPushButton* m_btnCancel;
+    std::atomic<bool> m_cancelFlag{false};
     
     CatalogClient* m_catalog;
     PCCCalibrator* m_calibrator;

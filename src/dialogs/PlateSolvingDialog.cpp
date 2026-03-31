@@ -240,7 +240,8 @@ void PlateSolvingDialog::onCancel() {
     if (engine == "astap") {
         m_astapSolver->cancelSolve();
     } else {
-        m_log->append(tr("Native solver cancel not supported."));
+        m_solver->cancelSolve();
+        m_log->append(tr("Native solver cancel requested."));
     }
     m_cancelBtn->setEnabled(false);
     m_solveBtn->setEnabled(true);

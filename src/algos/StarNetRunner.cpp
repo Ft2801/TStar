@@ -430,9 +430,21 @@ void StarNetWorker::process(const ImageBuffer& input, const StarNetParams& param
     });
 
     conv.start(pythonExe, convArgs);
-    if (!conv.waitForFinished(60000)) {
-        emit finished(output, "Output conversion timed out.\n\nLog:\n" + convLog.trimmed().right(1000));
-        return;
+    
+    elapsed = 0;
+    while (!conv.waitForFinished(interval)) {
+        if (m_stop) {
+            conv.kill();
+            conv.waitForFinished(3000);
+            emit finished(output, "Conversion cancelled by user.");
+            return;
+        }
+        elapsed += interval;
+        if (elapsed > 120000) { // 2 min timeout for conversion
+            conv.kill();
+            emit finished(output, "Conversion timed out.");
+            return;
+        }
     }
     
     if (conv.exitCode() != 0) {

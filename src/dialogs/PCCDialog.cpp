@@ -29,10 +29,15 @@ PCCDialog::PCCDialog(ImageViewer* viewer, QWidget* parent) : DialogBase(parent, 
     m_chkNeutralizeBackground->setChecked(true);
     lay->addWidget(m_chkNeutralizeBackground);
 
-    // Button
+    // Buttons
+    QHBoxLayout* btnLay = new QHBoxLayout();
+    m_btnCancel = new QPushButton(tr("Cancel"), this);
+    m_btnCancel->setEnabled(false);
     m_btnRun = new QPushButton(tr("Run PCC"), this);
     m_btnRun->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    lay->addWidget(m_btnRun);
+    btnLay->addWidget(m_btnCancel);
+    btnLay->addWidget(m_btnRun);
+    lay->addLayout(btnLay);
     
     if (m_viewer && m_viewer->getBuffer().isValid()) {
         const ImageBuffer::Metadata& meta = m_viewer->getBuffer().metadata();
@@ -52,6 +57,7 @@ PCCDialog::PCCDialog(ImageViewer* viewer, QWidget* parent) : DialogBase(parent, 
     }
     
     connect(m_btnRun, &QPushButton::clicked, this, &PCCDialog::onRun);
+    connect(m_btnCancel, &QPushButton::clicked, this, &PCCDialog::onCancel);
     
     m_catalog = new CatalogClient(this);
     connect(m_catalog, &CatalogClient::catalogReady, this, &PCCDialog::onCatalogReady);
@@ -110,6 +116,8 @@ void PCCDialog::onRun() {
     
     m_status->setText(tr("Downloading Gaia DR3 Catalog..."));
     m_btnRun->setEnabled(false);
+    m_btnCancel->setEnabled(true);
+    m_cancelFlag.store(false);
     m_catalog->queryGaiaDR3(ra, dec, 1.0);
 }
 
@@ -133,7 +141,8 @@ void PCCDialog::onCatalogReady(const std::vector<CatalogStar>& stars) {
     ImageBuffer scopy = m_viewer->getBuffer();
     
     // Run Heavy Lifting in Background
-    QFuture<PCCResult> future = QtConcurrent::run([scopy, stars]() {
+    std::atomic<bool>* flagPtr = &m_cancelFlag;
+    QFuture<PCCResult> future = QtConcurrent::run([scopy, stars, flagPtr]() {
         // 1. Background Neutralization Stats (Standard defaults: -2.8 sigma, +2.0 sigma)
         float bg_r = scopy.getRobustMedian(0, -2.8f, +2.0f);
         float bg_g = scopy.getRobustMedian(1, -2.8f, +2.0f);
@@ -151,6 +160,7 @@ void PCCDialog::onCatalogReady(const std::vector<CatalogStar>& stars) {
         // 3. Calibrate using aperture photometry (Standard algorithm)
         ImageBuffer::Metadata meta = scopy.metadata();
         PCCCalibrator calibrator;
+        calibrator.setCancelFlag(flagPtr);
         calibrator.setWCS(meta.ra, meta.dec, meta.crpix1, meta.crpix2, 
                              meta.cd1_1, meta.cd1_2, meta.cd2_1, meta.cd2_2);
         
@@ -187,6 +197,7 @@ void PCCDialog::onCalibrationFinished() {
     m_viewer->getBuffer().setMetadata(meta);
 
     m_btnRun->setEnabled(true);
+    m_btnCancel->setEnabled(false);
     
     MainWindowCallbacks* mw = getCallbacks();
     if (mw) mw->endLongProcess();
@@ -243,5 +254,15 @@ void PCCDialog::onCalibrationFinished() {
 void PCCDialog::onCatalogError(const QString& err) {
     m_status->setText(tr("Catalog Error: %1").arg(err));
     m_btnRun->setEnabled(true);
+    m_btnCancel->setEnabled(false);
+}
+
+void PCCDialog::onCancel() {
+    m_cancelFlag.store(true);
+    m_status->setText(tr("Cancelling..."));
+    if (m_catalog) {
+        // If query is running, unfortunately CatalogClient doesn't have cancel()
+        // but it will call errorOccurred or catalogReady which we handle.
+    }
 }
 // onShowGraphs Removed

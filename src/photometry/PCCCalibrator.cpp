@@ -429,6 +429,8 @@ PCCResult PCCCalibrator::calibrateWithAperture(const ImageBuffer& image,
     std::vector<double> CatBG, ImgBG;
 
     for (const auto& cat : catalogStars) {
+        if (m_cancelFlag && m_cancelFlag->load()) return {false, 1.0, 1.0, 1.0};
+        
         // Convert catalog RA,Dec to pixel coordinates
         double px, py;
         worldToPixel(cat.ra, cat.dec, px, py);

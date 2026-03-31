@@ -31,6 +31,7 @@
 #include "io/FitsLoader.h"
 #include <opencv2/opencv.hpp>
 #include "photometry/StarDetector.h"
+#include "astrometry/WCSUtils.h"
 
 ImageBuffer::ImageBuffer() : m_mutex(std::make_unique<QReadWriteLock>(QReadWriteLock::Recursive)) {}
 
@@ -66,6 +67,8 @@ ImageBuffer::ImageBuffer(const ImageBuffer& other)
 // Custom copy assignment to handle non-copyable mutex
 ImageBuffer& ImageBuffer::operator=(const ImageBuffer& other) {
     if (this != &other) {
+        ReadLock otherLock(&other); // Thread-safe access to source
+        
         // If this buffer was previously swapped, clean up its swap file before overwriting.
         if (m_isSwapped && !m_swapFile.isEmpty()) {
             QFile::remove(m_swapFile);
@@ -85,11 +88,7 @@ ImageBuffer& ImageBuffer::operator=(const ImageBuffer& other) {
         // Keep existing mutex or create new one
         if (!m_mutex) m_mutex = std::make_unique<QReadWriteLock>(QReadWriteLock::Recursive);
 
-        // If the source is currently swapped out, force a swap-in so we get the real data.
-        if (other.m_isSwapped) {
-            const_cast<ImageBuffer&>(other).forceSwapIn();
-        }
-        m_data = other.m_data;
+        m_data = other.data(); // This internal call handles swap-in via ReadLock logic above
     }
     return *this;
 }
@@ -2715,6 +2714,34 @@ void ImageBuffer::reframeWCS(const QTransform& trans, [[maybe_unused]] int oldWi
     syncWcsToHeaders();
 }
 
+void ImageBuffer::filterCatalogStars() {
+    ReadLock lock(this);
+    filterCatalogStarsInternal();
+}
+
+void ImageBuffer::filterCatalogStarsInternal() {
+    // No locking here - assumed to be called within a locked context
+    if (m_meta.catalogStars.empty()) return;
+    
+    // Check WCS existence before worldToPixel loop
+    bool hasWcs = (m_meta.ra != 0 || m_meta.dec != 0 || !m_meta.ctype1.isEmpty());
+    if (!hasWcs) return;
+
+    std::vector<CatalogStar> filtered;
+    filtered.reserve(m_meta.catalogStars.size());
+
+    for (const auto& star : m_meta.catalogStars) {
+        double px, py;
+        if (WCSUtils::worldToPixel(m_meta, star.ra, star.dec, px, py)) {
+            // Check if within bounds of the CURRENT buffer
+            if (px >= 0 && px < m_width && py >= 0 && py < m_height) {
+                filtered.push_back(star);
+            }
+        }
+    }
+    m_meta.catalogStars = std::move(filtered);
+}
+
 // Geometric Ops
 void ImageBuffer::crop(int x, int y, int w, int h) {
     WriteLock lock(this);  // Thread-safe write access
@@ -2763,6 +2790,9 @@ void ImageBuffer::crop(int x, int y, int w, int h) {
         m_mask.width = w;
         m_mask.height = h;
     }
+
+    // Prune catalog stars that are now off-screen
+    filterCatalogStarsInternal();
 }
 
 void ImageBuffer::rotate(float angleDegrees) {
@@ -3102,6 +3132,9 @@ void ImageBuffer::cropRotated(float cx, float cy, float w, float h, float angleD
         m_mask.width = maskBuf.width();
         m_mask.height = maskBuf.height();
     }
+
+    // Prune catalog stars that are now off-screen
+    filterCatalogStarsInternal();
 }
 
 float ImageBuffer::getPixelValue(int x, int y, int c) const {

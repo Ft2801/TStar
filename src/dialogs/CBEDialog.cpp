@@ -70,6 +70,10 @@ CBEDialog::CBEDialog(QWidget* pParent, ImageViewer* viewer, const ImageBuffer& b
     btnLayout->addWidget(btnClearCache);
     btnLayout->addStretch();
 
+    m_btnCancel = new QPushButton(tr("Cancel"), this);
+    m_btnCancel->setEnabled(false);
+    btnLayout->addWidget(m_btnCancel);
+
     QPushButton* btnClose = new QPushButton(tr("Close"), this);
     btnLayout->addWidget(btnClose);
 
@@ -81,6 +85,7 @@ CBEDialog::CBEDialog(QWidget* pParent, ImageViewer* viewer, const ImageBuffer& b
 
     // Connections
     connect(m_btnApply, &QPushButton::clicked, this, &CBEDialog::onApply);
+    connect(m_btnCancel, &QPushButton::clicked, this, &CBEDialog::onCancel);
     connect(btnClose, &QPushButton::clicked, this, &QDialog::close);
 
     connect(btnClearCache, &QPushButton::clicked, this, [this]() {
@@ -126,6 +131,8 @@ void CBEDialog::onApply() {
     }
 
     m_btnApply->setEnabled(false);
+    m_btnCancel->setEnabled(true);
+    m_cancelFlag.store(false);
     setCursor(Qt::WaitCursor);
 
     if (auto cb = getCallbacks()) {
@@ -315,8 +322,15 @@ void CBEDialog::onHiPSImageReady(const ImageBuffer& refImg) {
     m_busyDialog->setLabelText(tr("Running CBE..."));
     m_busyDialog->show();
 
-    auto future = QtConcurrent::run([target, ref, opts]() mutable -> QPair<bool, ImageBuffer> {
-        bool ok = Background::CatalogGradientExtractor::extract(target, ref, opts);
+    std::atomic<bool>* flagPtr = &m_cancelFlag;
+    auto progress = [this](int pct) {
+        QMetaObject::invokeMethod(this, [this, pct]() {
+            if (m_busyDialog) m_busyDialog->setValue(pct);
+        }, Qt::QueuedConnection);
+    };
+
+    auto future = QtConcurrent::run([target, ref, opts, flagPtr, progress]() mutable -> QPair<bool, ImageBuffer> {
+        bool ok = Background::CatalogGradientExtractor::extract(target, ref, opts, progress, flagPtr);
         return qMakePair(ok, target);
     });
 
@@ -338,6 +352,7 @@ void CBEDialog::onHiPSImageReady(const ImageBuffer& refImg) {
         }
 
         m_btnApply->setEnabled(true);
+        m_btnCancel->setEnabled(false);
         unsetCursor();
         if (m_busyDialog) m_busyDialog->hide();
     });
@@ -351,6 +366,13 @@ void CBEDialog::onHiPSError(const QString& err) {
     }
     QMessageBox::critical(this, tr("HiPS Error"), err);
     m_btnApply->setEnabled(true);
+    m_btnCancel->setEnabled(false);
     unsetCursor();
     if (m_busyDialog) m_busyDialog->hide();
+}
+
+void CBEDialog::onCancel() {
+    m_cancelFlag.store(true);
+    if (m_hipsClient) m_hipsClient->cancel();
+    if (m_busyDialog) m_busyDialog->setLabelText(tr("Cancelling..."));
 }

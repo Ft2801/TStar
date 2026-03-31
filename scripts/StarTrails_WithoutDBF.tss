@@ -15,7 +15,7 @@ cd ../process
 calibrate light -cfa -equalize_cfa -debayer
 
 # Stack using MAX to create star trails
-stack pp_light max -output_norm -out=../result
+stack r_pp_light max -output_norm -out=../result
 
 cd ..
 close

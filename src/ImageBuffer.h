@@ -301,6 +301,9 @@ public:
     void setName(const QString& name) { m_name = name; }
     QString name() const { return m_name; }
 
+    // Metadata Pruning
+    void filterCatalogStars();
+
     bool isModified() const { return m_modified; }
     void setModified(bool modified) { m_modified = modified; }
 
@@ -444,6 +447,7 @@ public:
     };
 
 private:
+    void filterCatalogStarsInternal();
     static void rgbToHsv(float r, float g, float b, float& h, float& s, float& v);
     
     // Agile Autostretch (Display only)

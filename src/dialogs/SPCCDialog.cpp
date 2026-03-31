@@ -287,10 +287,13 @@ void SPCCDialog::buildUI() {
         m_runBtn->setFont(f);
     }
     m_resetBtn = new QPushButton(tr("Reset"));
+    m_cancelBtn = new QPushButton(tr("Cancel"));
+    m_cancelBtn->setEnabled(false);
     m_closeBtn = new QPushButton(tr("Close"));
     btnLayout->addWidget(m_closeBtn);
     btnLayout->addStretch();
     btnLayout->addWidget(m_resetBtn);
+    btnLayout->addWidget(m_cancelBtn);
     btnLayout->addWidget(m_runBtn);
     mainLayout->addLayout(btnLayout);
 
@@ -405,6 +408,7 @@ void SPCCDialog::connectSignals() {
     connect(m_closeBtn,      &QPushButton::clicked, this, &SPCCDialog::reject);
     connect(m_runBtn,        &QPushButton::clicked, this, &SPCCDialog::onRun);
     connect(m_resetBtn,      &QPushButton::clicked, this, &SPCCDialog::onReset);
+    connect(m_cancelBtn,     &QPushButton::clicked, this, &SPCCDialog::onCancel);
     connect(m_fetchStarsBtn, &QPushButton::clicked, this, &SPCCDialog::onFetchStars);
     connect(m_saspViewerBtn, &QPushButton::clicked, this, &SPCCDialog::onOpenSaspViewer);
 
@@ -736,6 +740,7 @@ void SPCCDialog::onRun() {
 // background thread.
 // ─────────────────────────────────────────────────────────────────────────────
 void SPCCDialog::startCalibration() {
+    m_cancelFlag.store(false);
     const ImageBuffer bufCopy = m_viewer->getBuffer();
     const SPCCParams  p       = collectParams();
     const std::vector<StarRecord> starsCopy = m_starList;
@@ -768,6 +773,7 @@ SPCCParams SPCCDialog::collectParams() const {
     p.linearMode   = m_linearModeCheck->isChecked();
     p.runGradient  = m_runGradientCheck->isChecked();
     p.gradientMethod = m_gradMethodCombo->currentText();
+    p.cancelFlag = const_cast<std::atomic<bool>*>(&m_cancelFlag);
 
     // Progress callback: marshal updates to the UI thread via QMetaObject.
     // The lambda captures 'this' by pointer; SPCCDialog outlives the worker
@@ -877,6 +883,17 @@ void SPCCDialog::onReset() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// onCancel
+// ─────────────────────────────────────────────────────────────────────────────
+void SPCCDialog::onCancel() {
+    m_cancelFlag.store(true);
+    m_statusLabel->setText(tr("Cancelling..."));
+    if (m_fetchWatcher && m_fetchWatcher->isRunning()) {
+        m_fetchWatcher->cancel();
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // onOpenSaspViewer
 // ─────────────────────────────────────────────────────────────────────────────
 void SPCCDialog::onOpenSaspViewer() {
@@ -941,4 +958,5 @@ void SPCCDialog::setControlsEnabled(bool en) {
     m_gradMethodCombo->setEnabled(en);
     m_fullMatrixCheck->setEnabled(en);
     m_runGradientCheck->setEnabled(en);
+    if (m_cancelBtn) m_cancelBtn->setEnabled(!en);
 }

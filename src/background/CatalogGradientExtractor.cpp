@@ -125,11 +125,14 @@ static cv::Mat extractChannel(const cv::Mat& mat, int ch) {
 bool CatalogGradientExtractor::extract(ImageBuffer& target,
                                        const ImageBuffer& reference,
                                        const Options& opts,
-                                       std::function<void(int)> /*progress*/,
-                                       const bool* /*cancelFlag*/)
+                                       std::function<void(int)> progress,
+                                       std::atomic<bool>* cancelFlag)
 {
-    ImageBuffer gradMap = computeGradientMap(target, reference, opts);
+    if (progress) progress(5);
+    ImageBuffer gradMap = computeGradientMap(target, reference, opts, cancelFlag);
     if (!gradMap.isValid()) return false;
+    if (cancelFlag && cancelFlag->load()) return false;
+    if (progress) progress(90);
 
     if (opts.outputGradientMap) {
         target = gradMap;
@@ -146,12 +149,14 @@ bool CatalogGradientExtractor::extract(ImageBuffer& target,
     for (size_t i = 0; i < n; ++i)
         tgtData[i] = tgtData[i] - gd[i];   // unclamped: preserves shadows & colour balance
 
+    if (progress) progress(100);
     return true;
 }
 
 ImageBuffer CatalogGradientExtractor::computeGradientMap(const ImageBuffer& target,
                                                           const ImageBuffer& reference,
-                                                          const Options& /*opts*/)
+                                                          const Options& /*opts*/,
+                                                          std::atomic<bool>* cancelFlag)
 {
     ImageBuffer result;
     const int W    = target.width();
@@ -185,6 +190,7 @@ ImageBuffer CatalogGradientExtractor::computeGradientMap(const ImageBuffer& targ
     gradChannels.reserve(tCh);
 
     for (int c = 0; c < tCh; ++c) {
+        if (cancelFlag && cancelFlag->load()) return {};
         cv::Mat tgtChan = extractChannel(tgtMat, c);  // CV_32FC1
 
         cv::Mat gradient;

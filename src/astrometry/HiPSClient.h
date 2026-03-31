@@ -31,6 +31,7 @@ public:
      */
     void fetchFITS(const QString& hips, double ra, double dec, double fov,
                    int width, int height, double rotationAngle = 0.0);
+    void cancel();
     void clearCache();
     static qint64 getCacheSize();
     static void setMaxCacheSize(qint64 bytes);

@@ -72,6 +72,7 @@ private slots:
     // ── Controls ──────────────────────────────────────────────────────────────
     void onReset();
     void onOpenSaspViewer();
+    void onCancel();
 
     // ── Settings persistence ──────────────────────────────────────────────────
     void saveWhiteRefSetting(int);
@@ -144,6 +145,7 @@ private:
     QPushButton*    m_fetchStarsBtn    = nullptr;   ///< Step 1
     QPushButton*    m_runBtn           = nullptr;   ///< Step 2
     QPushButton*    m_resetBtn         = nullptr;
+    QPushButton*    m_cancelBtn        = nullptr;
     QPushButton*    m_saspViewerBtn    = nullptr;
     QPushButton*    m_closeBtn         = nullptr;
 
@@ -165,6 +167,7 @@ private:
     QFutureWatcher<std::vector<StarRecord>>* m_fetchWatcher = nullptr;
     QFutureWatcher<SPCCResult>*              m_calibWatcher = nullptr;
     CatalogClient*                           m_catalog = nullptr;
+    std::atomic<bool>                        m_cancelFlag{false};
 
     // Data path (resolved at construction from MainWindow or application dir)
     QString         m_dataPath;

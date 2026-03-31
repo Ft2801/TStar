@@ -3,6 +3,7 @@
 
 #include "../ImageBuffer.h"
 #include <functional>
+#include <atomic>
 
 namespace Background {
 
@@ -29,14 +30,15 @@ public:
                         const ImageBuffer& reference,
                         const Options& opts,
                         std::function<void(int)> progress = nullptr,
-                        const bool* cancelFlag = nullptr);
+                        std::atomic<bool>* cancelFlag = nullptr);
 
     /**
      * @brief Computes the gradient map (target_low_freq - matched_reference_low_freq).
      */
     static ImageBuffer computeGradientMap(const ImageBuffer& target,
                                            const ImageBuffer& reference,
-                                           const Options& opts);
+                                           const Options& opts,
+                                           std::atomic<bool>* cancelFlag = nullptr);
 };
 
 } // namespace Background

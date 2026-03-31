@@ -37,7 +37,7 @@ cd ../process
 calibrate light -dark=../masters/dark_stacked -flat=../masters/pp_flat_stacked -cc=dark -cfa -equalize_cfa -debayer
 
 # Stack using MAX for star trails
-stack pp_light max -output_norm -out=../result
+stack r_pp_light max -output_norm -out=../result
 
 cd ..
 close

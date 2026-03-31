@@ -5,6 +5,7 @@
 #include "StarDetector.h"
 #include "CatalogClient.h"
 #include "../ImageBuffer.h"
+#include <atomic>
 
 #include "PCCResult.h"
 
@@ -26,6 +27,7 @@ public:
                         
     void setWCS(double crval1, double crval2, double crpix1, double crpix2, double cd1_1, double cd1_2, double cd2_1, double cd2_2);
     void setSIP(int a_order, int b_order, int ap_order, int bp_order, const std::map<std::string, double>& coeffs);
+    void setCancelFlag(std::atomic<bool>* flag) { m_cancelFlag = flag; }
 
 private:
     // WCS Data
@@ -45,6 +47,8 @@ private:
     
     void pixelToWorld(double x, double y, double& ra, double& dec);
     void worldToPixel(double ra, double dec, double& x, double& y);
+
+    std::atomic<bool>* m_cancelFlag = nullptr;
 };
 
 #endif // PCCCALIBRATOR_H

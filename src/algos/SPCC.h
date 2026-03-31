@@ -31,6 +31,7 @@
 #include <QString>
 #include <QStringList>
 #include <cstring>
+#include <atomic>
 #include "ImageBuffer.h"
 
 // Forward declarations
@@ -193,6 +194,9 @@ struct SPCCParams {
 
     // Progress reporting: callback(percent 0-100, message)
     std::function<void(int, const QString&)> progressCallback;
+    
+    // Cancellation flag
+    std::atomic<bool>* cancelFlag = nullptr;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

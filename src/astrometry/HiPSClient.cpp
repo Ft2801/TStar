@@ -78,6 +78,14 @@ void HiPSClient::fetchFITS(const QString& hips, double ra, double dec,
     connect(m_reply, &QNetworkReply::downloadProgress, this, &HiPSClient::downloadProgress);
 }
 
+void HiPSClient::cancel() {
+    if (m_reply) {
+        m_reply->abort();
+        // m_reply will be deleted in onReplyFinished or deleteLater
+        m_reply = nullptr;
+    }
+}
+
 void HiPSClient::onReplyFinished() {
     QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
     if (!reply) return;

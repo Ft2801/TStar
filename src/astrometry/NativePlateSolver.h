@@ -29,6 +29,7 @@ public:
     // radius: Search radius in degrees
     // pixelScale: arcsec/pixel (essential for scaling catalog)
     void solve(const ImageBuffer& image, double raHint, double decHint, double radiusDeg, double pixelScale);
+    void cancelSolve() { m_stop = true; }
 
 signals:
     void logMessage(const QString& msg);
@@ -99,6 +100,8 @@ private:
     static void updateStarPositions(std::vector<MatchStar>& matchedCatStars,
                                     int numMatched,
                                     const std::vector<MatchStar>& newProjectedCat);
+
+    std::atomic<bool> m_stop{false};
 };
 
 #endif // NATIVEPLATESOLVER_H

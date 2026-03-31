@@ -31,6 +31,7 @@ private slots:
     void onApply();
     void onHiPSImageReady(const ImageBuffer& refImg);
     void onHiPSError(const QString& err);
+    void onCancel();
 
 private:
     QPointer<ImageViewer> m_viewer;
@@ -42,6 +43,8 @@ private:
     QCheckBox*  m_checkProtectStars;
     QCheckBox*  m_checkGradientMap;
     QPushButton* m_btnApply;
+    QPushButton* m_btnCancel;
+    std::atomic<bool> m_cancelFlag{false};
 
     // State tracked across onApply() → onHiPSImageReady()
     int  m_targetWidth    = 0;   // full-resolution target width (pixels)

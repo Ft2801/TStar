@@ -32,6 +32,7 @@ void NativePlateSolver::solve(const ImageBuffer& image, double raHint, double de
         emit finished(res);
         return;
     }
+    m_stop = false;
 
     if (!std::isfinite(raHint) || !std::isfinite(decHint) || !std::isfinite(radiusDeg) || radiusDeg <= 0.0) {
         NativeSolveResult res;
@@ -436,6 +437,8 @@ int NativePlateSolver::matchCatalog(const std::vector<MatchStar>& imgStars, int 
     }
 
     for (int trial = 0; trial < MAX_CONVERGENCE_TRIALS && conv > CONV_TOLERANCE; trial++) {
+        if (m_stop) return -1;
+
 
         // 4a: Compute new projection center via apply_match at image center (0, 0)
         double newRA, newDec;
@@ -502,6 +505,11 @@ int NativePlateSolver::matchCatalog(const std::vector<MatchStar>& imgStars, int 
         transOut = newTrans;
         // Update numMatched to survivors after sigma clipping
         numMatched = std::min((int)transOut.nr, std::min((int)matchedImgStars.size(), (int)matchedCatStars.size()));
+        
+        if (numMatched <= 0) {
+            if (safeThis) emit logMessage(tr("Recalculation resulted in flat match set."));
+            break;
+        }
         conv = std::sqrt(transOut.x00 * transOut.x00 + transOut.y00 * transOut.y00);
 
         if (safeThis) {
@@ -574,8 +582,10 @@ void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars,
     QPointer<NativePlateSolver> safeThis(this);
     if (safeThis) emit logMessage(tr("Detecting Image Stars..."));
     StarDetector detector;
+    if (m_stop) return;
     detector.setMaxStars(500);
     std::vector<DetectedStar> detected = detector.detect(image);
+    if (m_stop) return;
     if (safeThis) emit logMessage(tr("Detected %1 stars in image.").arg(detected.size()));
 
     if (detected.size() < 5) {
@@ -682,8 +692,12 @@ void NativePlateSolver::onCatalogReceived(const std::vector<MatchStar>& catalogS
     // member logic from a worker thread, which can trigger hard-to-reproduce
     // access violations on some Windows runtimes.
     if (safeThis) {
-        emit logMessage(tr("Starting native solve pipeline..."));
-        safeThis->processSolving(catalogStars, imageSnapshot, rawCatalogStars, raHint, decHint, pixelScale);
+        emit logMessage(tr("Starting native solve pipeline in background..."));
+        (void)QtConcurrent::run([this, safeThis, catalogStars, imageSnapshot, rawCatalogStars, raHint, decHint, pixelScale](){
+            if (safeThis) {
+                this->processSolving(catalogStars, imageSnapshot, rawCatalogStars, raHint, decHint, pixelScale);
+            }
+        });
     }
 }
 

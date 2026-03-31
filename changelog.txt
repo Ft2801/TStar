@@ -1,6 +1,13 @@
 TStar Changelog
 ===============
 
+Version 1.8.5
+-------------
+- Improved WCS and catalog star handling during crop operations
+- Hardened native plate solver for increased mathematical robustness
+- Implemented cancellation support for missing processes
+- Fixed UI layout and boundary clamping issues in crop tools
+
 Version 1.8.4
 -------------
 - Added PGC catalog integration for the annotation tool
