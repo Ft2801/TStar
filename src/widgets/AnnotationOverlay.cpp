@@ -727,6 +727,7 @@ void AnnotationOverlay::renderToPainter(QPainter& painter, const QRectF& imageRe
     double pixScale = m_viewer->pixelScale();
     if (pixScale <= 0) pixScale = 1.0;
     
+    auto meta = m_viewer->getBuffer().metadata();
     if (m_wcsObjectsVisible) {
         // We draw WCS objects using the same logic but adapted for image pixels
         // (The user's previous manual edit had a loop here, I'll use it or a better one)
@@ -771,24 +772,31 @@ void AnnotationOverlay::renderToPainter(QPainter& painter, const QRectF& imageRe
                 }
             }
 
+            double minorRadiusImagePx = radiusImagePx;
+            if (obj.minorDiameter > 0 && pixScale > 0) {
+                minorRadiusImagePx = (obj.minorDiameter * 30.0) / pixScale;
+                QRectF markerRect(imagePos.x() - minorRadiusImagePx, imagePos.y() - minorRadiusImagePx, 
+                                  minorRadiusImagePx * 2, minorRadiusImagePx * 2);
+                if (imageRect.contains(markerRect.center()) && !imageRect.contains(markerRect)) {
+                    minorRadiusImagePx *= 0.9;
+                }
+            }
+
             // Draw Marker
             if (obj.longType != "ConstellationName") {
                 painter.setPen(QPen(color, 1.0 * scaleM));
                 if (radiusImagePx > 5.0 * scaleM) {
                     painter.setBrush(Qt::NoBrush);
                     if (obj.minorDiameter > 0) {
-                        double minorRadiusImagePx = radiusImagePx;
-                        if (pixScale > 0) {
-                            minorRadiusImagePx = (obj.minorDiameter * 30.0) / pixScale;
-                            QRectF markerRect(imagePos.x() - minorRadiusImagePx, imagePos.y() - minorRadiusImagePx, 
-                                              minorRadiusImagePx * 2, minorRadiusImagePx * 2);
-                            if (imageRect.contains(markerRect.center()) && !imageRect.contains(markerRect)) {
-                                minorRadiusImagePx *= 0.9;
-                            }
-                        }
+                        double imgPA = WCSUtils::positionAngle(meta);
+                        double totalPA = obj.anglePA - imgPA;
                         painter.save();
                         painter.translate(imagePos);
-                        painter.rotate(-obj.anglePA);
+                        if (WCSUtils::isParityFlipped(meta)) {
+                            painter.rotate(totalPA);
+                        } else {
+                            painter.rotate(-totalPA);
+                        }
                         painter.drawEllipse(QPointF(0, 0), minorRadiusImagePx, radiusImagePx);
                         painter.restore();
                     } else {
@@ -796,7 +804,7 @@ void AnnotationOverlay::renderToPainter(QPainter& painter, const QRectF& imageRe
                     }
                 } else {
                     double gap = (obj.longType=="Star") ? 3.0 * scaleM : 5.0 * scaleM;
-                    double len = (obj.longType=="Star") ? 7.0 * scaleM : 10.0 * scaleM;
+                    double len = (obj.longType=="Star") ? 6.0 * scaleM : 8.0 * scaleM; // Reduced for elegance
                     painter.drawLine(imagePos - QPointF(0, gap + len), imagePos - QPointF(0, gap));
                     painter.drawLine(imagePos + QPointF(0, gap), imagePos + QPointF(0, gap + len));
                     painter.drawLine(imagePos - QPointF(gap + len, 0), imagePos - QPointF(gap, 0));
@@ -817,22 +825,40 @@ void AnnotationOverlay::renderToPainter(QPainter& painter, const QRectF& imageRe
             } else labelText = obj.name;
 
             if (!labelText.isEmpty()) {
-                double offset = 15.0 * scaleM;
                 painter.setPen(QPen(color, 1.0 * scaleM));
                 if (radiusImagePx > 5.0 * scaleM) {
-                    double angle = -M_PI / 4.0;
-                    QPointF tp = imagePos + QPointF(radiusImagePx * 1.3 * std::cos(angle), radiusImagePx * 1.3 * std::sin(angle));
+                    double labelAngleRad = -M_PI / 4.0;
+                    double imgPA = WCSUtils::positionAngle(meta);
+                    double totalPA = obj.anglePA - imgPA;
+                    double rotRad = WCSUtils::isParityFlipped(meta) ? (totalPA * M_PI / 180.0) : (-totalPA * M_PI / 180.0);
+                    
+                    auto getEllipsePointImage = [&](double rx, double ry, double lAngleRad, double rot) {
+                        double localA = lAngleRad - rot;
+                        double x = rx * std::cos(localA);
+                        double y = ry * std::sin(localA);
+                        double rx_s = x * std::cos(rot) - y * std::sin(rot);
+                        double ry_s = x * std::sin(rot) + y * std::cos(rot);
+                        return imagePos + QPointF(rx_s, ry_s);
+                    };
+
+                    double rx = (obj.minorDiameter > 0) ? minorRadiusImagePx : radiusImagePx;
+                    double ry = radiusImagePx;
+
+                    QPointF circleEdge = getEllipsePointImage(rx, ry, labelAngleRad, rotRad);
+                    QPointF tp = getEllipsePointImage(rx * 1.15, ry * 1.15, labelAngleRad, rotRad);
+                    
                     if (tp.x() < 10 || tp.x() > imageRect.width() - 50 || tp.y() < 10 || tp.y() > imageRect.height() - 10) {
-                        angle += M_PI;
-                        tp = imagePos + QPointF(radiusImagePx * 1.3 * std::cos(angle), radiusImagePx * 1.3 * std::sin(angle));
+                        labelAngleRad += M_PI;
+                        circleEdge = getEllipsePointImage(rx, ry, labelAngleRad, rotRad);
+                        tp = getEllipsePointImage(rx * 1.15, ry * 1.15, labelAngleRad, rotRad);
                     }
                     if (obj.longType != "ConstellationName") {
-                         painter.drawLine(imagePos + QPointF(radiusImagePx * std::cos(angle), radiusImagePx * std::sin(angle)), tp);
+                         painter.drawLine(circleEdge, tp);
                     }
                     painter.drawText(tp + QPointF(2.0*scaleM, -2.0*scaleM), labelText);
                 } else {
                     QFontMetricsF ifm(painter.font());
-                    painter.drawText(imagePos + QPointF(offset, ifm.height()/2 - 2*scaleM), labelText);
+                    painter.drawText(imagePos + QPointF(10.0 * scaleM, ifm.height()/2 - 2*scaleM), labelText);
                 }
             }
         }

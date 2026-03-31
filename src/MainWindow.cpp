@@ -1430,47 +1430,9 @@ MainWindow::MainWindow(QWidget *parent)
     // Direct connection to dialog
     connect(settingsBtn, &QToolButton::clicked, this, &MainWindow::onSettingsAction);
     
+    // Settings button only
     mainToolbar->addWidget(settingsBtn);
     mainToolbar->addSeparator();
-
-    // Help Button (SVG icon, same style as Invert/FalseColor)
-    QToolButton* helpBtn = new QToolButton(this);
-    helpBtn->setIcon(makeIcon("images/help.svg"));
-    helpBtn->setToolTip(tr("Help"));
-    connect(helpBtn, &QToolButton::clicked, this, [this](){
-        HelpDialog dlg(this);
-        QRect mainGeom = this->geometry();
-        dlg.move(mainGeom.center() - QPoint(dlg.width() / 2, dlg.height() / 2));
-        dlg.exec();
-    });
-    mainToolbar->addWidget(helpBtn);
-    
-    // About button — info.svg icon
-    QToolButton* aboutBtn = new QToolButton(this);
-    aboutBtn->setIcon(makeIcon("images/info.svg"));
-    aboutBtn->setToolTip(tr("About TStar"));
-    connect(aboutBtn, &QToolButton::clicked, this, [this](){
-        AboutDialog dlg(this, TStar::getVersion(), __DATE__); // Only Date
-        
-        // Manual Centering
-        dlg.adjustSize();
-        QSize dlgSize = dlg.size();
-        QRect mainGeom = this->geometry();
-        QPoint center = mainGeom.center();
-        int x = center.x() - dlgSize.width() / 2;
-        int y = center.y() - dlgSize.height() / 2;
-        
-         // Screen bounds check
-        if (auto scr = this->screen()) {
-             QRect screenGeom = scr->availableGeometry();
-             if (x < screenGeom.left()) x = screenGeom.left();
-             if (y < screenGeom.top()) y = screenGeom.top();
-        }
-        
-        dlg.move(x, y);
-        dlg.exec();
-    });
-    mainToolbar->addWidget(aboutBtn);
 
     // === Auto-Updater ===
     QTimer::singleShot(2000, this, [this](){
@@ -4156,6 +4118,48 @@ void MainWindow::openPCCDistributionDialog() {
 
 void MainWindow::setupSidebarTools() {
     if (m_sidebar) {
+        auto makeIconLocal = [](const QString& source) -> QIcon {
+             QString path = source;
+             if (!source.startsWith(":") && !QDir::isAbsolutePath(source)) {
+                 path = QCoreApplication::applicationDirPath() + "/" + source;
+                 if (!QFile::exists(path)) {
+                     path = QCoreApplication::applicationDirPath() + "/../Resources/" + source;
+                 }
+             }
+             QIcon icon;
+             icon.addFile(path);
+             return icon;
+        };
+
+        m_sidebar->addBottomAction(makeIconLocal("images/help.svg"), tr("Help"), [this](){
+            HelpDialog dlg(this);
+            QRect mainGeom = this->geometry();
+            dlg.move(mainGeom.center() - QPoint(dlg.width() / 2, dlg.height() / 2));
+            dlg.exec();
+        });
+
+        m_sidebar->addBottomAction(makeIconLocal("images/info.svg"), tr("About TStar"), [this](){
+            AboutDialog dlg(this, TStar::getVersion(), __DATE__); // Only Date
+            
+            // Manual Centering
+            dlg.adjustSize();
+            QSize dlgSize = dlg.size();
+            QRect mainGeom = this->geometry();
+            QPoint center = mainGeom.center();
+            int x = center.x() - dlgSize.width() / 2;
+            int y = center.y() - dlgSize.height() / 2;
+
+             // Screen bounds check
+            if (auto scr = this->screen()) {
+                 QRect screenGeom = scr->availableGeometry();
+                 if (x < screenGeom.left()) x = screenGeom.left();
+                 if (y < screenGeom.top()) y = screenGeom.top();
+            }
+
+            dlg.move(x, y);
+            dlg.exec();
+        });
+
         m_sidebar->addBottomAction(QIcon(":/images/astrometry.svg"), tr("Image Annotation"), [this](){
             openAnnotationToolDialog();
         });

@@ -26,12 +26,13 @@ SidebarWidget::SidebarWidget(QWidget* parent) : QWidget(parent) {
     
     // 1. Tab Strip (Left)
     m_tabContainer = new QWidget(this);
-    m_tabContainer->setFixedWidth(32); // Narrow strip
+    m_tabContainer->setFixedWidth(36); // Narrow strip
     m_tabContainer->setStyleSheet("background-color: #252525; border-right: 1px solid #1a1a1a;");
     
     m_tabLayout = new QVBoxLayout(m_tabContainer);
-    m_tabLayout->setContentsMargins(2, 5, 2, 5);
+    m_tabLayout->setContentsMargins(2, 5, 2, 5); // Symmetric left/right margins to center buttons
     m_tabLayout->setSpacing(5);
+    m_tabLayout->setAlignment(Qt::AlignHCenter); // Ensure all children are horizontally centered
     m_tabLayout->addStretch();
     
     // 2. Content Area (Right) - Use ScrollArea for Clipping/Slide Effect
@@ -68,10 +69,7 @@ SidebarWidget::SidebarWidget(QWidget* parent) : QWidget(parent) {
         
         // macOS: Force a repaint and layout update to prevent black/blank boxes during animation
         if (m_stack) m_stack->update();
-        if (m_console) {
-            // Re-check headers or cast if needed, but since m_console is QTextEdit* it has viewport
-            m_console->update();
-        }
+        if (m_console) m_console->update();
         m_contentContainer->update();
         update();
     });
@@ -138,7 +136,7 @@ void SidebarWidget::addPanel(const QString& name, const QString& iconPath, QWidg
             // Console Panel
             panel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
             // Ensure no margins on the panel itself if possible
-            if (panel->layout()) panel->layout()->setContentsMargins(0,0,0,0);
+            if (panel->layout()) panel->layout()->setContentsMargins(0, 0, 0, 0);
             
             layout->addWidget(panel, 1); // Expand to fill rest
 
@@ -164,21 +162,19 @@ void SidebarWidget::addPanel(const QString& name, const QString& iconPath, QWidg
 }
 
 void SidebarWidget::createTab(const QString& name, [[maybe_unused]] const QString& iconPath, int id) {
-    // vertical button with text
+    // Vertical button with text
     VerticalButton* btn = new VerticalButton(name, this);
     btn->setCheckable(true);
     btn->setToolTip(name);
-        
-    btn->setFixedSize(30, 120); // Taller for vertical text
     
-    // Stylesheet might conflict with custom paint? 
-    // Button Logic handles check state in PaintEvent, so minimal style needed for border/bg
-    // actually paintEvent handles bg.
-    // Just ensure transparent base
-    btn->setStyleSheet("border: none;");
+    // 32px width fits exactly inside the container accounting for symmetric margins (2+2)
+    btn->setFixedSize(32, 120); // Taller for vertical text, 32px width to fill container
+    
+    // Disable styled background so paintEvent has full control over rendering
+    btn->setAttribute(Qt::WA_StyledBackground, false);
 
     m_tabGroup->addButton(btn, id);
-    m_tabLayout->insertWidget(m_tabLayout->count() - 1, btn); // Insert before stretch
+    m_tabLayout->insertWidget(m_tabLayout->count() - 1, btn, 0, Qt::AlignHCenter); // Insert before stretch, centered
 }
 
 void SidebarWidget::onTabClicked(int id) {
@@ -200,15 +196,15 @@ void SidebarWidget::onTabClicked(int id) {
 void SidebarWidget::addBottomAction(const QIcon& icon, const QString& tooltip, std::function<void()> callback) {
     QPushButton* btn = new QPushButton(this);
     btn->setIcon(icon);
-    btn->setIconSize(QSize(20, 20));
-    btn->setFixedSize(28, 28);
+    btn->setIconSize(QSize(24, 24));
+    btn->setFixedSize(32, 32); // Match tab button width for visual consistency
     btn->setToolTip(tooltip);
     btn->setFlat(true);
     btn->setCursor(Qt::PointingHandCursor);
-    btn->setStyleSheet("QPushButton { background-color: transparent; border: none; padding: 4px; } "
+    btn->setStyleSheet("QPushButton { background-color: transparent; border: none; } "
                        "QPushButton:hover { background-color: #3d3d3d; border-radius: 4px; }");
     
-    m_tabLayout->addWidget(btn);
+    m_tabLayout->addWidget(btn, 0, Qt::AlignHCenter); // Centered to match tab buttons above
     connect(btn, &QPushButton::clicked, callback);
 }
 
@@ -259,19 +255,18 @@ QWidget* SidebarWidget::getPanel(const QString& name) {
     return m_stack->widget(m_nameToId[name]);
 }
 
-
 void SidebarWidget::setExpandedWidth(int width) {
     if (width < 100) width = 100;
     if (width > 800) width = 800;
     m_expandedWidth = width;
     if (m_expanded) {
-         m_contentContainer->setFixedWidth(m_expandedWidth);
-         // CRITICAL Fix: Resize the parent widget immediately to avoid clipping
-         resize(totalVisibleWidth(), height());
-         if (m_stack) m_stack->update();
-         if (m_console) m_console->update();
-         m_contentContainer->update();
-         update();
+        m_contentContainer->setFixedWidth(m_expandedWidth);
+        // CRITICAL Fix: Resize the parent widget immediately to avoid clipping
+        resize(totalVisibleWidth(), height());
+        if (m_stack) m_stack->update();
+        if (m_console) m_console->update();
+        m_contentContainer->update();
+        update();
     }
     // Sync stack width to ensure "slide" effect works
     if (m_stack) {
@@ -284,7 +279,7 @@ bool SidebarWidget::isInteracting() const {
     // Check if the cursor is anywhere within the sidebar's current area
     // We use global position to be cross-platform/reliable regardless of focus
     QPoint globalCursor = QCursor::pos();
-    QRect globalRect = QRect(mapToGlobal(QPoint(0,0)), size());
+    QRect globalRect = QRect(mapToGlobal(QPoint(0, 0)), size());
     
     bool underMouse = globalRect.contains(globalCursor);
     bool hasFocusedChild = hasFocus() || (m_console && m_console->hasFocus());
@@ -354,21 +349,21 @@ void SidebarWidget::updateLastLogLine(const QString& htmlMsg) {
     m_console->verticalScrollBar()->setValue(m_console->verticalScrollBar()->maximum());
 }
 
-SidebarWidget::VerticalButton::VerticalButton(const QString& text, QWidget* parent) : QPushButton(text, parent) {
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+SidebarWidget::VerticalButton::VerticalButton(const QString& text, QWidget* parent)
+    : QPushButton(text, parent)
+{
+    // Fixed policy: size is explicitly set via setFixedSize, no expansion needed
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 QSize SidebarWidget::VerticalButton::sizeHint() const {
-    QSize s = QPushButton::sizeHint();
-    return QSize(s.height(), s.width());
+    // Return the fixed size directly, consistent with setFixedSize(32, 120) in createTab
+    return QSize(32, 120);
 }
 
 void SidebarWidget::VerticalButton::paintEvent(QPaintEvent*) {
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
-    
-    QStyleOptionButton opt;
-    initStyleOption(&opt);
     
     // Find SidebarWidget iteratively to handle layout re-parenting
     SidebarWidget* sb = nullptr;
@@ -381,13 +376,20 @@ void SidebarWidget::VerticalButton::paintEvent(QPaintEvent*) {
     
     bool isSidebarExpanded = sb ? sb->m_expanded : false;
 
-    if (isChecked() && isSidebarExpanded) p.fillRect(rect(), QColor("#0055aa"));
-    else if (underMouse()) p.fillRect(rect(), QColor("#444"));
-    
+    // Background
+    if (isChecked() && isSidebarExpanded)
+        p.fillRect(rect(), QColor("#0055aa"));
+    else if (underMouse())
+        p.fillRect(rect(), QColor("#444"));
+
+    // Save painter state before transform to prevent artifacts on subsequent repaints
+    p.save();
     p.translate(0, height());
     p.rotate(-90);
     
     p.setPen((isChecked() && isSidebarExpanded) ? Qt::white : QColor("#ccc"));
+    // After -90° rotation width and height are swapped, so text rect must reflect that
     QRect textRect(0, 0, height(), width());
     p.drawText(textRect, Qt::AlignCenter, text());
+    p.restore();
 }

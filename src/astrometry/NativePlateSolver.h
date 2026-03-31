@@ -56,7 +56,7 @@ private:
                         double raHint, double decHint,
                         double pixelScale);
 
-    // Core solver 
+    // Core solver
     //
     //   1. Project catalog at initial (ra0, dec0)
     //   2. new_star_match: triangle voting → iter_trans(RECALC_NO) → applyMatch+matchLists

@@ -20,7 +20,7 @@ static const int    MAX_CONVERGENCE_TRIALS = 5;
 // TRANS_SANITY_CHECK absolute tolerance
 static const double TRANS_SANITY_CHECK = 0.1;
 
-NativePlateSolver::NativePlateSolver(QObject* parent) 
+NativePlateSolver::NativePlateSolver(QObject* parent)
     : QObject(parent), m_nam(new QNetworkAccessManager(this))
 {
 }
@@ -54,7 +54,7 @@ void NativePlateSolver::solve(const ImageBuffer& image, double raHint, double de
 
     emit logMessage(tr("Starting Native Solver. Center: %1, %2 Radius: %3 deg")
                     .arg(raHint).arg(decHint).arg(radiusDeg));
-    
+
     fetchCatalog();
 }
 
@@ -81,9 +81,9 @@ double NativePlateSolver::computeMagLimit(double ra, double dec, double fovDegre
 
 void NativePlateSolver::fetchCatalog() {
     emit logMessage(tr("Querying Catalog (VizieR)..."));
-    
+
     CatalogClient* client = new CatalogClient(this);
-    
+
     connect(client, &CatalogClient::catalogReady, this, [this, client](const std::vector<CatalogStar>& stars) {
         m_catalogStars.clear();
         m_catalogStars.reserve(stars.size());
@@ -99,7 +99,7 @@ void NativePlateSolver::fetchCatalog() {
         ms.reserve(m_catalogStars.size());
         for (const auto& s : m_catalogStars) {
             MatchStar m;
-            m.id    = (int)ms.size();  // ← set sequential catalog index (critical for updateStarPositions)
+            m.id    = (int)ms.size();
             m.index = (int)ms.size();
             m.x     = s.ra;   // RA in degrees
             m.y     = s.dec;  // Dec in degrees
@@ -117,7 +117,7 @@ void NativePlateSolver::fetchCatalog() {
         this->onCatalogReceived(ms);
         client->deleteLater();
     });
-    
+
     connect(client, &CatalogClient::mirrorStatus, this, [this](const QString& msg) {
         emit logMessage(msg);
     });
@@ -142,7 +142,7 @@ void NativePlateSolver::fetchCatalog() {
 bool NativePlateSolver::checkTransSanity(const GenericTrans& trans) {
     double var1 = std::abs(std::abs(trans.x10) - std::abs(trans.y01));
     double var2 = std::abs(std::abs(trans.y10) - std::abs(trans.x01));
-    
+
     if (var1 > TRANS_SANITY_CHECK || var2 > TRANS_SANITY_CHECK) {
         return false;
     }
@@ -152,7 +152,6 @@ bool NativePlateSolver::checkTransSanity(const GenericTrans& trans) {
 bool NativePlateSolver::checkTransScale(const GenericTrans& trans, double scaleMin, double scaleMax) {
     double resolution = std::sqrt(trans.x10 * trans.x10 + trans.y10 * trans.y10);
     if (scaleMin > 0 && scaleMax > 0) {
-        // 1/scaleMin = scale*a (upper bound), 1/scaleMax = scale*b (lower bound)
         return resolution <= 1.0 / scaleMin && resolution >= 1.0 / scaleMax;
     }
     return true;
@@ -200,37 +199,37 @@ std::vector<MatchStar> NativePlateSolver::projectCatalog(const std::vector<Match
                                                           double ra0, double dec0) const {
     double a0 = ra0 * DEG2RAD;
     double d0 = dec0 * DEG2RAD;
-    
+
     std::vector<MatchStar> projected;
     projected.reserve(catStars.size());
-    
+
     double sin_d0 = std::sin(d0);
     double cos_d0 = std::cos(d0);
-    
+
     for(const auto& s : catStars) {
         double a = s.x * DEG2RAD;
         double d = s.y * DEG2RAD;
-        
+
         double H = std::sin(d) * sin_d0 + std::cos(d) * cos_d0 * std::cos(a - a0);
-        
+
         if (H < 0.01) continue; // Skip stars behind the tangent point
-        
+
         double xi_rad = (std::cos(d) * std::sin(a - a0)) / H;
         double eta_rad = (std::sin(d) * cos_d0 - std::cos(d) * sin_d0 * std::cos(a - a0)) / H;
-        
+
         MatchStar p = s;
         p.x = xi_rad * RAD2ARCSEC;   // tangent plane X in arcsec
         p.y = eta_rad * RAD2ARCSEC;  // tangent plane Y in arcsec
-        
+
         projected.push_back(p);
     }
-    
+
     return projected;
 }
 
 // ==========================================================================
 // updateStarPositions
-// After reprojecting catalog at a new center, update the matched catalog 
+// After reprojecting catalog at a new center, update the matched catalog
 // star positions to the new projection, preserving the matched pair linkage
 // ==========================================================================
 void NativePlateSolver::updateStarPositions(std::vector<MatchStar>& matchedCatStars,
@@ -284,9 +283,6 @@ int NativePlateSolver::matchCatalog(const std::vector<MatchStar>& imgStars, int 
         double rangePct = 30.0;
         double a_factor = 1.0 + (rangePct / 100.0);
         double b_factor = 1.0 - (rangePct / 100.0);
-        // scaleMin = 1/(scale*a), scaleMax = 1/(scale*b)
-        // vote matrix ratio check: imageTriSide/catTriSide ≈ 1/scale
-        // so: 1/(scale*a) < ratio < 1/(scale*b)
         minScale = 1.0 / (scale * a_factor);
         maxScale = 1.0 / (scale * b_factor);
     }
@@ -301,8 +297,6 @@ int NativePlateSolver::matchCatalog(const std::vector<MatchStar>& imgStars, int 
     if ((int)projCat.size() < 10) return -1;
 
     // === Step 2: Triangle matching (new_star_match) — ONE TIME ONLY ===
-    //   - Top m_maxStars stars from each list → triangles + voting → initial TRANS
-    //   - ALL imgStars + ALL projCat stars → full matching at AT_MATCH_MAXDIST then AT_MATCH_RADIUS
     //
     // Fallback strategy:
     //   Attempt 1: 60 stars, ±30% scale filter, default triangle radius (normal case)
@@ -317,7 +311,7 @@ int NativePlateSolver::matchCatalog(const std::vector<MatchStar>& imgStars, int 
     static const double TRIANGLE_RADIUS_WIDE = 0.003; // 50 % larger than the default 0.002
 
     std::vector<MatchStar> matchedImgStars, matchedCatStars;
-    bool parityFlipped = false; // set true if attempt 5 (image-Y flip) was used
+    bool parityFlipped = false;
 
     auto logMatcherDiag = [&](int attempt) {
         if (safeThis) {
@@ -354,8 +348,6 @@ int NativePlateSolver::matchCatalog(const std::vector<MatchStar>& imgStars, int 
 
     if (!matchOk) {
         // Attempt 4: standard count but WIDER triangle radius (handles lens distortion).
-        // Images with field distortion > ~0.4 % cause triangle shapes to differ by
-        // more than the 0.002 default radius.  0.003 accommodates up to ~0.6 % distortion.
         emit logMessage(tr("  Attempt 3 failed, retrying with wider triangle radius 0.003..."));
         logMatcherDiag(3);
         matcher.setMaxStars(60);
@@ -365,13 +357,6 @@ int NativePlateSolver::matchCatalog(const std::vector<MatchStar>& imgStars, int 
 
     if (!matchOk) {
         // Attempt 5: PARITY FLIP — negate image Y axis.
-        // The vote step is shape-invariant (triangle shapes are reflection-symmetric),
-        // so votes accumulate correctly with either handedness.  Flipping image Y makes
-        // the solver try the opposite orientation, which is needed when the telescope
-        // optical train produces a mirror-reversed image (odd number of reflections).
-        //
-        // After success we un-flip x01/y01 of the final TRANS so the WCS coefficients
-        // are expressed in the original (un-flipped) image pixel coordinate system.
         emit logMessage(tr("  Attempt 4 failed, retrying with image-Y parity flip..."));
         logMatcherDiag(4);
         std::vector<MatchStar> flippedImgStars = imgStars;
@@ -397,7 +382,7 @@ int NativePlateSolver::matchCatalog(const std::vector<MatchStar>& imgStars, int 
                         .arg(matchedImgStars.size()).arg(transOut.x00, 0, 'f', 2).arg(transOut.y00, 0, 'f', 2));
     }
 
-    // === Step 3: TRANS sanity and scale checks (port of check_affine_TRANS_sanity/scale) ===
+    // === Step 3: TRANS sanity and scale checks ===
     if (!checkTransSanity(transOut)) {
         if (safeThis) {
             emit logMessage(tr("Transform sanity check failed (|cos|≠|sin| by >%.1f arcsec/px).").arg(TRANS_SANITY_CHECK));
@@ -418,18 +403,6 @@ int NativePlateSolver::matchCatalog(const std::vector<MatchStar>& imgStars, int 
     }
 
     // === Step 4: Convergence loop ===
-    //
-    //   while (offset > CONV_TOLERANCE && trial < max_trials):
-    //     1. Compute new center: apply_match(ra0,dec0, 0,0, trans) -> (newRA, newDec)
-    //     2. Re-project catalog at new center
-    //     3. update_stars_positions(&star_list_B, numMatched, newCstars)
-    //        <- update B positions of the ORIGINAL matched pairs using new projection
-    //     4. atRecalcTrans(numMatched, star_list_A, numMatched, star_list_B, ...) -> new TRANS
-    //        <- recalc TRANS from SAME matched pairs (with updated B positions)
-    //
-    // Key: We do NOT re-apply trans to all stars and re-match each iteration.
-    // We keep the ORIGINAL matched pairs and just update catalog side positions.
-    //
     double conv = std::sqrt(transOut.x00 * transOut.x00 + transOut.y00 * transOut.y00);
     if (safeThis) {
         emit logMessage(tr("  Initial: offset=%1 arcsec, nr=%2")
@@ -438,7 +411,6 @@ int NativePlateSolver::matchCatalog(const std::vector<MatchStar>& imgStars, int 
 
     for (int trial = 0; trial < MAX_CONVERGENCE_TRIALS && conv > CONV_TOLERANCE; trial++) {
         if (m_stop) return -1;
-
 
         // 4a: Compute new projection center via apply_match at image center (0, 0)
         double newRA, newDec;
@@ -454,12 +426,9 @@ int NativePlateSolver::matchCatalog(const std::vector<MatchStar>& imgStars, int 
         }
 
         // 4c: Update positions of matched catalog stars from new projection (by ID)
-        // Port of: update_stars_positions(&star_list_B, numMatched, cstars)
-        // Uses each star's .id (original catalog index) to find its new projected coords.
         updateStarPositions(matchedCatStars, numMatched, newProjCat);
 
-        // 4d: Recalculate TRANS from the SAME matched pairs (RECALC_YES = use all from start)
-        // Port of: atRecalcTrans(numMatched, star_list_A, numMatched, star_list_B, ...)
+        // 4d: Recalculate TRANS from the SAME matched pairs (RECALC_YES)
         if ((int)matchedImgStars.size() < numMatched || (int)matchedCatStars.size() < numMatched) {
             if (safeThis) emit logMessage(tr("Matched pair vectors became inconsistent (A=%1, B=%2, need=%3).")
                                           .arg(matchedImgStars.size()).arg(matchedCatStars.size()).arg(numMatched));
@@ -477,8 +446,9 @@ int NativePlateSolver::matchCatalog(const std::vector<MatchStar>& imgStars, int 
             break;
         }
 
-        // Cull arrays to prevent accumulation of rejected outliers that will induce NaN mappings downstream
-        const int requested = std::max(0, std::min(newTrans.nr, std::min((int)idxA.size(), (int)idxB.size())));
+        // Cull arrays to prevent accumulation of rejected outliers
+        const int requested = std::max(0, std::min(newTrans.nr,
+                              std::min((int)idxA.size(), (int)idxB.size())));
         std::vector<MatchStar> culledImg;
         std::vector<MatchStar> culledCat;
         culledImg.reserve(requested);
@@ -505,7 +475,7 @@ int NativePlateSolver::matchCatalog(const std::vector<MatchStar>& imgStars, int 
         transOut = newTrans;
         // Update numMatched to survivors after sigma clipping
         numMatched = std::min((int)transOut.nr, std::min((int)matchedImgStars.size(), (int)matchedCatStars.size()));
-        
+
         if (numMatched <= 0) {
             if (safeThis) emit logMessage(tr("Recalculation resulted in flat match set."));
             break;
@@ -528,9 +498,6 @@ int NativePlateSolver::matchCatalog(const std::vector<MatchStar>& imgStars, int 
 
     // If parity-flip was used (image Y was negated), convert TRANS back to original
     // image coordinates by negating the x01 and y01 terms.
-    // Derivation: y_flip = -y_orig, so if TRANS was fit in flip-space:
-    //   x' = x00 + x10*x + x01*y_flip  =  x00 + x10*x + x01*(-y_orig)
-    // In original space this becomes: x01_orig = -x01_flip (and same for y01).
     if (parityFlipped) {
         transOut.x01 = -transOut.x01;
         transOut.y01 = -transOut.y01;
@@ -600,11 +567,15 @@ void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars,
     double imgCenterY = image.height() * 0.5;
 
     std::vector<MatchStar> imgMatchStars;
+    imgMatchStars.reserve(detected.size());
     for(const auto& s : detected) {
         MatchStar ms;
-        ms.x = s.x - imgCenterX;               // center X
-        ms.y = s.y - imgCenterY;               // center Y (match FITS raw memory orientation logic)
+        ms.id    = (int)imgMatchStars.size();
+        ms.index = (int)imgMatchStars.size();
+        ms.x = s.x - imgCenterX;
+        ms.y = s.y - imgCenterY;
         ms.mag = -2.5 * std::log10(std::max(s.flux, 1.0)); // Instrumental magnitude
+        ms.match_id = -1;
         imgMatchStars.push_back(ms);
     }
 
@@ -647,7 +618,7 @@ void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars,
     NativeSolveResult res;
     res.success = (result > 0);
     res.transform = bestTrans;
-    
+
     if (res.success) {
         if (safeThis) emit logMessage(tr("Match Success! Computing WCS..."));
 
@@ -660,7 +631,7 @@ void NativePlateSolver::processSolving(const std::vector<MatchStar>& catStars,
                 emit logMessage(tr("WCS computed: CRPIX=(%1, %2) CRVAL=(%3, %4)")
                                .arg(res.crpix1).arg(res.crpix2)
                                .arg(res.crval1).arg(res.crval2));
-                
+
                 double solvedScale = std::sqrt(res.cd[0][0]*res.cd[0][0] + res.cd[1][0]*res.cd[1][0]) * 3600.0;
                 emit logMessage(tr("Solved pixel scale: %1 arcsec/px").arg(solvedScale, 0, 'f', 3));
             }
@@ -688,9 +659,6 @@ void NativePlateSolver::onCatalogReceived(const std::vector<MatchStar>& catalogS
 
     QPointer<NativePlateSolver> safeThis(this);
 
-    // Run on the owner thread for stability. This avoids invoking QObject
-    // member logic from a worker thread, which can trigger hard-to-reproduce
-    // access violations on some Windows runtimes.
     if (safeThis) {
         emit logMessage(tr("Starting native solve pipeline in background..."));
         (void)QtConcurrent::run([this, safeThis, catalogStars, imageSnapshot, rawCatalogStars, raHint, decHint, pixelScale](){

@@ -6,7 +6,7 @@
 #include <algorithm>
 
 // ============================================================================
-// Constants 
+// Constants
 // ============================================================================
 
 // Max radius in triangle-space (ba,ca) for matching
@@ -18,10 +18,10 @@
 // Max distance (arcsec) in iter_trans — hard upper limit
 #define AT_MATCH_MAXDIST     50.0
 
-// Sigma clipping multiplier in iter_trans 
+// Sigma clipping multiplier in iter_trans
 #define AT_MATCH_NSIGMA       10.0
 
-// Percentile for sigma estimation used in iter_trans clipping 
+// Percentile for sigma estimation used in iter_trans clipping
 #define AT_MATCH_PERCENTILE   0.35
 
 // Percentile used only for the sig diagnostic field (not for clipping)
@@ -30,10 +30,10 @@
 // Halt sigma threshold (if dist² at percentile is below this, stop iterating)
 #define AT_MATCH_HALTSIGMA    0.1
 
-// Max image stars for triangle generation 
+// Max image stars for triangle generation
 // Fewer image-star triangles → much cleaner vote matrix signal-to-noise
 #define AT_MATCH_NBRIGHT          20
-// Max catalog stars for triangle generation 
+// Max catalog stars for triangle generation
 #define AT_MATCH_CATALOG_NBRIGHT  60
 
 // Min votes in vote matrix for a pair to be valid
@@ -55,8 +55,11 @@
 // Marker for "no angle constraint"
 #define AT_MATCH_NOANGLE     -999.0
 
+// Maximum allowed vote matrix dimension to prevent oversized allocations
+#define AT_MATCH_MAX_VOTE_DIM 500
+
 // ============================================================================
-// Data structures 
+// Data structures
 // ============================================================================
 
 struct MatchStar {
@@ -90,7 +93,7 @@ struct GenericTrans {
 };
 
 // ============================================================================
-// TriangleMatcher 
+// TriangleMatcher
 // ============================================================================
 
 class TriangleMatcher {
@@ -116,7 +119,7 @@ public:
     //  6 = second match too few, 7 = third iterTrans, 8 = succeeded
     int  lastFailStage()  const { return m_lastFailStage; }
 
-    // Main solve method 
+    // Main solve method
     //   1. Triangle voting (atFindTrans)
     //   2. iter_trans (RECALC_NO)
     //   3. atApplyTrans + atMatchLists

@@ -2675,41 +2675,43 @@ void ImageBuffer::blendResult(const ImageBuffer& original, bool inverseMask) {
 // WCS Reframing Helper
 void ImageBuffer::reframeWCS(const QTransform& trans, [[maybe_unused]] int oldWidth, [[maybe_unused]] int oldHeight) {
     if (m_meta.ra == 0 && m_meta.dec == 0) return;
+
+    // Step 1: Map CRPIX through the forward transform (0-indexed buffer coordinates)
     double crpix1_0 = m_meta.crpix1 - 1.0;
     double crpix2_0 = m_meta.crpix2 - 1.0;
-    
+
     QPointF pOld(crpix1_0, crpix2_0);
     QPointF pNew = trans.map(pOld);
-    
+
     m_meta.crpix1 = pNew.x() + 1.0;
     m_meta.crpix2 = pNew.y() + 1.0;
 
-    // 2. Update CD Matrix
-    // CD_new = CD_old * T^-1
+    // Step 2: Update the CD matrix.
+    //
+    // CD_new = CD_old * J_inv
+    //
+    // where J_inv is the Jacobian of trans^{-1}, with Qt's layout:
+    //   J_inv = [ inv.m11()  inv.m21() ]
+    //           [ inv.m12()  inv.m22() ]
+    //
+    // CD11_new = CD11_old * inv.m11() + CD12_old * inv.m21()
+    // CD12_new = CD11_old * inv.m12() + CD12_old * inv.m22()
+    // CD21_new = CD21_old * inv.m11() + CD22_old * inv.m21()
+    // CD22_new = CD21_old * inv.m12() + CD22_old * inv.m22()
+
     bool invertible = false;
     QTransform inv = trans.inverted(&invertible);
     if (!invertible) return;
-    
-    // Matrix multiplication:
-    // [ cd11 cd12 ]   [ m11 m12 ]
-    // [ cd21 cd22 ] * [ m21 m22 ]
-    
-    // Chain Rule: d(World)/d(NewPixel) = d(World)/d(OldPixel) * d(OldPixel)/d(NewPixel)
-    // [ CD11_new  CD12_new ] = [ CD11_old  CD12_old ] * [ dx/dx'  dx/dy' ]
-    // [ CD21_new  CD22_new ]   [ CD21_old  CD22_old ]   [ dy/dx'  dy/dy' ]
-    //
-    // For inv mapping (x,y) = f(x',y'): 
-    // dx/dx' = n11, dx/dy' = n21, dy/dx' = n12, dy/dy' = n22
-    
+
     double old_cd11 = m_meta.cd1_1;
     double old_cd12 = m_meta.cd1_2;
     double old_cd21 = m_meta.cd2_1;
     double old_cd22 = m_meta.cd2_2;
-    
-    m_meta.cd1_1 = old_cd11 * inv.m11() + old_cd12 * inv.m12();
-    m_meta.cd1_2 = old_cd11 * inv.m21() + old_cd12 * inv.m22();
-    m_meta.cd2_1 = old_cd21 * inv.m11() + old_cd22 * inv.m12();
-    m_meta.cd2_2 = old_cd21 * inv.m21() + old_cd22 * inv.m22();
+
+    m_meta.cd1_1 = old_cd11 * inv.m11() + old_cd12 * inv.m21();
+    m_meta.cd1_2 = old_cd11 * inv.m12() + old_cd12 * inv.m22();
+    m_meta.cd2_1 = old_cd21 * inv.m11() + old_cd22 * inv.m21();
+    m_meta.cd2_2 = old_cd21 * inv.m12() + old_cd22 * inv.m22();
 
     syncWcsToHeaders();
 }
@@ -3035,95 +3037,130 @@ void ImageBuffer::rgbToHsv(float r, float g, float b, float& h, float& s, float&
     if (h < 0.0f) h += 1.0f;
 }
 
-
 void ImageBuffer::cropRotated(float cx, float cy, float w, float h, float angleDegrees) {
-    WriteLock lock(this);  // Thread-safe write access
+    WriteLock lock(this);
     if (m_data.empty()) return;
     if (w <= 1 || h <= 1) return;
 
-    int oldW = m_width;
-    int oldH = m_height;
+    [[maybe_unused]] int oldW = m_width;
+    [[maybe_unused]] int oldH = m_height;
 
-    // Output size is fixed to w, h
     int outW = static_cast<int>(w);
     int outH = static_cast<int>(h);
-    
-    // Updated to use blendResult
+
     ImageBuffer original;
     if (hasMask()) original = *this;
-    
+
     std::vector<float> newData(outW * outH * m_channels);
-    
-    float theta = angleDegrees * 3.14159265f / 180.0f; // Radians (Positive for visual CW match)
+
+    float theta = angleDegrees * 3.14159265f / 180.0f;
     float cosT = std::cos(theta);
     float sinT = std::sin(theta);
-    
+
     float halfW = w / 2.0f;
     float halfH = h / 2.0f;
-    
-    // Center of source: cx, cy
-    
+
     #pragma omp parallel for
     for (int y = 0; y < outH; ++y) {
         for (int x = 0; x < outW; ++x) {
-            // Coord relative to center of new image
             float dx = x - halfW;
             float dy = y - halfH;
-            
-            // Rotate back to align with source axes
+
+            // Inverse map: destination pixel -> source pixel
             float srcDX = dx * cosT - dy * sinT;
             float srcDY = dx * sinT + dy * cosT;
-            
-            // Add source center
+
             float srcX = cx + srcDX;
             float srcY = cy + srcDY;
-            
-            // Bilinear Interp
+
             if (srcX >= 0 && srcX < m_width - 1 && srcY >= 0 && srcY < m_height - 1) {
                 int px = static_cast<int>(srcX);
                 int py = static_cast<int>(srcY);
                 float fx = srcX - px;
                 float fy = srcY - py;
-                
+
                 int idx00 = (py * m_width + px) * m_channels;
                 int idx01 = ((py) * m_width + (px+1)) * m_channels;
                 int idx10 = ((py+1) * m_width + px) * m_channels;
                 int idx11 = ((py+1) * m_width + (px+1)) * m_channels;
-                
+
                 for (int c = 0; c < m_channels; ++c) {
                     float v00 = m_data[idx00 + c];
                     float v01 = m_data[idx01 + c];
                     float v10 = m_data[idx10 + c];
                     float v11 = m_data[idx11 + c];
-                    
+
                     float top = v00 * (1 - fx) + v01 * fx;
                     float bot = v10 * (1 - fx) + v11 * fx;
                     float val = top * (1 - fy) + bot * fy;
-                    
+
                     newData[(y * outW + x) * m_channels + c] = val;
                 }
             } else {
-                // Background color (Black)
                 for (int c = 0; c < m_channels; ++c) {
                     newData[(y * outW + x) * m_channels + c] = 0.0f;
                 }
             }
         }
     }
-    
+
     m_width = outW;
     m_height = outH;
     m_data = newData;
-    
-    // WCS Transform: maps from source image coordinates to destination coordinates
-    // reframeWCS(trans) expects trans to be (Source -> Dest)
-    QTransform wcsTrans;
-    wcsTrans.translate(halfW, halfH);   // Center at dest center
-    wcsTrans.rotate(angleDegrees);      // Rotate forward 
-    wcsTrans.translate(-cx, -cy);       // From source center
-    
-    reframeWCS(wcsTrans, oldW, oldH);
-    
+
+    // --- CRPIX update (screen-space, Y-down) ---
+    {
+        double crpix1_0 = m_meta.crpix1 - 1.0;
+        double crpix2_0 = m_meta.crpix2 - 1.0;
+
+        double u = crpix1_0 - static_cast<double>(cx);
+        double v = crpix2_0 - static_cast<double>(cy);
+
+        double ct = static_cast<double>(cosT);
+        double st = static_cast<double>(sinT);
+
+        // Forward map (old -> new) derived from inverting the pixel loop:
+        //   x_new - halfW =  (x_old - cx)*cosT + (y_old - cy)*sinT
+        //   y_new - halfH = -(x_old - cx)*sinT + (y_old - cy)*cosT
+        double newU =  u * ct + v * st;
+        double newV = -u * st + v * ct;
+
+        m_meta.crpix1 = newU + static_cast<double>(halfW) + 1.0;
+        m_meta.crpix2 = newV + static_cast<double>(halfH) + 1.0;
+    }
+
+    // --- CD matrix update ---
+    //
+    // The pixel loop rotates destination offsets by +theta to find source offsets.
+    // The forward pixel transform rotates by -theta (in screen Y-down space).
+    // The CD matrix lives in astronomical Y-up space where the rotation direction
+    // is opposite to screen space, so the effective astronomical rotation is +theta.
+    //
+    // CD_new = CD_old * R(+theta)
+    // where R(+theta) = [ cos(theta)  -sin(theta) ]
+    //                   [ sin(theta)   cos(theta)  ]
+    //
+    // CD11_new = CD11_old * cosT + CD12_old * sinT
+    // CD12_new = CD11_old * (-sinT) + CD12_old * cosT
+    // CD21_new = CD21_old * cosT + CD22_old * sinT
+    // CD22_new = CD21_old * (-sinT) + CD22_old * cosT
+    {
+        double old_cd11 = m_meta.cd1_1;
+        double old_cd12 = m_meta.cd1_2;
+        double old_cd21 = m_meta.cd2_1;
+        double old_cd22 = m_meta.cd2_2;
+
+        double ct = static_cast<double>(cosT);
+        double st = static_cast<double>(sinT);
+
+        m_meta.cd1_1 = old_cd11 *  ct + old_cd12 *  st;
+        m_meta.cd1_2 = old_cd11 * (-st) + old_cd12 * ct;
+        m_meta.cd2_1 = old_cd21 *  ct + old_cd22 *  st;
+        m_meta.cd2_2 = old_cd21 * (-st) + old_cd22 * ct;
+    }
+
+    syncWcsToHeaders();
+
     if (hasMask()) {
         ImageBuffer maskBuf;
         maskBuf.setData(original.width(), original.height(), 1, m_mask.data);
