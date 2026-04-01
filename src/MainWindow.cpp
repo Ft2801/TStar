@@ -5428,8 +5428,8 @@ bool MainWindow::saveWorkspaceProjectTo(const QString& projectFilePath) {
     QString fileName = fi.completeBaseName();
     if (fileName.isEmpty()) fileName = "workspace";
     
-    // Snapshots go to AppData/TStar/projects/{projectName}_data
-    QString projDataDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/projects";
+    // Snapshots go to [ProjectRoot]/{projectName}_data
+    QString projDataDir = getWorkspaceProjectsDir();
     QDir appDataProjDir(projDataDir);
     if (!appDataProjDir.exists() && !appDataProjDir.mkpath(".")) {
         QMessageBox::critical(this, tr("Project Save Error"), tr("Cannot create projects directory: %1").arg(projDataDir));
@@ -5526,9 +5526,9 @@ bool MainWindow::loadWorkspaceProjectFrom(const QString& projectFilePath) {
     // Try to get snapshot directory from project file first (new format)
     QString dataDirPath = doc.object()["snapshotDir"].toString();
     
-    // Fallback: check in AppData/TStar/projects
+    // Fallback: check in configured Project Root or AppData
     if (dataDirPath.isEmpty()) {
-        QString projDataDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/projects";
+        QString projDataDir = getWorkspaceProjectsDir();
         dataDirPath = QDir(projDataDir).filePath(fi.completeBaseName() + "_data");
     }
     
@@ -5556,15 +5556,21 @@ bool MainWindow::loadWorkspaceProjectFrom(const QString& projectFilePath) {
 }
 
 QString MainWindow::getWorkspaceProjectsDir() const {
-    // Returns the AppData directory for workspace projects
-    // Windows: C:\Users\<user>\AppData\Local\TStar\TStar\projects
-    // macOS: ~/Library/Application Support/TStar/projects
+    // Check if user has defined a custom project root in Settings
+    QSettings settings;
+    QString userRoot = settings.value("paths/project_root").toString().trimmed();
+    if (!userRoot.isEmpty()) {
+        QDir rootDir(userRoot);
+        // Ensure path exists or can be created
+        if (rootDir.exists() || rootDir.mkpath(".")) {
+            return rootDir.absolutePath();
+        }
+    }
+
+    // Default Fallback to AppData/Local/TStar/TStar/projects
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-    
-    // Create projects subdirectory path
     QString projectsDir = appDataPath + "/projects";
     
-    // Ensure the directory exists
     QDir dir(projectsDir);
     if (!dir.exists()) {
         dir.mkpath(".");
@@ -5678,8 +5684,8 @@ void MainWindow::closeWorkspaceProject() {
 }
 
 void MainWindow::deleteWorkspaceProject() {
-    // Collect all available projects from AppData/TStar/projects
-    QString projDataDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/projects";
+    // Collect available projects from the current workspace root
+    QString projDataDir = getWorkspaceProjectsDir();
     QDir projDir(projDataDir);
 
     if (!projDir.exists()) {

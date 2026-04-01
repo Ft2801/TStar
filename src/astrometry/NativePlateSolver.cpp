@@ -662,20 +662,20 @@ void NativePlateSolver::onCatalogReceived(const std::vector<MatchStar>& catalogS
 
     if (safeThis) {
         emit logMessage(tr("Starting native solve pipeline in background..."));
-        (void)QtConcurrent::run([this, safeThis, catalogStars, imageSnapshot,
+        (void)QtConcurrent::run([safeThis, catalogStars, imageSnapshot,
                                   rawCatalogStars, raHint, decHint, pixelScale]() {
             if (!safeThis) return;
             try {
-                this->processSolving(catalogStars, imageSnapshot,
+                safeThis->processSolving(catalogStars, imageSnapshot,
                                      rawCatalogStars, raHint, decHint, pixelScale);
             } catch (const std::exception& e) {
                 NativeSolveResult res;
                 res.errorMsg = QString("Native solver exception: %1").arg(e.what());
-                if (safeThis) emit this->finished(res);
+                if (safeThis) emit safeThis->finished(res);
             } catch (...) {
                 NativeSolveResult res;
                 res.errorMsg = "Native solver: unknown exception.";
-                if (safeThis) emit this->finished(res);
+                if (safeThis) emit safeThis->finished(res);
             }
         });
     }

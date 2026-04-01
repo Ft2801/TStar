@@ -3540,6 +3540,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Allinea Canali</translation>
         </message>
         <message>
+            <source>Align images in sequence</source>
+            <translation type="finished">Allinea immagini in sequenza</translation>
+        </message>
+        <message>
             <source>Aligns a sequence of calibrated images to a common reference frame using star-based registration with sub-pixel accuracy:</source>
             <translation type="finished">Allinea una sequenza di immagini calibrate a un fotogramma di riferimento comune usando la registrazione basata su stelle con precisione sub-pixel:</translation>
         </message>
@@ -3570,6 +3574,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Analyzes the difference between your image and the reference to build a highly accurate gradient model</source>
             <translation type="finished">Analizza la differenza tra la tua immagine e il riferimento per costruire un modello di gradiente altamente accurato</translation>
+        </message>
+        <message>
+            <source>Appendix: Scripting Commands Reference</source>
+            <translation type="finished">Appendice: Riferimento Comandi Scripting</translation>
         </message>
         <message>
             <source>Applies Kappa-Sigma rejection multiple times for aggressive outlier removal.</source>
@@ -3660,6 +3668,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Rimozione Sfondo: Applica ABE o CBE per eliminare i gradienti</translation>
         </message>
         <message>
+            <source>Basic pixel math</source>
+            <translation type="finished">Operazioni pixel di base</translation>
+        </message>
+        <message>
             <source>Batch Crop: applies the same crop to all currently open images</source>
             <translation type="finished">Ritaglio multiplo: applica lo stesso ritaglio a tutte le immagini aperte</translation>
         </message>
@@ -3712,6 +3724,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">CLAHE</translation>
         </message>
         <message>
+            <source>Calibrate sequence</source>
+            <translation type="finished">Calibrazione sequenza</translation>
+        </message>
+        <message>
             <source>Calibrates colors using star catalog data:</source>
             <translation type="finished">Calibra i colori usando dati del catalogo stellare:</translation>
         </message>
@@ -3726,6 +3742,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Catalog Background Extraction (CBE)</source>
             <translation type="finished">Estrazione Sfondo da Catalogo (CBE)</translation>
+        </message>
+        <message>
+            <source>Change working directory</source>
+            <translation type="finished">Cambia directory di lavoro</translation>
         </message>
         <message>
             <source>Channel Choice:</source>
@@ -3798,6 +3818,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Close</source>
             <translation type="finished">Chiudi</translation>
+        </message>
+        <message>
+            <source>Close the current image</source>
+            <translation type="finished">Chiudi l'immagine corrente</translation>
         </message>
         <message>
             <source>Closing Project: Use File &gt; Close Project to deactivate the current project</source>
@@ -3960,6 +3984,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Crea Fotogrammi Master: Media le esposizioni bias/dark/flat multiple per filtro</translation>
         </message>
         <message>
+            <source>Create RGB from mono channels</source>
+            <translation type="finished">Crea RGB da canali mono</translation>
+        </message>
+        <message>
             <source>Create and apply masks for selective processing:</source>
             <translation type="finished">Crea e applica maschere per elaborazioni selettive:</translation>
         </message>
@@ -3980,6 +4008,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Ritaglia e ruota l'immagine con precisione:</translation>
         </message>
         <message>
+            <source>Crop image to box or selection</source>
+            <translation type="finished">Ritaglia immagine alla selezione o box</translation>
+        </message>
+        <message>
             <source>Ctrl+Z / Ctrl+Shift+Z</source>
             <translation type="finished">Ctrl+Z / Ctrl+Shift+Z</translation>
         </message>
@@ -3994,6 +4026,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Debayer</source>
             <translation type="finished">Debayer</translation>
+        </message>
+        <message>
+            <source>Debayer current image or sequence</source>
+            <translation type="finished">Debayer immagine corrente o sequenza</translation>
         </message>
         <message>
             <source>Debayer:</source>
@@ -4084,6 +4120,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Equalizza l'intensità dei canali RGB facendo corrispondere i loro mediani. Questo è essenziale per ottenere un bilanciamento del colore neutro prima di combinare i singoli canali in un'immagine a colori.</translation>
         </message>
         <message>
+            <source>Execute PixelMath formula</source>
+            <translation type="finished">Esegui formula PixelMath</translation>
+        </message>
+        <message>
             <source>Execute Stack: Combine and output final integrated image</source>
             <translation type="finished">Esegui Stack: Combina e genera l'immagine integrata finale</translation>
         </message>
@@ -4140,6 +4180,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Sfumatura:</translation>
         </message>
         <message>
+            <source>File &amp; Directory</source>
+            <translation type="finished">File e Directory</translation>
+        </message>
+        <message>
             <source>First image in sequence used as reference (or manually selected)</source>
             <translation type="finished">La prima immagine nella sequenza utilizzata come riferimento (o selezionata manualmente)</translation>
         </message>
@@ -4170,6 +4214,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Generate masks using Binary, Range Selection, Lightness, Chrominance, Star Mask, and Color-based workflows</source>
             <translation type="finished">Genera maschere usando Binary, Range Selection, Lightness, Chrominance, Star Mask e workflow basati sul colore</translation>
+        </message>
+        <message>
+            <source>Geometric transformations</source>
+            <translation type="finished">Trasformazioni geometriche</translation>
         </message>
         <message>
             <source>Getting Started</source>
@@ -4272,6 +4320,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Ponderazione Immagine:</translation>
         </message>
         <message>
+            <source>Image math &amp; Geometry</source>
+            <translation type="finished">Matematica immagine e Geometria</translation>
+        </message>
+        <message>
             <source>Improves signal-to-noise ratio by coherent data aggregation</source>
             <translation type="finished">Migliora il rapporto segnale-rumore mediante aggregazione di dati coerenti</translation>
         </message>
@@ -4358,6 +4410,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Load Registered Images: Select the aligned image sequence</source>
             <translation type="finished">Carica Immagini Registrate: Seleziona la sequenza di immagini allineate</translation>
+        </message>
+        <message>
+            <source>Load an image into the script context</source>
+            <translation type="finished">Carica un'immagine nel contesto dello script</translation>
         </message>
         <message>
             <source>Load and apply existing mask</source>
@@ -4620,6 +4676,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Flussi di lavoro predefiniti per le attività comuni di astrofotografia</translation>
         </message>
         <message>
+            <source>Preprocessing &amp; Recovery</source>
+            <translation type="finished">Preprocessing e Recupero</translation>
+        </message>
+        <message>
             <source>Preserve Details:</source>
             <translation type="finished">Preserva Dettagli:</translation>
         </message>
@@ -4720,6 +4780,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Rimuovi Piedistallo</translation>
         </message>
         <message>
+            <source>Remove gradients (ABE)</source>
+            <translation type="finished">Rimuovi gradienti (ABE)</translation>
+        </message>
+        <message>
             <source>Removes chromatic aberration and optical artifacts.</source>
             <translation type="finished">Rimuove aberrazioni cromatiche e artefatti ottici.</translation>
         </message>
@@ -4780,6 +4844,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
             <translation type="finished">Ruota di qualsiasi angolo in gradi</translation>
         </message>
         <message>
+            <source>Run StarNet++ star removal</source>
+            <translation type="finished">Esegui rimozione stelle StarNet++</translation>
+        </message>
+        <message>
+            <source>Run full automated pipeline</source>
+            <translation type="finished">Esegui pipeline automatizzata completa</translation>
+        </message>
+        <message>
             <source>SCNR (Selective Color Noise Reduction)</source>
             <translation type="finished">SCNR (Riduzione Selettiva Rumore Colore)</translation>
         </message>
@@ -4798,6 +4870,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Save Image:</source>
             <translation type="finished">Salva Immagine:</translation>
+        </message>
+        <message>
+            <source>Save current image (default 32-bit float)</source>
+            <translation type="finished">Salva immagine corrente (default 32-bit float)</translation>
         </message>
         <message>
             <source>Save file</source>
@@ -4902,6 +4978,14 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Square Root / Logarithmic:</source>
             <translation type="finished">Radice Quadrata / Logaritmico:</translation>
+        </message>
+        <message>
+            <source>Stack a sequence</source>
+            <translation type="finished">Esegui stacking di una sequenza</translation>
+        </message>
+        <message>
+            <source>Stacking &amp; Sequencing</source>
+            <translation type="finished">Stacking e Sequenze</translation>
         </message>
         <message>
             <source>Stacking Workflow:</source>
@@ -5026,6 +5110,10 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>TStar includes workspace-level color management to keep display and processing behavior consistent across tools and sessions.</source>
             <translation type="finished">TStar include una gestione colore a livello workspace per mantenere coerenti visualizzazione ed elaborazione tra strumenti e sessioni.</translation>
+        </message>
+        <message>
+            <source>TStar scripts (.tss) use a simple command-based syntax. Parameters in [brackets] are optional.</source>
+            <translation type="finished">Gli script TStar (.tss) usano una semplice sintassi basata su comandi. I parametri in [parentesi] sono opzionali.</translation>
         </message>
         <message>
             <source>TStar supports FITS/FIT, XISF, TIFF/TIF, PNG, JPG/JPEG, BMP and (when LibRaw support is available) major camera RAW formats such as CR2/CR3/NEF/ARW/DNG/ORF/RW2/RAF and others.</source>

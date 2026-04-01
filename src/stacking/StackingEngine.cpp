@@ -358,8 +358,10 @@ StackResult StackingEngine::execute(StackingArgs& args) {
         Normalization::equalizeRGB(args.result);
     }
     
-    // Update metadata
-    updateMetadata(args);
+    // Update metadata using final framing offsets to adjust WCS
+    int width, height, offsetX, offsetY;
+    computeOutputDimensions(args, width, height, offsetX, offsetY);
+    updateMetadata(args, offsetX, offsetY);
     
     // Generate summary
     QString summary = generateSummary(args);
@@ -1715,7 +1717,7 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args) {
 // METADATA AND SUMMARY
 //=============================================================================
 
-void StackingEngine::updateMetadata(StackingArgs& args) {
+void StackingEngine::updateMetadata(StackingArgs& args, int offsetX, int offsetY) {
     auto& meta = args.result.metadata();
 
     // Compute total exposure first
@@ -1847,7 +1849,8 @@ void StackingEngine::updateMetadata(StackingArgs& args) {
     if (FitsHeaderUtils::hasValidWCS(meta)) {
         FitsHeaderUtils::Metadata fmeta;
         fmeta.ra      = meta.ra;      fmeta.dec     = meta.dec;
-        fmeta.crpix1  = meta.crpix1;  fmeta.crpix2  = meta.crpix2;
+        fmeta.crpix1  = meta.crpix1 - offsetX;
+        fmeta.crpix2  = meta.crpix2 - offsetY;
         fmeta.cd1_1   = meta.cd1_1;   fmeta.cd1_2   = meta.cd1_2;
         fmeta.cd2_1   = meta.cd2_1;   fmeta.cd2_2   = meta.cd2_2;
         fmeta.ctype1  = meta.ctype1;  fmeta.ctype2  = meta.ctype2;
@@ -1922,9 +1925,6 @@ void StackingWorker::run() {
     
     emit finished(result == StackResult::OK);
 }
-
-
-
 
 //=============================================================================
 // BLOCK LOADING HELPER

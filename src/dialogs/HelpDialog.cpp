@@ -656,6 +656,42 @@ QString HelpDialog::buildHelpContent()
     html += "<li>" + tr("Check the Console panel for processing messages") + "</li>";
     html += "</ul>";
 
+    // Scripting Reference Appendix
+    html += "<h2>" + tr("Appendix: Scripting Commands Reference") + "</h2>";
+    html += "<p>" + tr("TStar scripts (.tss) use a simple command-based syntax. Parameters in [brackets] are optional.") + "</p>";
+    
+    html += "<h3>" + tr("File & Directory") + "</h3>";
+    html += "<ul>";
+    html += "<li><code>cd &lt;path&gt;</code>: " + tr("Change working directory") + "</li>";
+    html += "<li><code>load &lt;filename&gt;</code>: " + tr("Load an image into the script context") + "</li>";
+    html += "<li><code>save &lt;filename&gt; [--32b|--16b]</code>: " + tr("Save current image (default 32-bit float)") + "</li>";
+    html += "<li><code>close</code>: " + tr("Close the current image") + "</li>";
+    html += "</ul>";
+
+    html += "<h3>" + tr("Stacking & Sequencing") + "</h3>";
+    html += "<ul>";
+    html += "<li><code>stack &lt;prefix&gt; [method] [rejection] [sigma] [--out=...]</code>: " + tr("Stack a sequence") + "</li>";
+    html += "<li><code>calibrate &lt;prefix&gt; [--bias=...] [--dark=...] [--flat=...]</code>: " + tr("Calibrate sequence") + "</li>";
+    html += "<li><code>register &lt;prefix&gt; [--drizzle] [--norotation]</code>: " + tr("Align images in sequence") + "</li>";
+    html += "<li><code>autostack &lt;project_path&gt;</code>: " + tr("Run full automated pipeline") + "</li>";
+    html += "</ul>";
+
+    html += "<h3>" + tr("Preprocessing & Recovery") + "</h3>";
+    html += "<ul>";
+    html += "<li><code>debayer [--pattern=...] [--algo=...]</code>: " + tr("Debayer current image or sequence") + "</li>";
+    html += "<li><code>background [--degree=...]</code>: " + tr("Remove gradients (ABE)") + "</li>";
+    html += "<li><code>starnet [--nostarmask] [--stride=...]</code>: " + tr("Run StarNet++ star removal") + "</li>";
+    html += "<li><code>rgbcomp &lt;r&gt; &lt;g&gt; &lt;b&gt; [-out=...]</code>: " + tr("Create RGB from mono channels") + "</li>";
+    html += "</ul>";
+
+    html += "<h3>" + tr("Image math & Geometry") + "</h3>";
+    html += "<ul>";
+    html += "<li><code>pm &lt;expression&gt;</code>: " + tr("Execute PixelMath formula") + "</li>";
+    html += "<li><code>rotate &lt;angle&gt;</code> | <code>resample &lt;factor&gt;</code>: " + tr("Geometric transformations") + "</li>";
+    html += "<li><code>crop [x y w h]</code>: " + tr("Crop image to box or selection") + "</li>";
+    html += "<li><code>fmul &lt;val&gt;</code> | <code>offset &lt;val&gt;</code> | <code>neg</code>: " + tr("Basic pixel math") + "</li>";
+    html += "</ul>";
+
     // Footer
     html += "<p style=\"margin-top: 30px; color: #888;\">";
     html += "TStar © 2026 Fabio Tempera | <a href=\"https://github.com/Ft2801/TStar\" style=\"color: #4a9eff;\">GitHub</a>";

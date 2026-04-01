@@ -170,7 +170,8 @@ void TriangleMatcher::setTriangle(MatchTriangle& tri, const std::vector<MatchSta
 // ============================================================================
 std::vector<MatchTriangle> TriangleMatcher::generateTriangles(const std::vector<MatchStar>& stars, int nbright)
 {
-    int n = std::min((int)stars.size(), nbright);
+    // Hard cap at 150 stars to prevent O(n^3) triangle explosion (150^3 / 6 ≈ 550k triangles)
+    int n = std::min((int)stars.size(), std::min(nbright, 150));
     std::vector<MatchTriangle> triangles;
     if (n < 3) return triangles;
 
@@ -234,7 +235,12 @@ std::vector<int> TriangleMatcher::computeVotes(
     numStarsA = std::min(numStarsA, AT_MATCH_MAX_VOTE_DIM);
     numStarsB = std::min(numStarsB, AT_MATCH_MAX_VOTE_DIM);
 
-    std::vector<int> votes(numStarsA * numStarsB, 0);
+    std::vector<int> votes;
+    try {
+        votes.assign(static_cast<size_t>(numStarsA) * numStarsB, 0);
+    } catch (const std::bad_alloc&) {
+        return std::vector<int>(); // Return empty on allocation failure
+    }
 
     double rad2 = m_triangleRadius * m_triangleRadius;
     bool useScaleFilter = (minScale > 0 && maxScale > 0);

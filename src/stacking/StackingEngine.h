@@ -315,7 +315,7 @@ private:
     /**
      * @brief Update FITS header with stacking info
      */
-    void updateMetadata(StackingArgs& args);
+    void updateMetadata(StackingArgs& args, int offsetX = 0, int offsetY = 0);
     
     /**
      * @brief Generate stacking summary message
