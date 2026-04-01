@@ -65,6 +65,7 @@ private:
     void setupUI();
     void populatePredefinedScripts();
     void highlightLine(int lineNumber, bool error);
+    void buildCommandTooltip();
     
     // UI
     QComboBox* m_predefinedCombo;

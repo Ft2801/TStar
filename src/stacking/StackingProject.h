@@ -60,6 +60,7 @@ public:
     
 private:
     bool createDirectories();
+    QString resolveProjectFilePath() const;
     
     QString m_rootDir;
     QString m_biasDir;

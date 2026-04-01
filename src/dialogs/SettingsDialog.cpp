@@ -119,7 +119,17 @@ SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, tr("Setting
     m_astapExtraArgs = new QLineEdit();
     m_astapExtraArgs->setPlaceholderText("-s 500 -log");
     form->addRow(tr("ASTAP Extra Args:"), m_astapExtraArgs);
-    
+
+    // Project root
+    m_projectRootPath = new QLineEdit();
+    m_projectRootPath->setPlaceholderText(tr("Default: inside each project folder"));
+    QPushButton* btnProjRoot = new QPushButton(tr("Browse..."));
+    connect(btnProjRoot, &QPushButton::clicked, this, &SettingsDialog::pickProjectRootPath);
+    QHBoxLayout* rowProjRoot = new QHBoxLayout();
+    rowProjRoot->addWidget(m_projectRootPath);
+    rowProjRoot->addWidget(btnProjRoot);
+    form->addRow(tr("Project Files Root:"), rowProjRoot);
+
     leftColumn->addWidget(pathsGroup);
     leftColumn->addStretch();
 
@@ -191,6 +201,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : DialogBase(parent, tr("Setting
     }
     m_astapPath->setText(astapDbPath);
     m_astapExtraArgs->setText(m_settings.value("paths/astap_extra").toString());
+    m_projectRootPath->setText(m_settings.value("paths/project_root").toString());
     
     QString savedLang = m_settings.value("general/language", "System").toString();
     int idx = m_langCombo->findData(savedLang);
@@ -358,6 +369,7 @@ void SettingsDialog::saveSettings() {
     // Legacy executable setting is no longer exposed in UI; prefer bundled CLI.
     m_settings.remove("paths/astap");
     m_settings.setValue("paths/astap_extra", m_astapExtraArgs->text());
+    m_settings.setValue("paths/project_root", m_projectRootPath->text());
 
     QString oldLang = m_settings.value("general/language", "System").toString();
     QString newLang = m_langCombo->currentData().toString();
@@ -392,10 +404,22 @@ void SettingsDialog::saveSettings() {
 void SettingsDialog::refreshAstapStatus() {
     QString currentUiPath = m_astapPath ? m_astapPath->text().trimmed() : "";
     QString dbPath = AstapSolver::getAstapDatabasePath(currentUiPath);
-    
+
     if (!dbPath.isEmpty()) {
         m_lblAstapStatus->setText(tr("ASTAP Star Database: installed"));
     } else {
         m_lblAstapStatus->setText(tr("ASTAP Star Database: not installed"));
     }
-}
+}
+
+void SettingsDialog::pickProjectRootPath() {
+    QString startDir = m_projectRootPath->text().trimmed();
+    if (startDir.isEmpty()) startDir = QDir::homePath();
+    QString path = QFileDialog::getExistingDirectory(
+        this, tr("Select Project Files Root Directory"), startDir);
+    if (!path.isEmpty()) {
+        m_projectRootPath->setText(path);
+        m_settings.setValue("paths/project_root", path);
+        m_settings.sync();
+    }
+}

@@ -1114,6 +1114,14 @@
             <translation type="finished">Caché borrada</translation>
         </message>
         <message>
+            <source>Cancel</source>
+            <translation type="finished">Cancelar</translation>
+        </message>
+        <message>
+            <source>Cancelling...</source>
+            <translation type="finished">Cancelando...</translation>
+        </message>
+        <message>
             <source>Catalog Background Extraction</source>
             <translation type="finished">Extracción de Fondo de Catálogo</translation>
         </message>
@@ -8505,10 +8513,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">No se encontraron suficientes estrellas de catálogo (%1).</translation>
         </message>
         <message>
-            <source>Not enough image stars detected (%1).</source>
-            <translation type="finished">No se detectaron suficientes estrellas en la imagen (%1).</translation>
-        </message>
-        <message>
             <source>Pixel scale is invalid or missing; proceeding without strict scale constraints.</source>
             <translation type="finished">La escala de píxeles no es válida o falta; procediendo sin restricciones de escala estrictas.</translation>
         </message>
@@ -8519,6 +8523,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Querying Catalog (VizieR)...</source>
             <translation type="finished">Consultando Catálogo (VizieR)...</translation>
+        </message>
+        <message>
+            <source>Recalculation resulted in flat match set.</source>
+            <translation type="finished">El recálculo resultó en un conjunto de coincidencias plano.</translation>
         </message>
         <message>
             <source>Search radius %1 deg &gt; 3.0 deg: using Gaia 1.0 deg for online query. Recommend ASTAP for wide fields.</source>
@@ -8533,8 +8541,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Iniciando Solver Nativo. Centro: %1, %2 Radio: %3 deg</translation>
         </message>
         <message>
-            <source>Starting native solve pipeline...</source>
-            <translation type="finished">Iniciando tubería de resolución nativa...</translation>
+            <source>Starting native solve pipeline in background...</source>
+            <translation type="finished">Iniciando tubería de resolución nativa en segundo piano...</translation>
         </message>
         <message>
             <source>Too few valid pairs after culling (%1).</source>
@@ -8627,6 +8635,14 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Calibración Fallida.</translation>
         </message>
         <message>
+            <source>Cancel</source>
+            <translation type="finished">Cancelar</translation>
+        </message>
+        <message>
+            <source>Cancelling...</source>
+            <translation type="finished">Cancelando...</translation>
+        </message>
+        <message>
             <source>Catalog Error: %1</source>
             <translation type="finished">Error Catálogo: %1</translation>
         </message>
@@ -8657,10 +8673,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Factors (K):\nR: %1\nG: %2\nB: %3\n\nBackground Ref (Detected):\nR: %4\nG: %5\nB: %6\n\nComputed Offsets:\nR: %7\nG: %8\nB: %9</source>
             <translation type="finished">Factores (K):\nR: %1\nG: %2\nB: %3\n\nRef Fondo (Detectado):\nR: %4\nG: %5\nB: %6\n\nOffsets Calculados:\nR: %7\nG: %8\nB: %9</translation>
-        </message>
-        <message>
-            <source>Image must be plate solved first.</source>
-            <translation type="finished">La imagen debe ser resuelta astrométricamente primero.</translation>
         </message>
         <message>
             <source>PCC</source>
@@ -8983,8 +8995,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Solucionador interno</translation>
         </message>
         <message>
-            <source>Native solver cancel not supported.</source>
-            <translation type="finished">Cancelación de solucionador nativo no soportada.</translation>
+            <source>Native solver cancel requested.</source>
+            <translation type="finished">Cancelación del resolvedor nativo solicitada.</translation>
         </message>
         <message>
             <source>Object Name (e.g. M31)</source>
@@ -10332,6 +10344,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Una segunda curva de filtro opcional (ej. combinando L-Pro con un corte IR).</translation>
         </message>
         <message>
+            <source>Active image has no plate solution. Solve with ASTAP first.</source>
+            <translation type="finished">La imagen activa no tiene solución astrométrica. Resuelve con ASTAP primero.</translation>
+        </message>
+        <message>
             <source>Applies a single global multiplier per channel. If unchecked, applies a non-linear polynomial warping based on the fitted model.</source>
             <translation type="finished">Aplica un único multiplicador global por canal. Si no está marcado, aplica una deformación polinomial no lineal basada en el modelo ajustado.</translation>
         </message>
@@ -10350,6 +10366,14 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Calibration failed.</source>
             <translation type="finished">Calibración fallida.</translation>
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="finished">Cancelar</translation>
+        </message>
+        <message>
+            <source>Cancelling...</source>
+            <translation type="finished">Cancelando...</translation>
         </message>
         <message>
             <source>Catalog Error</source>
@@ -10390,10 +10414,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Gradient Surface Method:</source>
             <translation type="finished">Método de Superficie de Gradiente:</translation>
-        </message>
-        <message>
-            <source>Image must be plate-solved first.</source>
-            <translation type="finished">La imagen debe estar resuelta astrométricamente primero.</translation>
         </message>
         <message>
             <source>LP / Cut Filter 1:</source>
@@ -10781,6 +10801,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Añadir</translation>
         </message>
         <message>
+            <source>Available commands:\n</source>
+            <translation type="finished">Comandos disponibles:\n</translation>
+        </message>
+        <message>
             <source>Cannot open script file: %1</source>
             <translation type="finished">No se puede abrir script: %1</translation>
         </message>
@@ -10867,6 +10891,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Variables</source>
             <translation type="finished">Variables</translation>
+        </message>
+        <message>
+            <source>\nVariables: ${VAR_NAME} or $VAR_NAME</source>
+            <translation type="finished">\nVariables: ${VAR_NAME} o $VAR_NAME</translation>
         </message>
         <message>
             <source>→ %1</source>
@@ -11137,6 +11165,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Display Stretch Predeterminado:</translation>
         </message>
         <message>
+            <source>Default: inside each project folder</source>
+            <translation type="finished">Predeterminado: en cada carpeta de proyecto</translation>
+        </message>
+        <message>
             <source>Display</source>
             <translation type="finished">Visualización</translation>
         </message>
@@ -11229,6 +11261,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">ProPhoto RGB</translation>
         </message>
         <message>
+            <source>Project Files Root:</source>
+            <translation type="finished">Raíz de archivos de proyecto:</translation>
+        </message>
+        <message>
             <source>Restart Required</source>
             <translation type="finished">Reinicio Requerido</translation>
         </message>
@@ -11239,6 +11275,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Select GraXpert Executable</source>
             <translation type="finished">Seleccionar Ejecutable GraXpert</translation>
+        </message>
+        <message>
+            <source>Select Project Files Root Directory</source>
+            <translation type="finished">Seleccionar directorio raíz de archivos de progetto</translation>
         </message>
         <message>
             <source>Select StarNet++ Executable</source>

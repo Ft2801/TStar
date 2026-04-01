@@ -23,6 +23,7 @@ public slots:
     void downloadModels();
     void downloadAstapCatalog();
     void saveSettings();
+    void pickProjectRootPath();
 
 signals:
     void settingsChanged();
@@ -47,6 +48,7 @@ private:
     QLabel* m_lblModelsStatus;
     QPushButton* m_btnDownloadAstap;
     QLabel* m_lblAstapStatus;
+    QLineEdit* m_projectRootPath;
 };
 
 #endif // SETTINGSDIALOG_H

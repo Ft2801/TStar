@@ -58,8 +58,14 @@ italian.UninstallOldVersion=È stata rilevata una versione precedente di TStar. 
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-; Main executable and all files from dist folder
-Source: "..\dist\TStar\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\dist\TStar\*"; \
+    DestDir: "{app}"; \
+    Flags: ignoreversion recursesubdirs createallsubdirs; \
+    Excludes: "scripts\*"
+
+Source: "..\dist\TStar\scripts\*"; \
+    DestDir: "{app}\scripts"; \
+    Flags: onlyifdoesntexist recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

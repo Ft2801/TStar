@@ -1114,6 +1114,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancelling...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Catalog Background Extraction</source>
             <translation type="unfinished" />
         </message>
@@ -8502,10 +8510,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Not enough image stars detected (%1).</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Pixel scale is invalid or missing; proceeding without strict scale constraints.</source>
             <translation type="unfinished" />
         </message>
@@ -8515,6 +8519,10 @@
         </message>
         <message>
             <source>Querying Catalog (VizieR)...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Recalculation resulted in flat match set.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8530,7 +8538,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Starting native solve pipeline...</source>
+            <source>Starting native solve pipeline in background...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8624,6 +8632,14 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancelling...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Catalog Error: %1</source>
             <translation type="unfinished" />
         </message>
@@ -8653,10 +8669,6 @@
         </message>
         <message>
             <source>Factors (K):\nR: %1\nG: %2\nB: %3\n\nBackground Ref (Detected):\nR: %4\nG: %5\nB: %6\n\nComputed Offsets:\nR: %7\nG: %8\nB: %9</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image must be plate solved first.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8980,7 +8992,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Native solver cancel not supported.</source>
+            <source>Native solver cancel requested.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10329,6 +10341,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Active image has no plate solution. Solve with ASTAP first.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Applies a single global multiplier per channel. If unchecked, applies a non-linear polynomial warping based on the fitted model.</source>
             <translation type="unfinished" />
         </message>
@@ -10346,6 +10362,14 @@
         </message>
         <message>
             <source>Calibration failed.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancelling...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10386,10 +10410,6 @@
         </message>
         <message>
             <source>Gradient Surface Method:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image must be plate-solved first.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10778,6 +10798,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Available commands:\n</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Cannot open script file: %1</source>
             <translation type="unfinished" />
         </message>
@@ -10863,6 +10887,10 @@
         </message>
         <message>
             <source>Variables</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>\nVariables: ${VAR_NAME} or $VAR_NAME</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11134,6 +11162,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Default: inside each project folder</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Display</source>
             <translation type="unfinished" />
         </message>
@@ -11226,6 +11258,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Project Files Root:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Restart Required</source>
             <translation type="unfinished" />
         </message>
@@ -11235,6 +11271,10 @@
         </message>
         <message>
             <source>Select GraXpert Executable</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Select Project Files Root Directory</source>
             <translation type="unfinished" />
         </message>
         <message>

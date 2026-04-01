@@ -523,7 +523,8 @@ void SPCCDialog::onFetchStars() {
     const ImageBuffer::Metadata& meta = m_viewer->getBuffer().metadata();
     if (!WCSUtils::hasValidWCS(meta)) {
         QMessageBox::warning(this, tr("No WCS"),
-            tr("Image must be plate-solved first."));
+            tr("Image must be plate solved before running SPCC.\n"
+               "After stacking, run the ASTAP solver, then retry."));
         return;
     }
 
@@ -568,10 +569,9 @@ void SPCCDialog::onCatalogReady(const std::vector<CatalogStar>& catalogStars) {
     const SPCCDataStore& storeRef = m_store;
     const QStringList allSEDs = SPCC::availableSEDs(storeRef);
     const double sepThreshold = m_sepThreshSpin->value();
-    const bool useGaia = true;
 
     QFuture<std::vector<StarRecord>> future = QtConcurrent::run(
-        [bufCopy, catalogStars, allSEDs, useGaia, sepThreshold, &storeRef]() -> std::vector<StarRecord>
+        [bufCopy, catalogStars, allSEDs, sepThreshold]() -> std::vector<StarRecord>
     {
         std::vector<StarRecord> matchedStars;
 
@@ -724,9 +724,17 @@ void SPCCDialog::onRun() {
         return;
     }
 
+    if (m_viewer && m_viewer->getBuffer().isValid()) {
+        const ImageBuffer::Metadata& currentMeta = m_viewer->getBuffer().metadata();
+        if (!WCSUtils::hasValidWCS(currentMeta)) {
+            QMessageBox::critical(this, tr("No WCS"),
+                tr("Active image has no plate solution. Solve with ASTAP first."));
+            return;
+        }
+    }
+
     // Take a fresh snapshot for Reset
     m_originalBuffer = m_viewer->getBuffer();
-
     setControlsEnabled(false);
     m_statusLabel->setText(tr("Starting calibration..."));
     m_progressBar->setValue(0);
@@ -747,7 +755,19 @@ void SPCCDialog::startCalibration() {
 
     QFuture<SPCCResult> future = QtConcurrent::run(
         [bufCopy, p, starsCopy]() -> SPCCResult {
-            return SPCC::calibrateWithStarList(bufCopy, p, starsCopy);
+            try {
+                return SPCC::calibrateWithStarList(bufCopy, p, starsCopy);
+            } catch (const std::exception& e) {
+                SPCCResult r;
+                r.success = false;
+                r.error_msg = QString("SPCC exception: %1").arg(e.what());
+                return r;
+            } catch (...) {
+                SPCCResult r;
+                r.success = false;
+                r.error_msg = "SPCC: unknown exception during calibration.";
+                return r;
+            }
         });
     m_calibWatcher->setFuture(future);
 }

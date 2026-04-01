@@ -64,9 +64,9 @@ void CatalogClient::sendAPASS() {
     QNetworkReply* reply = m_manager->get(req);
     
     // Timeout mechanism - 15 seconds per mirror
-    QTimer::singleShot(15000, reply, [this, reply]() {
+    QTimer::singleShot(15000, reply, [reply]() {
         if (reply->isRunning()) {
-            qWarning() << "VizieR APASS timeout on mirror" << s_currentMirrorIndex;
+            qWarning() << "VizieR APASS timeout on mirror" << CatalogClient::s_currentMirrorIndex;
             reply->abort();
         }
     });
@@ -120,9 +120,9 @@ void CatalogClient::sendGaia() {
     
     // Adaptive timeout: wider fields need more time on VizieR.
     const int timeoutMs = (m_lastQueryRadius > 2.0) ? 30000 : 20000;
-    QTimer::singleShot(timeoutMs, reply, [this, reply]() {
+    QTimer::singleShot(timeoutMs, reply, [reply]() {
         if (reply->isRunning()) {
-            qWarning() << "VizieR Gaia timeout on mirror" << s_currentMirrorIndex;
+            qWarning() << "VizieR Gaia timeout on mirror" << CatalogClient::s_currentMirrorIndex;
             reply->abort();
         }
     });
@@ -173,9 +173,9 @@ void CatalogClient::sendHyperLeda() {
     QNetworkReply* reply = m_manager->get(req);
     
     const int timeoutMs = (m_lastQueryRadius > 2.0) ? 30000 : 20000;
-    QTimer::singleShot(timeoutMs, reply, [this, reply]() {
+    QTimer::singleShot(timeoutMs, reply, [reply]() {
         if (reply->isRunning()) {
-            qWarning() << "VizieR HyperLeda timeout on mirror" << s_currentMirrorIndex;
+            qWarning() << "VizieR HyperLeda timeout on mirror" << CatalogClient::s_currentMirrorIndex;
             reply->abort();
         }
     });

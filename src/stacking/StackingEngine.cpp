@@ -1,6 +1,6 @@
 
 #include "StackingEngine.h"
-
+#include "../io/FitsHeaderUtils.h"
 
 #include <QDateTime>
 #include <set>
@@ -1818,12 +1818,52 @@ void StackingEngine::updateMetadata(StackingArgs& args) {
             foundStackCnt = true;
         }
     }
-    if (!foundStackCnt) {
+        if (!foundStackCnt) {
         ImageBuffer::Metadata::HeaderCard card;
         card.key     = "STACKCNT";
         card.value   = QString::number(args.nbImagesToStack);
         card.comment = "Number of stacked frames";
         meta.rawHeaders.push_back(card);
+    }
+
+    // Strip stale per-frame WCS cards, then rebuild fresh from meta struct
+    static const QSet<QString> wcsKeysToStrip = {
+        "CTYPE1","CTYPE2","EQUINOX","CRVAL1","CRVAL2","CRPIX1","CRPIX2",
+        "CD1_1","CD1_2","CD2_1","CD2_2","LONPOLE","LATPOLE",
+        "A_ORDER","B_ORDER","AP_ORDER","BP_ORDER"
+    };
+
+    auto& headers = meta.rawHeaders;
+    headers.erase(std::remove_if(headers.begin(), headers.end(),
+        [](const ImageBuffer::Metadata::HeaderCard& c) {
+            QString k = c.key.trimmed().toUpper();
+            if (wcsKeysToStrip.contains(k)) return true;
+            if ((k.startsWith("A_") || k.startsWith("B_") ||
+                 k.startsWith("AP_") || k.startsWith("BP_")) &&
+                k.contains('_', Qt::CaseSensitive)) return true;
+            return false;
+        }), headers.end());
+
+    if (FitsHeaderUtils::hasValidWCS(meta)) {
+        FitsHeaderUtils::Metadata fmeta;
+        fmeta.ra      = meta.ra;      fmeta.dec     = meta.dec;
+        fmeta.crpix1  = meta.crpix1;  fmeta.crpix2  = meta.crpix2;
+        fmeta.cd1_1   = meta.cd1_1;   fmeta.cd1_2   = meta.cd1_2;
+        fmeta.cd2_1   = meta.cd2_1;   fmeta.cd2_2   = meta.cd2_2;
+        fmeta.ctype1  = meta.ctype1;  fmeta.ctype2  = meta.ctype2;
+        fmeta.equinox = meta.equinox;
+        fmeta.lonpole = meta.lonpole; fmeta.latpole = meta.latpole;
+        fmeta.sipOrderA  = meta.sipOrderA;  fmeta.sipOrderB  = meta.sipOrderB;
+        fmeta.sipOrderAP = meta.sipOrderAP; fmeta.sipOrderBP = meta.sipOrderBP;
+        fmeta.sipCoeffs  = meta.sipCoeffs;
+        auto wcsCards = FitsHeaderUtils::buildWCSHeader(fmeta);
+        for (const auto& wc : wcsCards) {
+            ImageBuffer::Metadata::HeaderCard card;
+            card.key     = wc.key;
+            card.value   = wc.value;
+            card.comment = wc.comment;
+            headers.push_back(card);
+        }
     }
 }
 

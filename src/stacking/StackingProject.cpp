@@ -4,6 +4,8 @@
 #include <QJsonArray>
 #include <QFileInfo>
 #include <QDateTime>
+#include <QSettings>
+#include <QDir>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -74,46 +76,50 @@ bool StackingProject::load(const QString& projectFile) {
     if (!file.open(QIODevice::ReadOnly)) {
         return false;
     }
-    
     QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
     file.close();
-    
     if (!doc.isObject()) {
         return false;
     }
-    
-    // Set root directory from project file location
     m_rootDir = QFileInfo(projectFile).absolutePath();
-    
     if (!fromJson(doc.object())) {
         return false;
     }
-    
-    // Reconstruct directory paths
-    m_biasDir = m_rootDir + "/biases";
-    m_darkDir = m_rootDir + "/darks";
-    m_flatDir = m_rootDir + "/flats";
-    m_lightDir = m_rootDir + "/lights";
+    m_biasDir    = m_rootDir + "/biases";
+    m_darkDir    = m_rootDir + "/darks";
+    m_flatDir    = m_rootDir + "/flats";
+    m_lightDir   = m_rootDir + "/lights";
     m_processDir = m_rootDir + "/process";
-    m_outputDir = m_rootDir + "/output";
-    
+    m_outputDir  = m_rootDir + "/output";
     m_valid = true;
     return true;
 }
 
 bool StackingProject::save() const {
-    QString projectFile = m_rootDir + "/.tstar_project.json";
-    
+    QString projectFile = resolveProjectFilePath();
+    QFileInfo fi(projectFile);
+    QDir().mkpath(fi.absolutePath());
+
     QFile file(projectFile);
     if (!file.open(QIODevice::WriteOnly)) {
         return false;
     }
-    
     QJsonDocument doc(toJson());
     file.write(doc.toJson(QJsonDocument::Indented));
     file.close();
-    
     return true;
+}
+
+QString StackingProject::resolveProjectFilePath() const {
+    QSettings settings;
+    QString userRoot = settings.value("paths/project_root").toString().trimmed();
+    if (!userRoot.isEmpty()) {
+        QDir ud(userRoot);
+        if (ud.exists() || ud.mkpath(".")) {
+            return ud.absoluteFilePath(m_name + ".tstar_project.json");
+        }
+    }
+    return m_rootDir + "/.tstar_project.json";
 }
 
 //=============================================================================
@@ -266,6 +272,16 @@ QString StackingProject::findProjectFile(const QString& directory) {
     QString projectFile = directory + "/.tstar_project.json";
     if (QFile::exists(projectFile)) {
         return projectFile;
+    }
+    QSettings settings;
+    QString userRoot = settings.value("paths/project_root").toString().trimmed();
+    if (!userRoot.isEmpty()) {
+        QDir ud(userRoot);
+        QString name = QFileInfo(directory).fileName();
+        QString candidate = ud.absoluteFilePath(name + ".tstar_project.json");
+        if (QFile::exists(candidate)) {
+            return candidate;
+        }
     }
     return QString();
 }

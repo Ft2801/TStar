@@ -108,9 +108,11 @@ void PCCDialog::onRun() {
 
     double ra = meta.ra;
     double dec = meta.dec;
-    
+
     if (!WCSUtils::hasValidWCS(meta)) {
-        QMessageBox::critical(this, tr("Error"), tr("Image must be plate solved first."));
+        QMessageBox::critical(this, tr("Error"),
+            tr("Image must be plate solved before running PCC.\n"
+               "After stacking, run the ASTAP solver first."));
         return;
     }
     
@@ -141,18 +143,25 @@ void PCCDialog::onCatalogReady(const std::vector<CatalogStar>& stars) {
     ImageBuffer scopy = m_viewer->getBuffer();
     
     // Run Heavy Lifting in Background
+    float detThreshold = 2.0f;
+    {
+        const ImageBuffer::Metadata& m = m_viewer->getBuffer().metadata();
+        if (m.stackCount > 1) {
+            detThreshold = 3.0f;
+        }
+    }
     std::atomic<bool>* flagPtr = &m_cancelFlag;
-    QFuture<PCCResult> future = QtConcurrent::run([scopy, stars, flagPtr]() {
+    QFuture<PCCResult> future = QtConcurrent::run([scopy, stars, flagPtr, detThreshold]() {
         // 1. Background Neutralization Stats (Standard defaults: -2.8 sigma, +2.0 sigma)
         float bg_r = scopy.getRobustMedian(0, -2.8f, +2.0f);
         float bg_g = scopy.getRobustMedian(1, -2.8f, +2.0f);
         float bg_b = scopy.getRobustMedian(2, -2.8f, +2.0f);
-        
+
         // 2. Detect Stars
         StarDetector detector;
-        detector.setMaxStars(2000); // Increase limit for robustness
-        detector.setThresholdSigma(2.0f); // Sensible default?
-        
+        detector.setMaxStars(2000);
+        detector.setThresholdSigma(detThreshold);
+
         std::vector<DetectedStar> sR = detector.detect(scopy, 0);
         std::vector<DetectedStar> sG = detector.detect(scopy, 1);
         std::vector<DetectedStar> sB = detector.detect(scopy, 2);

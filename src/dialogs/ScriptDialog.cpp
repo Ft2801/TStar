@@ -38,7 +38,8 @@ ScriptDialog::ScriptDialog(MainWindow* parent)
     
     // Register stacking commands
     Scripting::StackingCommands::registerCommands(m_runner);
-    
+    buildCommandTooltip();
+
     // Connect runner signals
     connect(&m_runner, &Scripting::ScriptRunner::commandStarted,
             this, &ScriptDialog::onCommandStarted);
@@ -107,14 +108,7 @@ void ScriptDialog::setupUI() {
     m_scriptEditor = new QTextEdit(this);
     m_scriptEditor->setFontFamily("Consolas");
     m_scriptEditor->setStyleSheet("background-color: #1e1e1e; color: #d4d4d4;");
-    m_scriptEditor->setToolTip(tr("Available commands:\n"
-        "save <filename> [format]\n"
-        "starnet [stride] [create_star_mask]\n"
-        "align <ref> <target1> <target2> ...\n"
-        "integrate <type> <output>\n"
-        "load <filename>\n"
-        "pm <expression>\n"
-        "Variables can be used as ${VAR_NAME}"));
+    // Tooltip is set dynamically in buildCommandTooltip() after commands are registered
     editorLayout->addWidget(m_scriptEditor);
     topSplitter->addWidget(editorGroup);
     
@@ -447,4 +441,32 @@ void ScriptDialog::highlightLine(int lineNumber, bool error) {
     
     cursor.setCharFormat(fmt);
     m_scriptEditor->setTextCursor(cursor);
+}
+
+void ScriptDialog::buildCommandTooltip() {
+    QStringList cmdNames = m_runner.registeredCommands();
+    cmdNames.sort(Qt::CaseInsensitive);
+
+    QString tip = tr("Available commands:\n");
+    for (const QString& name : cmdNames) {
+        const Scripting::CommandDef* def = m_runner.getCommand(name);
+        if (!def) continue;
+        QString line = name;
+        if (!def->description.isEmpty()) {
+            line += " — " + def->description;
+        } else {
+            QString args;
+            if (def->minArgs > 0) {
+                for (int i = 0; i < def->minArgs; ++i)
+                    args += QString(" <arg%1>").arg(i + 1);
+            }
+            if (def->maxArgs < 0 || def->maxArgs > def->minArgs) {
+                args += " [...]";
+            }
+            line += args;
+        }
+        tip += line + "\n";
+    }
+    tip += tr("\nVariables: ${VAR_NAME} or $VAR_NAME");
+    m_scriptEditor->setToolTip(tip);
 }

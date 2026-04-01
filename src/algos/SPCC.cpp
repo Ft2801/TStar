@@ -40,6 +40,11 @@
 #  define M_PI 3.14159265358979323846
 #endif
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#endif
+
 Q_LOGGING_CATEGORY(lcSPCC, "spcc")
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1551,3 +1556,7 @@ SPCCResult SPCC::calibrateWithCatalog(const ImageBuffer& buf,
 
     return calibrateWithStarList(buf, params, records);
 }
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif

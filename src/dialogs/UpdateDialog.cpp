@@ -175,9 +175,23 @@ void UpdateDialog::onDownloadFinished() {
 }
 
 void UpdateDialog::launchInstaller() {
-    // Launch installer detached
 #if defined(Q_OS_MAC)
-    // On macOS, use 'open' to mount the DMG and show its contents
+    QString appDir = QCoreApplication::applicationDirPath();
+    QString scriptsSrc = QDir::cleanPath(appDir + "/../Resources/scripts");
+    QString scriptsBak = QDir::homePath() + "/Library/Application Support/TStar/scripts_backup";
+
+    QDir bakDir(scriptsBak);
+    if (!bakDir.exists()) bakDir.mkpath(".");
+
+    QDir srcDir(scriptsSrc);
+    if (srcDir.exists()) {
+        for (const QFileInfo& fi : srcDir.entryInfoList({"*.tss"}, QDir::Files)) {
+            QString dest = bakDir.absoluteFilePath(fi.fileName());
+            if (!QFile::exists(dest)) {
+                QFile::copy(fi.absoluteFilePath(), dest);
+            }
+        }
+    }
     bool success = QProcess::startDetached("open", QStringList() << m_destinationPath);
 #else
     bool success = QProcess::startDetached(m_destinationPath, QStringList());
@@ -185,6 +199,8 @@ void UpdateDialog::launchInstaller() {
     if (success) {
         QCoreApplication::quit();
     } else {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to launch installer. Please run it manually:\n%1").arg(m_destinationPath));
+        QMessageBox::critical(this, tr("Error"),
+            tr("Failed to launch installer. Please run it manually:\n%1")
+            .arg(m_destinationPath));
     }
 }
