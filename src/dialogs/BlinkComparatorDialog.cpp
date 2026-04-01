@@ -200,6 +200,10 @@ void BlinkComparatorDialog::setupUI() {
     connect(m_playPauseBtn, &QPushButton::clicked, this, &BlinkComparatorDialog::onPlayPauseClicked);
     leftLayout->addWidget(m_playPauseBtn);
     
+    m_switchBtn = new QPushButton(tr("Manual blink"), this);
+    connect(m_switchBtn, &QPushButton::clicked, this, &BlinkComparatorDialog::onSwitchClicked);
+    leftLayout->addWidget(m_switchBtn);
+    
     leftLayout->addSpacing(20);
     
     // AutoStretch Checkbox (styled as a tool button to match other tools)
@@ -225,9 +229,21 @@ void BlinkComparatorDialog::setupUI() {
     
     mainLayout->addWidget(leftPanel);
     
-    // --- Right Panel (Canvas) ---
+    // --- Right Panel (Filename + Canvas) ---
+    QWidget* rightPanel = new QWidget(this);
+    QVBoxLayout* rightLayout = new QVBoxLayout(rightPanel);
+    rightLayout->setContentsMargins(0, 0, 0, 0);
+    rightLayout->setSpacing(0);
+    
+    m_filenameLabel = new QLabel(tr("No Image"), this);
+    m_filenameLabel->setAlignment(Qt::AlignCenter);
+    m_filenameLabel->setStyleSheet("font-weight: bold; font-size: 14px; background-color: #222; color: #eee; padding: 5px; border-bottom: 1px solid #444;");
+    rightLayout->addWidget(m_filenameLabel);
+    
     m_canvas = new BlinkCanvas(this);
-    mainLayout->addWidget(m_canvas, 1);
+    rightLayout->addWidget(m_canvas, 1);
+    
+    mainLayout->addWidget(rightPanel, 1);
     
     connect(m_btnZoomIn, &QToolButton::clicked, m_canvas, &BlinkCanvas::zoomIn);
     connect(m_btnZoomOut, &QToolButton::clicked, m_canvas, &BlinkCanvas::zoomOut);
@@ -318,6 +334,15 @@ void BlinkComparatorDialog::onRateChanged(int rateMs) {
     }
 }
 
+void BlinkComparatorDialog::onSwitchClicked() {
+    if (m_isPlaying) {
+        m_playPauseBtn->setChecked(false);
+        onPlayPauseClicked();
+    }
+    m_showingView1 = !m_showingView1;
+    refreshCurrentImage();
+}
+
 void BlinkComparatorDialog::onAutoStretchToggled(bool checked) {
     m_useAutoStretch = checked;
     // Invalidate caches to force re-render
@@ -363,7 +388,9 @@ void BlinkComparatorDialog::onViewsSelectionChanged() {
 void BlinkComparatorDialog::refreshCurrentImage() {
     if (m_showingView1) {
         m_canvas->setImage(m_img1);
+        m_filenameLabel->setText(m_view1Combo->currentText());
     } else {
         m_canvas->setImage(m_img2);
+        m_filenameLabel->setText(m_view2Combo->currentText());
     }
 }

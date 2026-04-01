@@ -1063,6 +1063,10 @@
             <translation type="finished">Ajuster</translation>
         </message>
         <message>
+            <source>Manual blink</source>
+            <translation type="finished">Blink manual</translation>
+        </message>
+        <message>
             <source>No Image</source>
             <translation type="finished">Aucune Image</translation>
         </message>
@@ -5113,7 +5117,7 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         </message>
         <message>
             <source>TStar scripts (.tss) use a simple command-based syntax. Parameters in [brackets] are optional.</source>
-            <translation type="finished">Les scripts TStar (.tss) utilisent une syntaxe simple basée sur des commandes. Les paramètres entre [crochets] sont facultativi.</translation>
+            <translation type="finished">Les scripts TStar (.tss) utilisent une syntaxe simple basée sur des commandes. Les paramètres entre [crochets] sont facultatifs.</translation>
         </message>
         <message>
             <source>TStar supports FITS/FIT, XISF, TIFF/TIF, PNG, JPG/JPEG, BMP and (when LibRaw support is available) major camera RAW formats such as CR2/CR3/NEF/ARW/DNG/ORF/RW2/RAF and others.</source>
@@ -8559,10 +8563,6 @@ Choisissez Non pour appliquer uniquement en mémoire (vous pourrez Enregistrer s
         <message>
             <source>Detecting Image Stars...</source>
             <translation type="finished">Détection Étoiles Image...</translation>
-        </message>
-        <message>
-            <source>Image data buffer is inconsistent.</source>
-            <translation type="finished">Le tampon de données de l'image est incohérent.</translation>
         </message>
         <message>
             <source>Initial match: %1 pairs, offset=(%2, %3) arcsec</source>

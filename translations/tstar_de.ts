@@ -1063,6 +1063,10 @@
             <translation type="finished">Einpassen</translation>
         </message>
         <message>
+            <source>Manual blink</source>
+            <translation type="finished">Manueller Blink</translation>
+        </message>
+        <message>
             <source>No Image</source>
             <translation type="finished">Kein Bild</translation>
         </message>
@@ -8559,10 +8563,6 @@ Wählen Sie Nein, um nur im Speicher anzuwenden (Sie können später Speichern u
         <message>
             <source>Detecting Image Stars...</source>
             <translation type="finished">Erkenne Bildsterne...</translation>
-        </message>
-        <message>
-            <source>Image data buffer is inconsistent.</source>
-            <translation type="finished">Bilddatenpuffer ist inkonsistent.</translation>
         </message>
         <message>
             <source>Initial match: %1 pairs, offset=(%2, %3) arcsec</source>

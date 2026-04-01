@@ -1063,6 +1063,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Manual blink</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>No Image</source>
             <translation type="unfinished" />
         </message>
@@ -8555,10 +8559,6 @@
         </message>
         <message>
             <source>Detecting Image Stars...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image data buffer is inconsistent.</source>
             <translation type="unfinished" />
         </message>
         <message>

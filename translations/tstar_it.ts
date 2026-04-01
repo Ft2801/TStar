@@ -1063,6 +1063,10 @@
             <translation type="finished">Adatta</translation>
         </message>
         <message>
+            <source>Manual blink</source>
+            <translation type="finished">Blink manuale</translation>
+        </message>
+        <message>
             <source>No Image</source>
             <translation type="finished">Nessuna Immagine</translation>
         </message>
@@ -8559,10 +8563,6 @@ Scegli No per applicare solo in memoria (puoi usare Salva con Nome dopo).</trans
         <message>
             <source>Detecting Image Stars...</source>
             <translation type="finished">Rilevamento Stelle Immagine...</translation>
-        </message>
-        <message>
-            <source>Image data buffer is inconsistent.</source>
-            <translation type="finished">Il buffer dei dati dell'immagine è incoerente.</translation>
         </message>
         <message>
             <source>Initial match: %1 pairs, offset=(%2, %3) arcsec</source>

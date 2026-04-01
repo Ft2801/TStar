@@ -70,6 +70,7 @@ private slots:
     void onAutoStretchToggled(bool checked);
     void onViewsSelectionChanged();
     void refreshCurrentImage();
+    void onSwitchClicked();
 
 private:
     void setupUI();
@@ -81,6 +82,7 @@ private:
     QComboBox* m_view2Combo;
     QSpinBox* m_rateSpinBox;
     QPushButton* m_playPauseBtn;
+    QPushButton* m_switchBtn;
     QPushButton* m_refreshBtn;
     QToolButton* m_autoStretchBtn;
 
@@ -89,6 +91,7 @@ private:
     QToolButton* m_btnFit;
 
     BlinkCanvas* m_canvas;
+    QLabel* m_filenameLabel;
     
     QTimer m_blinkTimer;
     bool m_showingView1 = true;
