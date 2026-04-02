@@ -5,6 +5,11 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#elif defined(__APPLE__)
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#include <mach/mach.h>
+#include <unistd.h>
 #else
 #include <unistd.h>
 #endif
@@ -45,8 +50,25 @@ double SwapManager::getMemoryUsagePercent() {
     DWORDLONG totalPhysMem = memInfo.ullTotalPhys;
     DWORDLONG physMemUsed = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
     return (static_cast<double>(physMemUsed) / totalPhysMem) * 100.0;
+#elif defined(__APPLE__)
+    // macOS implementation
+    int64_t totalPhysMem = 0;
+    size_t len = sizeof(totalPhysMem);
+    if (sysctlbyname("hw.memsize", &totalPhysMem, &len, NULL, 0) != 0) return 0.0;
+    
+    mach_msg_type_number_t count = HOST_VM_INFO64_COUNT;
+    vm_statistics64_data_t vmstat;
+    if (host_statistics64(mach_host_self(), HOST_VM_INFO64, (host_info64_t)&vmstat, &count) != KERN_SUCCESS) {
+        return 0.0;
+    }
+    
+    long page_size = sysconf(_SC_PAGESIZE);
+    // Available = free + inactive + speculative
+    double availPhysMem = (double)(vmstat.free_count + vmstat.inactive_count + vmstat.speculative_count) * page_size;
+    double physMemUsed = (double)totalPhysMem - availPhysMem;
+    return (physMemUsed / (double)totalPhysMem) * 100.0;
 #else
-    // Linux/Mac implementation using sysconf
+    // Linux implementation 
     long pages = sysconf(_SC_PHYS_PAGES);
     long avail_pages = sysconf(_SC_AV_PHYS_PAGES);
     long page_size = sysconf(_SC_PAGESIZE);
