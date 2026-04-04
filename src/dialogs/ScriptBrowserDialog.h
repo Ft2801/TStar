@@ -40,7 +40,7 @@ private:
      * @brief Resolves the path to the application's scripts directory,
      *        searching several platform-specific and development locations.
      */
-    QString scriptsDir() const;
+    QStringList scriptDirs() const;
 
     QListWidget* m_scriptList;
     QTextEdit*   m_preview;

@@ -14,6 +14,7 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QStandardPaths>
 #include <QFont>
 
 // ----------------------------------------------------------------------------
@@ -97,61 +98,73 @@ void ScriptBrowserDialog::setupUI()
 // Private Methods - Script Discovery
 // ----------------------------------------------------------------------------
 
-QString ScriptBrowserDialog::scriptsDir() const
+QStringList ScriptBrowserDialog::scriptDirs() const
 {
+    QStringList paths;
     const QString appDir = QCoreApplication::applicationDirPath();
-    QString scriptsPath;
 
+    // 1. User Application Support (macOS) / AppData (Windows) - PRESERVED across updates
 #ifdef Q_OS_MAC
-    // On macOS, the application is a bundle; resources live in Contents/Resources
-    scriptsPath = appDir + "/../Resources/scripts";
-    if (QDir(scriptsPath).exists())
-        return QDir(scriptsPath).canonicalPath();
+    QString userPath = QDir::homePath() + "/Library/Application Support/TStar/scripts";
+#else
+    QString userPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/scripts";
+#endif
+    if (!userPath.isEmpty()) {
+        QDir().mkpath(userPath);
+        paths << userPath;
+    }
+
+    // 2. Bundled Resources (macOS bundle)
+#ifdef Q_OS_MAC
+    QString bundlePath = appDir + "/../Resources/scripts";
+    if (QDir(bundlePath).exists()) paths << QDir(bundlePath).canonicalPath();
 #endif
 
-    // Standard location alongside the executable (Windows, Linux, and development builds)
-    scriptsPath = appDir + "/scripts";
-    if (QDir(scriptsPath).exists())
-        return scriptsPath;
+    // 3. Executable relative (Windows / Dev)
+    QString binPath = appDir + "/scripts";
+    if (QDir(binPath).exists()) paths << binPath;
 
-    // Fallback: one level up from the build output directory (development environment)
+    // 4. Development fallbacks
     QDir parentDir(appDir);
     parentDir.cdUp();
+    QString devPath1 = parentDir.absolutePath() + "/scripts";
+    if (QDir(devPath1).exists()) paths << devPath1;
 
-    scriptsPath = parentDir.absolutePath() + "/scripts";
-    if (QDir(scriptsPath).exists())
-        return QDir(scriptsPath).absolutePath();
+    QString devPath2 = parentDir.absolutePath() + "/src/scripts";
+    if (QDir(devPath2).exists()) paths << devPath2;
 
-    scriptsPath = parentDir.absolutePath() + "/src/scripts";
-    if (QDir(scriptsPath).exists())
-        return QDir(scriptsPath).absolutePath();
-
-    return QString();
+    paths.removeDuplicates();
+    return paths;
 }
 
 void ScriptBrowserDialog::loadScripts()
 {
     m_scriptList->clear();
 
-    const QString path = scriptsDir();
-    if (path.isEmpty())
-    {
-        m_scriptList->addItem(tr("(Scripts folder not found)"));
-        return;
+    const QStringList paths = scriptDirs();
+    bool foundAny = false;
+
+    for (const QString& path : paths) {
+        QDir dir(path);
+        const QStringList filters = { "*.tss", "*.txt" };
+        const QStringList scripts = dir.entryList(filters, QDir::Files, QDir::Name);
+
+        for (const QString& script : scripts) {
+            QListWidgetItem* item = new QListWidgetItem(script);
+            item->setData(Qt::UserRole, dir.absoluteFilePath(script));
+            
+            // Highlight user scripts vs bundled scripts
+            if (path.contains("Application Support") || path.contains("AppData")) {
+                item->setForeground(QColor("#7abfff")); // Light blue for user scripts
+                item->setToolTip(tr("User script"));
+            }
+
+            m_scriptList->addItem(item);
+            foundAny = true;
+        }
     }
 
-    QDir dir(path);
-    const QStringList filters = { "*.tss", "*.txt" };
-    const QStringList scripts = dir.entryList(filters, QDir::Files, QDir::Name);
-
-    for (const QString& script : scripts)
-    {
-        QListWidgetItem* item = new QListWidgetItem(script);
-        item->setData(Qt::UserRole, dir.absoluteFilePath(script));
-        m_scriptList->addItem(item);
-    }
-
-    if (scripts.isEmpty())
+    if (!foundAny)
         m_scriptList->addItem(tr("(No scripts found)"));
 }
 

@@ -106,7 +106,7 @@ PlateSolvingDialog::PlateSolvingDialog(QWidget* parent)
     opticsLayout->addWidget(m_focalLength,                        0, 1);
     opticsLayout->addWidget(new QLabel(tr("Pixel Size (um):")),   1, 0);
     opticsLayout->addWidget(m_pixelSizeUm,                        1, 1);
-    opticsLayout->addWidget(new QLabel(tr("Pixel Scale (\"/px):")), 2, 0);
+    opticsLayout->addWidget(new QLabel(tr("Pixel Scale (arcsec/px):")), 2, 0);
     opticsLayout->addWidget(m_pixelScale,                         2, 1);
     opticsLayout->addWidget(btnCalcScale,                         2, 2);
 

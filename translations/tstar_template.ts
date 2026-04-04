@@ -3,6 +3,10 @@
     <context>
         <name>ABEDialog</name>
         <message>
+            <source>(C) 2026 SetiAstro</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>ABE Error: %1</source>
             <translation type="unfinished" />
         </message>
@@ -15,7 +19,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Applying correction...</source>
+            <source>Applying background correction...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -39,7 +43,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Downsampling image (Factor: %1)...</source>
+            <source>Downsampling image (factor: %1)...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -51,15 +55,15 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Evaluating Model (Channel %1)...</source>
+            <source>Evaluating model (channel %1)...</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Fitting Polynomial degree %1 (Channel %2)...</source>
+            <source>Fitting RBF (smooth: %1, channel %2)...</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Fitting RBF (Smooth: %1) (Channel %2)...</source>
+            <source>Fitting polynomial (degree %1, channel %2)...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -67,11 +71,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>If checked, aligns channel backgrounds to the same level.\nUncheck if you have already performed Photometric Color Calibration (PCC).</source>
+            <source>Generating sample points...</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>No valid sample points. Using grid fallback...</source>
+            <source>No valid sample points found. Falling back to uniform grid...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -99,15 +103,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Sampling points...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Starting ABE Model generation...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>© 2026 SetiAstro</source>
+            <source>Starting ABE model generation...</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -165,11 +161,15 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Copyright © 2026</source>
+            <source>Copyright (C) 2026</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>GitHub profile</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Link to my </source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -182,10 +182,6 @@
         </message>
         <message>
             <source>astronomy website</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>link to my </source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -228,15 +224,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Detection Threshold (σ):</source>
+            <source>Detection Threshold:</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Image %1: aligned (shift=%2,%3  rot=%4°  %5 stars)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image %1: registration failed — %2</source>
+            <source>Image %1: registration failed - %2</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -276,7 +268,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Select at least one image to align different from the reference.</source>
+            <source>Select at least one image to align, different from the reference.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -335,19 +327,19 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Click and drag to draw arrow</source>
+            <source>Click and drag to draw a circle</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Click and drag to draw circle</source>
+            <source>Click and drag to draw a rectangle</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Click and drag to draw rectangle</source>
+            <source>Click and drag to draw an arrow</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Click on image to add text label</source>
+            <source>Click on the image to place a text label</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -359,15 +351,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Compass position</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Constellations</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Could not find catalog data directory.</source>
+            <source>Could not find the catalog data directory.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -403,10 +391,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Image must be plate solved first.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>No image loaded</source>
             <translation type="unfinished" />
         </message>
@@ -435,11 +419,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Select mode</source>
+            <source>Select / Pan (no drawing)</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Select/Pan (no drawing)</source>
+            <source>Select mode</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -455,11 +439,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Text added. Click again to add more.</source>
+            <source>Text label added. Click again to add more.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Tip: Annotations are saved as overlay. If you close the tool, annotations will disappear, and then reappear when you open this tool again. Open this tool to continue editing with full undo/redo support. To burn annotations into the image, use File &gt; Save while the tool is open.</source>
+            <source>The image must be plate-solved before annotating.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -506,7 +490,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Invalid Mask Data</source>
+            <source>Invalid mask data</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -518,7 +502,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Select a mask to see preview</source>
+            <source>Select a mask to preview</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -553,11 +537,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Constant value subtracted from the image.</source>
+            <source>Constant offset subtracted from the image before stretching.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>For colour images, use human eye luminous efficiency weights to compute the luminance.</source>
+            <source>Controls the degree of non-linearity applied.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -592,15 +576,11 @@
             <source>Stretch factor:</source>
             <translation type="unfinished" />
         </message>
-        <message>
-            <source>The stretch factor adjusts the non-linearity.</source>
-            <translation type="unfinished" />
-        </message>
     </context>
     <context>
         <name>AstapDownloader</name>
         <message>
-            <source>Connecting to SourceForge…</source>
+            <source>Connecting to SourceForge...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -620,11 +600,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Downloading… %1 MB</source>
+            <source>Downloading... %1 MB</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Downloading… %1%</source>
+            <source>Downloading... %1%</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -675,10 +655,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>ASTAP timed out after %1 seconds. Terminating process...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>ASTAP timed out.</source>
             <translation type="unfinished" />
         </message>
@@ -711,11 +687,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Large FOV detected: reducing from %1° to %2° for search stability</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Note: ASTAP database not explicitly located by TStar; ASTAP will use its internal search paths.</source>
+            <source>Large FOV detected: reducing from %1 deg to %2 deg for search stability</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -754,7 +726,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>(C) 2026 Fabio Tempera</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>+</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>-</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -957,14 +937,6 @@
             <source>Zoom Out</source>
             <translation type="unfinished" />
         </message>
-        <message>
-            <source>© 2026 Fabio Tempera</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>−</source>
-            <translation type="unfinished" />
-        </message>
     </context>
     <context>
         <name>BackgroundNeutralizationDialog</name>
@@ -1094,10 +1066,6 @@
     <context>
         <name>CBEDialog</name>
         <message>
-            <source>  (non-standard orientation — ensure image has been recently plate-solved)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source> px</source>
             <translation type="unfinished" />
         </message>
@@ -1174,14 +1142,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>HiPS request: %1x%2 px, FoV=%3° (%4°x%5°), rot=%6°, parity=%7</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Image must be Plate Solved before using Catalog Background Extraction.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>No Astrometry</source>
             <translation type="unfinished" />
         </message>
@@ -1202,15 +1162,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Reference alignment cancelled. Background extraction aborted.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Reference image cache has been emptied.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Reference received (%1x%2, %3ch). Running gradient extraction...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1386,7 +1338,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Assign Profile (Keep pixel values, change interpretation)</source>
+            <source>Assign Profile (keep pixel values, change interpretation)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1410,7 +1362,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Convert to Profile (Change pixel values to match visual intent)</source>
+            <source>Convert to Profile (change pixel values to match visual intent)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -1554,6 +1506,10 @@
     </context>
     <context>
         <name>ContinuumSubtractionDialog</name>
+        <message>
+            <source> (starless)</source>
+            <translation type="unfinished" />
+        </message>
         <message>
             <source>%1 starless: NB (%2x%3) and Continuum (%4x%5) dimensions must match.</source>
             <translation type="unfinished" />
@@ -1823,7 +1779,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>WB Star Threshold (σ):</source>
+            <source>WB Star Threshold:</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -1993,7 +1949,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Redo: Correction Brush stroke performed.</source>
+            <source>Redo: Correction Brush stroke reapplied.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2009,7 +1965,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Undo: Correction Brush stroke performed.</source>
+            <source>Undo: Correction Brush stroke reverted.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -2274,10 +2230,6 @@
         </message>
         <message>
             <source>The image '%1' has unsaved changes. Do you want to close it?</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>This view is currently in use by the '%1' tool. Please close the tool or select different views before closing this image.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3004,6 +2956,10 @@
     <context>
         <name>GHSDialog</name>
         <message>
+            <source>(C) 2026 Mike Cranfield</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Apply</source>
             <translation type="unfinished" />
         </message>
@@ -3191,17 +3147,9 @@
             <source>Zoom:</source>
             <translation type="unfinished" />
         </message>
-        <message>
-            <source>© 2026 Mike Cranfield</source>
-            <translation type="unfinished" />
-        </message>
     </context>
     <context>
         <name>GlobalExceptionHandler</name>
-        <message>
-            <source>&lt;h3&gt;A critical error occurred&lt;/h3&gt;&lt;p&gt;The application must terminate.&lt;/p&gt;</source>
-            <translation type="unfinished" />
-        </message>
         <message>
             <source>&lt;h3&gt;An unexpected error occurred&lt;/h3&gt;</source>
             <translation type="unfinished" />
@@ -3282,10 +3230,6 @@
         <name>HeaderEditorDialog</name>
         <message>
             <source>Add/Update Key</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Apply changes and save file?\nWarning: This overwrites the existing file if you choose Yes.\nChoose No to only apply to memory (you can Save As later).</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -3650,10 +3594,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Automatically detects and subtracts the minimum pixel value (black floor) from the image. Essential before stretching to ensure true black levels.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Automatically stretches the image based on statistical analysis. Ideal for quick previews.</source>
             <translation type="unfinished" />
         </message>
@@ -3858,10 +3798,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Combines registered images to reduce noise and increase signal-to-noise ratio (SNR). Different stacking modes offer various trade-offs between noise reduction and artifact rejection:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Combines separate channel images into one RGB image.</source>
             <translation type="unfinished" />
         </message>
@@ -4058,10 +3994,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Displays a 3x3 grid of zoomed panels from the corners, edges, and center of your image. Useful for evaluating optical quality, coma, and field curvature across your frame.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Double-click to run a script on the active image</source>
             <translation type="unfinished" />
         </message>
@@ -4098,10 +4030,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Enable in Settings for smoother gradients and reduced banding in auto-stretched previews. Uses high-precision floating-point calculations instead of 16-bit histogram binning.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Enhances narrowband details by subtracting broadband continuum/star light:</source>
             <translation type="unfinished" />
         </message>
@@ -4115,10 +4043,6 @@
         </message>
         <message>
             <source>Enter a project name and select a directory location</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Equalizes the intensity of RGB channels by matching their medians. This is essential for achieving a neutral color balance before combining separate channels into a color image.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4143,10 +4067,6 @@
         </message>
         <message>
             <source>Extract Luminance</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Extracts the luminance (brightness) channel from an RGB image into a separate grayscale window. Useful for processing the L channel independently before recombining.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4622,10 +4542,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Organize your astrophotography workflow using Workspace Projects. A project maintains a dedicated working directory where all associated images, calibration files, and processing results are stored.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Output &amp; Quality Assessment</source>
             <translation type="unfinished" />
         </message>
@@ -4803,10 +4719,6 @@
         </message>
         <message>
             <source>Removes thermal noise that accumulates over exposure time</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Replaces the luminance channel of an RGB image with a processed version. Select the source luminance and target color image, then blend with adjustable intensity.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5106,19 +5018,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>TStar includes a comprehensive pipeline for preprocessing and stacking astronomical images. Follow these steps in order: Conversion → Calibration → Registration → Stacking.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>TStar includes workspace-level color management to keep display and processing behavior consistent across tools and sessions.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>TStar scripts (.tss) use a simple command-based syntax. Parameters in [brackets] are optional.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>TStar supports FITS/FIT, XISF, TIFF/TIF, PNG, JPG/JPEG, BMP and (when LibRaw support is available) major camera RAW formats such as CR2/CR3/NEF/ARW/DNG/ORF/RW2/RAF and others.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5151,10 +5051,6 @@
         </message>
         <message>
             <source>Tip: Create separate master frames for each filter (e.g., L, R, G, B, Ha, OIII, SII)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Tip: More frames allow aggressive rejection. With N=3 frames, use median. With N&gt;10, can use Kappa-Sigma with σ=2.5</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5291,10 +5187,6 @@
         </message>
         <message>
             <source>Weight frames by quality (FWHM, star count, background) before combining</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Welcome to TStar! This guide covers all features and tools available in the application.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -6426,7 +6318,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>NB → RGB Stars</source>
+            <source>NB -&gt; RGB Stars</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -6554,7 +6446,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Opened RAW: %1 (Bayer pattern: %2) – use Debayer to convert to colour.</source>
+            <source>Opened RAW: %1 (Bayer pattern: %2) -- use Debayer to convert to colour.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -6670,7 +6562,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Opening NB → RGB Stars...</source>
+            <source>Opening NB -&gt; RGB Stars...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -7433,7 +7325,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Fuzziness (°):</source>
+            <source>Fuzziness (deg):</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -7575,11 +7467,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Connecting to GitHub mirror…</source>
+            <source>Connecting to GitHub mirror...</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Connecting to Google Drive…</source>
+            <source>Connecting to Google Drive...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -7591,23 +7483,23 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Downloading from primary (Google Drive)…</source>
+            <source>Downloading from primary (Google Drive)...</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Downloading… %1 MB</source>
+            <source>Downloading... %1 MB</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Downloading… %1%</source>
+            <source>Downloading... %1%</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Downloading… 0%</source>
+            <source>Downloading... 0%</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Extracting models…</source>
+            <source>Extracting models...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -7627,7 +7519,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Finalizing installation…</source>
+            <source>Finalizing installation...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -7635,23 +7527,23 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Google Drive confirmation failed, trying GitHub mirror…</source>
+            <source>Google Drive confirmation failed, trying GitHub mirror...</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Google Drive failed. Trying GitHub mirror…</source>
+            <source>Google Drive failed. Trying GitHub mirror...</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Google Drive form parsing failed, trying GitHub mirror…</source>
+            <source>Google Drive form parsing failed, trying GitHub mirror...</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Google Drive interstitial detected — confirming…</source>
+            <source>Google Drive interstitial detected - confirming...</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Installing models…</source>
+            <source>Installing models...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -7659,11 +7551,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Models extraction completed but verification failed - expected file 'deep_sharp_stellar_AI4.pth' not found. Files extracted: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Primary failed. Trying backup (Google Drive)…</source>
+            <source>Primary failed. Trying backup (Google Drive)...</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -7773,11 +7661,11 @@
     <context>
         <name>MultiscaleDecompDialog</name>
         <message>
-            <source>Amount:</source>
+            <source>Amount</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Amt</source>
+            <source>Amount:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -7833,11 +7721,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Layer: R (Residual)</source>
+            <source>Layer: ---</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Layer: —</source>
+            <source>Layer: R (Residual)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -7905,11 +7793,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Thr (σ)</source>
+            <source>Threshold</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Threshold (σ):</source>
+            <source>Threshold:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8024,15 +7912,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>NB -&gt; RGB Stars</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>NB \u2192 RGB Stars</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>NB → RGB Stars</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>NB→RGB Stars</source>
+            <source>NB-&gt;RGB Stars</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8135,7 +8023,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Blackpoint\n(Min → Med):</source>
+            <source>Blackpoint (Min -&gt; Med):</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8247,7 +8135,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Imported %1 view → channels split.</source>
+            <source>Imported %1 view -&gt; channels split.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8482,19 +8370,11 @@
     <context>
         <name>NativePlateSolver</name>
         <message>
-            <source>    [Attempt %1 diag] maxVote=%2 validPairs=%3 nMatched=%4 stage=%5</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>  Attempt 1 failed, retrying without scale filter...</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>  Attempt 2 failed, retrying with 150 stars...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>  Attempt 3 failed, retrying with wider triangle radius 0.003...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8510,15 +8390,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>  No full convergence (offset=%1 arcsec), using best solution</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>  Not enough stars after reprojection (%1).</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>  Parity un-flip applied to TRANS (x01, y01 negated).</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8535,14 +8407,6 @@
         </message>
         <message>
             <source>Catalog Error: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Catalog mag range: %1 - %2 (%3 stars, %4 with bad mag)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Catalog magnitudes unavailable (%1 stars, all invalid mags)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8586,19 +8450,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Matched pair vectors became inconsistent (A=%1, B=%2, need=%3).</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Matching failed. No valid solution found.</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Not enough catalog stars found (%1).</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Pixel scale is invalid or missing; proceeding without strict scale constraints.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8611,10 +8467,6 @@
         </message>
         <message>
             <source>Recalculation resulted in flat match set.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Search radius %1 deg &gt; 3.0 deg: using Gaia 1.0 deg for online query. Recommend ASTAP for wide fields.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8631,10 +8483,6 @@
         </message>
         <message>
             <source>Too few valid pairs after culling (%1).</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Transform sanity check failed (|cos|≠|sin| by &gt;%.1f arcsec/px).</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8756,10 +8604,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Factors (K):\nR: %1\nG: %2\nB: %3\n\nBackground Ref (Detected):\nR: %4\nG: %5\nB: %6\n\nComputed Offsets:\nR: %7\nG: %8\nB: %9</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>PCC</source>
             <translation type="unfinished" />
         </message>
@@ -8838,6 +8682,10 @@
     <context>
         <name>PerfectPaletteDialog</name>
         <message>
+            <source>(C) 2026 SetiAstro</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>&lt;b&gt;Intensities&lt;/b&gt;</source>
             <translation type="unfinished" />
         </message>
@@ -8899,10 +8747,6 @@
         </message>
         <message>
             <source>Strength:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>© 2026 SetiAstro</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -8981,7 +8825,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Rescale result (maps min–max to 0–1)</source>
+            <source>Rescale result (maps min--max to 0--1)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -8990,14 +8834,6 @@
         </message>
         <message>
             <source>Unknown function '%1' with %2 arguments</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Unknown function or wrong arg count: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Unknown variable '%1'. Use r, g, b, or I1..I10 (with optional .r/.g/.b).</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9060,10 +8896,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Error: Enter valid Focal Length and Pixel Size to calculate scale.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Focal Length (mm)</source>
             <translation type="unfinished" />
         </message>
@@ -9096,15 +8928,15 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Pixel Scale (″/px):</source>
+            <source>Pixel Scale (arcsec/px):</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Pixel Size (µm)</source>
+            <source>Pixel Size (um)</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Pixel Size (µm):</source>
+            <source>Pixel Size (um):</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9148,7 +8980,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Solve in progress — cancel before closing.</source>
+            <source>Solve in progress -- cancel before closing.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9255,10 +9087,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Warning: Auto-detect Bayer Pattern failed (Header: '%1'). Defaulting to RGGB.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Warning: Missing exposure time metadata. Using scaling factor 1.0.</source>
             <translation type="unfinished" />
         </message>
@@ -9267,10 +9095,6 @@
         <name>PreprocessingDialog</name>
         <message>
             <source>(Optional)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>(Optional: A Master Dark frame taken at the SAME exposure time and temperature as your FLAT frames. Used to subtract thermal noise from the flats before flat-fielding. If left empty, the main DARK is used instead (or flats are not dark-subtracted if no dark is set). Cosmetic correction uses the DARK tab file — not this Dark for Flat.)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9286,6 +9110,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>&lt;span style='color:red'&gt;FAIL: %1&lt;/span&gt;</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>&lt;span style='color:red'&gt;Failed to create master bias&lt;/span&gt;</source>
             <translation type="unfinished" />
         </message>
@@ -9295,10 +9123,6 @@
         </message>
         <message>
             <source>&lt;span style='color:red'&gt;Failed to create master flat&lt;/span&gt;</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>&lt;span style='color:red'&gt;✗ %1&lt;/span&gt;</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9342,7 +9166,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Cold σ:</source>
+            <source>Cold sigma:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9410,11 +9234,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Hot σ:</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Identifies and repairs individual defective rows or columns (stuck pixels, hot lines). A 'bad line' is a row or column whose mean value deviates significantly from its neighbours. Cosmetic correction (sigma-clipping or from Master Dark) provides complementary hot/cold pixel repair.</source>
+            <source>Hot sigma:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9443,6 +9263,10 @@
         </message>
         <message>
             <source>No Files</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>OK: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9475,10 +9299,6 @@
         </message>
         <message>
             <source>Remove</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Repairs horizontal readout banding noise common in CMOS sensors. Works by estimating and subtracting the per-row/column offset. Enable only if you see horizontal stripe patterns in dark or bias frames.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -9565,13 +9385,13 @@
             <source>VNG</source>
             <translation type="unfinished" />
         </message>
-        <message>
-            <source>✓ %1</source>
-            <translation type="unfinished" />
-        </message>
     </context>
     <context>
         <name>RARDialog</name>
+        <message>
+            <source>(C) 2026 Riccardo Alberghi</source>
+            <translation type="unfinished" />
+        </message>
         <message>
             <source>Aberration Removal Complete.</source>
             <translation type="unfinished" />
@@ -9722,10 +9542,6 @@
         </message>
         <message>
             <source>The model is already downloaded:\n%1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>© 2026 Riccardo Alberghi</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -10082,10 +9898,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Check if the reference image pattern matches your image. Use the buttons below to flip or rotate it if necessary.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Fine Rotation:</source>
             <translation type="unfinished" />
         </message>
@@ -10110,11 +9922,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Rotate 90° CCW</source>
+            <source>Rotate 90 deg CCW</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Rotate 90° CW</source>
+            <source>Rotate 90 deg CW</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10129,23 +9941,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Detected %1 stars</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Detecting stars in reference (uncached)...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Detecting stars in reference image...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Detecting stars in target image...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Extracting luminance...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10157,15 +9953,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Image %1: %2 stars detected, %3 matched, shift=(%4, %5), rot=%6 deg</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Image %1: registration FAILED - %2</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>No stars detected</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10198,10 +9986,6 @@
         </message>
         <message>
             <source>Saved: %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Target: %1 stars detected</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -10252,7 +10036,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Detection σ:</source>
+            <source>Detection Sigma:</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10433,10 +10217,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Applies a single global multiplier per channel. If unchecked, applies a non-linear polynomial warping based on the fitted model.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>B Filter:</source>
             <translation type="unfinished" />
         </message>
@@ -10521,7 +10301,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Method used to model and subtract the sky background from the image.</source>
+            <source>Method used to model and subtract the sky background.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10649,7 +10429,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Select at least one of the R, G or B filter curves, or a Sensor curve with internal Bayer filters.</source>
+            <source>Select at least one R, G, or B filter curve, or a Sensor curve.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10677,7 +10457,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Stellar Spectral Energy Distribution used as the white point reference (e.g., G2V for Sun-like stars).</source>
+            <source>Stellar SED used as the white point reference (e.g., G2V for Sun-like).</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10701,7 +10481,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Warning: tstar_data.fits not found — combo boxes will be empty.</source>
+            <source>Warning: tstar_data.fits not found --- combo boxes will be empty.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10819,15 +10599,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>(Scripts folder not found)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Available Scripts</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Available commands: save &lt;filename&gt; [format], starnet [stride] [create_star_mask], align &lt;ref&gt; &lt;target1&gt; &lt;target2&gt; ..., integrate &lt;type&gt; &lt;output&gt;, load &lt;filename&gt;, pm &lt;expression&gt;, Variables: ${VAR_NAME}</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10854,6 +10626,10 @@
             <source>TStar Scripts</source>
             <translation type="unfinished" />
         </message>
+        <message>
+            <source>User script</source>
+            <translation type="unfinished" />
+        </message>
     </context>
     <context>
         <name>ScriptDialog</name>
@@ -10862,11 +10638,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>-&gt; %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>&lt;span style='color:lime'&gt;Script finished successfully.&lt;/span&gt;</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>&lt;span style='color:red'&gt;  ✗ Failed&lt;/span&gt;</source>
+            <source>&lt;span style='color:red'&gt;Failed&lt;/span&gt;</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10981,10 +10761,6 @@
             <source>\nVariables: ${VAR_NAME} or $VAR_NAME</source>
             <translation type="unfinished" />
         </message>
-        <message>
-            <source>→ %1</source>
-            <translation type="unfinished" />
-        </message>
     </context>
     <context>
         <name>ScriptParser</name>
@@ -11087,7 +10863,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Hue End (°):</source>
+            <source>Hue End (deg):</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11095,7 +10871,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Hue Start (°):</source>
+            <source>Hue Start (deg):</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11159,7 +10935,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Smoothness (°):</source>
+            <source>Smoothness (deg):</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11234,7 +11010,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Cosmic Clarity models</source>
+            <source>Cosmic Clarity Models</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11262,7 +11038,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Download latest Cosmic Clarity models</source>
+            <source>Download Latest Cosmic Clarity Models</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11338,7 +11114,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Preparing…</source>
+            <source>Preparing...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11431,7 +11207,7 @@
     <context>
         <name>SimpleTiffReader</name>
         <message>
-            <source>Compressed TIFFs not supported (only Uncompressed).</source>
+            <source>Compressed TIFFs are not supported (only uncompressed).</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11447,7 +11223,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Invalid TIFF version (not 42).</source>
+            <source>Invalid TIFF version (expected 42).</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11516,6 +11292,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Resolving relative path: '%1' -&gt; '%2'</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Stacking cancelled</source>
             <translation type="unfinished" />
         </message>
@@ -11548,10 +11328,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>StarNet: failed to start – check executable path and permissions.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>StarNet: failed to write input TIFF: %1</source>
             <translation type="unfinished" />
         </message>
@@ -11565,10 +11341,6 @@
         </message>
         <message>
             <source>StarNet: no image loaded</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>StarNet: output TIFF not found: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11593,10 +11365,6 @@
         </message>
         <message>
             <source>save: failed to write %1</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>save: no filename specified (use positional arg or -out=...)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11731,10 +11499,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Comet shifts applied. You can now stack with 'Comet' mode (ensure registration is done).</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Comet shifts computed successfully.</source>
             <translation type="unfinished" />
         </message>
@@ -11763,7 +11527,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Debayer images on-the-fly during stacking. Enable this for RAW/CFA images.</source>
+            <source>Debayer images on-the-fly during stacking. Enable for RAW/CFA images.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -12119,7 +11883,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>W×H</source>
+            <source>WxH</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -12127,7 +11891,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>σ</source>
+            <source>s</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -12211,10 +11975,6 @@
         </message>
         <message>
             <source>Loading image %1/%2...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Mean stacking complete (accelerated C)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -12570,10 +12330,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>If checked, applies an auto-stretch before StarNet and inverts it afterwards.\nEssential for linear images.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Linear Data (Pre-stretch)</source>
             <translation type="unfinished" />
         </message>
@@ -12827,6 +12583,10 @@
     <context>
         <name>StretchDialog</name>
         <message>
+            <source>(C) 2026 SetiAstro</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Amount:</source>
             <translation type="unfinished" />
         </message>
@@ -12931,7 +12691,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Statistical Stretch applied (M=%1, BP=%2σ)</source>
+            <source>Statistical Stretch applied (M=%1, BP=%2?)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -12946,15 +12706,11 @@
             <source>Target median brightness after stretch (0.25 = typical astro)</source>
             <translation type="unfinished" />
         </message>
-        <message>
-            <source>© 2026 SetiAstro</source>
-            <translation type="unfinished" />
-        </message>
     </context>
     <context>
         <name>Task</name>
         <message>
-            <source>Processing %1 / 100</source>
+            <source>Processing %1/100</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -13153,6 +12909,10 @@
     <context>
         <name>WavescaleHDRDialog</name>
         <message>
+            <source>(C) 2026 SetiAstro</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Apply</source>
             <translation type="unfinished" />
         </message>
@@ -13212,10 +12972,6 @@
             <source>Wavescale HDR applied.</source>
             <translation type="unfinished" />
         </message>
-        <message>
-            <source>© 2026 SetiAstro</source>
-            <translation type="unfinished" />
-        </message>
     </context>
     <context>
         <name>XISFReader</name>
@@ -13224,39 +12980,39 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Could not locate Data element in embedded block.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Could not open file: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Could not parse embedded data element.</source>
+            <source>Data block too small: expected %1 bytes, got %2.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Data block too small: expected %1 bytes, got %2</source>
+            <source>Image index %1 out of range (file has %2 images).</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Image index %1 out of range (file has %2 images)</source>
+            <source>Incomplete XML header read.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Incomplete XML Header.</source>
+            <source>Incomplete data read: expected %1 bytes, got %2.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Incomplete data read: expected %1 bytes, got %2</source>
+            <source>Invalid XISF signature.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Invalid Header Length: %1</source>
+            <source>Invalid XISF signature. File is not XISF 1.0.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Invalid XISF Signature.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Invalid XISF Signature. File is not XISF 1.0.</source>
+            <source>Invalid header length: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -13264,11 +13020,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Seek error to data block at %1</source>
+            <source>Seek error to data block at offset %1.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Unexpected EOF reading header length.</source>
+            <source>Unexpected EOF while reading header length.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -13280,7 +13036,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Unknown inline encoding: %1</source>
+            <source>Unknown inline data encoding: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -13288,7 +13044,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>XML Parse Error: %1</source>
+            <source>XML parse error: %1</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -13306,67 +13062,7 @@
     <context>
         <name>main</name>
         <message>
-            <source>Applying Custom Widgets...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Configuring UI Colors...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Configuring Workspace...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Constructing Main Window...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Finalizing Setup...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Initializing Core Systems...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Initializing Memory Manager...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Initializing OpenCV Backend...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Initializing Tool Dialogs...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Loading Color Management...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Loading Configuration...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Loading Icons &amp; Resources...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Loading Image Processing Algorithms...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Loading Stylesheets...</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Ready!</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Setting up Dark Theme...</source>
             <translation type="unfinished" />
         </message>
     </context>

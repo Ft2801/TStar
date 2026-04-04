@@ -214,7 +214,7 @@ void NarrowbandNormalizationDialog::buildUI()
     m_normForm->addRow(tr("Mode:"),     m_cmbMode);
     m_normForm->addRow(tr("Lightness:"), m_cmbLightness);
 
-    m_lblBlackpoint      = new QLabel(tr("Blackpoint\n(Min -> Med):"), this);
+    m_lblBlackpoint      = new QLabel(tr("Blackpoint (Min -> Med):"), this);
     m_lblHLrecover       = new QLabel(tr("HL Recover:"),   this);
     m_lblHLreduct        = new QLabel(tr("HL Reduction:"), this);
     m_lblBrightness      = new QLabel(tr("Brightness:"),   this);

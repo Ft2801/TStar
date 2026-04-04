@@ -111,8 +111,14 @@ ScriptResult ScriptRunner::executeFile(const QString& path)
 
     // Scripts execute relative to the user-defined working directory
     // rather than the script file's location.
-    if (m_workingDir.isEmpty())
-        setWorkingDirectory(QDir::currentPath());
+    if (m_workingDir.isEmpty()) {
+        const QString scriptDir = fi.absoluteDir().absolutePath();
+        if (!scriptDir.isEmpty() && QDir(scriptDir).exists()) {
+            setWorkingDirectory(scriptDir);
+        } else {
+            setWorkingDirectory(QDir::currentPath());
+        }
+    }
 
     // Parse the file.
     ScriptParser parser;

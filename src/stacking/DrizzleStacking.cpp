@@ -129,7 +129,8 @@ void DrizzleStacking::drizzleFrame(
     std::vector<double>& accum,
     std::vector<double>& weightAccum,
     int outputWidth, int outputHeight,
-    const DrizzleParams& params)
+    const DrizzleParams& params,
+    double offsetX, double offsetY)
 {
     const double scale = params.scaleFactor;
     const double drop  = params.dropSize;
@@ -155,7 +156,7 @@ void DrizzleStacking::drizzleFrame(
 
             for (int i = 0; i < 4; ++i) {
                 QPointF pt = reg.transform(px[i], py[i]);
-                quad[i] = { pt.x() * scale, pt.y() * scale };
+                quad[i] = { (pt.x() - offsetX) * scale, (pt.y() - offsetY) * scale };
             }
 
             // Shrink polygon to simulate the drop size
@@ -193,8 +194,8 @@ void DrizzleStacking::drizzleFrame(
                             double cxIn = static_cast<double>(x) + 0.5;
                             double cyIn = static_cast<double>(y) + 0.5;
                             QPointF centerOut = reg.transform(cxIn, cyIn);
-                            double tx = centerOut.x() * scale;
-                            double ty = centerOut.y() * scale;
+                            double tx = (centerOut.x() - offsetX) * scale;
+                            double ty = (centerOut.y() - offsetY) * scale;
 
                             double dx = (static_cast<double>(ox) + 0.5) - tx;
                             double dy = (static_cast<double>(oy) + 0.5) - ty;
@@ -228,7 +229,8 @@ void DrizzleStacking::fastDrizzleFrame(
     std::vector<double>& accum,
     std::vector<double>& weightAccum,
     int outputWidth, int outputHeight,
-    const DrizzleParams& params)
+    const DrizzleParams& params,
+    double offsetX, double offsetY)
 {
     const int w        = input.width();
     const int h        = input.height();
@@ -245,8 +247,8 @@ void DrizzleStacking::fastDrizzleFrame(
             double cyIn = static_cast<double>(y) + 0.5;
 
             QPointF centerOut = reg.transform(cxIn, cyIn);
-            double tx = centerOut.x() * scale;
-            double ty = centerOut.y() * scale;
+            double tx = (centerOut.x() - offsetX) * scale;
+            double ty = (centerOut.y() - offsetY) * scale;
 
             // Nearest-neighbour output pixel
             int ox = static_cast<int>(std::floor(tx));
@@ -876,12 +878,13 @@ float DrizzleStacking::getKernelWeight(double dx, double dy) const
 // ============================================================================
 
 void DrizzleStacking::initialize(int inputWidth, int inputHeight, int channels,
-                                  const DrizzleParams& params)
+                                 const DrizzleParams& params,
+                                 double offsetX, double offsetY)
 {
-    m_params   = params;
-    m_channels = channels;
-
-    // Compute output dimensions from the scale factor
+    m_params    = params;
+    m_channels  = channels;
+    m_offsetX   = offsetX;
+    m_offsetY   = offsetY;
     m_outWidth  = static_cast<int>(inputWidth  * params.scaleFactor);
     m_outHeight = static_cast<int>(inputHeight * params.scaleFactor);
 
@@ -905,10 +908,12 @@ void DrizzleStacking::addImage(
 
     if (m_params.fastMode) {
         fastDrizzleFrame(img, reg, m_accum, m_weightAccum,
-                         m_outWidth, m_outHeight, m_params);
+                         m_outWidth, m_outHeight, m_params,
+                         m_offsetX, m_offsetY);
     } else {
         drizzleFrame(img, reg, m_accum, m_weightAccum,
-                     m_outWidth, m_outHeight, m_params);
+                     m_outWidth, m_outHeight, m_params,
+                     m_offsetX, m_offsetY);
     }
 }
 

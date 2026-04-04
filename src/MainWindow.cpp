@@ -6089,22 +6089,29 @@ QString MainWindow::getWorkspaceProjectsDir() const {
  *  5. User home path
  */
 QString MainWindow::getProjectWorkingDirectory() const {
-    // Active workspace project directory
+    // 1. Active workspace project directory
     if (m_workspaceProject.active && !m_workspaceProject.filePath.isEmpty()) {
         const QString projDir = QFileInfo(m_workspaceProject.filePath).absoluteDir().absolutePath();
         if (!projDir.isEmpty() && QDir(projDir).exists()) return projDir;
     }
 
-    // Current working directory
+    // 2. User Home / Documents (User preference: default to Home when no project is active)
+    // We prioritize this over CWD/LastDir to avoid getting stuck in random deep folders.
+    const QString homePath = QDir::homePath();
+    if (!homePath.isEmpty() && QDir(homePath).exists() && !m_workspaceProject.active) {
+        return homePath;
+    }
+
+    // 3. Current working directory
     const QString cwd = QDir::currentPath();
     if (!cwd.isEmpty() && QDir(cwd).exists()) return cwd;
 
-    // Persisted last working directory
+    // 4. Persisted last working directory
     QSettings settings("TStar", "TStar");
     const QString lastDir = settings.value("General/LastWorkingDir").toString();
     if (!lastDir.isEmpty() && QDir(lastDir).exists()) return lastDir;
 
-    // Desktop, then Home
+    // 5. Desktop (Final fallback)
     const QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     if (!desktopPath.isEmpty() && QDir(desktopPath).exists()) return desktopPath;
 

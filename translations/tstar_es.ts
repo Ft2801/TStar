@@ -3,6 +3,10 @@
     <context>
         <name>ABEDialog</name>
         <message>
+            <source>(C) 2026 SetiAstro</source>
+            <translation type="finished">(C) 2026 SetiAstro</translation>
+        </message>
+        <message>
             <source>ABE Error: %1</source>
             <translation type="finished">Error ABE: %1</translation>
         </message>
@@ -15,8 +19,8 @@
             <translation type="finished">Aplicar</translation>
         </message>
         <message>
-            <source>Applying correction...</source>
-            <translation type="finished">Aplicando corrección...</translation>
+            <source>Applying background correction...</source>
+            <translation type="finished">Aplicando corrección de fondo...</translation>
         </message>
         <message>
             <source>Auto Background Extraction</source>
@@ -39,8 +43,8 @@
             <translation type="finished">Submuestreo:</translation>
         </message>
         <message>
-            <source>Downsampling image (Factor: %1)...</source>
-            <translation type="finished">Submuestrando imagen (Factor: %1)...</translation>
+            <source>Downsampling image (factor: %1)...</source>
+            <translation type="finished">Submuestreo de immagine (factor: %1)...</translation>
         </message>
         <message>
             <source>Enable RBF</source>
@@ -51,28 +55,28 @@
             <translation type="finished">Error: Los datos de la imagen parecen vacíos o inválidos.</translation>
         </message>
         <message>
-            <source>Evaluating Model (Channel %1)...</source>
-            <translation type="finished">Evaluando Modelo (Canal %1)...</translation>
+            <source>Evaluating model (channel %1)...</source>
+            <translation type="finished">Evaluando modelo (canal %1)...</translation>
         </message>
         <message>
-            <source>Fitting Polynomial degree %1 (Channel %2)...</source>
-            <translation type="finished">Ajustando Polinomio grado %1 (Canal %2)...</translation>
+            <source>Fitting RBF (smooth: %1, channel %2)...</source>
+            <translation type="finished">Ajuste RBF (suavizado: %1, canal %2)...</translation>
         </message>
         <message>
-            <source>Fitting RBF (Smooth: %1) (Channel %2)...</source>
-            <translation type="finished">Ajustando RBF (Suav: %1) (Canal %2)...</translation>
+            <source>Fitting polynomial (degree %1, channel %2)...</source>
+            <translation type="finished">Ajuste polinomial (grado %1, canal %2)...</translation>
         </message>
         <message>
             <source>Found %1 valid sample points.</source>
             <translation type="finished">Encontrados %1 puntos de muestra válidos.</translation>
         </message>
         <message>
-            <source>If checked, aligns channel backgrounds to the same level.\nUncheck if you have already performed Photometric Color Calibration (PCC).</source>
-            <translation type="finished">Si se marca, alinea los fondos de canal al mismo nivel. Desmarcar si ya se realizó Calibración de Color Fotométrica (PCC).</translation>
+            <source>Generating sample points...</source>
+            <translation type="finished">Generando puntos de muestreo...</translation>
         </message>
         <message>
-            <source>No valid sample points. Using grid fallback...</source>
-            <translation type="finished">No hay puntos de muestreo válidos. Usando rejilla alternativa...</translation>
+            <source>No valid sample points found. Falling back to uniform grid...</source>
+            <translation type="finished">No si trovaron puntos de muestreo válidos. Volviendo a la cuadrícula uniforme...</translation>
         </message>
         <message>
             <source>Normalize Background (Undo Color Calib)</source>
@@ -99,16 +103,8 @@
             <translation type="finished">Muestras:</translation>
         </message>
         <message>
-            <source>Sampling points...</source>
-            <translation type="finished">Muestreando puntos...</translation>
-        </message>
-        <message>
-            <source>Starting ABE Model generation...</source>
-            <translation type="finished">Iniciando generación Modelo ABE...</translation>
-        </message>
-        <message>
-            <source>© 2026 SetiAstro</source>
-            <translation type="finished">© 2026 SetiAstro</translation>
+            <source>Starting ABE model generation...</source>
+            <translation type="finished">Iniciando generación de modelo ABE...</translation>
         </message>
     </context>
     <context>
@@ -165,12 +161,16 @@
             <translation type="finished">Compilación:</translation>
         </message>
         <message>
-            <source>Copyright © 2026</source>
-            <translation type="finished">Copyright © 2026</translation>
+            <source>Copyright (C) 2026</source>
+            <translation type="finished">Copyright (C) 2026</translation>
         </message>
         <message>
             <source>GitHub profile</source>
             <translation type="finished">perfil GitHub</translation>
+        </message>
+        <message>
+            <source>Link to my </source>
+            <translation type="finished">Enlace a mi</translation>
         </message>
         <message>
             <source>TStar is a professional astrophotography image processing application.</source>
@@ -183,10 +183,6 @@
         <message>
             <source>astronomy website</source>
             <translation type="finished">sitio de astronomía</translation>
-        </message>
-        <message>
-            <source>link to my </source>
-            <translation type="finished">enlace a mi </translation>
         </message>
         <message>
             <source>portfolio</source>
@@ -228,16 +224,12 @@
             <translation type="finished">Completado: %1/%2 imágenes alineadas correctamente.</translation>
         </message>
         <message>
-            <source>Detection Threshold (σ):</source>
-            <translation type="finished">Umbral de detección (σ):</translation>
+            <source>Detection Threshold:</source>
+            <translation type="finished">Umbral de detección:</translation>
         </message>
         <message>
-            <source>Image %1: aligned (shift=%2,%3  rot=%4°  %5 stars)</source>
-            <translation type="finished">Imagen %1: alineada (shift=%2,%3  rot=%4°  %5 estrellas)</translation>
-        </message>
-        <message>
-            <source>Image %1: registration failed — %2</source>
-            <translation type="finished">Imagen %1: falló el registro — %2</translation>
+            <source>Image %1: registration failed - %2</source>
+            <translation type="finished">Imagen %1: registro fallido - %2</translation>
         </message>
         <message>
             <source>Image 1:</source>
@@ -276,8 +268,8 @@
             <translation type="finished">Selecciona una imagen de referencia válida.</translation>
         </message>
         <message>
-            <source>Select at least one image to align different from the reference.</source>
-            <translation type="finished">Selecciona al menos una imagen para alinear diferente de la referencia.</translation>
+            <source>Select at least one image to align, different from the reference.</source>
+            <translation type="finished">Seleccione al menos una imagen para alinear, distinta de la referencia.</translation>
         </message>
         <message>
             <source>The reference image is empty.</source>
@@ -335,20 +327,20 @@
             <translation type="finished">Borrar Todo</translation>
         </message>
         <message>
-            <source>Click and drag to draw arrow</source>
-            <translation type="finished">Haz clic y arrastra para dibujar flecha</translation>
+            <source>Click and drag to draw a circle</source>
+            <translation type="finished">Haga clic y arrastre para dibujar un círculo</translation>
         </message>
         <message>
-            <source>Click and drag to draw circle</source>
-            <translation type="finished">Haz clic y arrastra para dibujar círculo</translation>
+            <source>Click and drag to draw a rectangle</source>
+            <translation type="finished">Haga clic y arrastre para dibujar un rettangolo</translation>
         </message>
         <message>
-            <source>Click and drag to draw rectangle</source>
-            <translation type="finished">Haz clic y arrastra para dibujar rectángulo</translation>
+            <source>Click and drag to draw an arrow</source>
+            <translation type="finished">Haga clic e trascina per disegnare una freccia</translation>
         </message>
         <message>
-            <source>Click on image to add text label</source>
-            <translation type="finished">Haz clic en la imagen para añadir texto</translation>
+            <source>Click on the image to place a text label</source>
+            <translation type="finished">Haga clic en la imagen para colocar una etiqueta de texto</translation>
         </message>
         <message>
             <source>Color:</source>
@@ -359,16 +351,12 @@
             <translation type="finished">Brújula</translation>
         </message>
         <message>
-            <source>Compass position</source>
-            <translation type="finished">Posición de la brújula</translation>
-        </message>
-        <message>
             <source>Constellations</source>
             <translation type="finished">Constelaciones</translation>
         </message>
         <message>
-            <source>Could not find catalog data directory.</source>
-            <translation type="finished">No se pudo encontrar el directorio de datos del catálogo.</translation>
+            <source>Could not find the catalog data directory.</source>
+            <translation type="finished">No si pudo encontrar el directorio de datos del catálogo.</translation>
         </message>
         <message>
             <source>Cyan</source>
@@ -403,10 +391,6 @@
             <translation type="finished">Verde</translation>
         </message>
         <message>
-            <source>Image must be plate solved first.</source>
-            <translation type="finished">La imagen debe ser resuelta astrométricamente primero.</translation>
-        </message>
-        <message>
             <source>No image loaded</source>
             <translation type="finished">Ninguna imagen cargada</translation>
         </message>
@@ -435,12 +419,12 @@
             <translation type="finished">Seleccionar</translation>
         </message>
         <message>
-            <source>Select mode</source>
-            <translation type="finished">Modo selección</translation>
+            <source>Select / Pan (no drawing)</source>
+            <translation type="finished">Seleccionar / Pan (sin dibujo)</translation>
         </message>
         <message>
-            <source>Select/Pan (no drawing)</source>
-            <translation type="finished">Seleccionar/Pan (sin dibujo)</translation>
+            <source>Select mode</source>
+            <translation type="finished">Modo selección</translation>
         </message>
         <message>
             <source>Stars</source>
@@ -455,12 +439,12 @@
             <translation type="finished">Etiqueta de texto</translation>
         </message>
         <message>
-            <source>Text added. Click again to add more.</source>
-            <translation type="finished">Texto añadido. Haz clic de nuevo para añadir más.</translation>
+            <source>Text label added. Click again to add more.</source>
+            <translation type="finished">Etiqueta de texto añadida. Haga clic de nuevo para añadir más.</translation>
         </message>
         <message>
-            <source>Tip: Annotations are saved as overlay. If you close the tool, annotations will disappear, and then reappear when you open this tool again. Open this tool to continue editing with full undo/redo support. To burn annotations into the image, use File &gt; Save while the tool is open.</source>
-            <translation type="finished">Consejo: Las anotaciones se guardan como superposición. Si cierras la herramienta, las anotaciones desaparecerán y luego reaparecerán cuando abras esta herramienta nuevamente. Abre esta herramienta para continuar editando con soporte completo de deshacer/rehacer. Para grabar anotaciones en la imagen, usa Archivo &gt; Guardar mientras la herramienta está abierta.</translation>
+            <source>The image must be plate-solved before annotating.</source>
+            <translation type="finished">La imagen debe estar resuelta astrométricamente antes de anotar.</translation>
         </message>
         <message>
             <source>Top Left</source>
@@ -506,8 +490,8 @@
             <translation type="finished">Cancelar</translation>
         </message>
         <message>
-            <source>Invalid Mask Data</source>
-            <translation type="finished">Datos de Máscara no válidos</translation>
+            <source>Invalid mask data</source>
+            <translation type="finished">Datos de máscara no válidos</translation>
         </message>
         <message>
             <source>OK</source>
@@ -518,8 +502,8 @@
             <translation type="finished">Previsualización</translation>
         </message>
         <message>
-            <source>Select a mask to see preview</source>
-            <translation type="finished">Seleccione una máscara para ver la previsualización</translation>
+            <source>Select a mask to preview</source>
+            <translation type="finished">Seleccione una máscara para previsualizar</translation>
         </message>
         <message>
             <source>[Saved] %1</source>
@@ -553,12 +537,12 @@
             <translation type="finished">Cancelar</translation>
         </message>
         <message>
-            <source>Constant value subtracted from the image.</source>
-            <translation type="finished">Valor constante restado de la imagen.</translation>
+            <source>Constant offset subtracted from the image before stretching.</source>
+            <translation type="finished">Desplazamiento constante restado de la imagen antes del estiramiento.</translation>
         </message>
         <message>
-            <source>For colour images, use human eye luminous efficiency weights to compute the luminance.</source>
-            <translation type="finished">Para color, usar pesos de eficiencia luminosa humana.</translation>
+            <source>Controls the degree of non-linearity applied.</source>
+            <translation type="finished">Controla el grado de no linealidad aplicado.</translation>
         </message>
         <message>
             <source>High: %1%</source>
@@ -592,16 +576,12 @@
             <source>Stretch factor:</source>
             <translation type="finished">Factor Stretching:</translation>
         </message>
-        <message>
-            <source>The stretch factor adjusts the non-linearity.</source>
-            <translation type="finished">El factor de stretching ajusta la no-linealidad.</translation>
-        </message>
     </context>
     <context>
         <name>AstapDownloader</name>
         <message>
-            <source>Connecting to SourceForge…</source>
-            <translation type="finished">Conectando con SourceForge…</translation>
+            <source>Connecting to SourceForge...</source>
+            <translation type="finished">Conectando con SourceForge...</translation>
         </message>
         <message>
             <source>Download cancelled.</source>
@@ -620,12 +600,12 @@
             <translation type="finished">Descarga exitosa pero falló el inicio automático del instalador.</translation>
         </message>
         <message>
-            <source>Downloading… %1 MB</source>
-            <translation type="finished">Descargando… %1 MB</translation>
+            <source>Downloading... %1 MB</source>
+            <translation type="finished">Descargando... %1 MB</translation>
         </message>
         <message>
-            <source>Downloading… %1%</source>
-            <translation type="finished">Descargando… %1%</translation>
+            <source>Downloading... %1%</source>
+            <translation type="finished">Descargando... %1%</translation>
         </message>
         <message>
             <source>Failed to download ASTAP D50 Database.</source>
@@ -675,10 +655,6 @@
             <translation type="finished">Resolución ASTAP cancelada.</translation>
         </message>
         <message>
-            <source>ASTAP timed out after %1 seconds. Terminating process...</source>
-            <translation type="finished">ASTAP agotó el tiempo después de %1 secondi. Terminando proceso...</translation>
-        </message>
-        <message>
             <source>ASTAP timed out.</source>
             <translation type="finished">ASTAP agotó el tiempo.</translation>
         </message>
@@ -711,12 +687,8 @@
             <translation type="finished">Buffer de immagine no válido para resolución ASTAP.</translation>
         </message>
         <message>
-            <source>Large FOV detected: reducing from %1° to %2° for search stability</source>
-            <translation type="finished">FOV grande detectado: reduciendo de %1° a %2° para estabilidad de búsqueda</translation>
-        </message>
-        <message>
-            <source>Note: ASTAP database not explicitly located by TStar; ASTAP will use its internal search paths.</source>
-            <translation type="finished">Nota: base de datos ASTAP no localizada explícitamente por TStar; ASTAP usará sus rutas de búsqueda internas.</translation>
+            <source>Large FOV detected: reducing from %1 deg to %2 deg for search stability</source>
+            <translation type="finished">FOV grande detectado: reduciendo de %1 deg a %2 deg para estabilidad de búsqueda</translation>
         </message>
         <message>
             <source>QProcess start error: %1</source>
@@ -754,8 +726,16 @@
             <translation type="finished">%1 estrellas (de %2 total)</translation>
         </message>
         <message>
+            <source>(C) 2026 Fabio Tempera</source>
+            <translation type="finished">(C) 2026 Fabio Tempera</translation>
+        </message>
+        <message>
             <source>+</source>
             <translation type="finished">+</translation>
+        </message>
+        <message>
+            <source>-</source>
+            <translation type="finished">-</translation>
         </message>
         <message>
             <source>Add Star</source>
@@ -957,14 +937,6 @@
             <source>Zoom Out</source>
             <translation type="finished">Alejar</translation>
         </message>
-        <message>
-            <source>© 2026 Fabio Tempera</source>
-            <translation type="finished">© 2026 Fabio Tempera</translation>
-        </message>
-        <message>
-            <source>−</source>
-            <translation type="finished">−</translation>
-        </message>
     </context>
     <context>
         <name>BackgroundNeutralizationDialog</name>
@@ -1094,10 +1066,6 @@
     <context>
         <name>CBEDialog</name>
         <message>
-            <source>  (non-standard orientation — ensure image has been recently plate-solved)</source>
-            <translation type="finished">  (orientación no estándar — asegúrese de que la imagen haya sido resuelta astrométricamente recientemente)</translation>
-        </message>
-        <message>
             <source> px</source>
             <translation type="finished"> px</translation>
         </message>
@@ -1174,14 +1142,6 @@
             <translation type="finished">Encuesta HiPS:</translation>
         </message>
         <message>
-            <source>HiPS request: %1x%2 px, FoV=%3° (%4°x%5°), rot=%6°, parity=%7</source>
-            <translation type="finished">Petición HiPS: %1x%2 px, FoV=%3° (%4°x%5°), rot=%6°, paridad=%7</translation>
-        </message>
-        <message>
-            <source>Image must be Plate Solved before using Catalog Background Extraction.</source>
-            <translation type="finished">La imagen debe ser resuelta astrométricamente antes de usar la Extracción de Fondo por Catálogo.</translation>
-        </message>
-        <message>
             <source>No Astrometry</source>
             <translation type="finished">Sin Astrometría</translation>
         </message>
@@ -1202,16 +1162,8 @@
             <translation type="finished">Proteger Estrellas (Filtro morfológico)</translation>
         </message>
         <message>
-            <source>Reference alignment cancelled. Background extraction aborted.</source>
-            <translation type="finished">Alineación de referencia cancelada. Extracción de fondo interrumpida.</translation>
-        </message>
-        <message>
             <source>Reference image cache has been emptied.</source>
             <translation type="finished">La caché de imágenes de referencia ha sido vaciada.</translation>
-        </message>
-        <message>
-            <source>Reference received (%1x%2, %3ch). Running gradient extraction...</source>
-            <translation type="finished">Referencia recibida (%1x%2, %3ch). Ejecutando extracción de gradiente...</translation>
         </message>
         <message>
             <source>Requesting reference survey from HiPS...</source>
@@ -1386,8 +1338,8 @@
             <translation type="finished">Acción</translation>
         </message>
         <message>
-            <source>Assign Profile (Keep pixel values, change interpretation)</source>
-            <translation type="finished">Asignar perfil (Mantener valores de píxeles, cambiar interpretación)</translation>
+            <source>Assign Profile (keep pixel values, change interpretation)</source>
+            <translation type="finished">Asignar perfil (mantener valores de píxeles, cambiar interpretación)</translation>
         </message>
         <message>
             <source>Browse...</source>
@@ -1410,8 +1362,8 @@
             <translation type="finished">Transformación de perfil de color iniciada...</translation>
         </message>
         <message>
-            <source>Convert to Profile (Change pixel values to match visual intent)</source>
-            <translation type="finished">Convertir a perfil (Cambiar valores de píxeles para mantener la intención visual)</translation>
+            <source>Convert to Profile (change pixel values to match visual intent)</source>
+            <translation type="finished">Convertir a perfil (cambiar valores de píxeles para coincidir con la intención visual)</translation>
         </message>
         <message>
             <source>Current Image</source>
@@ -1554,6 +1506,10 @@
     </context>
     <context>
         <name>ContinuumSubtractionDialog</name>
+        <message>
+            <source> (starless)</source>
+            <translation type="finished"> (sin estrellas)</translation>
+        </message>
         <message>
             <source>%1 starless: NB (%2x%3) and Continuum (%4x%5) dimensions must match.</source>
             <translation type="finished">%1 starless: las dimensiones NB (%2x%3) y Continuum (%4x%5) deben coincidir.</translation>
@@ -1823,8 +1779,8 @@
             <translation type="finished">Canal desconocido: %1</translation>
         </message>
         <message>
-            <source>WB Star Threshold (σ):</source>
-            <translation type="finished">Umbral de estrellas WB (σ):</translation>
+            <source>WB Star Threshold:</source>
+            <translation type="finished">Umbral de estrellas WB:</translation>
         </message>
     </context>
     <context>
@@ -1993,8 +1949,8 @@
             <translation type="finished">Rehacer</translation>
         </message>
         <message>
-            <source>Redo: Correction Brush stroke performed.</source>
-            <translation type="finished">Rehacer: Trazo de pincel de corrección realizado.</translation>
+            <source>Redo: Correction Brush stroke reapplied.</source>
+            <translation type="finished">Rehacer: Trazo de pincel de corrección reaplicado.</translation>
         </message>
         <message>
             <source>Standard (Median)</source>
@@ -2009,8 +1965,8 @@
             <translation type="finished">Deshacer</translation>
         </message>
         <message>
-            <source>Undo: Correction Brush stroke performed.</source>
-            <translation type="finished">Deshacer: Trazo de pincel de corrección realizado.</translation>
+            <source>Undo: Correction Brush stroke reverted.</source>
+            <translation type="finished">Deshacer: Trazo de pincel de corrección revertido.</translation>
         </message>
         <message>
             <source>Zoom In</source>
@@ -2275,10 +2231,6 @@
         <message>
             <source>The image '%1' has unsaved changes. Do you want to close it?</source>
             <translation type="finished">Imagen '%1' tiene cambios sin guardar. ¿Cerrar?</translation>
-        </message>
-        <message>
-            <source>This view is currently in use by the '%1' tool. Please close the tool or select different views before closing this image.</source>
-            <translation type="finished">Esta vista está actualmente en uso por la herramienta "%1". Cierre la herramienta o seleccione vistas diferentes antes de cerrar esta imagen.</translation>
         </message>
         <message>
             <source>Unsaved Changes</source>
@@ -3004,6 +2956,10 @@
     <context>
         <name>GHSDialog</name>
         <message>
+            <source>(C) 2026 Mike Cranfield</source>
+            <translation type="finished">(C) 2026 Mike Cranfield</translation>
+        </message>
+        <message>
             <source>Apply</source>
             <translation type="finished">Aplicar</translation>
         </message>
@@ -3191,17 +3147,9 @@
             <source>Zoom:</source>
             <translation type="finished">Zoom:</translation>
         </message>
-        <message>
-            <source>© 2026 Mike Cranfield</source>
-            <translation type="finished">© 2026 Mike Cranfield</translation>
-        </message>
     </context>
     <context>
         <name>GlobalExceptionHandler</name>
-        <message>
-            <source>&lt;h3&gt;A critical error occurred&lt;/h3&gt;&lt;p&gt;The application must terminate.&lt;/p&gt;</source>
-            <translation type="finished">&lt;h3&gt;Ocurrió un error crítico&lt;/h3&gt;&lt;p&gt;La aplicación debe cerrarse.&lt;/p&gt;</translation>
-        </message>
         <message>
             <source>&lt;h3&gt;An unexpected error occurred&lt;/h3&gt;</source>
             <translation type="finished">&lt;h3&gt;Ocurrió un error inesperado&lt;/h3&gt;</translation>
@@ -3283,12 +3231,6 @@
         <message>
             <source>Add/Update Key</source>
             <translation type="finished">Añadir/Actualizar Clave</translation>
-        </message>
-        <message>
-            <source>Apply changes and save file?\nWarning: This overwrites the existing file if you choose Yes.\nChoose No to only apply to memory (you can Save As later).</source>
-            <translation type="finished">¿Aplicar cambios y guardar archivo?
-Advertencia: Esto sobrescribe el archivo existente si elige Sí.
-Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</translation>
         </message>
         <message>
             <source>Close</source>
@@ -3652,10 +3594,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Detecta y elimina automáticamente los gradientes</translation>
         </message>
         <message>
-            <source>Automatically detects and subtracts the minimum pixel value (black floor) from the image. Essential before stretching to ensure true black levels.</source>
-            <translation type="finished">Detecta y resta automáticamente el valor mínimo de píxel (suelo negro) de la imagen. Esencial antes del estiramiento para garantizar niveles de negro reales.</translation>
-        </message>
-        <message>
             <source>Automatically stretches the image based on statistical analysis. Ideal for quick previews.</source>
             <translation type="finished">Estira automáticamente la imagen basándose en análisis estadístico. Ideal para vistas previas rápidas.</translation>
         </message>
@@ -3860,10 +3798,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Combina imágenes con fórmulas</translation>
         </message>
         <message>
-            <source>Combines registered images to reduce noise and increase signal-to-noise ratio (SNR). Different stacking modes offer various trade-offs between noise reduction and artifact rejection:</source>
-            <translation type="finished">Combina imágenes registradas para reducir el ruido e aumentar la relación señal-ruido (SNR). Diferentes modos de apilamiento ofrecen varios compromisos entre reducción de ruido y rechazo de artefactos:</translation>
-        </message>
-        <message>
             <source>Combines separate channel images into one RGB image.</source>
             <translation type="finished">Combina imágenes de canales separados en una imagen RGB.</translation>
         </message>
@@ -4060,10 +3994,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Modos de Visualización:</translation>
         </message>
         <message>
-            <source>Displays a 3x3 grid of zoomed panels from the corners, edges, and center of your image. Useful for evaluating optical quality, coma, and field curvature across your frame.</source>
-            <translation type="finished">Muestra una cuadrícula de 3x3 de paneles ampliados desde las esquinas, los bordes y el centro de la imagen. Útil para evaluar la calidad óptica, el coma y la curvatura de campo en todo el fotograma.</translation>
-        </message>
-        <message>
             <source>Double-click to run a script on the active image</source>
             <translation type="finished">Doble clic para ejecutar un script en la imagen activa</translation>
         </message>
@@ -4100,10 +4030,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Activa Enlace RGB para imágenes en color para mantener el balance de color</translation>
         </message>
         <message>
-            <source>Enable in Settings for smoother gradients and reduced banding in auto-stretched previews. Uses high-precision floating-point calculations instead of 16-bit histogram binning.</source>
-            <translation type="finished">Habilitar en los ajustes para gradientes más suaves y banding reducido en las previsualizaciones de auto-stretch. Utiliza cálculos de punto flotante de alta precisión en lugar de binning de histograma de 16 bits.</translation>
-        </message>
-        <message>
             <source>Enhances narrowband details by subtracting broadband continuum/star light:</source>
             <translation type="finished">Mejora detalles de banda estrecha restando luz continua/estelar de banda ancha:</translation>
         </message>
@@ -4118,10 +4044,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Enter a project name and select a directory location</source>
             <translation type="finished">Ingresa el nombre del proyecto y selecciona la ubicación del directorio</translation>
-        </message>
-        <message>
-            <source>Equalizes the intensity of RGB channels by matching their medians. This is essential for achieving a neutral color balance before combining separate channels into a color image.</source>
-            <translation type="finished">Ecualiza la intensidad de los canales RGB haciendo coincidir sus medianas. Esto es esencial para lograr un equilibrio de color neutro antes de combinar canales por separado en una imagen a color.</translation>
         </message>
         <message>
             <source>Execute PixelMath formula</source>
@@ -4146,10 +4068,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Extract Luminance</source>
             <translation type="finished">Extraer Luminancia</translation>
-        </message>
-        <message>
-            <source>Extracts the luminance (brightness) channel from an RGB image into a separate grayscale window. Useful for processing the L channel independently before recombining.</source>
-            <translation type="finished">Extrae el canal de luminancia (brillo) de una imagen RGB en una ventana de escala de grises separada. Útil para procesar el canal L de forma independiente antes de recombinar.</translation>
         </message>
         <message>
             <source>FITS Header Editor</source>
@@ -4624,10 +4542,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Organización: Todos los archivos relacionados (lights, darks, flats, resultados procesados) en un lugar</translation>
         </message>
         <message>
-            <source>Organize your astrophotography workflow using Workspace Projects. A project maintains a dedicated working directory where all associated images, calibration files, and processing results are stored.</source>
-            <translation type="finished">Organiza tu flujo de trabajo de astrofotografía usando Proyectos del Espacio de Trabajo. Un proyecto mantiene un directorio de trabajo dedicado donde se almacenan todas las imágenes asociadas, archivos de calibración y resultados de procesamiento.</translation>
-        </message>
-        <message>
             <source>Output &amp; Quality Assessment</source>
             <translation type="finished">Output y Evaluación de Calidad</translation>
         </message>
@@ -4806,10 +4720,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Removes thermal noise that accumulates over exposure time</source>
             <translation type="finished">Elimina el ruido térmico que se acumula durante el tiempo de exposición</translation>
-        </message>
-        <message>
-            <source>Replaces the luminance channel of an RGB image with a processed version. Select the source luminance and target color image, then blend with adjustable intensity.</source>
-            <translation type="finished">Reemplaza el canal de luminancia de una imagen RGB con una versión procesada. Seleccione la luminancia de origen y la imagen de color de destino, luego mezcle con intensidad ajustable.</translation>
         </message>
         <message>
             <source>Required for PCC and annotation tools</source>
@@ -5108,20 +5018,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Scripts TStar</translation>
         </message>
         <message>
-            <source>TStar includes a comprehensive pipeline for preprocessing and stacking astronomical images. Follow these steps in order: Conversion → Calibration → Registration → Stacking.</source>
-            <translation type="finished">TStar incluye una pipeline integral para el preprocesamiento y apilamiento de imágenes astronómicas. Sigue estos pasos en orden: Conversión → Calibración → Registro → Apilamiento.</translation>
-        </message>
-        <message>
             <source>TStar includes workspace-level color management to keep display and processing behavior consistent across tools and sessions.</source>
             <translation type="finished">TStar incluye gestión de color a nivel de espacio de trabajo para mantener consistente el comportamiento de visualización y procesamiento entre herramientas y sesiones.</translation>
-        </message>
-        <message>
-            <source>TStar scripts (.tss) use a simple command-based syntax. Parameters in [brackets] are optional.</source>
-            <translation type="finished">Los scripts de TStar (.tss) usan una sintaxis simple basada en comandos. Los parámetros en [corchetes] son opcionales.</translation>
-        </message>
-        <message>
-            <source>TStar supports FITS/FIT, XISF, TIFF/TIF, PNG, JPG/JPEG, BMP and (when LibRaw support is available) major camera RAW formats such as CR2/CR3/NEF/ARW/DNG/ORF/RW2/RAF and others.</source>
-            <translation type="finished">TStar admite FITS/FIT, XISF, TIFF/TIF, PNG, JPG/JPEG, BMP y (cuando el soporte LibRaw está disponible) los principales formatos RAW de cámaras como CR2/CR3/NEF/ARW/DNG/ORF/RW2/RAF y otros.</translation>
         </message>
         <message>
             <source>TStar supports scripting for automating processing workflows:</source>
@@ -5154,10 +5052,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Tip: Create separate master frames for each filter (e.g., L, R, G, B, Ha, OIII, SII)</source>
             <translation type="finished">Consejo: Crea fotogramas maestros separados para cada filtro (p. ej., L, R, G, B, Ha, OIII, SII)</translation>
-        </message>
-        <message>
-            <source>Tip: More frames allow aggressive rejection. With N=3 frames, use median. With N&gt;10, can use Kappa-Sigma with σ=2.5</source>
-            <translation type="finished">Consejo: Más fotogramas permiten rechazo agresivo. Con N=3 fotogramas, usa mediana. Con N&gt;10, puedes usar Kappa-Sigma con σ=2.5</translation>
         </message>
         <message>
             <source>Tip: Registration must be completed before stacking; misaligned frames will produce low-quality stacks</source>
@@ -5294,10 +5188,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Weight frames by quality (FWHM, star count, background) before combining</source>
             <translation type="finished">Peso fotogramas por calidad (FWHM, conteo de estrellas, fondo) antes de combinar</translation>
-        </message>
-        <message>
-            <source>Welcome to TStar! This guide covers all features and tools available in the application.</source>
-            <translation type="finished">¡Bienvenido a TStar! Esta guía cubre todas las funciones y herramientas disponibles en la aplicación.</translation>
         </message>
         <message>
             <source>White balance and color controls integrated with the TStar workflow</source>
@@ -6428,8 +6318,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Descomposición multiscala</translation>
         </message>
         <message>
-            <source>NB → RGB Stars</source>
-            <translation type="finished">NB → Estrellas RGB</translation>
+            <source>NB -&gt; RGB Stars</source>
+            <translation type="finished">NB -&gt; Estrellas RGB</translation>
         </message>
         <message>
             <source>Narrowband Normalization</source>
@@ -6556,8 +6446,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">RAW abierto: %1</translation>
         </message>
         <message>
-            <source>Opened RAW: %1 (Bayer pattern: %2) – use Debayer to convert to colour.</source>
-            <translation type="finished">RAW abierto: %1 (patrón Bayer: %2) – usa Debayer para convertir a color.</translation>
+            <source>Opened RAW: %1 (Bayer pattern: %2) -- use Debayer to convert to colour.</source>
+            <translation type="finished">RAW abierto: %1 (patrón Bayer: %2) -- use Debayer para convertir a color.</translation>
         </message>
         <message>
             <source>Opened Upscale Tool.</source>
@@ -6672,8 +6562,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Abriendo descomposición multiscala...</translation>
         </message>
         <message>
-            <source>Opening NB → RGB Stars...</source>
-            <translation type="finished">Abriendo NB → Estrellas RGB...</translation>
+            <source>Opening NB -&gt; RGB Stars...</source>
+            <translation type="finished">Abriendo NB -&gt; Estrellas RGB...</translation>
         </message>
         <message>
             <source>Opening Narrowband Normalization...</source>
@@ -7436,8 +7326,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Difuminado</translation>
         </message>
         <message>
-            <source>Fuzziness (°):</source>
-            <translation type="finished">Difuminado (°):</translation>
+            <source>Fuzziness (deg):</source>
+            <translation type="finished">Desenfoque (deg):</translation>
         </message>
         <message>
             <source>Histogram</source>
@@ -7578,12 +7468,12 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Todas las fuentes de descarga fallaron. Por favor, comprueba tu conexión a internet.</translation>
         </message>
         <message>
-            <source>Connecting to GitHub mirror…</source>
-            <translation type="finished">Conectando con el mirror de GitHub…</translation>
+            <source>Connecting to GitHub mirror...</source>
+            <translation type="finished">Conectando con el espejo de GitHub...</translation>
         </message>
         <message>
-            <source>Connecting to Google Drive…</source>
-            <translation type="finished">Conectando con Google Drive…</translation>
+            <source>Connecting to Google Drive...</source>
+            <translation type="finished">Conectando con Google Drive...</translation>
         </message>
         <message>
             <source>Download cancelled.</source>
@@ -7594,24 +7484,24 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Descarga completada.</translation>
         </message>
         <message>
-            <source>Downloading from primary (Google Drive)…</source>
-            <translation type="finished">Descargando de la fuente primaria (Google Drive)…</translation>
+            <source>Downloading from primary (Google Drive)...</source>
+            <translation type="finished">Descargando desde el primario (Google Drive)...</translation>
         </message>
         <message>
-            <source>Downloading… %1 MB</source>
-            <translation type="finished">Descargando… %1 MB</translation>
+            <source>Downloading... %1 MB</source>
+            <translation type="finished">Descargando... %1 MB</translation>
         </message>
         <message>
-            <source>Downloading… %1%</source>
-            <translation type="finished">Descargando… %1%</translation>
+            <source>Downloading... %1%</source>
+            <translation type="finished">Descargando... %1%</translation>
         </message>
         <message>
-            <source>Downloading… 0%</source>
-            <translation type="finished">Descargando… 0%</translation>
+            <source>Downloading... 0%</source>
+            <translation type="finished">Descargando... 0%</translation>
         </message>
         <message>
-            <source>Extracting models…</source>
-            <translation type="finished">Extrayendo modelos…</translation>
+            <source>Extracting models...</source>
+            <translation type="finished">Extrayendo modelos...</translation>
         </message>
         <message>
             <source>Extraction complete.</source>
@@ -7630,44 +7520,40 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Fallo al extraer el ZIP de los modelos.</translation>
         </message>
         <message>
-            <source>Finalizing installation…</source>
-            <translation type="finished">Finalizando la instalación…</translation>
+            <source>Finalizing installation...</source>
+            <translation type="finished">Finalizando instalación...</translation>
         </message>
         <message>
             <source>GitHub mirror download failed or timed out.</source>
             <translation type="finished">Descarga del mirror GitHub falló o tiempo agotado.</translation>
         </message>
         <message>
-            <source>Google Drive confirmation failed, trying GitHub mirror…</source>
-            <translation type="finished">Confirmación de Google Drive falló, probando mirror GitHub…</translation>
+            <source>Google Drive confirmation failed, trying GitHub mirror...</source>
+            <translation type="finished">Confirmación de Google Drive fallida, probando el espejo de GitHub...</translation>
         </message>
         <message>
-            <source>Google Drive failed. Trying GitHub mirror…</source>
-            <translation type="finished">Fallo en Google Drive. Probando el mirror de GitHub…</translation>
+            <source>Google Drive failed. Trying GitHub mirror...</source>
+            <translation type="finished">Google Drive falló. Probando el espejo de GitHub...</translation>
         </message>
         <message>
-            <source>Google Drive form parsing failed, trying GitHub mirror…</source>
-            <translation type="finished">Análisis del formulario de Google Drive falló, probando mirror GitHub…</translation>
+            <source>Google Drive form parsing failed, trying GitHub mirror...</source>
+            <translation type="finished">Error al analizar el formulario de Google Drive, probando el espejo de GitHub...</translation>
         </message>
         <message>
-            <source>Google Drive interstitial detected — confirming…</source>
-            <translation type="finished">Intersticial de Google Drive detectado — confirmando…</translation>
+            <source>Google Drive interstitial detected - confirming...</source>
+            <translation type="finished">Intersticial de Google Drive detectado - confirmando...</translation>
         </message>
         <message>
-            <source>Installing models…</source>
-            <translation type="finished">Instalando modelos…</translation>
+            <source>Installing models...</source>
+            <translation type="finished">Instalando modelos...</translation>
         </message>
         <message>
             <source>Models downloaded and installed successfully.</source>
             <translation type="finished">Modelos descargados e instalados con éxito.</translation>
         </message>
         <message>
-            <source>Models extraction completed but verification failed - expected file 'deep_sharp_stellar_AI4.pth' not found. Files extracted: %1</source>
-            <translation type="finished">Extracción de modelos completada pero verificación fallida - archivo esperado 'deep_sharp_stellar_AI4.pth' no encontrado. Archivos extraídos: %1</translation>
-        </message>
-        <message>
-            <source>Primary failed. Trying backup (Google Drive)…</source>
-            <translation type="finished">Fallo en la fuente primaria. Probando el backup (Google Drive)…</translation>
+            <source>Primary failed. Trying backup (Google Drive)...</source>
+            <translation type="finished">Falló el primario. Probando el respaldo (Google Drive)...</translation>
         </message>
     </context>
     <context>
@@ -7776,12 +7662,12 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
     <context>
         <name>MultiscaleDecompDialog</name>
         <message>
-            <source>Amount:</source>
-            <translation type="finished">Cantidad:</translation>
+            <source>Amount</source>
+            <translation type="finished">Cantidad</translation>
         </message>
         <message>
-            <source>Amt</source>
-            <translation type="finished">Cantidad</translation>
+            <source>Amount:</source>
+            <translation type="finished">Cantidad:</translation>
         </message>
         <message>
             <source>Apply to Image</source>
@@ -7836,12 +7722,12 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Capa: %1 / %2</translation>
         </message>
         <message>
-            <source>Layer: R (Residual)</source>
-            <translation type="finished">Capa: R (Residual)</translation>
+            <source>Layer: ---</source>
+            <translation type="finished">Capa: ---</translation>
         </message>
         <message>
-            <source>Layer: —</source>
-            <translation type="finished">Capa: —</translation>
+            <source>Layer: R (Residual)</source>
+            <translation type="finished">Capa: R (Residual)</translation>
         </message>
         <message>
             <source>Layers</source>
@@ -7908,12 +7794,12 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Enviar a imagen nueva</translation>
         </message>
         <message>
-            <source>Thr (σ)</source>
-            <translation type="finished">Umb. (σ)</translation>
+            <source>Threshold</source>
+            <translation type="finished">Umbral</translation>
         </message>
         <message>
-            <source>Threshold (σ):</source>
-            <translation type="finished">Umbral (σ):</translation>
+            <source>Threshold:</source>
+            <translation type="finished">Umbral:</translation>
         </message>
         <message>
             <source>Type</source>
@@ -8027,16 +7913,16 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Imágenes faltantes</translation>
         </message>
         <message>
+            <source>NB -&gt; RGB Stars</source>
+            <translation type="finished">NB -&gt; Estrellas RGB</translation>
+        </message>
+        <message>
             <source>NB \u2192 RGB Stars</source>
             <translation type="finished">NB \u2192 Estrellas RGB</translation>
         </message>
         <message>
-            <source>NB → RGB Stars</source>
-            <translation type="finished">NB → Estrellas RGB</translation>
-        </message>
-        <message>
-            <source>NB→RGB Stars</source>
-            <translation type="finished">NB→Estrellas RGB</translation>
+            <source>NB-&gt;RGB Stars</source>
+            <translation type="finished">NB-&gt;Estrellas RGB</translation>
         </message>
         <message>
             <source>No %1 loaded.</source>
@@ -8138,8 +8024,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Aplicar a vista actual</translation>
         </message>
         <message>
-            <source>Blackpoint\n(Min → Med):</source>
-            <translation type="finished">Punto negro\n(Min → Med):</translation>
+            <source>Blackpoint (Min -&gt; Med):</source>
+            <translation type="finished">Punto negro (Min -&gt; Med):</translation>
         </message>
         <message>
             <source>Blend Mode:</source>
@@ -8250,8 +8136,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">La importación requiere un compuesto RGB asignado (3 canales).</translation>
         </message>
         <message>
-            <source>Imported %1 view → channels split.</source>
-            <translation type="finished">Vista %1 importada → canales divididos.</translation>
+            <source>Imported %1 view -&gt; channels split.</source>
+            <translation type="finished">Vista %1 importada -&gt; canales divididos.</translation>
         </message>
         <message>
             <source>Lightness:</source>
@@ -8485,20 +8371,12 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
     <context>
         <name>NativePlateSolver</name>
         <message>
-            <source>    [Attempt %1 diag] maxVote=%2 validPairs=%3 nMatched=%4 stage=%5</source>
-            <translation type="finished">    [Intento %1 diag] maxVote=%2 validPairs=%3 nMatched=%4 stage=%5</translation>
-        </message>
-        <message>
             <source>  Attempt 1 failed, retrying without scale filter...</source>
             <translation type="finished">  Intento 1 fallido, reintentando sin filtro de escala...</translation>
         </message>
         <message>
             <source>  Attempt 2 failed, retrying with 150 stars...</source>
             <translation type="finished">  Intento 2 fallido, reintentando con 150 estrellas...</translation>
-        </message>
-        <message>
-            <source>  Attempt 3 failed, retrying with wider triangle radius 0.003...</source>
-            <translation type="finished">  Intento 3 fallido, reintentando con radio de triángulo más ancho 0.003...</translation>
         </message>
         <message>
             <source>  Attempt 4 failed, retrying with image-Y parity flip...</source>
@@ -8513,16 +8391,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">  Inicial: offset=%1 arcsec, nr=%2</translation>
         </message>
         <message>
-            <source>  No full convergence (offset=%1 arcsec), using best solution</source>
-            <translation type="finished">  Sin convergencia completa (offset=%1 arcsec), usando la mejor solución</translation>
-        </message>
-        <message>
             <source>  Not enough stars after reprojection (%1).</source>
             <translation type="finished">  No hay suficientes estrellas después de la reproyección (%1).</translation>
-        </message>
-        <message>
-            <source>  Parity un-flip applied to TRANS (x01, y01 negated).</source>
-            <translation type="finished">  Anulación de inversión de paridad aplicada a TRANS (x01, y01 negados).</translation>
         </message>
         <message>
             <source>  Parity-flip succeeded (image-Y inverted).</source>
@@ -8539,14 +8409,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Catalog Error: %1</source>
             <translation type="finished">Error Catálogo: %1</translation>
-        </message>
-        <message>
-            <source>Catalog mag range: %1 - %2 (%3 stars, %4 with bad mag)</source>
-            <translation type="finished">Rango de mag del catálogo: %1 - %2 (%3 estrellas, %4 con mag no válida)</translation>
-        </message>
-        <message>
-            <source>Catalog magnitudes unavailable (%1 stars, all invalid mags)</source>
-            <translation type="finished">Magnitudes de catálogo no disponibles (%1 estrellas, todas las mag no son válidas)</translation>
         </message>
         <message>
             <source>Catalog query returned too few valid stars (%1).</source>
@@ -8589,20 +8451,12 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">¡Coincidencia Exitosa! Calculando WCS...</translation>
         </message>
         <message>
-            <source>Matched pair vectors became inconsistent (A=%1, B=%2, need=%3).</source>
-            <translation type="finished">Los vectores de pares coincidentes se volvieron inconsistentes (A=%1, B=%2, requiere=%3).</translation>
-        </message>
-        <message>
             <source>Matching failed. No valid solution found.</source>
             <translation type="finished">Fallo de coincidencia. No se encontró ninguna solución válida.</translation>
         </message>
         <message>
             <source>Not enough catalog stars found (%1).</source>
             <translation type="finished">No se encontraron suficientes estrellas de catálogo (%1).</translation>
-        </message>
-        <message>
-            <source>Pixel scale is invalid or missing; proceeding without strict scale constraints.</source>
-            <translation type="finished">La escala de píxeles no es válida o falta; procediendo sin restricciones de escala estrictas.</translation>
         </message>
         <message>
             <source>Projected %1 catalog stars at RA=%2 Dec=%3</source>
@@ -8615,10 +8469,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Recalculation resulted in flat match set.</source>
             <translation type="finished">El recálculo resultó en un conjunto de coincidencias plano.</translation>
-        </message>
-        <message>
-            <source>Search radius %1 deg &gt; 3.0 deg: using Gaia 1.0 deg for online query. Recommend ASTAP for wide fields.</source>
-            <translation type="finished">Radio de búsqueda %1 deg &gt; 3.0 deg: usando Gaia 1.0 deg para la consulta en línea. Se recomienda ASTAP para campos anchos.</translation>
         </message>
         <message>
             <source>Solved pixel scale: %1 arcsec/px</source>
@@ -8635,10 +8485,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Too few valid pairs after culling (%1).</source>
             <translation type="finished">Muy pocos pares válidos después de la depuración (%1).</translation>
-        </message>
-        <message>
-            <source>Transform sanity check failed (|cos|≠|sin| by &gt;%.1f arcsec/px).</source>
-            <translation type="finished">Comprobación de cordura de transformación fallida (|cos|≠|sin| por &gt;%.1f arcsec/px).</translation>
         </message>
         <message>
             <source>Transform scale check failed.</source>
@@ -8759,10 +8605,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Error: Sin imagen válida.</translation>
         </message>
         <message>
-            <source>Factors (K):\nR: %1\nG: %2\nB: %3\n\nBackground Ref (Detected):\nR: %4\nG: %5\nB: %6\n\nComputed Offsets:\nR: %7\nG: %8\nB: %9</source>
-            <translation type="finished">Factores (K):\nR: %1\nG: %2\nB: %3\n\nRef Fondo (Detectado):\nR: %4\nG: %5\nB: %6\n\nOffsets Calculados:\nR: %7\nG: %8\nB: %9</translation>
-        </message>
-        <message>
             <source>PCC</source>
             <translation type="finished">PCC</translation>
         </message>
@@ -8841,6 +8683,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
     <context>
         <name>PerfectPaletteDialog</name>
         <message>
+            <source>(C) 2026 SetiAstro</source>
+            <translation type="finished">(C) 2026 SetiAstro</translation>
+        </message>
+        <message>
             <source>&lt;b&gt;Intensities&lt;/b&gt;</source>
             <translation type="finished">&lt;b&gt;Intensidades&lt;/b&gt;</translation>
         </message>
@@ -8903,10 +8749,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Strength:</source>
             <translation type="finished">Fuerza:</translation>
-        </message>
-        <message>
-            <source>© 2026 SetiAstro</source>
-            <translation type="finished">© 2026 SetiAstro</translation>
         </message>
     </context>
     <context>
@@ -8984,8 +8826,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Listo</translation>
         </message>
         <message>
-            <source>Rescale result (maps min–max to 0–1)</source>
-            <translation type="finished">Reescalar resultado (mapea min–max a 0–1)</translation>
+            <source>Rescale result (maps min--max to 0--1)</source>
+            <translation type="finished">Reescalar resultado (mapea min--max de 0 a 1)</translation>
         </message>
         <message>
             <source>Unclosed function call: %1</source>
@@ -8994,14 +8836,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Unknown function '%1' with %2 arguments</source>
             <translation type="finished">Función desconocida '%1' con %2 argumentos</translation>
-        </message>
-        <message>
-            <source>Unknown function or wrong arg count: %1</source>
-            <translation type="finished">Función desconocida o arg incorrectos: %1</translation>
-        </message>
-        <message>
-            <source>Unknown variable '%1'. Use r, g, b, or I1..I10 (with optional .r/.g/.b).</source>
-            <translation type="finished">Variable desconocida '%1'. Use r, g, b, o I1..I10 (con .r/.g/.b opcional).</translation>
         </message>
         <message>
             <source>Unknown variable or function: '%1'</source>
@@ -9063,10 +8897,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Dec:</translation>
         </message>
         <message>
-            <source>Error: Enter valid Focal Length and Pixel Size to calculate scale.</source>
-            <translation type="finished">Error: Introduzca Distancia Focal y Tamaño de Píxel válidos para calcular la escala.</translation>
-        </message>
-        <message>
             <source>Focal Length (mm)</source>
             <translation type="finished">Distancia Focal (mm)</translation>
         </message>
@@ -9099,16 +8929,16 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Parámetros: AD=%1, Dec=%2, Radio=%3, EscalaPixel=%4</translation>
         </message>
         <message>
-            <source>Pixel Scale (″/px):</source>
-            <translation type="finished">Escala Pixel (″/px):</translation>
+            <source>Pixel Scale (arcsec/px):</source>
+            <translation type="finished">Escala de píxeles (arcsec/px):</translation>
         </message>
         <message>
-            <source>Pixel Size (µm)</source>
-            <translation type="finished">Tamaño Píxel (µm)</translation>
+            <source>Pixel Size (um)</source>
+            <translation type="finished">Tamaño de píxel (um)</translation>
         </message>
         <message>
-            <source>Pixel Size (µm):</source>
-            <translation type="finished">Tamaño Píxel (µm):</translation>
+            <source>Pixel Size (um):</source>
+            <translation type="finished">Tamaño de píxel (um):</translation>
         </message>
         <message>
             <source>Plate Solving</source>
@@ -9151,8 +8981,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Resolver</translation>
         </message>
         <message>
-            <source>Solve in progress — cancel before closing.</source>
-            <translation type="finished">Resolución en curso — cancele antes de cerrar.</translation>
+            <source>Solve in progress -- cancel before closing.</source>
+            <translation type="finished">Resolución en curso -- cancele antes de cerrar.</translation>
         </message>
         <message>
             <source>Solver Engine:</source>
@@ -9258,10 +9088,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Omitido %1: Memoria insuficiente (uso &gt; 90%)</translation>
         </message>
         <message>
-            <source>Warning: Auto-detect Bayer Pattern failed (Header: '%1'). Defaulting to RGGB.</source>
-            <translation type="finished">Aviso: Auto-detectar Patrón Bayer falló (Cabecera: '%1'). Usando RGGB.</translation>
-        </message>
-        <message>
             <source>Warning: Missing exposure time metadata. Using scaling factor 1.0.</source>
             <translation type="finished">Advertencia: Metadatos de tiempo de exposición faltantes. Usando factor de escala 1.0.</translation>
         </message>
@@ -9271,10 +9097,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>(Optional)</source>
             <translation type="finished">(Opcional)</translation>
-        </message>
-        <message>
-            <source>(Optional: A Master Dark frame taken at the SAME exposure time and temperature as your FLAT frames. Used to subtract thermal noise from the flats before flat-fielding. If left empty, the main DARK is used instead (or flats are not dark-subtracted if no dark is set). Cosmetic correction uses the DARK tab file — not this Dark for Flat.)</source>
-            <translation type="finished">(Opcional: un Master Dark tomado con el MISMO tiempo de exposición y temperatura que tus FLATs. Se usa para restar el ruido térmico de los flats antes del flat-fielding. Si se deja vacío, si usará el DARK principal (o los flats no se restarán si no hay dark configurado). La corrección cosmética usa el archivo de la pestaña DARK — no este Dark para Flat.)</translation>
         </message>
         <message>
             <source>(Same as input)</source>
@@ -9289,6 +9111,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">&lt;span style='color:green'&gt;¡Calibración completada!&lt;/span&gt;</translation>
         </message>
         <message>
+            <source>&lt;span style='color:red'&gt;FAIL: %1&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:red'&gt;FALLO: %1&lt;/span&gt;</translation>
+        </message>
+        <message>
             <source>&lt;span style='color:red'&gt;Failed to create master bias&lt;/span&gt;</source>
             <translation type="finished">&lt;span style='color:red'&gt;Fallo al crear Master Bias&lt;/span&gt;</translation>
         </message>
@@ -9299,10 +9125,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>&lt;span style='color:red'&gt;Failed to create master flat&lt;/span&gt;</source>
             <translation type="finished">&lt;span style='color:red'&gt;Fallo al crear Master Flat&lt;/span&gt;</translation>
-        </message>
-        <message>
-            <source>&lt;span style='color:red'&gt;✗ %1&lt;/span&gt;</source>
-            <translation type="finished">&lt;span style='color:red'&gt;✗ %1&lt;/span&gt;</translation>
         </message>
         <message>
             <source>&lt;span style='color:salmon'&gt;Calibration finished with errors&lt;/span&gt;</source>
@@ -9345,8 +9167,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Borrar Todo</translation>
         </message>
         <message>
-            <source>Cold σ:</source>
-            <translation type="finished">σ Frío:</translation>
+            <source>Cold sigma:</source>
+            <translation type="finished">Sigma frío:</translation>
         </message>
         <message>
             <source>Cosmetic correction:</source>
@@ -9413,12 +9235,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Del Master Dark</translation>
         </message>
         <message>
-            <source>Hot σ:</source>
-            <translation type="finished">σ Caliente:</translation>
-        </message>
-        <message>
-            <source>Identifies and repairs individual defective rows or columns (stuck pixels, hot lines). A 'bad line' is a row or column whose mean value deviates significantly from its neighbours. Cosmetic correction (sigma-clipping or from Master Dark) provides complementary hot/cold pixel repair.</source>
-            <translation type="finished">Identifica y repara filas o columnas defectuosas individuales (píxeles atascados, líneas calientes). Una "línea mala" es una fila o columna cuyo valor medio se desvía significativamente de sus vecinos. La corrección cosmética (sigma-clipping o desde Master Dark) proporciona una reparación complementaria de píxeles calientes/fríos.</translation>
+            <source>Hot sigma:</source>
+            <translation type="finished">Sigma caliente:</translation>
         </message>
         <message>
             <source>Image Calibration</source>
@@ -9447,6 +9265,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>No Files</source>
             <translation type="finished">Sin Archivos</translation>
+        </message>
+        <message>
+            <source>OK: %1</source>
+            <translation type="finished">OK: %1</translation>
         </message>
         <message>
             <source>Optimize dark scaling</source>
@@ -9479,10 +9301,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Remove</source>
             <translation type="finished">Eliminar</translation>
-        </message>
-        <message>
-            <source>Repairs horizontal readout banding noise common in CMOS sensors. Works by estimating and subtracting the per-row/column offset. Enable only if you see horizontal stripe patterns in dark or bias frames.</source>
-            <translation type="finished">Repara el ruido de bandas (banding) de lectura horizontal común en los sensores CMOS. Funciona estimando y restando el desplazamiento por fila/columna. Actívalo solo si ves patrones de rayas horizontales en los frames dark o bias.</translation>
         </message>
         <message>
             <source>Save Master Bias</source>
@@ -9568,13 +9386,13 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <source>VNG</source>
             <translation type="finished">VNG</translation>
         </message>
-        <message>
-            <source>✓ %1</source>
-            <translation type="finished">✓ %1</translation>
-        </message>
     </context>
     <context>
         <name>RARDialog</name>
+        <message>
+            <source>(C) 2026 Riccardo Alberghi</source>
+            <translation type="finished">(C) 2026 Riccardo Alberghi</translation>
+        </message>
         <message>
             <source>Aberration Removal Complete.</source>
             <translation type="finished">Eliminación de Aberraciones Completa.</translation>
@@ -9726,10 +9544,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>The model is already downloaded:\n%1</source>
             <translation type="finished">Modelo ya descargado:\n%1</translation>
-        </message>
-        <message>
-            <source>© 2026 Riccardo Alberghi</source>
-            <translation type="finished">© 2026 Riccardo Alberghi</translation>
         </message>
     </context>
     <context>
@@ -10085,10 +9899,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Cancelar</translation>
         </message>
         <message>
-            <source>Check if the reference image pattern matches your image. Use the buttons below to flip or rotate it if necessary.</source>
-            <translation type="finished">Compruebe si el patrón de la imagen de referencia coincide con su imagen. Utilice los botones de abajo per voltearla o rotarla si es necesario.</translation>
-        </message>
-        <message>
             <source>Fine Rotation:</source>
             <translation type="finished">Rotación Fina:</translation>
         </message>
@@ -10113,12 +9923,12 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Superposición (con Objetivo):</translation>
         </message>
         <message>
-            <source>Rotate 90° CCW</source>
-            <translation type="finished">Girar 90° CCW</translation>
+            <source>Rotate 90 deg CCW</source>
+            <translation type="finished">Girar 90° antihorario</translation>
         </message>
         <message>
-            <source>Rotate 90° CW</source>
-            <translation type="finished">Girar 90° CW</translation>
+            <source>Rotate 90 deg CW</source>
+            <translation type="finished">Girar 90° horario</translation>
         </message>
         <message>
             <source>Show Original Overlay</source>
@@ -10132,24 +9942,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Analizando referencia</translation>
         </message>
         <message>
-            <source>Detected %1 stars</source>
-            <translation type="finished">Detectadas %1 estrellas</translation>
-        </message>
-        <message>
-            <source>Detecting stars in reference (uncached)...</source>
-            <translation type="finished">Detectando estrellas en referencia (sin caché)...</translation>
-        </message>
-        <message>
             <source>Detecting stars in reference image...</source>
             <translation type="finished">Detectando estrellas imagen de referencia...</translation>
-        </message>
-        <message>
-            <source>Detecting stars in target image...</source>
-            <translation type="finished">Detectando estrellas imagen objetivo...</translation>
-        </message>
-        <message>
-            <source>Extracting luminance...</source>
-            <translation type="finished">Extrayendo luminancia...</translation>
         </message>
         <message>
             <source>Failed to load image %1</source>
@@ -10160,16 +9954,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Fallo al cargar imagen de referencia</translation>
         </message>
         <message>
-            <source>Image %1: %2 stars detected, %3 matched, shift=(%4, %5), rot=%6 deg</source>
-            <translation type="finished">Imagen %1: %2 estrellas detectadas, %3 coincidentes, shift=(%4, %5), rot=%6 deg</translation>
-        </message>
-        <message>
             <source>Image %1: registration FAILED - %2</source>
             <translation type="finished">Imagen %1: registro FALLIDO - %2</translation>
-        </message>
-        <message>
-            <source>No stars detected</source>
-            <translation type="finished">No se detectaron estrellas</translation>
         </message>
         <message>
             <source>Not enough matches: %1</source>
@@ -10202,10 +9988,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Saved: %1</source>
             <translation type="finished">Guardato: %1</translation>
-        </message>
-        <message>
-            <source>Target: %1 stars detected</source>
-            <translation type="finished">Objetivo: %1 estrellas detectadas</translation>
         </message>
     </context>
     <context>
@@ -10255,8 +10037,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Calculando estadísticas de imagen y conteo de estrellas...</translation>
         </message>
         <message>
-            <source>Detection σ:</source>
-            <translation type="finished">σ Detección:</translation>
+            <source>Detection Sigma:</source>
+            <translation type="finished">Sigma de detección:</translation>
         </message>
         <message>
             <source>FAIL</source>
@@ -10436,10 +10218,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">La imagen activa no tiene solución astrométrica. Resuelve con ASTAP primero.</translation>
         </message>
         <message>
-            <source>Applies a single global multiplier per channel. If unchecked, applies a non-linear polynomial warping based on the fitted model.</source>
-            <translation type="finished">Aplica un único multiplicador global por canal. Si no está marcado, aplica una deformación polinomial no lineal basada en el modelo ajustado.</translation>
-        </message>
-        <message>
             <source>B Filter:</source>
             <translation type="finished">Filtro B:</translation>
         </message>
@@ -10524,8 +10302,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Emparejando %1 estrellas de catálogo a la imagen...</translation>
         </message>
         <message>
-            <source>Method used to model and subtract the sky background from the image.</source>
-            <translation type="finished">Método utilizado para modelar y sustraer el fondo del cielo de la imagen.</translation>
+            <source>Method used to model and subtract the sky background.</source>
+            <translation type="finished">Método utilizado para modelar y restar el fondo del cielo.</translation>
         </message>
         <message>
             <source>Missing Input</source>
@@ -10652,8 +10430,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Seleccione un SED de referencia blanco (ej. G2V o A0V).</translation>
         </message>
         <message>
-            <source>Select at least one of the R, G or B filter curves, or a Sensor curve with internal Bayer filters.</source>
-            <translation type="finished">Seleccione al menos una de las curvas de filtro R, G o B, o una curva de sensor con filtros Bayer internos.</translation>
+            <source>Select at least one R, G, or B filter curve, or a Sensor curve.</source>
+            <translation type="finished">Seleccione al menos una curva de filtro R, G o B, o una curva de Sensor.</translation>
         </message>
         <message>
             <source>Sensor (QE curve):</source>
@@ -10680,8 +10458,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Iniciando calibración...</translation>
         </message>
         <message>
-            <source>Stellar Spectral Energy Distribution used as the white point reference (e.g., G2V for Sun-like stars).</source>
-            <translation type="finished">Distribución de Energía Espectral estelar utilizada como referencia del punto blanco (ej. G2V para estrellas similares al Sol).</translation>
+            <source>Stellar SED used as the white point reference (e.g., G2V for Sun-like).</source>
+            <translation type="finished">SED estelar utilizado como referencia del punto blanco (ej. G2V para tipo solar).</translation>
         </message>
         <message>
             <source>Step 1: Fetch Stars from Active Image</source>
@@ -10704,8 +10482,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Curva de transmisión para el filtro del canal Rojo. Use '(None)' para una respuesta plana.</translation>
         </message>
         <message>
-            <source>Warning: tstar_data.fits not found — combo boxes will be empty.</source>
-            <translation type="finished">Advertencia: tstar_data.fits no encontrado — los cuadros combinados estarán vacíos.</translation>
+            <source>Warning: tstar_data.fits not found --- combo boxes will be empty.</source>
+            <translation type="finished">Advertencia: tstar_data.fits no encontrado --- los cuadros combinados estarán vacíos.</translation>
         </message>
         <message>
             <source>White Reference (SED):</source>
@@ -10822,16 +10600,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">(No se encontraron scripts)</translation>
         </message>
         <message>
-            <source>(Scripts folder not found)</source>
-            <translation type="finished">(Carpeta de scripts no encontrada)</translation>
-        </message>
-        <message>
             <source>Available Scripts</source>
             <translation type="finished">Scripts Disponibles</translation>
-        </message>
-        <message>
-            <source>Available commands: save &lt;filename&gt; [format], starnet [stride] [create_star_mask], align &lt;ref&gt; &lt;target1&gt; &lt;target2&gt; ..., integrate &lt;type&gt; &lt;output&gt;, load &lt;filename&gt;, pm &lt;expression&gt;, Variables: ${VAR_NAME}</source>
-            <translation type="finished">Comandos disponibles: save &lt;filename&gt; [format], starnet [stride] [create_star_mask], align &lt;ref&gt; &lt;target1&gt; &lt;target2&gt; ..., integrate &lt;type&gt; &lt;output&gt;, load &lt;filename&gt;, pm &lt;expression&gt;, Variables: ${VAR_NAME}</translation>
         </message>
         <message>
             <source>Close</source>
@@ -10857,6 +10627,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <source>TStar Scripts</source>
             <translation type="finished">Scripts TStar</translation>
         </message>
+        <message>
+            <source>User script</source>
+            <translation type="finished">Script de usuario</translation>
+        </message>
     </context>
     <context>
         <name>ScriptDialog</name>
@@ -10865,12 +10639,16 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">(Seleccionar script predefinido)</translation>
         </message>
         <message>
+            <source>-&gt; %1</source>
+            <translation type="finished">-&gt; %1</translation>
+        </message>
+        <message>
             <source>&lt;span style='color:lime'&gt;Script finished successfully.&lt;/span&gt;</source>
             <translation type="finished">&lt;span style='color:lime'&gt;Script finalizado con éxito.&lt;/span&gt;</translation>
         </message>
         <message>
-            <source>&lt;span style='color:red'&gt;  ✗ Failed&lt;/span&gt;</source>
-            <translation type="finished">&lt;span style='color:red'&gt; ✗ Fallido&lt;/span&gt;</translation>
+            <source>&lt;span style='color:red'&gt;Failed&lt;/span&gt;</source>
+            <translation type="finished">&lt;span style='color:red'&gt;Error&lt;/span&gt;</translation>
         </message>
         <message>
             <source>&lt;span style='color:red'&gt;Script failed: %1 (line %2)&lt;/span&gt;</source>
@@ -10984,10 +10762,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <source>\nVariables: ${VAR_NAME} or $VAR_NAME</source>
             <translation type="finished">\nVariables: ${VAR_NAME} o $VAR_NAME</translation>
         </message>
-        <message>
-            <source>→ %1</source>
-            <translation type="finished">→ %1</translation>
-        </message>
     </context>
     <context>
         <name>ScriptParser</name>
@@ -11090,16 +10864,16 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Verde:</translation>
         </message>
         <message>
-            <source>Hue End (°):</source>
-            <translation type="finished">Fin de Tono (°):</translation>
+            <source>Hue End (deg):</source>
+            <translation type="finished">Fin de tono (deg):</translation>
         </message>
         <message>
             <source>Hue Selection</source>
             <translation type="finished">Selección de Tono</translation>
         </message>
         <message>
-            <source>Hue Start (°):</source>
-            <translation type="finished">Inicio de Tono (°):</translation>
+            <source>Hue Start (deg):</source>
+            <translation type="finished">Inicio de tono (deg):</translation>
         </message>
         <message>
             <source>Intensity:</source>
@@ -11162,8 +10936,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Mostrar Máscara</translation>
         </message>
         <message>
-            <source>Smoothness (°):</source>
-            <translation type="finished">Suavidad (°):</translation>
+            <source>Smoothness (deg):</source>
+            <translation type="finished">Suavizado (deg):</translation>
         </message>
         <message>
             <source>Yellow:</source>
@@ -11237,8 +11011,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Buscar actualizaciones al inicio</translation>
         </message>
         <message>
-            <source>Cosmic Clarity models</source>
-            <translation type="finished">Modelos Cosmic Clarity</translation>
+            <source>Cosmic Clarity Models</source>
+            <translation type="finished">Modelos de Cosmic Clarity</translation>
         </message>
         <message>
             <source>Cosmic Clarity models: installed</source>
@@ -11265,8 +11039,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Descargar Base de Datos de Estrellas ASTAP D50</translation>
         </message>
         <message>
-            <source>Download latest Cosmic Clarity models</source>
-            <translation type="finished">Descargar últimos modelos Cosmic Clarity</translation>
+            <source>Download Latest Cosmic Clarity Models</source>
+            <translation type="finished">Descargar los últimos modelos de Cosmic Clarity</translation>
         </message>
         <message>
             <source>Downloading ASTAP D50 Catalog...</source>
@@ -11341,8 +11115,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Reinicie la aplicación para que los cambios de idioma surtan efecto.</translation>
         </message>
         <message>
-            <source>Preparing…</source>
-            <translation type="finished">Preparando…</translation>
+            <source>Preparing...</source>
+            <translation type="finished">Preparando...</translation>
         </message>
         <message>
             <source>ProPhoto RGB</source>
@@ -11434,8 +11208,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
     <context>
         <name>SimpleTiffReader</name>
         <message>
-            <source>Compressed TIFFs not supported (only Uncompressed).</source>
-            <translation type="finished">TIFF comprimidos no soportados.</translation>
+            <source>Compressed TIFFs are not supported (only uncompressed).</source>
+            <translation type="finished">Los TIFF comprimidos no sono compatibles (solo sin comprimir).</translation>
         </message>
         <message>
             <source>Could not seek to IFD.</source>
@@ -11450,8 +11224,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Marcador orden bytes TIFF inválido.</translation>
         </message>
         <message>
-            <source>Invalid TIFF version (not 42).</source>
-            <translation type="finished">Versión TIFF inválida (no 42).</translation>
+            <source>Invalid TIFF version (expected 42).</source>
+            <translation type="finished">Versión TIFF no válida (si esperaba 42).</translation>
         </message>
         <message>
             <source>Strip offset/count mismatch.</source>
@@ -11519,6 +11293,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Registrando tomas...</translation>
         </message>
         <message>
+            <source>Resolving relative path: '%1' -&gt; '%2'</source>
+            <translation type="finished">Resolviendo ruta relativa: '%1' -&gt; '%2'</translation>
+        </message>
+        <message>
             <source>Stacking cancelled</source>
             <translation type="finished">Apilado cancelado</translation>
         </message>
@@ -11551,10 +11329,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">StarNet: no se pudo guardar FITS sin estrellas: %1</translation>
         </message>
         <message>
-            <source>StarNet: failed to start – check executable path and permissions.</source>
-            <translation type="finished">StarNet: error al iniciar – verifique ruta y permisos.</translation>
-        </message>
-        <message>
             <source>StarNet: failed to write input TIFF: %1</source>
             <translation type="finished">StarNet: error al escribir TIFF de entrada: %1</translation>
         </message>
@@ -11569,10 +11343,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>StarNet: no image loaded</source>
             <translation type="finished">StarNet: no hay imagen cargada</translation>
-        </message>
-        <message>
-            <source>StarNet: output TIFF not found: %1</source>
-            <translation type="finished">StarNet: TIFF de salida no encontrado: %1</translation>
         </message>
         <message>
             <source>StarNet: output TIFF not found: %1\n%2</source>
@@ -11597,10 +11367,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>save: failed to write %1</source>
             <translation type="finished">guardar: error al escribir %1</translation>
-        </message>
-        <message>
-            <source>save: no filename specified (use positional arg or -out=...)</source>
-            <translation type="finished">guardar: no se especificó un nombre de archivo (usa argumento posicional o -out=...)</translation>
         </message>
         <message>
             <source>save: no image loaded</source>
@@ -11734,10 +11500,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Cometa</translation>
         </message>
         <message>
-            <source>Comet shifts applied. You can now stack with 'Comet' mode (ensure registration is done).</source>
-            <translation type="finished">Desplazamientos de cometa aplicados. Ahora puede apilar en modo "Cometa" (asegure el registro).</translation>
-        </message>
-        <message>
             <source>Comet shifts computed successfully.</source>
             <translation type="finished">Desplazamientos de cometa calculados con éxito.</translation>
         </message>
@@ -11766,8 +11528,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Debayer (Imágenes CFA)</translation>
         </message>
         <message>
-            <source>Debayer images on-the-fly during stacking. Enable this for RAW/CFA images.</source>
-            <translation type="finished">Debayer al vuelo durante apilado. Habilitar para RAW/CFA.</translation>
+            <source>Debayer images on-the-fly during stacking. Enable for RAW/CFA images.</source>
+            <translation type="finished">Debayerizar imágenes sobre la marcha durante el apilado. Activar para imágenes RAW/CFA.</translation>
         </message>
         <message>
             <source>Deselect All</source>
@@ -12122,16 +11884,16 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Winsorized Sigma</translation>
         </message>
         <message>
-            <source>W×H</source>
-            <translation type="finished">An×Al</translation>
+            <source>WxH</source>
+            <translation type="finished">AnxAl</translation>
         </message>
         <message>
             <source>result_stacked.fit</source>
             <translation type="finished">resultado_apilado.fit</translation>
         </message>
         <message>
-            <source>σ</source>
-            <translation type="finished">σ</translation>
+            <source>s</source>
+            <translation type="finished">s</translation>
         </message>
     </context>
     <context>
@@ -12215,10 +11977,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
         <message>
             <source>Loading image %1/%2...</source>
             <translation type="finished">Cargando imagen %1/%2...</translation>
-        </message>
-        <message>
-            <source>Mean stacking complete (accelerated C)</source>
-            <translation type="finished">Apilado Media completado (acelerado C)</translation>
         </message>
         <message>
             <source>Normalized image %1/%2</source>
@@ -12573,10 +12331,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Muy recomendado si se detecta hardware compatible.</translation>
         </message>
         <message>
-            <source>If checked, applies an auto-stretch before StarNet and inverts it afterwards.\nEssential for linear images.</source>
-            <translation type="finished">Si se marca, aplica auto-stretching antes de StarNet y revierte después.\nEsencial para imágenes lineales.</translation>
-        </message>
-        <message>
             <source>Linear Data (Pre-stretch)</source>
             <translation type="finished">Datos Lineales (Pre-stretching)</translation>
         </message>
@@ -12830,6 +12584,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
     <context>
         <name>StretchDialog</name>
         <message>
+            <source>(C) 2026 SetiAstro</source>
+            <translation type="finished">(C) 2026 SetiAstro</translation>
+        </message>
+        <message>
             <source>Amount:</source>
             <translation type="finished">Cantidad:</translation>
         </message>
@@ -12934,8 +12692,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Statistical Stretch</translation>
         </message>
         <message>
-            <source>Statistical Stretch applied (M=%1, BP=%2σ)</source>
-            <translation type="finished">Statistical Stretch aplicado (M=%1, BP=%2σ)</translation>
+            <source>Statistical Stretch applied (M=%1, BP=%2?)</source>
+            <translation type="finished">Estiramiento estadístico aplicado (M=%1, BP=%2?)</translation>
         </message>
         <message>
             <source>Stretch applied</source>
@@ -12949,16 +12707,12 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <source>Target median brightness after stretch (0.25 = typical astro)</source>
             <translation type="finished">Brillo mediano objetivo tras stretch (0.25 = típico astro)</translation>
         </message>
-        <message>
-            <source>© 2026 SetiAstro</source>
-            <translation type="finished">© 2026 SetiAstro</translation>
-        </message>
     </context>
     <context>
         <name>Task</name>
         <message>
-            <source>Processing %1 / 100</source>
-            <translation type="finished">Procesando %1 / 100</translation>
+            <source>Processing %1/100</source>
+            <translation type="finished">Procesando %1/100</translation>
         </message>
     </context>
     <context>
@@ -13156,6 +12910,10 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
     <context>
         <name>WavescaleHDRDialog</name>
         <message>
+            <source>(C) 2026 SetiAstro</source>
+            <translation type="finished">(C) 2026 SetiAstro</translation>
+        </message>
+        <message>
             <source>Apply</source>
             <translation type="finished">Aplicar</translation>
         </message>
@@ -13215,10 +12973,6 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <source>Wavescale HDR applied.</source>
             <translation type="finished">Wavescale HDR aplicado.</translation>
         </message>
-        <message>
-            <source>© 2026 SetiAstro</source>
-            <translation type="finished">© 2026 SetiAstro</translation>
-        </message>
     </context>
     <context>
         <name>XISFReader</name>
@@ -13227,52 +12981,52 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Archivos XISF Big-endian no soportados.</translation>
         </message>
         <message>
+            <source>Could not locate Data element in embedded block.</source>
+            <translation type="finished">No si pudo localizar el elemento Data en il bloque incrustado.</translation>
+        </message>
+        <message>
             <source>Could not open file: %1</source>
             <translation type="finished">No se pudo abrir archivo: %1</translation>
         </message>
         <message>
-            <source>Could not parse embedded data element.</source>
-            <translation type="finished">No se pudo analizar elemento de datos incrustado.</translation>
+            <source>Data block too small: expected %1 bytes, got %2.</source>
+            <translation type="finished">Bloque de datos demasiado pequeño: si esperaban %1 bytes, si obtuvieron %2.</translation>
         </message>
         <message>
-            <source>Data block too small: expected %1 bytes, got %2</source>
-            <translation type="finished">Bloque datos muy pequeño: esperados %1 bytes, obtenidos %2</translation>
+            <source>Image index %1 out of range (file has %2 images).</source>
+            <translation type="finished">Índice de imagen %1 fuera de rango (el archivo tiene %2 imágenes).</translation>
         </message>
         <message>
-            <source>Image index %1 out of range (file has %2 images)</source>
-            <translation type="finished">Índice imagen %1 fuera rango (archivo tiene %2 imágenes)</translation>
+            <source>Incomplete XML header read.</source>
+            <translation type="finished">Lectura de encabezado XML incompleta.</translation>
         </message>
         <message>
-            <source>Incomplete XML Header.</source>
-            <translation type="finished">Cabecera XML incompleta.</translation>
+            <source>Incomplete data read: expected %1 bytes, got %2.</source>
+            <translation type="finished">Lectura de datos incompleta: si esperaban %1 bytes, si obtuvieron %2.</translation>
         </message>
         <message>
-            <source>Incomplete data read: expected %1 bytes, got %2</source>
-            <translation type="finished">Lectura datos incompleta: esperados %1 bytes, obtenidos %2</translation>
-        </message>
-        <message>
-            <source>Invalid Header Length: %1</source>
-            <translation type="finished">Longitud Cabecera Inválida: %1</translation>
-        </message>
-        <message>
-            <source>Invalid XISF Signature.</source>
+            <source>Invalid XISF signature.</source>
             <translation type="finished">Firma XISF no válida.</translation>
         </message>
         <message>
-            <source>Invalid XISF Signature. File is not XISF 1.0.</source>
-            <translation type="finished">Firma XISF inválida. No es XISF 1.0.</translation>
+            <source>Invalid XISF signature. File is not XISF 1.0.</source>
+            <translation type="finished">Firma XISF no valida. El archivo no es XISF 1.0.</translation>
+        </message>
+        <message>
+            <source>Invalid header length: %1</source>
+            <translation type="finished">Longitud de encabezado no válida: %1</translation>
         </message>
         <message>
             <source>No valid image found in XISF header.</source>
             <translation type="finished">Sin imagen válida en cabecera XISF.</translation>
         </message>
         <message>
-            <source>Seek error to data block at %1</source>
-            <translation type="finished">Error búsqueda bloque datos en %1</translation>
+            <source>Seek error to data block at offset %1.</source>
+            <translation type="finished">Error de búsqueda nel bloque de datos en el desplazamiento %1.</translation>
         </message>
         <message>
-            <source>Unexpected EOF reading header length.</source>
-            <translation type="finished">EOF inesperado leyendo longitud cabecera.</translation>
+            <source>Unexpected EOF while reading header length.</source>
+            <translation type="finished">EOF inesperado al leer la longitud del encabezado.</translation>
         </message>
         <message>
             <source>Unexpected EOF.</source>
@@ -13283,16 +13037,16 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
             <translation type="finished">Tipo ubicación datos desconocido.</translation>
         </message>
         <message>
-            <source>Unknown inline encoding: %1</source>
-            <translation type="finished">Codificación en línea desconocida: %1</translation>
+            <source>Unknown inline data encoding: %1</source>
+            <translation type="finished">Codificación de datos en línea desconocida: %1</translation>
         </message>
         <message>
             <source>Unsupported sample format: %1</source>
             <translation type="finished">Formato muestra no soportado: %1</translation>
         </message>
         <message>
-            <source>XML Parse Error: %1</source>
-            <translation type="finished">Error Análisis XML: %1</translation>
+            <source>XML parse error: %1</source>
+            <translation type="finished">Error de análisis XML: %1</translation>
         </message>
     </context>
     <context>
@@ -13309,68 +13063,8 @@ Elija No para aplicar solo a la memoria (puede Guardar Como más tarde).</transl
     <context>
         <name>main</name>
         <message>
-            <source>Applying Custom Widgets...</source>
-            <translation type="finished">Aplicando Widgets Personalizados...</translation>
-        </message>
-        <message>
-            <source>Configuring UI Colors...</source>
-            <translation type="finished">Configurando Colores UI...</translation>
-        </message>
-        <message>
-            <source>Configuring Workspace...</source>
-            <translation type="finished">Configurando Espacio de Trabajo...</translation>
-        </message>
-        <message>
-            <source>Constructing Main Window...</source>
-            <translation type="finished">Construyendo Ventana Principal...</translation>
-        </message>
-        <message>
-            <source>Finalizing Setup...</source>
-            <translation type="finished">Finalizando Configuración...</translation>
-        </message>
-        <message>
-            <source>Initializing Core Systems...</source>
-            <translation type="finished">Inicializando Sistemas Centrales...</translation>
-        </message>
-        <message>
-            <source>Initializing Memory Manager...</source>
-            <translation type="finished">Inicializando Gestor de Memoria...</translation>
-        </message>
-        <message>
-            <source>Initializing OpenCV Backend...</source>
-            <translation type="finished">Inicializando Backend OpenCV...</translation>
-        </message>
-        <message>
-            <source>Initializing Tool Dialogs...</source>
-            <translation type="finished">Inicializando Diálogos de Herramientas...</translation>
-        </message>
-        <message>
-            <source>Loading Color Management...</source>
-            <translation type="finished">Cargando Gestión de Color...</translation>
-        </message>
-        <message>
-            <source>Loading Configuration...</source>
-            <translation type="finished">Cargando Configuración...</translation>
-        </message>
-        <message>
-            <source>Loading Icons &amp; Resources...</source>
-            <translation type="finished">Cargando Iconos y Recursos...</translation>
-        </message>
-        <message>
-            <source>Loading Image Processing Algorithms...</source>
-            <translation type="finished">Cargando Algoritmos...</translation>
-        </message>
-        <message>
-            <source>Loading Stylesheets...</source>
-            <translation type="finished">Cargando Estilos...</translation>
-        </message>
-        <message>
             <source>Ready!</source>
             <translation type="finished">¡Listo!</translation>
-        </message>
-        <message>
-            <source>Setting up Dark Theme...</source>
-            <translation type="finished">Configurando Tema Oscuro...</translation>
         </message>
     </context>
 </TS>

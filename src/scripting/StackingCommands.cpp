@@ -244,9 +244,22 @@ void StackingCommands::registerCommands(ScriptRunner& runner)
 
 QString StackingCommands::resolvePath(const QString& path)
 {
-    if (QDir::isAbsolutePath(path))
-        return path;
-    return QDir(s_workingDir).absoluteFilePath(path);
+    if (path.isEmpty()) return QString();
+    QFileInfo fi(path);
+    if (fi.isAbsolute()) return path;
+
+    QString resolved = QDir(s_workingDir).absoluteFilePath(path);
+    
+    // Diagnostic logging for script debugging
+    if (s_runner) {
+        s_runner->logMessageDirect(
+            QObject::tr("Resolving relative path: '%1' -> '%2'")
+                .arg(path).arg(resolved), 
+            "neutral"
+        );
+    }
+
+    return resolved;
 }
 
 // ============================================================================

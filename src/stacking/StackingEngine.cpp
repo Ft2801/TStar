@@ -1836,8 +1836,12 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args)
     dParams.useWeightMaps = true;
     dParams.fastMode     = args.params.drizzleFast;
 
-    drizzle.initialize(args.sequence->width(), args.sequence->height(),
-                       args.sequence->channels(), dParams);
+    // ---- Compute output dimensions (framing) ----
+    int canvasWidth, canvasHeight, offsetX, offsetY;
+    computeOutputDimensions(args, canvasWidth, canvasHeight, offsetX, offsetY);
+
+    drizzle.initialize(canvasWidth, canvasHeight, args.sequence->channels(), dParams,
+                       offsetX, offsetY);
 
     // Reference stack from the rejection pre-pass (may be empty)
     ImageBuffer referenceStack;

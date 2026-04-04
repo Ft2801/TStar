@@ -124,26 +124,33 @@ public:
      * @param outputWidth  Width  of output grid.
      * @param outputHeight Height of output grid.
      * @param params       Drizzle parameters.
+     * @param offsetX      X-offset applied to output coordinates.
+     * @param offsetY      Y-offset applied to output coordinates.
      */
     void drizzleFrame(const ImageBuffer& input,
                       const RegistrationData& reg,
                       std::vector<double>& accum,
                       std::vector<double>& weightAccum,
                       int outputWidth, int outputHeight,
-                      const DrizzleParams& params);
+                      const DrizzleParams& params,
+                      double offsetX = 0.0, double offsetY = 0.0);
 
     /**
      * @brief Fast drizzle for 1x point kernel (nearest-neighbour scatter).
      *
      * Each input pixel centre is transformed and deposited into the single
      * nearest output pixel with unit weight.  No polygon clipping is needed.
+     *
+     * @param offsetX      X-offset applied to output coordinates.
+     * @param offsetY      Y-offset applied to output coordinates.
      */
     void fastDrizzleFrame(const ImageBuffer& input,
                           const RegistrationData& reg,
                           std::vector<double>& accum,
                           std::vector<double>& weightAccum,
                           int outputWidth, int outputHeight,
-                          const DrizzleParams& params);
+                          const DrizzleParams& params,
+                          double offsetX = 0.0, double offsetY = 0.0);
 
     // -- Kernel management ---------------------------------------------------
 
@@ -161,7 +168,8 @@ public:
      * @brief Allocate accumulators and configure output dimensions.
      */
     void initialize(int inputWidth, int inputHeight, int channels,
-                    const DrizzleParams& params);
+                    const DrizzleParams& params,
+                    double offsetX = 0.0, double offsetY = 0.0);
 
     /**
      * @brief Drizzle one image into the internal accumulators.
@@ -207,6 +215,8 @@ private:
     int                  m_outWidth   = 0;
     int                  m_outHeight  = 0;
     int                  m_channels   = 0;
+    double               m_offsetX    = 0.0;
+    double               m_offsetY    = 0.0;
     DrizzleParams        m_params;
     std::vector<double>  m_accum;        ///< channels * W * H
     std::vector<double>  m_weightAccum;  ///< W * H
