@@ -472,10 +472,10 @@ bool StackingCommands::cmdStack(const ScriptCommand& cmd)
 
     // -- Parse stacking parameters -------------------------------------------
     Stacking::StackingParams params;
-    params.method       = parseMethod(cmd.option("method", "mean"));
-    params.rejection    = parseRejection(cmd.option("rejection", "winsorized"));
+    params.method        = parseMethod(cmd.option("method", "mean"));
+    params.rejection     = parseRejection(cmd.option("rejection", "none"));
     params.normalization = parseNormalization(cmd.option("norm", "addscale"));
-    params.weighting    = parseWeighting(cmd.option("weighting", "noise"));
+    params.weighting     = parseWeighting(cmd.option("weighting", "noise"));
 
     // Rejection sigma thresholds.
     if (cmd.hasOption("rej")) {

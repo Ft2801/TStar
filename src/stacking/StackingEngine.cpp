@@ -1078,8 +1078,16 @@ StackResult StackingEngine::stackMean(StackingArgs& args)
         const auto& imgInfo = args.sequence->image(imgIdx);
         double scale = args.params.upscaleAtStacking ? 2.0 : 1.0;
 
-        frameShifts[frame].sx = imgInfo.registration.shiftX * scale - offsetX;
-        frameShifts[frame].sy = imgInfo.registration.shiftY * scale - offsetY;
+        // Resolve registration (comet or star alignment)
+        RegistrationData reg;
+        if (!args.effectiveRegs.empty() && imgIdx < static_cast<int>(args.effectiveRegs.size())) {
+            reg = args.effectiveRegs[imgIdx];
+        } else {
+            reg = imgInfo.registration;
+        }
+
+        frameShifts[frame].sx = reg.shiftX * scale - offsetX;
+        frameShifts[frame].sy = reg.shiftY * scale - offsetY;
         frameShifts[frame].iw = preloadedImages[frame].width();
         frameShifts[frame].ih = preloadedImages[frame].height();
     }
@@ -1874,7 +1882,7 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args)
                     if (data[i] != 0.0f) {
                         data[i] = Normalization::applyToPixel(
                             data[i], args.params.normalization,
-                            processed, c, args.coefficients);
+                            idx, c, args.coefficients);
                     }
                 }
             }

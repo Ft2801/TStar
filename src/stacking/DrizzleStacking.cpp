@@ -130,7 +130,9 @@ void DrizzleStacking::drizzleFrame(
     std::vector<double>& weightAccum,
     int outputWidth, int outputHeight,
     const DrizzleParams& params,
-    double offsetX, double offsetY)
+    double offsetX, double offsetY,
+    const std::vector<float>& weights,
+    const float* rejectionMap)
 {
     const double scale = params.scaleFactor;
     const double drop  = params.dropSize;
@@ -142,6 +144,9 @@ void DrizzleStacking::drizzleFrame(
     #pragma omp parallel for
     for (int y = 0; y < inH; ++y) {
         for (int x = 0; x < inW; ++x) {
+            // Reject outliers from first pass
+            if (rejectionMap && rejectionMap[y * inW + x] > 0.5f)
+                continue;
 
             // Define pixel corner coordinates
             double px[] = { static_cast<double>(x),     static_cast<double>(x) + 1.0,
@@ -205,7 +210,8 @@ void DrizzleStacking::drizzleFrame(
                         size_t idx = static_cast<size_t>(oy) * outputWidth + ox;
 
                         for (int c = 0; c < channels; ++c) {
-                            double val = static_cast<double>(input.value(x, y, c)) * weight;
+                            float fw = (c < static_cast<int>(weights.size())) ? weights[c] : 1.0f;
+                            double val = static_cast<double>(input.value(x, y, c)) * weight * fw;
                             #pragma omp atomic
                             accum[c * outPixels + idx] += val;
                         }
@@ -230,7 +236,9 @@ void DrizzleStacking::fastDrizzleFrame(
     std::vector<double>& weightAccum,
     int outputWidth, int outputHeight,
     const DrizzleParams& params,
-    double offsetX, double offsetY)
+    double offsetX, double offsetY,
+    const std::vector<float>& weights,
+    const float* rejectionMap)
 {
     const int w        = input.width();
     const int h        = input.height();
@@ -241,6 +249,9 @@ void DrizzleStacking::fastDrizzleFrame(
     #pragma omp parallel for collapse(2)
     for (int y = 0; y < h; ++y) {
         for (int x = 0; x < w; ++x) {
+            // Reject outliers 
+            if (rejectionMap && rejectionMap[y * w + x] > 0.5f)
+                continue;
 
             // Transform the centre of the input pixel
             double cxIn = static_cast<double>(x) + 0.5;
@@ -259,7 +270,8 @@ void DrizzleStacking::fastDrizzleFrame(
                 const double weight = 1.0;
 
                 for (int c = 0; c < channels; ++c) {
-                    double val = static_cast<double>(input.value(x, y, c)) * weight;
+                    float fw = (c < static_cast<int>(weights.size())) ? weights[c] : 1.0f;
+                    double val = static_cast<double>(input.value(x, y, c)) * weight * fw;
                     #pragma omp atomic
                     accum[c * outPixels + idx] += val;
                 }
@@ -909,11 +921,11 @@ void DrizzleStacking::addImage(
     if (m_params.fastMode) {
         fastDrizzleFrame(img, reg, m_accum, m_weightAccum,
                          m_outWidth, m_outHeight, m_params,
-                         m_offsetX, m_offsetY);
+                         m_offsetX, m_offsetY, weights, rejectionMap);
     } else {
         drizzleFrame(img, reg, m_accum, m_weightAccum,
                      m_outWidth, m_outHeight, m_params,
-                     m_offsetX, m_offsetY);
+                     m_offsetX, m_offsetY, weights, rejectionMap);
     }
 }
 

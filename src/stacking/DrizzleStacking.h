@@ -133,7 +133,9 @@ public:
                       std::vector<double>& weightAccum,
                       int outputWidth, int outputHeight,
                       const DrizzleParams& params,
-                      double offsetX = 0.0, double offsetY = 0.0);
+                      double offsetX = 0.0, double offsetY = 0.0,
+                      const std::vector<float>& weights = {},
+                      const float* rejectionMap = nullptr);
 
     /**
      * @brief Fast drizzle for 1x point kernel (nearest-neighbour scatter).
@@ -150,7 +152,9 @@ public:
                           std::vector<double>& weightAccum,
                           int outputWidth, int outputHeight,
                           const DrizzleParams& params,
-                          double offsetX = 0.0, double offsetY = 0.0);
+                          double offsetX = 0.0, double offsetY = 0.0,
+                          const std::vector<float>& weights = {},
+                          const float* rejectionMap = nullptr);
 
     // -- Kernel management ---------------------------------------------------
 
