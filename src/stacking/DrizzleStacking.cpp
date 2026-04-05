@@ -913,8 +913,8 @@ void DrizzleStacking::initialize(int inputWidth, int inputHeight, int channels,
 void DrizzleStacking::addImage(
     const ImageBuffer& img,
     const RegistrationData& reg,
-    const std::vector<float>& /*weights*/,
-    const float* /*rejectionMap*/)
+    const std::vector<float>& weights,
+    const float* rejectionMap)
 {
     if (m_accum.empty()) return;   // Not initialised
 
