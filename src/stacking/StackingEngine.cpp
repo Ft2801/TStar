@@ -1854,11 +1854,20 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args)
     DrizzleStacking drizzle;
 
     DrizzleStacking::DrizzleParams dParams;
-    dParams.scaleFactor  = args.params.drizzleScale;
-    dParams.dropSize     = args.params.drizzlePixFrac;
-    dParams.kernelType   = static_cast<int>(args.params.drizzleKernel);
+    dParams.scaleFactor   = args.params.drizzleScale;
+    dParams.dropSize      = args.params.drizzlePixFrac;
+    dParams.kernelType    = static_cast<int>(args.params.drizzleKernel);
     dParams.useWeightMaps = true;
-    dParams.fastMode     = args.params.drizzleFast;
+    dParams.fastMode      = args.params.drizzleFast;
+
+    // Convert Bayer pattern enum to string for the drizzle engine
+    switch (args.params.bayerPattern) {
+        case Preprocessing::BayerPattern::RGGB: dParams.bayerPattern = "RGGB"; break;
+        case Preprocessing::BayerPattern::BGGR: dParams.bayerPattern = "BGGR"; break;
+        case Preprocessing::BayerPattern::GBRG: dParams.bayerPattern = "GBRG"; break;
+        case Preprocessing::BayerPattern::GRBG: dParams.bayerPattern = "GRBG"; break;
+        default: dParams.bayerPattern = ""; break;
+    }
 
     // ---- Compute output dimensions (framing) ----
     int canvasWidth, canvasHeight, offsetX, offsetY;
@@ -1921,17 +1930,20 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args)
             float* maskData = dimRejectionMap->data().data();
             std::memset(maskData, 0, sizeof(float) * buffer.width() * buffer.height());
 
-            // Noise-based threshold for rejection
-            double ch0Noise = Statistics::computeNoise(buffer.data().data(),
-                                                       buffer.width(), buffer.height());
+            // Noise-based threshold for rejection (per-channel)
+            std::vector<double> channelNoises(buffer.channels());
+            for (int c = 0; c < buffer.channels(); ++c) {
+                channelNoises[c] = Statistics::computeNoise(buffer.data().data() + c * buffer.width() * buffer.height(),
+                                                            buffer.width(), buffer.height());
+            }
+
             float sigmaParam = std::max(args.params.sigmaLow, args.params.sigmaHigh);
             if (sigmaParam <= 0.0f) sigmaParam = 3.0f;
 
-            float threshold = static_cast<float>(sigmaParam * ch0Noise);
-            if (threshold < 1e-6f) threshold = 1e-6f;
+            int rejectedCount = 0;
+            const int totalPixels = buffer.width() * buffer.height();
 
             // Compare each pixel against the reference using full registration transform
-            // This ensures rejection works even with rotation or scaling.
             for (int y = 0; y < buffer.height(); ++y) {
                 for (int x = 0; x < buffer.width(); ++x) {
                     QPointF mapped = reg.transform(x, y);
@@ -1944,14 +1956,34 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args)
                         for (int c = 0; c < buffer.channels(); ++c) {
                             float val = buffer.value(x, y, c);
                             float ref = referenceStack.value(rx, ry, c);
+                            float threshold = static_cast<float>(sigmaParam * channelNoises[c]);
+                            if (threshold < 1e-6f) threshold = 1e-6f;
+
                             if (std::abs(val - ref) > threshold) {
                                 reject = true;
                                 break;
                             }
                         }
-                        if (reject) maskData[y * buffer.width() + x] = 1.0f;
+                        if (reject) {
+                            maskData[y * buffer.width() + x] = 1.0f;
+                            rejectedCount++;
+                        }
                     }
                 }
+            }
+
+            float rejectPercent = 100.0f * rejectedCount / totalPixels;
+            if (rejectPercent > 0.0f) {
+                emit logMessage(tr("Drizzle: Frame %1 rejection: %2%").arg(idx + 1).arg(rejectPercent, 0, 'f', 1), 
+                                (rejectPercent > 50.0f) ? "orange" : "");
+            }
+
+            // Safety: if more than 95% is rejected, the reference stack is likely bad.
+            // In this case, we disable rejection for this frame to avoid a black output.
+            if (rejectPercent > 95.0f) {
+                emit logMessage(tr("WARNING: Excessive rejection (%1%) - disabling mask for frame %2")
+                                .arg(rejectPercent, 0, 'f', 1).arg(idx + 1), "red");
+                std::memset(maskData, 0, sizeof(float) * totalPixels);
             }
         }
 
@@ -1982,8 +2014,12 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args)
 
     args.progress(tr("Finalizing Drizzle..."), -1);
 
+    // Important: Raw Drizzle can produce 3-channel output from 1-channel input.
+    // We must use the actual channel count from the drizzle accumulator.
+    int outChans = drizzle.channels();
+
     if (!prepareOutput(args, drizzle.outputWidth(), drizzle.outputHeight(),
-                       args.sequence->channels())) {
+                       outChans)) {
         return StackResult::AllocError;
     }
 

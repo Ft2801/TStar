@@ -27,6 +27,60 @@ BackgroundExtractor::BackgroundExtractor()
 {
 }
 
+// Deep copy for GSL vectors
+BackgroundExtractor::BackgroundExtractor(const BackgroundExtractor& other)
+    : m_degree(other.m_degree)
+    , m_tolerance(other.m_tolerance)
+    , m_smoothing(other.m_smoothing)
+    , m_method(other.m_method)
+    , m_samples(other.m_samples)
+    , m_width(other.m_width)
+    , m_height(other.m_height)
+    , m_channels(other.m_channels)
+{
+    m_models.resize(other.m_models.size());
+    for (size_t i = 0; i < other.m_models.size(); ++i) {
+        m_models[i].rbfWeights = other.m_models[i].rbfWeights;
+        m_models[i].rbfCenters = other.m_models[i].rbfCenters;
+        if (other.m_models[i].polyCoeffs) {
+            m_models[i].polyCoeffs = gsl_vector_alloc(other.m_models[i].polyCoeffs->size);
+            gsl_vector_memcpy(m_models[i].polyCoeffs, other.m_models[i].polyCoeffs);
+        } else {
+            m_models[i].polyCoeffs = nullptr;
+        }
+    }
+}
+
+BackgroundExtractor& BackgroundExtractor::operator=(const BackgroundExtractor& other)
+{
+    if (this == &other) return *this;
+
+    clearModels();
+    
+    m_degree    = other.m_degree;
+    m_tolerance = other.m_tolerance;
+    m_smoothing = other.m_smoothing;
+    m_method    = other.m_method;
+    m_samples   = other.m_samples;
+    m_width     = other.m_width;
+    m_height    = other.m_height;
+    m_channels  = other.m_channels;
+
+    m_models.resize(other.m_models.size());
+    for (size_t i = 0; i < other.m_models.size(); ++i) {
+        m_models[i].rbfWeights = other.m_models[i].rbfWeights;
+        m_models[i].rbfCenters = other.m_models[i].rbfCenters;
+        if (other.m_models[i].polyCoeffs) {
+            m_models[i].polyCoeffs = gsl_vector_alloc(other.m_models[i].polyCoeffs->size);
+            gsl_vector_memcpy(m_models[i].polyCoeffs, other.m_models[i].polyCoeffs);
+        } else {
+            m_models[i].polyCoeffs = nullptr;
+        }
+    }
+
+    return *this;
+}
+
 BackgroundExtractor::~BackgroundExtractor()
 {
     clearModels();
@@ -156,6 +210,7 @@ void BackgroundExtractor::generateGrid(const ImageBuffer& img, int samplesPerLin
             Sample s;
             s.x = static_cast<float>(cx);
             s.y = static_cast<float>(cy);
+            s.median.resize(m_channels);
 
             // Compute per-channel median within the patch
             for (int c = 0; c < m_channels; ++c) {

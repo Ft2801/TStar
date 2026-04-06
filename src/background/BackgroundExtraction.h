@@ -48,7 +48,7 @@ enum class FittingMethod {
 /** Represents a single grid sample with spatial position and per-channel median. */
 struct Sample {
     float x, y;
-    float median[3];    ///< Per-channel median intensity within the sample patch
+    std::vector<float> median;  ///< Per-channel median intensities
     bool  valid = true;
 };
 
@@ -68,6 +68,12 @@ class BackgroundExtractor {
 public:
     BackgroundExtractor();
     ~BackgroundExtractor();
+
+    // Disable copying/assignment unless I want to implement deep cloning of GSL vectors.
+    // Given the usage in scripts, preventing unintended shallow copies is enough, 
+    // or I can implement a proper deep copy. Let's do a deep copy to be robust.
+    BackgroundExtractor(const BackgroundExtractor& other);
+    BackgroundExtractor& operator=(const BackgroundExtractor& other);
 
     /**
      * @brief Configure the fitting parameters.

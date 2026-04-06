@@ -38,81 +38,163 @@ void MosaicFeathering::initRampLUT()
 }
 
 // ============================================================================
-// DrizzleStacking -- Weight map computation
+// DrizzleStacking -- Coordinate mapping and algorithms
 // ============================================================================
 
-DrizzleStacking::DrizzleWeight DrizzleStacking::computeWeightMap(
+Stacking::DrizzleMap DrizzleStacking::computeDrizzleMap(
     const ImageBuffer& input,
     const RegistrationData& reg,
-    int outputWidth, int outputHeight,
-    const DrizzleParams& params)
+    int outWidth, int outHeight,
+    double scale,
+    double offsetX,
+    double offsetY)
 {
-    DrizzleWeight result;
-    result.width  = outputWidth;
-    result.height = outputHeight;
-    result.weight.resize(static_cast<size_t>(outputWidth) * outputHeight, 0.0f);
+    DrizzleMap result;
+    result.width  = input.width();
+    result.height = input.height();
+    result.xMap.resize(static_cast<size_t>(result.width) * result.height);
+    result.yMap.resize(static_cast<size_t>(result.width) * result.height);
 
-    const double scale = params.scaleFactor;
-    const double drop  = params.dropSize;
-    const int inW = input.width();
-    const int inH = input.height();
+    const int inW = result.width;
+    const int inH = result.height;
 
-    // For each input pixel, project its four corners into output space,
-    // optionally shrink the resulting quad, then accumulate overlap area.
+    // Pre-compute the output (x', y') for every input pixel center
     #pragma omp parallel for
     for (int y = 0; y < inH; ++y) {
         for (int x = 0; x < inW; ++x) {
-
-            // Define the four corners of the input pixel drop (pixfrac)
             double cx = static_cast<double>(x) + 0.5;
             double cy = static_cast<double>(y) + 0.5;
-            double hd = drop * 0.5;
-            double px[] = { cx - hd, cx + hd, cx + hd, cx - hd };
-            double py[] = { cy - hd, cy - hd, cy + hd, cy + hd };
 
-            // Transform corners to output space
-            Polygon quad(4);
-            double minX =  1e9, maxX = -1e9;
-            double minY =  1e9, maxY = -1e9;
-
-            for (int i = 0; i < 4; ++i) {
-                QPointF pt = reg.transform(px[i], py[i]);
-                quad[i] = { pt.x() * scale, pt.y() * scale };
-            }
-
-            // Compute the bounding box of the transformed quad
-            for (const auto& p : quad) {
-                if (p.x < minX) minX = p.x;
-                if (p.x > maxX) maxX = p.x;
-                if (p.y < minY) minY = p.y;
-                if (p.y > maxY) maxY = p.y;
-            }
-
-            int x0 = std::max(0, static_cast<int>(std::floor(minX)));
-            int x1 = std::min(outputWidth  - 1, static_cast<int>(std::floor(maxX)));
-            int y0 = std::max(0, static_cast<int>(std::floor(minY)));
-            int y1 = std::min(outputHeight - 1, static_cast<int>(std::floor(maxY)));
-
-            // Scan every output pixel that the bounding box touches
-            for (int oy = y0; oy <= y1; ++oy) {
-                for (int ox = x0; ox <= x1; ++ox) {
-                    double oxD = static_cast<double>(ox);
-                    double oyD = static_cast<double>(oy);
-
-                    Polygon clipped = clipPolygon(quad, oxD, oyD, oxD + 1.0, oyD + 1.0);
-                    double area = computePolygonArea(clipped);
-
-                    if (area > 1e-6) {
-                        size_t idx = static_cast<size_t>(oy) * outputWidth + ox;
-                        #pragma omp atomic
-                        result.weight[idx] += static_cast<float>(area);
-                    }
-                }
-            }
+            // reg.transform maps from input linear to reference linear coords.
+            QPointF pt = reg.transform(cx, cy);
+            
+            size_t idx = static_cast<size_t>(y) * inW + x;
+            // Apply framing offset and scale to get output canvas coordinates
+            result.xMap[idx] = static_cast<float>((pt.x() - offsetX) * scale);
+            result.yMap[idx] = static_cast<float>((pt.y() - offsetY) * scale);
         }
     }
 
+    // Unused but kept for validation if needed
+    (void)outWidth;
+    (void)outHeight;
+
     return result;
+}
+
+bool DrizzleStacking::interpolatePoint(
+    const Stacking::DrizzleMap& map, float xin, float yin,
+    float& xout, float& yout)
+{
+    int i0 = static_cast<int>(std::floor(xin - 0.5f));
+    int j0 = static_cast<int>(std::floor(yin - 0.5f));
+
+    if (i0 < 0 || i0 >= map.width - 1 || j0 < 0 || j0 >= map.height - 1)
+        return false;
+
+    float fx = xin - 0.5f - i0;
+    float fy = yin - 0.5f - j0;
+
+    auto getX = [&](int ix, int iy) { return map.xMap[static_cast<size_t>(iy) * map.width + ix]; };
+    auto getY = [&](int ix, int iy) { return map.yMap[static_cast<size_t>(iy) * map.width + ix]; };
+
+    float f00 = getX(i0, j0), g00 = getY(i0, j0);
+    float f10 = getX(i0 + 1, j0), g10 = getY(i0 + 1, j0);
+    float f01 = getX(i0, j0 + 1), g01 = getY(i0, j0 + 1);
+    float f11 = getX(i0 + 1, j0 + 1), g11 = getY(i0 + 1, j0 + 1);
+
+    xout = f00 * (1 - fx) * (1 - fy) + f10 * fx * (1 - fy) + f01 * (1 - fx) * fy + f11 * fx * fy;
+    yout = g00 * (1 - fx) * (1 - fy) + g10 * fx * (1 - fy) + g01 * (1 - fx) * fy + g11 * fx * fy;
+
+    return true;
+}
+
+bool DrizzleStacking::interpolateFourPoints(
+    const Stacking::DrizzleMap& map, int ixcen, int iycen,
+    float dh, float xout[4], float yout[4])
+{
+    // Map the 4 corners of a shrunk pixel centered at (ixcen+0.5, iycen+0.5)
+    float xin[] = { ixcen + 0.5f - dh, ixcen + 0.5f + dh, ixcen + 0.5f + dh, ixcen + 0.5f - dh };
+    float yin[] = { iycen + 0.5f - dh, iycen + 0.5f - dh, iycen + 0.5f + dh, iycen + 0.5f + dh };
+
+    for (int i = 0; i < 4; ++i) {
+        if (!interpolatePoint(map, xin[i], yin[i], xout[i], yout[i]))
+            return false;
+    }
+    return true;
+}
+
+float DrizzleStacking::sgarea(float x1, float y1, float x2, float y2) {
+    // Area of intersection of a line segment with a unit square
+    float d;
+    if (x1 == x2) return 0.0f;
+    if (x1 < 0.0f && x2 < 0.0f) return 0.0f;
+    if (x1 > 1.0f && x2 > 1.0f) return 0.0f;
+
+    if (x1 < 0.0f) {
+        y1 = y1 + (y2 - y1) * (0.0f - x1) / (x2 - x1);
+        x1 = 0.0f;
+    } else if (x1 > 1.0f) {
+        y1 = y1 + (y2 - y1) * (1.0f - x1) / (x2 - x1);
+        x1 = 1.0f;
+    }
+
+    if (x2 < 0.0f) {
+        y2 = y1 + (y2 - y1) * (0.0f - x1) / (x2 - x1);
+        x2 = 0.0f;
+    } else if (x2 > 1.0f) {
+        y2 = y1 + (y2 - y1) * (1.0f - x1) / (x2 - x1);
+        x2 = 1.0f;
+    }
+
+    d = x2 - x1;
+    if (y1 <= 0.0f && y2 <= 0.0f) return 0.0f;
+    if (y1 >= 1.0f && y2 >= 1.0f) return d;
+
+    if (y1 <= 0.0f) {
+        x1 = x1 + (x2 - x1) * (0.0f - y1) / (y2 - y1);
+        y1 = 0.0f;
+    } else if (y1 >= 1.0f) {
+        x1 = x1 + (x2 - x1) * (1.0f - y1) / (y2 - y1);
+        y1 = 1.0f;
+    }
+
+    if (y2 <= 0.0f) {
+        x2 = x1 + (x2 - x1) * (0.0f - y1) / (y2 - y1);
+        y2 = 0.0f;
+    } else if (y2 >= 1.0f) {
+        x2 = x1 + (x2 - x1) * (1.0f - y1) / (y2 - y1);
+        y2 = 1.0f;
+    }
+
+    return 0.5f * (y1 + y2) * (x2 - x1);
+}
+
+float DrizzleStacking::boxer(float is, float js, const float x[4], const float y[4]) {
+    // Area of intersection of a quadrilateral with a unit-pixel at (is, js)
+    float area = 0.0f;
+    float tx[4], ty[4];
+    for (int i = 0; i < 4; ++i) {
+        tx[i] = x[i] - is;
+        ty[i] = y[i] - js;
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        int next = (i + 1) % 4;
+        area += sgarea(tx[i], ty[i], tx[next], ty[next]);
+    }
+
+    return std::abs(area);
+}
+
+int DrizzleStacking::getCFAChannel(int x, int y, const QString& pattern) {
+    if (pattern.isEmpty()) return 0;
+    // Standard patterns: "RGGB", "BGGR", "GBRG", "GRBG"
+    char p = pattern.toUpper().at((y % 2) * 2 + (x % 2)).toLatin1();
+    if (p == 'R') return 0;
+    if (p == 'G') return 1;
+    if (p == 'B') return 2;
+    return 0;
 }
 
 // ============================================================================
@@ -134,100 +216,80 @@ void DrizzleStacking::drizzleFrame(
     const double drop  = params.dropSize;
     const int inW      = input.width();
     const int inH      = input.height();
-    const int channels = input.channels();
+    const int inChans  = input.channels();
     const size_t outPixels = static_cast<size_t>(outputWidth) * outputHeight;
+
+    // Use pre-computed mapping for speed and precision
+    Stacking::DrizzleMap dmap = computeDrizzleMap(input, reg, outputWidth, outputHeight, scale, offsetX, offsetY);
+    if (!dmap.isValid()) return;
+
+    // Flux conservation scaling: upsampling distributes flux over scale^2 pixels
+    const double fScale = scale * scale;
+    const float dh = static_cast<float>(drop * 0.5);
 
     #pragma omp parallel for
     for (int y = 0; y < inH; ++y) {
         for (int x = 0; x < inW; ++x) {
-            // Reject outliers from first pass
+            // Outlier rejection
             if (rejectionMap && rejectionMap[y * inW + x] > 0.5f)
                 continue;
 
-            // Source pixel center
-            double cxIn = static_cast<double>(x) + 0.5;
-            double cyIn = static_cast<double>(y) + 0.5;
-
-            // Half-size of the input drop
-            double hdIn = drop * 0.5;
-
-            // Compute corner coordinates of the shrunken source pixel
-            double pInX[4] = { cxIn - hdIn, cxIn + hdIn, cxIn + hdIn, cxIn - hdIn };
-            double pInY[4] = { cyIn - hdIn, cyIn - hdIn, cyIn + hdIn, cyIn + hdIn };
-
-            // Transform corners to output space
-            float minX =  1e9f, maxX = -1e9f;
-            float minY =  1e9f, maxY = -1e9f;
-
-            QPointF pOut[4];
-            for (int i = 0; i < 4; ++i) {
-                // reg.transform maps from input linear to reference linear coords.
-                pOut[i] = reg.transform(pInX[i], pInY[i]);
-
-                // Apply registration translation/offset and output scaling
-                pOut[i].rx() = (pOut[i].x() - offsetX) * scale;
-                pOut[i].ry() = (pOut[i].y() - offsetY) * scale;
-
-                if (pOut[i].x() < minX) minX = static_cast<float>(pOut[i].x());
-                if (pOut[i].x() > maxX) maxX = static_cast<float>(pOut[i].x());
-                if (pOut[i].y() < minY) minY = static_cast<float>(pOut[i].y());
-                if (pOut[i].y() > maxY) maxY = static_cast<float>(pOut[i].y());
-            }
-
-            // Reject pixels that fall entirely outside output bounds
-            if (maxX < 0.0f || minX >= static_cast<float>(outputWidth) ||
-                maxY < 0.0f || minY >= static_cast<float>(outputHeight)) {
+            // Compute output quadrilateral for shrunken pixel (pixfrac)
+            float xout[4], yout[4];
+            if (!interpolateFourPoints(dmap, x, y, dh, xout, yout))
                 continue;
-            }
 
-            // Precise bounds of the transformed area on the output grid
-            int x0 = std::max(0, static_cast<int>(std::floor(minX)));
-            int x1 = std::min(outputWidth  - 1, static_cast<int>(std::floor(maxX)));
-            int y0 = std::max(0, static_cast<int>(std::floor(minY)));
-            int y1 = std::min(outputHeight - 1, static_cast<int>(std::floor(maxY)));
+            // Jacobian Correction: Geometric scale conservation
+            // Area of transformed quad = 0.5 * |(x0-x2)(y1-y3) - (x1-x3)(y0-y2)|
+            double jacobian = 0.5 * std::abs((xout[0] - xout[2]) * (yout[1] - yout[3]) - 
+                                            (xout[1] - xout[3]) * (yout[0] - yout[2]));
+            
+            if (jacobian < 1e-9) continue;
 
-            // Create output polygon
-            Polygon quad(4);
+            // Bounding box of the transformed drop
+            float minX = 1e9f, maxX = -1e9f, minY = 1e9f, maxY = -1e9f;
             for (int i = 0; i < 4; ++i) {
-                quad[i] = { pOut[i].x(), pOut[i].y() };
+                minX = std::min(minX, xout[i]); maxX = std::max(maxX, xout[i]);
+                minY = std::min(minY, yout[i]); maxY = std::max(maxY, yout[i]);
             }
 
-            // Scatter flux into every overlapping output pixel
-            for (int oy = y0; oy <= y1; ++oy) {
-                for (int ox = x0; ox <= x1; ++ox) {
-                    double oxD = static_cast<double>(ox);
-                    double oyD = static_cast<double>(oy);
+            int ox0 = std::clamp(static_cast<int>(std::floor(minX)), 0, outputWidth - 1);
+            int ox1 = std::clamp(static_cast<int>(std::floor(maxX)), 0, outputWidth - 1);
+            int oy0 = std::clamp(static_cast<int>(std::floor(minY)), 0, outputHeight - 1);
+            int oy1 = std::clamp(static_cast<int>(std::floor(maxY)), 0, outputHeight - 1);
 
-                    Polygon clipped = clipPolygon(quad, oxD, oyD, oxD + 1.0, oyD + 1.0);
-                    double area = computePolygonArea(clipped);
+            // Per-pixel frame quality weight (e.g. FWHM, SNR)
+            float frameWeight = (weights.size() > 0) ? weights[0] : 1.0f;
+            
+            // CFA Routing: If raw drizzling, determine destination channel
+            bool isRawDriz = !params.bayerPattern.isEmpty() && inChans == 1;
+            int cfaChan = isRawDriz ? getCFAChannel(x, y, params.bayerPattern) : 0;
 
-                    if (area > 1e-6) {
-                        float weight = static_cast<float>(area);
+            // Scatter flux into output pixels
+            for (int oy = oy0; oy <= oy1; ++oy) {
+                for (int ox = ox0; ox <= ox1; ++ox) {
+                    float overlapArea = boxer(static_cast<float>(ox), static_cast<float>(oy), xout, yout);
+                    if (overlapArea < 1e-6f) continue;
 
-                        // Modulate weight with the convolution kernel (if not Point)
-                        if (m_currentKernel != DrizzleKernelType::Point) {
-                            double cxIn = static_cast<double>(x) + 0.5;
-                            double cyIn = static_cast<double>(y) + 0.5;
-                            QPointF centerOut = reg.transform(cxIn, cyIn);
-                            double tx = (centerOut.x() - offsetX) * scale;
-                            double ty = (centerOut.y() - offsetY) * scale;
+                    // Weight: (Overlap * FrameWeight) / Jacobian
+                    double finalWeight = (double)(overlapArea * frameWeight) / jacobian;
 
-                            double dx = (static_cast<double>(ox) + 0.5) - tx;
-                            double dy = (static_cast<double>(oy) + 0.5) - ty;
-                            weight *= getKernelWeight(dx, dy);
-                        }
-
-                        size_t idx = static_cast<size_t>(oy) * outputWidth + ox;
-
-                        for (int c = 0; c < channels; ++c) {
-                            float fw = (c < static_cast<int>(weights.size())) ? weights[c] : 1.0f;
-                            double val = static_cast<double>(input.value(x, y, c)) * weight * fw;
-                            #pragma omp atomic
-                            accum[c * outPixels + idx] += val;
-                        }
-
+                    if (isRawDriz) {
+                        // Raw Driz: Route to R, G, or B accumulator
+                        double val = static_cast<double>(input.value(x, y, 0)) * finalWeight * fScale;
                         #pragma omp atomic
-                        weightAccum[idx] += weight;
+                        accum[cfaChan * outPixels + (static_cast<size_t>(oy) * outputWidth + ox)] += val;
+                        #pragma omp atomic
+                        weightAccum[cfaChan * outPixels + (static_cast<size_t>(oy) * outputWidth + ox)] += finalWeight;
+                    } else {
+                        // Standard RGB Driz: All channels get the same weight
+                        for (int c = 0; c < inChans; ++c) {
+                            double val = static_cast<double>(input.value(x, y, c)) * finalWeight * fScale;
+                            #pragma omp atomic
+                            accum[c * outPixels + (static_cast<size_t>(oy) * outputWidth + ox)] += val;
+                            #pragma omp atomic
+                            weightAccum[c * outPixels + (static_cast<size_t>(oy) * outputWidth + ox)] += finalWeight;
+                        }
                     }
                 }
             }
@@ -284,110 +346,12 @@ void DrizzleStacking::fastDrizzleFrame(
                     double val = static_cast<double>(input.value(x, y, c)) * weight * fw;
                     #pragma omp atomic
                     accum[c * outPixels + idx] += val;
+                    #pragma omp atomic
+                    weightAccum[c * outPixels + idx] += weight * fw;
                 }
-
-                #pragma omp atomic
-                weightAccum[idx] += weight;
             }
         }
     }
-}
-
-// ============================================================================
-// DrizzleStacking -- Polygon geometry helpers
-// ============================================================================
-
-double DrizzleStacking::computePolygonArea(const Polygon& p)
-{
-    double area = 0.0;
-    size_t j = p.size() - 1;
-    for (size_t i = 0; i < p.size(); ++i) {
-        area += (p[j].x + p[i].x) * (p[j].y - p[i].y);
-        j = i;
-    }
-    return std::abs(area) * 0.5;
-}
-
-DrizzleStacking::Polygon DrizzleStacking::shrinkPolygon(const Polygon& p,
-                                                         double factor)
-{
-    if (p.empty()) return p;
-
-    // Compute the centroid
-    double cx = 0.0, cy = 0.0;
-    for (const auto& pt : p) {
-        cx += pt.x;
-        cy += pt.y;
-    }
-    cx /= static_cast<double>(p.size());
-    cy /= static_cast<double>(p.size());
-
-    // Scale each vertex towards the centroid
-    Polygon out;
-    out.reserve(p.size());
-    for (const auto& pt : p) {
-        out.push_back({
-            cx + (pt.x - cx) * factor,
-            cy + (pt.y - cy) * factor
-        });
-    }
-    return out;
-}
-
-DrizzleStacking::Polygon DrizzleStacking::clipPolygon(
-    const Polygon& subject,
-    double xMin, double yMin,
-    double xMax, double yMax)
-{
-    if (subject.empty()) return subject;
-
-    Polygon output = subject;
-
-    // Sutherland-Hodgman clipping against each of the four edges
-    auto clipEdge = [&](double cEdge, bool isVertical, bool isMax) {
-        Polygon input = output;
-        output.clear();
-        if (input.empty()) return;
-
-        Point S = input.back();
-
-        for (const auto& E : input) {
-            bool E_in, S_in;
-
-            if (isVertical) {
-                if (isMax) { E_in = E.x <= cEdge; S_in = S.x <= cEdge; }
-                else       { E_in = E.x >= cEdge; S_in = S.x >= cEdge; }
-            } else {
-                if (isMax) { E_in = E.y <= cEdge; S_in = S.y <= cEdge; }
-                else       { E_in = E.y >= cEdge; S_in = S.y >= cEdge; }
-            }
-
-            if (E_in) {
-                if (!S_in) {
-                    double t;
-                    if (isVertical) t = (cEdge - S.x) / (E.x - S.x);
-                    else            t = (cEdge - S.y) / (E.y - S.y);
-                    output.push_back({ S.x + t * (E.x - S.x),
-                                       S.y + t * (E.y - S.y) });
-                }
-                output.push_back(E);
-            } else if (S_in) {
-                double t;
-                if (isVertical) t = (cEdge - S.x) / (E.x - S.x);
-                else            t = (cEdge - S.y) / (E.y - S.y);
-                output.push_back({ S.x + t * (E.x - S.x),
-                                   S.y + t * (E.y - S.y) });
-            }
-            S = E;
-        }
-    };
-
-    clipEdge(xMin, true,  false);   // Left
-    clipEdge(xMax, true,  true);    // Right
-    clipEdge(yMin, false, false);   // Top
-    clipEdge(yMax, false, true);    // Bottom
-
-    return output;
 }
 
 // ============================================================================
@@ -397,26 +361,25 @@ DrizzleStacking::Polygon DrizzleStacking::clipPolygon(
 void DrizzleStacking::finalizeStack(
     const std::vector<double>& accum,
     const std::vector<double>& weightAccum,
-    ImageBuffer& output)
+    ImageBuffer& output,
+    int channels)
 {
     const int width      = output.width();
     const int height     = output.height();
-    const int channels   = output.channels();
     const size_t pixelCount = static_cast<size_t>(width) * height;
     float* data = output.data().data();
 
+    // Robust weighting
     #pragma omp parallel for
     for (int c = 0; c < channels; ++c) {
         for (size_t i = 0; i < pixelCount; ++i) {
-            double w = weightAccum[i];
+            double w = weightAccum[c * pixelCount + i];
+            size_t outIdx = i * channels + c; // Interleaved output
 
-            // Output is stored in interleaved layout: pixel_i * channels + c
-            size_t outIdx = i * channels + c;
-
-            if (w > 0.0) {
-                // Accumulators use planar layout: [ch0 | ch1 | ch2]
+            if (w > 1e-12) {
+                // val = Sum(val_i * weight_i) / Sum(weight_i)
                 double val = accum[c * pixelCount + i] / w;
-                data[outIdx] = static_cast<float>(val);
+                data[outIdx] = std::clamp(static_cast<float>(val), 0.0f, 1.0f);
             } else {
                 data[outIdx] = 0.0f;
             }
@@ -904,19 +867,22 @@ void DrizzleStacking::initialize(int inputWidth, int inputHeight, int channels,
                                  double offsetX, double offsetY)
 {
     m_params    = params;
-    m_channels  = channels;
     m_offsetX   = offsetX;
     m_offsetY   = offsetY;
-    m_outWidth  = static_cast<int>(inputWidth  * params.scaleFactor);
-    m_outHeight = static_cast<int>(inputHeight * params.scaleFactor);
+    m_outWidth  = static_cast<int>(std::round(inputWidth  * params.scaleFactor));
+    m_outHeight = static_cast<int>(std::round(inputHeight * params.scaleFactor));
+
+    // For Raw Drizzle (CFA), the output has 3 channels even if input has 1
+    bool isRawDriz = !m_params.bayerPattern.isEmpty() && channels == 1;
+    m_channels = isRawDriz ? 3 : channels;
 
     size_t outPixels = static_cast<size_t>(m_outWidth) * m_outHeight;
 
-    // Zero-initialise the accumulators
-    m_accum.assign(outPixels * channels, 0.0);
-    m_weightAccum.assign(outPixels, 0.0);
+    // Zero-initialise the planar accumulators
+    m_accum.assign(outPixels * m_channels, 0.0);
+    m_weightAccum.assign(outPixels * m_channels, 0.0);
 
-    // Build kernel LUT if a non-point kernel is requested
+    // Build kernel LUT if requested
     initKernel(static_cast<DrizzleKernelType>(params.kernelType));
 }
 
@@ -944,7 +910,7 @@ bool DrizzleStacking::resolve(ImageBuffer& output)
     if (m_accum.empty()) return false;
 
     output = ImageBuffer(m_outWidth, m_outHeight, m_channels);
-    finalizeStack(m_accum, m_weightAccum, output);
+    finalizeStack(m_accum, m_weightAccum, output, m_channels);
     return true;
 }
 

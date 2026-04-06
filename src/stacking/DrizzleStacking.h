@@ -15,6 +15,7 @@
 
 #include "../ImageBuffer.h"
 #include "StackingTypes.h"
+#include "DrizzleMap.h"
 #include <vector>
 
 namespace Stacking {
@@ -45,41 +46,23 @@ public:
      * @brief Configuration for a drizzle pass.
      */
     struct DrizzleParams {
-        double dropSize     = 0.5;   ///< Pixel shrink factor (0.3 - 1.0)
-        double scaleFactor  = 2.0;   ///< Output upscale factor
-        bool   useWeightMaps = true; ///< Use per-pixel weight maps
-        int    kernelType   = 0;     ///< 0 = point, 1 = Gaussian, 2 = Lanczos
-        bool   fastMode     = false; ///< Use optimised 1x point-kernel path
+        double dropSize      = 0.5;   ///< Pixel shrink factor (0.3 - 1.0)
+        double scaleFactor   = 2.0;   ///< Output upscale factor
+        bool   useWeightMaps = true;  ///< Use per-pixel weight maps
+        int    kernelType    = 0;     ///< 0 = square, 1 = Gaussian, 2 = point, 3 = turbo, 4 = Lanczos
+        bool   fastMode      = false; ///< Use optimised 1x point-kernel path
+        QString bayerPattern;         ///< e.g. "RGGB", "GBRG" (for Raw Drizzle)
     };
 
     /**
-     * @brief Per-pixel contribution weight map produced by computeWeightMap().
+     * @brief Compute the drizzle coordinate map for a single input image.
      */
-    struct DrizzleWeight {
-        std::vector<float> weight;   ///< Per-pixel weight values
-        int width  = 0;
-        int height = 0;
-    };
-
-    // -- Static helpers ------------------------------------------------------
-
-    /**
-     * @brief Compute the drizzle weight map for a single input image.
-     *
-     * The map records, for every output pixel, the fractional area of the
-     * (possibly shrunk) input pixel that overlaps it.
-     *
-     * @param input        Source image.
-     * @param reg          Registration transform for this frame.
-     * @param outputWidth  Width  of the output grid (scaled).
-     * @param outputHeight Height of the output grid (scaled).
-     * @param params       Drizzle parameters.
-     * @return DrizzleWeight map.
-     */
-    static DrizzleWeight computeWeightMap(const ImageBuffer& input,
-                                          const RegistrationData& reg,
-                                          int outputWidth, int outputHeight,
-                                          const DrizzleParams& params);
+    static Stacking::DrizzleMap computeDrizzleMap(const ImageBuffer& input,
+                                                  const RegistrationData& reg,
+                                                  int outWidth, int outHeight,
+                                                  double scale,
+                                                  double offsetX = 0.0,
+                                                  double offsetY = 0.0);
 
     /**
      * @brief Divide accumulated values by accumulated weights to produce
@@ -91,7 +74,8 @@ public:
      */
     static void finalizeStack(const std::vector<double>& accum,
                               const std::vector<double>& weightAccum,
-                              ImageBuffer& output);
+                              ImageBuffer& output,
+                              int channels);
 
     /**
      * @brief Simple 2x nearest-neighbour upscale (drizzle preparation).
@@ -198,6 +182,7 @@ public:
 
     int outputWidth()  const { return m_outWidth;  }
     int outputHeight() const { return m_outHeight; }
+    int channels()     const { return m_channels;  }
 
 private:
 
@@ -223,23 +208,24 @@ private:
     double               m_offsetY    = 0.0;
     DrizzleParams        m_params;
     std::vector<double>  m_accum;        ///< channels * W * H
-    std::vector<double>  m_weightAccum;  ///< W * H
+    std::vector<double>  m_weightAccum;  ///< channels * W * H
 
-    // -- Polygon geometry helpers --------------------------------------------
+    // -- Algorithms --------------------------------------
 
-    struct Point { double x, y; };
-    typedef std::vector<Point> Polygon;
+    /** @brief specialized overlap calculation for unit-cube pixels. */
+    static float sgarea(float x1, float y1, float x2, float y2);
+    static float boxer(float is, float js, const float x[4], const float y[4]);
 
-    /** @brief Signed area of a simple polygon (Shoelace formula). */
-    static double  computePolygonArea(const Polygon& p);
+    /** @brief Bilinear interpolation for sub-pixel positions in the DrizzleMap. */
+    static bool interpolatePoint(const Stacking::DrizzleMap& map, float xin, float yin,
+                                 float& xout, float& yout);
 
-    /** @brief Sutherland-Hodgman clip of subject against an axis-aligned rectangle. */
-    static Polygon clipPolygon(const Polygon& subject,
-                               double xMin, double yMin,
-                               double xMax, double yMax);
+    /** @brief Map 4 corners of a shrunk pixel. */
+    static bool interpolateFourPoints(const Stacking::DrizzleMap& map, int ix, int iy,
+                                      float dh, float xout[4], float yout[4]);
 
-    /** @brief Shrink a polygon towards its centroid by the given factor. */
-    static Polygon shrinkPolygon(const Polygon& p, double factor);
+    /** @brief Get the output channel for a RAW pixel position (Bayer routing). */
+    static int getCFAChannel(int x, int y, const QString& pattern);
 };
 
 // ============================================================================

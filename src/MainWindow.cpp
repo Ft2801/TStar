@@ -246,15 +246,17 @@ MainWindow::MainWindow(QWidget *parent)
 
     // --- 4.2: Restore Working Directory from Settings ---
     QSettings settings("TStar", "TStar");
-    QString lastDir = settings.value("General/LastWorkingDir").toString();
+    QString lastWorkingDir = settings.value("General/LastWorkingDir").toString();
     m_lastDialogDir = settings.value("General/LastDialogDir").toString();
 
-    if (!lastDir.isEmpty() && QDir(lastDir).exists()) {
-        QDir::setCurrent(lastDir);
+    if (!lastWorkingDir.isEmpty() && QDir(lastWorkingDir).exists()) {
+        QDir::setCurrent(lastWorkingDir);
+        if (m_lastDialogDir.isEmpty()) m_lastDialogDir = lastWorkingDir;
     } else {
         QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-        if (!desktopPath.isEmpty()) {
+        if (!desktopPath.isEmpty() && QDir(desktopPath).exists()) {
             QDir::setCurrent(desktopPath);
+            if (m_lastDialogDir.isEmpty()) m_lastDialogDir = desktopPath;
         }
     }
 
@@ -894,11 +896,26 @@ MainWindow::MainWindow(QWidget *parent)
 
     // -- Toolbar Group: Home Directory --
     auto homeBtn = addBtn(tr("Set Home"), "images/home.svg", [this](){
-        QString dir = QFileDialog::getExistingDirectory(this, tr("Select Home Directory"), QDir::currentPath());
+        QString current = QDir::currentPath();
+        QSettings settings("TStar", "TStar");
+        QString lastHome = settings.value("General/LastWorkingDir", current).toString();
+
+        QString dir = QFileDialog::getExistingDirectory(this, tr("Select Home Directory"), lastHome);
         if (!dir.isEmpty()) {
             QDir::setCurrent(dir);
-            QSettings settings("TStar", "TStar");
+            m_lastDialogDir = dir;
+
             settings.setValue("General/LastWorkingDir", dir);
+            settings.setValue("General/LastDialogDir", dir);
+            
+            // Also update specific tool folders to the new home to ensure consistency
+            settings.setValue("Stacking/InputFolder", dir);
+            settings.setValue("Stacking/OutputFolder", dir);
+            settings.setValue("Registration/InputFolder", dir);
+            settings.setValue("Preprocessing/InputFolder", dir);
+            settings.setValue("Project/LastPath", dir);
+            settings.sync();
+
             log(tr("Home Directory changed to: %1").arg(dir), Log_Success);
             showConsoleTemporarily(2000);
         }
