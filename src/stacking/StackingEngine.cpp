@@ -1385,9 +1385,10 @@ StackResult StackingEngine::stackMean(StackingArgs& args)
                                 result = computeWeightedMean(data, keptPixels, nbImages,
                                                              args.weights.data(), mstackPtr, c);
                             } else {
-                                float sum = 0.0f;
+                                double sum = 0.0;
+                                #pragma omp simd reduction(+:sum)
                                 for (int k = 0; k < keptPixels; ++k) sum += s[k];
-                                result = sum / keptPixels;
+                                result = static_cast<float>(sum / keptPixels);
                             }
                         }
 
@@ -1411,9 +1412,10 @@ StackResult StackingEngine::stackMean(StackingArgs& args)
                             result = computeWeightedMean(data, keptPixels, nbImages,
                                                          args.weights.data(), mstackPtr, -1);
                         } else {
-                            float sum = 0.0f;
+                            double sum = 0.0;
+                            #pragma omp simd reduction(+:sum)
                             for (int k = 0; k < keptPixels; ++k) sum += data.stack[k];
-                            result = sum / keptPixels;
+                            result = static_cast<float>(sum / keptPixels);
                         }
                     }
 

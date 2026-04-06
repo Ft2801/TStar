@@ -114,7 +114,8 @@ void subtract_bias_c(float* image, const float* bias, size_t size, int threads)
 {
     #pragma omp parallel for num_threads(threads)
     for (long long i = 0; i < (long long)size; ++i) {
-        image[i] -= bias[i];
+        float val = image[i] - bias[i];
+        image[i] = (val < 0.0f) ? 0.0f : val;
     }
 }
 
@@ -123,7 +124,8 @@ void subtract_dark_c(float* image, const float* dark, size_t size,
 {
     #pragma omp parallel for num_threads(threads)
     for (long long i = 0; i < (long long)size; ++i) {
-        image[i] = (image[i] - k * dark[i]) + pedestal;
+        float val = (image[i] - k * dark[i]) + pedestal;
+        image[i] = (val < 0.0f) ? 0.0f : val;
     }
 }
 
@@ -136,12 +138,12 @@ void apply_flat_c(float* image, const float* flat, size_t size,
     for (long long i = 0; i < (long long)size; ++i) {
         float flat_val = flat[i];
 
-        /* Clamp flat value to prevent division by near-zero values */
-        if (flat_val <= epsilon) {
-            flat_val = epsilon;
+        /* Exclude dead/un-flat-fieldable regions */
+        if (flat_val > epsilon) {
+            image[i] *= (normalization / flat_val);
+        } else {
+            image[i] = 0.0f;
         }
-
-        image[i] *= (normalization / flat_val);
     }
 }
 
@@ -196,15 +198,11 @@ int find_deviant_pixels_c(const float* dark, int width, int height,
             /* Compute robust statistics */
             float median = compute_median(phase_data, n);
 
+            /* Prepare a copy of phase_data for MAD calculation */
             for (size_t i = 0; i < n; ++i) {
-                abs_dev[i] = fabsf(phase_data[i] - median);
+                abs_dev[i] = phase_data[i];
             }
-            float mad = compute_median(abs_dev, n);
-            float sigma = mad * MAD_TO_SIGMA;
-
-            if (sigma < MIN_SIGMA) {
-                sigma = MIN_SIGMA;
-            }
+            float sigma = compute_mad_sigma(abs_dev, n, median);
 
             /* Compute detection thresholds */
             float hot_thresh = median + hot_sigma * sigma;
@@ -875,8 +873,11 @@ double compute_flat_normalization_c(const float* flat, int width, int height, in
         for (int x = start_x; x < end_x; ++x) {
             long idx = (y * width + x) * channels;
             for (int c = 0; c < channels; ++c) {
-                total_sum += flat[idx + c];
-                count++;
+                float val = flat[idx + c];
+                if (val > 0.0f) {
+                    total_sum += val;
+                    count++;
+                }
             }
         }
     }

@@ -63,11 +63,12 @@ DrizzleStacking::DrizzleWeight DrizzleStacking::computeWeightMap(
     for (int y = 0; y < inH; ++y) {
         for (int x = 0; x < inW; ++x) {
 
-            // Define the four corners of the input pixel
-            double px[] = { static_cast<double>(x),     static_cast<double>(x) + 1.0,
-                            static_cast<double>(x) + 1.0, static_cast<double>(x) };
-            double py[] = { static_cast<double>(y),     static_cast<double>(y),
-                            static_cast<double>(y) + 1.0, static_cast<double>(y) + 1.0 };
+            // Define the four corners of the input pixel drop (pixfrac)
+            double cx = static_cast<double>(x) + 0.5;
+            double cy = static_cast<double>(y) + 0.5;
+            double hd = drop * 0.5;
+            double px[] = { cx - hd, cx + hd, cx + hd, cx - hd };
+            double py[] = { cy - hd, cy - hd, cy + hd, cy + hd };
 
             // Transform corners to output space
             Polygon quad(4);
@@ -77,11 +78,6 @@ DrizzleStacking::DrizzleWeight DrizzleStacking::computeWeightMap(
             for (int i = 0; i < 4; ++i) {
                 QPointF pt = reg.transform(px[i], py[i]);
                 quad[i] = { pt.x() * scale, pt.y() * scale };
-            }
-
-            // Shrink the quad towards its centroid to simulate the drop size
-            if (drop < 1.0 - 1e-5) {
-                quad = shrinkPolygon(quad, drop);
             }
 
             // Compute the bounding box of the transformed quad
@@ -148,39 +144,53 @@ void DrizzleStacking::drizzleFrame(
             if (rejectionMap && rejectionMap[y * inW + x] > 0.5f)
                 continue;
 
-            // Define pixel corner coordinates
-            double px[] = { static_cast<double>(x),     static_cast<double>(x) + 1.0,
-                            static_cast<double>(x) + 1.0, static_cast<double>(x) };
-            double py[] = { static_cast<double>(y),     static_cast<double>(y),
-                            static_cast<double>(y) + 1.0, static_cast<double>(y) + 1.0 };
+            // Source pixel center
+            double cxIn = static_cast<double>(x) + 0.5;
+            double cyIn = static_cast<double>(y) + 0.5;
 
-            // Transform to output space
-            Polygon quad(4);
-            double minX =  1e9, maxX = -1e9;
-            double minY =  1e9, maxY = -1e9;
+            // Half-size of the input drop
+            double hdIn = drop * 0.5;
 
+            // Compute corner coordinates of the shrunken source pixel
+            double pInX[4] = { cxIn - hdIn, cxIn + hdIn, cxIn + hdIn, cxIn - hdIn };
+            double pInY[4] = { cyIn - hdIn, cyIn - hdIn, cyIn + hdIn, cyIn + hdIn };
+
+            // Transform corners to output space
+            float minX =  1e9f, maxX = -1e9f;
+            float minY =  1e9f, maxY = -1e9f;
+
+            QPointF pOut[4];
             for (int i = 0; i < 4; ++i) {
-                QPointF pt = reg.transform(px[i], py[i]);
-                quad[i] = { (pt.x() - offsetX) * scale, (pt.y() - offsetY) * scale };
+                // reg.transform maps from input linear to reference linear coords.
+                pOut[i] = reg.transform(pInX[i], pInY[i]);
+
+                // Apply registration translation/offset and output scaling
+                pOut[i].rx() = (pOut[i].x() - offsetX) * scale;
+                pOut[i].ry() = (pOut[i].y() - offsetY) * scale;
+
+                if (pOut[i].x() < minX) minX = static_cast<float>(pOut[i].x());
+                if (pOut[i].x() > maxX) maxX = static_cast<float>(pOut[i].x());
+                if (pOut[i].y() < minY) minY = static_cast<float>(pOut[i].y());
+                if (pOut[i].y() > maxY) maxY = static_cast<float>(pOut[i].y());
             }
 
-            // Shrink polygon to simulate the drop size
-            if (drop < 1.0 - 1e-5) {
-                quad = shrinkPolygon(quad, drop);
+            // Reject pixels that fall entirely outside output bounds
+            if (maxX < 0.0f || minX >= static_cast<float>(outputWidth) ||
+                maxY < 0.0f || minY >= static_cast<float>(outputHeight)) {
+                continue;
             }
 
-            // Bounding box of transformed quad
-            for (const auto& p : quad) {
-                if (p.x < minX) minX = p.x;
-                if (p.x > maxX) maxX = p.x;
-                if (p.y < minY) minY = p.y;
-                if (p.y > maxY) maxY = p.y;
-            }
-
+            // Precise bounds of the transformed area on the output grid
             int x0 = std::max(0, static_cast<int>(std::floor(minX)));
             int x1 = std::min(outputWidth  - 1, static_cast<int>(std::floor(maxX)));
             int y0 = std::max(0, static_cast<int>(std::floor(minY)));
             int y1 = std::min(outputHeight - 1, static_cast<int>(std::floor(maxY)));
+
+            // Create output polygon
+            Polygon quad(4);
+            for (int i = 0; i < 4; ++i) {
+                quad[i] = { pOut[i].x(), pOut[i].y() };
+            }
 
             // Scatter flux into every overlapping output pixel
             for (int oy = y0; oy <= y1; ++oy) {

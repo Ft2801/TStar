@@ -501,23 +501,23 @@ RejectionResult RejectionAlgorithms::linearFitClipping(
 
         // ---- OLS regression: y = a*x + b  (x = rank index) ----
         const float m_x = (N - 1) * 0.5f;
-        float m_y = 0.0f;
+        double m_y = 0.0;
         for (int j = 0; j < N; ++j)
             m_y += validPairs[j].first;
         m_y /= N;
 
-        float ssxy = 0.0f, ssxx = 0.0f;
+        double ssxy = 0.0, ssxx = 0.0;
         for (int j = 0; j < N; ++j) {
-            const float dx = j - m_x;
+            const double dx = j - m_x;
             ssxy += dx * (validPairs[j].first - m_y);
             ssxx += dx * dx;
         }
 
-        const float a = (ssxx > 0.0f) ? ssxy / ssxx : 0.0f;
-        const float b = m_y - a * m_x;
+        const float a = static_cast<float>((ssxx > 0.0) ? ssxy / ssxx : 0.0);
+        const float b = static_cast<float>(m_y - a * m_x);
 
         // ---- Scale estimate: Mean Absolute Error (MAE) ----
-        float sigma = 0.0f;
+        double sigma = 0.0;
         for (int j = 0; j < N; ++j)
             sigma += std::abs(validPairs[j].first - (a * j + b));
         sigma /= N;
@@ -698,6 +698,12 @@ RejectionResult RejectionAlgorithms::biweightClipping(
             if (std::abs(shift) > 1e-5 * scale)
                 converged = false;
         }
+
+        // Recompute the scale (MAD) for the new location to ensure proper convergence
+        for (int i = 0; i < n; ++i)
+            work[i] = static_cast<float>(std::abs(stack[i] - center));
+        scale = static_cast<double>(Statistics::quickMedian(work.data(), n));
+        if (scale < 1e-9) scale = 1e-9; // Protect against zero scale
 
         if (converged) break;
     }

@@ -16,7 +16,7 @@
 // ============================================================================
 
 DebayerDialog::DebayerDialog(QWidget* parent)
-    : DialogBase(parent, tr("Debayer"), 350, 400)
+    : DialogBase(parent, tr("Debayer"), 350, 200)
 {
     setWindowTitle(tr("Debayer"));
     setMinimumWidth(350);

@@ -1,6 +1,11 @@
 TStar Changelog
 ===============
 
+Version 1.8.6
+-------------
+- Fixed a RAW conversion tool bug
+- Stacking suite improvements
+
 Version 1.8.5
 -------------
 - Improved WCS and catalog star handling during crop operations

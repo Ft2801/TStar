@@ -78,31 +78,39 @@ void Blending::applyBlending(const std::vector<const ImageBuffer*>& images,
 
     const size_t pixelCount = static_cast<size_t>(w) * h;
     float* outData = output.data().data();
+    size_t numImages = images.size();
 
     // Weighted average across all input images for each pixel and channel.
-    for (size_t pixel = 0; pixel < pixelCount; ++pixel) {
-        for (int c = 0; c < channels; ++c) {
-
+    // Iterating channels on the outer loop is much more cache-friendly for planar images.
+#ifdef _OPENMP
+    #pragma omp parallel for schedule(static)
+#endif
+    for (int c = 0; c < channels; ++c) {
+        for (size_t pixel = 0; pixel < pixelCount; ++pixel) {
             double weightedSum = 0.0;
             double totalWeight = 0.0;
+            double c_kahan = 0.0; // Kahan summation error compensator for precision
 
-            for (size_t i = 0; i < images.size(); ++i) {
+            for (size_t i = 0; i < numImages; ++i) {
                 if (!images[i] || masks[i].size() != pixelCount) continue;
 
                 float weight = masks[i][pixel];
                 if (weight > 0.0f) {
-                    size_t dataIdx   = c * pixelCount + pixel;
+                    size_t dataIdx   = static_cast<size_t>(c) * pixelCount + pixel;
                     float pixelValue = images[i]->data().data()[dataIdx];
 
                     // Skip zero pixels (no data).
                     if (pixelValue != 0.0f) {
-                        weightedSum += pixelValue * weight;
+                        double term = (pixelValue * weight) - c_kahan;
+                        double t = weightedSum + term;
+                        c_kahan = (t - weightedSum) - term;
+                        weightedSum = t;
                         totalWeight += weight;
                     }
                 }
             }
 
-            size_t outIdx = c * pixelCount + pixel;
+            size_t outIdx = static_cast<size_t>(c) * pixelCount + pixel;
             if (totalWeight > 0.0) {
                 outData[outIdx] = static_cast<float>(weightedSum / totalWeight);
             } else {

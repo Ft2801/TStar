@@ -216,18 +216,21 @@ std::vector<MatchTriangle> TriangleMatcher::generateTriangles(
         }
     }
 
-    // Step 3: Prune near-degenerate triangles (b/a > AT_MATCH_RATIO)
+    // Step 3: Prune near-degenerate triangles (b/a > AT_MATCH_RATIO) and near-flat ones
     triangles.erase(
         std::remove_if(triangles.begin(), triangles.end(),
                         [](const MatchTriangle& t) {
-                            return t.ba > AT_MATCH_RATIO;
+                            // Prune isosceles and flat triangles
+                            return (t.ba > AT_MATCH_RATIO) || ((t.ba + t.ca) >= 0.999);
                         }),
         triangles.end());
 
-    // Step 4: Sort by b/a for efficient binary-search lookup
+    // Step 4: Sort by b/a, then by c/a for robust matching when ba is identical
     std::sort(triangles.begin(), triangles.end(),
               [](const MatchTriangle& a, const MatchTriangle& b) {
-                  return a.ba < b.ba;
+                  if (std::abs(a.ba - b.ba) > 1e-11)
+                      return a.ba < b.ba;
+                  return a.ca < b.ca;
               });
 
     return triangles;

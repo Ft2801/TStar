@@ -249,16 +249,6 @@ bool load(const QString& filePath, ImageBuffer& buf, QString* errorMsg)
         return false;
     }
 
-    if (!lr->rawdata.raw_image)
-    {
-        // The file contains a pre-processed image (e.g. a rendered DNG).
-        if (errorMsg)
-            *errorMsg = "This file has no Bayer CFA data (already processed DNG?). "
-                        "Open it as a TIFF or JPEG instead.";
-        libraw_close(lr);
-        return false;
-    }
-
     // Determine the visible image dimensions, accounting for margin regions.
     const int rawW = lr->rawdata.sizes.raw_width;
     const int left = lr->rawdata.sizes.left_margin;
@@ -280,20 +270,64 @@ bool load(const QString& filePath, ImageBuffer& buf, QString* errorMsg)
     float       range   = maximum - black;
     if (range <= 0.0f) range = 65535.0f;
 
-    // Allocate the output buffer as a single-channel (CFA) float image.
-    buf.resize(visW, visH, 1);
-    float*               dst = buf.data().data();
-    const unsigned short* src = lr->rawdata.raw_image;
-
-    // Copy and normalise the visible sensor area.
-    for (int y = 0; y < visH; ++y)
+    if (lr->rawdata.raw_image)
     {
-        const int srcRow = y + top;
-        for (int x = 0; x < visW; ++x)
+        // Allocate the output buffer as a single-channel (CFA) float image.
+        buf.resize(visW, visH, 1);
+        float*               dst = buf.data().data();
+        const unsigned short* src = lr->rawdata.raw_image;
+
+        // Copy and normalise the visible sensor area.
+        for (int y = 0; y < visH; ++y)
         {
-            const float val = static_cast<float>(src[srcRow * rawW + (x + left)]);
-            dst[static_cast<size_t>(y) * visW + x] =
-                std::max(0.0f, (val - black) / range);
+            const int srcRow = y + top;
+            for (int x = 0; x < visW; ++x)
+            {
+                const float val = static_cast<float>(src[srcRow * rawW + (x + left)]);
+                dst[static_cast<size_t>(y) * visW + x] =
+                    std::max(0.0f, (val - black) / range);
+            }
+        }
+    }
+    else if (lr->rawdata.color3_image)
+    {
+        // 3-channel RGB raw data (e.g. Foveon, some DNGs)
+        buf.resize(visW, visH, 3);
+        float* dst = buf.data().data();
+        const unsigned short (*src)[3] = reinterpret_cast<const unsigned short(*)[3]>(lr->rawdata.color3_image);
+
+        for (int y = 0; y < visH; ++y)
+        {
+            const int srcRow = y + top;
+            for (int x = 0; x < visW; ++x)
+            {
+                const size_t srcIdx = srcRow * rawW + (x + left);
+                const size_t dstIdx = (static_cast<size_t>(y) * visW + x) * 3;
+                dst[dstIdx + 0] = std::max(0.0f, (src[srcIdx][0] - black) / range);
+                dst[dstIdx + 1] = std::max(0.0f, (src[srcIdx][1] - black) / range);
+                dst[dstIdx + 2] = std::max(0.0f, (src[srcIdx][2] - black) / range);
+            }
+        }
+    }
+    else if (lr->rawdata.color4_image)
+    {
+        // 4-channel RGBG raw data
+        buf.resize(visW, visH, 3);
+        float* dst = buf.data().data();
+        const unsigned short (*src)[4] = reinterpret_cast<const unsigned short(*)[4]>(lr->rawdata.color4_image);
+
+        for (int y = 0; y < visH; ++y)
+        {
+            const int srcRow = y + top;
+            for (int x = 0; x < visW; ++x)
+            {
+                const size_t srcIdx = srcRow * rawW + (x + left);
+                const size_t dstIdx = (static_cast<size_t>(y) * visW + x) * 3;
+                dst[dstIdx + 0] = std::max(0.0f, (src[srcIdx][0] - black) / range);
+                // Average the two green channels
+                dst[dstIdx + 1] = std::max(0.0f, (((src[srcIdx][1] + src[srcIdx][3]) / 2.0f) - black) / range);
+                dst[dstIdx + 2] = std::max(0.0f, (src[srcIdx][2] - black) / range);
+            }
         }
     }
 
@@ -301,8 +335,17 @@ bool load(const QString& filePath, ImageBuffer& buf, QString* errorMsg)
 
     ImageBuffer::Metadata& meta = buf.metadata();
 
-    meta.isMono       = true;
-    meta.bayerPattern = deduceBayerPattern(lr);
+    if (lr->rawdata.raw_image)
+    {
+        meta.isMono       = true;
+        meta.bayerPattern = deduceBayerPattern(lr);
+    }
+    else
+    {
+        meta.isMono       = false;
+        meta.bayerPattern = ""; // No Bayer matrix for 3/4 channel raw
+    }
+    
     meta.exposure     = lr->other.shutter;
     meta.focalLength  = lr->other.focal_len;
     meta.filePath     = filePath;
@@ -329,7 +372,9 @@ bool load(const QString& filePath, ImageBuffer& buf, QString* errorMsg)
 
     // Populate raw header cards for the metadata panel.
     meta.rawHeaders.push_back({"INSTRUME", instrume,              "Camera make and model"});
-    meta.rawHeaders.push_back({"BAYERPAT", meta.bayerPattern,     "Bayer pattern"});
+    
+    if (meta.isMono)
+        meta.rawHeaders.push_back({"BAYERPAT", meta.bayerPattern,     "Bayer pattern"});
 
     if (lr->other.iso_speed > 0.0f)
         meta.rawHeaders.push_back({"ISO",
@@ -353,6 +398,7 @@ bool load(const QString& filePath, ImageBuffer& buf, QString* errorMsg)
     meta.rawHeaders.push_back({"NAXIS1",  QString::number(visW), "Image width"});
     meta.rawHeaders.push_back({"NAXIS2",  QString::number(visH), "Image height"});
     meta.rawHeaders.push_back({"BITPIX",  "16",                  "Original ADC bit depth"});
+    meta.rawHeaders.push_back({"ROWORDER", "TOP-DOWN",           "Image row order"});
 
     // Attempt ICC profile extraction.
     if (IccProfileExtractor::extractFromFile(filePath, meta.iccData))
