@@ -9,6 +9,7 @@
 #include "ChannelOps.h"
 #include "StatisticalStretch.h"
 #include "../photometry/StarDetector.h"
+#include "../preprocessing/Debayer.h"
 
 #include <algorithm>
 #include <cmath>
@@ -627,140 +628,35 @@ ImageBuffer ChannelOps::debayer(const ImageBuffer& mosaic,
         return ImageBuffer();
     }
 
-    ImageBuffer::ReadLock lock(&mosaic);
-
-    int w = mosaic.width();
-    int h = mosaic.height();
-    const float* src = mosaic.data().data();
-
-    std::vector<float> dst(w * h * 3);
-
-    // ---- Decode Bayer pattern offsets ----
-    // Layout: {Rx, Ry, G1x, G1y, G2x, G2y, Bx, By} within a 2x2 block
-    int offsets[8];
-    if (pattern == "RGGB") {
-        offsets[0]=0; offsets[1]=0; offsets[2]=1; offsets[3]=0;
-        offsets[4]=0; offsets[5]=1; offsets[6]=1; offsets[7]=1;
-    } else if (pattern == "BGGR") {
-        offsets[0]=1; offsets[1]=1; offsets[2]=0; offsets[3]=1;
-        offsets[4]=1; offsets[5]=0; offsets[6]=0; offsets[7]=0;
-    } else if (pattern == "GRBG") {
-        offsets[0]=1; offsets[1]=0; offsets[2]=0; offsets[3]=0;
-        offsets[4]=1; offsets[5]=1; offsets[6]=0; offsets[7]=1;
-    } else if (pattern == "GBRG") {
-        offsets[0]=0; offsets[1]=1; offsets[2]=1; offsets[3]=1;
-        offsets[4]=0; offsets[5]=0; offsets[6]=1; offsets[7]=0;
-    } else {
-        return ImageBuffer();
-    }
-
-    bool useEdge = (method == "edge");
-
-    // Boundary-safe pixel access
-    auto getPixel = [&](int x, int y) -> float {
-        x = std::max(0, std::min(w - 1, x));
-        y = std::max(0, std::min(h - 1, y));
-        return src[y * w + x];
-    };
-
-    // Determine the color type (0=R, 1=G, 2=B) at a given position
-    auto getColorType = [&](int x, int y) -> int {
-        int py = y % 2;
-        if (x % 2 == offsets[0] && py == offsets[1]) return 0;  // Red
-        if (x % 2 == offsets[6] && py == offsets[7]) return 2;  // Blue
-        return 1;  // Green
-    };
-
-    // Edge-aware interpolation weight
-    auto edgeWeight = [&](int x1, int y1, int x2, int y2) -> float {
-        if (!useEdge) return 1.0f;
-        float diff = std::abs(getPixel(x1, y1) - getPixel(x2, y2));
-        return 1.0f / (1.0f + diff * 10.0f);
-    };
-
-    // ---- Demosaic each pixel ----
-    for (int y = 0; y < h; ++y) {
-        for (int x = 0; x < w; ++x) {
-            int   idx = (y * w + x) * 3;
-            float r = 0.0f, g = 0.0f, b = 0.0f;
-            int   ct = getColorType(x, y);
-
-            if (ct == 0) {
-                // Red pixel: interpolate G (4-neighbors) and B (4-diagonals)
-                r = getPixel(x, y);
-
-                float w1 = edgeWeight(x, y, x-1, y);
-                float w2 = edgeWeight(x, y, x+1, y);
-                float w3 = edgeWeight(x, y, x, y-1);
-                float w4 = edgeWeight(x, y, x, y+1);
-                float wsum = w1 + w2 + w3 + w4;
-                g = (getPixel(x-1,y)*w1 + getPixel(x+1,y)*w2 +
-                     getPixel(x,y-1)*w3 + getPixel(x,y+1)*w4) / wsum;
-
-                w1 = edgeWeight(x, y, x-1, y-1);
-                w2 = edgeWeight(x, y, x+1, y-1);
-                w3 = edgeWeight(x, y, x-1, y+1);
-                w4 = edgeWeight(x, y, x+1, y+1);
-                wsum = w1 + w2 + w3 + w4;
-                b = (getPixel(x-1,y-1)*w1 + getPixel(x+1,y-1)*w2 +
-                     getPixel(x-1,y+1)*w3 + getPixel(x+1,y+1)*w4) / wsum;
-
-            } else if (ct == 2) {
-                // Blue pixel: interpolate G (4-neighbors) and R (4-diagonals)
-                b = getPixel(x, y);
-
-                float w1 = edgeWeight(x, y, x-1, y);
-                float w2 = edgeWeight(x, y, x+1, y);
-                float w3 = edgeWeight(x, y, x, y-1);
-                float w4 = edgeWeight(x, y, x, y+1);
-                float wsum = w1 + w2 + w3 + w4;
-                g = (getPixel(x-1,y)*w1 + getPixel(x+1,y)*w2 +
-                     getPixel(x,y-1)*w3 + getPixel(x,y+1)*w4) / wsum;
-
-                w1 = edgeWeight(x, y, x-1, y-1);
-                w2 = edgeWeight(x, y, x+1, y-1);
-                w3 = edgeWeight(x, y, x-1, y+1);
-                w4 = edgeWeight(x, y, x+1, y+1);
-                wsum = w1 + w2 + w3 + w4;
-                r = (getPixel(x-1,y-1)*w1 + getPixel(x+1,y-1)*w2 +
-                     getPixel(x-1,y+1)*w3 + getPixel(x+1,y+1)*w4) / wsum;
-
-            } else {
-                // Green pixel: interpolate R and B from axis neighbors
-                g = getPixel(x, y);
-                int  py    = y % 2;
-                bool rOnRow = (py == offsets[1]);
-
-                if (rOnRow) {
-                    // Red neighbors along the row, blue along the column
-                    float w1 = edgeWeight(x, y, x-1, y);
-                    float w2 = edgeWeight(x, y, x+1, y);
-                    r = (getPixel(x-1,y)*w1 + getPixel(x+1,y)*w2) / (w1 + w2);
-
-                    w1 = edgeWeight(x, y, x, y-1);
-                    w2 = edgeWeight(x, y, x, y+1);
-                    b = (getPixel(x,y-1)*w1 + getPixel(x,y+1)*w2) / (w1 + w2);
-                } else {
-                    // Blue neighbors along the row, red along the column
-                    float w1 = edgeWeight(x, y, x-1, y);
-                    float w2 = edgeWeight(x, y, x+1, y);
-                    b = (getPixel(x-1,y)*w1 + getPixel(x+1,y)*w2) / (w1 + w2);
-
-                    w1 = edgeWeight(x, y, x, y-1);
-                    w2 = edgeWeight(x, y, x, y+1);
-                    r = (getPixel(x,y-1)*w1 + getPixel(x,y+1)*w2) / (w1 + w2);
-                }
-            }
-
-            dst[idx + 0] = std::clamp(r, 0.0f, 1.0f);
-            dst[idx + 1] = std::clamp(g, 0.0f, 1.0f);
-            dst[idx + 2] = std::clamp(b, 0.0f, 1.0f);
-        }
-    }
+    // Map string pattern to Preprocessing::BayerPattern
+    Preprocessing::BayerPattern p = Preprocessing::BayerPattern::RGGB;
+    if (pattern == "RGGB")      p = Preprocessing::BayerPattern::RGGB;
+    else if (pattern == "BGGR") p = Preprocessing::BayerPattern::BGGR;
+    else if (pattern == "GBRG") p = Preprocessing::BayerPattern::GBRG;
+    else if (pattern == "GRBG") p = Preprocessing::BayerPattern::GRBG;
+    else return ImageBuffer();
 
     ImageBuffer out;
-    out.setData(w, h, 3, dst);
-    out.setMetadata(mosaic.metadata());
+    bool success = false;
+
+    // Map method string to Debayer algorithm
+    if (method == "edge") {
+        success = Preprocessing::Debayer::edgeAware(mosaic, out, p);
+    } else if (method == "bilinear") {
+        success = Preprocessing::Debayer::bilinear(mosaic, out, p);
+    } else if (method == "vng") {
+        success = Preprocessing::Debayer::vng(mosaic, out, p);
+    } else if (method == "ahd") {
+        success = Preprocessing::Debayer::ahd(mosaic, out, p);
+    } else if (method == "rcd") {
+        success = Preprocessing::Debayer::rcd(mosaic, out, p);
+    } else {
+        // Default to edgeAware if unspecified or unknown
+        success = Preprocessing::Debayer::edgeAware(mosaic, out, p);
+    }
+
+    if (!success) return ImageBuffer();
+
     return out;
 }
 

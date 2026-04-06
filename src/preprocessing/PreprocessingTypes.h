@@ -59,7 +59,8 @@ enum class DebayerAlgorithm {
     VNG,          ///< Variable Number of Gradients
     AHD,          ///< Adaptive Homogeneity-Directed
     SuperPixel,   ///< 2x2 super-pixel binning (halves resolution)
-    RCD           ///< Ratio Corrected Demosaicing
+    RCD,          ///< Ratio Corrected Demosaicing
+    EdgeAware     ///< Edge-aware gradient-based interpolation
 };
 
 /**

@@ -213,6 +213,70 @@ bool Debayer::bilinear(const ImageBuffer& input, ImageBuffer& output,
     return true;
 }
 
+void Debayer::bilinearPixel(const float* src, int width, int height,
+                            int x, int y, int redRow, int redCol,
+                            int blueRow, int blueCol,
+                            float& r, float& g, float& b)
+{
+    const int idx_base = y * width + x;
+    const float val = src[idx_base];
+
+    if (isRed(x, y, redRow, redCol)) {
+        r = val;
+        int countG = 0, countB = 0;
+        float sumG = 0, sumB = 0;
+
+        if (x > 0)          { sumG += src[y * width + (x - 1)]; ++countG; }
+        if (x < width - 1)  { sumG += src[y * width + (x + 1)]; ++countG; }
+        if (y > 0)          { sumG += src[(y - 1) * width + x]; ++countG; }
+        if (y < height - 1) { sumG += src[(y + 1) * width + x]; ++countG; }
+        g = (countG > 0) ? sumG / countG : 0.0f;
+
+        if (x > 0 && y > 0)                  { sumB += src[(y - 1) * width + (x - 1)]; ++countB; }
+        if (x < width - 1 && y > 0)          { sumB += src[(y - 1) * width + (x + 1)]; ++countB; }
+        if (x > 0 && y < height - 1)         { sumB += src[(y + 1) * width + (x - 1)]; ++countB; }
+        if (x < width - 1 && y < height - 1) { sumB += src[(y + 1) * width + (x + 1)]; ++countB; }
+        b = (countB > 0) ? sumB / countB : 0.0f;
+
+    } else if (isBlue(x, y, blueRow, blueCol)) {
+        b = val;
+        int countG = 0, countR = 0;
+        float sumG = 0, sumR = 0;
+
+        if (x > 0)          { sumG += src[y * width + (x - 1)]; ++countG; }
+        if (x < width - 1)  { sumG += src[y * width + (x + 1)]; ++countG; }
+        if (y > 0)          { sumG += src[(y - 1) * width + x]; ++countG; }
+        if (y < height - 1) { sumG += src[(y + 1) * width + x]; ++countG; }
+        g = (countG > 0) ? sumG / countG : 0.0f;
+
+        if (x > 0 && y > 0)                  { sumR += src[(y - 1) * width + (x - 1)]; ++countR; }
+        if (x < width - 1 && y > 0)          { sumR += src[(y - 1) * width + (x + 1)]; ++countR; }
+        if (x > 0 && y < height - 1)         { sumR += src[(y + 1) * width + (x - 1)]; ++countR; }
+        if (x < width - 1 && y < height - 1) { sumR += src[(y + 1) * width + (x + 1)]; ++countR; }
+        r = (countR > 0) ? sumR / countR : 0.0f;
+
+    } else {
+        g = val;
+        const bool redHorizontal = (y % 2 == redRow);
+        int countR = 0, countB = 0;
+        float sumR = 0, sumB = 0;
+
+        if (redHorizontal) {
+            if (x > 0)          { sumR += src[y * width + (x - 1)]; ++countR; }
+            if (x < width - 1)  { sumR += src[y * width + (x + 1)]; ++countR; }
+            if (y > 0)          { sumB += src[(y - 1) * width + x]; ++countB; }
+            if (y < height - 1) { sumB += src[(y + 1) * width + x]; ++countB; }
+        } else {
+            if (x > 0)          { sumB += src[y * width + (x - 1)]; ++countB; }
+            if (x < width - 1)  { sumB += src[y * width + (x + 1)]; ++countB; }
+            if (y > 0)          { sumR += src[(y - 1) * width + x]; ++countR; }
+            if (y < height - 1) { sumR += src[(y + 1) * width + x]; ++countR; }
+        }
+        r = (countR > 0) ? sumR / countR : 0.0f;
+        b = (countB > 0) ? sumB / countB : 0.0f;
+    }
+}
+
 // ============================================================================
 //  VNG (Variable Number of Gradients)
 // ============================================================================
@@ -484,6 +548,20 @@ bool Debayer::ahd(const ImageBuffer& input, ImageBuffer& output,
     float*       dst = output.data().data();
 
     // ------------------------------------------------------------------
+    // Pre-pass: Baseline green interpolation via bilinear to avoid zeros
+    //           at the boundaries of the advanced steps.
+    // ------------------------------------------------------------------
+    #pragma omp parallel for
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            float r, g, b;
+            bilinearPixel(src, width, height, x, y, rRow, rCol, bRow, bCol, r, g, b);
+            const int idx = (y * width + x) * 3;
+            dst[idx + 1] = g; // We only need green for initialization
+        }
+    }
+
+    // ------------------------------------------------------------------
     // Step 1: Interpolate green channel in both horizontal and vertical
     //         directions using Laplacian-corrected linear interpolation.
     // ------------------------------------------------------------------
@@ -498,12 +576,9 @@ bool Debayer::ahd(const ImageBuffer& input, ImageBuffer& output,
             if (isGreen(x, y, rRow, rCol, bRow, bCol)) {
                 gH[idx] = gV[idx] = src[idx];
             } else {
-                // Horizontal: average of left/right green neighbours with
-                // second-order correction from the current colour channel.
                 gH[idx] = (src[idx - 1] + src[idx + 1]) * 0.5f
                          + (2.0f * src[idx] - src[idx - 2] - src[idx + 2]) * 0.25f;
 
-                // Vertical: same idea along the column.
                 gV[idx] = (src[idx - width] + src[idx + width]) * 0.5f
                          + (2.0f * src[idx] - src[idx - 2 * width] - src[idx + 2 * width]) * 0.25f;
             }
@@ -512,8 +587,6 @@ bool Debayer::ahd(const ImageBuffer& input, ImageBuffer& output,
 
     // ------------------------------------------------------------------
     // Step 2: Choose the direction with higher local homogeneity.
-    //         Homogeneity is approximated by the sum of absolute first
-    //         differences in a 3x3 window around each pixel.
     // ------------------------------------------------------------------
     #pragma omp parallel for
     for (int y = 4; y < height - 4; ++y) {
@@ -590,6 +663,21 @@ bool Debayer::ahd(const ImageBuffer& input, ImageBuffer& output,
         }
     }
 
+    // Border fallback (4-pixel strip)
+    #pragma omp parallel for
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            if (x < 4 || x >= width - 4 || y < 4 || y >= height - 4) {
+                float r, g, b;
+                bilinearPixel(src, width, height, x, y, rRow, rCol, bRow, bCol, r, g, b);
+                const int idx = (y * width + x) * 3;
+                dst[idx + 0] = r;
+                dst[idx + 1] = g;
+                dst[idx + 2] = b;
+            }
+        }
+    }
+
     output.setMetadata(input.metadata());
     return true;
 }
@@ -617,10 +705,21 @@ bool Debayer::rcd(const ImageBuffer& input, ImageBuffer& output,
     float*       dst = output.data().data();
 
     // ------------------------------------------------------------------
+    // Pre-pass: Baseline green interpolation via bilinear to avoid zeros
+    //           at the boundaries of the advanced steps.
+    // ------------------------------------------------------------------
+    #pragma omp parallel for
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            float r, g, b;
+            bilinearPixel(src, width, height, x, y, rRow, rCol, bRow, bCol, r, g, b);
+            const int idx = (y * width + x) * 3;
+            dst[idx + 1] = g; 
+        }
+    }
+
+    // ------------------------------------------------------------------
     // Step 1: Green channel interpolation with directional edge detection.
-    //         At non-green sites, choose the horizontal or vertical
-    //         average depending on which direction has the smaller
-    //         gradient.  Equal gradients produce a 4-neighbour average.
     // ------------------------------------------------------------------
     #pragma omp parallel for
     for (int y = 2; y < height - 2; ++y) {
@@ -705,6 +804,115 @@ bool Debayer::rcd(const ImageBuffer& input, ImageBuffer& output,
         }
     }
 
+    // Border fallback (2-pixel strip)
+    #pragma omp parallel for
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            if (x < 2 || x >= width - 2 || y < 2 || y >= height - 2) {
+                float r, g, b;
+                bilinearPixel(src, width, height, x, y, rRow, rCol, bRow, bCol, r, g, b);
+                const int idx = (y * width + x) * 3;
+                dst[idx + 0] = r;
+                dst[idx + 1] = g;
+                dst[idx + 2] = b;
+            }
+        }
+    }
+
+    output.setMetadata(input.metadata());
+    return true;
+}
+
+bool Debayer::edgeAware(const ImageBuffer& input, ImageBuffer& output,
+                        BayerPattern pattern)
+{
+    if (input.channels() != 1) return false;
+
+    const int width  = input.width();
+    const int height = input.height();
+    output.resize(width, height, 3);
+
+    int rRow, rCol, bRow, bCol;
+    getPatternOffsets(pattern, rRow, rCol, bRow, bCol);
+
+    const float* src = input.data().data();
+    float*       dst = output.data().data();
+
+    // Boundary-safe pixel access (clamping)
+    auto getPixel = [&](int x, int y) -> float {
+        x = std::clamp(x, 0, width - 1);
+        y = std::clamp(y, 0, height - 1);
+        return src[y * width + x];
+    };
+
+    // Edge-aware interpolation weight based on local intensity difference
+    auto edgeWeight = [&](int x, int y, int nx, int ny) -> float {
+        float diff = std::abs(getPixel(x, y) - getPixel(nx, ny));
+        return 1.0f / (1.0f + diff * 10.0f);
+    };
+
+    #pragma omp parallel for
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            float r = 0.0f, g = 0.0f, b = 0.0f;
+            const int idx = (y * width + x) * 3;
+
+            if (isRed(x, y, rRow, rCol)) {
+                r = getPixel(x, y);
+                // Green: 4-way weighted neighbours
+                float w1 = edgeWeight(x, y, x-1, y);
+                float w2 = edgeWeight(x, y, x+1, y);
+                float w3 = edgeWeight(x, y, x, y-1);
+                float w4 = edgeWeight(x, y, x, y+1);
+                g = (getPixel(x-1,y)*w1 + getPixel(x+1,y)*w2 + getPixel(x,y-1)*w3 + getPixel(x,y+1)*w4) / (w1+w2+w3+w4);
+
+                // Blue: 4-way diagonal weighted neighbours
+                w1 = edgeWeight(x, y, x-1, y-1);
+                w2 = edgeWeight(x, y, x+1, y-1);
+                w3 = edgeWeight(x, y, x-1, y+1);
+                w4 = edgeWeight(x, y, x+1, y+1);
+                b = (getPixel(x-1,y-1)*w1 + getPixel(x+1,y-1)*w2 + getPixel(x-1,y+1)*w3 + getPixel(x+1,y+1)*w4) / (w1+w2+w3+w4);
+
+            } else if (isBlue(x, y, bRow, bCol)) {
+                b = getPixel(x, y);
+                // Green: 4-way weighted neighbours
+                float w1 = edgeWeight(x, y, x-1, y);
+                float w2 = edgeWeight(x, y, x+1, y);
+                float w3 = edgeWeight(x, y, x, y-1);
+                float w4 = edgeWeight(x, y, x, y+1);
+                g = (getPixel(x-1,y)*w1 + getPixel(x+1,y)*w2 + getPixel(x,y-1)*w3 + getPixel(x,y+1)*w4) / (w1+w2+w3+w4);
+
+                // Red: 4-way diagonal weighted neighbours
+                w1 = edgeWeight(x, y, x-1, y-1);
+                w2 = edgeWeight(x, y, x+1, y-1);
+                w3 = edgeWeight(x, y, x-1, y+1);
+                w4 = edgeWeight(x, y, x+1, y+1);
+                r = (getPixel(x-1,y-1)*w1 + getPixel(x+1,y-1)*w2 + getPixel(x-1,y+1)*w3 + getPixel(x+1,y+1)*w4) / (w1+w2+w3+w4);
+
+            } else {
+                g = getPixel(x, y);
+                bool rOnRow = (y % 2 == rRow);
+                if (rOnRow) {
+                    float w1 = edgeWeight(x, y, x-1, y);
+                    float w2 = edgeWeight(x, y, x+1, y);
+                    r = (getPixel(x-1,y)*w1 + getPixel(x+1,y)*w2) / (w1 + w2);
+                    w1 = edgeWeight(x, y, x, y-1);
+                    w2 = edgeWeight(x, y, x, y+1);
+                    b = (getPixel(x,y-1)*w1 + getPixel(x,y+1)*w2) / (w1 + w2);
+                } else {
+                    float w1 = edgeWeight(x, y, x-1, y);
+                    float w2 = edgeWeight(x, y, x+1, y);
+                    b = (getPixel(x-1,y)*w1 + getPixel(x+1,y)*w2) / (w1 + w2);
+                    w1 = edgeWeight(x, y, x, y-1);
+                    w2 = edgeWeight(x, y, x, y+1);
+                    r = (getPixel(x,y-1)*w1 + getPixel(x,y+1)*w2) / (w1 + w2);
+                }
+            }
+            dst[idx + 0] = r;
+            dst[idx + 1] = g;
+            dst[idx + 2] = b;
+        }
+    }
     output.setMetadata(input.metadata());
     return true;
 }

@@ -271,24 +271,27 @@ void DrizzleStacking::drizzleFrame(
                     float overlapArea = boxer(static_cast<float>(ox), static_cast<float>(oy), xout, yout);
                     if (overlapArea < 1e-6f) continue;
 
-                    // Weight: (Overlap * FrameWeight) / Jacobian
-                    double finalWeight = (double)(overlapArea * frameWeight) / jacobian;
-
                     if (isRawDriz) {
                         // Raw Driz: Route to R, G, or B accumulator
+                        float chanWeight = (cfaChan < static_cast<int>(weights.size())) ? weights[cfaChan] : frameWeight;
+                        double finalWeight = (double)(overlapArea * chanWeight) / jacobian;
                         double val = static_cast<double>(input.value(x, y, 0)) * finalWeight * fScale;
+                        size_t outIdx = static_cast<size_t>(oy) * outputWidth + ox;
                         #pragma omp atomic
-                        accum[cfaChan * outPixels + (static_cast<size_t>(oy) * outputWidth + ox)] += val;
+                        accum[cfaChan * outPixels + outIdx] += val;
                         #pragma omp atomic
-                        weightAccum[cfaChan * outPixels + (static_cast<size_t>(oy) * outputWidth + ox)] += finalWeight;
+                        weightAccum[cfaChan * outPixels + outIdx] += finalWeight;
                     } else {
-                        // Standard RGB Driz: All channels get the same weight
+                        // Standard RGB Driz: All channels get their respective weight
                         for (int c = 0; c < inChans; ++c) {
+                            float chanWeight = (c < static_cast<int>(weights.size())) ? weights[c] : frameWeight;
+                            double finalWeight = (double)(overlapArea * chanWeight) / jacobian;
                             double val = static_cast<double>(input.value(x, y, c)) * finalWeight * fScale;
+                            size_t outIdx = static_cast<size_t>(oy) * outputWidth + ox;
                             #pragma omp atomic
-                            accum[c * outPixels + (static_cast<size_t>(oy) * outputWidth + ox)] += val;
+                            accum[c * outPixels + outIdx] += val;
                             #pragma omp atomic
-                            weightAccum[c * outPixels + (static_cast<size_t>(oy) * outputWidth + ox)] += finalWeight;
+                            weightAccum[c * outPixels + outIdx] += finalWeight;
                         }
                     }
                 }

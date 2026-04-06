@@ -596,8 +596,10 @@ bool PreprocessingEngine::debayer(ImageBuffer& image)
             success = Debayer::rcd(image, output, pattern);
             break;
         case DebayerAlgorithm::AHD:
-            // AHD falls back to VNG until a dedicated implementation is available.
-            success = Debayer::vng(image, output, pattern);
+            success = Debayer::ahd(image, output, pattern);
+            break;
+        case DebayerAlgorithm::EdgeAware:
+            success = Debayer::edgeAware(image, output, pattern);
             break;
         default:
             success = Debayer::bilinear(image, output, pattern);

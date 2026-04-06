@@ -1899,14 +1899,17 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args)
 
         // Pre-drizzle normalization
         if (args.params.hasNormalization()) {
-            for (int c = 0; c < buffer.channels(); ++c) {
-                float* data  = buffer.data().data() + c * buffer.width() * buffer.height();
-                size_t count = static_cast<size_t>(buffer.width()) * buffer.height();
+            float* data  = buffer.data().data();
+            const int channels = buffer.channels();
+            const size_t pixelCount = static_cast<size_t>(buffer.width()) * buffer.height();
 
-                for (size_t i = 0; i < count; ++i) {
-                    if (data[i] != 0.0f) {
-                        data[i] = Normalization::applyToPixel(
-                            data[i], args.params.normalization,
+            #pragma omp parallel for collapse(2)
+            for (size_t i = 0; i < pixelCount; ++i) {
+                for (int c = 0; c < channels; ++c) {
+                    size_t idx_px = i * channels + c;
+                    if (data[idx_px] != 0.0f) {
+                        data[idx_px] = Normalization::applyToPixel(
+                            data[idx_px], args.params.normalization,
                             idx, c, args.coefficients);
                     }
                 }

@@ -90,8 +90,8 @@ void StackingCommands::registerCommands(ScriptRunner& runner)
             cmdClose),
 
         // -- Stacking --------------------------------------------------------
-        CommandDef("stack", 1, 8,
-            "stack <prefix> [method] [rejection] [sigma_lo] [sigma_hi] [--out=<name>]",
+        CommandDef("stack", 0, 8,
+            "stack [prefix] [method] [rejection] [sigma_lo] [sigma_hi] [--out=<name>]",
             "Stack a sequence of images",
             cmdStack),
         CommandDef("rgbcomp", 3, 2,
@@ -114,8 +114,8 @@ void StackingCommands::registerCommands(ScriptRunner& runner)
             "calibrate <prefix> [--bias=<file>] [--dark=<file>] [--flat=<file>]",
             "Calibrate images with master bias, dark, and flat frames",
             cmdCalibrate),
-        CommandDef("register", 1, 1,
-            "register <prefix> [--drizzle] [--norotation]",
+        CommandDef("register", 0, 1,
+            "register [prefix] [--drizzle] [--norotation]",
             "Register (align) images in a sequence",
             cmdRegister),
         CommandDef("convert", 1, 3,
@@ -438,20 +438,29 @@ Stacking::WeightingType StackingCommands::parseWeighting(const QString& str)
 
 bool StackingCommands::cmdStack(const ScriptCommand& cmd)
 {
-    QString prefix = cmd.args[0];
+    QString prefix;
+    if (!cmd.args.isEmpty()) {
+        prefix = cmd.args[0];
+    } else if (s_sequence && s_sequence->isValid()) {
+        // Use current sequence if no prefix provided.
+    } else {
+        return false;
+    }
 
     // -- Discover matching files ---------------------------------------------
-    QDir dir(s_workingDir);
-    QStringList filters;
-    filters << prefix + "*.fit" << prefix + "*.fits" << prefix + "*.fts";
-
-    QStringList files = dir.entryList(filters, QDir::Files, QDir::Name);
-    if (files.isEmpty())
-        return false;
-
     QStringList fullPaths;
-    for (const QString& f : files)
-        fullPaths << dir.absoluteFilePath(f);
+    if (!prefix.isEmpty()) {
+        QDir dir(s_workingDir);
+        QStringList filters;
+        filters << prefix + "*.fit" << prefix + "*.fits" << prefix + "*.fts";
+
+        QStringList files = dir.entryList(filters, QDir::Files, QDir::Name);
+        if (files.isEmpty())
+            return false;
+
+        for (const QString& f : files)
+            fullPaths << dir.absoluteFilePath(f);
+    }
 
     // -- Reuse existing sequence if it matches (preserves registration) ------
     bool reuseSequence = false;
@@ -711,7 +720,19 @@ bool StackingCommands::cmdCalibrate(const ScriptCommand& cmd)
     int processed = s_preprocessor.preprocessBatch(
         fullPaths, s_workingDir, progressCallback);
 
-    return processed == fullPaths.size();
+    if (processed == fullPaths.size()) {
+        // Update the active sequence with the newly calibrated files.
+        QStringList outPaths;
+        QDir dir(s_workingDir);
+        for (const QString& f : files) {
+            outPaths << dir.absoluteFilePath("pp_" + f);
+        }
+        s_sequence = std::make_unique<Stacking::ImageSequence>();
+        s_sequence->loadFromFiles(outPaths);
+        return true;
+    }
+
+    return false;
 }
 
 // ============================================================================
@@ -720,26 +741,34 @@ bool StackingCommands::cmdCalibrate(const ScriptCommand& cmd)
 
 bool StackingCommands::cmdRegister(const ScriptCommand& cmd)
 {
-    QString prefix = cmd.args[0];
-
-    // Discover matching files (need at least 2 for registration).
-    QDir dir(s_workingDir);
-    QStringList filters;
-    filters << prefix + "*.fit" << prefix + "*.fits" << prefix + "*.fts";
-
-    QStringList files = dir.entryList(filters, QDir::Files, QDir::Name);
-    if (files.size() < 2)
+    QString prefix;
+    if (!cmd.args.isEmpty()) {
+        prefix = cmd.args[0];
+    } else if (s_sequence && s_sequence->isValid()) {
+        // Already have a sequence to register.
+    } else {
         return false;
+    }
 
-    QStringList fullPaths;
-    for (const QString& f : files)
-        fullPaths << dir.absoluteFilePath(f);
+    if (!prefix.isEmpty()) {
+        QDir dir(s_workingDir);
+        QStringList filters;
+        filters << prefix + "*.fit" << prefix + "*.fits" << prefix + "*.fts";
 
-    // Create a fresh sequence.
-    s_sequence = std::make_unique<Stacking::ImageSequence>();
-    if (!s_sequence->loadFromFiles(fullPaths)) {
-        s_sequence.reset();
-        return false;
+        QStringList files = dir.entryList(filters, QDir::Files, QDir::Name);
+        if (files.size() < 2)
+            return false;
+
+        QStringList fullPaths;
+        for (const QString& f : files)
+            fullPaths << dir.absoluteFilePath(f);
+
+        // Create a fresh sequence.
+        s_sequence = std::make_unique<Stacking::ImageSequence>();
+        if (!s_sequence->loadFromFiles(fullPaths)) {
+            s_sequence.reset();
+            return false;
+        }
     }
 
     // Configure registration parameters.
@@ -778,7 +807,7 @@ bool StackingCommands::cmdRegister(const ScriptCommand& cmd)
     int successCount = engine.registerSequence(*s_sequence, -1);
 
     // Consider registration successful if at least 80 % of frames aligned.
-    return successCount >= static_cast<int>(files.size() * 0.8);
+    return successCount >= static_cast<int>(s_sequence->count() * 0.8);
 }
 
 // ============================================================================
@@ -852,7 +881,17 @@ bool StackingCommands::cmdDebayer(const ScriptCommand& cmd)
         s_preprocessor.setParams(params);
         int processed = s_preprocessor.preprocessBatch(
             fullPaths, s_workingDir);
-        return processed > 0;
+
+        if (processed == fullPaths.size()) {
+            QStringList outPaths;
+            for (const QString& f : files)
+                outPaths << dir.absoluteFilePath("deb_" + f);
+
+            s_sequence = std::make_unique<Stacking::ImageSequence>();
+            s_sequence->loadFromFiles(outPaths);
+            return true;
+        }
+        return false;
     }
 
     // -- Single image mode ---------------------------------------------------
@@ -875,10 +914,12 @@ bool StackingCommands::cmdDebayer(const ScriptCommand& cmd)
 
 bool StackingCommands::cmdBackground(const ScriptCommand& cmd)
 {
-    if (!s_currentImage || !s_currentImage->isValid()) {
-        if (s_runner)
-            s_runner->setVariable("error", "No image loaded");
-        return false;
+    // -- Step 1: Determine target (sequence or current image) -----------------
+    QString sequencePrefix;
+    if (!cmd.args.isEmpty()) {
+        sequencePrefix = cmd.args[0];
+    } else if (s_sequence && s_sequence->count() > 0) {
+        // Use the currently active sequence if no prefix specified.
     }
 
     int   degree    = cmd.option("degree",    "1").toInt();
@@ -888,24 +929,111 @@ bool StackingCommands::cmdBackground(const ScriptCommand& cmd)
 
     Background::BackgroundExtractor extractor;
     extractor.setParameters(degree, tolerance, smoothing);
-    extractor.generateGrid(*s_currentImage);
 
-    if (!extractor.computeModel()) {
-        if (s_runner)
-            s_runner->setVariable("error",
-                "Failed to compute background model");
-        return false;
-    }
-
-    ImageBuffer result;
     auto corrType = division
         ? Background::CorrectionType::Division
         : Background::CorrectionType::Subtraction;
 
+    // -- Step 2: Handle sequence processing ----------------------------------
+    if (!sequencePrefix.isEmpty() || (s_sequence && s_sequence->count() > 0)) {
+        QStringList files;
+        QDir dir(s_workingDir);
+
+        if (!sequencePrefix.isEmpty()) {
+            QStringList filters;
+            filters << sequencePrefix + "*.fit" << sequencePrefix + "*.fits" << sequencePrefix + "*.fts";
+            files = dir.entryList(filters, QDir::Files, QDir::Name);
+        } else {
+            for (int i = 0; i < s_sequence->count(); ++i) {
+                files << s_sequence->image(i).fileName();
+            }
+        }
+
+        if (files.isEmpty()) {
+            if (s_runner)
+                s_runner->setVariable("error", "No sequence files found");
+            return false;
+        }
+
+        if (s_runner)
+            s_runner->logMessage(
+                QString("Batch background extraction: processing %1 files")
+                    .arg(files.size()), "cyan");
+
+        int processed = 0;
+        for (int i = 0; i < files.size(); ++i) {
+            QString path = dir.absoluteFilePath(files[i]);
+            ImageBuffer buf;
+            if (!Stacking::FitsIO::read(path, buf)) {
+                if (s_runner)
+                    s_runner->logMessage("Failed to load: " + files[i], "orange");
+                continue;
+            }
+
+            extractor.generateGrid(buf);
+            if (!extractor.computeModel()) {
+                if (s_runner)
+                    s_runner->logMessage("Failed to compute model for: " + files[i], "orange");
+                continue;
+            }
+
+            ImageBuffer result;
+            if (!extractor.apply(buf, result, corrType))
+                continue;
+
+            QString outName = "bkg_" + files[i];
+            QString outPath = dir.absoluteFilePath(outName);
+            if (Stacking::FitsIO::write(outPath, result, 32)) {
+                processed++;
+            }
+
+            if (s_runner)
+                s_runner->progressChanged(
+                    QString("Backgr. Extraction: %1").arg(files[i]),
+                    (double)(i + 1) / files.size());
+        }
+
+        if (processed > 0) {
+            // Update active sequence with background-removed files.
+            QStringList outPaths;
+            for (int i = 0; i < files.size(); ++i) {
+                outPaths << dir.absoluteFilePath("bkg_" + files[i]);
+            }
+            s_sequence = std::make_unique<Stacking::ImageSequence>();
+            s_sequence->loadFromFiles(outPaths);
+        }
+
+        if (s_runner)
+            s_runner->logMessage(
+                QString("Batch removal complete: %1 of %2 files processed")
+                    .arg(processed).arg(files.size()),
+                processed > 0 ? "green" : "red");
+
+        return processed > 0;
+    }
+
+    // -- Step 3: Fallback to current image -----------------------------------
+    if (!s_currentImage || !s_currentImage->isValid()) {
+        if (s_runner)
+            s_runner->setVariable("error", "No image or sequence loaded");
+        return false;
+    }
+
+    extractor.generateGrid(*s_currentImage);
+    if (!extractor.computeModel()) {
+        if (s_runner)
+            s_runner->setVariable("error", "Failed to compute background model");
+        return false;
+    }
+
+    ImageBuffer result;
     if (!extractor.apply(*s_currentImage, result, corrType))
         return false;
 
     *s_currentImage = std::move(result);
+    if (s_runner)
+        s_runner->logMessage("Background extraction applied to current image", "green");
+
     return true;
 }
 
@@ -1062,14 +1190,21 @@ bool StackingCommands::cmdRGBComp(const ScriptCommand& cmd)
         return false;
     }
 
-    // Construct an interleaved RGB image with planar channel layout.
-    const int size = rImg.width() * rImg.height();
-    ImageBuffer rgb(rImg.width(), rImg.height(), 3);
+    // Construct an interleaved RGB image buffer.
+    const int w = rImg.width();
+    const int h = rImg.height();
+    ImageBuffer rgb(w, h, 3);
     float* data = rgb.data().data();
+    const float* rData = rImg.data().data();
+    const float* gData = gImg.data().data();
+    const float* bData = bImg.data().data();
 
-    std::memcpy(data,              rImg.data().data(), size * sizeof(float));
-    std::memcpy(data + size,       gImg.data().data(), size * sizeof(float));
-    std::memcpy(data + size * 2,   bImg.data().data(), size * sizeof(float));
+    #pragma omp parallel for
+    for (int i = 0; i < w * h; ++i) {
+        data[i * 3 + 0] = rData[i];
+        data[i * 3 + 1] = gData[i];
+        data[i * 3 + 2] = bData[i];
+    }
 
     QString outName = cmd.option("out", "rgb_composition.fit");
     return Stacking::FitsIO::write(resolvePath(outName), rgb, 32);

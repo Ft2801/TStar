@@ -176,13 +176,19 @@ void BackgroundExtractor::generateGrid(const ImageBuffer& img, int samplesPerLin
     const int nx     = samplesPerLine;
 
     const int   boxesWidth = nx * size + 2;
-    const float spacing    = static_cast<float>(m_width - boxesWidth)
-                           / static_cast<float>(std::max(1, nx - 1));
+    const float spacing    = (nx > 1) 
+                           ? static_cast<float>(m_width - boxesWidth) / (nx - 1)
+                           : 0.0f;
 
-    // Compute vertical grid count
+    // -- Step 3: Determine vertical grid count --------------------------------
+    // Safety check: if spacing is too negative, the grid cannot be formed.
+    // If spacing <= -size, the loop below would infinite loop.
     int ny = 1;
-    while (ny * size + std::round((ny - 1) * spacing) < (m_height - 2)) {
-        ny++;
+    if (spacing > -static_cast<float>(size) + 1.0f) {
+        while (ny * size + std::round((ny - 1) * spacing) < (m_height - 2)) {
+            ny++;
+            if (ny > 100) break; // Hard cap for safety
+        }
     }
     ny--;
     if (ny <= 0) {
@@ -519,7 +525,7 @@ float BackgroundExtractor::evaluateRBF(float x, float y, int channel)
 
 bool BackgroundExtractor::computeModel()
 {
-    if (m_samples.empty()) {
+    if (m_samples.empty() || m_channels <= 0) {
         return false;
     }
 
@@ -563,38 +569,43 @@ bool BackgroundExtractor::apply(const ImageBuffer& src, ImageBuffer& dst,
     const int h    = src.height();
     const int ch   = src.channels();
 
-    // Compute average background level per channel for brightness preservation
+    // Compute average background level per channel for brightness preservation.
+    // If no samples exist, use a fall-back mean (though computeModel should have failed).
     std::vector<float> bgMeans(ch, 0.0f);
-    for (int c = 0; c < ch; ++c) {
-        double sum = 0.0;
-        for (const auto& s : m_samples) {
-            sum += s.median[c];
+    if (!m_samples.empty()) {
+        const float invCount = 1.0f / static_cast<float>(m_samples.size());
+        for (int c = 0; c < ch; ++c) {
+            double sum = 0.0;
+            for (const auto& s : m_samples) {
+                if (c < (int)s.median.size())
+                    sum += s.median[c];
+            }
+            bgMeans[c] = static_cast<float>(sum * invCount);
         }
-        bgMeans[c] = static_cast<float>(sum / m_samples.size());
     }
 
-    // Apply correction pixel-by-pixel
-    #pragma omp parallel for
+    // Apply correction pixel-by-pixel using the fitted model surface.
+    #pragma omp parallel for collapse(2)
     for (int y = 0; y < h; ++y) {
         for (int x = 0; x < w; ++x) {
             for (int c = 0; c < ch; ++c) {
                 const float bg = (m_method == FittingMethod::Polynomial)
                     ? evaluatePolynomial(static_cast<float>(x),
                                          static_cast<float>(y),
-                                         m_models[c].polyCoeffs)
+                                         (c < (int)m_models.size()) ? m_models[c].polyCoeffs : nullptr)
                     : evaluateRBF(static_cast<float>(x),
-                                  static_cast<float>(y), c);
+                                  static_cast<float>(y), (c < (int)m_models.size()) ? c : 0);
 
-                const size_t idx =
-                    (static_cast<size_t>(y) * w + x) * ch + c;
+                const size_t idx = (static_cast<size_t>(y) * w + x) * ch + c;
 
                 if (type == CorrectionType::Subtraction) {
                     data[idx] = std::clamp(data[idx] - bg + bgMeans[c],
                                            0.0f, 1.0f);
                 } else {
-                    data[idx] = std::clamp(
-                        bg > 0.0f ? (data[idx] / bg * bgMeans[c]) : data[idx],
-                        0.0f, 1.0f);
+                    // Division mode: guard against div-by-zero or negative model values.
+                    const float divisor = std::max(bg, 1e-6f);
+                    data[idx] = std::clamp(data[idx] / divisor * bgMeans[c],
+                                           0.0f, 1.0f);
                 }
             }
         }

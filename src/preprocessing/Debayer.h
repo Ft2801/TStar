@@ -67,6 +67,22 @@ public:
     static bool rcd(const ImageBuffer& input, ImageBuffer& output,
                     BayerPattern pattern);
 
+    /**
+     * @brief Edge-aware demosaicing (ported from ChannelOps).
+     *        Uses local gradient weights to guide interpolation.
+     */
+    static bool edgeAware(const ImageBuffer& input, ImageBuffer& output,
+                          BayerPattern pattern);
+
+    /**
+     * @brief Perform bilinear interpolation at a single pixel location.
+     *        Useful for boundary pixels in higher-order algorithms.
+     */
+    static void bilinearPixel(const float* src, int width, int height,
+                              int x, int y, int redRow, int redCol,
+                              int blueRow, int blueCol,
+                              float& r, float& g, float& b);
+
     // ========================================================================
     //  Pattern Utilities
     // ========================================================================
