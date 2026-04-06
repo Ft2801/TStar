@@ -2141,12 +2141,7 @@ void MainWindow::openFile() {
     m_isLoadingBatch = true;
 
     // Remember last used directory
-    const QString chosenDir = QFileInfo(paths.first()).absolutePath();
-    if (!chosenDir.isEmpty() && QDir(chosenDir).exists()) {
-        m_lastDialogDir = chosenDir;
-        QSettings settings("TStar", "TStar");
-        settings.setValue("General/LastDialogDir", chosenDir);
-    }
+    updateLastUsedDir(paths.first());
 
     int total = paths.size();
     auto loadedCount = std::make_shared<std::atomic<int>>(0);
@@ -2202,21 +2197,13 @@ void MainWindow::saveFile() {
 
     // File dialog
     QString selectedFilter;
-    QString startDir = m_lastDialogDir;
-    if (startDir.isEmpty() || !QDir(startDir).exists()) {
-        startDir = getProjectWorkingDirectory();
-    }
+    QString startDir = getProjectWorkingDirectory();
 
     QString path = QFileDialog::getSaveFileName(this, tr("Save Image As"), startDir,
         tr("FITS (*.fits);;XISF (*.xisf);;TIFF (*.tif *.tiff);;PNG (*.png);;JPG (*.jpg)"), &selectedFilter);
 
     if (!path.isEmpty()) {
-        const QString chosenDir = QFileInfo(path).absolutePath();
-        if (!chosenDir.isEmpty() && QDir(chosenDir).exists()) {
-            m_lastDialogDir = chosenDir;
-            QSettings settings("TStar", "TStar");
-            settings.setValue("General/LastDialogDir", chosenDir);
-        }
+        updateLastUsedDir(path);
     }
     if (path.isEmpty()) return;
 
@@ -6095,27 +6082,51 @@ QString MainWindow::getProjectWorkingDirectory() const {
         if (!projDir.isEmpty() && QDir(projDir).exists()) return projDir;
     }
 
-    // 2. User Home / Documents (User preference: default to Home when no project is active)
-    // We prioritize this over CWD/LastDir to avoid getting stuck in random deep folders.
-    const QString homePath = QDir::homePath();
-    if (!homePath.isEmpty() && QDir(homePath).exists() && !m_workspaceProject.active) {
-        return homePath;
+    // 2. Last used dialog directory (Session-local or persistent)
+    if (!m_lastDialogDir.isEmpty() && QDir(m_lastDialogDir).exists()) {
+        return m_lastDialogDir;
     }
 
-    // 3. Current working directory
+    // 3. User Desktop (Universal fallback prioritized over Home)
+    const QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    if (!desktopPath.isEmpty() && QDir(desktopPath).exists()) {
+        return desktopPath;
+    }
+
+    // 4. Current working directory
     const QString cwd = QDir::currentPath();
     if (!cwd.isEmpty() && QDir(cwd).exists()) return cwd;
 
-    // 4. Persisted last working directory
-    QSettings settings("TStar", "TStar");
-    const QString lastDir = settings.value("General/LastWorkingDir").toString();
-    if (!lastDir.isEmpty() && QDir(lastDir).exists()) return lastDir;
-
-    // 5. Desktop (Final fallback)
-    const QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-    if (!desktopPath.isEmpty() && QDir(desktopPath).exists()) return desktopPath;
-
+    // 5. User Home (Ultimate fallback)
     return QDir::homePath();
+}
+
+/**
+ * @brief Updates the last used directory and synchronizes with system CWD.
+ */
+void MainWindow::updateLastUsedDir(const QString& path) {
+    if (path.isEmpty()) return;
+
+    QString chosenDir;
+    QFileInfo fi(path);
+    if (fi.isDir()) {
+        chosenDir = fi.absoluteFilePath();
+    } else {
+        chosenDir = fi.absolutePath();
+    }
+
+    if (!chosenDir.isEmpty() && QDir(chosenDir).exists()) {
+        m_lastDialogDir = chosenDir;
+
+        // Update process CWD so standard file dialogs and other tools follow
+        QDir::setCurrent(chosenDir);
+
+        // Persist to settings
+        QSettings settings("TStar", "TStar");
+        settings.setValue("General/LastDialogDir", chosenDir);
+        settings.setValue("General/LastWorkingDir", chosenDir);
+        settings.sync(); // Force write to avoid loss on crash
+    }
 }
 
 

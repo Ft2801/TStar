@@ -447,19 +447,33 @@ StackResult StackingEngine::dispatchStacking(StackingArgs& args)
 {
     // Drizzle integration path
     if (args.params.drizzle) {
+        // PREVENT DUPLICATE SCALING: Drizzle has its own internal 2x/3x scaling logic.
+        // If upscaleAtStacking is also on, it results in a 4x canvas and data corruption.
+        bool originalUpscale = args.params.upscaleAtStacking;
+        args.params.upscaleAtStacking = false;
+
         if (args.params.hasRejection()) {
             args.log(tr("Drizzle enabled: Running first pass for rejection..."), "blue");
             args.params.createRejectionMaps = true;
 
             StackResult res = stackMean(args);
-            if (res != StackResult::OK) return res;
-            if (m_cancelled) return StackResult::CancelledError;
+            if (res != StackResult::OK) {
+                args.params.upscaleAtStacking = originalUpscale;
+                return res;
+            }
+            if (m_cancelled) {
+                args.params.upscaleAtStacking = originalUpscale;
+                return StackResult::CancelledError;
+            }
         }
 
         args.log(tr("Starting Drizzle stacking (Scale: %1x, PixFrac: %2)...")
                      .arg(args.params.drizzleScale)
                      .arg(args.params.drizzlePixFrac), "blue");
-        return stackDrizzle(args);
+        
+        StackResult res = stackDrizzle(args);
+        args.params.upscaleAtStacking = originalUpscale;
+        return res;
     }
 
     // Standard stacking methods
@@ -1905,12 +1919,6 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args)
             float* maskData = dimRejectionMap->data().data();
             std::memset(maskData, 0, sizeof(float) * buffer.width() * buffer.height());
 
-            int shiftX = 0, shiftY = 0;
-            if (reg.hasRegistration) {
-                shiftX = static_cast<int>(std::round(reg.shiftX));
-                shiftY = static_cast<int>(std::round(reg.shiftY));
-            }
-
             // Noise-based threshold for rejection
             double ch0Noise = Statistics::computeNoise(buffer.data().data(),
                                                        buffer.width(), buffer.height());
@@ -1920,11 +1928,13 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args)
             float threshold = static_cast<float>(sigmaParam * ch0Noise);
             if (threshold < 1e-6f) threshold = 1e-6f;
 
-            // Compare each pixel against the reference
+            // Compare each pixel against the reference using full registration transform
+            // This ensures rejection works even with rotation or scaling.
             for (int y = 0; y < buffer.height(); ++y) {
                 for (int x = 0; x < buffer.width(); ++x) {
-                    int rx = x - shiftX;
-                    int ry = y - shiftY;
+                    QPointF mapped = reg.transform(x, y);
+                    int rx = static_cast<int>(std::round(mapped.x() - offsetX));
+                    int ry = static_cast<int>(std::round(mapped.y() - offsetY));
 
                     if (rx >= 0 && rx < referenceStack.width() &&
                         ry >= 0 && ry < referenceStack.height()) {

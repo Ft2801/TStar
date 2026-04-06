@@ -455,11 +455,20 @@ bool StackingCommands::cmdStack(const ScriptCommand& cmd)
 
     // -- Reuse existing sequence if it matches (preserves registration) ------
     bool reuseSequence = false;
-    if (s_sequence && s_sequence->count() == fullPaths.size()) {
-        QString seqFile = QFileInfo(s_sequence->image(0).filePath).fileName();
-        QString reqFile = QFileInfo(fullPaths[0]).fileName();
-        if (seqFile == reqFile)
+    
+    // Smart Reuse: If the user asks for 'r_PREFIX', they probably mean the 
+    // registered version of the sequence we already have in memory.
+    QString effectivePrefix = prefix;
+    if (prefix.startsWith("r_") && prefix.length() > 2) {
+        effectivePrefix = prefix.mid(2);
+    }
+
+    if (s_sequence && s_sequence->count() > 0) {
+        QString currentPrefix = QFileInfo(s_sequence->image(0).filePath).baseName();
+        // Simple heuristic: if the base name of our memory sequence matches the requested prefix, reuse it.
+        if (currentPrefix.contains(effectivePrefix) || effectivePrefix.contains(currentPrefix)) {
             reuseSequence = true;
+        }
     }
 
     if (!reuseSequence) {
@@ -521,6 +530,32 @@ bool StackingCommands::cmdStack(const ScriptCommand& cmd)
         params.drizzleScale = cmd.option("scale").toDouble();
     if (cmd.hasOption("pixfrac"))
         params.drizzlePixFrac = cmd.option("pixfrac").toDouble();
+
+    if (params.drizzle && s_runner) {
+        // Validate registration
+        bool hasReg = false;
+        if (s_sequence && s_sequence->count() > 0) {
+            hasReg = s_sequence->image(0).registration.hasRegistration;
+        }
+
+        if (!hasReg) {
+            s_runner->logMessage(
+                "WARNING: Drizzle requested but no registration data found. "
+                "Registration must be performed before stacking for Drizzle to be effective.", "salmon");
+        }
+
+        QString modeStr = params.drizzleFast ? "Fast (Nearest-Neighbor)" : "Slow (Polygon-Clipping)";
+        s_runner->logMessage(
+            QString("Drizzle ENABLED: Scale=%1x, PixFrac=%2, Mode=%3")
+                .arg(params.drizzleScale, 0, 'f', 1)
+                .arg(params.drizzlePixFrac, 0, 'f', 2)
+                .arg(modeStr), "cyan");
+
+        if (params.drizzleFast && std::abs(params.drizzlePixFrac - 1.0) > 0.01) {
+            s_runner->logMessage(
+                "NOTE: PixFrac is ignored in Fast Drizzle mode.", "orange");
+        }
+    }
 
     // Feathering.
     if (cmd.hasOption("feather"))
@@ -716,6 +751,9 @@ bool StackingCommands::cmdRegister(const ScriptCommand& cmd)
         params.detectionThreshold = cmd.option("sigma").toFloat();
     if (cmd.hasOption("maxstars"))
         params.maxStars = cmd.option("maxstars").toInt();
+
+    // Ensure output directory is set to s_workingDir for r_ files
+    params.outputDirectory = s_workingDir;
 
     // Run registration.
     Stacking::RegistrationEngine engine;

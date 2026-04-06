@@ -502,7 +502,8 @@ protected:
 private:
     bool    m_isUpdating = false;
     QString m_lastDialogDir;
-
+    void updateLastUsedDir(const QString& path);
+    
     // ---- Pixel info label ---------------------------------------------------
 
     class QLabel* m_pixelInfoLabel = nullptr;

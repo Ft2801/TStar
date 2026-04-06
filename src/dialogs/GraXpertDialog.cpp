@@ -75,7 +75,6 @@ GraXpertDialog::GraXpertDialog(QWidget* parent)
     m_aiVersionCombo = new QComboBox();
     m_aiVersionCombo->addItem(tr("Latest (auto)"), "Latest (auto)");
     m_aiVersionCombo->addItem("3.0.2", "3.0.2");
-    m_aiVersionCombo->addItem("3.0.1", "3.0.1");
     m_aiVersionCombo->addItem("2.0.0", "2.0.0");
     m_aiVersionCombo->setStyleSheet(kComboStyle);
 
