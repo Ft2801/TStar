@@ -169,6 +169,8 @@
 #include <QMenuBar>
 #include <QMenu>
 #include <QToolButton>
+#include <QDesktopServices>
+#include <QUrl>
 #include <QToolBar>
 #include <QStatusBar>
 #include <QComboBox>
@@ -376,8 +378,9 @@ MainWindow::MainWindow(QWidget *parent)
             QString sc3 = QCoreApplication::translate("MainWindow", "Shift + draw a selection: create a new view");
             QString sc4 = QCoreApplication::translate("MainWindow", "Ctrl+Z / Ctrl+Shift+Z: undo / redo");
             QString sc5 = QCoreApplication::translate("MainWindow", "Ctrl+0: fit to screen");
+            QString sc6 = QCoreApplication::translate("MainWindow", "Ctrl+M: minigame");
 
-            QStringList shortcuts = { sc1, sc2, sc3, sc4, sc5 };
+            QStringList shortcuts = { sc1, sc2, sc3, sc4, sc5, sc6 };
             for (const auto& sc : shortcuts) {
                 p.drawText(sx, sy, sc);
                 sy += lineHeight;
@@ -1321,8 +1324,8 @@ MainWindow::MainWindow(QWidget *parent)
             UpdateDialog dlg(this, ver, body, url);
             dlg.exec();
         });
-        connect(checker, &UpdateChecker::noUpdateAvailable, this, [](){
-            // log(tr("TStar is up to date."), Log_Info);
+        connect(checker, &UpdateChecker::noUpdateAvailable, this, [this](){
+            log(tr("TStar is up to date."), Log_Info);
         });
         connect(checker, &UpdateChecker::errorOccurred, this, [this](const QString& err){
             log(tr("Update check failed: %1").arg(err), Log_Warning);
@@ -1330,7 +1333,14 @@ MainWindow::MainWindow(QWidget *parent)
         checker->checkForUpdates(TStar::getVersion());
     });
 
-    // --- 4.27: Final Window Setup ---
+    // --- 4.27: Easter Egg - Minigame Shortcut ---
+    // Hidden action for Ctrl+M that launches the minigame
+    QAction* minigameAction = new QAction(this);
+    minigameAction->setShortcut(Qt::CTRL | Qt::Key_M);
+    addAction(minigameAction);
+    connect(minigameAction, &QAction::triggered, this, &MainWindow::openMinigame);
+
+    // --- 4.28: Final Window Setup ---
     resize(1280, 800);
     log(tr("Application Ready."));
 }
@@ -2321,6 +2331,35 @@ void MainWindow::saveFile() {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Section 16: Minigame
+// ---------------------------------------------------------------------------
+
+void MainWindow::openMinigame() {
+    // Construct the path to the minigame HTML file
+    QString minigamePath = QCoreApplication::applicationDirPath() + "/minigame/index.html";
+    
+    // Try the macOS bundle structure as fallback
+    if (!QFile::exists(minigamePath)) {
+        minigamePath = QCoreApplication::applicationDirPath() + "/../Resources/minigame/index.html";
+    }
+    
+    // Try source build directory
+    if (!QFile::exists(minigamePath)) {
+        minigamePath = QCoreApplication::applicationDirPath() + "/src/minigame/index.html";
+    }
+    
+    if (!QFile::exists(minigamePath)) {
+        QMessageBox::warning(this, tr("Minigame Not Found"), 
+                            tr("Could not locate minigame/index.html. Tried: %1").arg(minigamePath));
+        log(tr("Minigame file not found at: %1").arg(minigamePath), Log_Error);
+        return;
+    }
+    
+    // Open the HTML file in the default web browser
+    QDesktopServices::openUrl(QUrl::fromLocalFile(minigamePath));
+    log(tr("Minigame launched: %1").arg(minigamePath), Log_Success);
+}
 
 // ---------------------------------------------------------------------------
 // Section 17: Channel Operations

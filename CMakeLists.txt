@@ -1101,6 +1101,8 @@ endif()
 
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/images"
      DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/minigame"
+     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/scripts"
      DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/data"
@@ -1111,6 +1113,9 @@ if(APPLE)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_CURRENT_SOURCE_DIR}/src/images"
             "$<TARGET_BUNDLE_DIR:TStar>/Contents/Resources/images"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/minigame"
+            "$<TARGET_BUNDLE_DIR:TStar>/Contents/Resources/minigame"
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_CURRENT_BINARY_DIR}/translations"
             "$<TARGET_BUNDLE_DIR:TStar>/Contents/Resources/translations"

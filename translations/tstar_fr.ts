@@ -5898,6 +5898,10 @@
             <translation type="finished">Cosmic Clarity cancelled.</translation>
         </message>
         <message>
+            <source>Could not locate minigame/index.html. Tried: %1</source>
+            <translation type="finished">Impossible de localiser minigame/index.html. Tentative : %1</translation>
+        </message>
+        <message>
             <source>Create Mask...</source>
             <translation type="finished">Créer un Masque...</translation>
         </message>
@@ -5908,6 +5912,10 @@
         <message>
             <source>Ctrl+0: fit to screen</source>
             <translation type="finished">Ctrl+0: adapter à l'écran</translation>
+        </message>
+        <message>
+            <source>Ctrl+M: minigame</source>
+            <translation type="finished">Ctrl+M : mini-jeu</translation>
         </message>
         <message>
             <source>Ctrl+O: open image</source>
@@ -6288,6 +6296,18 @@
         <message>
             <source>Mask Removed.</source>
             <translation type="finished">Masque supprimé.</translation>
+        </message>
+        <message>
+            <source>Minigame Not Found</source>
+            <translation type="finished">Mini-jeu non trouvé</translation>
+        </message>
+        <message>
+            <source>Minigame file not found at: %1</source>
+            <translation type="finished">Fichier du mini-jeu non trouvé à : %1</translation>
+        </message>
+        <message>
+            <source>Minigame launched: %1</source>
+            <translation type="finished">Mini-jeu lancé : %1</translation>
         </message>
         <message>
             <source>Mirror H</source>
@@ -11947,6 +11967,10 @@
             <translation type="finished">Drizzle activé : Première passe pour le rejet...</translation>
         </message>
         <message>
+            <source>Drizzle: Frame %1 rejection: %2%</source>
+            <translation type="finished">Drizzle : rejet de la Frame %1 : %2%</translation>
+        </message>
+        <message>
             <source>Drizzling image %1/%2...</source>
             <translation type="finished">Drizzling image %1/%2...</translation>
         </message>
@@ -12049,6 +12073,10 @@
         <message>
             <source>Using %1 parallel blocks of max %2 rows each</source>
             <translation type="finished">Utilisation de %1 blocs parallèles de max %2 lignes</translation>
+        </message>
+        <message>
+            <source>WARNING: Excessive rejection (%1%) - disabling mask for frame %2</source>
+            <translation type="finished">ATTENTION : Rejet excessif (%1%) - désactivation del masque pour la frame %2</translation>
         </message>
         <message>
             <source>Warning: Cosmetic correction enabled but no master dark provided</source>

@@ -4,6 +4,7 @@ TStar Changelog
 Version 1.8.6
 -------------
 - Fixed a RAW conversion tool bug
+- Added minigame (Ctrl + M)
 - Stacking suite improvements
 
 Version 1.8.5

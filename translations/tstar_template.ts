@@ -5898,6 +5898,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Could not locate minigame/index.html. Tried: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Create Mask...</source>
             <translation type="unfinished" />
         </message>
@@ -5907,6 +5911,10 @@
         </message>
         <message>
             <source>Ctrl+0: fit to screen</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Ctrl+M: minigame</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -6287,6 +6295,18 @@
         </message>
         <message>
             <source>Mask Removed.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Minigame Not Found</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Minigame file not found at: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Minigame launched: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11946,6 +11966,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Drizzle: Frame %1 rejection: %2%</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Drizzling image %1/%2...</source>
             <translation type="unfinished" />
         </message>
@@ -12047,6 +12071,10 @@
         </message>
         <message>
             <source>Using %1 parallel blocks of max %2 rows each</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>WARNING: Excessive rejection (%1%) - disabling mask for frame %2</source>
             <translation type="unfinished" />
         </message>
         <message>

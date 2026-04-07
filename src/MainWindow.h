@@ -191,6 +191,7 @@ private slots:
     // ---- File actions -------------------------------------------------------
     void openFile();
     void saveFile();
+    void openMinigame();
 
     // ---- Processing tool dialogs --------------------------------------------
     void openStretchDialog();
