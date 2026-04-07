@@ -553,9 +553,40 @@ void SPCCDialog::saveBFilterSetting(int)
 
 void SPCCDialog::saveSensorSetting(int)
 {
+    QString sensor = m_sensorCombo->currentText();
     QSettings s; s.beginGroup(kSettingsGroup);
-    s.setValue("Sensor", m_sensorCombo->currentText());
+    s.setValue("Sensor", sensor);
     s.endGroup();
+
+    if (!m_storeLoaded) return;
+
+    bool isOSC = false;
+    if (sensor != tr("(None)")) {
+        for (const SPCCObject& o : m_store.sensor_list) {
+            QString baseName = o.name;
+            baseName.remove(QRegularExpression("\\s+(Red|Green|Blue|R|G|B)$", QRegularExpression::CaseInsensitiveOption));
+            
+            if (baseName.compare(sensor, Qt::CaseInsensitive) == 0) {
+                if (o.type == OSC_SENSOR) {
+                    isOSC = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (isOSC) {
+        m_rFilterCombo->setCurrentText(tr("(None)"));
+        m_gFilterCombo->setCurrentText(tr("(None)"));
+        m_bFilterCombo->setCurrentText(tr("(None)"));
+        m_rFilterCombo->setEnabled(false);
+        m_gFilterCombo->setEnabled(false);
+        m_bFilterCombo->setEnabled(false);
+    } else {
+        m_rFilterCombo->setEnabled(true);
+        m_gFilterCombo->setEnabled(true);
+        m_bFilterCombo->setEnabled(true);
+    }
 }
 
 void SPCCDialog::saveLpFilter1Setting(int)

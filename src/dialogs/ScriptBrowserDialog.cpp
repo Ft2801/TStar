@@ -143,6 +143,7 @@ void ScriptBrowserDialog::loadScripts()
 
     const QStringList paths = scriptDirs();
     bool foundAny = false;
+    QSet<QString> addedFiles;
 
     for (const QString& path : paths) {
         QDir dir(path);
@@ -150,6 +151,9 @@ void ScriptBrowserDialog::loadScripts()
         const QStringList scripts = dir.entryList(filters, QDir::Files, QDir::Name);
 
         for (const QString& script : scripts) {
+            if (addedFiles.contains(script)) continue;
+            addedFiles.insert(script);
+
             QListWidgetItem* item = new QListWidgetItem(script);
             item->setData(Qt::UserRole, dir.absoluteFilePath(script));
             

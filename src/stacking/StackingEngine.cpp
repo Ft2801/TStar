@@ -597,13 +597,25 @@ void StackingEngine::computeOutputDimensions(const StackingArgs& args,
 
         for (int idx : args.imageIndices) {
             const auto& img = seq->image(idx);
-            double dx = img.registration.shiftX;
-            double dy = img.registration.shiftY;
+            
+            if (img.registration.isShiftOnly()) {
+                double dx = img.registration.shiftX;
+                double dy = img.registration.shiftY;
+                minX = std::min(minX, dx);
+                minY = std::min(minY, dy);
+                maxX = std::max(maxX, img.width + dx);
+                maxY = std::max(maxY, img.height + dy);
+            } else {
+                QPointF c1 = img.registration.transform(0, 0);
+                QPointF c2 = img.registration.transform(img.width, 0);
+                QPointF c3 = img.registration.transform(img.width, img.height);
+                QPointF c4 = img.registration.transform(0, img.height);
 
-            minX = std::min(minX, dx);
-            minY = std::min(minY, dy);
-            maxX = std::max(maxX, img.width + dx);
-            maxY = std::max(maxY, img.height + dy);
+                minX = std::min({minX, c1.x(), c2.x(), c3.x(), c4.x()});
+                minY = std::min({minY, c1.y(), c2.y(), c3.y(), c4.y()});
+                maxX = std::max({maxX, c1.x(), c2.x(), c3.x(), c4.x()});
+                maxY = std::max({maxY, c1.y(), c2.y(), c3.y(), c4.y()});
+            }
         }
 
         width   = static_cast<int>(std::ceil(maxX - minX));

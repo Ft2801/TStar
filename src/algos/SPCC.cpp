@@ -369,14 +369,14 @@ bool SPCC::loadTStarFits(const QString& dataPath, SPCCDataStore& out)
             obj.type = WB_REF;
             out.sed_list.push_back(std::move(obj));
         }
-        else if (ctype_up == "FILTER")
+        else if (ctype_up == "FILTER" && !name.contains("OSC", Qt::CaseInsensitive))
         {
             obj.type = MONO_FILTER;
             out.filter_list.push_back(std::move(obj));
         }
         else
         {
-            obj.type = MONO_SENSOR;
+            obj.type = name.contains("OSC", Qt::CaseInsensitive) ? OSC_SENSOR : MONO_SENSOR;
             out.sensor_list.push_back(std::move(obj));
         }
 
