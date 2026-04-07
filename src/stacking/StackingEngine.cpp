@@ -200,12 +200,13 @@ StackResult StackingEngine::execute(StackingArgs& args)
     }
 
     // ---- Step 5: Auto-detect Bayer pattern ----
-
-    if (args.params.debayer &&
+ 
+    if ((args.params.debayer || args.params.drizzle) &&
         (args.params.bayerPattern == Preprocessing::BayerPattern::Auto ||
          args.params.bayerPattern == Preprocessing::BayerPattern::None)) {
         autoDetectBayerPattern(args);
     }
+
 
     // ---- Step 6: Cosmetic correction ----
 
@@ -1859,6 +1860,12 @@ StackResult StackingEngine::stackDrizzle(StackingArgs& args)
     dParams.kernelType    = static_cast<int>(args.params.drizzleKernel);
     dParams.useWeightMaps = true;
     dParams.fastMode      = args.params.drizzleFast;
+
+    // Resolve Bayer pattern from metadata if still set to Auto/None
+    if (args.params.bayerPattern == Preprocessing::BayerPattern::Auto ||
+        args.params.bayerPattern == Preprocessing::BayerPattern::None) {
+        autoDetectBayerPattern(args);
+    }
 
     // Convert Bayer pattern enum to string for the drizzle engine
     switch (args.params.bayerPattern) {

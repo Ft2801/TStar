@@ -44,56 +44,55 @@ void MosaicFeathering::initRampLUT()
 Stacking::DrizzleMap DrizzleStacking::computeDrizzleMap(
     const ImageBuffer& input,
     const RegistrationData& reg,
-    int outWidth, int outHeight,
-    double scale,
-    double offsetX,
-    double offsetY)
+    int outputWidth, int outputHeight,
+    double scale, double offsetX, double offsetY)
 {
-    DrizzleMap result;
-    result.width  = input.width();
-    result.height = input.height();
-    result.xMap.resize(static_cast<size_t>(result.width) * result.height);
-    result.yMap.resize(static_cast<size_t>(result.width) * result.height);
+    const int inW = input.width();
+    const int inH = input.height();
+    Stacking::DrizzleMap result;
 
-    const int inW = result.width;
-    const int inH = result.height;
+    result.width  = inW;
+    result.height = inH;
+    result.xMap.resize(static_cast<size_t>(inW) * inH);
+    result.yMap.resize(static_cast<size_t>(inW) * inH);
 
-    // Pre-compute the output (x', y') for every input pixel center
+    double H[3][3];
+    reg.getDrizzleMatrix(scale, offsetX, offsetY, H);
+
     #pragma omp parallel for
+
     for (int y = 0; y < inH; ++y) {
         for (int x = 0; x < inW; ++x) {
-            double cx = static_cast<double>(x) + 0.5;
-            double cy = static_cast<double>(y) + 0.5;
-
-            // reg.transform maps from input linear to reference linear coords.
-            QPointF pt = reg.transform(cx, cy);
+            float ox, oy;
+            projectPoint(H, static_cast<double>(x), static_cast<double>(y), ox, oy);
             
             size_t idx = static_cast<size_t>(y) * inW + x;
-            // Apply framing offset and scale to get output canvas coordinates
-            result.xMap[idx] = static_cast<float>((pt.x() - offsetX) * scale);
-            result.yMap[idx] = static_cast<float>((pt.y() - offsetY) * scale);
+            result.xMap[idx] = ox;
+            result.yMap[idx] = oy;
         }
     }
 
     // Unused but kept for validation if needed
-    (void)outWidth;
-    (void)outHeight;
+    (void)outputWidth;
+    (void)outputHeight;
 
     return result;
 }
+
 
 bool DrizzleStacking::interpolatePoint(
     const Stacking::DrizzleMap& map, float xin, float yin,
     float& xout, float& yout)
 {
-    int i0 = static_cast<int>(std::floor(xin - 0.5f));
-    int j0 = static_cast<int>(std::floor(yin - 0.5f));
+    // Bilinear fallback for arbitrary points
+    int i0 = static_cast<int>(std::floor(xin));
+    int j0 = static_cast<int>(std::floor(yin));
 
     if (i0 < 0 || i0 >= map.width - 1 || j0 < 0 || j0 >= map.height - 1)
         return false;
 
-    float fx = xin - 0.5f - i0;
-    float fy = yin - 0.5f - j0;
+    float fx = xin - i0;
+    float fy = yin - j0;
 
     auto getX = [&](int ix, int iy) { return map.xMap[static_cast<size_t>(iy) * map.width + ix]; };
     auto getY = [&](int ix, int iy) { return map.yMap[static_cast<size_t>(iy) * map.width + ix]; };
@@ -110,73 +109,116 @@ bool DrizzleStacking::interpolatePoint(
 }
 
 bool DrizzleStacking::interpolateFourPoints(
-    const Stacking::DrizzleMap& map, int ixcen, int iycen,
-    float dh, float xout[4], float yout[4])
+    const Stacking::DrizzleMap& map, int i, int j,
+    float h, float xout[4], float yout[4])
 {
-    // Map the 4 corners of a shrunk pixel centered at (ixcen+0.5, iycen+0.5)
-    float xin[] = { ixcen + 0.5f - dh, ixcen + 0.5f + dh, ixcen + 0.5f + dh, ixcen + 0.5f - dh };
-    float yin[] = { iycen + 0.5f - dh, iycen + 0.5f - dh, iycen + 0.5f + dh, iycen + 0.5f + dh };
+    // Correct vertex summation for a 3x3 neighborhood.
+    if (i < 1 || i >= map.width - 1 || j < 1 || j >= map.height - 1)
+        return false;
 
-    for (int i = 0; i < 4; ++i) {
-        if (!interpolatePoint(map, xin[i], yin[i], xout[i], yout[i]))
-            return false;
+    float f[3][3], g[3][3];
+    for (int jj = 0; jj <= 2; ++jj) {
+        for (int ii = 0; ii <= 2; ++ii) {
+            int ix = i - 1 + ii;
+            int iy = j - 1 + jj;
+            size_t idx = static_cast<size_t>(iy) * map.width + ix;
+            
+            float fac;
+            if (ii == 1 && jj == 1) fac = (1.0f - h) * (1.0f - h);
+            else if (ii == 1 || jj == 1) fac = (1.0f - h) * h;
+            else fac = h * h;
+
+            f[ii][jj] = map.xMap[idx] * fac;
+            g[ii][jj] = map.yMap[idx] * fac;
+        }
     }
+
+    // Order in y: +h, +h, -h, -h; order in x: -h, +h, +h, -h
+    // This correctly handles the local perspective distortion.
+    xout[0] = f[0][1] + f[1][1] + f[0][2] + f[1][2];
+    yout[0] = g[0][1] + g[1][1] + g[0][2] + g[1][2];
+
+    xout[1] = f[1][1] + f[2][1] + f[1][2] + f[2][2];
+    yout[1] = g[1][1] + g[2][1] + g[1][2] + g[2][2];
+
+    xout[2] = f[1][0] + f[2][0] + f[1][1] + f[2][1];
+    yout[2] = g[1][0] + g[2][0] + g[1][1] + g[2][1];
+
+    xout[3] = f[0][0] + f[1][0] + f[0][1] + f[1][1];
+    yout[3] = g[0][0] + g[1][0] + g[0][1] + g[1][1];
+
     return true;
 }
 
 float DrizzleStacking::sgarea(float x1, float y1, float x2, float y2) {
-    // Area of intersection of a line segment with a unit square
-    float d;
-    if (x1 == x2) return 0.0f;
-    if (x1 < 0.0f && x2 < 0.0f) return 0.0f;
-    if (x1 > 1.0f && x2 > 1.0f) return 0.0f;
+    float xlo, xhi, ylo, yhi, xtop;
+    float dx, dy, det, sgn_dx;
 
-    if (x1 < 0.0f) {
-        y1 = y1 + (y2 - y1) * (0.0f - x1) / (x2 - x1);
-        x1 = 0.0f;
-    } else if (x1 > 1.0f) {
-        y1 = y1 + (y2 - y1) * (1.0f - x1) / (x2 - x1);
-        x1 = 1.0f;
+    dx = x2 - x1;
+    dy = y2 - y1;
+
+    // Trap vertical line
+    if (dx == 0.0f) return 0.0f;
+
+    if (dx < 0.0f) {
+        sgn_dx = -1.0f; xlo = x2; xhi = x1;
+    } else {
+        sgn_dx = 1.0f; xlo = x1; xhi = x2;
     }
 
-    if (x2 < 0.0f) {
-        y2 = y1 + (y2 - y1) * (0.0f - x1) / (x2 - x1);
-        x2 = 0.0f;
-    } else if (x2 > 1.0f) {
-        y2 = y1 + (y2 - y1) * (1.0f - x1) / (x2 - x1);
-        x2 = 1.0f;
+    if (xlo >= 1.0f || xhi <= 0.0f) return 0.0f;
+
+    xlo = std::max(xlo, 0.0f);
+    xhi = std::min(xhi, 1.0f);
+
+    float slope = dy / dx;
+    ylo = y1 + slope * (xlo - x1);
+    yhi = y1 + slope * (xhi - x1);
+
+    // Trap segment entirely below axis
+    if (ylo <= 0.0f && yhi <= 0.0f) return 0.0f;
+
+    // Line segment entirely above square
+    if (ylo >= 1.0f && yhi >= 1.0f) {
+        return sgn_dx * (xhi - xlo);
     }
 
-    d = x2 - x1;
-    if (y1 <= 0.0f && y2 <= 0.0f) return 0.0f;
-    if (y1 >= 1.0f && y2 >= 1.0f) return d;
+    det = x1 * y2 - y1 * x2;
 
-    if (y1 <= 0.0f) {
-        x1 = x1 + (x2 - x1) * (0.0f - y1) / (y2 - y1);
-        y1 = 0.0f;
-    } else if (y1 >= 1.0f) {
-        x1 = x1 + (x2 - x1) * (1.0f - y1) / (y2 - y1);
-        y1 = 1.0f;
+    // Adjust bounds if segment crosses axis
+    if (ylo < 0.0f) {
+        ylo = 0.0f;
+        xlo = det / dy;
+    }
+    if (yhi < 0.0f) {
+        yhi = 0.0f;
+        xhi = det / dy;
     }
 
-    if (y2 <= 0.0f) {
-        x2 = x1 + (x2 - x1) * (0.0f - y1) / (y2 - y1);
-        y2 = 0.0f;
-    } else if (y2 >= 1.0f) {
-        x2 = x1 + (x2 - x1) * (1.0f - y1) / (y2 - y1);
-        y2 = 1.0f;
+    if (ylo <= 1.0f) {
+        if (yhi <= 1.0f) {
+            // Segment entirely within square
+            return sgn_dx * 0.5f * (xhi - xlo) * (yhi + ylo);
+        }
+        // Crosses top
+        xtop = (dx + det) / dy;
+        return sgn_dx * (0.5f * (xtop - xlo) * (1.0f + ylo) + xhi - xtop);
     }
 
-    return 0.5f * (y1 + y2) * (x2 - x1);
+    xtop = (dx + det) / dy;
+    return sgn_dx * (0.5f * (xhi - xtop) * (1.0f + yhi) + xtop - xlo);
 }
 
+
 float DrizzleStacking::boxer(float is, float js, const float x[4], const float y[4]) {
-    // Area of intersection of a quadrilateral with a unit-pixel at (is, js)
     float area = 0.0f;
     float tx[4], ty[4];
+    float x_off = is - 0.5f;
+    float y_off = js - 0.5f;
+
     for (int i = 0; i < 4; ++i) {
-        tx[i] = x[i] - is;
-        ty[i] = y[i] - js;
+        tx[i] = x[i] - x_off;
+        ty[i] = y[i] - y_off;
     }
 
     for (int i = 0; i < 4; ++i) {
@@ -184,8 +226,9 @@ float DrizzleStacking::boxer(float is, float js, const float x[4], const float y
         area += sgarea(tx[i], ty[i], tx[next], ty[next]);
     }
 
-    return std::abs(area);
+    return area;
 }
+
 
 int DrizzleStacking::getCFAChannel(int x, int y, const QString& pattern) {
     if (pattern.isEmpty()) return 0;
@@ -219,12 +262,11 @@ void DrizzleStacking::drizzleFrame(
     const int inChans  = input.channels();
     const size_t outPixels = static_cast<size_t>(outputWidth) * outputHeight;
 
-    // Use pre-computed mapping for speed and precision
+    // Use unified Drizzle Map (Center-to-Center Matrix Projection)
     Stacking::DrizzleMap dmap = computeDrizzleMap(input, reg, outputWidth, outputHeight, scale, offsetX, offsetY);
     if (!dmap.isValid()) return;
 
-    // Flux conservation scaling: upsampling distributes flux over scale^2 pixels
-    const double fScale = scale * scale;
+    // Shrunken pixel radius in input coordinates (pixfrac * 0.5)
     const float dh = static_cast<float>(drop * 0.5);
 
     #pragma omp parallel for
@@ -234,59 +276,53 @@ void DrizzleStacking::drizzleFrame(
             if (rejectionMap && rejectionMap[y * inW + x] > 0.5f)
                 continue;
 
-            // Compute output quadrilateral for shrunken pixel (pixfrac)
+            // Compute output quadrilateral vertices for the shrunken pixel
             float xout[4], yout[4];
             if (!interpolateFourPoints(dmap, x, y, dh, xout, yout))
                 continue;
 
-            // Jacobian Correction: Geometric scale conservation
-            // Area of transformed quad = 0.5 * |(x0-x2)(y1-y3) - (x1-x3)(y0-y2)|
-            double jacobian = 0.5 * std::abs((xout[0] - xout[2]) * (yout[1] - yout[3]) - 
-                                            (xout[1] - xout[3]) * (yout[0] - yout[2]));
+            double jacobian = 0.5 * ((xout[1] - xout[3]) * (yout[0] - yout[2]) - 
+                                     (xout[0] - xout[2]) * (yout[1] - yout[3]));
             
-            if (jacobian < 1e-9) continue;
+            if (std::abs(jacobian) < 1e-9) continue;
+            const double invJaco = 1.0 / jacobian;
 
-            // Bounding box of the transformed drop
-            float minX = 1e9f, maxX = -1e9f, minY = 1e9f, maxY = -1e9f;
-            for (int i = 0; i < 4; ++i) {
-                minX = std::min(minX, xout[i]); maxX = std::max(maxX, xout[i]);
-                minY = std::min(minY, yout[i]); maxY = std::max(maxY, yout[i]);
+            float minX = xout[0], maxX = xout[0], minY = yout[0], maxY = yout[0];
+            for (int i = 1; i < 4; ++i) {
+                if (xout[i] < minX) minX = xout[i];
+                if (xout[i] > maxX) maxX = xout[i];
+                if (yout[i] < minY) minY = yout[i];
+                if (yout[i] > maxY) maxY = yout[i];
             }
 
-            int ox0 = std::clamp(static_cast<int>(std::floor(minX)), 0, outputWidth - 1);
-            int ox1 = std::clamp(static_cast<int>(std::floor(maxX)), 0, outputWidth - 1);
-            int oy0 = std::clamp(static_cast<int>(std::floor(minY)), 0, outputHeight - 1);
-            int oy1 = std::clamp(static_cast<int>(std::floor(maxY)), 0, outputHeight - 1);
+            int ox0 = std::clamp(static_cast<int>(std::floor(minX + 0.5f)) - 1, 0, outputWidth - 1);
+            int ox1 = std::clamp(static_cast<int>(std::ceil(maxX + 0.5f)) + 1, 0, outputWidth - 1);
+            int oy0 = std::clamp(static_cast<int>(std::floor(minY + 0.5f)) - 1, 0, outputWidth - 1);
+            int oy1 = std::clamp(static_cast<int>(std::ceil(maxY + 0.5f)) + 1, 0, outputHeight - 1);
 
-            // Per-pixel frame quality weight (e.g. FWHM, SNR)
             float frameWeight = (weights.size() > 0) ? weights[0] : 1.0f;
-            
-            // CFA Routing: If raw drizzling, determine destination channel
             bool isRawDriz = !params.bayerPattern.isEmpty() && inChans == 1;
             int cfaChan = isRawDriz ? getCFAChannel(x, y, params.bayerPattern) : 0;
 
-            // Scatter flux into output pixels
             for (int oy = oy0; oy <= oy1; ++oy) {
                 for (int ox = ox0; ox <= ox1; ++ox) {
                     float overlapArea = boxer(static_cast<float>(ox), static_cast<float>(oy), xout, yout);
-                    if (overlapArea < 1e-6f) continue;
+                    if (std::abs(overlapArea) < 1e-6f) continue;
 
                     if (isRawDriz) {
-                        // Raw Driz: Route to R, G, or B accumulator
                         float chanWeight = (cfaChan < static_cast<int>(weights.size())) ? weights[cfaChan] : frameWeight;
-                        double finalWeight = (double)(overlapArea * chanWeight) / jacobian;
-                        double val = static_cast<double>(input.value(x, y, 0)) * finalWeight * fScale;
+                        double finalWeight = (double)(overlapArea * chanWeight) * invJaco;
+                        double val = static_cast<double>(input.value(x, y, 0)) * finalWeight;
                         size_t outIdx = static_cast<size_t>(oy) * outputWidth + ox;
                         #pragma omp atomic
                         accum[cfaChan * outPixels + outIdx] += val;
                         #pragma omp atomic
                         weightAccum[cfaChan * outPixels + outIdx] += finalWeight;
                     } else {
-                        // Standard RGB Driz: All channels get their respective weight
                         for (int c = 0; c < inChans; ++c) {
                             float chanWeight = (c < static_cast<int>(weights.size())) ? weights[c] : frameWeight;
-                            double finalWeight = (double)(overlapArea * chanWeight) / jacobian;
-                            double val = static_cast<double>(input.value(x, y, c)) * finalWeight * fScale;
+                            double finalWeight = (double)(overlapArea * chanWeight) * invJaco;
+                            double val = static_cast<double>(input.value(x, y, c)) * finalWeight;
                             size_t outIdx = static_cast<size_t>(oy) * outputWidth + ox;
                             #pragma omp atomic
                             accum[c * outPixels + outIdx] += val;
@@ -299,6 +335,7 @@ void DrizzleStacking::drizzleFrame(
         }
     }
 }
+
 
 // ============================================================================
 // DrizzleStacking -- Fast 1x point-kernel drizzle
@@ -384,7 +421,46 @@ void DrizzleStacking::finalizeStack(
                 double val = accum[c * pixelCount + i] / w;
                 data[outIdx] = std::clamp(static_cast<float>(val), 0.0f, 1.0f);
             } else {
-                data[outIdx] = 0.0f;
+                // Gap filling (interpolation) for dead pixels with zero weight.
+                // Search in a 3x3 window for neighbors that do have weight.
+                double sumVal = 0.0, sumW = 0.0;
+                int    py = i / width, px = i % width;
+
+                for (int dy = -1; dy <= 1; ++dy) {
+                    for (int dx = -1; dx <= 1; ++dx) {
+                        int ny = py + dy, nx = px + dx;
+                        if (ny < 0 || ny >= height || nx < 0 || nx >= width) continue;
+                        
+                        size_t nIdx = ny * width + nx;
+                        double nw   = weightAccum[c * pixelCount + nIdx];
+                        if (nw > 1e-12) {
+                            sumVal += accum[c * pixelCount + nIdx] / nw;
+                            sumW   += 1.0;
+                        }
+                    }
+                }
+
+                if (sumW > 0.0) {
+                    data[outIdx] = static_cast<float>(sumVal / sumW);
+                } else {
+                    // Larger 5x5 fallback for persistent holes
+                    double fVal = 0.0, fW = 0.0;
+                    for (int dy = -2; dy <= 2; ++dy) {
+                        for (int dx = -2; dx <= 2; ++dx) {
+                            int ny = py + dy, nx = px + dx;
+                            if (ny < 0 || ny >= height || nx < 0 || nx >= width) continue;
+                            size_t nIdx = ny * width + nx;
+                            double nw   = weightAccum[c * pixelCount + nIdx];
+                            if (nw > 1e-12) {
+                                double dist = std::sqrt(dx*dx + dy*dy);
+                                double weight = 1.0 / (1.0 + dist);
+                                fVal += (accum[c * pixelCount + nIdx] / nw) * weight;
+                                fW   += weight;
+                            }
+                        }
+                    }
+                    data[outIdx] = fW > 0.0 ? static_cast<float>(fVal / fW) : 0.0f;
+                }
             }
         }
     }

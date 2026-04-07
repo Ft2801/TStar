@@ -279,6 +279,7 @@ bool StackingCommands::cmdCd(const ScriptCommand& cmd)
     }
 
     s_workingDir = dir.absolutePath();
+    QDir::setCurrent(s_workingDir);
 
     if (s_runner) {
         s_runner->setWorkingDirectory(s_workingDir);
@@ -540,6 +541,16 @@ bool StackingCommands::cmdStack(const ScriptCommand& cmd)
     if (cmd.hasOption("pixfrac"))
         params.drizzlePixFrac = cmd.option("pixfrac").toDouble();
 
+    // Bayer Pattern override (CFA Drizzle)
+    if (cmd.hasOption("cfa") || cmd.hasOption("bayer")) {
+        QString pattern = cmd.option("cfa", cmd.option("bayer")).toUpper();
+        if      (pattern == "RGGB") params.bayerPattern = Preprocessing::BayerPattern::RGGB;
+        else if (pattern == "BGGR") params.bayerPattern = Preprocessing::BayerPattern::BGGR;
+        else if (pattern == "GBRG") params.bayerPattern = Preprocessing::BayerPattern::GBRG;
+        else if (pattern == "GRBG") params.bayerPattern = Preprocessing::BayerPattern::GRBG;
+        else params.bayerPattern = Preprocessing::BayerPattern::Auto;
+    }
+
     if (params.drizzle && s_runner) {
         // Validate registration
         bool hasReg = false;
@@ -664,7 +675,7 @@ bool StackingCommands::cmdCalibrate(const ScriptCommand& cmd)
         fullPaths << dir.absoluteFilePath(f);
 
     // -- Configure preprocessing parameters ----------------------------------
-    Preprocessing::PreprocessParams params;
+    Preprocessing::PreprocessParams params = s_preprocessor.params();
 
     if (cmd.hasOption("bias")) {
         params.masterBias = resolvePath(cmd.option("bias"));
@@ -680,8 +691,7 @@ bool StackingCommands::cmdCalibrate(const ScriptCommand& cmd)
     }
 
     // Dark optimization.
-    params.darkOptim.enabled =
-        cmd.hasOption("dark_optimize") || cmd.hasOption("cc");
+    params.darkOptim.enabled = cmd.hasOption("dark_optimize");
 
     // Optional debayering during calibration.
     if (cmd.hasOption("debayer")) {
@@ -826,7 +836,14 @@ bool StackingCommands::cmdSetMaster(const ScriptCommand& cmd)
     else if (type == "darkflat")                 masterType = Preprocessing::MasterType::DarkFlat;
     else                                         return false;
 
-    return s_preprocessor.masters().load(masterType, path);
+    Preprocessing::PreprocessParams params = s_preprocessor.params();
+    if      (masterType == Preprocessing::MasterType::Bias)     { params.masterBias = path; params.useBias = true; }
+    else if (masterType == Preprocessing::MasterType::Dark)     { params.masterDark = path; params.useDark = true; }
+    else if (masterType == Preprocessing::MasterType::Flat)     { params.masterFlat = path; params.useFlat = true; }
+    else if (masterType == Preprocessing::MasterType::DarkFlat) { params.masterDarkFlat = path; }
+
+    s_preprocessor.setParams(params);
+    return s_preprocessor.masters().isLoaded(masterType);
 }
 
 // ============================================================================
@@ -922,9 +939,9 @@ bool StackingCommands::cmdBackground(const ScriptCommand& cmd)
         // Use the currently active sequence if no prefix specified.
     }
 
-    int   degree    = cmd.option("degree",    "1").toInt();
+    int   degree    = cmd.option("degree",    "2").toInt();
     float tolerance = cmd.option("tolerance", "3.0").toFloat();
-    float smoothing = cmd.option("smoothing", "0.0").toFloat();
+    float smoothing = cmd.option("smoothing", "0.5").toFloat();
     bool  division  = cmd.hasOption("div") || cmd.hasOption("division");
 
     Background::BackgroundExtractor extractor;

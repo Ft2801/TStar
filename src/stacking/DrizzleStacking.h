@@ -46,7 +46,7 @@ public:
      * @brief Configuration for a drizzle pass.
      */
     struct DrizzleParams {
-        double dropSize      = 0.5;   ///< Pixel shrink factor (0.3 - 1.0)
+        double dropSize      = 0.8;   ///< Pixel shrink factor (0.3 - 1.0)
         double scaleFactor   = 2.0;   ///< Output upscale factor
         bool   useWeightMaps = true;  ///< Use per-pixel weight maps
         int    kernelType    = 0;     ///< 0 = square, 1 = Gaussian, 2 = point, 3 = turbo, 4 = Lanczos
@@ -57,12 +57,19 @@ public:
     /**
      * @brief Compute the drizzle coordinate map for a single input image.
      */
-    static Stacking::DrizzleMap computeDrizzleMap(const ImageBuffer& input,
-                                                  const RegistrationData& reg,
-                                                  int outWidth, int outHeight,
-                                                  double scale,
-                                                  double offsetX = 0.0,
-                                                  double offsetY = 0.0);
+    static DrizzleMap computeDrizzleMap(
+        const ImageBuffer& input,
+        const RegistrationData& reg,
+        int outputWidth, int outputHeight,
+        double scale, double offsetX, double offsetY);
+
+    /** @brief Matrix-based point projection (Full Homography). */
+    static inline void projectPoint(const double H[3][3], double x, double y, float& xout, float& yout) {
+        const double z = H[2][0] * x + H[2][1] * y + H[2][2];
+        const double s = (std::abs(z) > 1e-9) ? 1.0 / z : 1.0;
+        xout = static_cast<float>((H[0][0] * x + H[0][1] * y + H[0][2]) * s);
+        yout = static_cast<float>((H[1][0] * x + H[1][1] * y + H[1][2]) * s);
+    }
 
     /**
      * @brief Divide accumulated values by accumulated weights to produce

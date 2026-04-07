@@ -282,6 +282,41 @@ struct RegistrationData {
     }
 
     /**
+     * @brief Compute a unified drizzle matrix.
+     * @param scale Original drizzle scale factor.
+     * @param offsetX Framing/Crop X offset.
+     * @param offsetY Framing/Crop Y offset.
+     * @param outH Resulting 3x3 matrix.
+     */
+    void getDrizzleMatrix(double scale, double offsetX, double offsetY, double outH[3][3]) const
+    {
+        // Compute Drizzle Scaling + Shifting matrix S
+        // Formula: X' = (X - off) * scale + 0.5 * (scale - 1)
+        // This expands to: X' = X * scale + [0.5 * (scale - 1) - off * scale]
+        
+        double s = scale;
+        double tx = 0.5 * (s - 1.0) - (offsetX * s);
+        double ty = 0.5 * (s - 1.0) - (offsetY * s);
+
+        double S[3][3] = {
+            {s, 0, tx},
+            {0, s, ty},
+            {0, 0, 1.0}
+        };
+
+        // outH = S * H (Matrix multiplication: Scale/Shift * Registration)
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                outH[i][j] = 0;
+                for (int k = 0; k < 3; ++k) {
+                    outH[i][j] += S[i][k] * H[k][j];
+                }
+            }
+        }
+    }
+
+
+    /**
      * @brief Test whether the registration is a pure translation.
      * @return true if no rotation, scaling or projective warp is present.
      */
