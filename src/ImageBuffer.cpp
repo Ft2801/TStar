@@ -19,6 +19,7 @@
 #include "core/SimdOps.h"
 #include "core/RobustStatistics.h"
 #include "core/ColorProfileManager.h"
+#include "core/Version.h"
 
 // I/O modules
 #include "io/IccProfileExtractor.h"
@@ -159,6 +160,26 @@ QString ImageBuffer::getHeaderValue(const QString& key) const {
     if (key == "OBJECT")   return m_meta.objectName;
 
     return QString();
+}
+
+void ImageBuffer::addHistoryAction(const QString& action) {
+    if (action.isEmpty()) return;
+
+    QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    QString version   = TStar::getVersion();
+    QString entry     = QString("[%1] [%2] %3").arg(version).arg(timestamp).arg(action);
+
+    // Append to raw headers
+    m_meta.rawHeaders.push_back({"HISTORY", entry, ""});
+    m_modified = true;
+}
+
+void ImageBuffer::mergeHistory(const Metadata& other) {
+    for (const auto& card : other.rawHeaders) {
+        if (card.key == "HISTORY") {
+            m_meta.rawHeaders.push_back(card);
+        }
+    }
 }
 
 
@@ -4713,10 +4734,16 @@ void ImageBuffer::applyArcSinh(float stretchFactor) {
     WriteLock lock(this);
     if (m_data.empty()) return;
 
-    ImageBuffer original;
-    if (hasMask()) original = *this;
+    // Capture mask state and original data for blending.
+    const bool         hasM         = hasMask();
+    const bool         maskInverted = m_mask.inverted;
+    const bool         protectMode  = (m_mask.mode == "protect");
+    const float        maskOpacity  = m_mask.opacity;
+    std::vector<float> originalData;
+    if (hasM)
+        originalData = m_data; // Copy current pixels before modification.
 
-    float norm  = 1.0f / std::asinh(stretchFactor);
+    float norm  = (stretchFactor == 0.0f) ? 1.0f : 1.0f / std::asinh(stretchFactor);
     long  total = static_cast<long>(m_width) * m_height;
     int   ch    = m_channels;
 
@@ -4725,13 +4752,31 @@ void ImageBuffer::applyArcSinh(float stretchFactor) {
         long idx = i * ch;
         for (int c = 0; c < ch; ++c) {
             float v   = m_data[idx + c];
-            float out = std::asinh(v * stretchFactor) * norm;
+            float out = (stretchFactor == 0.0f) ? v : std::asinh(v * stretchFactor) * norm;
             m_data[idx + c] = std::clamp(out, 0.0f, 1.0f);
         }
     }
 
-    if (hasMask()) {
-        blendResult(original);
+    // Manual blending avoids recursive WriteLock calls and potential OpenMP deadlocks.
+    if (hasM && !m_mask.data.empty() && !originalData.empty()) {
+        #pragma omp parallel for schedule(static)
+        for (long pi = 0; pi < total; ++pi) {
+            if ((size_t)pi >= m_mask.data.size()) continue;
+
+            float alpha = m_mask.data[pi];
+            if (maskInverted)
+                alpha = 1.0f - alpha;
+            if (protectMode)
+                alpha = 1.0f - alpha;
+            alpha *= maskOpacity;
+
+            const float inv_alpha = 1.0f - alpha;
+            size_t      base      = (size_t)pi * ch;
+            for (int c = 0; c < ch; ++c) {
+                m_data[base + c] = m_data[base + c] * alpha +
+                                   originalData[base + c] * inv_alpha;
+            }
+        }
     }
 }
 
@@ -4745,8 +4790,14 @@ void ImageBuffer::applyArcSinh(float stretchFactor, float blackPoint,
     WriteLock lock(this);
     if (m_data.empty()) return;
 
-    ImageBuffer original;
-    if (hasMask()) original = *this;
+    // Capture mask state and original data for blending.
+    const bool         hasM         = hasMask();
+    const bool         maskInverted = m_mask.inverted;
+    const bool         protectMode  = (m_mask.mode == "protect");
+    const float        maskOpacity  = m_mask.opacity;
+    std::vector<float> originalData;
+    if (hasM)
+        originalData = m_data;
 
     long total    = static_cast<long>(m_width) * m_height;
     int  channels = m_channels;
@@ -4760,10 +4811,10 @@ void ImageBuffer::applyArcSinh(float stretchFactor, float blackPoint,
     #pragma omp parallel for
     for (long i = 0; i < total; ++i) {
         if (channels == 3) {
-            long idx = i * 3;
-            float rv = m_data[idx + 0];
-            float gv = m_data[idx + 1];
-            float bv = m_data[idx + 2];
+            long  idx = i * 3;
+            float rv  = m_data[idx + 0];
+            float gv  = m_data[idx + 1];
+            float bv  = m_data[idx + 2];
 
             // Subtract black point and normalize.
             float rp = std::max(0.0f, (rv - offset) / (1.0f - offset));
@@ -4773,10 +4824,10 @@ void ImageBuffer::applyArcSinh(float stretchFactor, float blackPoint,
             // Compute weighted luminance and stretch factor.
             float x = factor_r * rp + factor_g * gp + factor_b * bp;
             float k = (x <= 1e-9f)
-                ? 0.0f
-                : (stretchFactor == 0.0f
-                       ? 1.0f
-                       : std::asinh(stretchFactor * x) / (x * asinh_beta));
+                          ? 0.0f
+                          : (stretchFactor == 0.0f
+                                 ? 1.0f
+                                 : std::asinh(stretchFactor * x) / (x * asinh_beta));
 
             m_data[idx + 0] = std::clamp(rp * k, 0.0f, 1.0f);
             m_data[idx + 1] = std::clamp(gp * k, 0.0f, 1.0f);
@@ -4786,16 +4837,34 @@ void ImageBuffer::applyArcSinh(float stretchFactor, float blackPoint,
             float v  = m_data[i];
             float xp = std::max(0.0f, (v - offset) / (1.0f - offset));
             float k  = (xp <= 1e-9f)
-                ? 0.0f
-                : (stretchFactor == 0.0f
-                       ? 1.0f
-                       : std::asinh(stretchFactor * xp) / (xp * asinh_beta));
+                           ? 0.0f
+                           : (stretchFactor == 0.0f
+                                  ? 1.0f
+                                  : std::asinh(stretchFactor * xp) / (xp * asinh_beta));
             m_data[i] = std::clamp(xp * k, 0.0f, 1.0f);
         }
     }
 
-    if (hasMask()) {
-        blendResult(original);
+    // Manual blending to avoid recursive lock issues.
+    if (hasM && !m_mask.data.empty() && !originalData.empty()) {
+        #pragma omp parallel for schedule(static)
+        for (long pi = 0; pi < total; ++pi) {
+            if ((size_t)pi >= m_mask.data.size()) continue;
+
+            float alpha = m_mask.data[pi];
+            if (maskInverted)
+                alpha = 1.0f - alpha;
+            if (protectMode)
+                alpha = 1.0f - alpha;
+            alpha *= maskOpacity;
+
+            const float inv_alpha = 1.0f - alpha;
+            size_t      base      = (size_t)pi * channels;
+            for (int c = 0; c < channels; ++c) {
+                m_data[base + c] = m_data[base + c] * alpha +
+                                   originalData[base + c] * inv_alpha;
+            }
+        }
     }
 }
 

@@ -27,7 +27,9 @@ double Distortion::computePoly(double u, double v, int order,
             {
                 double val = coeffs[p][q];
                 if (val != 0.0) {
-                    res += val * std::pow(u, p) * std::pow(v, q);
+                    double up = (p == 0) ? 1.0 : std::pow(u, p);
+                    double vq = (q == 0) ? 1.0 : std::pow(v, q);
+                    res += val * up * vq;
                 }
             }
         }

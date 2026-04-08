@@ -12,13 +12,9 @@
   ![Downloads](https://img.shields.io/github/downloads/Ft2801/TStar/total)
 </div>
 
----
-
 **Author:** Fabio Tempera
 
 **Website:** [https://ft2801.github.io/TStar-Astronomy-Website/](https://ft2801.github.io/TStar-Astronomy-Website/)
-
----
 
 ## Table of Contents
 
@@ -41,8 +37,6 @@
 - [License](#license)
 - [Acknowledgments](#acknowledgments)
 
----
-
 ## Overview
 
 TStar is a high-performance, cross-platform image processing suite built with C++17 and Qt6, designed
@@ -54,8 +48,6 @@ The application targets both casual astrophotographers and advanced users who re
 control over every stage of their image processing workflow, from raw frame calibration through stacking,
 stretching, color calibration, and final export.
 
----
-
 ## Key Features
 
 | Feature | Description |
@@ -63,6 +55,7 @@ stretching, color calibration, and final export.
 | **Native FITS/XISF Support** | Full read/write compatibility with 8, 16, 32-bit integer and 32-bit floating-point FITS and XISF files |
 | **MDI Workspace** | Flexible Multi-Document Interface for simultaneous editing of multiple images |
 | **Project Management** | Full workspace projects with dedicated working directories, state persistence, and recent-project workflow |
+| **History Panel** | Per-image history panel integrated in the sidebar, showing all applied operations and one-click navigation to any past or future state |
 | **Professional Astrometry** | Native plate solver and ASTAP integration with full WCS propagation to downstream tools |
 | **Scientific Color Calibration** | PCC and SPCC workflows grounded in photometric and spectrophotometric data |
 | **Automatic Image Annotation** | Catalog overlays (Messier, NGC, IC, LdN, Sh2, Stars, Constellations) with optional WCS RA/Dec grid |
@@ -70,8 +63,7 @@ stretching, color calibration, and final export.
 | **AI Integration** | Seamless integration with GraXpert, Cosmic Clarity, and StarNet++ via a bundled Python environment |
 | **Cross-Platform** | Fully supported on Windows (MinGW) and macOS (Intel and Apple Silicon) |
 | **Scripting Engine** | Built-in TStar Script (.tss) runner for complex multi-step processing automation |
-
----
+|**Easter egg minigame**| Space themed proprietary browser minigame accessible with Ctrl + M |
 
 ## Tools and Functionalities
 
@@ -97,8 +89,6 @@ TStar provides comprehensive file format support across the entire astrophotogra
 - **Header and Metadata Preservation** -- FITS/XISF metadata propagation through processing steps, WCS persistence and editing, ICC profile support, and project snapshot persistence.
 - **SER File Support** -- Sequential SER video file reading for planetary and lucky imaging workflows.
 
----
-
 ### 2. Stretching & Linear to Non-Linear
 
 Tools for transforming raw linear sensor data into perceptually viewable images.
@@ -111,8 +101,6 @@ Tools for transforming raw linear sensor data into perceptually viewable images.
 | **Curves Transformation** | Precision spline-based contrast and color adjustment using interactive curve handles per channel. |
 | **ArcSinh Stretch** | Color-preserving stretch that boosts saturation in proportion to signal intensity while compressing dynamic range. |
 | **Star Stretch** | Specialized stretch for isolated star layers, typically used in conjunction with star masks or starless/stars workflow. |
-
----
 
 ### 3. Color Calibration & Correction
 
@@ -131,8 +119,6 @@ Tools for transforming raw linear sensor data into perceptually viewable images.
 | **Saturation** | Global saturation adjustment with optional luminance-preservation weighting. |
 | **Workspace Color Management** | ICC profile-aware color pipeline applied consistently across all tools and sessions within a workspace project. |
 
----
-
 ### 4. AI & Restoration
 
 TStar integrates with leading external AI tools through a managed Python bridge. The bundled Python
@@ -144,8 +130,6 @@ environment ensures all AI features are self-contained and do not require user-m
 | **GraXpert** | AI-powered gradient removal. TStar launches GraXpert as a background process and exchanges images via the bridge script. |
 | **StarNet++** | Automated star removal to produce starless images for independent background and nebulosity processing. |
 | **Aberration Remover (RAR)** | Corrects chromatic aberration, star elongation, and residual optical artifacts using learning-based approaches. |
-
----
 
 ### 5. Channel Management
 
@@ -164,8 +148,6 @@ environment ensures all AI features are self-contained and do not require user-m
 | **NB to RGB Stars** | Blends narrowband star data with RGB star channels for natural-looking star colors in narrowband composites. |
 | **Narrowband Normalization** | Balances narrowband channels for compositing with configurable highlight recovery to prevent channel clipping. |
 | **Multiscale Decomposition** | Decomposes an image into wavelet scale layers for independent per-scale contrast and detail editing. |
-
----
 
 ### 6. Masking
 
@@ -189,8 +171,6 @@ pipeline across all compatible tools.
 - Binary and continuous mask types
 - Per-tool mask assignment and management
 
----
-
 ### 7. Image Pipeline (Preprocessing)
 
 TStar includes a complete preprocessing and stacking suite for calibrating and integrating raw light frames.
@@ -204,8 +184,6 @@ TStar includes a complete preprocessing and stacking suite for calibrating and i
 | **Drizzle Stacking** | Full drizzle integration and fast drizzle mode for undersampled datasets, improving resolution and sampling. |
 | **Normalization** | Frame-level and overlap-based normalization to equalize sky background levels before integration. |
 | **Weighting** | Signal-to-noise and quality-based frame weighting for optimal integration contribution. |
-
----
 
 ### 8. Utilities & Effects
 
@@ -225,13 +203,11 @@ TStar includes a complete preprocessing and stacking suite for calibrating and i
 | **Rotate & Crop** | Precision rotation and cropping with aspect ratio constraints, individual pixel accuracy, and batch processing support. |
 | **Image Binning** | Reduces image dimensions by combining adjacent pixels to improve signal-to-noise ratio or reduce file size. |
 | **Image Upscale** | Enlarges images using selectable interpolation methods: Nearest Neighbor, Bilinear, Bicubic, or Lanczos4. |
+| **WCS Mosaic Builder** | Assembles multiple plate-solved images into a single seamless mosaic.|
 | **RAW to FITS Converter** | Batch converts camera RAW files (Canon, Nikon, Sony, and others) to FITS format. |
 | **FITS Header Editor** | Full FITS keyword viewer and editor with import from another file support. |
-| **RAW Editor** | Lightroom-style light and color development controls applied to linear data. |
 | **AstroSpike** | Generates artificial diffraction spikes around bright stars for aesthetic effect. |
 | **RawEditor** | Non-destructive light and color editor (exposure, contrast, highlights, shadows, white balance) for linear image development. |
-
----
 
 ### 9. Workspace & Views
 
@@ -248,8 +224,6 @@ TStar includes a complete preprocessing and stacking suite for calibrating and i
 | **AutoStretch Target Median** | Configurable target median presets that control how aggressively the display stretch is applied. |
 | **Linked Views** | Optional synchronized zoom and pan across all open image windows for side-by-side comparison. |
 
----
-
 ### 10. Scripting & Automation
 
 TStar includes a built-in scripting engine that enables automated multi-step processing workflows.
@@ -260,8 +234,6 @@ TStar includes a built-in scripting engine that enables automated multi-step pro
 | **Script Runner** | Integrated script editor and runner with output logging and error reporting. |
 | **Stacking Automation Scripts** | Pre-built scripts for common stacking workflows (calibration, registration, integration). |
 | **Script Browser** | File browser for discovering and launching scripts from a centralized or project-local script directory. |
-
----
 
 ## Translations
 
@@ -274,8 +246,6 @@ TStar is available in multiple languages. Translation files are located in the `
 | Spanish | `es` | Available |
 | French | `fr` | Available |
 | Italian | `it` | Available |
-
----
 
 ## Installation
 
@@ -299,8 +269,6 @@ TStar for macOS is distributed as a signed DMG installer package for both Apple 
    - **Intel Mac:** x86_64 build
 3. Open the DMG and drag TStar into your Applications folder.
 4. On first launch, if macOS Gatekeeper blocks the app, right-click the application and select **Open** to bypass the unsigned app warning.
-
----
 
 ## Building from Source
 
@@ -334,15 +302,11 @@ chmod +x ./src/build_macos.sh
 
 See [BUILDING.md](BUILDING.md) for complete dependency setup, deployment packaging, and DMG creation instructions.
 
----
-
 ## License
 
 Copyright (C) 2026 Fabio Tempera.
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for the full license text.
-
----
 
 ## Acknowledgments
 

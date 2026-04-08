@@ -76,7 +76,7 @@ void StackingEngine::configureForMasterBias(StackingArgs& args)
     args.params.sigmaLow  = 3.0f;
     args.params.sigmaHigh = 3.0f;
 
-    args.params.maximizeFraming   = false;
+    args.params.framingMode       = FramingMode::Reference;
     args.params.upscaleAtStacking = false;
     args.params.drizzle           = false;
 }
@@ -98,7 +98,7 @@ void StackingEngine::configureForMasterDark(StackingArgs& args)
     args.params.sigmaLow  = 3.0f;
     args.params.sigmaHigh = 3.0f;
 
-    args.params.maximizeFraming   = false;
+    args.params.framingMode       = FramingMode::Reference;
     args.params.upscaleAtStacking = false;
     args.params.drizzle           = false;
 }
@@ -120,7 +120,7 @@ void StackingEngine::configureForMasterFlat(StackingArgs& args)
     args.params.sigmaLow  = 3.0f;
     args.params.sigmaHigh = 3.0f;
 
-    args.params.maximizeFraming   = false;
+    args.params.framingMode       = FramingMode::Reference;
     args.params.upscaleAtStacking = false;
     args.params.drizzle           = false;
 }
@@ -593,10 +593,16 @@ void StackingEngine::computeOutputDimensions(const StackingArgs& args,
 {
     const ImageSequence* seq = args.sequence;
 
-    if (args.params.maximizeFraming && seq->hasRegistration()) {
-        // Compute bounding box encompassing all registered frames
-        double minX = 0,              maxX = seq->width();
-        double minY = 0,              maxY = seq->height();
+    if (args.params.framingMode != FramingMode::Reference && seq->hasRegistration()) {
+        // We accumulate boundaries
+        double minX = (args.params.framingMode == FramingMode::Intersection) ? -1e9 :  1e9;
+        double maxX = (args.params.framingMode == FramingMode::Intersection) ?  1e9 : -1e9;
+        double minY = (args.params.framingMode == FramingMode::Intersection) ? -1e9 :  1e9;
+        double maxY = (args.params.framingMode == FramingMode::Intersection) ?  1e9 : -1e9;
+
+        // Ensure we handle the reference frame explicitly if intersection minX/Y stays unbounded.
+        // Initialize properly using the first valid frame limits to avoid bounding limit errors.
+        bool first = true;
 
         for (int idx : args.imageIndices) {
             const auto& img = seq->image(idx);
@@ -608,44 +614,69 @@ void StackingEngine::computeOutputDimensions(const StackingArgs& args,
                 reg = img.registration;
             }
             
+            double curMinX = 1e9, curMaxX = -1e9;
+            double curMinY = 1e9, curMaxY = -1e9;
+            
             if (reg.isShiftOnly()) {
-                // By definition, output_x = source_x + shiftX when backward mapping: nx = x - shiftX
-                // So forward mapping is: out_x = in_x + round(reg.shiftX)
                 double dx = reg.shiftX;
                 double dy = reg.shiftY;
-                minX = std::min(minX, dx);
-                minY = std::min(minY, dy);
-                maxX = std::max(maxX, img.width + dx);
-                maxY = std::max(maxY, img.height + dy);
+                curMinX = dx;
+                curMinY = dy;
+                curMaxX = img.width + dx;
+                curMaxY = img.height + dy;
             } else {
-                // Compute output bounds precisely by sampling the entire image boundary polygon.
-                // 4 corners alone fail to capture inward or outward bulging introduced by heavy 
-                // homographies or SIP distortion polynomials. Dense sampling ensures exact bounding boxes.
                 auto evaluateMappingExtent = [&](double sx, double sy) {
                     QPointF p = reg.transform(sx, sy);
-                    minX = std::min(minX, p.x());
-                    minY = std::min(minY, p.y());
-                    maxX = std::max(maxX, p.x());
-                    maxY = std::max(maxY, p.y());
+                    curMinX = std::min(curMinX, p.x());
+                    curMinY = std::min(curMinY, p.y());
+                    curMaxX = std::max(curMaxX, p.x());
+                    curMaxY = std::max(curMaxY, p.y());
                 };
                 
                 const int steps = 50;
                 for (int i = 0; i <= steps; ++i) {
                     double t = static_cast<double>(i) / steps;
-                    
-                    // Top and Bottom edges
                     evaluateMappingExtent(img.width * t, 0);
                     evaluateMappingExtent(img.width * t, img.height);
-                    
-                    // Left and Right edges
                     evaluateMappingExtent(0, img.height * t);
                     evaluateMappingExtent(img.width, img.height * t);
                 }
-                
-                // Add a margin of 1.0 for interpolation kernel safety 
-                minX -= 1.0; minY -= 1.0;
-                maxX += 1.0; maxY += 1.0;
             }
+            
+            if (first) {
+                minX = curMinX; maxX = curMaxX;
+                minY = curMinY; maxY = curMaxY;
+                first = false;
+            } else {
+                if (args.params.framingMode == FramingMode::Union) {
+                    minX = std::min(minX, curMinX);
+                    minY = std::min(minY, curMinY);
+                    maxX = std::max(maxX, curMaxX);
+                    maxY = std::max(maxY, curMaxY);
+                } else if (args.params.framingMode == FramingMode::Intersection) {
+                    minX = std::max(minX, curMinX);
+                    minY = std::max(minY, curMinY);
+                    maxX = std::min(maxX, curMaxX);
+                    maxY = std::min(maxY, curMaxY);
+                }
+            }
+        }
+        
+        // Ensure intersection actually produces a valid (>0) rectangle
+        if (args.params.framingMode == FramingMode::Intersection) {
+            if (maxX <= minX || maxY <= minY) {
+                // Failsafe: Revert to reference if intersection is empty
+                minX = 0; maxX = seq->width();
+                minY = 0; maxY = seq->height();
+            } else {
+                // Optional crop margin to avoid interpolator border artifacts on "min"
+                minX += 1.0; minY += 1.0;
+                maxX -= 1.0; maxY -= 1.0;
+            }
+        } else {
+            // Margin for interpolators on "Union"
+            minX -= 1.0; minY -= 1.0;
+            maxX += 1.0; maxY += 1.0;
         }
 
         width   = static_cast<int>(std::ceil(maxX - minX));

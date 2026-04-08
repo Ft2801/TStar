@@ -435,6 +435,13 @@ void StarRecompositionDialog::onApply()
                      result, params, &err)) {
         MainWindowCallbacks* mw = getCallbacks();
         if (mw) {
+            // Inherit metadata from starless image and merge history from stars image
+            result.setMetadata(starlessViewer->getBuffer().metadata());
+            result.mergeHistory(starsViewer->getBuffer().metadata());
+            result.addHistoryAction(tr("Star Recomposition from %1 and %2")
+                                    .arg(m_cmbStarless->currentText())
+                                    .arg(m_cmbStars->currentText()));
+
             QString newName = m_cmbStarless->currentText() + "_recomposed";
             mw->createResultWindow(result, newName);
             mw->logMessage(

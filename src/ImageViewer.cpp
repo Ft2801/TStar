@@ -736,6 +736,9 @@ void ImageViewer::pushUndo(const QString& description)
         trimStack(m_undoStack, m_undoDescriptions);
     }
 
+    if (!description.isEmpty())
+        m_buffer.addHistoryAction(description);
+
     m_undoStack.push_back(m_buffer);
     m_undoDescriptions.push_back(description);
     m_redoStack.clear();
@@ -1450,6 +1453,7 @@ void ImageViewer::mouseReleaseEvent(QMouseEvent* event)
                 ImageBuffer newBuf = m_buffer;
                 newBuf.cropRotated(r.center().x(), r.center().y(),
                                    rect.width(), rect.height(), 0);
+                newBuf.addHistoryAction(tr("Crop from Selection (ROI)"));
                 emit requestNewView(newBuf, tr("Selection"));
             }
         }

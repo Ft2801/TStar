@@ -3554,6 +3554,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Assembles multiple plate-solved images into a single seamless mosaic:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>AstroSpike</source>
             <translation type="unfinished" />
         </message>
@@ -3715,6 +3719,10 @@
         </message>
         <message>
             <source>Choose Subtract or Divide mode</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Choose a reference anchor image that defines the output projection plane and pixel scale</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4022,6 +4030,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Each subsequent entry corresponds to a processing operation that has been applied</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Effects</source>
             <translation type="unfinished" />
         </message>
@@ -4179,6 +4191,10 @@
         </message>
         <message>
             <source>Histogram:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>History Panel</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4826,6 +4842,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Select two or more open images — all must carry valid WCS astrometric solutions</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Select two views from the dropdown menus</source>
             <translation type="unfinished" />
         </message>
@@ -4839,6 +4859,10 @@
         </message>
         <message>
             <source>Set black clipping level</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Set the feathering distance (pixels) to control the width of the blending transition between panels</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5034,6 +5058,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>The current state is displayed in bold so you can immediately locate your position in the history</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>The project becomes active and sets its directory as the working location</source>
             <translation type="unfinished" />
         </message>
@@ -5043,6 +5071,10 @@
         </message>
         <message>
             <source>The tool will balance RGB channels</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>The topmost entry represents the original unmodified state of the image</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5179,6 +5211,10 @@
         </message>
         <message>
             <source>Visualizes the color distribution of stars after Photometric Color Calibration:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>WCS Mosaic Builder</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5406,6 +5442,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Image Blended with %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Image Blending</source>
             <translation type="unfinished" />
         </message>
@@ -5483,6 +5523,10 @@
     </context>
     <context>
         <name>ImageViewer</name>
+        <message>
+            <source>Crop from Selection (ROI)</source>
+            <translation type="unfinished" />
+        </message>
         <message>
             <source>Selection</source>
             <translation type="unfinished" />
@@ -5865,6 +5909,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Combined Channels (RGB)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Confirm Deletion</source>
             <translation type="unfinished" />
         </message>
@@ -5898,6 +5946,10 @@
         </message>
         <message>
             <source>Cosmic Clarity Error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cosmic Clarity application</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -6134,6 +6186,10 @@
         </message>
         <message>
             <source>GraXpert</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>GraXpert application</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -7278,6 +7334,10 @@
         </message>
         <message>
             <source>before opening another project</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>extracted %1 channel</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -9440,6 +9500,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Aberration Remover (RAR)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Aborted by user.</source>
             <translation type="unfinished" />
         </message>
@@ -11299,7 +11363,15 @@
     <context>
         <name>StackingCommands</name>
         <message>
+            <source> &gt; %1 -&gt; %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>(no .tif files found)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Auto-Debayering CFA images...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11307,7 +11379,27 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Batch background extraction: processing %1 files</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Batch removal complete: %1 of %2 files processed</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Calibrating frames...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Changed working directory to: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Conversion complete: %1 success, %2 failed</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Convert: No files found to convert.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11315,11 +11407,51 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Converting %1 files using %2 threads...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cropping to %1,%2 size %3x%4</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Debayer: No files found matching </source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Debayered %1 images</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Drizzle ENABLED: Scale=%1x, PixFrac=%2, Mode=%3</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Exception converting %1: %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Failed to compute model for: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Failed to load %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Failed to load: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to save %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Fast (Nearest-Neighbor)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Filtering sequence by roundness: %1%2</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11331,7 +11463,43 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Framing mode set to: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image Stats: Min=%1, Max=%2, Mean=%3</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>NOTE: PixFrac is ignored in Fast Drizzle mode.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>No roundness data available to perform filtering. Run register first to calculate metrics.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Note: TStar applies registration and framing dynamically during 'stack'.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Options: -force</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Options: -nocache</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Pipeline complete! Output: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>PixelMath error: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Plate solving reference frame for sequence '%1'...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11339,11 +11507,55 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>RGB Equalization: DISABLED (Preserves camera color cast)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>RGB Equalization: ENABLED (Neutralizes color cast)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reference image '%1' is already plate-solved. Using existing WCS data.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Registering frames...</source>
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Resampling image to %1x%2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Resolving relative path: '%1' -&gt; '%2'</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Rotating image by %1 degrees</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Roundness filter (k-sigma, %1k): threshold=%2, excluded %3 out of %4 frames.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Roundness filter (percent): excluded %1 out of %2 frames.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Save: failed to write %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Save: no filename specified (use positional arg or -out=...)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Save: no image loaded</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Slow (Polygon-Clipping)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11419,11 +11631,39 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>save: failed to write %1</source>
+            <source>Unknown exception converting %1</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>save: no image loaded</source>
+            <source>Updated FITS header: %1 = %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Using solver engine: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>WARNING: Drizzle requested but no registration data found. Registration must be performed before stacking for Drizzle to be effective.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>seqapplyreg: No sequence loaded. Run register first.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>seqplatesolve: No sequence loaded. Load a sequence first.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>seqplatesolve: Plate solving complete and successful.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>seqplatesolve: Plate solving failed.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>seqplatesolve: sequence name argument missing.</source>
             <translation type="unfinished" />
         </message>
     </context>
@@ -12469,7 +12709,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>StarNet++ Star Mask generation</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>StarNet++ Star Removal</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>StarNet++ Star Removal (starless)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -12601,6 +12849,10 @@
         </message>
         <message>
             <source>Star Recomposition completed: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Star Recomposition from %1 and %2</source>
             <translation type="unfinished" />
         </message>
         <message>

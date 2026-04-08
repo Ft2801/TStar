@@ -151,6 +151,16 @@ QString HelpDialog::buildHelpContent()
     html += "<li>" + tr("Closing Project: Use File > Close Project to deactivate the current project") + "</li>";
     html += "</ul>";
 
+    // -- History Panel --------------------------------------------------------
+    html += "<h3>" + tr("History Panel") + "</h3>";
+    html += "<p>" + tr("The History panel, located in the sidebar, shows the complete undo/redo stack "
+                    "for the currently active image window:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("The topmost entry represents the original unmodified state of the image") + "</li>";
+    html += "<li>" + tr("Each subsequent entry corresponds to a processing operation that has been applied") + "</li>";
+    html += "<li>" + tr("The current state is displayed in bold so you can immediately locate your position in the history") + "</li>";
+    html += "</ul>";
+
     // -- Navigation Controls --------------------------------------------------
     html += "<h2>" + tr("Navigation Controls") + "</h2>";
     html += "<ul>";
@@ -614,6 +624,14 @@ QString HelpDialog::buildHelpContent()
     html += "<ul>";
     html += "<li>" + tr("Supports all major RAW formats (Canon, Nikon, Sony, etc.)") + "</li>";
     html += "<li>" + tr("Preserves capture metadata in FITS headers") + "</li>";
+    html += "</ul>";
+
+    html += "<h3>" + tr("WCS Mosaic Builder") + "</h3>";
+    html += "<p>" + tr("Assembles multiple plate-solved images into a single seamless mosaic:") + "</p>";
+    html += "<ul>";
+    html += "<li>" + tr("Select two or more open images — all must carry valid WCS astrometric solutions") + "</li>";
+    html += "<li>" + tr("Choose a reference anchor image that defines the output projection plane and pixel scale") + "</li>";
+    html += "<li>" + tr("Set the feathering distance (pixels) to control the width of the blending transition between panels") + "</li>";
     html += "</ul>";
 
     // -- Masks ----------------------------------------------------------------

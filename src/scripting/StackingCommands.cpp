@@ -8,6 +8,7 @@
 #include "StackingCommands.h"
 #include "../io/FitsWrapper.h"
 #include "../io/FitsLoaderCWrapper.h"
+#include "../io/FitsHeaderUtils.h"
 #include "../stacking/Registration.h"
 #include "../io/TiffIO.h"
 #include "../background/BackgroundExtraction.h"
@@ -32,6 +33,9 @@
 #include <QDirIterator>
 #include <QSettings>
 #include <QRegularExpression>
+#include <QEventLoop>
+#include "../astrometry/NativePlateSolver.h"
+#include "../astrometry/AstapSolver.h"
 
 #include <mutex>
 
@@ -48,6 +52,7 @@ namespace Scripting {
 std::unique_ptr<Stacking::ImageSequence>  StackingCommands::s_sequence;
 std::unique_ptr<ImageBuffer>              StackingCommands::s_currentImage;
 QString                                   StackingCommands::s_currentFilename;
+Stacking::FramingMode                     StackingCommands::s_framingMode = Stacking::FramingMode::Reference;
 Preprocessing::PreprocessingEngine        StackingCommands::s_preprocessor;
 QString                                   StackingCommands::s_workingDir;
 ScriptRunner*                             StackingCommands::s_runner = nullptr;
@@ -198,9 +203,14 @@ void StackingCommands::registerCommands(ScriptRunner& runner)
             "Run the full pipeline: calibrate, register, stack",
             cmdAutoStack),
         CommandDef("seqapplyreg", 1, 1,
-            "seqapplyreg <name> [--prefix=] [--framing=min|max|ref]",
+            "seqapplyreg <name> [--prefix=] [--framing=min|max|ref] [-filter-round=<X>%|k]",
             "Apply stored registration transforms to a sequence",
             cmdSeqApplyReg),
+        
+        CommandDef("seqplatesolve", 1, 3,
+            "seqplatesolve <name> [-force] [-nocache]",
+            "Plate solve the reference frame of a sequence",
+            cmdSeqPlateSolve),
 
         // -- Metadata --------------------------------------------------------
         CommandDef("update_key", 2, 3,
@@ -288,7 +298,7 @@ bool StackingCommands::cmdCd(const ScriptCommand& cmd)
     if (s_runner) {
         s_runner->setWorkingDirectory(s_workingDir);
         s_runner->logMessage(
-            QString("Changed working directory to: %1").arg(s_workingDir),
+            QObject::tr("Changed working directory to: %1").arg(s_workingDir),
             "neutral");
     }
 
@@ -323,6 +333,64 @@ bool StackingCommands::cmdLoad(const ScriptCommand& cmd)
 }
 
 // ============================================================================
+// Helper for save command templating
+// ============================================================================
+static QString resolveFilenameFormat(QString path, const ImageBuffer& img) {
+    if (!path.contains("$")) return path;
+
+    QRegularExpression rx("\\$([A-Za-z0-9_\\-]+)(?::([^\\$]+))?\\$");
+    QRegularExpressionMatchIterator i = rx.globalMatch(path);
+    int offset = 0;
+    while (i.hasNext()) {
+        QRegularExpressionMatch match = i.next();
+        QString keyword = match.captured(1).toUpper();
+        QString format = match.captured(2);
+        
+        QString value = "";
+        const auto& meta = img.metadata();
+        
+        // Custom logic for EXPTIME if we want to format it nicely
+        if (keyword == "STACKCNT" && meta.stackCount > 0) {
+            value = QString::number(meta.stackCount);
+        } else if (keyword == "EXPTIME" && meta.exposure > 0.0) {
+            if (format.contains("%d") || format.contains("d")) {
+                value = QString::number(qRound(meta.exposure));
+            } else {
+                value = QString::number(meta.exposure, 'f', 2);
+            }
+        } else {
+            // Find keyword in rawHeaders
+            bool found = false;
+            for (const auto& card : meta.rawHeaders) {
+                if (card.key.toUpper() == keyword) {
+                    value = card.value.trimmed();
+                    // Strip quotes if they exist around the value
+                    if (value.startsWith("'") && value.endsWith("'")) {
+                        value = value.mid(1, value.length() - 2).trimmed();
+                    }
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (found) {
+                if (format == "dm12" && keyword == "DATE-OBS") {
+                    value = value.left(10).replace("-", ""); // Format dm12 usually means yymmdd or yyyymmdd or just stripped date. Let's provide a safe substring.
+                } else if (format.contains("d")) {
+                    value = QString::number(qRound(value.toDouble()));
+                }
+            }
+        }
+        
+        if (value.isEmpty()) value = "UNKNOWN";
+
+        path.replace(match.capturedStart() + offset, match.capturedLength(), value);
+        offset += value.length() - match.capturedLength();
+    }
+    return path;
+}
+
+// ============================================================================
 // save -- Save current image
 // ============================================================================
 
@@ -330,25 +398,24 @@ bool StackingCommands::cmdSave(const ScriptCommand& cmd)
 {
     if (!s_currentImage || !s_currentImage->isValid()) {
         if (s_runner)
-            s_runner->logMessage(QObject::tr("save: no image loaded"), "red");
+            s_runner->logMessage(QObject::tr("Save: no image loaded"), "red");
         return false;
     }
 
     // Determine output path from positional argument or option.
     QString path;
     if (cmd.args.size() > 0) {
-        path = resolvePath(cmd.args[0]);
+        path = resolvePath(resolveFilenameFormat(cmd.args[0], *s_currentImage));
     } else {
         path = cmd.option("out", cmd.option("output", ""));
         if (path.isEmpty()) {
             if (s_runner)
                 s_runner->logMessage(
-                    QObject::tr("save: no filename specified "
-                                "(use positional arg or -out=...)"),
+                    QObject::tr("Save: no filename specified (use positional arg or -out=...)"),
                     "red");
             return false;
         }
-        path = resolvePath(path);
+        path = resolvePath(resolveFilenameFormat(path, *s_currentImage));
     }
 
     // Select output bit depth.
@@ -359,7 +426,7 @@ bool StackingCommands::cmdSave(const ScriptCommand& cmd)
     if (!Stacking::FitsIO::write(path, *s_currentImage, bits)) {
         if (s_runner)
             s_runner->logMessage(
-                QObject::tr("save: failed to write %1").arg(path), "red");
+                QObject::tr("Save: failed to write %1").arg(path), "red");
         return false;
     }
 
@@ -532,10 +599,10 @@ bool StackingCommands::cmdStack(const ScriptCommand& cmd)
     if (s_runner) {
         if (params.equalizeRGB)
             s_runner->logMessage(
-                "RGB Equalization: ENABLED (Neutralizes color cast)", "orange");
+                QObject::tr("RGB Equalization: ENABLED (Neutralizes color cast)"), "orange");
         else
             s_runner->logMessage(
-                "RGB Equalization: DISABLED (Preserves camera color cast)", "green");
+                QObject::tr("RGB Equalization: DISABLED (Preserves camera color cast)"), "green");
     }
 
     // Drizzle options.
@@ -565,20 +632,19 @@ bool StackingCommands::cmdStack(const ScriptCommand& cmd)
 
         if (!hasReg) {
             s_runner->logMessage(
-                "WARNING: Drizzle requested but no registration data found. "
-                "Registration must be performed before stacking for Drizzle to be effective.", "salmon");
+                QObject::tr("WARNING: Drizzle requested but no registration data found. Registration must be performed before stacking for Drizzle to be effective."), "salmon");
         }
 
-        QString modeStr = params.drizzleFast ? "Fast (Nearest-Neighbor)" : "Slow (Polygon-Clipping)";
+        QString modeStr = params.drizzleFast ? QObject::tr("Fast (Nearest-Neighbor)") : QObject::tr("Slow (Polygon-Clipping)");
         s_runner->logMessage(
-            QString("Drizzle ENABLED: Scale=%1x, PixFrac=%2, Mode=%3")
+            QString(QObject::tr("Drizzle ENABLED: Scale=%1x, PixFrac=%2, Mode=%3"))
                 .arg(params.drizzleScale, 0, 'f', 1)
                 .arg(params.drizzlePixFrac, 0, 'f', 2)
                 .arg(modeStr), "cyan");
 
         if (params.drizzleFast && std::abs(params.drizzlePixFrac - 1.0) > 0.01) {
             s_runner->logMessage(
-                "NOTE: PixFrac is ignored in Fast Drizzle mode.", "orange");
+                QObject::tr("NOTE: PixFrac is ignored in Fast Drizzle mode."), "orange");
         }
     }
 
@@ -596,7 +662,12 @@ bool StackingCommands::cmdStack(const ScriptCommand& cmd)
             params.outputFilename += ".fit";
     }
 
-    params.maximizeFraming = cmd.hasOption("maximize");
+    if (cmd.hasOption("maximize")) {
+        params.framingMode = Stacking::FramingMode::Union;
+    } else {
+        params.framingMode = s_framingMode;
+    }
+
     params.upscaleAtStacking = cmd.hasOption("upscale");
     params.createRejectionMaps = cmd.hasOption("rejmap") || cmd.hasOption("rejmaps");
     params.overlapNormalization = cmd.hasOption("overlap_norm");
@@ -893,7 +964,7 @@ bool StackingCommands::cmdDebayer(const ScriptCommand& cmd)
         if (files.isEmpty()) {
             if (s_runner)
                 s_runner->logMessage(
-                    "Debayer: No files found matching " + prefix, "salmon");
+                    QObject::tr("Debayer: No files found matching ") + prefix, "salmon");
             return false;
         }
 
@@ -983,7 +1054,7 @@ bool StackingCommands::cmdBackground(const ScriptCommand& cmd)
 
         if (s_runner)
             s_runner->logMessage(
-                QString("Batch background extraction: processing %1 files")
+                QObject::tr("Batch background extraction: processing %1 files")
                     .arg(files.size()), "cyan");
 
         int processed = 0;
@@ -1031,7 +1102,7 @@ bool StackingCommands::cmdBackground(const ScriptCommand& cmd)
 
         if (s_runner)
             s_runner->logMessage(
-                QString("Batch removal complete: %1 of %2 files processed")
+                QString(QObject::tr("Batch removal complete: %1 of %2 files processed"))
                     .arg(processed).arg(files.size()),
                 processed > 0 ? "green" : "red");
 
@@ -1325,7 +1396,7 @@ bool StackingCommands::cmdPixelMath(const ScriptCommand& cmd)
             } else {
                 if (s_runner)
                     s_runner->logMessage(
-                        QString("PixelMath: could not load variable "
+                        QObject::tr("PixelMath: could not load variable "
                                 "'%1' from '%2'")
                             .arg(varName, path),
                         "orange");
@@ -1342,7 +1413,7 @@ bool StackingCommands::cmdPixelMath(const ScriptCommand& cmd)
 
     if (s_runner)
         s_runner->logMessage(
-            QString("PixelMath error: %1").arg(pm.lastError()), "red");
+            QObject::tr("PixelMath error: %1").arg(pm.lastError()), "red");
     return false;
 }
 
@@ -1832,7 +1903,7 @@ bool StackingCommands::cmdAutoStack(const ScriptCommand& cmd)
                     bayerDebug = "NONE";
 
                 s_runner->logMessage(
-                    QString("CFA Check - Channels: %1, Pattern: %2, "
+                    QObject::tr("CFA Check - Channels: %1, Pattern: %2, "
                             "Detected: %3")
                         .arg(checkBuf.channels())
                         .arg(bayerDebug)
@@ -1843,7 +1914,7 @@ bool StackingCommands::cmdAutoStack(const ScriptCommand& cmd)
             if (isCFA) {
                 if (s_runner)
                     emit s_runner->logMessage(
-                        "Auto-Debayering CFA images...", "cyan");
+                        QObject::tr("Auto-Debayering CFA images..."), "cyan");
 
                 QString bayerPat = checkBuf.metadata().bayerPattern;
                 if (bayerPat.isEmpty())
@@ -1889,7 +1960,7 @@ bool StackingCommands::cmdAutoStack(const ScriptCommand& cmd)
 
                     if (s_runner)
                         emit s_runner->logMessage(
-                            QString("Debayered %1 images")
+                            QObject::tr("Debayered %1 images")
                                 .arg(dbCount.loadRelaxed()),
                             "green");
 
@@ -1991,13 +2062,13 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd)
     if (files.isEmpty()) {
         if (s_runner)
             s_runner->logMessage(
-                "Convert: No files found to convert.", "orange");
+                QObject::tr("Convert: No files found to convert."), "orange");
         return true; // Empty directory is not an error.
     }
 
     if (s_runner)
         s_runner->logMessage(
-            QString("Converting %1 files using %2 threads...")
+            QObject::tr("Converting %1 files using %2 threads...")
                 .arg(files.size())
                 .arg(ResourceManager::instance().maxThreads()),
             "neutral");
@@ -2025,7 +2096,7 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd)
                 std::lock_guard<std::mutex> lock(logMutex);
                 if (s_runner)
                     s_runner->logMessage(
-                        QString(" > %1 -> %2").arg(file, outName),
+                        QObject::tr(" > %1 -> %2").arg(file, outName),
                         "#888888");
             }
 
@@ -2074,7 +2145,7 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd)
                                 std::lock_guard<std::mutex> lock(logMutex);
                                 if (s_runner)
                                     s_runner->logMessage(
-                                        QString("Warning: minor data error "
+                                        QObject::tr("Warning: minor data error "
                                                 "in %1 (non-fatal, "
                                                 "continuing)")
                                             .arg(file),
@@ -2131,7 +2202,7 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd)
                                     std::lock_guard<std::mutex> lock(logMutex);
                                     if (s_runner)
                                         s_runner->logMessage(
-                                            QString("Cannot open %1 in CFA "
+                                            QObject::tr("Cannot open %1 in CFA "
                                                     "mode: no RAW data "
                                                     "available")
                                                 .arg(file),
@@ -2254,7 +2325,7 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd)
                     std::lock_guard<std::mutex> lock(logMutex);
                     if (s_runner)
                         s_runner->logMessage(
-                            QString("Failed to save %1").arg(outName),
+                            QObject::tr("Failed to save %1").arg(outName),
                             "red");
                 }
             } else {
@@ -2262,7 +2333,7 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd)
                 std::lock_guard<std::mutex> lock(logMutex);
                 if (s_runner)
                     s_runner->logMessage(
-                        QString("Failed to load %1").arg(file), "red");
+                        QObject::tr("Failed to load %1").arg(file), "red");
             }
 
             if (s_runner)
@@ -2275,7 +2346,7 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd)
             std::lock_guard<std::mutex> lock(logMutex);
             if (s_runner)
                 s_runner->logMessage(
-                    QString("Exception converting %1: %2")
+                    QObject::tr("Exception converting %1: %2")
                         .arg(file, e.what()),
                     "red");
         } catch (...) {
@@ -2283,19 +2354,113 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd)
             std::lock_guard<std::mutex> lock(logMutex);
             if (s_runner)
                 s_runner->logMessage(
-                    QString("Unknown exception converting %1").arg(file),
+                    QObject::tr("Unknown exception converting %1").arg(file),
                     "red");
         }
     });
 
     if (s_runner)
         s_runner->logMessage(
-            QString("Conversion complete: %1 success, %2 failed")
+            QObject::tr("Conversion complete: %1 success, %2 failed")
                 .arg(convertedCount.loadRelaxed() -
                      failedCount.loadRelaxed())
                 .arg(failedCount.loadRelaxed()),
             "green");
 
+    return true;
+}
+
+// ============================================================================
+// seqplatesolve -- Plate solve the reference frame of a sequence
+// ============================================================================
+
+bool StackingCommands::cmdSeqPlateSolve(const ScriptCommand& cmd)
+{
+    if (!s_sequence || s_sequence->count() == 0) {
+        if (s_runner) s_runner->logMessage(QObject::tr("seqplatesolve: No sequence loaded. Load a sequence first."), "red");
+        return false;
+    }
+
+    if (cmd.args.isEmpty()) {
+        if (s_runner) s_runner->logMessage(QObject::tr("seqplatesolve: sequence name argument missing."), "red");
+        return false;
+    }
+
+    QString name = cmd.args[0];
+    bool force = cmd.hasOption("force");
+    bool nocache = cmd.hasOption("nocache");
+
+    if (s_runner) {
+        s_runner->logMessage(QObject::tr("Plate solving reference frame for sequence '%1'...").arg(name), "cyan");
+        if (force) s_runner->logMessage(QObject::tr("Options: -force"), "neutral");
+        if (nocache) s_runner->logMessage(QObject::tr("Options: -nocache"), "neutral");
+    }
+
+    // In TStar, registration transforms are computed via sequence plate solving
+    // and caching WCS, then matching frames into RegistrationData.
+    
+    QSettings settings("TStar Team", "TStar");
+    QString engine = settings.value("Astrometry/SolverEngine", "native").toString();
+    
+    auto& refEntry = s_sequence->image(0);
+    ImageBuffer refImg;
+    QString errorMsg;
+    if (!FitsLoader::load(refEntry.filePath, refImg, &errorMsg)) {
+        if (s_runner) s_runner->logMessage(QObject::tr("seqplatesolve: Cannot load reference image: ") + errorMsg, "red");
+        return false;
+    }
+    
+    const auto& meta = refImg.metadata();
+    
+    if (!force && FitsHeaderUtils::hasValidWCS(meta)) {
+        if (s_runner) s_runner->logMessage(QObject::tr("Reference image '%1' is already plate-solved. Using existing WCS data.").arg(QFileInfo(refEntry.filePath).fileName()), "green");
+        return true;
+    }
+    
+    double raHint = meta.ra != 0.0 ? meta.ra : 0.0;
+    double decHint = meta.dec != 0.0 ? meta.dec : 0.0;
+    double scale = (meta.focalLength > 0 && meta.pixelSize > 0) 
+        ? ((meta.pixelSize / meta.focalLength) * 206.265) : -1.0;
+    
+    NativeSolveResult solvedResult;
+    bool didSolve = false;
+    
+    if (s_runner) s_runner->logMessage(QObject::tr("Using solver engine: %1").arg(engine), "neutral");
+    
+    QEventLoop loop;
+    
+    if (engine == "astap") {
+        AstapSolver solver;
+        QObject::connect(&solver, &AstapSolver::logMessage, [](const QString& m){
+            if (s_runner) s_runner->logMessage(m, "neutral");
+        });
+        QObject::connect(&solver, &AstapSolver::finished, [&](const NativeSolveResult& r){
+            solvedResult = r;
+            didSolve = true;
+            loop.quit();
+        });
+        solver.solve(refImg, raHint, decHint, 15.0, scale);
+        loop.exec();
+    } else {
+        NativePlateSolver solver;
+        QObject::connect(&solver, &NativePlateSolver::logMessage, [](const QString& m){
+            if (s_runner) s_runner->logMessage(m, "neutral");
+        });
+        QObject::connect(&solver, &NativePlateSolver::finished, [&](const NativeSolveResult& r){
+            solvedResult = r;
+            didSolve = true;
+            loop.quit();
+        });
+        solver.solve(refImg, raHint, decHint, 15.0, scale);
+        loop.exec();
+    }
+    
+    if (didSolve && solvedResult.success) {
+        if (s_runner) s_runner->logMessage(QObject::tr("seqplatesolve: Plate solving complete and successful."), "green");
+    } else {
+        if (s_runner) s_runner->logMessage(QObject::tr("seqplatesolve: Plate solving failed."), "red");
+    }
+    
     return true;
 }
 
@@ -2313,27 +2478,92 @@ bool StackingCommands::cmdSeqApplyReg(const ScriptCommand& cmd)
     if (!s_sequence || s_sequence->count() == 0) {
         if (s_runner)
             s_runner->logMessage(
-                "seqapplyreg: No sequence loaded. Run register first.",
+                QObject::tr("seqapplyreg: No sequence loaded. Run register first."),
                 "red");
         return false;
     }
 
     if (s_runner)
         s_runner->logMessage(
-            "Applying registration to sequence: " + prefix, "cyan");
+            QObject::tr("Configuring registration application for sequence: ") + prefix, "cyan");
 
     QString outPrefix = cmd.option("prefix", "r_");
-
-    Stacking::StackingParams params;
     QString framing = cmd.option("framing", "ref").toLower();
-    if (framing == "max")
-        params.maximizeFraming = true;
+    
+    // Save framing mode globally so stack uses it.
+    if (framing == "min") {
+        s_framingMode = Stacking::FramingMode::Intersection;
+    } else if (framing == "max" || framing == "cog") {
+        s_framingMode = Stacking::FramingMode::Union;
+    } else {
+        s_framingMode = Stacking::FramingMode::Reference;
+    }
+    
+    if (s_runner) s_runner->logMessage(QObject::tr("Framing mode set to: %1").arg(framing), "neutral");
 
-    // In TStar, registration transforms are applied dynamically during
-    // stacking rather than being written out as separate files.
+    // Process image filtering logic: -filter-round
+    QString filterRound = cmd.option("filter-round", "");
+    if (!filterRound.isEmpty()) {
+        bool isPercent = filterRound.endsWith("%");
+        bool isK = filterRound.endsWith("k");
+        
+        float val = filterRound.left(filterRound.length() - 1).toFloat();
+        if (s_runner) s_runner->logMessage(QObject::tr("Filtering sequence by roundness: %1%2").arg(val).arg(isPercent ? "%" : (isK ? "k" : "")), "neutral");
+
+        std::vector<std::pair<double, int>> rounds;
+        for (int i = 0; i < s_sequence->count(); ++i) {
+            auto& img = s_sequence->image(i);
+            if (img.selected && img.quality.hasMetrics) {
+                rounds.push_back({img.quality.roundness, i});
+            }
+        }
+        
+        if (!rounds.empty()) {
+            if (isPercent) {
+                // Keep the top val percent of images with highest roundness (closer to 1.0)
+                std::sort(rounds.begin(), rounds.end(), std::greater<std::pair<double, int>>());
+                int keepCount = std::max(1, static_cast<int>(std::round(rounds.size() * (val / 100.0f))));
+                int disabled = 0;
+                for (size_t i = keepCount; i < rounds.size(); ++i) {
+                    s_sequence->image(rounds[i].second).selected = false;
+                    disabled++;
+                }
+                if (s_runner) s_runner->logMessage(QObject::tr("Roundness filter (percent): excluded %1 out of %2 frames.").arg(disabled).arg(rounds.size()), "green");
+            } else if (isK) {
+                // k-sigma filtering 
+                std::sort(rounds.begin(), rounds.end());
+                double median = rounds[rounds.size() / 2].first;
+                
+                // Compute MAD (Median Absolute Deviation)
+                std::vector<double> absDevs;
+                for (const auto& r : rounds) {
+                    absDevs.push_back(std::abs(r.first - median));
+                }
+                std::sort(absDevs.begin(), absDevs.end());
+                double mad = absDevs[absDevs.size() / 2];
+                double sigma = mad * 1.4826; // Scale to standard deviation
+                
+                // Exclude outliers based on computed k-sigma threshold.
+                double threshold = median - val * sigma;
+                
+                int disabled = 0;
+                for (const auto& r : rounds) {
+                    if (r.first < threshold) {
+                        s_sequence->image(r.second).selected = false;
+                        disabled++;
+                    }
+                }
+                if (s_runner) s_runner->logMessage(QObject::tr("Roundness filter (k-sigma, %1k): threshold=%2, excluded %3 out of %4 frames.")
+                                                   .arg(val).arg(threshold).arg(disabled).arg(rounds.size()), "green");
+            }
+        } else {
+            if (s_runner) s_runner->logMessage(QObject::tr("No roundness data available to perform filtering. Run register first to calculate metrics."), "red");
+        }
+    }
+
     if (s_runner)
         s_runner->logMessage(
-            "Note: TStar applies registration dynamically during 'stack'.",
+            QObject::tr("Note: TStar applies registration and framing dynamically during 'stack'."),
             "yellow");
 
     return true;
@@ -2352,7 +2582,7 @@ bool StackingCommands::cmdRotate(const ScriptCommand& cmd)
 
     if (s_runner)
         s_runner->logMessage(
-            QString("Rotating image by %1 degrees").arg(angle), "neutral");
+            QObject::tr("Rotating image by %1 degrees").arg(angle), "neutral");
 
     s_currentImage->rotate(angle);
     s_currentImage->setModified(true);
@@ -2380,7 +2610,7 @@ bool StackingCommands::cmdResample(const ScriptCommand& cmd)
 
     if (s_runner)
         s_runner->logMessage(
-            QString("Resampling image to %1x%2").arg(newW).arg(newH),
+            QObject::tr("Resampling image to %1x%2").arg(newW).arg(newH),
             "neutral");
 
     // Use Lanczos interpolation via OpenCV.
@@ -2432,7 +2662,7 @@ bool StackingCommands::cmdUpdateKey(const ScriptCommand& cmd)
 
     if (s_runner)
         s_runner->logMessage(
-            QString("Updated FITS header: %1 = %2").arg(key, value),
+            QObject::tr("Updated FITS header: %1 = %2").arg(key, value),
             "green");
     return true;
 }
@@ -2456,7 +2686,7 @@ bool StackingCommands::cmdCrop(const ScriptCommand& cmd)
 
     if (s_runner)
         s_runner->logMessage(
-            QString("Cropping to %1,%2 size %3x%4")
+            QObject::tr("Cropping to %1,%2 size %3x%4")
                 .arg(x).arg(y).arg(w).arg(h),
             "neutral");
 
@@ -2489,7 +2719,7 @@ bool StackingCommands::cmdStat(const ScriptCommand& cmd)
 
     if (s_runner) {
         s_runner->logMessage(
-            QString("Image Stats: Min=%1, Max=%2, Mean=%3")
+            QObject::tr("Image Stats: Min=%1, Max=%2, Mean=%3")
                 .arg(minVal).arg(maxVal).arg(mean),
             "white");
         s_runner->setVariable("STAT_MIN",  QString::number(minVal));
@@ -2585,3 +2815,5 @@ bool StackingCommands::cmdMosaic(const ScriptCommand& cmd)
 }
 
 } // namespace Scripting
+
+

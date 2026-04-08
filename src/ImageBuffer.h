@@ -489,6 +489,12 @@ public:
     bool isModified() const               { return m_modified; }
     void setModified(bool modified)       { m_modified = modified; }
 
+    /// Append a HISTORY record to the image metadata.
+    void addHistoryAction(const QString& action);
+
+    /// Append all HISTORY records from another metadata object.
+    void mergeHistory(const Metadata& other);
+
     // ---- Metadata pruning ---------------------------------------------------
 
     /// Remove catalog stars that fall outside the current image bounds.

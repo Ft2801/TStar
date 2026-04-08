@@ -229,7 +229,7 @@ static void configureStackingArgs(Stacking::StackingArgs& args,
     // weighted, reframed, upscaled, or drizzled.
     args.params.normalization      = norm;
     args.params.weighting          = Stacking::WeightingType::None;
-    args.params.maximizeFraming    = false;
+    args.params.framingMode        = Stacking::FramingMode::Reference;
     args.params.upscaleAtStacking  = false;
     args.params.drizzle            = false;
 }

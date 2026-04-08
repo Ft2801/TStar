@@ -1123,7 +1123,7 @@ Stacking::StackingParams StackingDialog::gatherParams() const
     params.force32Bit             = m_force32BitCheck->isChecked();
     params.outputNormalization    = m_outputNormCheck->isChecked();
     params.equalizeRGB            = m_equalizeRGBCheck->isChecked();
-    params.maximizeFraming        = m_maximizeFramingCheck->isChecked();
+    params.framingMode            = m_maximizeFramingCheck->isChecked() ? Stacking::FramingMode::Union : Stacking::FramingMode::Reference;
     params.createRejectionMaps    = m_createRejMapsCheck->isChecked();
     params.fastNormalization      = m_fastNormCheck->isChecked();
     params.overlapNormalization   = m_overlapNormCheck->isChecked();

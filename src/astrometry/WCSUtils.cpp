@@ -309,7 +309,9 @@ void WCSUtils::applySIP(const Metadata& meta, double u, double v,
         for (int j = 0; j <= orderA - i; ++j) {
             if (i == 0 && j == 0) continue;
             double coeff = getSIPCoeff(meta, "A_", i, j);
-            du += coeff * std::pow(u, i) * std::pow(v, j);
+            double ui = (i == 0) ? 1.0 : std::pow(u, i);
+            double vj = (j == 0) ? 1.0 : std::pow(v, j);
+            du += coeff * ui * vj;
         }
     }
 
@@ -318,7 +320,9 @@ void WCSUtils::applySIP(const Metadata& meta, double u, double v,
         for (int j = 0; j <= orderB - i; ++j) {
             if (i == 0 && j == 0) continue;
             double coeff = getSIPCoeff(meta, "B_", i, j);
-            dv += coeff * std::pow(u, i) * std::pow(v, j);
+            double ui = (i == 0) ? 1.0 : std::pow(u, i);
+            double vj = (j == 0) ? 1.0 : std::pow(v, j);
+            dv += coeff * ui * vj;
         }
     }
 }
@@ -342,7 +346,9 @@ void WCSUtils::applySIPInverse(const Metadata& meta, double u, double v,
             for (int j = 0; j <= meta.sipOrderAP - i; ++j) {
                 if (i == 0 && j == 0) continue;
                 double coeff = getSIPCoeff(meta, "AP_", i, j);
-                du += coeff * std::pow(u, i) * std::pow(v, j);
+                double ui = (i == 0) ? 1.0 : std::pow(u, i);
+                double vj = (j == 0) ? 1.0 : std::pow(v, j);
+                du += coeff * ui * vj;
             }
         }
 
@@ -350,7 +356,9 @@ void WCSUtils::applySIPInverse(const Metadata& meta, double u, double v,
             for (int j = 0; j <= meta.sipOrderBP - i; ++j) {
                 if (i == 0 && j == 0) continue;
                 double coeff = getSIPCoeff(meta, "BP_", i, j);
-                dv += coeff * std::pow(u, i) * std::pow(v, j);
+                double ui = (i == 0) ? 1.0 : std::pow(u, i);
+                double vj = (j == 0) ? 1.0 : std::pow(v, j);
+                dv += coeff * ui * vj;
             }
         }
 

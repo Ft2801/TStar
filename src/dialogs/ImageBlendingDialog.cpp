@@ -415,6 +415,11 @@ void ImageBlendingDialog::onApply()
     if (runner.run(baseV->getBuffer(), topV->getBuffer(),
                    result, params, &err)) {
         if (MainWindowCallbacks* mw = getCallbacks()) {
+            // Inherit metadata from base image and merge history from top image
+            result.setMetadata(baseV->getBuffer().metadata());
+            result.mergeHistory(topV->getBuffer().metadata());
+            result.addHistoryAction(tr("Image Blended with %1").arg(topV->windowTitle()));
+
             // Propagate the base image's display settings to the result.
             auto  mode   = static_cast<int>(baseV->getDisplayMode());
             float median = baseV->getAutoStretchMedian();

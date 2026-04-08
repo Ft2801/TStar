@@ -386,7 +386,7 @@ struct StackingParams {
     bool equalizeRGB            = false;    ///< Equalize channel medians in the output.
 
     // -- Advanced options -----------------------------------------------------
-    bool              maximizeFraming    = false;    ///< Extend canvas to include all frames.
+    FramingMode       framingMode        = FramingMode::Reference; ///< Sizing policy.
     bool              upscaleAtStacking  = false;    ///< 2x up-scale during integration.
     bool              drizzle            = false;    ///< Enable drizzle integration.
     double            drizzleScale       = 2.0;      ///< Drizzle output scale factor.

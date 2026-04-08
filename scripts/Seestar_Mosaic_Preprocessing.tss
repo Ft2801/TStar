@@ -9,17 +9,22 @@
 
 # Convert Light Frames
 cd lights
-convert light -out=../process
+link light -out=../process
 cd ../process
 
-# Basic calibration (debayer only)
+# Calibrate Light Frames
 calibrate light -debayer
 
-# Align lights for mosaic
-register pp_light
+# Platesolve 
+seqplatesolve pp_light -force -nocache
 
-# Stack calibrated lights
-stack r_pp_light rej 3 3 -norm=addscale -output_norm -rgb_equal -32b -out=result
+# Align lights
+seqapplyreg pp_light -filter-round=2.5k -framing=max
 
-save ../result
+# Stack calibrated lights to result.fit
+stack r_pp_light rej 3 3 -norm=addscale -output_norm -rgb_equal -out=result
+
+#save result using FITS keywords for the name
+load result
+save ../$OBJECT:%s$_$STACKCNT:%d$x$EXPTIME:%d$sec_T$CCD-TEMP:%d$degC_$DATE-OBS:dm12$
 close

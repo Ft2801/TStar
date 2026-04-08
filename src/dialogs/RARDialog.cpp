@@ -375,6 +375,7 @@ void RARDialog::onRun()
     // Handle results
     if (success) {
         if (mw) {
+            output.addHistoryAction(tr("Aberration Remover (RAR)"));
             mw->createResultWindow(output, rarTitle);
             mw->logMessage(tr("Aberration Removal Complete."), 1, true);
         }

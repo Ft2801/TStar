@@ -113,6 +113,7 @@ private:
     // Command handlers -- geometry and metadata
     // ========================================================================
 
+    static bool cmdSeqPlateSolve(const ScriptCommand& cmd);
     static bool cmdSeqApplyReg(const ScriptCommand& cmd);
     static bool cmdRotate(const ScriptCommand& cmd);
     static bool cmdResample(const ScriptCommand& cmd);
@@ -148,6 +149,7 @@ private:
     static std::unique_ptr<Stacking::ImageSequence>  s_sequence;
     static std::unique_ptr<ImageBuffer>              s_currentImage;
     static QString                                   s_currentFilename;  ///< Basename of last loaded/saved file.
+    static Stacking::FramingMode                     s_framingMode;
     static Preprocessing::PreprocessingEngine         s_preprocessor;
     static QString                                   s_workingDir;
     static ScriptRunner*                             s_runner;

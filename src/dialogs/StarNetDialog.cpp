@@ -171,7 +171,7 @@ void StarNetDialog::onRun()
         bool ok = runner->run(input, starless, params, &errorMsg);
 
         // Marshal results back to the GUI thread
-        QMetaObject::invokeMethod(this, [=]() {
+        QMetaObject::invokeMethod(this, [=]() mutable {
             pd->close();
             pd->deleteLater();
 
@@ -198,6 +198,7 @@ void StarNetDialog::onRun()
                             this, tr("Error"), tr("StarNet produced an empty image."));
                     } else {
                         // Create the starless result window
+                        starless.addHistoryAction(tr("StarNet++ Star Removal (starless)"));
                         cb->createResultWindow(starless, starlessTitle);
                         cb->logMessage(
                             tr("Starless image created: %1").arg(starlessTitle), 1, true);
@@ -242,6 +243,7 @@ void StarNetDialog::onRun()
                                 ImageBuffer mask;
                                 mask.setData(input.width(), input.height(),
                                              input.channels(), maskData);
+                                mask.addHistoryAction(tr("StarNet++ Star Mask generation"));
                                 cb->createResultWindow(mask, starmaskTitle);
                                 cb->logMessage(
                                     tr("Star mask created: %1").arg(starmaskTitle),

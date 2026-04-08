@@ -3554,6 +3554,10 @@
             <translation type="finished">ArcSinh:</translation>
         </message>
         <message>
+            <source>Assembles multiple plate-solved images into a single seamless mosaic:</source>
+            <translation type="finished">Fügt mehrere Plate-solved Bilder zu einem nahtlosen Mosaik zusammen:</translation>
+        </message>
+        <message>
             <source>AstroSpike</source>
             <translation type="finished">AstroSpike</translation>
         </message>
@@ -3716,6 +3720,10 @@
         <message>
             <source>Choose Subtract or Divide mode</source>
             <translation type="finished">Subtrahieren oder Dividieren Modus wählen</translation>
+        </message>
+        <message>
+            <source>Choose a reference anchor image that defines the output projection plane and pixel scale</source>
+            <translation type="finished">Wählen Sie ein Referenzbild, das die Projektionsebene und den Pixelskala definiert</translation>
         </message>
         <message>
             <source>Choose between affecting all channels or specific color ranges</source>
@@ -4022,6 +4030,10 @@
             <translation type="finished">Jede Ebene repräsentiert Strukturen auf einer bestimmten räumlichen Skala</translation>
         </message>
         <message>
+            <source>Each subsequent entry corresponds to a processing operation that has been applied</source>
+            <translation type="finished">Jeder nachfolgende Eintrag entspricht einem angewandten Verarbeitungsschritt</translation>
+        </message>
+        <message>
             <source>Effects</source>
             <translation type="finished">Effekte</translation>
         </message>
@@ -4180,6 +4192,10 @@
         <message>
             <source>Histogram:</source>
             <translation type="finished">Histogramm:</translation>
+        </message>
+        <message>
+            <source>History Panel</source>
+            <translation type="finished">Verlauf-Panel</translation>
         </message>
         <message>
             <source>Ideal for aligning separate narrowband or RGB channel exposures</source>
@@ -4826,6 +4842,10 @@
             <translation type="finished">Wählen Sie bestimmte Kanäle (R, G, B oder Alle) beim Mischen eines Monochrom-Bildes auf ein Farbbild aus.</translation>
         </message>
         <message>
+            <source>Select two or more open images — all must carry valid WCS astrometric solutions</source>
+            <translation type="finished">Wählen Sie zwei oder mehr offene Bilder aus — alle müssen gültige astrometrische WCS-Lösungen enthalten</translation>
+        </message>
+        <message>
             <source>Select two views from the dropdown menus</source>
             <translation type="finished">Wählen Sie zwei Ansichten aus den Dropdown-Menüs aus</translation>
         </message>
@@ -4840,6 +4860,10 @@
         <message>
             <source>Set black clipping level</source>
             <translation type="finished">Schwarzclipping-Level einstellen</translation>
+        </message>
+        <message>
+            <source>Set the feathering distance (pixels) to control the width of the blending transition between panels</source>
+            <translation type="finished">Legen Sie den Feather-Abstand (Pixel) fest, um die Breite des Übergangs zwischen den Panels zu steuern</translation>
         </message>
         <message>
             <source>Sharpens stars and details</source>
@@ -5034,6 +5058,10 @@
             <translation type="finished">Temperatur / Farbton</translation>
         </message>
         <message>
+            <source>The current state is displayed in bold so you can immediately locate your position in the history</source>
+            <translation type="finished">Der aktuelle Zustand wird fett angezeigt, damit Sie Ihre Position im Verlauf sofort finden können</translation>
+        </message>
+        <message>
             <source>The project becomes active and sets its directory as the working location</source>
             <translation type="finished">Das Projekt wird aktiv und legt sein Verzeichnis als Arbeitsort fest</translation>
         </message>
@@ -5044,6 +5072,10 @@
         <message>
             <source>The tool will balance RGB channels</source>
             <translation type="finished">Das Werkzeug gleicht die RGB-Kanäle aus</translation>
+        </message>
+        <message>
+            <source>The topmost entry represents the original unmodified state of the image</source>
+            <translation type="finished">Der oberste Eintrag stellt den ursprünglichen, unveränderten Zustand des Bildes dar</translation>
         </message>
         <message>
             <source>Tile views automatically (grid, horizontal, vertical) for side-by-side analysis</source>
@@ -5180,6 +5212,10 @@
         <message>
             <source>Visualizes the color distribution of stars after Photometric Color Calibration:</source>
             <translation type="finished">Visualisiert die Farbverteilung der Sterne nach der photometrischen Farbkalibrierung:</translation>
+        </message>
+        <message>
+            <source>WCS Mosaic Builder</source>
+            <translation type="finished">WCS-Mosaik</translation>
         </message>
         <message>
             <source>Wavescale HDR</source>
@@ -5406,6 +5442,10 @@
             <translation type="finished">Hohe Auflösung (2048px)</translation>
         </message>
         <message>
+            <source>Image Blended with %1</source>
+            <translation type="finished">Bild mit %1 gemischt</translation>
+        </message>
+        <message>
             <source>Image Blending</source>
             <translation type="finished">Bildmischung</translation>
         </message>
@@ -5483,6 +5523,10 @@
     </context>
     <context>
         <name>ImageViewer</name>
+        <message>
+            <source>Crop from Selection (ROI)</source>
+            <translation type="finished">Ausschnitt aus Auswahl (ROI)</translation>
+        </message>
         <message>
             <source>Selection</source>
             <translation type="finished">Auswahl</translation>
@@ -5865,6 +5909,10 @@
             <translation type="finished">Kanäle kombinieren</translation>
         </message>
         <message>
+            <source>Combined Channels (RGB)</source>
+            <translation type="finished">Kombinierte Kanäle (RGB)</translation>
+        </message>
+        <message>
             <source>Confirm Deletion</source>
             <translation type="finished">Löschen bestätigen</translation>
         </message>
@@ -5899,6 +5947,10 @@
         <message>
             <source>Cosmic Clarity Error</source>
             <translation type="finished">Cosmic Clarity Error</translation>
+        </message>
+        <message>
+            <source>Cosmic Clarity application</source>
+            <translation type="finished">Cosmic Clarity Anwendung</translation>
         </message>
         <message>
             <source>Cosmic Clarity cancelled.</source>
@@ -6135,6 +6187,10 @@
         <message>
             <source>GraXpert</source>
             <translation type="finished">GraXpert</translation>
+        </message>
+        <message>
+            <source>GraXpert application</source>
+            <translation type="finished">GraXpert Anwendung</translation>
         </message>
         <message>
             <source>Header</source>
@@ -7280,6 +7336,10 @@
         <message>
             <source>before opening another project</source>
             <translation type="finished">bevor ein anderes Projekt geöffnet wird</translation>
+        </message>
+        <message>
+            <source>extracted %1 channel</source>
+            <translation type="finished">Kanal %1 extrahiert</translation>
         </message>
     </context>
     <context>
@@ -9441,6 +9501,10 @@
             <translation type="finished">Aberrations-Entferner</translation>
         </message>
         <message>
+            <source>Aberration Remover (RAR)</source>
+            <translation type="finished">Aberrationsentferner (RAR)</translation>
+        </message>
+        <message>
             <source>Aborted by user.</source>
             <translation type="finished">Vom Benutzer abgebrochen.</translation>
         </message>
@@ -11300,28 +11364,96 @@
     <context>
         <name>StackingCommands</name>
         <message>
+            <source> &gt; %1 -&gt; %2</source>
+            <translation type="finished">&gt; %1 -&gt; %2</translation>
+        </message>
+        <message>
             <source>(no .tif files found)</source>
             <translation type="finished">(keine .tif-Dateien gefunden)</translation>
+        </message>
+        <message>
+            <source>Auto-Debayering CFA images...</source>
+            <translation type="finished">Auto-Debayering der CFA-Bilder...</translation>
         </message>
         <message>
             <source>Background extraction applied to current image</source>
             <translation type="finished">Hintergrundextraktion auf das aktuelle Bild angewendet</translation>
         </message>
         <message>
+            <source>Batch background extraction: processing %1 files</source>
+            <translation type="finished">Batch-Hintergrundextraktion: %1 Dateien werden verarbeitet</translation>
+        </message>
+        <message>
+            <source>Batch removal complete: %1 of %2 files processed</source>
+            <translation type="finished">Batch-Entfernung abgeschlossen: %1 von %2 Dateien verarbeitet</translation>
+        </message>
+        <message>
             <source>Calibrating frames...</source>
             <translation type="finished">Kalibriere Frames...</translation>
+        </message>
+        <message>
+            <source>Changed working directory to: %1</source>
+            <translation type="finished">Arbeitsverzeichnis geändert in: %1</translation>
+        </message>
+        <message>
+            <source>Conversion complete: %1 success, %2 failed</source>
+            <translation type="finished">Konvertierung abgeschlossen: %1 erfolgreich, %2 fehlgeschlagen</translation>
+        </message>
+        <message>
+            <source>Convert: No files found to convert.</source>
+            <translation type="finished">Konvertieren: Keine Dateien zum Konvertieren gefunden.</translation>
         </message>
         <message>
             <source>Converted %1 of %2 files</source>
             <translation type="finished">%1 von %2 Dateien konvertiert</translation>
         </message>
         <message>
+            <source>Converting %1 files using %2 threads...</source>
+            <translation type="finished">%1 Dateien werden mit %2 Threads konvertiert...</translation>
+        </message>
+        <message>
+            <source>Cropping to %1,%2 size %3x%4</source>
+            <translation type="finished">Zuschneiden auf %1,%2 Größe %3x%4</translation>
+        </message>
+        <message>
+            <source>Debayer: No files found matching </source>
+            <translation type="finished">Debayer: Keine passenden Dateien gefunden</translation>
+        </message>
+        <message>
+            <source>Debayered %1 images</source>
+            <translation type="finished">%1 Bilder debayered</translation>
+        </message>
+        <message>
+            <source>Drizzle ENABLED: Scale=%1x, PixFrac=%2, Mode=%3</source>
+            <translation type="finished">Drizzle AKTIVIERT: Skalierung=%1x, PixFrac=%2, Modus=%3</translation>
+        </message>
+        <message>
+            <source>Exception converting %1: %2</source>
+            <translation type="finished">Ausnahme beim Konvertieren von %1: %2</translation>
+        </message>
+        <message>
             <source>Failed to compute model for: %1</source>
             <translation type="finished">Modellberechnung fehlgeschlagen für: %1</translation>
         </message>
         <message>
+            <source>Failed to load %1</source>
+            <translation type="finished">Laden von %1 fehlgeschlagen</translation>
+        </message>
+        <message>
             <source>Failed to load: %1</source>
             <translation type="finished">Laden fehlgeschlagen: %1</translation>
+        </message>
+        <message>
+            <source>Failed to save %1</source>
+            <translation type="finished">Fehler beim Speichern von %1</translation>
+        </message>
+        <message>
+            <source>Fast (Nearest-Neighbor)</source>
+            <translation type="finished">Schnell (Nächster Nachbar)</translation>
+        </message>
+        <message>
+            <source>Filtering sequence by roundness: %1%2</source>
+            <translation type="finished">Sequenz wird nach Rundheit gefiltert: %1%2</translation>
         </message>
         <message>
             <source>Found %1 light frames</source>
@@ -11332,20 +11464,100 @@
             <translation type="finished">Gefunden: %1</translation>
         </message>
         <message>
+            <source>Framing mode set to: %1</source>
+            <translation type="finished">Framing-Modus eingestellt auf: %1</translation>
+        </message>
+        <message>
+            <source>Image Stats: Min=%1, Max=%2, Mean=%3</source>
+            <translation type="finished">Bildstatistik: Min=%1, Max=%2, Mittelwert=%3</translation>
+        </message>
+        <message>
+            <source>NOTE: PixFrac is ignored in Fast Drizzle mode.</source>
+            <translation type="finished">HINWEIS: PixFrac wird im Fast-Drizzle-Modus ignoriert.</translation>
+        </message>
+        <message>
+            <source>No roundness data available to perform filtering. Run register first to calculate metrics.</source>
+            <translation type="finished">Keine Rundheitsdaten für die Filterung verfügbar. Führen Sie zuerst register aus, um Metriken zu berechnen.</translation>
+        </message>
+        <message>
+            <source>Note: TStar applies registration and framing dynamically during 'stack'.</source>
+            <translation type="finished">Hinweis: TStar wendet Registrierung und Framing dynamisch während des 'stack' an.</translation>
+        </message>
+        <message>
+            <source>Options: -force</source>
+            <translation type="finished">Optionen: -force</translation>
+        </message>
+        <message>
+            <source>Options: -nocache</source>
+            <translation type="finished">Optionen: -nocache</translation>
+        </message>
+        <message>
             <source>Pipeline complete! Output: %1</source>
             <translation type="finished">Pipeline fertig! Ausgabe: %1</translation>
+        </message>
+        <message>
+            <source>PixelMath error: %1</source>
+            <translation type="finished">PixelMath-Fehler: %1</translation>
+        </message>
+        <message>
+            <source>Plate solving reference frame for sequence '%1'...</source>
+            <translation type="finished">Plate-solving des Referenzbildes für Sequenz '%1'...</translation>
         </message>
         <message>
             <source>Project created: %1</source>
             <translation type="finished">Projekt erstellt: %1</translation>
         </message>
         <message>
+            <source>RGB Equalization: DISABLED (Preserves camera color cast)</source>
+            <translation type="finished">RGB-Equalization: DEAKTIVIERT (Farbstich der Kamera bleibt erhalten)</translation>
+        </message>
+        <message>
+            <source>RGB Equalization: ENABLED (Neutralizes color cast)</source>
+            <translation type="finished">RGB-Equalization: AKTIVIERT (Neutralisiert den Farbstich)</translation>
+        </message>
+        <message>
+            <source>Reference image '%1' is already plate-solved. Using existing WCS data.</source>
+            <translation type="finished">Referenzbild '%1' ist bereits plate-solved. Vorhandene WCS-Daten werden verwendet.</translation>
+        </message>
+        <message>
             <source>Registering frames...</source>
             <translation type="finished">Registriere Frames...</translation>
         </message>
         <message>
+            <source>Resampling image to %1x%2</source>
+            <translation type="finished">Bild-Resampling auf %1x%2</translation>
+        </message>
+        <message>
             <source>Resolving relative path: '%1' -&gt; '%2'</source>
             <translation type="finished">Relativer Pfad wird aufgelöst: '%1' -&gt; '%2'</translation>
+        </message>
+        <message>
+            <source>Rotating image by %1 degrees</source>
+            <translation type="finished">Bild wird um %1 Grad gedreht</translation>
+        </message>
+        <message>
+            <source>Roundness filter (k-sigma, %1k): threshold=%2, excluded %3 out of %4 frames.</source>
+            <translation type="finished">Rundheitsfilter (k-sigma, %1k): Schwellenwert=%2, %3 von %4 Bildern ausgeschlossen.</translation>
+        </message>
+        <message>
+            <source>Roundness filter (percent): excluded %1 out of %2 frames.</source>
+            <translation type="finished">Rundheitsfilter (Prozent): %1 von %2 Bildern ausgeschlossen.</translation>
+        </message>
+        <message>
+            <source>Save: failed to write %1</source>
+            <translation type="finished">Speichern: Fehler beim Schreiben von %1</translation>
+        </message>
+        <message>
+            <source>Save: no filename specified (use positional arg or -out=...)</source>
+            <translation type="finished">Speichern: Kein Dateiname angegeben (verwenden Sie das Positionsargument oder -out=...)</translation>
+        </message>
+        <message>
+            <source>Save: no image loaded</source>
+            <translation type="finished">Speichern: Kein Bild geladen</translation>
+        </message>
+        <message>
+            <source>Slow (Polygon-Clipping)</source>
+            <translation type="finished">Langsam (Polygon-Clipping)</translation>
         </message>
         <message>
             <source>Stacking cancelled</source>
@@ -11421,12 +11633,40 @@
             <translation type="finished">Starte Pipeline für: %1</translation>
         </message>
         <message>
-            <source>save: failed to write %1</source>
-            <translation type="finished">speichern: Fehler beim Schreiben von %1</translation>
+            <source>Unknown exception converting %1</source>
+            <translation type="finished">Unbekannte Ausnahme beim Konvertieren von %1</translation>
         </message>
         <message>
-            <source>save: no image loaded</source>
-            <translation type="finished">Speichern: kein Bild geladen</translation>
+            <source>Updated FITS header: %1 = %2</source>
+            <translation type="finished">FITS-Header aktualisiert: %1 = %2</translation>
+        </message>
+        <message>
+            <source>Using solver engine: %1</source>
+            <translation type="finished">Solver-Engine wird verwendet: %1</translation>
+        </message>
+        <message>
+            <source>WARNING: Drizzle requested but no registration data found. Registration must be performed before stacking for Drizzle to be effective.</source>
+            <translation type="finished">WARNUNG: Drizzle angefordert, aber keine Registrierungsdaten gefunden. Die Registrierung muss vor dem Stacken durchgeführt werden, damit Drizzle wirksam ist.</translation>
+        </message>
+        <message>
+            <source>seqapplyreg: No sequence loaded. Run register first.</source>
+            <translation type="finished">seqapplyreg: Keine Sequenz geladen. Führen Sie zuerst register aus.</translation>
+        </message>
+        <message>
+            <source>seqplatesolve: No sequence loaded. Load a sequence first.</source>
+            <translation type="finished">seqplatesolve: Keine Sequenz geladen. Laden Sie zuerst eine Sequenz.</translation>
+        </message>
+        <message>
+            <source>seqplatesolve: Plate solving complete and successful.</source>
+            <translation type="finished">seqplatesolve: Plate-solving erfolgreich abgeschlossen.</translation>
+        </message>
+        <message>
+            <source>seqplatesolve: Plate solving failed.</source>
+            <translation type="finished">seqplatesolve: Plate-solving fehlgeschlagen.</translation>
+        </message>
+        <message>
+            <source>seqplatesolve: sequence name argument missing.</source>
+            <translation type="finished">seqplatesolve: Sequenzname-Argument fehlt.</translation>
         </message>
     </context>
     <context>
@@ -12471,8 +12711,16 @@
             <translation type="finished">StarNet hat leeres Bild erzeugt.</translation>
         </message>
         <message>
+            <source>StarNet++ Star Mask generation</source>
+            <translation type="finished">StarNet++ Star Mask Generierung</translation>
+        </message>
+        <message>
             <source>StarNet++ Star Removal</source>
             <translation type="finished">StarNet++ Sternentfernung</translation>
+        </message>
+        <message>
+            <source>StarNet++ Star Removal (starless)</source>
+            <translation type="finished">StarNet++ Sternentfernung (starless)</translation>
         </message>
         <message>
             <source>Starless image created: %1</source>
@@ -12604,6 +12852,10 @@
         <message>
             <source>Star Recomposition completed: %1</source>
             <translation type="finished">Stern-Rekombination abgeschlossen: %1</translation>
+        </message>
+        <message>
+            <source>Star Recomposition from %1 and %2</source>
+            <translation type="finished">Stern-Rekombination aus %1 und %2</translation>
         </message>
         <message>
             <source>Starless View:</source>

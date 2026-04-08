@@ -2462,6 +2462,7 @@ void MainWindow::extractChannels() {
 
     for (size_t i = 0; i < channels.size(); ++i) {
         if (i < 3) {
+            channels[i].addHistoryAction(tr("extracted %1 channel").arg(suffixes[i].mid(1)));
             createNewImageWindow(channels[i], buildChildTitle(baseTitle, suffixes[i]), srcMode, srcMedian, srcLinked);
         }
     }
@@ -2494,6 +2495,7 @@ void MainWindow::combineChannels() {
 
     connect(dlg, &QDialog::accepted, this, [this, dlg](){
         ImageBuffer result = dlg->getResult();
+        result.addHistoryAction(tr("Combined Channels (RGB)"));
         createNewImageWindow(result, "Combined_RGB");
         log("Channels Combined", Log_Success);
         showConsoleTemporarily(2000);
@@ -4636,7 +4638,7 @@ void MainWindow::runCosmicClarity(const CosmicClarityParams& params) {
         QString err;
         bool success = runner->run(input, result, params, &err);
 
-        QMetaObject::invokeMethod(this, [=]() {
+        QMetaObject::invokeMethod(this, [=]() mutable {
             pd->close();
             pd->deleteLater();
             thread->quit();
@@ -4647,6 +4649,7 @@ void MainWindow::runCosmicClarity(const CosmicClarityParams& params) {
             endLongProcess();
 
             if (success) {
+                result.addHistoryAction(tr("Cosmic Clarity application"));
                 createNewImageWindow(result, buildChildTitle(srcTitle, "_cc"), srcMode, srcMedian, srcLinked);
             } else if (!err.isEmpty() && err != "Process cancelled by user.") {
                 QMessageBox::critical(this, tr("Cosmic Clarity Error"), err);
@@ -4709,7 +4712,7 @@ void MainWindow::runGraXpert(const GraXpertParams& params) {
         QString err;
         bool success = runner->run(input, result, params, &err);
 
-        QMetaObject::invokeMethod(this, [=]() {
+        QMetaObject::invokeMethod(this, [=]() mutable {
             pd->close();
             pd->deleteLater();
             thread->quit();
@@ -4720,6 +4723,7 @@ void MainWindow::runGraXpert(const GraXpertParams& params) {
             endLongProcess();
 
             if (success) {
+                result.addHistoryAction(tr("GraXpert application"));
                 createNewImageWindow(result, buildChildTitle(srcTitle, "_graxpert"), srcMode, srcMedian, srcLinked);
             }
         });
