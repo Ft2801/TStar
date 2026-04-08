@@ -4,10 +4,13 @@ TStar Changelog
 Version 1.8.6
 -------------
 - Fixed a RAW conversion tool bug
+- Added mosaic composition tool
+- Added mosaic management in stacking suite
 - Added history explorer and manager
 - Added TStar signature and history on header metadata
 - Added space themed minigame (Ctrl + M)
 - Stacking suite improvements
+- Minor bugfixes
 
 Version 1.8.5
 -------------

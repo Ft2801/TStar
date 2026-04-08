@@ -86,6 +86,7 @@
 #include "dialogs/MorphologyDialog.h"
 #include "dialogs/MultiscaleDecompDialog.h"
 #include "dialogs/BlinkComparatorDialog.h"
+#include "dialogs/WCSMosaicDialog.h"
 // #include "dialogs/DeconvolutionDialog.h"
 
 // --- Dialog Headers: Effects ---
@@ -1235,6 +1236,7 @@ MainWindow::MainWindow(QWidget *parent)
     addMenuAction(utilMenu, tr("Aberration Inspector (9-Points)"),"", [this](){ openAberrationInspectorDialog(); });
     addMenuAction(utilMenu, tr("Multiscale Decomposition"),       "", [this](){ openMultiscaleDecompDialog(); });
     addMenuAction(utilMenu, tr("Blink Comparator"),               "", [this](){ openBlinkComparatorDialog(); });
+    addMenuAction(utilMenu, tr("WCS Mosaic Builder"),             "", [this](){ openWCSMosaicDialog(); });
 
     // --- F. Effects ---
     QMenu* effectMenu = processMenu->addMenu(tr("Effects"));
@@ -1376,7 +1378,7 @@ void MainWindow::tileImageViews() {
     QList<CustomMdiSubWindow*> imageWindows;
     for (auto* sub : m_mdiArea->subWindowList(QMdiArea::CreationOrder)) {
         auto* csw = qobject_cast<CustomMdiSubWindow*>(sub);
-        if (csw && !csw->isToolWindow() && csw->viewer()) {
+        if (csw && !csw->isToolWindow() && csw->viewer() && !csw->isHidden() && !csw->isShaded()) {
             imageWindows.append(csw);
         }
     }
@@ -1425,7 +1427,7 @@ void MainWindow::tileImageViewsVertical() {
     QList<CustomMdiSubWindow*> imageWindows;
     for (auto* sub : m_mdiArea->subWindowList(QMdiArea::CreationOrder)) {
         auto* csw = qobject_cast<CustomMdiSubWindow*>(sub);
-        if (csw && !csw->isToolWindow() && csw->viewer()) imageWindows.append(csw);
+        if (csw && !csw->isToolWindow() && csw->viewer() && !csw->isHidden() && !csw->isShaded()) imageWindows.append(csw);
     }
 
     int count = imageWindows.size();
@@ -1456,7 +1458,7 @@ void MainWindow::tileImageViewsHorizontal() {
     QList<CustomMdiSubWindow*> imageWindows;
     for (auto* sub : m_mdiArea->subWindowList(QMdiArea::CreationOrder)) {
         auto* csw = qobject_cast<CustomMdiSubWindow*>(sub);
-        if (csw && !csw->isToolWindow() && csw->viewer()) imageWindows.append(csw);
+        if (csw && !csw->isToolWindow() && csw->viewer() && !csw->isHidden() && !csw->isShaded()) imageWindows.append(csw);
     }
 
     int count = imageWindows.size();
@@ -5023,6 +5025,44 @@ void MainWindow::openAlignChannelsDialog() {
     CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, m_alignChannelsDlg, tr("Align Channels"));
     sub->resize(450, 450);
     centerToolWindow(sub);
+}
+
+// ============================================================================
+// WCS Mosaic Builder
+// ============================================================================
+
+/**
+ * @brief Opens the WCS Mosaic Builder dialog as a tool sub-window.
+ */
+void MainWindow::openWCSMosaicDialog() {
+    if (m_wcsMosaicDlg) {
+        m_wcsMosaicDlg->raise();
+        m_wcsMosaicDlg->activateWindow();
+    } else {
+        m_wcsMosaicDlg = new WCSMosaicDialog(this);
+        log(tr("Opening WCS Mosaic Builder..."), Log_Action, true);
+        m_wcsMosaicDlg->setAttribute(Qt::WA_DeleteOnClose);
+        connect(m_wcsMosaicDlg, &QDialog::destroyed, this, [this]() { m_wcsMosaicDlg = nullptr; });
+        
+        connect(m_wcsMosaicDlg, &WCSMosaicDialog::mosaicReady, this, [this](const ImageBuffer& buf, const QString& title) {
+            createNewImageWindow(buf, title);
+        });
+
+        CustomMdiSubWindow* sub = setupToolSubwindow(nullptr, m_wcsMosaicDlg, tr("WCS Mosaic Builder"));
+        sub->resize(600, 450);
+        centerToolWindow(sub);
+    }
+    
+    QVector<ImageViewer*> viewers;
+    for (auto* subItem : m_mdiArea->subWindowList()) {
+        if (auto* csw = qobject_cast<CustomMdiSubWindow*>(subItem)) {
+            if (!csw->isToolWindow() && csw->viewer()) {
+                viewers.push_back(csw->viewer());
+            }
+        }
+    }
+    m_wcsMosaicDlg->setAvailableImages(viewers);
+    m_wcsMosaicDlg->setViewer(currentViewer());
 }
 
 

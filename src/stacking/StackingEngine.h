@@ -174,6 +174,9 @@ private:
     /** @brief Minimum-value stacking. */
     StackResult stackMin(StackingArgs& args);
 
+    /** @brief Mosaic stacking assembly. */
+    StackResult stackMosaic(StackingArgs& args);
+
     /** @brief Drizzle integration. */
     StackResult stackDrizzle(StackingArgs& args);
 

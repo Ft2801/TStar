@@ -5333,6 +5333,13 @@
         </message>
     </context>
     <context>
+        <name>HistoryPanel</name>
+        <message>
+            <source>[Initial State]</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
         <name>ImageBlendingDialog</name>
         <message>
             <source>Add</source>
@@ -6154,6 +6161,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>History</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Home Directory changed to: %1</source>
             <translation type="unfinished" />
         </message>
@@ -6667,6 +6678,10 @@
         </message>
         <message>
             <source>Opening Temperature / Tint tool...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Opening WCS Mosaic Builder...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -7195,6 +7210,10 @@
         </message>
         <message>
             <source>View Duplicated: </source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>WCS Mosaic Builder</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11284,11 +11303,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Background extraction applied to current image</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Calibrating frames...</source>
             <translation type="unfinished" />
         </message>
         <message>
             <source>Converted %1 of %2 files</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to compute model for: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Failed to load: %1</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11377,6 +11408,10 @@
         </message>
         <message>
             <source>StarNet: starting %1 %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Starting Mosaic Computation (overlap blending)...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11978,6 +12013,18 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Error: Failed to allocate data pool</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error: Failed to allocate output buffer</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error: Failed to compute parallel blocks</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Error: Failed to preload image %1</source>
             <translation type="unfinished" />
         </message>
@@ -11987,6 +12034,10 @@
         </message>
         <message>
             <source>Error: Invalid or empty sequence</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Error: Invalid output dimensions for mosaic.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -12002,11 +12053,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Mosaic merging image %1/%2...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Normalized image %1/%2</source>
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Normalizing mosaic overlaps...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Normalizing output...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Pixel rejection algorithm skipped for Mosaic method.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -12039,6 +12102,10 @@
         </message>
         <message>
             <source>Stacking cancelled by user</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stacking cancelled or failed</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -12931,6 +12998,85 @@
         </message>
         <message>
             <source>Upscale applied.</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>WCSMosaicDialog</name>
+        <message>
+            <source> px</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>%1 images selected (requires at least 2)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Apply</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Blending panel %1...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Feathering distance:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Input Images</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Insufficient valid images or missing anchor.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Mosaic</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Mosaic Error</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Mosaic Settings</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Ready</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Reference anchor:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Resulting mosaic dimensions (%1x%2) are invalid or excessively large. Check WCS data.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Starting WCS Mosaic generation...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>WCS Mosaic Builder</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>WCS Mosaic successfully computed.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>panel</source>
             <translation type="unfinished" />
         </message>
     </context>

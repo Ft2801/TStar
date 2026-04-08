@@ -232,6 +232,7 @@ private slots:
     void openColorProfileDialog();
     void openAnnotationToolDialog();
     void openAberrationInspectorDialog();
+    void openWCSMosaicDialog();
 
     // ---- Channel operations -------------------------------------------------
     void extractChannels();
@@ -430,6 +431,7 @@ private:
     QPointer<MultiscaleDecompDialog>           m_multiscaleDecompDlg;
     QPointer<NarrowbandNormalizationDialog>    m_nbNormDlg;
     QPointer<NBtoRGBStarsDialog>               m_nbToRGBStarsDlg;
+    QPointer<class WCSMosaicDialog>            m_wcsMosaicDlg;
     QPointer<BlinkComparatorDialog>            m_blinkComparatorDlg;
     QPointer<class SettingsDialog>             m_settingsDlg;
     QPointer<class ColorProfileDialog>         m_colorProfileDlg;

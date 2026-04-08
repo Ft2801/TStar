@@ -36,7 +36,8 @@ enum class Method {
     Mean,       ///< Arithmetic mean, optionally with pixel rejection.
     Median,     ///< Pixel-wise median (robust to outliers).
     Max,        ///< Maximum value (e.g. star trails).
-    Min         ///< Minimum value (e.g. bright-artefact removal).
+    Min,        ///< Minimum value (e.g. bright-artefact removal).
+    Mosaic      ///< Mosaic assembly (overlap blending).
 };
 
 /**

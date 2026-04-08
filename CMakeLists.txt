@@ -662,6 +662,8 @@ set(TSTAR_SOURCES
     src/dialogs/AboutDialog.h
     src/dialogs/BlinkComparatorDialog.cpp
     src/dialogs/BlinkComparatorDialog.h
+    src/dialogs/WCSMosaicDialog.cpp
+    src/dialogs/WCSMosaicDialog.h
     src/dialogs/ABEDialog.cpp
     src/dialogs/ABEDialog.h
     src/dialogs/SCNRDialog.cpp

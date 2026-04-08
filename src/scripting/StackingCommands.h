@@ -88,6 +88,7 @@ private:
     // ========================================================================
 
     static bool cmdStack(const ScriptCommand& cmd);
+    static bool cmdMosaic(const ScriptCommand& cmd);
     static bool cmdCalibrate(const ScriptCommand& cmd);
     static bool cmdRegister(const ScriptCommand& cmd);
     static bool cmdNewProject(const ScriptCommand& cmd);

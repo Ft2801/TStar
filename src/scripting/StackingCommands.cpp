@@ -90,6 +90,10 @@ void StackingCommands::registerCommands(ScriptRunner& runner)
             cmdClose),
 
         // -- Stacking --------------------------------------------------------
+        CommandDef("mosaic", 0, 8,
+            "mosaic [prefix] [--out=<name>]",
+            "Stitch a sequence of images into a mosaic",
+            cmdMosaic),
         CommandDef("stack", 0, 8,
             "stack [prefix] [method] [rejection] [sigma_lo] [sigma_hi] [--out=<name>]",
             "Stack a sequence of images",
@@ -392,6 +396,7 @@ Stacking::Method StackingCommands::parseMethod(const QString& str)
     if (s == "median") return Stacking::Method::Median;
     if (s == "max")    return Stacking::Method::Max;
     if (s == "min")    return Stacking::Method::Min;
+    if (s == "mosaic") return Stacking::Method::Mosaic;
     return Stacking::Method::Mean;
 }
 
@@ -592,6 +597,10 @@ bool StackingCommands::cmdStack(const ScriptCommand& cmd)
     }
 
     params.maximizeFraming = cmd.hasOption("maximize");
+    params.upscaleAtStacking = cmd.hasOption("upscale");
+    params.createRejectionMaps = cmd.hasOption("rejmap") || cmd.hasOption("rejmaps");
+    params.overlapNormalization = cmd.hasOption("overlap_norm");
+    params.fastNormalization = cmd.hasOption("fastnorm");
 
     if (!s_sequence || s_sequence->count() == 0)
         return false;
@@ -983,14 +992,14 @@ bool StackingCommands::cmdBackground(const ScriptCommand& cmd)
             ImageBuffer buf;
             if (!Stacking::FitsIO::read(path, buf)) {
                 if (s_runner)
-                    s_runner->logMessage("Failed to load: " + files[i], "orange");
+                    s_runner->logMessage(QObject::tr("Failed to load: %1").arg(files[i]), "orange");
                 continue;
             }
 
             extractor.generateGrid(buf);
             if (!extractor.computeModel()) {
                 if (s_runner)
-                    s_runner->logMessage("Failed to compute model for: " + files[i], "orange");
+                    s_runner->logMessage(QObject::tr("Failed to compute model for: %1").arg(files[i]), "orange");
                 continue;
             }
 
@@ -1049,7 +1058,7 @@ bool StackingCommands::cmdBackground(const ScriptCommand& cmd)
 
     *s_currentImage = std::move(result);
     if (s_runner)
-        s_runner->logMessage("Background extraction applied to current image", "green");
+        s_runner->logMessage(QObject::tr("Background extraction applied to current image"), "green");
 
     return true;
 }
@@ -2547,6 +2556,32 @@ bool StackingCommands::cmdMath(const ScriptCommand& cmd)
 
     s_currentImage->setModified(true);
     return true;
+}
+
+// ========================================================================
+// cmdMosaic (mosaic union)
+// ========================================================================
+bool StackingCommands::cmdMosaic(const ScriptCommand& cmd)
+{
+    ScriptCommand modifiedCmd = cmd;
+    modifiedCmd.name = "stack";
+    modifiedCmd.options["method"] = "mosaic";
+    
+    // Default to 'mosaic' method in positional argument
+    if (modifiedCmd.args.size() >= 2) {
+        modifiedCmd.args[1] = "mosaic";
+    } else if (modifiedCmd.args.size() == 1) {
+        modifiedCmd.args.push_back("mosaic");
+    } else if (modifiedCmd.args.isEmpty()) {
+        modifiedCmd.args.push_back("");      // prefix
+        modifiedCmd.args.push_back("mosaic"); // method
+    }
+    
+    if (s_runner) {
+        s_runner->logMessage(QObject::tr("Starting Mosaic Computation (overlap blending)..."), "green");
+    }
+
+    return cmdStack(modifiedCmd);
 }
 
 } // namespace Scripting

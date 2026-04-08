@@ -5333,6 +5333,13 @@
         </message>
     </context>
     <context>
+        <name>HistoryPanel</name>
+        <message>
+            <source>[Initial State]</source>
+            <translation type="finished">[Initialzustand]</translation>
+        </message>
+    </context>
+    <context>
         <name>ImageBlendingDialog</name>
         <message>
             <source>Add</source>
@@ -6154,6 +6161,10 @@
             <translation type="finished">Histogrammtransformation angewendet.</translation>
         </message>
         <message>
+            <source>History</source>
+            <translation type="finished">Verlauf</translation>
+        </message>
+        <message>
             <source>Home Directory changed to: %1</source>
             <translation type="finished">Home-Verzeichnis geändert zu: %1</translation>
         </message>
@@ -6668,6 +6679,10 @@
         <message>
             <source>Opening Temperature / Tint tool...</source>
             <translation type="finished">Werkzeug Temperatur / Farbton wird geöffnet...</translation>
+        </message>
+        <message>
+            <source>Opening WCS Mosaic Builder...</source>
+            <translation type="finished">WCS Mosaic Builder wird geöffnet...</translation>
         </message>
         <message>
             <source>PCC Applied: R=%1 G=%2 B=%3 (BG: %4, %5, %6)</source>
@@ -7197,6 +7212,10 @@
         <message>
             <source>View Duplicated: </source>
             <translation type="finished">Ansicht Dupliziert: </translation>
+        </message>
+        <message>
+            <source>WCS Mosaic Builder</source>
+            <translation type="finished">WCS-Mosaik</translation>
         </message>
         <message>
             <source>Wavescale HDR</source>
@@ -11285,12 +11304,24 @@
             <translation type="finished">(keine .tif-Dateien gefunden)</translation>
         </message>
         <message>
+            <source>Background extraction applied to current image</source>
+            <translation type="finished">Hintergrundextraktion auf das aktuelle Bild angewendet</translation>
+        </message>
+        <message>
             <source>Calibrating frames...</source>
             <translation type="finished">Kalibriere Frames...</translation>
         </message>
         <message>
             <source>Converted %1 of %2 files</source>
             <translation type="finished">%1 von %2 Dateien konvertiert</translation>
+        </message>
+        <message>
+            <source>Failed to compute model for: %1</source>
+            <translation type="finished">Modellberechnung fehlgeschlagen für: %1</translation>
+        </message>
+        <message>
+            <source>Failed to load: %1</source>
+            <translation type="finished">Laden fehlgeschlagen: %1</translation>
         </message>
         <message>
             <source>Found %1 light frames</source>
@@ -11380,6 +11411,10 @@
         <message>
             <source>StarNet: starting %1 %2</source>
             <translation type="finished">StarNet: starte %1 %2</translation>
+        </message>
+        <message>
+            <source>Starting Mosaic Computation (overlap blending)...</source>
+            <translation type="finished">Mosaik-Berechnung gestartet (Überlappungsmischung)...</translation>
         </message>
         <message>
             <source>Starting pipeline for: %1</source>
@@ -11980,6 +12015,18 @@
             <translation type="finished">Gleiche RGB-Kanäle an...</translation>
         </message>
         <message>
+            <source>Error: Failed to allocate data pool</source>
+            <translation type="finished">Fehler: Datenpool konnte nicht zugewiesen werden</translation>
+        </message>
+        <message>
+            <source>Error: Failed to allocate output buffer</source>
+            <translation type="finished">Fehler: Ausgabepuffer konnte nicht zugewiesen werden</translation>
+        </message>
+        <message>
+            <source>Error: Failed to compute parallel blocks</source>
+            <translation type="finished">Fehler: Parallele Blöcke konnten nicht berechnet werden</translation>
+        </message>
+        <message>
             <source>Error: Failed to preload image %1</source>
             <translation type="finished">Fehler: Bild %1 konnte nicht vorab geladen werden</translation>
         </message>
@@ -11990,6 +12037,10 @@
         <message>
             <source>Error: Invalid or empty sequence</source>
             <translation type="finished">Fehler: Ungültige oder leere Sequenz</translation>
+        </message>
+        <message>
+            <source>Error: Invalid output dimensions for mosaic.</source>
+            <translation type="finished">Fehler: Ungültige Ausgabedimensionen für das Mosaik.</translation>
         </message>
         <message>
             <source>Error: No images selected for stacking</source>
@@ -12004,12 +12055,24 @@
             <translation type="finished">Lade Bild %1/%2...</translation>
         </message>
         <message>
+            <source>Mosaic merging image %1/%2...</source>
+            <translation type="finished">Mosaik-Zusammenführung von Bild %1/%2...</translation>
+        </message>
+        <message>
             <source>Normalized image %1/%2</source>
             <translation type="finished">Bild normalisiert %1/%2</translation>
         </message>
         <message>
+            <source>Normalizing mosaic overlaps...</source>
+            <translation type="finished">Normalisierung der Mosaiküberlappungen...</translation>
+        </message>
+        <message>
             <source>Normalizing output...</source>
             <translation type="finished">Normalisiere Ausgabe...</translation>
+        </message>
+        <message>
+            <source>Pixel rejection algorithm skipped for Mosaic method.</source>
+            <translation type="finished">Pixel-Ablehnungsalgorithmus für Mosaik-Methode übersprungen.</translation>
         </message>
         <message>
             <source>Preload complete.</source>
@@ -12042,6 +12105,10 @@
         <message>
             <source>Stacking cancelled by user</source>
             <translation type="finished">Stacking vom Benutzer abgebrochen</translation>
+        </message>
+        <message>
+            <source>Stacking cancelled or failed</source>
+            <translation type="finished">Stacking abgebrochen oder fehlgeschlagen</translation>
         </message>
         <message>
             <source>Stacking complete: %1 images using %2</source>
@@ -12934,6 +13001,85 @@
         <message>
             <source>Upscale applied.</source>
             <translation type="finished">Upscale angewendet.</translation>
+        </message>
+    </context>
+    <context>
+        <name>WCSMosaicDialog</name>
+        <message>
+            <source> px</source>
+            <translation type="finished"> px</translation>
+        </message>
+        <message>
+            <source>%1 images selected (requires at least 2)</source>
+            <translation type="finished">%1 Bilder ausgewählt (mindestens 2 erforderlich)</translation>
+        </message>
+        <message>
+            <source>Apply</source>
+            <translation type="finished">Anwenden</translation>
+        </message>
+        <message>
+            <source>Blending panel %1...</source>
+            <translation type="finished">Mosaik-Feld %1 wird gemischt...</translation>
+        </message>
+        <message>
+            <source>Cancel</source>
+            <translation type="finished">Abbrechen</translation>
+        </message>
+        <message>
+            <source>Feathering distance:</source>
+            <translation type="finished">Feathering-Abstand:</translation>
+        </message>
+        <message>
+            <source>Image %1</source>
+            <translation type="finished">Bild %1</translation>
+        </message>
+        <message>
+            <source>Input Images</source>
+            <translation type="finished">Eingabebilder</translation>
+        </message>
+        <message>
+            <source>Insufficient valid images or missing anchor.</source>
+            <translation type="finished">Unzureichende gültige Bilder oder fehlender Anker.</translation>
+        </message>
+        <message>
+            <source>Mosaic</source>
+            <translation type="finished">Mosaik</translation>
+        </message>
+        <message>
+            <source>Mosaic Error</source>
+            <translation type="finished">Mosaik-Fehler</translation>
+        </message>
+        <message>
+            <source>Mosaic Settings</source>
+            <translation type="finished">Mosaik-Einstellungen</translation>
+        </message>
+        <message>
+            <source>Ready</source>
+            <translation type="finished">Bereit</translation>
+        </message>
+        <message>
+            <source>Reference anchor:</source>
+            <translation type="finished">Referenzanker:</translation>
+        </message>
+        <message>
+            <source>Resulting mosaic dimensions (%1x%2) are invalid or excessively large. Check WCS data.</source>
+            <translation type="finished">Die resultierenden Mosaikabmessungen (%1x%2) sind ungültig oder übermäßig groß. Überprüfen Sie die WCS-Daten.</translation>
+        </message>
+        <message>
+            <source>Starting WCS Mosaic generation...</source>
+            <translation type="finished">WCS-Mosaik-Generierung wird gestartet...</translation>
+        </message>
+        <message>
+            <source>WCS Mosaic Builder</source>
+            <translation type="finished">WCS-Mosaik</translation>
+        </message>
+        <message>
+            <source>WCS Mosaic successfully computed.</source>
+            <translation type="finished">WCS-Mosaik erfolgreich berechnet.</translation>
+        </message>
+        <message>
+            <source>panel</source>
+            <translation type="finished">Mosaik-Feld</translation>
         </message>
     </context>
     <context>

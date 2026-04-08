@@ -492,6 +492,9 @@ StackResult StackingEngine::dispatchStacking(StackingArgs& args)
         case Method::Min:
             return stackMin(args);
 
+        case Method::Mosaic:
+            return stackMosaic(args);
+
         default:
             return StackResult::GenericError;
     }
@@ -598,23 +601,50 @@ void StackingEngine::computeOutputDimensions(const StackingArgs& args,
         for (int idx : args.imageIndices) {
             const auto& img = seq->image(idx);
             
-            if (img.registration.isShiftOnly()) {
-                double dx = img.registration.shiftX;
-                double dy = img.registration.shiftY;
+            RegistrationData reg;
+            if (!args.effectiveRegs.empty() && idx < static_cast<int>(args.effectiveRegs.size())) {
+                reg = args.effectiveRegs[idx];
+            } else {
+                reg = img.registration;
+            }
+            
+            if (reg.isShiftOnly()) {
+                // By definition, output_x = source_x + shiftX when backward mapping: nx = x - shiftX
+                // So forward mapping is: out_x = in_x + round(reg.shiftX)
+                double dx = reg.shiftX;
+                double dy = reg.shiftY;
                 minX = std::min(minX, dx);
                 minY = std::min(minY, dy);
                 maxX = std::max(maxX, img.width + dx);
                 maxY = std::max(maxY, img.height + dy);
             } else {
-                QPointF c1 = img.registration.transform(0, 0);
-                QPointF c2 = img.registration.transform(img.width, 0);
-                QPointF c3 = img.registration.transform(img.width, img.height);
-                QPointF c4 = img.registration.transform(0, img.height);
-
-                minX = std::min({minX, c1.x(), c2.x(), c3.x(), c4.x()});
-                minY = std::min({minY, c1.y(), c2.y(), c3.y(), c4.y()});
-                maxX = std::max({maxX, c1.x(), c2.x(), c3.x(), c4.x()});
-                maxY = std::max({maxY, c1.y(), c2.y(), c3.y(), c4.y()});
+                // Compute output bounds precisely by sampling the entire image boundary polygon.
+                // 4 corners alone fail to capture inward or outward bulging introduced by heavy 
+                // homographies or SIP distortion polynomials. Dense sampling ensures exact bounding boxes.
+                auto evaluateMappingExtent = [&](double sx, double sy) {
+                    QPointF p = reg.transform(sx, sy);
+                    minX = std::min(minX, p.x());
+                    minY = std::min(minY, p.y());
+                    maxX = std::max(maxX, p.x());
+                    maxY = std::max(maxY, p.y());
+                };
+                
+                const int steps = 50;
+                for (int i = 0; i <= steps; ++i) {
+                    double t = static_cast<double>(i) / steps;
+                    
+                    // Top and Bottom edges
+                    evaluateMappingExtent(img.width * t, 0);
+                    evaluateMappingExtent(img.width * t, img.height);
+                    
+                    // Left and Right edges
+                    evaluateMappingExtent(0, img.height * t);
+                    evaluateMappingExtent(img.width, img.height * t);
+                }
+                
+                // Add a margin of 1.0 for interpolation kernel safety 
+                minX -= 1.0; minY -= 1.0;
+                maxX += 1.0; maxY += 1.0;
             }
         }
 
@@ -1004,7 +1034,7 @@ StackResult StackingEngine::stackMean(StackingArgs& args)
     }
 
     if (!prepareOutput(args, outputWidth, outputHeight, channels)) {
-        args.log("Error: Failed to allocate output buffer", "red");
+        args.log(tr("Error: Failed to allocate output buffer"), "red");
         return StackResult::AllocError;
     }
 
@@ -1030,7 +1060,7 @@ StackResult StackingEngine::stackMean(StackingArgs& args)
     int largestBlockHeight;
     if (computeParallelBlocks(blocks, maxRowsInMemory, outputWidth, outputHeight,
                               channels, nbThreads, largestBlockHeight) != 0) {
-        args.log("Error: Failed to compute parallel blocks", "red");
+        args.log(tr("Error: Failed to compute parallel blocks"), "red");
         return StackResult::GenericError;
     }
 
@@ -1049,7 +1079,7 @@ StackResult StackingEngine::stackMean(StackingArgs& args)
     for (int i = 0; i < poolSize; ++i) {
         if (!dataPool[i].allocate(nbImages, pixelsPerBlock, channels,
                                   args.params.rejection, useFeathering, false)) {
-            args.log("Error: Failed to allocate data pool", "red");
+            args.log(tr("Error: Failed to allocate data pool"), "red");
             return StackResult::AllocError;
         }
     }
@@ -1095,9 +1125,14 @@ StackResult StackingEngine::stackMean(StackingArgs& args)
     }
     args.log(tr("Preload complete."), "neutral");
 
-    // ---- Cache per-frame registration shifts ----
+    // ---- Cache per-frame registration shifts and bounding geometry ----
 
-    struct FrameShift { double sx, sy; int iw, ih; };
+    struct FrameShift { 
+        double sx, sy; 
+        int iw, ih; 
+        QPointF outCorners[4]; // The 4 corners mapped to output space
+        bool isShiftOnly;
+    };
     std::vector<FrameShift> frameShifts(nbImages);
 
     for (int frame = 0; frame < nbImages; ++frame) {
@@ -1113,10 +1148,23 @@ StackResult StackingEngine::stackMean(StackingArgs& args)
             reg = imgInfo.registration;
         }
 
+        frameShifts[frame].isShiftOnly = reg.isShiftOnly();
         frameShifts[frame].sx = reg.shiftX * scale - offsetX;
         frameShifts[frame].sy = reg.shiftY * scale - offsetY;
         frameShifts[frame].iw = preloadedImages[frame].width();
         frameShifts[frame].ih = preloadedImages[frame].height();
+
+        // Calculate exact footprint polygon in output space for precise feathering
+        if (!frameShifts[frame].isShiftOnly) {
+            frameShifts[frame].outCorners[0] = reg.transform(0, 0);
+            frameShifts[frame].outCorners[1] = reg.transform(frameShifts[frame].iw, 0);
+            frameShifts[frame].outCorners[2] = reg.transform(frameShifts[frame].iw, frameShifts[frame].ih);
+            frameShifts[frame].outCorners[3] = reg.transform(0, frameShifts[frame].ih);
+            for (int i = 0; i < 4; ++i) {
+                frameShifts[frame].outCorners[i].setX(frameShifts[frame].outCorners[i].x() * scale - offsetX);
+                frameShifts[frame].outCorners[i].setY(frameShifts[frame].outCorners[i].y() * scale - offsetY);
+            }
+        }
     }
 
     const float featherDist = static_cast<float>(args.params.featherDistance);
@@ -1338,14 +1386,38 @@ StackResult StackingEngine::stackMean(StackingArgs& args)
                     }
 
                     // Feathering weight: smooth falloff near source frame borders
+                    // Computes exact Euclidean distance from current output pixel to the footprint boundaries.
                     if (useFeathering && data.mstack) {
-                        float dL = static_cast<float>(srcX);
-                        float dT = static_cast<float>(srcGY);
-                        float dR = static_cast<float>(fs.iw - 1.0 - srcX);
-                        float dB = static_cast<float>(fs.ih - 1.0 - srcGY);
-                        float minDist = std::min({dL, dT, dR, dB});
+                        float minDist = featherDist; // initialized to maximum required
+                        if (fs.isShiftOnly) {
+                            // Axis-aligned rectangle bounds in output domain
+                            float outX = static_cast<float>(x);
+                            float outY = static_cast<float>(globalY);
+                            float left = fs.sx;
+                            float top = fs.sy;
+                            float right = fs.sx + fs.iw - 1.0f;
+                            float bottom = fs.sy + fs.ih - 1.0f;
+                            minDist = std::min({outX - left, outY - top, right - outX, bottom - outY});
+                        } else {
+                            // Minimum distance to the 4 segments of the transformed footprint polygon
+                            auto distToSegment = [](const QPointF& p, const QPointF& v, const QPointF& w) -> float {
+                                float l2 = (v.x() - w.x()) * (v.x() - w.x()) + (v.y() - w.y()) * (v.y() - w.y());
+                                if (l2 == 0.0f) return std::hypot(p.x() - v.x(), p.y() - v.y());
+                                float t = std::max(0.0f, std::min(1.0f, static_cast<float>(((p.x() - v.x()) * (w.x() - v.x()) + (p.y() - v.y()) * (w.y() - v.y())) / l2)));
+                                QPointF projection(v.x() + t * (w.x() - v.x()), v.y() + t * (w.y() - v.y()));
+                                return std::hypot(p.x() - projection.x(), p.y() - projection.y());
+                            };
+                            
+                            QPointF curP(x, globalY);
+                            for (int k = 0; k < 4; ++k) {
+                                float d = distToSegment(curP, fs.outCorners[k], fs.outCorners[(k + 1) % 4]);
+                                if (d < minDist) minDist = d;
+                            }
+                        }
+
                         if (minDist < 0.0f) minDist = 0.0f;
 
+                        // Same cubic smoothstep ramp used by major processing suites
                         float weight = (minDist >= featherDist)
                             ? 1.0f
                             : [&]{ float t = minDist / featherDist;
@@ -1461,7 +1533,7 @@ StackResult StackingEngine::stackMean(StackingArgs& args)
     }
 
     if (failed || m_cancelled || args.isCancelled() || !Threading::getThreadRun()) {
-        args.log("Stacking cancelled or failed", "salmon");
+        args.log(tr("Stacking cancelled or failed"), "salmon");
         return StackResult::CancelledError;
     }
 
@@ -2354,4 +2426,141 @@ int StackingEngine::computeOptimalBlockSize(const StackingArgs& args, int output
     return height;
 }
 
+//=============================================================================
+// MOSAIC STACKING (OVERLAP BLENDING)
+//=============================================================================
+
+StackResult StackingEngine::stackMosaic(StackingArgs& args)
+{
+    int outputWidth, outputHeight, offsetX, offsetY;
+    computeOutputDimensions(args, outputWidth, outputHeight, offsetX, offsetY);
+
+    if (outputWidth <= 0 || outputHeight <= 0) {
+        args.log(tr("Error: Invalid output dimensions for mosaic."), "red");
+        return StackResult::GenericError;
+    }
+
+    int channels = args.sequence->channels();
+
+    if (!prepareOutput(args, outputWidth, outputHeight, channels)) {
+        return StackResult::AllocError;
+    }
+
+    // Pre-calculate normalization coefficients per channel per frame (same structure as stackMean)
+    struct NormCoeffs { double offset; double mul; double scale; };
+    std::vector<std::vector<NormCoeffs>> allCoeffs(channels);
+
+    for (int c = 0; c < channels; ++c) {
+        allCoeffs[c].resize(args.nbImagesToStack, {0.0, 1.0, 1.0});
+
+        if (args.params.hasNormalization()) {
+            for (int i = 0; i < args.nbImagesToStack; ++i) {
+                int seqIdx = args.imageIndices[i];
+                int sourceCh = c;
+                if (c >= 3 || args.coefficients.poffset[c].empty()) {
+                    sourceCh = 0;
+                }
+
+                if (sourceCh < 3 && seqIdx < static_cast<int>(args.coefficients.poffset[sourceCh].size())) {
+                    allCoeffs[c][i].offset = args.coefficients.poffset[sourceCh][seqIdx];
+                    allCoeffs[c][i].mul    = args.coefficients.pmul[sourceCh][seqIdx];
+                    allCoeffs[c][i].scale  = args.coefficients.pscale[sourceCh][seqIdx];
+                }
+            }
+        }
+    }
+
+    std::vector<float> weightMap(static_cast<size_t>(outputWidth) * outputHeight, 0.0f);
+    float* output = args.result.data().data();
+    
+    // Initialize output to zero
+    std::fill(output, output + static_cast<size_t>(outputWidth) * outputHeight * channels, 0.0f);
+
+    int processed = 0;
+    int featherDistance = args.params.featherDistance > 0 ? args.params.featherDistance : 100;
+
+    for (int i = 0; i < args.nbImagesToStack; ++i) {
+        int idx = args.imageIndices[i];
+        if (m_cancelled) return StackResult::CancelledError;
+
+        args.progress(tr("Mosaic merging image %1/%2...").arg(processed + 1).arg(args.nbImagesToStack),
+                      static_cast<double>(processed) / args.nbImagesToStack);
+
+        ImageBuffer buffer;
+        if (!args.sequence->readImage(idx, buffer)) continue;
+
+        std::vector<float> imgMask;
+        Blending::generateBlendMask(buffer, featherDistance, imgMask);
+        ImageBuffer maskBuffer;
+        maskBuffer.setData(buffer.width(), buffer.height(), 1, imgMask);
+
+        RegistrationData reg;
+        if (!args.effectiveRegs.empty() && idx < static_cast<int>(args.effectiveRegs.size())) {
+            reg = args.effectiveRegs[idx];
+        } else {
+            reg = args.sequence->image(idx).registration;
+        }
+
+        #pragma omp parallel for collapse(2)
+        for (int y = 0; y < outputHeight; ++y) {
+            for (int x = 0; x < outputWidth; ++x) {
+                float weight;
+                if (getShiftedPixel(maskBuffer, x, y, 0, reg, offsetX, offsetY, weight) && weight > 0.0f) {
+                    size_t wIdx = static_cast<size_t>(y) * outputWidth + x;
+                    
+                    for (int c = 0; c < channels; ++c) {
+                        float value;
+                        if (getShiftedPixel(buffer, x, y, c, reg, offsetX, offsetY, value)) {
+                            const auto& coeff = allCoeffs[c][i];
+                            switch (args.params.normalization) {
+                                case NormalizationMethod::Additive:
+                                case NormalizationMethod::AdditiveScaling:
+                                    value = static_cast<float>(value * coeff.scale - coeff.offset);
+                                    break;
+                                case NormalizationMethod::Multiplicative:
+                                case NormalizationMethod::MultiplicativeScaling:
+                                    value = static_cast<float>(value * coeff.scale * coeff.mul);
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            size_t outIdx = (static_cast<size_t>(y) * outputWidth + x) * channels + c;
+                            
+                            #pragma omp atomic
+                            output[outIdx] += value * weight;
+                        }
+                    }
+                    
+                    #pragma omp atomic
+                    weightMap[wIdx] += weight;
+                }
+            }
+        }
+        processed++;
+    }
+
+    args.progress(tr("Normalizing mosaic overlaps..."), 100.0);
+
+    #pragma omp parallel for collapse(2)
+    for (int y = 0; y < outputHeight; ++y) {
+        for (int x = 0; x < outputWidth; ++x) {
+            size_t wIdx = static_cast<size_t>(y) * outputWidth + x;
+            float totalWeight = weightMap[wIdx];
+            if (totalWeight > 0.0f) {
+                for (int c = 0; c < channels; ++c) {
+                    size_t outIdx = (static_cast<size_t>(y) * outputWidth + x) * channels + c;
+                    output[outIdx] /= totalWeight;
+                }
+            }
+        }
+    }
+
+    if (args.params.hasRejection()) {
+        args.log(tr("Pixel rejection algorithm skipped for Mosaic method."), "orange");
+    }
+
+    args.returnValue = 0;
+    return StackResult::OK;
+}
 } // namespace Stacking

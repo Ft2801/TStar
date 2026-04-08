@@ -9,6 +9,7 @@
   ![Qt](https://img.shields.io/badge/Qt-6.5%2B-green.svg)
   ![C++](https://img.shields.io/badge/C%2B%2B-17-blue.svg)
   ![Version](https://img.shields.io/badge/version-1.8.5-orange.svg)
+  ![Downloads](https://img.shields.io/github/downloads/Ft2801/TStar/total)
 </div>
 
 ---
