@@ -91,6 +91,9 @@ public:
     QString getUndoDescription() const;
     QString getRedoDescription() const;
 
+    std::vector<QString> getAllUndoDescriptions() const;
+    std::vector<QString> getAllRedoDescriptions() const;
+
     /// Check whether undo or redo is available.
     bool canUndo() const { return !m_undoStack.empty(); }
     bool canRedo() const { return !m_redoStack.empty(); }

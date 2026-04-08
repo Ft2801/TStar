@@ -1,53 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Invaders: Hyperdrive</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VOID RUNNER</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div id="game-container">
-        <canvas id="gameCanvas"></canvas>
-        <div id="ui-layer">
-            <div id="hud" class="hidden">
-                <div class="hud-item">SCORE: <span id="score">0</span></div>
-                <div class="hud-item center">LEVEL: <span id="level">1</span></div>
-                <div class="hud-item right">HP: <div id="hp-bar"><div id="hp-fill"></div></div></div>
-            </div>
-            
-            <div id="main-menu" class="screen">
-                <h1 class="glow-text">NEON INVADERS<br><span class="subtitle">HYPERDRIVE</span></h1>
-                <div class="menu-options">
-                    <button id="btn-start" class="menu-btn">START GAME</button>
-                    <button id="btn-levels" class="menu-btn">SELECT LEVEL</button>
-                    <div id="controls-hint">ARROWS to Move • SPACE to Shoot</div>
-                </div>
-            </div>
+  <div id="ui-overlay">
 
-            <div id="level-select" class="screen hidden">
-                <h2>SELECT LEVEL</h2>
-                <div class="level-grid" id="level-grid">
-                    <!-- Populated by JS -->
-                </div>
-                <button id="btn-back" class="menu-btn">BACK</button>
-            </div>
-
-            <div id="game-over" class="screen hidden">
-                <h1 class="danger-text">GAME OVER</h1>
-                <p>FINAL SCORE: <span id="final-score">0</span></p>
-                <button id="btn-retry" class="menu-btn">RETRY</button>
-                <button id="btn-menu" class="menu-btn">MAIN MENU</button>
-            </div>
-            
-            <div id="victory" class="screen hidden">
-                <h1 class="victory-text">MISSION COMPLETE</h1>
-                <p>YOU SAVED THE GALAXY!</p>
-                <p>FINAL SCORE: <span id="victory-score">0</span></p>
-                <button id="btn-menu-win" class="menu-btn">MAIN MENU</button>
-            </div>
-        </div>
+    <!-- MENU -->
+    <div id="screen-menu" class="screen active">
+      <div class="logo-wrap">
+        <div class="logo-sub">— DEEP SPACE SURVIVAL —</div>
+        <div class="logo-main">VOID RUNNER</div>
+      </div>
+      <div class="menu-best" id="best-score-display">BEST SCORE: 0</div>
+      <div class="menu-buttons">
+        <button class="btn-primary" id="btn-start">LAUNCH MISSION</button>
+        <button class="btn-secondary" id="btn-how">HOW TO PLAY</button>
+        <button class="btn-secondary" id="btn-upgrades-menu">UPGRADES</button>
+      </div>
     </div>
-    <script src="game.js"></script>
+
+    <!-- HOW TO PLAY -->
+    <div id="screen-how" class="screen">
+      <div class="how-title">HOW TO PLAY</div>
+      <div class="how-grid">
+        <div class="how-item"><div class="how-key">A / LEFT</div><div class="how-desc">Rotate left</div></div>
+        <div class="how-item"><div class="how-key">D / RIGHT</div><div class="how-desc">Rotate right</div></div>
+        <div class="how-item"><div class="how-key">W / UP</div><div class="how-desc">Thrust forward</div></div>
+        <div class="how-item"><div class="how-key">S / DOWN</div><div class="how-desc">Brake</div></div>
+        <div class="how-item"><div class="how-key">SPACE</div><div class="how-desc">Fire primary weapon</div></div>
+        <div class="how-item"><div class="how-key">E</div><div class="how-desc">Activate special ability</div></div>
+        <div class="how-item"><div class="how-key">Q</div><div class="how-desc">Deploy shield burst</div></div>
+        <div class="how-item"><div class="how-key">R</div><div class="how-desc">Launch missile (if armed)</div></div>
+        <div class="how-item"><div class="how-key">TAB</div><div class="how-desc">Pause game</div></div>
+        <div class="how-item"><div class="how-key">1 / 2 / 3</div><div class="how-desc">Switch weapon mode</div></div>
+      </div>
+      <div class="how-section">OBJECTIVE</div>
+      <div class="how-text">
+        Survive 15 increasingly brutal waves across 3 sectors. Destroy enemies to earn credits.
+        Between waves, spend credits on upgrades. Reach sector 3 wave 5 and defeat the final boss to win.
+      </div>
+      <div class="how-section">ENEMY TYPES</div>
+      <div class="how-text">
+        <span class="col-cyan">ASTEROIDS</span> — Split into smaller pieces. Watch the debris. &nbsp;|&nbsp;
+        <span class="col-magenta">DRONES</span> — Fast, homing, fire back. &nbsp;|&nbsp;
+        <span class="col-yellow">CARRIERS</span> — Slow but spawn mini-drones. &nbsp;|&nbsp;
+        <span class="col-green">MINES</span> — Stationary, explode on proximity. &nbsp;|&nbsp;
+        <span class="col-orange">BOSS</span> — End of each sector. Multiple phases.
+      </div>
+      <div class="how-section">SCORING</div>
+      <div class="how-text">
+        Kills earn credits and score. Combo multiplier increases with consecutive kills — don't get hit or it resets.
+        Collect power-up drops for temporary buffs. Complete bonus objectives each wave for extra credits.
+      </div>
+      <button class="btn-secondary" id="btn-back-how">BACK</button>
+    </div>
+
+    <!-- UPGRADE SHOP (between waves) -->
+    <div id="screen-shop" class="screen">
+      <div class="shop-header">
+        <div class="shop-title">UPGRADE STATION</div>
+        <div class="shop-credits"><span class="col-yellow">CREDITS: </span><span id="shop-credits-val">0</span></div>
+        <div class="shop-wave-info" id="shop-wave-info">WAVE 1 COMPLETE</div>
+      </div>
+      <div class="shop-grid" id="shop-grid"></div>
+      <div class="shop-footer">
+        <div class="shop-objectives" id="shop-objectives"></div>
+        <button class="btn-primary" id="btn-shop-continue">CONTINUE MISSION</button>
+      </div>
+    </div>
+
+    <!-- PAUSE -->
+    <div id="screen-pause" class="screen">
+      <div class="pause-title">PAUSED</div>
+      <button class="btn-primary" id="btn-resume">RESUME</button>
+      <button class="btn-secondary" id="btn-pause-menu">MAIN MENU</button>
+    </div>
+
+    <!-- HUD -->
+    <div id="screen-hud" class="screen">
+      <div class="hud-top">
+        <div class="hud-block">
+          <div class="hud-label">SCORE</div>
+          <div class="hud-value" id="hud-score">0</div>
+        </div>
+        <div class="hud-block">
+          <div class="hud-label">SECTOR / WAVE</div>
+          <div class="hud-value" id="hud-wave">1 — 1</div>
+        </div>
+        <div class="hud-block">
+          <div class="hud-label">CREDITS</div>
+          <div class="hud-value col-yellow" id="hud-credits">0</div>
+        </div>
+        <div class="hud-block">
+          <div class="hud-label">COMBO</div>
+          <div class="hud-value col-magenta" id="hud-combo">x1</div>
+        </div>
+      </div>
+      <div class="hud-bottom">
+        <div class="hud-bars">
+          <div class="hud-bar-row">
+            <div class="hud-bar-label">SHIELD</div>
+            <div class="hud-bar-wrap"><div class="hud-bar bar-shield" id="bar-shield"></div></div>
+          </div>
+          <div class="hud-bar-row">
+            <div class="hud-bar-label">HULL</div>
+            <div class="hud-bar-wrap"><div class="hud-bar bar-hull" id="bar-hull"></div></div>
+          </div>
+          <div class="hud-bar-row">
+            <div class="hud-bar-label">SPECIAL</div>
+            <div class="hud-bar-wrap"><div class="hud-bar bar-special" id="bar-special"></div></div>
+          </div>
+        </div>
+        <div class="hud-weapons">
+          <div class="hud-label">WEAPON</div>
+          <div class="hud-weapon-slots" id="hud-weapon-slots"></div>
+        </div>
+        <div class="hud-abilities">
+          <div class="ability-slot" id="hud-special">
+            <div class="hud-label">SPECIAL [E]</div>
+            <div class="ability-name" id="special-name">—</div>
+          </div>
+          <div class="ability-slot" id="hud-missiles">
+            <div class="hud-label">MISSILES [R]</div>
+            <div class="ability-name" id="missile-count">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WAVE ANNOUNCE -->
+    <div id="screen-wave" class="screen">
+      <div class="wave-sector" id="wave-sector-text"></div>
+      <div class="wave-announce" id="wave-text">WAVE 1</div>
+      <div class="wave-sub" id="wave-sub">PREPARE FOR CONTACT</div>
+      <div class="wave-objective" id="wave-objective"></div>
+    </div>
+
+    <!-- BOSS WARNING -->
+    <div id="screen-boss" class="screen">
+      <div class="boss-warn">WARNING</div>
+      <div class="boss-title" id="boss-title">SECTOR BOSS INCOMING</div>
+      <div class="boss-sub" id="boss-sub"></div>
+    </div>
+
+    <!-- GAME OVER -->
+    <div id="screen-gameover" class="screen">
+      <div class="go-title">SHIP DESTROYED</div>
+      <div class="go-score-label">FINAL SCORE</div>
+      <div class="go-score" id="go-score">0</div>
+      <div class="go-best" id="go-best"></div>
+      <div class="go-stats" id="go-stats"></div>
+      <div class="go-buttons">
+        <button class="btn-primary" id="btn-restart">RESTART MISSION</button>
+        <button class="btn-secondary" id="btn-go-menu">MAIN MENU</button>
+      </div>
+    </div>
+
+    <!-- WIN -->
+    <div id="screen-win" class="screen">
+      <div class="win-title">SECTOR CLEARED</div>
+      <div class="win-sub" id="win-sub"></div>
+      <div class="go-score-label">FINAL SCORE</div>
+      <div class="go-score" id="win-score">0</div>
+      <div class="go-best" id="win-best"></div>
+      <div class="go-buttons">
+        <button class="btn-primary" id="btn-win-restart">PLAY AGAIN</button>
+        <button class="btn-secondary" id="btn-win-menu">MAIN MENU</button>
+      </div>
+    </div>
+
+    <!-- FLOATING TEXTS container -->
+    <div id="float-texts"></div>
+
+  </div>
+
+  <canvas id="game-canvas"></canvas>
+  <script src="game.js"></script>
 </body>
 </html>

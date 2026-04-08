@@ -203,6 +203,24 @@ QString ImageHistoryManager::getRedoDescription() const
     return m_redoStack.back().description;
 }
 
+std::vector<QString> ImageHistoryManager::getAllUndoDescriptions() const
+{
+    std::vector<QString> descs(m_undoStack.size());
+    for (size_t i = 0; i < m_undoStack.size(); ++i) {
+        descs[i] = m_undoStack[i].description;
+    }
+    return descs;
+}
+
+std::vector<QString> ImageHistoryManager::getAllRedoDescriptions() const
+{
+    std::vector<QString> descs(m_redoStack.size());
+    for (size_t i = 0; i < m_redoStack.size(); ++i) {
+        descs[i] = m_redoStack[i].description;
+    }
+    return descs;
+}
+
 // -----------------------------------------------------------------------------
 // Memory accounting and pruning
 // -----------------------------------------------------------------------------

@@ -61,6 +61,7 @@ class HeaderViewerDialog;
 class SidebarWidget;
 class RightSidebarWidget;
 class HeaderPanel;
+class HistoryPanel;
 class AstroSpikeDialog;
 class RawEditorDialog;
 class DebayerDialog;
@@ -478,6 +479,7 @@ private:
     SidebarWidget*      m_sidebar       = nullptr;
     RightSidebarWidget* m_rightSidebar  = nullptr;
     HeaderPanel*        m_headerPanel   = nullptr;
+    HistoryPanel*       m_historyPanel  = nullptr;
 
     // ---- Animations ---------------------------------------------------------
 

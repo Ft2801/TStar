@@ -4,7 +4,9 @@ TStar Changelog
 Version 1.8.6
 -------------
 - Fixed a RAW conversion tool bug
-- Added minigame (Ctrl + M)
+- Added history explorer and manager
+- Added TStar signature and history on header metadata
+- Added space themed minigame (Ctrl + M)
 - Stacking suite improvements
 
 Version 1.8.5

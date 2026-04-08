@@ -745,7 +745,7 @@ void ImageViewer::pushUndo(const QString& description)
     emit historyChanged();
 }
 
-void ImageViewer::undo()
+void ImageViewer::undo(bool emitSignals)
 {
     int oldW = m_buffer.width();
     int oldH = m_buffer.height();
@@ -753,12 +753,13 @@ void ImageViewer::undo()
     if (m_useDeltaHistory && m_historyManager && m_historyManager->canUndo())
     {
         m_redoStack.push_back(m_buffer);
-        m_redoDescriptions.push_back(m_historyManager->getUndoDescription());
+        
+        // Ensure we retrieve the description from the viewer's synchronized list
+        QString desc = m_undoDescriptions.empty() ? m_historyManager->getUndoDescription() : m_undoDescriptions.back();
+        m_redoDescriptions.push_back(desc);
+        
         m_historyManager->performUndo();
 
-        // The delta system currently wraps the history manager without directly
-        // restoring ImageBuffer content in performUndo(); the legacy stack is
-        // used for content restoration until the delta path is fully implemented.
         if (!m_undoStack.empty())
         {
             m_buffer = m_undoStack.back();
@@ -778,15 +779,17 @@ void ImageViewer::undo()
         refreshDisplay(true);
     }
 
-    if (m_buffer.width() != oldW || m_buffer.height() != oldH)
+    if (emitSignals && (m_buffer.width() != oldW || m_buffer.height() != oldH))
         fitToWindow();
 
     setModified(true);
-    emit bufferChanged();
-    emit historyChanged();
+    if (emitSignals) {
+        emit bufferChanged();
+        emit historyChanged();
+    }
 }
 
-void ImageViewer::redo()
+void ImageViewer::redo(bool emitSignals)
 {
     int oldW = m_buffer.width();
     int oldH = m_buffer.height();
@@ -794,7 +797,11 @@ void ImageViewer::redo()
     if (m_useDeltaHistory && m_historyManager && m_historyManager->canRedo())
     {
         m_undoStack.push_back(m_buffer);
-        m_undoDescriptions.push_back(m_historyManager->getRedoDescription());
+
+        // Fetch description carefully from synchronized list
+        QString desc = m_redoDescriptions.empty() ? m_historyManager->getRedoDescription() : m_redoDescriptions.back();
+        m_undoDescriptions.push_back(desc);
+
         m_historyManager->performRedo();
 
         if (!m_redoStack.empty())
@@ -816,19 +823,49 @@ void ImageViewer::redo()
         refreshDisplay(true);
     }
 
-    if (m_buffer.width() != oldW || m_buffer.height() != oldH)
+    if (emitSignals && (m_buffer.width() != oldW || m_buffer.height() != oldH))
         fitToWindow();
 
     setModified(true);
+    if (emitSignals) {
+        emit bufferChanged();
+        emit historyChanged();
+    }
+}
+
+void ImageViewer::jumpToHistoryState(int index)
+{
+    if (index < 0) return;
+
+    int currentStateIndex = static_cast<int>(m_undoDescriptions.size());
+    int maxIndex = currentStateIndex + static_cast<int>(m_redoDescriptions.size());
+    if (index > maxIndex) {
+        index = maxIndex; // Clamp to safe max
+    }
+
+    if (index == currentStateIndex) {
+        return;
+    }
+
+    if (index < currentStateIndex) {
+        int steps = currentStateIndex - index;
+        for (int i = 0; i < steps; ++i) {
+            undo(false);
+        }
+    } else {
+        int steps = index - currentStateIndex;
+        for (int i = 0; i < steps; ++i) {
+            redo(false);
+        }
+    }
+
+    fitToWindow();
     emit bufferChanged();
     emit historyChanged();
 }
 
 QString ImageViewer::getUndoDescription() const
 {
-    if (m_useDeltaHistory && m_historyManager)
-        return m_historyManager->getUndoDescription();
-
     if (m_undoDescriptions.empty())
         return QString();
 
@@ -837,9 +874,6 @@ QString ImageViewer::getUndoDescription() const
 
 QString ImageViewer::getRedoDescription() const
 {
-    if (m_useDeltaHistory && m_historyManager)
-        return m_historyManager->getRedoDescription();
-
     if (m_redoDescriptions.empty())
         return QString();
 

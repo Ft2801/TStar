@@ -251,7 +251,6 @@ RightSidebarWidget::RightSidebarWidget(QWidget* parent)
     connect(m_tabBtn, &QPushButton::clicked,
             this, &RightSidebarWidget::onTabClicked);
 
-    tabLayout->addStretch();
     tabLayout->addWidget(m_tabBtn);
     tabLayout->addStretch();
 

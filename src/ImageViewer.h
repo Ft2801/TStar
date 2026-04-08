@@ -84,13 +84,16 @@ public:
     // ---- Undo / redo --------------------------------------------------------
 
     void pushUndo(const QString& description = QString());
-    void undo();
-    void redo();
+    void undo(bool emitSignals = true);
+    void redo(bool emitSignals = true);
+    void jumpToHistoryState(int index);
     bool    canUndo() const;
     bool    canRedo() const;
     QString getUndoDescription() const;
     QString getRedoDescription() const;
-
+    const std::vector<QString>& undoDescriptions() const { return m_undoDescriptions; }
+    const std::vector<QString>& redoDescriptions() const { return m_redoDescriptions; }
+    
     // ---- Crop mode ----------------------------------------------------------
 
     void setCropMode(bool active);

@@ -26,6 +26,7 @@
 #include "widgets/SidebarWidget.h"
 #include "widgets/RightSidebarWidget.h"
 #include "widgets/HeaderPanel.h"
+#include "widgets/HistoryPanel.h"
 
 // --- Dialog Headers: Stretch Tools ---
 #include "dialogs/StretchDialog.h"
@@ -479,6 +480,16 @@ MainWindow::MainWindow(QWidget *parent)
     m_headerPanel = new HeaderPanel();
     m_sidebar->addPanel(tr("Header"), ":/images/header_icon.png", m_headerPanel);
 
+    // History panel
+    m_historyPanel = new HistoryPanel();
+    m_sidebar->addPanel(tr("History"), ":/images/history.png", m_historyPanel);
+
+    connect(m_historyPanel, &HistoryPanel::historyStateSelected, this, [this](int index) {
+        if (ImageViewer* v = currentViewer()) {
+            v->jumpToHistoryState(index);
+        }
+    });
+
     // --- 4.11: Timer Setup ---
 
     // Console auto-close timer
@@ -584,8 +595,10 @@ MainWindow::MainWindow(QWidget *parent)
         // Step 1: Update header panel metadata
         if (v) {
             m_headerPanel->setMetadata(v->getBuffer().metadata());
+            m_historyPanel->updateHistory(v);
         } else if (!window) {
             m_headerPanel->clear();
+            m_historyPanel->clear();
             if (m_autoStretchMedianBtn) {
                 m_autoStretchMedianValue = 0.25f;
                 m_autoStretchMedianBtn->setText("0.25");
@@ -671,6 +684,7 @@ MainWindow::MainWindow(QWidget *parent)
                     if (m_annotatorDlg)     m_annotatorDlg->setViewer(v);
                     // if (m_deconvolutionDlg) m_deconvolutionDlg->setViewer(v);
                     if (m_headerPanel)      m_headerPanel->setMetadata(v->getBuffer().metadata());
+                    if (m_historyPanel)     m_historyPanel->updateHistory(v);
 
                     // Color profile check
                     checkAndHandleColorProfile(v->getBuffer(), v->windowTitle());
@@ -732,6 +746,11 @@ MainWindow::MainWindow(QWidget *parent)
                     // Ensure signal connections
                     connect(v, &ImageViewer::viewChanged,    this, &MainWindow::propagateViewChange, Qt::UniqueConnection);
                     connect(v, &ImageViewer::historyChanged, this, &MainWindow::updateMenus,         Qt::UniqueConnection);
+                    connect(v, &ImageViewer::historyChanged, this, [this, v]() {
+                        if (currentViewer() == v && m_historyPanel) {
+                            m_historyPanel->updateHistory(v);
+                        }
+                    }, Qt::UniqueConnection);
                     updateMenus();
                 }
             }
@@ -1765,6 +1784,11 @@ CustomMdiSubWindow* MainWindow::createNewImageWindow(const ImageBuffer& buffer, 
     // Connect history/modification tracking
     connect(viewer, &ImageViewer::historyChanged,  this, &MainWindow::updateMenus);
     connect(viewer, &ImageViewer::historyChanged,  this, &MainWindow::markWorkspaceProjectDirty);
+    connect(viewer, &ImageViewer::historyChanged,  this, [this, viewer]() {
+        if (currentViewer() == viewer && m_historyPanel) {
+            m_historyPanel->updateHistory(viewer);
+        }
+    });
     connect(viewer, &ImageViewer::bufferChanged,   this, &MainWindow::markWorkspaceProjectDirty);
     connect(viewer, &ImageViewer::modifiedChanged,  this, &MainWindow::markWorkspaceProjectDirty);
 
@@ -2320,8 +2344,52 @@ void MainWindow::saveFile() {
     else if (dStr.contains(tr("16-bit")))         d = ImageBuffer::Depth_16Int;
     else if (dStr.contains(tr("8-bit")))          d = ImageBuffer::Depth_8Int;
 
+    ImageBuffer bufToSave = v->getBuffer();
+    ImageBuffer::Metadata meta = bufToSave.metadata();
+
+    // Appending HISTORY/PROGRAM annotations for FITS/XISF
+    if (format == "FITS" || format == "XISF") {
+        // Find the position of existing PROGRAM keyword to preserve ordering
+        int programPos = -1;
+        for (size_t i = 0; i < meta.rawHeaders.size(); ++i) {
+            if (meta.rawHeaders[i].key.trimmed().toUpper() == "PROGRAM") {
+                programPos = static_cast<int>(i);
+                break;
+            }
+        }
+
+        // Remove all existing PROGRAM entries
+        auto removeProgram = std::remove_if(meta.rawHeaders.begin(), meta.rawHeaders.end(),
+                                           [](const auto& card) {
+                                               return card.key.trimmed().toUpper() == "PROGRAM";
+                                           });
+        meta.rawHeaders.erase(removeProgram, meta.rawHeaders.end());
+
+        QString tstarVersion = QString(TStar::getVersion());
+
+        // Reinsert PROGRAM at its original position or at the beginning if it didn't exist
+        if (programPos >= 0 && programPos < static_cast<int>(meta.rawHeaders.size())) {
+            meta.rawHeaders.insert(meta.rawHeaders.begin() + programPos,
+                                  {"PROGRAM", "TStar v" + tstarVersion, "Edited with TStar"});
+        } else if (programPos >= 0) {
+            meta.rawHeaders.push_back({"PROGRAM", "TStar v" + tstarVersion, "Edited with TStar"});
+        } else {
+            meta.rawHeaders.insert(meta.rawHeaders.begin(),
+                                  {"PROGRAM", "TStar v" + tstarVersion, "Edited with TStar"});
+        }
+
+        // Append all sequential history steps with numbered labels to ensure all steps are preserved
+        const auto& undoDescs = v->undoDescriptions();
+        for (size_t i = 0; i < undoDescs.size(); ++i) {
+            QString histLabel = QString("HISTORY %1").arg(i + 1);
+            meta.rawHeaders.push_back({histLabel, "Modification: " + undoDescs[i], ""});
+        }
+        meta.rawHeaders.push_back({"HISTORY", "Saved with TStar v" + tstarVersion, ""});
+    }
+    bufToSave.setMetadata(meta);
+
     QString err;
-    if (!v->getBuffer().save(path, format, d, &err)) {
+    if (!bufToSave.save(path, format, d, &err)) {
         QMessageBox::critical(this, tr("Error"), tr("Save Failed:\n") + err);
     } else {
         v->setFilePath(path);
@@ -3005,6 +3073,7 @@ void MainWindow::openHeaderDialog() {
     ImageViewer* viewer = currentViewer();
     if (viewer && m_headerPanel) {
         m_headerPanel->setMetadata(viewer->getBuffer().metadata());
+        m_historyPanel->updateHistory(viewer);
     }
 }
 

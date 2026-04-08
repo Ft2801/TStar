@@ -555,6 +555,8 @@ set(TSTAR_SOURCES
     src/widgets/RightSidebarWidget.h
     src/widgets/HeaderPanel.cpp
     src/widgets/HeaderPanel.h
+    src/widgets/HistoryPanel.cpp
+    src/widgets/HistoryPanel.h
     src/widgets/AnnotationOverlay.cpp
     src/widgets/AnnotationOverlay.h
     src/widgets/SimplePlotWidget.cpp
