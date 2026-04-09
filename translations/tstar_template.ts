@@ -6993,7 +6993,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Save Failed:\n</source>
+            <source>Save Failed: </source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10269,6 +10269,18 @@
             <source>Previews</source>
             <translation type="unfinished" />
         </message>
+        <message>
+            <source>Search</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Search Functions</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Search functions...</source>
+            <translation type="unfinished" />
+        </message>
     </context>
     <context>
         <name>SCNRDialog</name>
@@ -11363,7 +11375,23 @@
     <context>
         <name>StackingCommands</name>
         <message>
-            <source> &gt; %1 -&gt; %2</source>
+            <source>  Image '%1' plate solving failed: %2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Image '%1' plate-solved and saved (RA=%2, Dec=%3).</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Image '%1' plate-solved but could not be saved.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Options: -force (re-solve all)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Options: -nocache (per-image metadata)</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11392,6 +11420,10 @@
         </message>
         <message>
             <source>Changed working directory to: %1</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Computing astrometric registration for sequence: </source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11467,6 +11499,30 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Image %1/%2: '%3' already plate-solved, skipping.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image %1/%2: Cannot load '%3': %4</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image %1/%2: Plate solving '%3' (RA=%4, Dec=%5, scale=%6 arcsec/px)...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image %1: '%2' has no valid WCS, excluding from registration.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image %1: '%2' homography computation failed, excluding.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Image %1: '%2' registration computed (dx=%3, dy=%4, rot=%5 deg, scale=%6)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Image Stats: Min=%1, Max=%2, Mean=%3</source>
             <translation type="unfinished" />
         </message>
@@ -11479,18 +11535,6 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Note: TStar applies registration and framing dynamically during 'stack'.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Options: -force</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Options: -nocache</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
             <source>Pipeline complete! Output: %1</source>
             <translation type="unfinished" />
         </message>
@@ -11499,7 +11543,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Plate solving reference frame for sequence '%1'...</source>
+            <source>Plate solving %1/%2</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Plate solving sequence '%1' (%2 images, engine: %3)...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11512,10 +11560,6 @@
         </message>
         <message>
             <source>RGB Equalization: ENABLED (Neutralizes color cast)</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Reference image '%1' is already plate-solved. Using existing WCS data.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11552,6 +11596,10 @@
         </message>
         <message>
             <source>Save: no image loaded</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Sequence center-of-gravity: RA=%1, Dec=%2</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11639,11 +11687,11 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Using solver engine: %1</source>
+            <source>WARNING: Drizzle requested but no registration data found. Registration must be performed before stacking for Drizzle to be effective.</source>
             <translation type="unfinished" />
         </message>
         <message>
-            <source>WARNING: Drizzle requested but no registration data found. Registration must be performed before stacking for Drizzle to be effective.</source>
+            <source>seqapplyreg complete: %1 images registered, %2 failed/excluded, framing=%3.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11651,15 +11699,23 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>seqapplyreg: Reference image has no valid WCS. Run seqplatesolve first.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>seqplatesolve complete: %1 solved (%2 skipped), %3 failed out of %4 images.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>seqplatesolve: Cancelled by user.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>seqplatesolve: Cannot load reference image: </source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>seqplatesolve: No sequence loaded. Load a sequence first.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>seqplatesolve: Plate solving complete and successful.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>seqplatesolve: Plate solving failed.</source>
             <translation type="unfinished" />
         </message>
         <message>

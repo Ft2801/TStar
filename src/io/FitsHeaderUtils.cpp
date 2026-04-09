@@ -85,10 +85,9 @@ bool FitsHeaderUtils::hasValidWCS(const Metadata& meta)
 {
     // A non-degenerate CD matrix is required (determinant must be non-zero).
     // RA = 0 and Dec = 0 are valid sky coordinates and must not be rejected.
+    // CRPIX at (0,0) is also valid (e.g. edge-referenced or 0-indexed solutions).
     const double det     = meta.cd1_1 * meta.cd2_2 - meta.cd1_2 * meta.cd2_1;
-    const bool hasMatrix = std::abs(det) > 1e-20;
-    const bool hasCrpix  = (meta.crpix1 != 0.0 || meta.crpix2 != 0.0);
-    return hasMatrix && hasCrpix;
+    return std::abs(det) > 1e-20;
 }
 
 std::vector<FitsHeaderUtils::HeaderCard>

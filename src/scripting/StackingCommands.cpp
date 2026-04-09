@@ -210,7 +210,7 @@ void StackingCommands::registerCommands(ScriptRunner& runner)
         
         CommandDef("seqplatesolve", 1, 3,
             "seqplatesolve <name> [-force] [-nocache]",
-            "Plate solve the reference frame of a sequence",
+            "Plate solve every image in a sequence (metadata hints prioritized)",
             cmdSeqPlateSolve),
 
         // -- Metadata --------------------------------------------------------
@@ -2378,174 +2378,311 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd)
 bool StackingCommands::cmdSeqPlateSolve(const ScriptCommand& cmd)
 {
     if (!s_sequence || s_sequence->count() == 0) {
-        if (s_runner) s_runner->logMessage(QObject::tr("seqplatesolve: No sequence loaded. Load a sequence first."), "red");
+        if (s_runner) s_runner->logMessage(
+            QObject::tr("seqplatesolve: No sequence loaded. Load a sequence first."), "red");
         return false;
     }
 
     if (cmd.args.isEmpty()) {
-        if (s_runner) s_runner->logMessage(QObject::tr("seqplatesolve: sequence name argument missing."), "red");
+        if (s_runner) s_runner->logMessage(
+            QObject::tr("seqplatesolve: sequence name argument missing."), "red");
         return false;
     }
 
-    QString name   = cmd.args[0];
-    bool    force   = cmd.hasOption("force");
-    bool    nocache = cmd.hasOption("nocache");
+    const QString name        = cmd.args[0];
+    const bool    force       = cmd.hasOption("force");
+    const bool    nocache     = cmd.hasOption("nocache");
+    const int     totalImages = s_sequence->count();
 
-    QSettings settings("TStar Team", "TStar");
-    QString engine = settings.value("Astrometry/SolverEngine", "native").toString();
+    // -- Resolve UI-parity parameters from command options --
+    const double optionRA     = cmd.option("ra", "0.0").toDouble();
+    const double optionDec    = cmd.option("dec", "0.0").toDouble();
+    const double optionRadius = cmd.option("radius", "3.0").toDouble();
+    const double optionScale  = cmd.option("scale", "0.0").toDouble();
+    const QString optionEngine = cmd.option("engine", "astap").toLower();
 
-    const int totalImages = s_sequence->count();
+    if (s_runner) {
+        s_runner->logMessage(
+            QObject::tr("Plate solving sequence '%1' (%2 images)...")
+                .arg(name).arg(totalImages), "cyan");
+        if (force)   s_runner->logMessage(QObject::tr("  Options: -force (re-solve all)"), "neutral");
+        if (nocache) s_runner->logMessage(QObject::tr("  Options: -nocache (per-image metadata)"), "neutral");
+        
+        if (optionRA != 0.0 || optionDec != 0.0)
+            s_runner->logMessage(QObject::tr("  Target: RA=%1, Dec=%2").arg(optionRA).arg(optionDec), "neutral");
+        if (optionScale > 0)
+            s_runner->logMessage(QObject::tr("  Scale: %1 arcsec/px").arg(optionScale), "neutral");
+        s_runner->logMessage(QObject::tr("  Engine: %1 (radius=%2 deg)").arg(optionEngine).arg(optionRadius), "neutral");
+    }
+
+    // =========================================================================
+    // PHASE 1 — PREPARE
+    // =========================================================================
+
+    ImageBuffer refImg;
+    QString     errorMsg;
+    if (!FitsLoader::load(s_sequence->image(0).filePath, refImg, &errorMsg)) {
+        if (s_runner) s_runner->logMessage(
+            QObject::tr("seqplatesolve: Cannot load first image to seed fallback hints: ") + errorMsg, "red");
+        return false;
+    }
+
+    const auto& refMeta  = refImg.metadata();
+    const double refFL   = refMeta.focalLength;
+    const double refPS   = refMeta.pixelSize;
+    const double refScaleFallback = (refFL > 0 && refPS > 0) ? ((refPS / refFL) * 206.265) : 0.0;
+
+    struct ImageResult {
+        bool             solved  = false;
+        bool             skipped = false;
+        NativeSolveResult result;
+        ImageBuffer      buf;     // kept alive for the finalize phase
+    };
+    std::vector<ImageResult> results(totalImages);
+
+    QAtomicInt solvedAtomic(0);
+    QAtomicInt failedAtomic(0);
+    std::mutex logMutex;
+
+    // --- Start sequential or parallel solve ---
+    QtConcurrent::blockingMap(
+        [&]() -> QVector<int> {
+            QVector<int> idx(totalImages);
+            std::iota(idx.begin(), idx.end(), 0);
+            return idx;
+        }(),
+        [&](int i)
+        {
+            if (s_runner && s_runner->isCancelled())
+                return;
+
+            auto& res       = results[i];
+            auto& entry     = s_sequence->image(i);
+            const QString fileName = QFileInfo(entry.filePath).fileName();
+
+            // Load image
+            QString loadErr;
+            if (!FitsLoader::load(entry.filePath, res.buf, &loadErr)) {
+                std::lock_guard<std::mutex> lock(logMutex);
+                if (s_runner) s_runner->logMessage(
+                    QObject::tr("Image %1/%2: Cannot load '%3': %4")
+                        .arg(i + 1).arg(totalImages).arg(fileName).arg(loadErr), "red");
+                failedAtomic.fetchAndAddRelaxed(1);
+                return;
+            }
+
+            const auto& meta = res.buf.metadata();
+
+            // Skip images that are already plate-solved (unless -force)
+            if (!force && FitsHeaderUtils::hasValidWCS(meta)) {
+                res.skipped = true;
+                res.solved  = true;
+                solvedAtomic.fetchAndAddRelaxed(1);
+                std::lock_guard<std::mutex> lock(logMutex);
+                if (s_runner) s_runner->logMessage(
+                    QObject::tr("Image %1/%2: '%3' already plate-solved, skipping.")
+                        .arg(i + 1).arg(totalImages).arg(fileName), "salmon");
+                return;
+            }
+
+            // =================================================================
+            // PARAMETER RESOLUTION (Parity with PlateSolvingDialog::onSolve)
+            // =================================================================
+            
+            // 1. Resolve RA/Dec
+            double ra  = optionRA;
+            double dec = optionDec;
+            if (ra == 0.0 && dec == 0.0) {
+                // If no command-line target provided, use image metadata
+                ra  = meta.ra;
+                dec = meta.dec;
+                // If per-image metadata is empty and we are caching, use reference
+                if (ra == 0.0 && dec == 0.0 && !nocache) {
+                    ra  = refMeta.ra;
+                    dec = refMeta.dec;
+                }
+            }
+
+            // 2. Resolve Scale
+            double scale = optionScale;
+            if (scale <= 0.0) {
+                // If per-image metadata is valid, compute from it
+                if (meta.focalLength > 0 && meta.pixelSize > 0)
+                    scale = (meta.pixelSize / meta.focalLength) * 206.265;
+                // Otherwise use reference or 0.0 (auto)
+                else if (!nocache)
+                    scale = refScaleFallback;
+            }
+
+            // 3. Radius
+            double radius = optionRadius;
+
+            {
+                std::lock_guard<std::mutex> lock(logMutex);
+                if (s_runner) s_runner->logMessage(
+                    QObject::tr("Image %1/%2: Solving '%3' (Engine: %4, RA=%5, Dec=%6, Scale=%7)...")
+                        .arg(i + 1).arg(totalImages).arg(fileName).arg(optionEngine)
+                        .arg(ra, 0, 'f', 4).arg(dec, 0, 'f', 4)
+                        .arg(scale > 0 ? QString::number(scale, 'f', 3) : QObject::tr("auto")),
+                    "neutral");
+            }
+
+            // -----------------------------------------------------------------
+            // EXECUTION LOOP (with engine fallback parity)
+            // -----------------------------------------------------------------
+            
+            auto runSolver = [&](const QString& engine, NativeSolveResult& outResult) -> bool {
+                QEventLoop  loop;
+                bool        success = false;
+                
+                if (engine == "astap") {
+                    AstapSolver solver;
+                    QObject::connect(&solver, &AstapSolver::logMessage, [&](const QString& m) {
+                        std::lock_guard<std::mutex> lock(logMutex);
+                        if (s_runner) s_runner->logMessage(m, "neutral");
+                    });
+                    QObject::connect(&solver, &AstapSolver::finished, [&](const NativeSolveResult& r) {
+                        outResult = r;
+                        success   = r.success;
+                        loop.quit();
+                    });
+                    solver.solve(res.buf, ra, dec, radius, scale);
+                    loop.exec();
+                } else {
+                    NativePlateSolver solver;
+                    QObject::connect(&solver, &NativePlateSolver::logMessage, [&](const QString& m) {
+                        std::lock_guard<std::mutex> lock(logMutex);
+                        if (s_runner) s_runner->logMessage(m, "neutral");
+                    });
+                    QObject::connect(&solver, &NativePlateSolver::finished, [&](const NativeSolveResult& r) {
+                        outResult = r;
+                        success   = r.success;
+                        loop.quit();
+                    });
+                    solver.solve(res.buf, ra, dec, radius, scale);
+                    loop.exec();
+                }
+                return success;
+            };
+
+            // Attempt primary engine
+            res.solved = runSolver(optionEngine, res.result);
+
+            // Automatic fallback if failed (parity with PlateSolvingDialog::onSolverFinished)
+            if (!res.solved && !s_runner->isCancelled()) {
+                QString fallbackEngine = (optionEngine == "astap") ? "native" : "astap";
+                {
+                    std::lock_guard<std::mutex> lock(logMutex);
+                    if (s_runner) s_runner->logMessage(
+                        QObject::tr("  Image %1: %2 failed. Falling back to %3...")
+                            .arg(i + 1).arg(optionEngine.toUpper()).arg(fallbackEngine.toUpper()), "orange");
+                }
+                res.solved = runSolver(fallbackEngine, res.result);
+            }
+
+            if (res.solved)
+                solvedAtomic.fetchAndAddRelaxed(1);
+            else
+                failedAtomic.fetchAndAddRelaxed(1);
+
+            if (s_runner) s_runner->progressChanged(
+                QObject::tr("Plate solving %1/%2").arg(i + 1).arg(totalImages),
+                static_cast<double>(i + 1) / totalImages);
+        }
+    );
+
+    // =========================================================================
+    // PHASE 3 — FINALIZE & CLEANUP 
+    // =========================================================================
+
     int solvedCount  = 0;
     int skippedCount = 0;
     int failedCount  = 0;
 
-    if (s_runner) {
-        s_runner->logMessage(QObject::tr("Plate solving sequence '%1' (%2 images, engine: %3)...")
-                                 .arg(name).arg(totalImages).arg(engine), "cyan");
-        if (force) s_runner->logMessage(QObject::tr("  Options: -force (re-solve all)"), "neutral");
-        if (nocache) s_runner->logMessage(QObject::tr("  Options: -nocache (per-image metadata)"), "neutral");
-    }
+    for (int i = 0; i < totalImages; ++i) {
+        auto& res   = results[i];
+        auto& entry = s_sequence->image(i);
+        const QString fileName = QFileInfo(entry.filePath).fileName();
 
-    // Extract reference image metadata as fallback hints
-    ImageBuffer refImg;
-    QString errorMsg;
-    if (!FitsLoader::load(s_sequence->image(0).filePath, refImg, &errorMsg)) {
-        if (s_runner) s_runner->logMessage(QObject::tr("seqplatesolve: Cannot load reference image: ") + errorMsg, "red");
-        return false;
-    }
-    const auto& refMeta = refImg.metadata();
-    double refRA   = refMeta.ra;
-    double refDec  = refMeta.dec;
-    double refFL   = refMeta.focalLength;
-    double refPS   = refMeta.pixelSize;
-
-    // Process each image
-    for (int idx = 0; idx < totalImages; ++idx) {
-        if (s_runner && s_runner->isCancelled()) {
-            if (s_runner) s_runner->logMessage(QObject::tr("seqplatesolve: Cancelled by user."), "red");
-            break;
-        }
-
-        auto& entry = s_sequence->image(idx);
-        QString fileName = QFileInfo(entry.filePath).fileName();
-
-        // Load the image to check its metadata
-        ImageBuffer imgBuf;
-        if (!FitsLoader::load(entry.filePath, imgBuf, &errorMsg)) {
-            if (s_runner) s_runner->logMessage(QObject::tr("Image %1/%2: Cannot load '%3': %4")
-                                                   .arg(idx + 1).arg(totalImages).arg(fileName).arg(errorMsg), "red");
-            failedCount++;
-            continue;
-        }
-
-        const auto& meta = imgBuf.metadata();
-
-        // Skip if already solved (unless -force)
-        if (!force && FitsHeaderUtils::hasValidWCS(meta)) {
-            if (s_runner) s_runner->logMessage(QObject::tr("Image %1/%2: '%3' already plate-solved, skipping.")
-                                                   .arg(idx + 1).arg(totalImages).arg(fileName), "salmon");
-            // Still update the sequence metadata from the existing WCS
-            entry.metadata = meta;
+        if (res.skipped) {
+            entry.metadata = res.buf.metadata();
             skippedCount++;
             solvedCount++;
             continue;
         }
 
-        // Extract per-image coordinate hints (or use reference fallback)
-        double raHint  = (meta.ra  != 0.0 || meta.dec != 0.0) ? meta.ra  : refRA;
-        double decHint = (meta.ra  != 0.0 || meta.dec != 0.0) ? meta.dec : refDec;
-        double fl      = (meta.focalLength > 0) ? meta.focalLength : refFL;
-        double ps      = (meta.pixelSize   > 0) ? meta.pixelSize   : refPS;
-        double scale   = (fl > 0 && ps > 0) ? ((ps / fl) * 206.265) : -1.0;
-
-        if (s_runner) s_runner->logMessage(QObject::tr("Image %1/%2: Plate solving '%3' (RA=%4, Dec=%5, scale=%6 arcsec/px)...")
-                                               .arg(idx + 1).arg(totalImages).arg(fileName)
-                                               .arg(raHint, 0, 'f', 4).arg(decHint, 0, 'f', 4)
-                                               .arg(scale > 0 ? QString::number(scale, 'f', 3) : "auto"), "neutral");
-
-        NativeSolveResult solvedResult;
-        bool didSolve = false;
-
-        QEventLoop loop;
-
-        if (engine == "astap") {
-            AstapSolver solver;
-            QObject::connect(&solver, &AstapSolver::logMessage, [](const QString& m){
-                if (s_runner) s_runner->logMessage(m, "neutral");
-            });
-            QObject::connect(&solver, &AstapSolver::finished, [&](const NativeSolveResult& r){
-                solvedResult = r;
-                didSolve = true;
-                loop.quit();
-            });
-            solver.solve(imgBuf, raHint, decHint, 15.0, scale);
-            loop.exec();
-        } else {
-            NativePlateSolver solver;
-            QObject::connect(&solver, &NativePlateSolver::logMessage, [](const QString& m){
-                if (s_runner) s_runner->logMessage(m, "neutral");
-            });
-            QObject::connect(&solver, &NativePlateSolver::finished, [&](const NativeSolveResult& r){
-                solvedResult = r;
-                didSolve = true;
-                loop.quit();
-            });
-            solver.solve(imgBuf, raHint, decHint, 15.0, scale);
-            loop.exec();
-        }
-
-        if (didSolve && solvedResult.success) {
-            // Update the image metadata in the sequence
-            auto& seqMeta = entry.metadata;
-            seqMeta.ra     = solvedResult.crval1;
-            seqMeta.dec    = solvedResult.crval2;
-            seqMeta.crpix1 = solvedResult.crpix1;
-            seqMeta.crpix2 = solvedResult.crpix2;
-            seqMeta.cd1_1  = solvedResult.cd[0][0];
-            seqMeta.cd1_2  = solvedResult.cd[0][1];
-            seqMeta.cd2_1  = solvedResult.cd[1][0];
-            seqMeta.cd2_2  = solvedResult.cd[1][1];
-
-            // Also update the on-disk ImageBuffer metadata and save back
-            auto& diskMeta = imgBuf.metadata();
-            diskMeta.ra     = solvedResult.crval1;
-            diskMeta.dec    = solvedResult.crval2;
-            diskMeta.crpix1 = solvedResult.crpix1;
-            diskMeta.crpix2 = solvedResult.crpix2;
-            diskMeta.cd1_1  = solvedResult.cd[0][0];
-            diskMeta.cd1_2  = solvedResult.cd[0][1];
-            diskMeta.cd2_1  = solvedResult.cd[1][0];
-            diskMeta.cd2_2  = solvedResult.cd[1][1];
-
-            // Save the updated FITS file with WCS headers
-            if (Stacking::FitsIO::write(entry.filePath, imgBuf, 32)) {
-                if (s_runner) s_runner->logMessage(QObject::tr("  Image '%1' plate-solved and saved (RA=%2, Dec=%3).")
-                                                       .arg(fileName)
-                                                       .arg(solvedResult.crval1, 0, 'f', 6)
-                                                       .arg(solvedResult.crval2, 0, 'f', 6), "green");
-            } else {
-                if (s_runner) s_runner->logMessage(QObject::tr("  Image '%1' plate-solved but could not be saved.")
-                                                       .arg(fileName), "orange");
-            }
-            solvedCount++;
-        } else {
-            if (s_runner) s_runner->logMessage(QObject::tr("  Image '%1' plate solving failed: %2")
-                                                   .arg(fileName).arg(solvedResult.errorMsg), "red");
+        if (!res.solved || !res.result.success) {
+            if (s_runner) s_runner->logMessage(
+                QObject::tr("  Image '%1' plate solving failed: %2")
+                    .arg(fileName).arg(res.result.errorMsg), "red");
             failedCount++;
+            continue;
         }
 
-        if (s_runner) s_runner->progressChanged(
-            QObject::tr("Plate solving %1/%2").arg(idx + 1).arg(totalImages),
-            static_cast<double>(idx + 1) / totalImages);
+        // Apply metadata updates with thorough cleanup (parity with PlateSolvingDialog.cpp:356-401)
+        auto updateMetadata = [&](ImageBuffer::Metadata& meta, const NativeSolveResult& solverRes) {
+            meta.ra     = solverRes.crval1;
+            meta.dec    = solverRes.crval2;
+            meta.crpix1 = solverRes.crpix1;
+            meta.crpix2 = solverRes.crpix2;
+            meta.cd1_1  = solverRes.cd[0][0];
+            meta.cd1_2  = solverRes.cd[0][1];
+            meta.cd2_1  = solverRes.cd[1][0];
+            meta.cd2_2  = solverRes.cd[1][1];
+
+            // Clear SIP distortion to prevent conflicts
+            meta.sipOrderA  = 0; meta.sipOrderB  = 0;
+            meta.sipOrderAP = 0; meta.sipOrderBP = 0;
+            meta.sipCoeffs.clear();
+
+            // Strip all conflicting WCS-related raw headers
+            QRegularExpression sipRegex("^(A|B|AP|BP|_?PV|_?PROJP)_\\d+_\\d+$");
+            auto it = meta.rawHeaders.begin();
+            while (it != meta.rawHeaders.end()) {
+                QString k = it->key.toUpper();
+                if (k.startsWith("CTYPE") || k.startsWith("CRVAL") ||
+                    k.startsWith("CRPIX") || k.startsWith("CD1_")  ||
+                    k.startsWith("CD2_")  || k.startsWith("PC1_")  ||
+                    k.startsWith("PC2_")  || k.startsWith("CDELT") ||
+                    k.startsWith("CROTA") || k.startsWith("CUNIT") ||
+                    k.startsWith("PV1_")  || k.startsWith("PV2_")  ||
+                    k.startsWith("PROJP") ||
+                    k == "A_ORDER" || k == "B_ORDER" ||
+                    k == "AP_ORDER" || k == "BP_ORDER" ||
+                    sipRegex.match(k).hasMatch()) {
+                    it = meta.rawHeaders.erase(it);
+                } else {
+                    ++it;
+                }
+            }
+            meta.ctype1 = "RA---TAN";
+            meta.ctype2 = "DEC--TAN";
+            meta.catalogStars = solverRes.catalogStars;
+        };
+
+        updateMetadata(entry.metadata, res.result);
+        updateMetadata(res.buf.metadata(), res.result);
+
+        // Save updated FITS file
+        if (Stacking::FitsIO::write(entry.filePath, res.buf, 32)) {
+            if (s_runner) s_runner->logMessage(
+                QObject::tr("  Image '%1' plate-solved and saved (RA=%2, Dec=%3).")
+                    .arg(fileName).arg(res.result.crval1, 0, 'f', 6).arg(res.result.crval2, 0, 'f', 6), "green");
+        } else {
+            if (s_runner) s_runner->logMessage(
+                QObject::tr("  Image '%1' plate-solved but could not be saved.").arg(fileName), "orange");
+        }
+        solvedCount++;
     }
 
-    if (s_runner) {
-        s_runner->logMessage(QObject::tr("seqplatesolve complete: %1 solved (%2 skipped), %3 failed out of %4 images.")
-                                 .arg(solvedCount).arg(skippedCount).arg(failedCount).arg(totalImages), "green");
-    }
+    if (s_runner) s_runner->logMessage(
+        QObject::tr("seqplatesolve complete: %1 solved (%2 skipped), %3 failed out of %4 images.")
+            .arg(solvedCount).arg(skippedCount).arg(failedCount).arg(totalImages), "green");
 
     return (solvedCount > 0);
 }
+
+// ============================================================================
 
 // ============================================================================
 // seqapplyreg -- Compute astrometric registration from WCS solutions
@@ -2644,25 +2781,7 @@ bool StackingCommands::cmdSeqApplyReg(const ScriptCommand& cmd)
     // Compute WCS-based homographies for each image relative to reference
     // =====================================================================
 
-    const int refIdx = s_sequence->referenceImage();
-    auto& refEntry   = s_sequence->image(refIdx);
-    const auto& refMeta = refEntry.metadata;
-
-    if (!FitsHeaderUtils::hasValidWCS(refMeta)) {
-        // Try loading from disk if metadata isn't cached
-        ImageBuffer refBuf;
-        if (FitsLoader::load(refEntry.filePath, refBuf)) {
-            refEntry.metadata = refBuf.metadata();
-        }
-        if (!FitsHeaderUtils::hasValidWCS(refEntry.metadata)) {
-            if (s_runner) s_runner->logMessage(
-                QObject::tr("seqapplyreg: Reference image has no valid WCS. Run seqplatesolve first."), "red");
-            return false;
-        }
-    }
-
     const int totalImages = s_sequence->count();
-    int regCount = 0;
     int failCount = 0;
 
     // Collect centers for COG computation
@@ -2690,8 +2809,62 @@ bool StackingCommands::cmdSeqApplyReg(const ScriptCommand& cmd)
             continue;
         }
 
-        // Collect center coordinate for COG
+        // Collect center coordinate for COG and Centering
         centers.push_back({entry.metadata.ra, entry.metadata.dec});
+    }
+
+    // Framing Optimization:
+    // If we're expanding the canvas for a mosaic (Union framing), the reference image MUST be
+    // the center-most frame from WCS to minimize distortion over the full Homography mapping.
+    // Otherwise, edge-to-edge homography will be severely warped.
+    if ((s_framingMode == Stacking::FramingMode::Union || s_framingMode == Stacking::FramingMode::COG) && !centers.empty()) {
+        double avgRA = 0.0, avgDec = 0.0;
+        for (const auto& c : centers) {
+            avgRA += c.first;
+            avgDec += c.second;
+        }
+        avgRA /= centers.size();
+        avgDec /= centers.size();
+
+        int bestIdx = -1;
+        double minDist = 1e12;
+
+        for (int idx = 0; idx < totalImages; ++idx) {
+            auto& entry = s_sequence->image(idx);
+            if (!entry.selected || !FitsHeaderUtils::hasValidWCS(entry.metadata)) continue;
+            
+            // Spherical projection distance heuristic
+            double dRa = (entry.metadata.ra - avgRA) * std::cos(avgDec * M_PI / 180.0);
+            double dDec = (entry.metadata.dec - avgDec);
+            double distSq = dRa * dRa + dDec * dDec;
+            if (distSq < minDist) {
+                minDist = distSq;
+                bestIdx = idx;
+            }
+        }
+
+        if (bestIdx >= 0 && bestIdx != s_sequence->referenceImage()) {
+            s_sequence->setReferenceImage(bestIdx);
+            if (s_runner) s_runner->logMessage(
+                QObject::tr("Mosaic framing: Selected image %1 ('%2') as Reference (closest to average center) to minimize spherical projection distortion.")
+                    .arg(bestIdx + 1).arg(QFileInfo(s_sequence->image(bestIdx).filePath).fileName()), "cyan");
+        }
+    }
+
+    const int refIdx = s_sequence->referenceImage();
+    auto& refEntry   = s_sequence->image(refIdx);
+
+    if (!FitsHeaderUtils::hasValidWCS(refEntry.metadata)) {
+        if (s_runner) s_runner->logMessage(
+            QObject::tr("seqapplyreg: Reference image has no valid WCS. Run seqplatesolve first."), "red");
+        return false;
+    }
+
+    int regCount = 0;
+
+    for (int idx = 0; idx < totalImages; ++idx) {
+        auto& entry = s_sequence->image(idx);
+        if (!entry.selected || !FitsHeaderUtils::hasValidWCS(entry.metadata)) continue;
 
         // Compute homography: source image -> reference image
         if (idx == refIdx) {

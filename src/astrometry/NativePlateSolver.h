@@ -163,6 +163,13 @@ private:
         std::vector<MatchStar>& matchedCatStars,
         int numMatched,
         const std::vector<MatchStar>& newProjectedCat);
+
+public:
+    void solveWithCatalog(const ImageBuffer& image,
+                      double raHint, double decHint,
+                      double pixelScale,
+                      const std::vector<MatchStar>& preloadedCatalog,
+                      const std::vector<CatalogStar>& rawCatalogStars);
 };
 
 #endif // NATIVEPLATESOLVER_H

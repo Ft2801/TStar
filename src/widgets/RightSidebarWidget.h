@@ -13,6 +13,9 @@
 class CustomMdiSubWindow;
 class QEnterEvent;
 class QEvent;
+class QAction;
+class QStackedWidget;
+class QLineEdit;
 
 /**
  * @brief Collapsible right-side panel that displays thumbnail previews of
@@ -66,6 +69,9 @@ public:
      */
     void removeThumbnail(CustomMdiSubWindow* sub);
 
+    /** Registers a tool action to be searchable via the Search tab. */
+    void registerToolAction(QAction* action);
+
     /** Programmatically collapses the content panel. */
     void collapse() { setExpanded(false); }
 
@@ -84,21 +90,37 @@ signals:
 
 private slots:
     void onTabClicked();
+    void onSearchTabClicked();
+    void onSearchTextChanged(const QString& text);
 
 private:
     void setExpanded(bool expanded);
+    void switchToTab(int index); // 0 = Previews, 1 = Search
+    void populateSearchResults(const QString& filter = "");
 
     // Tab strip (right edge column)
     QWidget*     m_tabContainer = nullptr;
     QPushButton* m_tabBtn       = nullptr;
+    QPushButton* m_searchTabBtn = nullptr;
 
     // Sliding content area
     QWidget*      m_contentWrapper   = nullptr;
+    QStackedWidget* m_stackedWidget  = nullptr;
+
+    // Page 0: Previews
+    QWidget*      m_previewsPage     = nullptr;
     QScrollArea*  m_contentContainer = nullptr;
     QWidget*      m_listWidget       = nullptr;
     QVBoxLayout*  m_listLayout       = nullptr;
 
-    // Top bar within the content area
+    // Page 1: Search
+    QWidget*      m_searchPage       = nullptr;
+    QLineEdit*    m_searchBox        = nullptr;
+    QScrollArea*  m_searchScrollArea = nullptr;
+    QWidget*      m_searchResultsWidget= nullptr;
+    QVBoxLayout*  m_searchResultsLayout= nullptr;
+
+    // Top bar within the previews area
     QWidget*   m_topContainer        = nullptr;
     QCheckBox* m_hideMinimizedViewsCb = nullptr;
 
@@ -109,9 +131,13 @@ private:
     bool m_hideMinimizedViews = false;
     int  m_expandedWidth      = 175;  ///< Content area width when fully open (px)
     int  m_anchorRight        = -1;   ///< Right-edge X anchor in parent coordinates
+    int  m_currentTabIndex    = 0;
 
     /** Maps each tracked subwindow to its thumbnail tile widget. */
     QMap<CustomMdiSubWindow*, QWidget*> m_items;
+
+    /** Stored searchable tools */
+    QList<QAction*> m_searchableActions;
 };
 
 #endif // RIGHTSIDEBARWIDGET_H

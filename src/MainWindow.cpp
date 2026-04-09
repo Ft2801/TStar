@@ -1362,6 +1362,24 @@ MainWindow::MainWindow(QWidget *parent)
     connect(minigameAction, &QAction::triggered, this, &MainWindow::openMinigame);
 
     // --- 4.28: Final Window Setup ---
+    if (m_rightSidebar) {
+        auto registerActions = [&](auto& self, QList<QAction*> actions) -> void {
+            for (QAction* act : actions) {
+                if (act->menu()) {
+                    self(self, act->menu()->actions());
+                } else if (!act->text().isEmpty() && !act->isSeparator()) {
+                    m_rightSidebar->registerToolAction(act);
+                }
+            }
+        };
+        registerActions(registerActions, mainToolbar->actions());
+        registerActions(registerActions, projectMenu->actions());
+        registerActions(registerActions, processMenu->actions());
+        registerActions(registerActions, stackMenu->actions());
+        registerActions(registerActions, maskMenu->actions());
+        registerActions(registerActions, viewMenu->actions());
+    }
+
     resize(1280, 800);
     log(tr("Application Ready."));
 }
@@ -2392,7 +2410,7 @@ void MainWindow::saveFile() {
 
     QString err;
     if (!bufToSave.save(path, format, d, &err)) {
-        QMessageBox::critical(this, tr("Error"), tr("Save Failed:\n") + err);
+        QMessageBox::critical(this, tr("Error"), tr("Save Failed: ") + err);
     } else {
         v->setFilePath(path);
         v->setModified(false);

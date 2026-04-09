@@ -186,8 +186,10 @@ void CatalogClient::sendGaia()
     query.addQueryItem("-out",
         "RA_ICRS,DE_ICRS,Gmag,BPmag,RPmag,teff_gspphot");
 
-    // Adaptive output limit: fewer results for wider fields to reduce transfer time.
-    const int outMax = (m_lastQueryRadius > 2.0) ? 1800 : 3000;
+    // Adaptive output limit: ensure dense star mapping even for wide fields (e.g. 3.0 deg radius)
+    // 10000 ensures we go deep enough into the magnitudes so that the 500 brightest image stars
+    // have a matching equivalent in the catalog to form triangles even on a 15 sq deg FOV.
+    const int outMax = 10000;
     query.addQueryItem("-out.max", QString::number(outMax));
     query.addQueryItem("-sort", "Gmag");
     query.addQueryItem("Gmag", "<20");

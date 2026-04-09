@@ -111,7 +111,7 @@
         <name>AberrationInspectorDialog</name>
         <message>
             <source>Aberration Inspector</source>
-            <translation type="finished">Aberrationsprüfer</translation>
+            <translation type="finished">Aberrationsinspektor</translation>
         </message>
         <message>
             <source>Bottom</source>
@@ -170,7 +170,7 @@
         </message>
         <message>
             <source>Link to my </source>
-            <translation type="finished">Link zu meinem</translation>
+            <translation type="finished">Link zu meinem </translation>
         </message>
         <message>
             <source>TStar is a professional astrophotography image processing application.</source>
@@ -205,7 +205,7 @@
         </message>
         <message>
             <source>Allow Rotation</source>
-            <translation type="finished">Rotation zulassen</translation>
+            <translation type="finished">Rotation erlauben</translation>
         </message>
         <message>
             <source>Allow Scale</source>
@@ -360,7 +360,7 @@
         </message>
         <message>
             <source>Cyan</source>
-            <translation type="finished">Cyan</translation>
+            <translation type="finished">Zyan</translation>
         </message>
         <message>
             <source>Data Error</source>
@@ -522,7 +522,7 @@
         </message>
         <message>
             <source>Arcsinh Stretch</source>
-            <translation type="finished">Arcsinh Stretch</translation>
+            <translation type="finished">Arcsinh Stretching</translation>
         </message>
         <message>
             <source>Arcsinh Stretch applied.</source>
@@ -759,7 +759,7 @@
         </message>
         <message>
             <source>AstroSpike</source>
-            <translation type="finished">AstroSpike</translation>
+            <translation type="finished">AstroSpikes</translation>
         </message>
         <message>
             <source>AstroSpike applied.</source>
@@ -795,7 +795,7 @@
         </message>
         <message>
             <source>Fit</source>
-            <translation type="finished">Einpassen</translation>
+            <translation type="finished">Anpassen</translation>
         </message>
         <message>
             <source>Fit to Screen</source>
@@ -1032,7 +1032,7 @@
         </message>
         <message>
             <source>Fit</source>
-            <translation type="finished">Einpassen</translation>
+            <translation type="finished">Anpassen</translation>
         </message>
         <message>
             <source>Manual blink</source>
@@ -1308,7 +1308,7 @@
         </message>
         <message>
             <source>Grid Size:</source>
-            <translation type="finished">Rastergröße:</translation>
+            <translation type="finished">Gittergröße:</translation>
         </message>
         <message>
             <source>Opacity:</source>
@@ -1926,7 +1926,7 @@
         </message>
         <message>
             <source>Fit</source>
-            <translation type="finished">Einpassen</translation>
+            <translation type="finished">Anpassen</translation>
         </message>
         <message>
             <source>Linked channels</source>
@@ -2156,7 +2156,7 @@
         </message>
         <message>
             <source>Rotate &amp; Crop Tool</source>
-            <translation type="finished">Drehen &amp; Zuschneiden Werkzeug</translation>
+            <translation type="finished">Drehen und Zuschneiden</translation>
         </message>
         <message>
             <source>Rotation (deg):</source>
@@ -2432,7 +2432,7 @@
         </message>
         <message>
             <source>Deconvolution failed: </source>
-            <translation type="finished">Dekonvolution fehlgeschlagen:</translation>
+            <translation type="finished">Dekonvolution fehlgeschlagen: </translation>
         </message>
         <message>
             <source>Deconvolve L* Only</source>
@@ -3009,7 +3009,7 @@
         </message>
         <message>
             <source>Generalized Hyperbolic Stretch (GHT)</source>
-            <translation type="finished">Generalized Hyperbolic Stretching (GHT)</translation>
+            <translation type="finished">Generalized Hyperbolic Stretch (GHT)</translation>
         </message>
         <message>
             <source>Global rescale</source>
@@ -3399,7 +3399,7 @@
         </message>
         <message>
             <source>Aberration Inspector</source>
-            <translation type="finished">Aberrationsprüfer</translation>
+            <translation type="finished">Aberrationsinspektor</translation>
         </message>
         <message>
             <source>Aberration Remover (RAR)</source>
@@ -3555,11 +3555,11 @@
         </message>
         <message>
             <source>Assembles multiple plate-solved images into a single seamless mosaic:</source>
-            <translation type="finished">Fügt mehrere Plate-solved Bilder zu einem nahtlosen Mosaik zusammen:</translation>
+            <translation type="finished">Fügt mehrere astrometrisch gelöste Bilder zu einem nahtlosen Mosaik zusammen:</translation>
         </message>
         <message>
             <source>AstroSpike</source>
-            <translation type="finished">AstroSpike</translation>
+            <translation type="finished">AstroSpikes</translation>
         </message>
         <message>
             <source>Auto Background Extraction (ABE)</source>
@@ -3759,7 +3759,7 @@
         </message>
         <message>
             <source>Click to add sample points on the background</source>
-            <translation type="finished">Klicken Sie um Probenpunkte im Hintergrund hinzuzufügen</translation>
+            <translation type="finished">Klicken Sie, um Stichprobenpunkte auf dem Hintergrund hinzuzufügen</translation>
         </message>
         <message>
             <source>Clip Limit:</source>
@@ -4091,7 +4091,7 @@
         </message>
         <message>
             <source>False Color:</source>
-            <translation type="finished">Falschfarben:</translation>
+            <translation type="finished">Falschfarbe:</translation>
         </message>
         <message>
             <source>False-color visualization for tonal/structural inspection</source>
@@ -4111,7 +4111,7 @@
         </message>
         <message>
             <source>Feathering:</source>
-            <translation type="finished">Weiche Kante:</translation>
+            <translation type="finished">Feathering:</translation>
         </message>
         <message>
             <source>File &amp; Directory</source>
@@ -4167,7 +4167,7 @@
         </message>
         <message>
             <source>Grid Size:</source>
-            <translation type="finished">Rastergröße:</translation>
+            <translation type="finished">Gittergröße:</translation>
         </message>
         <message>
             <source>Help &amp; Tutorial</source>
@@ -4219,7 +4219,7 @@
         </message>
         <message>
             <source>Image Annotator</source>
-            <translation type="finished">Bild-Annotator</translation>
+            <translation type="finished">Bild-Anmerkung</translation>
         </message>
         <message>
             <source>Image Binning</source>
@@ -4323,7 +4323,7 @@
         </message>
         <message>
             <source>Linear Fit</source>
-            <translation type="finished">Linearer Abgleich</translation>
+            <translation type="finished">Lineare Anpassung</translation>
         </message>
         <message>
             <source>Linear, Auto Stretch, Histogram, ArcSinh, Square Root, and Logarithmic</source>
@@ -4571,7 +4571,7 @@
         </message>
         <message>
             <source>PCC Distribution</source>
-            <translation type="finished">PCC-Verteilung</translation>
+            <translation type="finished">PCC Verteilung</translation>
         </message>
         <message>
             <source>Pan:</source>
@@ -4583,7 +4583,7 @@
         </message>
         <message>
             <source>Perfect Palette Picker</source>
-            <translation type="finished">Perfekter Palettenwähler</translation>
+            <translation type="finished">Perfekte Palette Wähler</translation>
         </message>
         <message>
             <source>Permanently apply current display transform to image data</source>
@@ -4595,7 +4595,7 @@
         </message>
         <message>
             <source>Pixel Math</source>
-            <translation type="finished">Pixel Math</translation>
+            <translation type="finished">PixelMath</translation>
         </message>
         <message>
             <source>Plate Solving</source>
@@ -4935,7 +4935,7 @@
         </message>
         <message>
             <source>Star Analysis</source>
-            <translation type="finished">Sternanalyse</translation>
+            <translation type="finished">Stern-Analyse</translation>
         </message>
         <message>
             <source>Star Detection:</source>
@@ -4943,7 +4943,7 @@
         </message>
         <message>
             <source>Star Halo Removal</source>
-            <translation type="finished">Sternenhalos Entfernen</translation>
+            <translation type="finished">Sternhalo-Entfernung</translation>
         </message>
         <message>
             <source>Star Recomposition</source>
@@ -4979,7 +4979,7 @@
         </message>
         <message>
             <source>Stretch Tools</source>
-            <translation type="finished">Streckungswerkzeuge</translation>
+            <translation type="finished">Stretching-Werkzeuge</translation>
         </message>
         <message>
             <source>Stretching &amp; Enhancement: Apply GHS, curves, or AI tools for final presentation</source>
@@ -5191,7 +5191,7 @@
         </message>
         <message>
             <source>Utilities</source>
-            <translation type="finished">Werkzeuge</translation>
+            <translation type="finished">Dienstprogramme</translation>
         </message>
         <message>
             <source>View Management</source>
@@ -5379,7 +5379,7 @@
         <name>ImageBlendingDialog</name>
         <message>
             <source>Add</source>
-            <translation type="finished">Addieren</translation>
+            <translation type="finished">Hinzufügen</translation>
         </message>
         <message>
             <source>All / RGB</source>
@@ -5423,7 +5423,7 @@
         </message>
         <message>
             <source>Feathering:</source>
-            <translation type="finished">Weiche Kante:</translation>
+            <translation type="finished">Feathering:</translation>
         </message>
         <message>
             <source>Green</source>
@@ -5491,7 +5491,7 @@
         </message>
         <message>
             <source>Screen</source>
-            <translation type="finished">Negativ Multiplizieren</translation>
+            <translation type="finished">Bildschirm</translation>
         </message>
         <message>
             <source>Selection</source>
@@ -5536,7 +5536,7 @@
         <name>LivePreviewDialog</name>
         <message>
             <source>Fit</source>
-            <translation type="finished">Einpassen</translation>
+            <translation type="finished">Anpassen</translation>
         </message>
         <message>
             <source>Live Mask Preview</source>
@@ -5630,7 +5630,7 @@
         </message>
         <message>
             <source>Aberration Inspector</source>
-            <translation type="finished">Aberrationsprüfer</translation>
+            <translation type="finished">Aberrationsinspektor</translation>
         </message>
         <message>
             <source>Aberration Inspector (9-Points)</source>
@@ -5638,7 +5638,7 @@
         </message>
         <message>
             <source>Aberration Remover</source>
-            <translation type="finished">Aberrations-Entferner</translation>
+            <translation type="finished">Aberrationsentferner</translation>
         </message>
         <message>
             <source>Abort</source>
@@ -5702,7 +5702,7 @@
         </message>
         <message>
             <source>Arcsinh Stretch</source>
-            <translation type="finished">Arcsinh Stretch</translation>
+            <translation type="finished">Arcsinh Stretching</translation>
         </message>
         <message>
             <source>Arcsinh Stretch Applied to %1</source>
@@ -5926,7 +5926,7 @@
         </message>
         <message>
             <source>Convert RAW to FITS...</source>
-            <translation type="finished">RAW zu FITS konvertieren...</translation>
+            <translation type="finished">Konvertiere RAW zu FITS...</translation>
         </message>
         <message>
             <source>Converted image '%1' to workspace profile.</source>
@@ -6230,7 +6230,7 @@
         </message>
         <message>
             <source>Image Annotator</source>
-            <translation type="finished">Bild-Annotator</translation>
+            <translation type="finished">Bild-Anmerkung</translation>
         </message>
         <message>
             <source>Image Binning</source>
@@ -6746,7 +6746,7 @@
         </message>
         <message>
             <source>PCC Distribution</source>
-            <translation type="finished">PCC-Verteilung</translation>
+            <translation type="finished">PCC Verteilung</translation>
         </message>
         <message>
             <source>Pedestal removed.</source>
@@ -6758,7 +6758,7 @@
         </message>
         <message>
             <source>Perfect Palette Picker</source>
-            <translation type="finished">Perfekter Palettenwähler</translation>
+            <translation type="finished">Perfekte Palette Wähler</translation>
         </message>
         <message>
             <source>Photometric Color Calibration</source>
@@ -6766,7 +6766,7 @@
         </message>
         <message>
             <source>Pixel Math</source>
-            <translation type="finished">Pixel Math</translation>
+            <translation type="finished">PixelMath</translation>
         </message>
         <message>
             <source>Pixel Math applied</source>
@@ -6798,7 +6798,7 @@
         </message>
         <message>
             <source>Please select an image first.</source>
-            <translation type="finished">Bitten wählen Sie zuerst ein Bild aus.</translation>
+            <translation type="finished">Bitte wählen Sie zuerst ein Bild.</translation>
         </message>
         <message>
             <source>Please select an image to crop.</source>
@@ -6993,9 +6993,8 @@
             <translation type="finished">Speichern</translation>
         </message>
         <message>
-            <source>Save Failed:\n</source>
-            <translation type="finished">Speichern fehlgeschlagen:
-</translation>
+            <source>Save Failed: </source>
+            <translation type="finished">Speichern Fehlgeschlagen: </translation>
         </message>
         <message>
             <source>Save Image As</source>
@@ -7123,11 +7122,11 @@
         </message>
         <message>
             <source>Star Analysis</source>
-            <translation type="finished">Sternanalyse</translation>
+            <translation type="finished">Stern-Analyse</translation>
         </message>
         <message>
             <source>Star Halo Removal</source>
-            <translation type="finished">Sternenhalos Entfernen</translation>
+            <translation type="finished">Sternhalo-Entfernung</translation>
         </message>
         <message>
             <source>Star Halo Removal applied.</source>
@@ -7147,11 +7146,11 @@
         </message>
         <message>
             <source>Statistical Stretch</source>
-            <translation type="finished">Statistisches Stretching</translation>
+            <translation type="finished">Statistical Stretch</translation>
         </message>
         <message>
             <source>Stretch Tools</source>
-            <translation type="finished">Streckungswerkzeuge</translation>
+            <translation type="finished">Stretching-Werkzeuge</translation>
         </message>
         <message>
             <source>TIFF Files (*.tiff *.tif);;</source>
@@ -7259,7 +7258,7 @@
         </message>
         <message>
             <source>Utilities</source>
-            <translation type="finished">Werkzeuge</translation>
+            <translation type="finished">Dienstprogramme</translation>
         </message>
         <message>
             <source>View</source>
@@ -7414,7 +7413,7 @@
         </message>
         <message>
             <source>Fit</source>
-            <translation type="finished">Einpassen</translation>
+            <translation type="finished">Anpassen</translation>
         </message>
         <message>
             <source>Freehand</source>
@@ -7699,7 +7698,7 @@
         </message>
         <message>
             <source>Fit</source>
-            <translation type="finished">Einpassen</translation>
+            <translation type="finished">Anpassen</translation>
         </message>
         <message>
             <source>Iterations:</source>
@@ -7743,7 +7742,7 @@
         </message>
         <message>
             <source>Please select an image first.</source>
-            <translation type="finished">Bitten wählen Sie zuerst ein Bild aus.</translation>
+            <translation type="finished">Bitte wählen Sie zuerst ein Bild.</translation>
         </message>
         <message>
             <source>Preview</source>
@@ -7794,7 +7793,7 @@
         </message>
         <message>
             <source>Fit</source>
-            <translation type="finished">Einpassen</translation>
+            <translation type="finished">Anpassen</translation>
         </message>
         <message>
             <source>Gain</source>
@@ -7949,7 +7948,7 @@
         </message>
         <message>
             <source>Fit</source>
-            <translation type="finished">Einpassen</translation>
+            <translation type="finished">Anpassen</translation>
         </message>
         <message>
             <source>From File</source>
@@ -8116,7 +8115,7 @@
         </message>
         <message>
             <source>Add</source>
-            <translation type="finished">Addieren</translation>
+            <translation type="finished">Hinzufügen</translation>
         </message>
         <message>
             <source>Apply to Current View</source>
@@ -8172,7 +8171,7 @@
         </message>
         <message>
             <source>Fit</source>
-            <translation type="finished">Einpassen</translation>
+            <translation type="finished">Anpassen</translation>
         </message>
         <message>
             <source>From %1 import</source>
@@ -8440,7 +8439,7 @@
         </message>
         <message>
             <source>Screen</source>
-            <translation type="finished">Negativ Multiplizieren</translation>
+            <translation type="finished">Bildschirm</translation>
         </message>
         <message>
             <source>Select %1 File</source>
@@ -8776,7 +8775,7 @@
         </message>
         <message>
             <source>Star Distribution (PCC Analysis)</source>
-            <translation type="finished">Sternverteilung (PCC)</translation>
+            <translation type="finished">Sternverteilung (PCC-Analyse)</translation>
         </message>
     </context>
     <context>
@@ -8827,7 +8826,7 @@
         </message>
         <message>
             <source>Perfect Palette Picker</source>
-            <translation type="finished">Perfekter Palettenwähler</translation>
+            <translation type="finished">Perfekte Palette Wähler</translation>
         </message>
         <message>
             <source>Perfect Palette completed: %1</source>
@@ -8835,11 +8834,11 @@
         </message>
         <message>
             <source>Please select an image first.</source>
-            <translation type="finished">Bitten wählen Sie zuerst ein Bild aus.</translation>
+            <translation type="finished">Bitte wählen Sie zuerst ein Bild.</translation>
         </message>
         <message>
             <source>Select View</source>
-            <translation type="finished">Ansicht auswählen</translation>
+            <translation type="finished">Ansicht wählen</translation>
         </message>
         <message>
             <source>Source for %1:</source>
@@ -9029,7 +9028,7 @@
         </message>
         <message>
             <source>Pixel Scale (arcsec/px):</source>
-            <translation type="finished">Pixelskala (arcsec/px):</translation>
+            <translation type="finished">Pixelskala (Bogensek/px):</translation>
         </message>
         <message>
             <source>Pixel Size (um)</source>
@@ -9498,7 +9497,7 @@
         </message>
         <message>
             <source>Aberration Remover</source>
-            <translation type="finished">Aberrations-Entferner</translation>
+            <translation type="finished">Aberrationsentferner</translation>
         </message>
         <message>
             <source>Aberration Remover (RAR)</source>
@@ -9614,7 +9613,7 @@
         </message>
         <message>
             <source>Please select an image first.</source>
-            <translation type="finished">Bitten wählen Sie zuerst ein Bild aus.</translation>
+            <translation type="finished">Bitte wählen Sie zuerst ein Bild.</translation>
         </message>
         <message>
             <source>Provider:</source>
@@ -9725,7 +9724,7 @@
         </message>
         <message>
             <source>Compare (Show Original)</source>
-            <translation type="finished">Vergleichen (Original anzeigen)</translation>
+            <translation type="finished">Vergleichen (Original zeigen)</translation>
         </message>
         <message>
             <source>Contrast</source>
@@ -9749,7 +9748,7 @@
         </message>
         <message>
             <source>Fit</source>
-            <translation type="finished">Einpassen</translation>
+            <translation type="finished">Anpassen</translation>
         </message>
         <message>
             <source>Grain</source>
@@ -10117,7 +10116,7 @@
         </message>
         <message>
             <source>Allow Rotation</source>
-            <translation type="finished">Rotation zulassen</translation>
+            <translation type="finished">Rotation erlauben</translation>
         </message>
         <message>
             <source>Auto</source>
@@ -10270,6 +10269,18 @@
             <source>Previews</source>
             <translation type="finished">Vorschaubilder</translation>
         </message>
+        <message>
+            <source>Search</source>
+            <translation type="finished">Suche</translation>
+        </message>
+        <message>
+            <source>Search Functions</source>
+            <translation type="finished">Suchfunktionen</translation>
+        </message>
+        <message>
+            <source>Search functions...</source>
+            <translation type="finished">Suchfunktionen...</translation>
+        </message>
     </context>
     <context>
         <name>SCNRDialog</name>
@@ -10303,7 +10314,7 @@
         </message>
         <message>
             <source>SCNR (Remove Green Noise)</source>
-            <translation type="finished">SCNR (Grünes Rauschen entfernen)</translation>
+            <translation type="finished">SCNR (Grünrauschen entfernen)</translation>
         </message>
     </context>
     <context>
@@ -10767,7 +10778,7 @@
         </message>
         <message>
             <source>Add</source>
-            <translation type="finished">Addieren</translation>
+            <translation type="finished">Hinzufügen</translation>
         </message>
         <message>
             <source>Available commands:\n</source>
@@ -11364,8 +11375,24 @@
     <context>
         <name>StackingCommands</name>
         <message>
-            <source> &gt; %1 -&gt; %2</source>
-            <translation type="finished">&gt; %1 -&gt; %2</translation>
+            <source>  Image '%1' plate solving failed: %2</source>
+            <translation type="finished">  Astrometrische Lösung für Bild '%1' fehlgeschlagen: %2</translation>
+        </message>
+        <message>
+            <source>  Image '%1' plate-solved and saved (RA=%2, Dec=%3).</source>
+            <translation type="finished">  Bild '%1' gelöst und gespeichert (RA=%2, Dek=%3).</translation>
+        </message>
+        <message>
+            <source>  Image '%1' plate-solved but could not be saved.</source>
+            <translation type="finished">  Bild '%1' gelöst, konnte aber nicht gespeichert werden.</translation>
+        </message>
+        <message>
+            <source>  Options: -force (re-solve all)</source>
+            <translation type="finished">  Optionen: -force (alles neu lösen)</translation>
+        </message>
+        <message>
+            <source>  Options: -nocache (per-image metadata)</source>
+            <translation type="finished">  Optionen: -nocache (Metadaten pro Bild)</translation>
         </message>
         <message>
             <source>(no .tif files found)</source>
@@ -11396,6 +11423,10 @@
             <translation type="finished">Arbeitsverzeichnis geändert in: %1</translation>
         </message>
         <message>
+            <source>Computing astrometric registration for sequence: </source>
+            <translation type="finished">Berechne astrometrische Registrierung für die Sequenz:</translation>
+        </message>
+        <message>
             <source>Conversion complete: %1 success, %2 failed</source>
             <translation type="finished">Konvertierung abgeschlossen: %1 erfolgreich, %2 fehlgeschlagen</translation>
         </message>
@@ -11417,7 +11448,7 @@
         </message>
         <message>
             <source>Debayer: No files found matching </source>
-            <translation type="finished">Debayer: Keine passenden Dateien gefunden</translation>
+            <translation type="finished">Debayer: Keine passenden Dateien gefunden für</translation>
         </message>
         <message>
             <source>Debayered %1 images</source>
@@ -11468,6 +11499,30 @@
             <translation type="finished">Framing-Modus eingestellt auf: %1</translation>
         </message>
         <message>
+            <source>Image %1/%2: '%3' already plate-solved, skipping.</source>
+            <translation type="finished">Bild %1/%2: '%3' bereits gelöst, wird übersprungen.</translation>
+        </message>
+        <message>
+            <source>Image %1/%2: Cannot load '%3': %4</source>
+            <translation type="finished">Bild %1/%2: '%3' kann nicht geladen werden: %4</translation>
+        </message>
+        <message>
+            <source>Image %1/%2: Plate solving '%3' (RA=%4, Dec=%5, scale=%6 arcsec/px)...</source>
+            <translation type="finished">Bild %1/%2: Löse '%3' (RA=%4, Dek=%5, Skala=%6 arcsec/px)...</translation>
+        </message>
+        <message>
+            <source>Image %1: '%2' has no valid WCS, excluding from registration.</source>
+            <translation type="finished">Bild %1: '%2' hat kein gültiges WCS, wird von der Registrierung ausgeschlossen.</translation>
+        </message>
+        <message>
+            <source>Image %1: '%2' homography computation failed, excluding.</source>
+            <translation type="finished">Bild %1: Homographie-Berechnung von '%2' fehlgeschlagen, wird ausgeschlossen.</translation>
+        </message>
+        <message>
+            <source>Image %1: '%2' registration computed (dx=%3, dy=%4, rot=%5 deg, scale=%6)</source>
+            <translation type="finished">Bild %1: Registrierung von '%2' berechnet (dx=%3, dy=%4, Rot=%5 Grad, Skala=%6)</translation>
+        </message>
+        <message>
             <source>Image Stats: Min=%1, Max=%2, Mean=%3</source>
             <translation type="finished">Bildstatistik: Min=%1, Max=%2, Mittelwert=%3</translation>
         </message>
@@ -11480,18 +11535,6 @@
             <translation type="finished">Keine Rundheitsdaten für die Filterung verfügbar. Führen Sie zuerst register aus, um Metriken zu berechnen.</translation>
         </message>
         <message>
-            <source>Note: TStar applies registration and framing dynamically during 'stack'.</source>
-            <translation type="finished">Hinweis: TStar wendet Registrierung und Framing dynamisch während des 'stack' an.</translation>
-        </message>
-        <message>
-            <source>Options: -force</source>
-            <translation type="finished">Optionen: -force</translation>
-        </message>
-        <message>
-            <source>Options: -nocache</source>
-            <translation type="finished">Optionen: -nocache</translation>
-        </message>
-        <message>
             <source>Pipeline complete! Output: %1</source>
             <translation type="finished">Pipeline fertig! Ausgabe: %1</translation>
         </message>
@@ -11500,8 +11543,12 @@
             <translation type="finished">PixelMath-Fehler: %1</translation>
         </message>
         <message>
-            <source>Plate solving reference frame for sequence '%1'...</source>
-            <translation type="finished">Plate-solving des Referenzbildes für Sequenz '%1'...</translation>
+            <source>Plate solving %1/%2</source>
+            <translation type="finished">Löse Bild %1/%2</translation>
+        </message>
+        <message>
+            <source>Plate solving sequence '%1' (%2 images, engine: %3)...</source>
+            <translation type="finished">Löse Sequenz '%1' (%2 Bilder, Engine: %3)...</translation>
         </message>
         <message>
             <source>Project created: %1</source>
@@ -11514,10 +11561,6 @@
         <message>
             <source>RGB Equalization: ENABLED (Neutralizes color cast)</source>
             <translation type="finished">RGB-Equalization: AKTIVIERT (Neutralisiert den Farbstich)</translation>
-        </message>
-        <message>
-            <source>Reference image '%1' is already plate-solved. Using existing WCS data.</source>
-            <translation type="finished">Referenzbild '%1' ist bereits plate-solved. Vorhandene WCS-Daten werden verwendet.</translation>
         </message>
         <message>
             <source>Registering frames...</source>
@@ -11554,6 +11597,10 @@
         <message>
             <source>Save: no image loaded</source>
             <translation type="finished">Speichern: Kein Bild geladen</translation>
+        </message>
+        <message>
+            <source>Sequence center-of-gravity: RA=%1, Dec=%2</source>
+            <translation type="finished">Schwerpunkt der Sequenz: RA=%1, Dek=%2</translation>
         </message>
         <message>
             <source>Slow (Polygon-Clipping)</source>
@@ -11641,28 +11688,36 @@
             <translation type="finished">FITS-Header aktualisiert: %1 = %2</translation>
         </message>
         <message>
-            <source>Using solver engine: %1</source>
-            <translation type="finished">Solver-Engine wird verwendet: %1</translation>
-        </message>
-        <message>
             <source>WARNING: Drizzle requested but no registration data found. Registration must be performed before stacking for Drizzle to be effective.</source>
             <translation type="finished">WARNUNG: Drizzle angefordert, aber keine Registrierungsdaten gefunden. Die Registrierung muss vor dem Stacken durchgeführt werden, damit Drizzle wirksam ist.</translation>
+        </message>
+        <message>
+            <source>seqapplyreg complete: %1 images registered, %2 failed/excluded, framing=%3.</source>
+            <translation type="finished">seqapplyreg abgeschlossen: %1 Bilder registriert, %2 fehlgeschlagen/ausgeschlossen, Framing=%3.</translation>
         </message>
         <message>
             <source>seqapplyreg: No sequence loaded. Run register first.</source>
             <translation type="finished">seqapplyreg: Keine Sequenz geladen. Führen Sie zuerst register aus.</translation>
         </message>
         <message>
+            <source>seqapplyreg: Reference image has no valid WCS. Run seqplatesolve first.</source>
+            <translation type="finished">seqapplyreg: Referenzbild hat kein gültiges WCS. Führen Sie zuerst seqplatesolve aus.</translation>
+        </message>
+        <message>
+            <source>seqplatesolve complete: %1 solved (%2 skipped), %3 failed out of %4 images.</source>
+            <translation type="finished">seqplatesolve abgeschlossen: %1 gelöst (%2 übersprungen), %3 fehlgeschlagen von %4 Bildern.</translation>
+        </message>
+        <message>
+            <source>seqplatesolve: Cancelled by user.</source>
+            <translation type="finished">seqplatesolve: Vom Benutzer abgebrochen.</translation>
+        </message>
+        <message>
+            <source>seqplatesolve: Cannot load reference image: </source>
+            <translation type="finished">seqplatesolve: Referenzbild kann nicht geladen werden:</translation>
+        </message>
+        <message>
             <source>seqplatesolve: No sequence loaded. Load a sequence first.</source>
             <translation type="finished">seqplatesolve: Keine Sequenz geladen. Laden Sie zuerst eine Sequenz.</translation>
-        </message>
-        <message>
-            <source>seqplatesolve: Plate solving complete and successful.</source>
-            <translation type="finished">seqplatesolve: Plate-solving erfolgreich abgeschlossen.</translation>
-        </message>
-        <message>
-            <source>seqplatesolve: Plate solving failed.</source>
-            <translation type="finished">seqplatesolve: Plate-solving fehlgeschlagen.</translation>
         </message>
         <message>
             <source>seqplatesolve: sequence name argument missing.</source>
@@ -11925,7 +11980,7 @@
         </message>
         <message>
             <source>Linear Fit</source>
-            <translation type="finished">Linearer Abgleich</translation>
+            <translation type="finished">Lineare Anpassung</translation>
         </message>
         <message>
             <source>Load Folder...</source>
@@ -12196,7 +12251,7 @@
         <name>StackingEngine</name>
         <message>
             <source>  Loading %1 (%2/%3)...</source>
-            <translation type="finished">Lade %1 (%2/%3)...</translation>
+            <translation type="finished">  Lade %1 (%2/%3)...</translation>
         </message>
         <message>
             <source>%1 stacking complete</source>
@@ -12514,7 +12569,7 @@
         </message>
         <message>
             <source>Star Analysis</source>
-            <translation type="finished">Sternanalyse</translation>
+            <translation type="finished">Stern-Analyse</translation>
         </message>
         <message>
             <source>Star Analysis: Found %1 stars</source>
@@ -12577,7 +12632,7 @@
         </message>
         <message>
             <source>Fit</source>
-            <translation type="finished">Einpassen</translation>
+            <translation type="finished">Anpassen</translation>
         </message>
         <message>
             <source>Halo removal parameters</source>
@@ -12597,7 +12652,7 @@
         </message>
         <message>
             <source>Please select an image first.</source>
-            <translation type="finished">Bitten wählen Sie zuerst ein Bild aus.</translation>
+            <translation type="finished">Bitte wählen Sie zuerst ein Bild.</translation>
         </message>
         <message>
             <source>Preview</source>
@@ -12613,7 +12668,7 @@
         </message>
         <message>
             <source>Star Halo Removal</source>
-            <translation type="finished">Sternenhalos Entfernen</translation>
+            <translation type="finished">Sternhalo-Entfernung</translation>
         </message>
         <message>
             <source>Star Halo Removal applied.</source>
@@ -12783,7 +12838,7 @@
         </message>
         <message>
             <source>Fit</source>
-            <translation type="finished">Einpassen</translation>
+            <translation type="finished">Anpassen</translation>
         </message>
         <message>
             <source>Generalized Hyperbolic Stretch</source>
@@ -13037,7 +13092,7 @@
         </message>
         <message>
             <source>Statistical Stretch</source>
-            <translation type="finished">Statistisches Stretching</translation>
+            <translation type="finished">Statistical Stretch</translation>
         </message>
         <message>
             <source>Statistical Stretch applied (M=%1, BP=%2?)</source>
@@ -13350,7 +13405,7 @@
         </message>
         <message>
             <source>Compare (Show Original)</source>
-            <translation type="finished">Vergleichen (Original anzeigen)</translation>
+            <translation type="finished">Vergleichen (Original zeigen)</translation>
         </message>
         <message>
             <source>Compression:</source>

@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include <QCoreApplication>
 #include <QStandardPaths>
+#include <QUuid>
 #include <QtConcurrent/QtConcurrent>
 #include <QElapsedTimer>
 #include <QMutexLocker>
@@ -349,16 +350,16 @@ void AstapSolver::solve(const ImageBuffer& image,
 
     m_cancelRequested.store(false);
 
-    QThreadPool::globalInstance()->start(
-        [this, image, raHint, decHint, radiusDeg, pixelScale, astapExec]()
-    {
+    // Run synchronously on the current thread to avoid QtConcurrent global pool starvation
+    auto execute_sync = [&]() {
         NativeSolveResult res;
 
         // -- Temporary file paths -----------------------------------------
         QString tempDir  = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-        QString tempTiff = tempDir + "/tstar_astap_solve.tif";
-        QString tempIni  = tempDir + "/tstar_astap_solve.ini";
-        QString tempWcs  = tempDir + "/tstar_astap_solve.wcs";
+        QString uniqueId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        QString tempTiff = tempDir + "/tstar_astap_solve_" + uniqueId + ".tif";
+        QString tempIni  = tempDir + "/tstar_astap_solve_" + uniqueId + ".ini";
+        QString tempWcs  = tempDir + "/tstar_astap_solve_" + uniqueId + ".wcs";
 
         QFile::remove(tempTiff);
         QFile::remove(tempIni);
@@ -562,9 +563,10 @@ void AstapSolver::solve(const ImageBuffer& image,
             };
 
             // Flush ASTAP stdout/stderr to our log
+            // Note: setProcessChannelMode(MergedChannels) combines stdout and stderr
+            // into readAllStandardOutput(), so we only read from that once.
             auto flushOutput = [&]() {
-                QString output = p.readAllStandardOutput() +
-                                 p.readAllStandardError();
+                QString output = p.readAllStandardOutput();
                 const QStringList lines = output.split('\n');
                 for (const QString& line : lines) {
                     QString t = line.trimmed();
@@ -657,7 +659,8 @@ void AstapSolver::solve(const ImageBuffer& image,
 
         QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection,
                                   Q_ARG(NativeSolveResult, res));
-    });
+    };
+    execute_sync();
 }
 
 // ============================================================================

@@ -261,6 +261,50 @@ void NativePlateSolver::applyMatch(double ra, double dec,
 }
 
 // ============================================================================
+// SolveWithCatalog --- Main solve entry point when catalog is preloaded
+// ============================================================================
+void NativePlateSolver::solveWithCatalog(
+    const ImageBuffer& image,
+    double raHint, double decHint, double pixelScale,
+    const std::vector<MatchStar>& preloadedCatalog,
+    const std::vector<CatalogStar>& rawCatalogStars)
+{
+    if (!image.isValid()) {
+        NativeSolveResult res;
+        res.errorMsg = tr("Invalid image buffer.");
+        emit finished(res);
+        return;
+    }
+    m_stop = false;
+    m_image      = image;
+    m_raHint     = raHint;
+    m_decHint    = decHint;
+    m_pixelScale = pixelScale;
+    
+    const std::vector<float> pixelSnapshot = m_image.data();
+    const int w  = m_image.width();
+    const int h  = m_image.height();
+    const int ch = m_image.channels();
+
+    QPointer<NativePlateSolver> safeThis(this);
+    (void)QtConcurrent::run(
+        [safeThis, preloadedCatalog, pixelSnapshot, w, h, ch,
+         rawCatalogStars, raHint, decHint, pixelScale]()
+    {
+        if (!safeThis) return;
+        try {
+            safeThis->processSolving(preloadedCatalog, pixelSnapshot,
+                                     w, h, ch, rawCatalogStars,
+                                     raHint, decHint, pixelScale);
+        } catch (const std::exception& e) {
+            NativeSolveResult res;
+            res.errorMsg = QString("Native solver exception: %1").arg(e.what());
+            if (safeThis) emit safeThis->finished(res);
+        }
+    });
+}
+
+// ============================================================================
 // projectCatalog --- Gnomonic projection to tangent plane (arcsec)
 // ============================================================================
 

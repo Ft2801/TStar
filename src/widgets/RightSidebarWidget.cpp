@@ -8,8 +8,13 @@
 #include <QVariantAnimation>
 #include <QMouseEvent>
 #include <QEnterEvent>
+#include <QEnterEvent>
 #include <QPainter>
 #include <QSettings>
+#include <QStackedWidget>
+#include <QLineEdit>
+#include <QAction>
+#include <QMenu>
 
 
 // ============================================================================
@@ -179,8 +184,19 @@ RightSidebarWidget::RightSidebarWidget(QWidget* parent)
     wrapperLayout->setContentsMargins(0, 0, 0, 0);
     wrapperLayout->setSpacing(0);
 
+    m_stackedWidget = new QStackedWidget(m_contentWrapper);
+    wrapperLayout->addWidget(m_stackedWidget);
+
+    // ==========================================
+    // Page 0: Previews
+    // ==========================================
+    m_previewsPage = new QWidget();
+    auto* previewsLayout = new QVBoxLayout(m_previewsPage);
+    previewsLayout->setContentsMargins(0, 0, 0, 0);
+    previewsLayout->setSpacing(0);
+
     // Top bar containing the "Hide minimized views" checkbox
-    m_topContainer = new QWidget(m_contentWrapper);
+    m_topContainer = new QWidget(m_previewsPage);
     m_topContainer->setFixedHeight(26);
     m_topContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     m_topContainer->setStyleSheet(
@@ -210,10 +226,10 @@ RightSidebarWidget::RightSidebarWidget(QWidget* parent)
     });
 
     topLayout->addWidget(m_hideMinimizedViewsCb);
-    wrapperLayout->addWidget(m_topContainer);
+    previewsLayout->addWidget(m_topContainer);
 
     // Scrollable thumbnail list
-    m_contentContainer = new QScrollArea(m_contentWrapper);
+    m_contentContainer = new QScrollArea(m_previewsPage);
     m_contentContainer->setStyleSheet("background-color: transparent; border: none;");
     m_contentContainer->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_contentContainer->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -229,7 +245,57 @@ RightSidebarWidget::RightSidebarWidget(QWidget* parent)
 
     m_contentContainer->setWidget(m_listWidget);
     m_contentContainer->setWidgetResizable(true);
-    wrapperLayout->addWidget(m_contentContainer);
+    previewsLayout->addWidget(m_contentContainer);
+
+    m_stackedWidget->addWidget(m_previewsPage);
+
+    // ==========================================
+    // Page 1: Search
+    // ==========================================
+    m_searchPage = new QWidget();
+    auto* searchPageLayout = new QVBoxLayout(m_searchPage);
+    searchPageLayout->setContentsMargins(0, 0, 0, 0);
+    searchPageLayout->setSpacing(0);
+
+    // Search box top area
+    QWidget* searchTop = new QWidget(m_searchPage);
+    searchTop->setFixedHeight(26);
+    searchTop->setStyleSheet(
+        "background-color: #202020;"
+        "border-bottom: 1px solid #1a1a1a;"
+        "border-left: none; border-right: none; border-top: none;"
+    );
+    auto* stLayout = new QHBoxLayout(searchTop);
+    stLayout->setContentsMargins(8, 0, 8, 0);
+    stLayout->setSpacing(0);
+    
+    m_searchBox = new QLineEdit();
+    m_searchBox->setPlaceholderText(tr("Search functions..."));
+    m_searchBox->setStyleSheet(
+        "QLineEdit { background-color: #333; color: #ccc; border: 1px solid #555; border-radius: 2px; padding: 0 4px; font-size: 11px; }"
+    );
+    stLayout->addWidget(m_searchBox);
+    searchPageLayout->addWidget(searchTop);
+
+    m_searchScrollArea = new QScrollArea(m_searchPage);
+    m_searchScrollArea->setStyleSheet("background-color: transparent; border: none;");
+    m_searchScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_searchScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+
+    m_searchResultsWidget = new QWidget();
+    m_searchResultsWidget->setStyleSheet("background: transparent;");
+    m_searchResultsLayout = new QVBoxLayout(m_searchResultsWidget);
+    m_searchResultsLayout->setContentsMargins(0, 8, 0, 8);
+    m_searchResultsLayout->setSpacing(0);
+    m_searchResultsLayout->addStretch();
+    
+    m_searchScrollArea->setWidget(m_searchResultsWidget);
+    m_searchScrollArea->setWidgetResizable(true);
+    searchPageLayout->addWidget(m_searchScrollArea);
+
+    m_stackedWidget->addWidget(m_searchPage);
+
+    connect(m_searchBox, &QLineEdit::textChanged, this, &RightSidebarWidget::onSearchTextChanged);
 
     // ------------------------------------------------------------------
     // Tab strip (fixed narrow column on the right edge)
@@ -252,6 +318,16 @@ RightSidebarWidget::RightSidebarWidget(QWidget* parent)
             this, &RightSidebarWidget::onTabClicked);
 
     tabLayout->addWidget(m_tabBtn);
+
+    m_searchTabBtn = new VerticalButton(tr("Search"), m_tabContainer);
+    m_searchTabBtn->setCheckable(true);
+    m_searchTabBtn->setFixedSize(30, 100);
+    m_searchTabBtn->setToolTip(tr("Search Functions"));
+    m_searchTabBtn->setStyleSheet("border: none;");
+    connect(m_searchTabBtn, &QPushButton::clicked,
+            this, &RightSidebarWidget::onSearchTabClicked);
+
+    tabLayout->addWidget(m_searchTabBtn);
     tabLayout->addStretch();
 
     mainLayout->addWidget(m_contentWrapper);
@@ -291,8 +367,42 @@ void RightSidebarWidget::setAnchorGeometry(int rightX, int topY, int h)
 
 void RightSidebarWidget::onTabClicked()
 {
-    setExpanded(!m_expanded);
-    m_tabBtn->setChecked(m_expanded);
+    switchToTab(0);
+}
+
+void RightSidebarWidget::onSearchTabClicked()
+{
+    switchToTab(1);
+}
+
+void RightSidebarWidget::switchToTab(int index)
+{
+    if (m_expanded && m_currentTabIndex == index) {
+        // Toggle off
+        setExpanded(false);
+    } else {
+        bool wasExpanded = m_expanded;
+        m_currentTabIndex = index;
+        m_stackedWidget->setCurrentIndex(index);
+        
+        if (wasExpanded) {
+            m_tabBtn->setChecked(m_currentTabIndex == 0);
+            m_searchTabBtn->setChecked(m_currentTabIndex == 1);
+            
+            int targetWidth = (m_currentTabIndex == 1) ? static_cast<int>(m_expandedWidth * 1.5) : m_expandedWidth;
+            m_widthAnim->stop();
+            m_widthAnim->setStartValue(m_contentWrapper->width());
+            m_widthAnim->setEndValue(targetWidth);
+            m_widthAnim->start();
+        } else {
+            setExpanded(true);
+        }
+        
+        if (index == 1) {
+            populateSearchResults(m_searchBox->text());
+            m_searchBox->setFocus();
+        }
+    }
 }
 
 void RightSidebarWidget::setExpanded(bool expanded)
@@ -301,9 +411,19 @@ void RightSidebarWidget::setExpanded(bool expanded)
     m_expanded = expanded;
     emit expandedToggled(expanded);
 
+    if (!expanded) {
+        m_tabBtn->setChecked(false);
+        m_searchTabBtn->setChecked(false);
+    } else {
+        m_tabBtn->setChecked(m_currentTabIndex == 0);
+        m_searchTabBtn->setChecked(m_currentTabIndex == 1);
+    }
+
+    int targetWidth = (m_currentTabIndex == 1) ? static_cast<int>(m_expandedWidth * 1.5) : m_expandedWidth;
+
     m_widthAnim->stop();
     m_widthAnim->setStartValue(m_contentWrapper->width());
-    m_widthAnim->setEndValue(expanded ? m_expandedWidth : 0);
+    m_widthAnim->setEndValue(expanded ? targetWidth : 0);
     m_widthAnim->start();
 }
 
@@ -334,8 +454,7 @@ void RightSidebarWidget::addThumbnail(CustomMdiSubWindow* sub,
 
     // Auto-expand when the first thumbnail is added
     if (m_items.size() == 1 && !m_expanded) {
-        setExpanded(true);
-        m_tabBtn->setChecked(true);
+        switchToTab(0);
     }
 }
 
@@ -348,9 +467,72 @@ void RightSidebarWidget::removeThumbnail(CustomMdiSubWindow* sub)
     w->deleteLater();
 
     // Auto-collapse when the list becomes empty
-    if (m_items.isEmpty() && m_expanded) {
+    if (m_items.isEmpty() && m_expanded && m_currentTabIndex == 0) {
         setExpanded(false);
-        m_tabBtn->setChecked(false);
+    }
+}
+
+void RightSidebarWidget::registerToolAction(QAction* action)
+{
+    if (!action || action->text().isEmpty() || m_searchableActions.contains(action)) return;
+    
+    // Ignore actions without a trigger or acts as a menu
+    if (action->menu()) return;
+
+    m_searchableActions.append(action);
+
+    // Re-sort alphabetically
+    std::sort(m_searchableActions.begin(), m_searchableActions.end(), [](QAction* a, QAction* b) {
+        QString textA = a->text().remove('&');
+        QString textB = b->text().remove('&');
+        return textA.compare(textB, Qt::CaseInsensitive) < 0;
+    });
+
+    if (m_expanded && m_currentTabIndex == 1) {
+        populateSearchResults(m_searchBox->text());
+    }
+}
+
+void RightSidebarWidget::onSearchTextChanged(const QString& text)
+{
+    populateSearchResults(text);
+}
+
+void RightSidebarWidget::populateSearchResults(const QString& filter)
+{
+    // Clear layout except stretch
+    while (QLayoutItem* item = m_searchResultsLayout->takeAt(0)) {
+        if (item->widget()) item->widget()->deleteLater();
+        else if (item->spacerItem()) {
+            m_searchResultsLayout->addItem(item); // Put stretch back
+            break;
+        }
+    }
+
+    QString f = filter.trimmed();
+
+    for (QAction* act : m_searchableActions) {
+        QString cleanText = act->text().remove('&');
+        if (!f.isEmpty() && !cleanText.contains(f, Qt::CaseInsensitive)) {
+            continue;
+        }
+
+        QPushButton* btn = new QPushButton(cleanText);
+        btn->setStyleSheet(
+            "QPushButton { text-align: left; padding: 6px 10px; background: transparent; color: #ccc; border: none; border-bottom: 1px solid #3a3a3a; font-size: 11px; }"
+            "QPushButton:hover { background: #444; border-bottom: 1px solid #3a3a3a; }"
+        );
+        btn->setCursor(Qt::PointingHandCursor);
+        if (!act->icon().isNull()) {
+            btn->setIcon(act->icon());
+            btn->setIconSize(QSize(16, 16));
+        }
+
+        connect(btn, &QPushButton::clicked, act, &QAction::trigger);
+        
+        // Insert before stretch
+        int count = m_searchResultsLayout->count();
+        m_searchResultsLayout->insertWidget(count > 0 ? count - 1 : 0, btn);
     }
 }
 
