@@ -4650,8 +4650,14 @@ void ImageBuffer::applySaturation(const SaturationParams& params) {
     WriteLock lock(this);
     if (m_channels != 3 || m_data.empty()) return;
 
-    ImageBuffer original;
-    if (hasMask()) original = *this;
+    // Capture mask state and original data for blending.
+    const bool         hasM         = hasMask();
+    const bool         maskInverted = m_mask.inverted;
+    const bool         protectMode  = (m_mask.mode == "protect");
+    const float        maskOpacity  = m_mask.opacity;
+    std::vector<float> originalData;
+    if (hasM)
+        originalData = m_data; // Copy current pixels before modification.
 
     #pragma omp parallel for
     for (int i = 0; i < (int)(m_data.size() / 3); ++i) {
@@ -4719,8 +4725,25 @@ void ImageBuffer::applySaturation(const SaturationParams& params) {
         m_data[i * 3 + 2] = b;
     }
 
-    if (hasMask()) {
-        blendResult(original);
+    // Manual blending avoids recursive WriteLock calls and potential OpenMP deadlocks.
+    if (hasM && !m_mask.data.empty() && !originalData.empty()) {
+        long total = static_cast<long>(m_width) * m_height;
+        #pragma omp parallel for schedule(static)
+        for (long pi = 0; pi < total; ++pi) {
+            if ((size_t)pi >= m_mask.data.size()) continue;
+
+            float alpha = m_mask.data[pi];
+            if (maskInverted) alpha = 1.0f - alpha;
+            if (protectMode)  alpha = 1.0f - alpha;
+            alpha *= maskOpacity;
+
+            const float inv_alpha = 1.0f - alpha;
+            size_t      base      = (size_t)pi * 3;
+            for (int c = 0; c < 3; ++c) {
+                m_data[base + c] = m_data[base + c] * alpha +
+                                   originalData[base + c] * inv_alpha;
+            }
+        }
     }
     setModified(true);
 }
