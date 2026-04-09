@@ -410,9 +410,9 @@ bool WCSUtils::pixelToWorld(const Metadata& meta, double px, double py,
         return false;
     }
 
-    // Relative pixel coordinates (0-indexed to CRPIX, with FITS 1-index offset)
-    double u = px - meta.crpix1 + 1.0;
-    double v = py - meta.crpix2 + 1.0;
+    // Relative pixel coordinates (0-indexed to CRPIX, with FITS 0.5-pixel center offset)
+    double u = px - meta.crpix1 + 0.5;
+    double v = py - meta.crpix2 + 0.5;
 
     // Apply forward SIP distortion if present
     if (meta.sipOrderA > 0 || meta.sipOrderB > 0) {
@@ -478,8 +478,8 @@ bool WCSUtils::worldToPixel(const Metadata& meta, double ra, double dec,
     }
 
     // Convert relative offset back to 0-indexed pixel coordinates
-    px = u + meta.crpix1 - 1.0;
-    py = v + meta.crpix2 - 1.0;
+    px = u + meta.crpix1 - 0.5;
+    py = v + meta.crpix2 - 0.5;
 
     return true;
 }
@@ -515,6 +515,182 @@ bool WCSUtils::getFieldOfView(const Metadata& meta, int width, int height,
     double scale = pixelScale(meta);       // arcsec / pixel
     fovX = width  * scale / 3600.0;        // degrees
     fovY = height * scale / 3600.0;        // degrees
+
+    return true;
+}
+
+// ===========================================================================
+// Astrometric registration helpers
+// ===========================================================================
+
+/**
+ * Compute a 3x3 homography that maps source pixel coords to reference
+ * pixel coords, by projecting N sample points through both WCS solutions.
+ *
+ *   1. For each sample pixel (x,y) in the source image, call
+ *      pixelToWorld to get (RA, Dec) via the source WCS.
+ *   2. Call worldToPixel to map that (RA, Dec) into the reference
+ *      image's pixel coordinates.
+ *   3. Solve for the 3x3 homography from the point correspondences
+ *      using the Direct Linear Transform (DLT).
+ */
+bool WCSUtils::computeHomographyFromWCS(
+    const Metadata& srcMeta, int srcW, int srcH,
+    const Metadata& refMeta, int refW, int refH,
+    double H[3][3])
+{
+    Q_UNUSED(refW);
+    Q_UNUSED(refH);
+
+    if (!hasValidWCS(srcMeta) || !hasValidWCS(refMeta))
+        return false;
+
+    // Sample points: 4 corners + 4 edge midpoints + center = 9 points
+    const double pts[][2] = {
+        {0.0,              0.0             },  // top-left
+        {(double)srcW,     0.0             },  // top-right
+        {0.0,              (double)srcH    },  // bottom-left
+        {(double)srcW,     (double)srcH    },  // bottom-right
+        {srcW * 0.5,       0.0             },  // top-mid
+        {srcW * 0.5,       (double)srcH    },  // bottom-mid
+        {0.0,              srcH * 0.5      },  // left-mid
+        {(double)srcW,     srcH * 0.5      },  // right-mid
+        {srcW * 0.5,       srcH * 0.5      },  // center
+    };
+    constexpr int N = 9;
+
+    // Collect (source pixel) -> (reference pixel) correspondences
+    double srcPts[N][2], dstPts[N][2];
+    int    nValid = 0;
+
+    for (int i = 0; i < N; ++i) {
+        double ra, dec;
+        if (!pixelToWorld(srcMeta, pts[i][0], pts[i][1], ra, dec))
+            continue;
+        double rx, ry;
+        if (!worldToPixel(refMeta, ra, dec, rx, ry))
+            continue;
+        srcPts[nValid][0] = pts[i][0];
+        srcPts[nValid][1] = pts[i][1];
+        dstPts[nValid][0] = rx;
+        dstPts[nValid][1] = ry;
+        nValid++;
+    }
+
+    if (nValid < 4)
+        return false;
+
+    // --- Solve for H using DLT (Ax = 0) ---
+    // For each correspondence (sx,sy) -> (dx,dy) we get two equations:
+    //   -sx*w  -sy*w  -w   0     0    0  dx*sx*w  dx*sy*w  dx*w
+    //    0      0      0  -sx*w -sy*w -w  dy*sx*w  dy*sy*w  dy*w
+    // Here w = 1.
+    // We use a simplified least-squares approach: build the 8x8 normal
+    // equations (fixing H[2][2]=1) and solve via Gauss elimination.
+
+    double A[8][9] = {};  // 8 unknowns, column 8 = RHS
+
+    for (int p = 0; p < nValid; ++p) {
+        double sx = srcPts[p][0], sy = srcPts[p][1];
+        double dx = dstPts[p][0], dy = dstPts[p][1];
+
+        // Row for x equation: h00*sx + h01*sy + h02 - h20*sx*dx - h21*sy*dx = dx
+        double rowX[8] = {sx, sy, 1.0, 0.0, 0.0, 0.0, -sx*dx, -sy*dx};
+        // Row for y equation: h10*sx + h11*sy + h12 - h20*sx*dy - h21*sy*dy = dy
+        double rowY[8] = {0.0, 0.0, 0.0, sx, sy, 1.0, -sx*dy, -sy*dy};
+
+        // Accumulate A^T * A and A^T * b
+        for (int i = 0; i < 8; ++i) {
+            for (int j = 0; j < 8; ++j) {
+                A[i][j] += rowX[i] * rowX[j] + rowY[i] * rowY[j];
+            }
+            A[i][8] += rowX[i] * dx + rowY[i] * dy;
+        }
+    }
+
+    // Gauss elimination with partial pivoting
+    for (int col = 0; col < 8; ++col) {
+        // Find pivot
+        int pivotRow = col;
+        double pivotVal = std::abs(A[col][col]);
+        for (int row = col + 1; row < 8; ++row) {
+            if (std::abs(A[row][col]) > pivotVal) {
+                pivotVal = std::abs(A[row][col]);
+                pivotRow = row;
+            }
+        }
+        if (pivotVal < 1e-20)
+            return false;  // Singular
+
+        // Swap rows
+        if (pivotRow != col) {
+            for (int j = 0; j < 9; ++j)
+                std::swap(A[col][j], A[pivotRow][j]);
+        }
+
+        // Eliminate
+        for (int row = col + 1; row < 8; ++row) {
+            double factor = A[row][col] / A[col][col];
+            for (int j = col; j < 9; ++j)
+                A[row][j] -= factor * A[col][j];
+        }
+    }
+
+    // Back-substitution
+    double h[8];
+    for (int i = 7; i >= 0; --i) {
+        h[i] = A[i][8];
+        for (int j = i + 1; j < 8; ++j)
+            h[i] -= A[i][j] * h[j];
+        h[i] /= A[i][i];
+    }
+
+    H[0][0] = h[0];  H[0][1] = h[1];  H[0][2] = h[2];
+    H[1][0] = h[3];  H[1][1] = h[4];  H[1][2] = h[5];
+    H[2][0] = h[6];  H[2][1] = h[7];  H[2][2] = 1.0;
+
+    return true;
+}
+
+/**
+ * Compute the spherical centre-of-gravity of a set of (RA, Dec) pairs.
+ *
+ * The algorithm converts each direction to a unit Cartesian vector,
+ * averages the vectors, and converts back.  This automatically handles
+ * the RA=0/360 wrap-around ambiguity.
+ */
+bool WCSUtils::computeSequenceCOG(
+    const std::vector<std::pair<double,double>>& coords,
+    double& ra, double& dec)
+{
+    if (coords.empty())
+        return false;
+
+    double cx = 0.0, cy = 0.0, cz = 0.0;
+
+    for (const auto& [r, d] : coords) {
+        double rr = r * DEG_TO_RAD;
+        double dd = d * DEG_TO_RAD;
+        cx += std::cos(dd) * std::cos(rr);
+        cy += std::cos(dd) * std::sin(rr);
+        cz += std::sin(dd);
+    }
+
+    double n = static_cast<double>(coords.size());
+    cx /= n;
+    cy /= n;
+    cz /= n;
+
+    double norm = std::sqrt(cx * cx + cy * cy + cz * cz);
+    if (norm < 1e-15)
+        return false;
+
+    dec = std::asin(cz / norm) * RAD_TO_DEG;
+    ra  = std::atan2(cy, cx) * RAD_TO_DEG;
+
+    // Normalise RA to [0, 360)
+    while (ra < 0.0)    ra += 360.0;
+    while (ra >= 360.0) ra -= 360.0;
 
     return true;
 }

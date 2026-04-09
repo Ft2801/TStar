@@ -80,7 +80,8 @@ enum class NormalizationMethod {
 enum class FramingMode {
     Reference,      ///< Match the reference frame dimensions.
     Union,          ///< Enclose the union of all frame footprints (largest output).
-    Intersection    ///< Use only the region common to all frames (smallest output).
+    Intersection,   ///< Use only the region common to all frames (smallest output).
+    COG             ///< Center on the center-of-gravity of all frame centres; keep reference dims.
 };
 
 /**

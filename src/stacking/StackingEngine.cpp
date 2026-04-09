@@ -593,12 +593,16 @@ void StackingEngine::computeOutputDimensions(const StackingArgs& args,
 {
     const ImageSequence* seq = args.sequence;
 
+    const bool isExpand = (args.params.framingMode == FramingMode::Union ||
+                           args.params.framingMode == FramingMode::COG);
+    const bool isShrink = (args.params.framingMode == FramingMode::Intersection);
+
     if (args.params.framingMode != FramingMode::Reference && seq->hasRegistration()) {
         // We accumulate boundaries
-        double minX = (args.params.framingMode == FramingMode::Intersection) ? -1e9 :  1e9;
-        double maxX = (args.params.framingMode == FramingMode::Intersection) ?  1e9 : -1e9;
-        double minY = (args.params.framingMode == FramingMode::Intersection) ? -1e9 :  1e9;
-        double maxY = (args.params.framingMode == FramingMode::Intersection) ?  1e9 : -1e9;
+        double minX = isShrink ? -1e9 :  1e9;
+        double maxX = isShrink ?  1e9 : -1e9;
+        double minY = isShrink ? -1e9 :  1e9;
+        double maxY = isShrink ?  1e9 : -1e9;
 
         // Ensure we handle the reference frame explicitly if intersection minX/Y stays unbounded.
         // Initialize properly using the first valid frame limits to avoid bounding limit errors.
@@ -648,12 +652,12 @@ void StackingEngine::computeOutputDimensions(const StackingArgs& args,
                 minY = curMinY; maxY = curMaxY;
                 first = false;
             } else {
-                if (args.params.framingMode == FramingMode::Union) {
+                if (isExpand) {
                     minX = std::min(minX, curMinX);
                     minY = std::min(minY, curMinY);
                     maxX = std::max(maxX, curMaxX);
                     maxY = std::max(maxY, curMaxY);
-                } else if (args.params.framingMode == FramingMode::Intersection) {
+                } else if (isShrink) {
                     minX = std::max(minX, curMinX);
                     minY = std::max(minY, curMinY);
                     maxX = std::min(maxX, curMaxX);
@@ -663,7 +667,7 @@ void StackingEngine::computeOutputDimensions(const StackingArgs& args,
         }
         
         // Ensure intersection actually produces a valid (>0) rectangle
-        if (args.params.framingMode == FramingMode::Intersection) {
+        if (isShrink) {
             if (maxX <= minX || maxY <= minY) {
                 // Failsafe: Revert to reference if intersection is empty
                 minX = 0; maxX = seq->width();
@@ -2194,9 +2198,12 @@ void StackingEngine::updateMetadata(StackingArgs& args, int offsetX, int offsetY
         // Raw FITS header cards (basis for saved header)
         meta.rawHeaders = refMeta.rawHeaders;
 
+        // Scale WCS if upscaling at stacking
+        double wcsScale = args.params.upscaleAtStacking ? 2.0 : 1.0;
+
         // Instrument / optics
         meta.focalLength  = refMeta.focalLength;
-        meta.pixelSize    = refMeta.pixelSize;
+        meta.pixelSize    = refMeta.pixelSize / wcsScale;
         meta.ccdTemp      = refMeta.ccdTemp;
         meta.bayerPattern = refMeta.bayerPattern;
         meta.isMono       = refMeta.isMono;
@@ -2210,13 +2217,14 @@ void StackingEngine::updateMetadata(StackingArgs& args, int offsetX, int offsetY
         meta.ra  = refMeta.ra;
         meta.dec = refMeta.dec;
 
-        // Full WCS
-        meta.crpix1  = refMeta.crpix1;
-        meta.crpix2  = refMeta.crpix2;
-        meta.cd1_1   = refMeta.cd1_1;
-        meta.cd1_2   = refMeta.cd1_2;
-        meta.cd2_1   = refMeta.cd2_1;
-        meta.cd2_2   = refMeta.cd2_2;
+        // Scale WCS if upscaling at stacking (already defined above)
+        // Full WCS (shifted by framing offset, and scaled)
+        meta.crpix1  = (refMeta.crpix1 * wcsScale) - offsetX;
+        meta.crpix2  = (refMeta.crpix2 * wcsScale) - offsetY;
+        meta.cd1_1   = refMeta.cd1_1 / wcsScale;
+        meta.cd1_2   = refMeta.cd1_2 / wcsScale;
+        meta.cd2_1   = refMeta.cd2_1 / wcsScale;
+        meta.cd2_2   = refMeta.cd2_2 / wcsScale;
         meta.ctype1  = refMeta.ctype1;
         meta.ctype2  = refMeta.ctype2;
         meta.equinox = refMeta.equinox;

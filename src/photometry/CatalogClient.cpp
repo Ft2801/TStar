@@ -145,11 +145,12 @@ void CatalogClient::sendAPASS()
 
     QNetworkReply* reply = m_manager->get(req);
 
-    // Per-mirror timeout: 15 seconds for APASS queries.
-    QTimer::singleShot(15000, reply, [reply]() {
+    // Per-mirror timeout: 30 seconds for APASS queries.
+    const int apassMirrorIdx = s_currentMirrorIndex;
+    QTimer::singleShot(30000, reply, [reply, apassMirrorIdx]() {
         if (reply->isRunning()) {
             qWarning() << "VizieR APASS timeout on mirror"
-                       << CatalogClient::s_currentMirrorIndex;
+                       << apassMirrorIdx;
             reply->abort();
         }
     });
@@ -199,11 +200,13 @@ void CatalogClient::sendGaia()
     QNetworkReply* reply = m_manager->get(req);
 
     // Adaptive timeout: wider fields require more VizieR processing time.
-    const int timeoutMs = (m_lastQueryRadius > 2.0) ? 30000 : 20000;
-    QTimer::singleShot(timeoutMs, reply, [reply]() {
+    // Increased to 45s/60s for heavy Gaia DR3 queries.
+    const int gaiaTimeoutMs = (m_lastQueryRadius > 2.0) ? 60000 : 45000;
+    const int gaiaMirrorIdx = s_currentMirrorIndex;
+    QTimer::singleShot(gaiaTimeoutMs, reply, [reply, gaiaMirrorIdx]() {
         if (reply->isRunning()) {
             qWarning() << "VizieR Gaia timeout on mirror"
-                       << CatalogClient::s_currentMirrorIndex;
+                       << gaiaMirrorIdx;
             reply->abort();
         }
     });
@@ -246,11 +249,13 @@ void CatalogClient::sendHyperLeda()
 
     QNetworkReply* reply = m_manager->get(req);
 
-    const int timeoutMs = (m_lastQueryRadius > 2.0) ? 30000 : 20000;
-    QTimer::singleShot(timeoutMs, reply, [reply]() {
+    // Increased timeout for HyperLeda queries.
+    const int hledaTimeoutMs = (m_lastQueryRadius > 2.0) ? 60000 : 45000;
+    const int hledaMirrorIdx = s_currentMirrorIndex;
+    QTimer::singleShot(hledaTimeoutMs, reply, [reply, hledaMirrorIdx]() {
         if (reply->isRunning()) {
             qWarning() << "VizieR HyperLeda timeout on mirror"
-                       << CatalogClient::s_currentMirrorIndex;
+                       << hledaMirrorIdx;
             reply->abort();
         }
     });

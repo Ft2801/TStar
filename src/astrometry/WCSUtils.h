@@ -11,6 +11,7 @@
 // ============================================================================
 
 #include "../ImageBuffer.h"
+#include <vector>
 
 class WCSUtils {
 public:
@@ -87,6 +88,42 @@ public:
     /** Returns the field of view in degrees (X and Y axes). */
     static bool getFieldOfView(const Metadata& meta, int width, int height,
                                double& fovX, double& fovY);
+
+    // -- Astrometric registration helpers ---------------------------------
+
+    /**
+     * Compute a homography matrix that maps pixel coordinates from
+     * a source image (with its own WCS) into the coordinate system of
+     * a reference image (with its own WCS), by mapping the four
+     * corners through both WCS solutions.
+     *
+     * @param srcMeta   WCS metadata of the source image.
+     * @param srcW      Source image width.
+     * @param srcH      Source image height.
+     * @param refMeta   WCS metadata of the reference image.
+     * @param refW      Reference image width.
+     * @param refH      Reference image height.
+     * @param H         Output 3x3 homography (source -> reference pixels).
+     * @return true on success.
+     */
+    static bool computeHomographyFromWCS(
+        const Metadata& srcMeta, int srcW, int srcH,
+        const Metadata& refMeta, int refW, int refH,
+        double H[3][3]);
+
+    /**
+     * Compute the spherical center-of-gravity (mean direction) of a
+     * set of (RA, Dec) coordinate pairs.  Handles RA wrap-around by
+     * converting to Cartesian, averaging, and converting back.
+     *
+     * @param coords  Vector of (RA, Dec) pairs in degrees.
+     * @param ra      Output mean RA in degrees.
+     * @param dec     Output mean Dec in degrees.
+     * @return true if the result is valid.
+     */
+    static bool computeSequenceCOG(
+        const std::vector<std::pair<double,double>>& coords,
+        double& ra, double& dec);
 
 private:
     // -- TAN (gnomonic) projection helpers --------------------------------
