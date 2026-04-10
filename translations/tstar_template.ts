@@ -10167,7 +10167,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Load Folder...</source>
+            <source>Load Images...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -10216,10 +10216,6 @@
         </message>
         <message>
             <source>Registration Parameters</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>Select Image Folder</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11375,6 +11371,14 @@
     <context>
         <name>StackingCommands</name>
         <message>
+            <source>  Engine: %1 (radius=%2 deg)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Image %1: %2 failed. Falling back to %3...</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>  Image '%1' plate solving failed: %2</source>
             <translation type="unfinished" />
         </message>
@@ -11392,6 +11396,14 @@
         </message>
         <message>
             <source>  Options: -nocache (per-image metadata)</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Scale: %1 arcsec/px</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>  Target: RA=%1, Dec=%2</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11507,7 +11519,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Image %1/%2: Plate solving '%3' (RA=%4, Dec=%5, scale=%6 arcsec/px)...</source>
+            <source>Image %1/%2: Solving '%3' (Engine: %4, RA=%5, Dec=%6, Scale=%7)...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11524,6 +11536,10 @@
         </message>
         <message>
             <source>Image Stats: Min=%1, Max=%2, Mean=%3</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Mosaic framing: Selected image %1 ('%2') as Reference (closest to average center) to minimize spherical projection distortion.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11547,7 +11563,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Plate solving sequence '%1' (%2 images, engine: %3)...</source>
+            <source>Plate solving sequence '%1' (%2 images)...</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11691,6 +11707,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>auto</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>seqapplyreg complete: %1 images registered, %2 failed/excluded, framing=%3.</source>
             <translation type="unfinished" />
         </message>
@@ -11707,11 +11727,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>seqplatesolve: Cancelled by user.</source>
-            <translation type="unfinished" />
-        </message>
-        <message>
-            <source>seqplatesolve: Cannot load reference image: </source>
+            <source>seqplatesolve: Cannot load first image to seed fallback hints: </source>
             <translation type="unfinished" />
         </message>
         <message>

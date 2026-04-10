@@ -6305,13 +6305,9 @@ void MainWindow::updateLastUsedDir(const QString& path) {
     if (!chosenDir.isEmpty() && QDir(chosenDir).exists()) {
         m_lastDialogDir = chosenDir;
 
-        // Update process CWD so standard file dialogs and other tools follow
-        QDir::setCurrent(chosenDir);
-
         // Persist to settings
         QSettings settings("TStar", "TStar");
         settings.setValue("General/LastDialogDir", chosenDir);
-        settings.setValue("General/LastWorkingDir", chosenDir);
         settings.sync(); // Force write to avoid loss on crash
     }
 }

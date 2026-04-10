@@ -10167,8 +10167,8 @@
             <translation type="finished">Dejar vacío para carpeta origen</translation>
         </message>
         <message>
-            <source>Load Folder...</source>
-            <translation type="finished">Cargar Carpeta...</translation>
+            <source>Load Images...</source>
+            <translation type="finished">Cargar Imágenes...</translation>
         </message>
         <message>
             <source>Loaded %1 images</source>
@@ -10217,10 +10217,6 @@
         <message>
             <source>Registration Parameters</source>
             <translation type="finished">Parámetros de Registro</translation>
-        </message>
-        <message>
-            <source>Select Image Folder</source>
-            <translation type="finished">Seleccionar Carpeta de Imágenes</translation>
         </message>
         <message>
             <source>Select Output Directory</source>
@@ -11375,6 +11371,14 @@
     <context>
         <name>StackingCommands</name>
         <message>
+            <source>  Engine: %1 (radius=%2 deg)</source>
+            <translation type="finished">  Motor: %1 (radio=%2 deg)</translation>
+        </message>
+        <message>
+            <source>  Image %1: %2 failed. Falling back to %3...</source>
+            <translation type="finished">  Imagen %1: %2 falló. Reintentando con %3...</translation>
+        </message>
+        <message>
             <source>  Image '%1' plate solving failed: %2</source>
             <translation type="finished">  Solución astrométrica de la imagen '%1' fallida: %2</translation>
         </message>
@@ -11393,6 +11397,14 @@
         <message>
             <source>  Options: -nocache (per-image metadata)</source>
             <translation type="finished">  Opciones: -nocache (metadatos por imagen)</translation>
+        </message>
+        <message>
+            <source>  Scale: %1 arcsec/px</source>
+            <translation type="finished">  Escala: %1 arcsec/px</translation>
+        </message>
+        <message>
+            <source>  Target: RA=%1, Dec=%2</source>
+            <translation type="finished">  Objetivo: AR=%1, Dec=%2</translation>
         </message>
         <message>
             <source>(no .tif files found)</source>
@@ -11507,8 +11519,8 @@
             <translation type="finished">Imagen %1/%2: No si puede cargar '%3': %4</translation>
         </message>
         <message>
-            <source>Image %1/%2: Plate solving '%3' (RA=%4, Dec=%5, scale=%6 arcsec/px)...</source>
-            <translation type="finished">Imagen %1/%2: Resolviendo '%3' (AR=%4, Dec=%5, escala=%6 arcsec/px)...</translation>
+            <source>Image %1/%2: Solving '%3' (Engine: %4, RA=%5, Dec=%6, Scale=%7)...</source>
+            <translation type="finished">Imagen %1/%2: Resolviendo '%3' (Motor: %4, AR=%5, Dec=%6, Escala=%7)...</translation>
         </message>
         <message>
             <source>Image %1: '%2' has no valid WCS, excluding from registration.</source>
@@ -11525,6 +11537,10 @@
         <message>
             <source>Image Stats: Min=%1, Max=%2, Mean=%3</source>
             <translation type="finished">Estadísticas de imagen: Mín=%1, Máx=%2, Media=%3</translation>
+        </message>
+        <message>
+            <source>Mosaic framing: Selected image %1 ('%2') as Reference (closest to average center) to minimize spherical projection distortion.</source>
+            <translation type="finished">Encuadre de mosaico: Imagen %1 ('%2') seleccionada como Referencia (más cercana al centro promedio) para minimizar la distorsión de proyección esférica.</translation>
         </message>
         <message>
             <source>NOTE: PixFrac is ignored in Fast Drizzle mode.</source>
@@ -11547,8 +11563,8 @@
             <translation type="finished">Resolviendo astrométricamente %1/%2</translation>
         </message>
         <message>
-            <source>Plate solving sequence '%1' (%2 images, engine: %3)...</source>
-            <translation type="finished">Resolviendo secuencia '%1' (%2 imágenes, motor: %3)...</translation>
+            <source>Plate solving sequence '%1' (%2 images)...</source>
+            <translation type="finished">Resolución astrométrica de la secuencia '%1' (%2 imágenes)...</translation>
         </message>
         <message>
             <source>Project created: %1</source>
@@ -11691,6 +11707,10 @@
             <translation type="finished">ADVERTENCIA: Drizzle solicitado pero no se han trovato datos de registro. El registro debe realizarse antes del stacking para que el Drizzle sea efectivo.</translation>
         </message>
         <message>
+            <source>auto</source>
+            <translation type="finished">auto</translation>
+        </message>
+        <message>
             <source>seqapplyreg complete: %1 images registered, %2 failed/excluded, framing=%3.</source>
             <translation type="finished">seqapplyreg completado: %1 imágenes registradas, %2 fallidas/excluidas, encuadre=%3.</translation>
         </message>
@@ -11707,12 +11727,8 @@
             <translation type="finished">seqplatesolve completado: %1 resueltas (%2 omitidas), %3 fallidas de %4 imágenes.</translation>
         </message>
         <message>
-            <source>seqplatesolve: Cancelled by user.</source>
-            <translation type="finished">seqplatesolve: Cancelado por el usuario.</translation>
-        </message>
-        <message>
-            <source>seqplatesolve: Cannot load reference image: </source>
-            <translation type="finished">seqplatesolve: No se puede cargar la imagen de referencia:</translation>
+            <source>seqplatesolve: Cannot load first image to seed fallback hints: </source>
+            <translation type="finished">seqplatesolve: No se puede cargar la primera imagen para las sugerencias de respaldo:</translation>
         </message>
         <message>
             <source>seqplatesolve: No sequence loaded. Load a sequence first.</source>

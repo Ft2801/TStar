@@ -2097,7 +2097,7 @@ bool StackingCommands::cmdConvert(const ScriptCommand& cmd)
                 std::lock_guard<std::mutex> lock(logMutex);
                 if (s_runner)
                     s_runner->logMessage(
-                        QObject::tr(" > %1 -> %2").arg(file, outName),
+                        QString(" > %1 -> %2").arg(file, outName),
                         "#888888");
             }
 

@@ -53,7 +53,7 @@ void RegistrationDialog::setupUI()
 
     QHBoxLayout* toolbar = new QHBoxLayout();
 
-    m_loadBtn = new QPushButton(tr("Load Folder..."), this);
+    m_loadBtn = new QPushButton(tr("Load Images..."), this);
     connect(m_loadBtn, &QPushButton::clicked, this, &RegistrationDialog::onLoadSequence);
     toolbar->addWidget(m_loadBtn);
     toolbar->addStretch();
@@ -255,17 +255,19 @@ void RegistrationDialog::onLoadSequence()
 {
     QSettings settings("TStar", "TStar");
     const QString initialDir = settings.value("Registration/InputFolder", QDir::currentPath()).toString();
-    const QString dir = QFileDialog::getExistingDirectory(this, tr("Select Image Folder"), initialDir);
+    
+    const QStringList filters = { "*.fit", "*.fits", "*.fts", "*.tif", "*.tiff" };
+    const QStringList paths = QFileDialog::getOpenFileNames(this, "Select Images for Registration", initialDir, "Images (*.fit *.fits *.fts *.tif *.tiff)");
 
-    if (dir.isEmpty())
+    if (paths.isEmpty())
         return;
 
-    settings.setValue("Registration/InputFolder", dir);
+    // Remember the directory of the first file
+    settings.setValue("Registration/InputFolder", QFileInfo(paths.first()).absolutePath());
+    
     m_sequence = std::make_unique<Stacking::ImageSequence>();
 
-    const QStringList filters = { "*.fit", "*.fits", "*.fts", "*.tif", "*.tiff" };
-
-    const bool success = m_sequence->loadFromDirectory(dir, filters,
+    const bool success = m_sequence->loadFromFiles(paths,
         [this]([[maybe_unused]] const QString& msg, double pct)
         {
             if (pct >= 0.0)
