@@ -2206,11 +2206,15 @@
         </message>
         <message>
             <source>LINK</source>
-            <translation type="finished">LINK</translation>
+            <translation type="finished">COLLEGA</translation>
         </message>
         <message>
             <source>LINKED</source>
             <translation type="finished">COLLEGATO</translation>
+        </message>
+        <message>
+            <source>NAME</source>
+            <translation type="finished">NOME</translation>
         </message>
         <message>
             <source>New Name:</source>

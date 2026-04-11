@@ -10,6 +10,7 @@
 #include <QDrag>
 #include <QMimeData>
 #include <QApplication>
+#include <QCoreApplication>
 #include <QMdiArea>
 #include <QEvent>
 #include <QDragEnterEvent>
@@ -35,15 +36,15 @@
 // Compile-time UI constants shared across all subwindow components.
 // ---------------------------------------------------------------------------
 namespace FixedUI {
-    constexpr int sidebarWidth    = 26;
-    constexpr int titleBarHeight  = 30;
+    constexpr int sidebarWidth    = 20;
+    constexpr int titleBarHeight  = 25;
     constexpr int buttonSize      = 24;
     constexpr int iconSize        = 16;
     constexpr int dragPixmapSize  = 32;
-    constexpr int minShadedWidth  = 200;
+    constexpr int minShadedWidth  = 300;
     constexpr int borderWidth     = 2;
-    constexpr int minWindowWidth  = 200;
-    constexpr int minWindowHeight = 150;
+    constexpr int minWindowWidth  = 250;
+    constexpr int minWindowHeight = 350;
     constexpr int resizeMargin    = 8;
 }
 
@@ -73,9 +74,26 @@ static QIcon iconFromSvg(const QString& svg, QWidget* widget = nullptr)
 NameStrip::NameStrip(QWidget* parent) : QWidget(parent)
 {
     setFixedWidth(FixedUI::sidebarWidth);
-    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setCursor(Qt::OpenHandCursor);
     setAcceptDrops(true);
+
+    // Store translated "NAME" text
+    m_title = QCoreApplication::translate("CustomMdiSubWindow", "NAME");
+
+    // Calculate fixed height based on longest text among NAME, LINK, LINKED, ADAPT
+    const QFontMetrics fm(QFont("Segoe UI", 9));
+    const QString linkText = QCoreApplication::translate("CustomMdiSubWindow", "LINK");
+    const QString linkedText = QCoreApplication::translate("CustomMdiSubWindow", "LINKED");
+    const QString adaptText = QCoreApplication::translate("CustomMdiSubWindow", "ADAPT");
+    
+    const int nameLen = fm.horizontalAdvance(m_title);
+    const int linkLen = fm.horizontalAdvance(linkText);
+    const int linkedLen = fm.horizontalAdvance(linkedText);
+    const int adaptLen = fm.horizontalAdvance(adaptText);
+    const int maxLen = std::max({nameLen, linkLen, linkedLen, adaptLen});
+    
+    setFixedHeight(maxLen + 10);  // 5px padding each side
 }
 
 void NameStrip::dragMoveEvent(QDragMoveEvent* event)
@@ -88,25 +106,9 @@ void NameStrip::dragMoveEvent(QDragMoveEvent* event)
     }
 }
 
-void NameStrip::setTitle(const QString& title)
-{
-    // Truncate long titles with an ellipsis to prevent layout overflow
-    const int maxChars = 15;
-    m_title = (title.length() > maxChars)
-        ? title.left(maxChars - 1) + QChar(0x2026)
-        : title;
-
-    const QFontMetrics fm(QFont("Segoe UI", 9));
-    const int textLen       = fm.horizontalAdvance(m_title);
-    const int desiredHeight = textLen + 40;
-    setFixedHeight(desiredHeight);
-    update();
-}
-
 int NameStrip::preferredHeight() const
 {
-    const QFontMetrics fm(QFont("Segoe UI", 9));
-    return fm.horizontalAdvance(m_title) + 40;
+    return height();
 }
 
 void NameStrip::paintEvent(QPaintEvent*)
@@ -123,9 +125,6 @@ void NameStrip::paintEvent(QPaintEvent*)
     p.rotate(-90);
     p.drawText(QRect(0, 0, height(), width()), Qt::AlignCenter, m_title);
     p.restore();
-
-    p.setPen(QColor("#222222"));
-    p.drawRect(0, 0, width() - 1, height() - 1);
 }
 
 void NameStrip::mouseDoubleClickEvent(QMouseEvent* event)
@@ -196,6 +195,23 @@ LinkStrip::LinkStrip(QWidget* parent) : QWidget(parent)
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setCursor(Qt::OpenHandCursor);
     setAcceptDrops(true);
+
+    // Cache translated strings
+    m_linkText = QCoreApplication::translate("CustomMdiSubWindow", "LINK");
+    m_linkedText = QCoreApplication::translate("CustomMdiSubWindow", "LINKED");
+
+    // Calculate fixed height based on longest text among NAME, LINK, LINKED, ADAPT
+    const QFontMetrics fm(QFont("Segoe UI", 9));
+    const QString nameText = QCoreApplication::translate("CustomMdiSubWindow", "NAME");
+    const QString adaptText = QCoreApplication::translate("CustomMdiSubWindow", "ADAPT");
+    
+    const int nameLen = fm.horizontalAdvance(nameText);
+    const int linkLen = fm.horizontalAdvance(m_linkText);
+    const int linkedLen = fm.horizontalAdvance(m_linkedText);
+    const int adaptLen = fm.horizontalAdvance(adaptText);
+    const int maxLen = std::max({nameLen, linkLen, linkedLen, adaptLen});
+    
+    setFixedHeight(maxLen + 10);  // 5px padding each side
 }
 
 void LinkStrip::setLinked(bool linked)
@@ -218,11 +234,8 @@ void LinkStrip::paintEvent(QPaintEvent*)
     p.translate(0, height());
     p.rotate(-90);
     p.drawText(QRect(0, 0, height(), width()), Qt::AlignCenter,
-               m_linked ? tr("LINKED") : tr("LINK"));
+               m_linked ? m_linkedText : m_linkText);
     p.restore();
-
-    p.setPen(QColor("#222222"));
-    p.drawRect(0, 0, width() - 1, height() - 1);
 }
 
 void LinkStrip::mousePressEvent(QMouseEvent* event)
@@ -310,6 +323,23 @@ AdaptStrip::AdaptStrip(QWidget* parent) : QWidget(parent)
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setCursor(Qt::OpenHandCursor);
     setAcceptDrops(true);
+
+    // Cache translated string
+    m_adaptText = QCoreApplication::translate("CustomMdiSubWindow", "ADAPT");
+
+    // Calculate fixed height based on longest text among NAME, LINK, LINKED, ADAPT
+    const QFontMetrics fm(QFont("Segoe UI", 9));
+    const QString nameText = QCoreApplication::translate("CustomMdiSubWindow", "NAME");
+    const QString linkText = QCoreApplication::translate("CustomMdiSubWindow", "LINK");
+    const QString linkedText = QCoreApplication::translate("CustomMdiSubWindow", "LINKED");
+    
+    const int nameLen = fm.horizontalAdvance(nameText);
+    const int linkLen = fm.horizontalAdvance(linkText);
+    const int linkedLen = fm.horizontalAdvance(linkedText);
+    const int adaptLen = fm.horizontalAdvance(m_adaptText);
+    const int maxLen = std::max({nameLen, linkLen, linkedLen, adaptLen});
+    
+    setFixedHeight(maxLen + 10);  // 5px padding each side
 }
 
 void AdaptStrip::paintEvent(QPaintEvent*)
@@ -323,11 +353,8 @@ void AdaptStrip::paintEvent(QPaintEvent*)
     p.save();
     p.translate(0, height());
     p.rotate(-90);
-    p.drawText(QRect(0, 0, height(), width()), Qt::AlignCenter, tr("ADAPT"));
+    p.drawText(QRect(0, 0, height(), width()), Qt::AlignCenter, m_adaptText);
     p.restore();
-
-    p.setPen(QColor("#222222"));
-    p.drawRect(0, 0, width() - 1, height() - 1);
 }
 
 void AdaptStrip::mousePressEvent(QMouseEvent* event)
@@ -402,7 +429,7 @@ CustomTitleBar::CustomTitleBar(QWidget* parent) : QWidget(parent)
     m_active = false;
 
     QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(5, 0, 5, 4);
+    layout->setContentsMargins(5, 0, 0, 2);
     layout->setSpacing(4);
 
     m_titleLabel = new QLabel("", this);
@@ -433,9 +460,9 @@ CustomTitleBar::CustomTitleBar(QWidget* parent) : QWidget(parent)
     };
 
     m_minBtn   = new QPushButton(this);
-    configBtn(m_minBtn,   Icons::WIN_SHADE,   "#555");
+    configBtn(m_minBtn,   Icons::WIN_SHADE,   "#4a6b7b");
     m_maxBtn   = new QPushButton(this);
-    configBtn(m_maxBtn,   Icons::WIN_RESTORE, "#555");
+    configBtn(m_maxBtn,   Icons::WIN_RESTORE, "#4a6b7b");
     m_closeBtn = new QPushButton(this);
     configBtn(m_closeBtn, Icons::WIN_CLOSE,   "#c00");
 
@@ -513,7 +540,7 @@ void CustomTitleBar::setMaximizeButtonVisible(bool visible)
 void CustomTitleBar::updateStyle()
 {
     const QString bg = m_active ? "#3a4b5b" : "#2a2a2a";
-    setStyleSheet(QString("background-color: %1; border-bottom: 1px solid #222;").arg(bg));
+    setStyleSheet(QString("background-color: %1;").arg(bg));
 }
 
 void CustomTitleBar::mousePressEvent(QMouseEvent* event)
@@ -728,21 +755,23 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget* parent) : QMdiSubWindow(parent)
 
     // Button that resizes the subwindow to match the image at its current zoom level
     m_fitWindowBtn = new QPushButton(leftStrip);
-    m_fitWindowBtn->setFixedWidth(FixedUI::sidebarWidth);
-    m_fitWindowBtn->setFixedHeight(FixedUI::sidebarWidth);
+    m_fitWindowBtn->setFixedSize(FixedUI::sidebarWidth, FixedUI::sidebarWidth);
     m_fitWindowBtn->setFlat(true);
     m_fitWindowBtn->setToolTip(tr("Resize the window so it matches the image at its current zoom level"));
     m_fitWindowBtn->setStyleSheet(
         "QPushButton { border: none; background: transparent; color: white; "
-        "              font-size: 14px; padding: 0px; }"
+        "              font-size: 14px; padding: 2px; }"
         "QPushButton:hover { background: #444; border-radius: 4px; }"
     );
     m_fitWindowBtn->setIcon(iconFromSvg(Icons::RESIZE));
+    m_fitWindowBtn->setIconSize(QSize(FixedUI::iconSize, FixedUI::iconSize));
     connect(m_fitWindowBtn, &QPushButton::clicked,
             this, &CustomMdiSubWindow::fitWindowToCurrentImageSize);
 
     leftLayout->addWidget(m_nameStrip);
+    leftLayout->addSpacing(2);
     leftLayout->addWidget(m_linkStrip);
+    leftLayout->addSpacing(2);
     leftLayout->addWidget(m_adaptStrip);
     leftLayout->addStretch();
     leftLayout->addWidget(m_fitWindowBtn);
@@ -1354,12 +1383,6 @@ void CustomMdiSubWindow::setSubWindowTitle(const QString& title)
 {
     setWindowTitle(title);
     if (m_titleBar)  m_titleBar->setTitle(title);
-    if (m_nameStrip) {
-        m_nameStrip->setTitle(title);
-        const int h = m_nameStrip->preferredHeight();
-        if (m_linkStrip)  m_linkStrip->setFixedHeight(h);
-        if (m_adaptStrip) m_adaptStrip->setFixedHeight(h);
-    }
     emit layoutChanged();
 }
 

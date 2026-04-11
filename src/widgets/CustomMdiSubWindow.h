@@ -23,7 +23,6 @@ class NameStrip : public QWidget {
 public:
     explicit NameStrip(QWidget* parent = nullptr);
 
-    void setTitle(const QString& title);
     int  preferredHeight() const;
 
 signals:
@@ -74,6 +73,8 @@ private:
     bool   m_linked       = false;
     bool   m_dragging     = false;
     QPoint m_dragStartPos;
+    QString m_linkText;
+    QString m_linkedText;
 };
 
 // ---------------------------------------------------------------------------
@@ -96,6 +97,7 @@ protected:
 
 private:
     QPoint m_dragStartPos;
+    QString m_adaptText;
 };
 
 // ---------------------------------------------------------------------------

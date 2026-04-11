@@ -832,6 +832,7 @@ MainWindow::MainWindow(QWidget *parent)
     // --- 4.17: Display Mode Combo Box ---
     m_stretchCombo = new QComboBox();
     m_stretchCombo->setFixedWidth(120);
+    m_stretchCombo->setFixedHeight(26);
     m_stretchCombo->addItem(tr("Linear"),       ImageBuffer::Display_Linear);
     m_stretchCombo->addItem(tr("Auto Stretch"),  ImageBuffer::Display_AutoStretch);
     m_stretchCombo->addItem(tr("Histogram"),     ImageBuffer::Display_Histogram);
@@ -872,7 +873,8 @@ MainWindow::MainWindow(QWidget *parent)
         "QToolButton::menu-indicator { width:0; }";
 
     m_autoStretchMedianBtn = new QToolButton(this);
-    m_autoStretchMedianBtn->setFixedWidth(45);
+    m_autoStretchMedianBtn->setFixedWidth(35);
+    m_autoStretchMedianBtn->setFixedHeight(26);
     m_autoStretchMedianBtn->setText("0.25");
     m_autoStretchMedianBtn->setPopupMode(QToolButton::InstantPopup);
     m_autoStretchMedianBtn->setToolButtonStyle(Qt::ToolButtonTextOnly);
@@ -1030,7 +1032,8 @@ MainWindow::MainWindow(QWidget *parent)
     // -- Toolbar Group: Channel View Selector --
     {
         m_channelViewBtn = new QToolButton(this);
-        m_channelViewBtn->setFixedWidth(45);
+        m_channelViewBtn->setFixedWidth(35);
+        m_channelViewBtn->setFixedHeight(26);
         m_channelViewBtn->setText(tr("RGB"));
         m_channelViewBtn->setPopupMode(QToolButton::InstantPopup);
         m_channelViewBtn->setToolButtonStyle(Qt::ToolButtonTextOnly);

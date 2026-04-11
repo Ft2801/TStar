@@ -2206,11 +2206,15 @@
         </message>
         <message>
             <source>LINK</source>
-            <translation type="finished">LINK</translation>
+            <translation type="finished">VERKNÜPFUNG</translation>
         </message>
         <message>
             <source>LINKED</source>
             <translation type="finished">VERKNÜPFT</translation>
+        </message>
+        <message>
+            <source>NAME</source>
+            <translation type="finished">NAME</translation>
         </message>
         <message>
             <source>New Name:</source>

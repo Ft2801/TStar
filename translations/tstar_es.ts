@@ -2213,6 +2213,10 @@
             <translation type="finished">VINCULADO</translation>
         </message>
         <message>
+            <source>NAME</source>
+            <translation type="finished">NOMBRE</translation>
+        </message>
+        <message>
             <source>New Name:</source>
             <translation type="finished">Nuevo Nombre:</translation>
         </message>

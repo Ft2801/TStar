@@ -2213,6 +2213,10 @@
             <translation type="finished">LIÉ</translation>
         </message>
         <message>
+            <source>NAME</source>
+            <translation type="finished">NOM</translation>
+        </message>
+        <message>
             <source>New Name:</source>
             <translation type="finished">Nouveau Nom :</translation>
         </message>

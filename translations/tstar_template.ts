@@ -2213,6 +2213,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>NAME</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>New Name:</source>
             <translation type="unfinished" />
         </message>
