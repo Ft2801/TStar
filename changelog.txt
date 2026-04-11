@@ -6,7 +6,6 @@ Version 1.8.6
 - Fixed a RAW conversion tool bug
 - Added tool search section in the right sidebar
 - Added mosaic composition tool
-- Added mosaic management in stacking suite
 - Added history explorer and manager
 - Added TStar signature and history on header metadata
 - Added space themed minigame (Ctrl + M)

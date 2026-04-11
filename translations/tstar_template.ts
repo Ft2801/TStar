@@ -3598,6 +3598,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Automatically detects and subtracts the minimum pixel value (black floor) from the image. Essential before stretching to ensure true black levels.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Automatically stretches the image based on statistical analysis. Ideal for quick previews.</source>
             <translation type="unfinished" />
         </message>
@@ -3806,6 +3810,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Combines registered images to reduce noise and increase signal-to-noise ratio (SNR). Different stacking modes offer various trade-offs between noise reduction and artifact rejection:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Combines separate channel images into one RGB image.</source>
             <translation type="unfinished" />
         </message>
@@ -4002,6 +4010,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Displays a 3x3 grid of zoomed panels from the corners, edges, and center of your image. Useful for evaluating optical quality, coma, and field curvature across your frame.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Double-click to run a script on the active image</source>
             <translation type="unfinished" />
         </message>
@@ -4042,6 +4054,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Enable in Settings for smoother gradients and reduced banding in auto-stretched previews. Uses high-precision floating-point calculations instead of 16-bit histogram binning.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Enhances narrowband details by subtracting broadband continuum/star light:</source>
             <translation type="unfinished" />
         </message>
@@ -4055,6 +4071,10 @@
         </message>
         <message>
             <source>Enter a project name and select a directory location</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Equalizes the intensity of RGB channels by matching their medians. This is essential for achieving a neutral color balance before combining separate channels into a color image.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4079,6 +4099,10 @@
         </message>
         <message>
             <source>Extract Luminance</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Extracts the luminance (brightness) channel from an RGB image into a separate grayscale window. Useful for processing the L channel independently before recombining.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4115,6 +4139,10 @@
         </message>
         <message>
             <source>File &amp; Directory</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Find and launch any tool quickly using the integrated Tool Search panel. Use arrow keys to navigate and Enter to launch.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4558,6 +4586,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Organize your astrophotography workflow using Workspace Projects. A project maintains a dedicated working directory where all associated images, calibration files, and processing results are stored.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Output &amp; Quality Assessment</source>
             <translation type="unfinished" />
         </message>
@@ -4735,6 +4767,10 @@
         </message>
         <message>
             <source>Removes thermal noise that accumulates over exposure time</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Replaces the luminance channel of an RGB image with a processed version. Select the source luminance and target color image, then blend with adjustable intensity.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5042,7 +5078,15 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>TStar includes a comprehensive pipeline for preprocessing and stacking astronomical images. Follow these steps in order: Conversion -&gt; Calibration -&gt; Registration -&gt; Stacking.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>TStar includes workspace-level color management to keep display and processing behavior consistent across tools and sessions.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>TStar supports FITS/FIT, XISF, TIFF/TIF, PNG, JPG/JPEG, BMP and (when LibRaw support is available) major camera RAW formats such as CR2/CR3/NEF/ARW/DNG/ORF/RW2/RAF and others.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5086,6 +5130,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Tip: More frames allow aggressive rejection. With N=3 frames, use median. With N&gt;10, can use Kappa-Sigma with ?=2.5</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Tip: Registration must be completed before stacking; misaligned frames will produce low-quality stacks</source>
             <translation type="unfinished" />
         </message>
@@ -5111,6 +5159,10 @@
         </message>
         <message>
             <source>Toggle mask visualization</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Tool Search &amp; Discovery</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -5223,6 +5275,10 @@
         </message>
         <message>
             <source>Weight frames by quality (FWHM, star count, background) before combining</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Welcome to TStar! This guide covers all features and tools available in the application.</source>
             <translation type="unfinished" />
         </message>
         <message>

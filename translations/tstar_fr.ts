@@ -3598,6 +3598,10 @@
             <translation type="finished">Détecte et supprime automatiquement les gradients</translation>
         </message>
         <message>
+            <source>Automatically detects and subtracts the minimum pixel value (black floor) from the image. Essential before stretching to ensure true black levels.</source>
+            <translation type="finished">Détecte et soustrait automatiquement la valeur minimale des pixels (fond de ciel noir) de l'image. Indispensable avant l'étirement pour garantir des niveaux de noir réels.</translation>
+        </message>
+        <message>
             <source>Automatically stretches the image based on statistical analysis. Ideal for quick previews.</source>
             <translation type="finished">Étire automatiquement l'image en fonction de l'analyse statistique. Idéal pour les aperçus rapides.</translation>
         </message>
@@ -3806,6 +3810,10 @@
             <translation type="finished">Combinez les images avec des formules</translation>
         </message>
         <message>
+            <source>Combines registered images to reduce noise and increase signal-to-noise ratio (SNR). Different stacking modes offer various trade-offs between noise reduction and artifact rejection:</source>
+            <translation type="finished">Combine les images alignées pour réduire le bruit et augmenter le rapport signal sur bruit (RSB). Différents modes d'empilement offrent divers compromis entre réduction du bruit et rejet d'artefacts :</translation>
+        </message>
+        <message>
             <source>Combines separate channel images into one RGB image.</source>
             <translation type="finished">Combine les images de canaux séparés en une seule image RGB.</translation>
         </message>
@@ -4002,6 +4010,10 @@
             <translation type="finished">Modes d'Affichage:</translation>
         </message>
         <message>
+            <source>Displays a 3x3 grid of zoomed panels from the corners, edges, and center of your image. Useful for evaluating optical quality, coma, and field curvature across your frame.</source>
+            <translation type="finished">Affiche une grille 3x3 de panneaux zoomés sur les coins, les bords et le centre de votre image. Utile pour évaluer la qualité optique, le coma et la courbure de champ sur l'ensemble du cadre.</translation>
+        </message>
+        <message>
             <source>Double-click to run a script on the active image</source>
             <translation type="finished">Double-cliquer pour exécuter un script sur l'image active</translation>
         </message>
@@ -4042,6 +4054,10 @@
             <translation type="finished">Activez Lien RGB pour les images couleur pour maintenir l'équilibre des couleurs</translation>
         </message>
         <message>
+            <source>Enable in Settings for smoother gradients and reduced banding in auto-stretched previews. Uses high-precision floating-point calculations instead of 16-bit histogram binning.</source>
+            <translation type="finished">Activez dans les Paramètres pour des gradients plus fluides et un banding réduit dans les prévisualisations auto-étirées. Utilise des calculs en virgola flottante de haute précision au lieu du binning d'histogramme 16 bits.</translation>
+        </message>
+        <message>
             <source>Enhances narrowband details by subtracting broadband continuum/star light:</source>
             <translation type="finished">Améliore les détails à bande étroite en soustrayant la lumière continue/stellaire à large bande :</translation>
         </message>
@@ -4056,6 +4072,10 @@
         <message>
             <source>Enter a project name and select a directory location</source>
             <translation type="finished">Entrez le nom du projet et sélectionnez l'emplacement du répertoire</translation>
+        </message>
+        <message>
+            <source>Equalizes the intensity of RGB channels by matching their medians. This is essential for achieving a neutral color balance before combining separate channels into a color image.</source>
+            <translation type="finished">Égalise l'intensité des canaux RVB en faisant correspondre leurs médianes. Indispensable pour obtenir un équilibre chromatique neutre avant de combiner les canaux séparés en une image couleur.</translation>
         </message>
         <message>
             <source>Execute PixelMath formula</source>
@@ -4080,6 +4100,10 @@
         <message>
             <source>Extract Luminance</source>
             <translation type="finished">Extraire Luminance</translation>
+        </message>
+        <message>
+            <source>Extracts the luminance (brightness) channel from an RGB image into a separate grayscale window. Useful for processing the L channel independently before recombining.</source>
+            <translation type="finished">Extrait le canal de luminance (luminosité) d'une image RVB dans une fenêtre séparée en niveaux de gris. Utile pour traiter le canal L indépendamment avant de le recombiner.</translation>
         </message>
         <message>
             <source>FITS Header Editor</source>
@@ -4116,6 +4140,10 @@
         <message>
             <source>File &amp; Directory</source>
             <translation type="finished">Fichier et Répertoire</translation>
+        </message>
+        <message>
+            <source>Find and launch any tool quickly using the integrated Tool Search panel. Use arrow keys to navigate and Enter to launch.</source>
+            <translation type="finished">Trouvez et lancez rapidement n'importe quel outil grâce au panneau de recherche intégré. Utilisez les touches fléchées pour naviguer et Entrée pour lancer.</translation>
         </message>
         <message>
             <source>First image in sequence used as reference (or manually selected)</source>
@@ -4558,6 +4586,10 @@
             <translation type="finished">Organisation : Tous les fichiers associés (lights, darks, flats, résultats traités) en un seul endroit</translation>
         </message>
         <message>
+            <source>Organize your astrophotography workflow using Workspace Projects. A project maintains a dedicated working directory where all associated images, calibration files, and processing results are stored.</source>
+            <translation type="finished">Organisez votre flux de travail astrophotographique à l'aide des Projets d'Espace de Travail. Un projet maintient un répertoire de travail dédié où sont stockés tous les fichiers associés.</translation>
+        </message>
+        <message>
             <source>Output &amp; Quality Assessment</source>
             <translation type="finished">Output &amp; Évaluation de Qualité</translation>
         </message>
@@ -4736,6 +4768,10 @@
         <message>
             <source>Removes thermal noise that accumulates over exposure time</source>
             <translation type="finished">Supprime le bruit thermique qui s'accumule au fil du temps d'exposition</translation>
+        </message>
+        <message>
+            <source>Replaces the luminance channel of an RGB image with a processed version. Select the source luminance and target color image, then blend with adjustable intensity.</source>
+            <translation type="finished">Remplace le canal de luminance d'une image RVB par une version traitée. Sélectionnez la luminance source et l'image couleur cible, puis mélangez avec une intensité réglable.</translation>
         </message>
         <message>
             <source>Required for PCC and annotation tools</source>
@@ -5042,8 +5078,16 @@
             <translation type="finished">Scripts TStar</translation>
         </message>
         <message>
+            <source>TStar includes a comprehensive pipeline for preprocessing and stacking astronomical images. Follow these steps in order: Conversion -&gt; Calibration -&gt; Registration -&gt; Stacking.</source>
+            <translation type="finished">TStar inclut un pipeline complet pour le prétraitement et l'empilement d'images astronomiques. Suivez ces étapes dans l'ordre : Conversion -&gt; Calibration -&gt; Alignement -&gt; Empilement.</translation>
+        </message>
+        <message>
             <source>TStar includes workspace-level color management to keep display and processing behavior consistent across tools and sessions.</source>
             <translation type="finished">TStar inclut une gestion des couleurs au niveau de l'espace de travail pour garder un comportement d'affichage et de traitement cohérent entre outils et sessions.</translation>
+        </message>
+        <message>
+            <source>TStar supports FITS/FIT, XISF, TIFF/TIF, PNG, JPG/JPEG, BMP and (when LibRaw support is available) major camera RAW formats such as CR2/CR3/NEF/ARW/DNG/ORF/RW2/RAF and others.</source>
+            <translation type="finished">TStar prend en charge les formats FITS/FIT, XISF, TIFF/TIF, PNG, JPG/JPEG, BMP et (lorsque le support LibRaw est disponible) les principaux formats RAW tels que CR2/CR3/NEF/ARW/DNG/ORF/RW2/RAF et autres.</translation>
         </message>
         <message>
             <source>TStar supports scripting for automating processing workflows:</source>
@@ -5086,6 +5130,10 @@
             <translation type="finished">Conseil : Créez des images maîtres séparées pour chaque filtre (par ex. L, R, G, B, Ha, OIII, SII)</translation>
         </message>
         <message>
+            <source>Tip: More frames allow aggressive rejection. With N=3 frames, use median. With N&gt;10, can use Kappa-Sigma with ?=2.5</source>
+            <translation type="finished">Conseil : Plus d'images permettent un rejet plus agressif. Avec N=3 images, utilisez median. Avec N&gt;10, vous pouvez utiliser Kappa-Sigma avec ?=2.5</translation>
+        </message>
+        <message>
             <source>Tip: Registration must be completed before stacking; misaligned frames will produce low-quality stacks</source>
             <translation type="finished">Conseil : L'enregistrement doit être terminé avant le stacking; les images mal alignées produiront des stacks de faible qualité</translation>
         </message>
@@ -5112,6 +5160,10 @@
         <message>
             <source>Toggle mask visualization</source>
             <translation type="finished">Activer/désactiver la visualisation du masque</translation>
+        </message>
+        <message>
+            <source>Tool Search &amp; Discovery</source>
+            <translation type="finished">Recherche d'outils et découverte</translation>
         </message>
         <message>
             <source>Tool to detect and subtract halos around bright stars, improving image clarity and preventing halo overlaps.</source>
@@ -5224,6 +5276,10 @@
         <message>
             <source>Weight frames by quality (FWHM, star count, background) before combining</source>
             <translation type="finished">Pondérez les images par qualité (FWHM, nombre d'étoiles, fond) avant de combiner</translation>
+        </message>
+        <message>
+            <source>Welcome to TStar! This guide covers all features and tools available in the application.</source>
+            <translation type="finished">Bienvenue sur TStar ! Ce guide couvre toutes les fonctionnalités et tous les outils disponibles dans l'application.</translation>
         </message>
         <message>
             <source>White balance and color controls integrated with the TStar workflow</source>

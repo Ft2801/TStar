@@ -20,6 +20,7 @@
 
 - [Overview](#overview)
 - [Key Features](#key-features)
+- [Tool Search & Discovery](#tool-search--discovery)
 - [Tools and Functionalities](#tools-and-functionalities)
   - [File Formats and I/O](#0-file-formats-bit-depths--io)
   - [Stretching and Linear to Non-Linear](#1-stretching--linear-to-non-linear)
@@ -64,6 +65,7 @@ stretching, color calibration, and final export.
 | **Cross-Platform** | Fully supported on Windows (MinGW) and macOS (Intel and Apple Silicon) |
 | **Scripting Engine** | Built-in TStar Script (.tss) runner for complex multi-step processing automation |
 |**Easter egg minigame**| Space themed proprietary browser minigame accessible with Ctrl + M |
+|**Tool Search & Discovery**| Integrated search panel for quick location and launch of any tool. |
 
 ## Tools and Functionalities
 

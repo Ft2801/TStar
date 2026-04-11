@@ -93,15 +93,11 @@ QString HelpDialog::buildHelpContent()
 
     // -- Title ----------------------------------------------------------------
     html += "<h1>" + tr("TStar - Astrophotography Processing") + "</h1>";
-    html += "<p>" + tr("Welcome to TStar! This guide covers all features and "
-                       "tools available in the application.") + "</p>";
+    html += "<p>" + tr("Welcome to TStar! This guide covers all features and tools available in the application.") + "</p>";
 
     // -- Getting Started ------------------------------------------------------
     html += "<h2>" + tr("Getting Started") + "</h2>";
-    html += "<p>" + tr("TStar supports FITS/FIT, XISF, TIFF/TIF, PNG, "
-                       "JPG/JPEG, BMP and (when LibRaw support is available) "
-                       "major camera RAW formats such as CR2/CR3/NEF/ARW/DNG/"
-                       "ORF/RW2/RAF and others.") + "</p>";
+    html += "<p>" + tr("TStar supports FITS/FIT, XISF, TIFF/TIF, PNG, JPG/JPEG, BMP and (when LibRaw support is available) major camera RAW formats such as CR2/CR3/NEF/ARW/DNG/ORF/RW2/RAF and others.") + "</p>";
     html += "<ul>";
     html += "<li><b>" + tr("Open Image:") + "</b> "
             + tr("Click Open or press Ctrl+O") + "</li>";
@@ -111,12 +107,13 @@ QString HelpDialog::buildHelpContent()
             + tr("Drag files directly onto the workspace") + "</li>";
     html += "</ul>";
 
+    // -- Tool Search & Discovery -----------------------------------------------
+    html += "<h2>" + tr("Tool Search & Discovery") + "</h2>";
+    html += "<p>" + tr("Find and launch any tool quickly using the integrated Tool Search panel. Use arrow keys to navigate and Enter to launch.") + "</p>";
+
     // -- Workspace Projects ---------------------------------------------------
     html += "<h2>" + tr("Workspace Projects") + "</h2>";
-    html += "<p>" + tr("Organize your astrophotography workflow using Workspace "
-                       "Projects. A project maintains a dedicated working "
-                       "directory where all associated images, calibration "
-                       "files, and processing results are stored.") + "</p>";
+    html += "<p>" + tr("Organize your astrophotography workflow using Workspace Projects. A project maintains a dedicated working directory where all associated images, calibration files, and processing results are stored.") + "</p>";
 
     html += "<h3>" + tr("Creating a New Project") + "</h3>";
     html += "<p>" + tr("To create a new workspace project:") + "</p>";
@@ -193,8 +190,7 @@ QString HelpDialog::buildHelpContent()
     html += "<p class=\"tip\">" + tr("Tip: Toggle RGB Link to stretch channels independently or together.") + "</p>";
 
     html += "<h3>" + tr("24-bit Display Stretch") + "</h3>";
-    html += "<p>" + tr("Enable in Settings for smoother gradients and reduced banding in auto-stretched previews. "
-                       "Uses high-precision floating-point calculations instead of 16-bit histogram binning.") + "</p>";
+    html += "<p>" + tr("Enable in Settings for smoother gradients and reduced banding in auto-stretched previews. Uses high-precision floating-point calculations instead of 16-bit histogram binning.") + "</p>";
 
     // -- Stretch Tools --------------------------------------------------------
     html += "<h2>" + tr("Stretch Tools") + "</h2>";
@@ -341,8 +337,7 @@ QString HelpDialog::buildHelpContent()
 
     // -- Image Pipeline -------------------------------------------------------
     html += "<h2>" + tr("Image Pipeline") + "</h2>";
-    html += "<p>" + tr("TStar includes a comprehensive pipeline for preprocessing and stacking astronomical images. "
-                       "Follow these steps in order: Conversion -> Calibration -> Registration -> Stacking.") + "</p>";
+    html += "<p>" + tr("TStar includes a comprehensive pipeline for preprocessing and stacking astronomical images. Follow these steps in order: Conversion -> Calibration -> Registration -> Stacking.") + "</p>";
 
     html += "<h3>" + tr("Image Conversion") + "</h3>";
     html += "<p>" + tr("Convert raw images to a standardized format before processing:") + "</p>";
@@ -388,8 +383,7 @@ QString HelpDialog::buildHelpContent()
     html += "<p class=\"tip\">" + tr("Tip: Registration must be completed before stacking; misaligned frames will produce low-quality stacks") + "</p>";
 
     html += "<h3>" + tr("Image Stacking") + "</h3>";
-    html += "<p>" + tr("Combines registered images to reduce noise and increase signal-to-noise ratio (SNR). "
-                       "Different stacking modes offer various trade-offs between noise reduction and artifact rejection:") + "</p>";
+    html += "<p>" + tr("Combines registered images to reduce noise and increase signal-to-noise ratio (SNR). Different stacking modes offer various trade-offs between noise reduction and artifact rejection:") + "</p>";
     html += "<ul>";
     html += "<li><b>" + tr("Average:") + "</b> " + tr("Simple mean of all pixels. Fast but sensitive to outliers (cosmic rays, hot pixels).") + "</li>";
     html += "<li><b>" + tr("Median:") + "</b> " + tr("Middle value of sorted pixels. Excellent outlier rejection but slower than average.") + "</li>";
@@ -415,8 +409,7 @@ QString HelpDialog::buildHelpContent()
     html += "<li>" + tr("Configure Normalization: Select normalization method for frame scaling") + "</li>";
     html += "<li>" + tr("Execute Stack: Combine and output final integrated image") + "</li>";
     html += "</ol>";
-    html += "<p class=\"tip\">" + tr("Tip: More frames allow aggressive rejection. With N=3 frames, use median. "
-                                     "With N>10, can use Kappa-Sigma with ?=2.5") + "</p>";
+    html += "<p class=\"tip\">" + tr("Tip: More frames allow aggressive rejection. With N=3 frames, use median. With N>10, can use Kappa-Sigma with ?=2.5") + "</p>";
 
     html += "<h3>" + tr("Output & Quality Assessment") + "</h3>";
     html += "<p>" + tr("After stacking, the result is ready for post-processing:") + "</p>";
@@ -438,9 +431,7 @@ QString HelpDialog::buildHelpContent()
     html += "<p>" + tr("Combines separate channel images into one RGB image.") + "</p>";
 
     html += "<h3>" + tr("Linear Fit") + "</h3>";
-    html += "<p>" + tr("Equalizes the intensity of RGB channels by matching their medians. "
-                       "This is essential for achieving a neutral color balance before combining "
-                       "separate channels into a color image.") + "</p>";
+    html += "<p>" + tr("Equalizes the intensity of RGB channels by matching their medians. This is essential for achieving a neutral color balance before combining separate channels into a color image.") + "</p>";
 
     html += "<h3>" + tr("Star Recomposition") + "</h3>";
     html += "<p>" + tr("Blends starless and star-only images with adjustable parameters.") + "</p>";
@@ -457,16 +448,13 @@ QString HelpDialog::buildHelpContent()
     html += "<p>" + tr("Converts RAW Bayer pattern images to full color.") + "</p>";
 
     html += "<h3>" + tr("Extract Luminance") + "</h3>";
-    html += "<p>" + tr("Extracts the luminance (brightness) channel from an RGB image into a separate grayscale window. "
-                       "Useful for processing the L channel independently before recombining.") + "</p>";
+    html += "<p>" + tr("Extracts the luminance (brightness) channel from an RGB image into a separate grayscale window. Useful for processing the L channel independently before recombining.") + "</p>";
 
     html += "<h3>" + tr("Recombine Luminance") + "</h3>";
-    html += "<p>" + tr("Replaces the luminance channel of an RGB image with a processed version. "
-                       "Select the source luminance and target color image, then blend with adjustable intensity.") + "</p>";
+    html += "<p>" + tr("Replaces the luminance channel of an RGB image with a processed version. Select the source luminance and target color image, then blend with adjustable intensity.") + "</p>";
 
     html += "<h3>" + tr("Remove Pedestal") + "</h3>";
-    html += "<p>" + tr("Automatically detects and subtracts the minimum pixel value (black floor) from the image. "
-                       "Essential before stretching to ensure true black levels.") + "</p>";
+    html += "<p>" + tr("Automatically detects and subtracts the minimum pixel value (black floor) from the image. Essential before stretching to ensure true black levels.") + "</p>";
 
     html += "<h3>" + tr("Perfect Palette Picker") + "</h3>";
     html += "<p>" + tr("Create stunning narrowband composites with full control:") + "</p>";
@@ -568,8 +556,7 @@ QString HelpDialog::buildHelpContent()
     html += "</ul>";
 
     html += "<h3>" + tr("Aberration Inspector") + "</h3>";
-    html += "<p>" + tr("Displays a 3x3 grid of zoomed panels from the corners, edges, and center of your image. "
-                       "Useful for evaluating optical quality, coma, and field curvature across your frame.") + "</p>";
+    html += "<p>" + tr("Displays a 3x3 grid of zoomed panels from the corners, edges, and center of your image. Useful for evaluating optical quality, coma, and field curvature across your frame.") + "</p>";
 
     html += "<h3>" + tr("Blink Comparator") + "</h3>";
     html += "<p>" + tr("Overlay and compare two active views by alternating their display:") + "</p>";
