@@ -71,6 +71,7 @@ private:
 
     // Display options
     QCheckBox* m_checkUpdates;
+    QCheckBox* m_showWelcomeCheck;
     QCheckBox* m_24bitStfCheck;
     QCheckBox* m_hideMagnifierCheck;
 

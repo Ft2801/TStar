@@ -754,6 +754,8 @@ set(TSTAR_SOURCES
     src/dialogs/AlignChannelsDialog.h
     src/dialogs/HelpDialog.cpp
     src/dialogs/HelpDialog.h
+    src/dialogs/WelcomeDialog.cpp
+    src/dialogs/WelcomeDialog.h
     src/dialogs/ClaheDialog.cpp
     src/dialogs/ClaheDialog.h
     src/dialogs/StarHaloRemovalDialog.cpp

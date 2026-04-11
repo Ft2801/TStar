@@ -107,9 +107,14 @@ QString HelpDialog::buildHelpContent()
             + tr("Drag files directly onto the workspace") + "</li>";
     html += "</ul>";
 
-    // -- Tool Search & Discovery -----------------------------------------------
     html += "<h2>" + tr("Tool Search & Discovery") + "</h2>";
     html += "<p>" + tr("Find and launch any tool quickly using the integrated Tool Search panel. Use arrow keys to navigate and Enter to launch.") + "</p>";
+
+    html += "<h3>" + tr("Image Stats Widget") + "</h3>";
+    html += "<p>" + tr("Panel widget that computes and displays global pixel statistics, FWHM, roundness, and photometry for the active image.") + "</p>";
+
+    html += "<h3>" + tr("Welcome Dialog") + "</h3>";
+    html += "<p>" + tr("Startup screen displaying a quick start guide and preliminary setup instructions for new users.") + "</p>";
 
     // -- Workspace Projects ---------------------------------------------------
     html += "<h2>" + tr("Workspace Projects") + "</h2>";

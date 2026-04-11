@@ -455,7 +455,7 @@ void AstapSolver::solve(const ImageBuffer& image,
             commonArgs << "-d" << dbPath;
             emitLog(tr("ASTAP Database found: %1").arg(dbPath));
         } else {
-            emitLog(tr("Note: ASTAP database not explicitly located by TStar; ASTAP will use its internal search paths."));
+            emitLog(tr("Note: ASTAP database not explicitly located by TStar. ASTAP will use its internal search paths."));
         }
 
         QStringList hintedArgs;

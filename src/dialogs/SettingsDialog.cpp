@@ -134,6 +134,9 @@ SettingsDialog::SettingsDialog(QWidget* parent)
     QVBoxLayout* updatesLayout = new QVBoxLayout(updatesGroup);
     m_checkUpdates = new QCheckBox(tr("Check for updates on startup"));
     updatesLayout->addWidget(m_checkUpdates);
+    
+    m_showWelcomeCheck = new QCheckBox(tr("Show welcome screen"));
+    updatesLayout->addWidget(m_showWelcomeCheck);
     rightColumn->addWidget(updatesGroup);
 
     // Cosmic Clarity ML Models Group
@@ -207,6 +210,7 @@ SettingsDialog::SettingsDialog(QWidget* parent)
     restoreCombo(m_defaultStretchCombo,     "display/default_stretch",      "Linear",  m_settings);
 
     m_checkUpdates->setChecked(m_settings.value("general/check_updates", true).toBool());
+    m_showWelcomeCheck->setChecked(m_settings.value("general/show_welcome", true).toBool());
     m_24bitStfCheck->setChecked(m_settings.value("display/24bit_stf",    true).toBool());
     m_hideMagnifierCheck->setChecked(m_settings.value("display/hide_magnifier", false).toBool());
 }
@@ -399,6 +403,7 @@ void SettingsDialog::saveSettings()
     const QString newLang = m_langCombo->currentData().toString();
     m_settings.setValue("general/language",           newLang);
     m_settings.setValue("general/check_updates",      m_checkUpdates->isChecked());
+    m_settings.setValue("general/show_welcome",       m_showWelcomeCheck->isChecked());
     m_settings.setValue("display/24bit_stf",          m_24bitStfCheck->isChecked());
     m_settings.setValue("display/hide_magnifier",     m_hideMagnifierCheck->isChecked());
     m_settings.setValue("display/default_stretch",    m_defaultStretchCombo->currentData().toString());

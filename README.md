@@ -210,6 +210,8 @@ TStar includes a complete preprocessing and stacking suite for calibrating and i
 | **FITS Header Editor** | Full FITS keyword viewer and editor with import from another file support. |
 | **AstroSpike** | Generates artificial diffraction spikes around bright stars for aesthetic effect. |
 | **RawEditor** | Non-destructive light and color editor (exposure, contrast, highlights, shadows, white balance) for linear image development. |
+| **Image Stats Widget** | Panel widget that computes and displays global pixel statistics, FWHM, roundness, and photometry. |
+| **Welcome Dialog** | Startup screen displaying a quick start guide and preliminary setup instructions for new users. |
 
 ### 9. Workspace & Views
 

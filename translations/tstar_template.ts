@@ -683,7 +683,7 @@
             <translation type="unfinished" />
         </message>
         <message>
-            <source>Note: ASTAP database not explicitly located by TStar; ASTAP will use its internal search paths.</source>
+            <source>Note: ASTAP database not explicitly located by TStar. ASTAP will use its internal search paths.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4270,6 +4270,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Image Stats Widget</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Image Upscale</source>
             <translation type="unfinished" />
         </message>
@@ -4599,6 +4603,10 @@
         </message>
         <message>
             <source>Pan:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Panel widget that computes and displays global pixel statistics, FWHM, roundness, and photometry for the active image.</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -4990,6 +4998,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Startup screen displaying a quick start guide and preliminary setup instructions for new users.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Statistical Quality: Check SNR improvement from number of stacked frames</source>
             <translation type="unfinished" />
         </message>
@@ -5267,6 +5279,10 @@
         </message>
         <message>
             <source>Weight frames by quality (FWHM, star count, background) before combining</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Welcome Dialog</source>
             <translation type="unfinished" />
         </message>
         <message>
@@ -11588,6 +11604,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Show welcome screen</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>Square Root</source>
             <translation type="unfinished" />
         </message>
@@ -13795,6 +13815,161 @@
         </message>
         <message>
             <source>Wavescale HDR applied.</source>
+            <translation type="unfinished" />
+        </message>
+    </context>
+    <context>
+        <name>WelcomeDialog</name>
+        <message>
+            <source>AI Models:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>ASTAP star database</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Color Calibration:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Cosmic Clarity models</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Detail &amp; Denoise:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Do not show this welcome screen again</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Explore:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>External Tools:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Extract Background:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Follow this standard processing workflow to get started quickly:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>For a full review of tools and shortcuts, open the Help &amp; Tutorial manual from the main menu.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Open:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Plate Solving:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Preliminary Setup</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Quick Start Guide</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Settings</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Star Catalog:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Stretch:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>TStar is a comprehensive, high-performance astrophotography processing suite designed to handle everything from RAW calibration to final dynamic stretch and presentation. It provides an intuitive, non-destructive workflow with both established algorithms and modern AI-driven tools.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>To get the most out of TStar, please complete these initial setup steps in the</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>Welcome to TStar</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>and</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>apply ABE or CBE (Color Management) to remove light pollution gradients.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>apply AI sharpening and noise reduction (Cosmic Clarity and GraXpert are recommended).</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>continue enhancing the image exploring the many tools available in TStar.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>download or link the</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>download the</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>for professional plate solving and accurate photometric color calibration.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>menu:</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>press</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>run Plate Solving (Utilities -&gt; Plate Solving) to attach sky coordinates.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>set the execution paths for</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>to enable advanced AI workflow integration.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>to load your stacked image (FITS/XISF/TIFF).</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>transition to non-linear space using GHS, Histogram, or ArcSinh Stretch tools.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>use SPCC or PCC (Color Management) to accurately balance colors.</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
+            <source>via Settings to enable AI-powered deconvolution and noise reduction.</source>
             <translation type="unfinished" />
         </message>
     </context>

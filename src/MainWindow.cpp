@@ -106,6 +106,7 @@
 // --- Dialog Headers: Application ---
 #include "dialogs/SettingsDialog.h"
 #include "dialogs/UpdateDialog.h"
+#include "dialogs/WelcomeDialog.h"
 #include "dialogs/HelpDialog.h"
 #include "dialogs/AboutDialog.h"
 
@@ -1333,9 +1334,15 @@ MainWindow::MainWindow(QWidget *parent)
     mainToolbar->addWidget(settingsBtn);
     mainToolbar->addSeparator();
 
-    // --- 4.26: Auto-Updater Check (Deferred) ---
+    // --- 4.26: Welcome & Auto-Updater Check (Deferred) ---
     QTimer::singleShot(2000, this, [this](){
-        QSettings settings;
+        QSettings settings("TStar", "TStar");
+        
+        if (settings.value("general/show_welcome", true).toBool()) {
+            WelcomeDialog welcomeDlg(this);
+            welcomeDlg.exec();
+        }
+
         if (!settings.value("general/check_updates", true).toBool()) {
             return;
         }

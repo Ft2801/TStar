@@ -683,8 +683,8 @@
             <translation type="finished">Rilevato FOV ampio: riduzione da %1 deg a %2 deg per stabilità di ricerca</translation>
         </message>
         <message>
-            <source>Note: ASTAP database not explicitly located by TStar; ASTAP will use its internal search paths.</source>
-            <translation type="unfinished" />
+            <source>Note: ASTAP database not explicitly located by TStar. ASTAP will use its internal search paths.</source>
+            <translation type="finished">Nota: database ASTAP non individuato da TStar. ASTAP userà i suoi percorsi di ricerca interni.</translation>
         </message>
         <message>
             <source>Saving temporary image for ASTAP...</source>
@@ -4270,6 +4270,10 @@
             <translation type="finished">Stacking Immagine</translation>
         </message>
         <message>
+            <source>Image Stats Widget</source>
+            <translation type="finished">Widget statistiche immagine</translation>
+        </message>
+        <message>
             <source>Image Upscale</source>
             <translation type="finished">Upscale Immagine</translation>
         </message>
@@ -4600,6 +4604,10 @@
         <message>
             <source>Pan:</source>
             <translation type="finished">Panoramica:</translation>
+        </message>
+        <message>
+            <source>Panel widget that computes and displays global pixel statistics, FWHM, roundness, and photometry for the active image.</source>
+            <translation type="finished">Pannello widget che calcola e visualizza statistiche globali dei pixel, FWHM, rotondità e fotometria per l'immagine attiva.</translation>
         </message>
         <message>
             <source>Percent Rejection:</source>
@@ -4990,6 +4998,10 @@
             <translation type="finished">StarNet++</translation>
         </message>
         <message>
+            <source>Startup screen displaying a quick start guide and preliminary setup instructions for new users.</source>
+            <translation type="finished">Schermata iniziale che mostra una guida rapida e istruzioni di configurazione preliminare per i nuovi utenti.</translation>
+        </message>
+        <message>
             <source>Statistical Quality: Check SNR improvement from number of stacked frames</source>
             <translation type="finished">Qualità Statistica: Controlla il miglioramento SNR dal numero di fotogrammi impilati</translation>
         </message>
@@ -5268,6 +5280,10 @@
         <message>
             <source>Weight frames by quality (FWHM, star count, background) before combining</source>
             <translation type="finished">Peso fotogrammi per qualità (FWHM, conteggio stelle, sfondo) prima di combinare</translation>
+        </message>
+        <message>
+            <source>Welcome Dialog</source>
+            <translation type="finished">Finestra di benvenuto</translation>
         </message>
         <message>
             <source>Welcome to TStar! This guide covers all features and tools available in the application.</source>
@@ -11588,6 +11604,10 @@
             <translation type="finished">Impostazioni</translation>
         </message>
         <message>
+            <source>Show welcome screen</source>
+            <translation type="finished">Mostra schermata di benvenuto</translation>
+        </message>
+        <message>
             <source>Square Root</source>
             <translation type="finished">Radice Quadrata</translation>
         </message>
@@ -13796,6 +13816,161 @@
         <message>
             <source>Wavescale HDR applied.</source>
             <translation type="finished">Wavescale HDR applicato.</translation>
+        </message>
+    </context>
+    <context>
+        <name>WelcomeDialog</name>
+        <message>
+            <source>AI Models:</source>
+            <translation type="finished">Modelli AI:</translation>
+        </message>
+        <message>
+            <source>ASTAP star database</source>
+            <translation type="finished">Database stellare ASTAP</translation>
+        </message>
+        <message>
+            <source>Close</source>
+            <translation type="finished">Chiudi</translation>
+        </message>
+        <message>
+            <source>Color Calibration:</source>
+            <translation type="finished">Calibrazione del Colore:</translation>
+        </message>
+        <message>
+            <source>Cosmic Clarity models</source>
+            <translation type="finished">Modelli Cosmic Clarity</translation>
+        </message>
+        <message>
+            <source>Detail &amp; Denoise:</source>
+            <translation type="finished">Dettaglio e Rumore:</translation>
+        </message>
+        <message>
+            <source>Do not show this welcome screen again</source>
+            <translation type="finished">Non mostrare più questa schermata di benvenuto</translation>
+        </message>
+        <message>
+            <source>Explore:</source>
+            <translation type="finished">Esplora:</translation>
+        </message>
+        <message>
+            <source>External Tools:</source>
+            <translation type="finished">Strumenti Esterni:</translation>
+        </message>
+        <message>
+            <source>Extract Background:</source>
+            <translation type="finished">Estrai Sfondo:</translation>
+        </message>
+        <message>
+            <source>Follow this standard processing workflow to get started quickly:</source>
+            <translation type="finished">Segui questo workflow di elaborazione standard per iniziare rapidamente:</translation>
+        </message>
+        <message>
+            <source>For a full review of tools and shortcuts, open the Help &amp; Tutorial manual from the main menu.</source>
+            <translation type="finished">Per una panoramica completa di strumenti e scorciatoie, apri il manuale Help &amp; Tutorial dal menu principale.</translation>
+        </message>
+        <message>
+            <source>Open:</source>
+            <translation type="finished">Apri:</translation>
+        </message>
+        <message>
+            <source>Plate Solving:</source>
+            <translation type="finished">Risoluzione Astrometrica:</translation>
+        </message>
+        <message>
+            <source>Preliminary Setup</source>
+            <translation type="finished">Configurazione Preliminare</translation>
+        </message>
+        <message>
+            <source>Quick Start Guide</source>
+            <translation type="finished">Guida Rapida</translation>
+        </message>
+        <message>
+            <source>Settings</source>
+            <translation type="finished">Impostazioni</translation>
+        </message>
+        <message>
+            <source>Star Catalog:</source>
+            <translation type="finished">Catalogo Stellare:</translation>
+        </message>
+        <message>
+            <source>Stretch:</source>
+            <translation type="finished">Stretch:</translation>
+        </message>
+        <message>
+            <source>TStar is a comprehensive, high-performance astrophotography processing suite designed to handle everything from RAW calibration to final dynamic stretch and presentation. It provides an intuitive, non-destructive workflow with both established algorithms and modern AI-driven tools.</source>
+            <translation type="finished">TStar è una suite di elaborazione astrofotografica completa e ad alte prestazioni, progettata per gestire tutto, dalla calibrazione RAW allo stretch dinamico finale e alla presentazione. Fornisce un workflow intuitivo e non distruttivo con algoritmi consolidati e moderni strumenti basati su IA.</translation>
+        </message>
+        <message>
+            <source>To get the most out of TStar, please complete these initial setup steps in the</source>
+            <translation type="finished">Per ottenere il massimo da TStar, completa questi passaggi di configurazione iniziale nel</translation>
+        </message>
+        <message>
+            <source>Welcome to TStar</source>
+            <translation type="finished">Benvenuto in TStar</translation>
+        </message>
+        <message>
+            <source>and</source>
+            <translation type="finished">e</translation>
+        </message>
+        <message>
+            <source>apply ABE or CBE (Color Management) to remove light pollution gradients.</source>
+            <translation type="finished">applica ABE o CBE (Gestione Colore) per rimuovere i gradienti di inquinamento luminoso.</translation>
+        </message>
+        <message>
+            <source>apply AI sharpening and noise reduction (Cosmic Clarity and GraXpert are recommended).</source>
+            <translation type="finished">applica nitidezza e riduzione del rumore AI (Cosmic Clarity e GraXpert sono consigliati).</translation>
+        </message>
+        <message>
+            <source>continue enhancing the image exploring the many tools available in TStar.</source>
+            <translation type="finished">continua a migliorare l'immagine esplorando i numerosi strumenti disponibili in TStar.</translation>
+        </message>
+        <message>
+            <source>download or link the</source>
+            <translation type="finished">scarica o collega il</translation>
+        </message>
+        <message>
+            <source>download the</source>
+            <translation type="finished">scarica il</translation>
+        </message>
+        <message>
+            <source>for professional plate solving and accurate photometric color calibration.</source>
+            <translation type="finished">per risoluzione astrometrica professionale e calibrazione fotometrica accurata del colore.</translation>
+        </message>
+        <message>
+            <source>menu:</source>
+            <translation type="finished">menu:</translation>
+        </message>
+        <message>
+            <source>press</source>
+            <translation type="finished">premi</translation>
+        </message>
+        <message>
+            <source>run Plate Solving (Utilities -&gt; Plate Solving) to attach sky coordinates.</source>
+            <translation type="finished">esegui la Risoluzione Astrometrica (Utilità -&gt; Risoluzione Astrometrica) per allegare le coordinate celesti.</translation>
+        </message>
+        <message>
+            <source>set the execution paths for</source>
+            <translation type="finished">imposta i percorsi di esecuzione per</translation>
+        </message>
+        <message>
+            <source>to enable advanced AI workflow integration.</source>
+            <translation type="finished">per abilitare l'integrazione avanzata del workflow AI.</translation>
+        </message>
+        <message>
+            <source>to load your stacked image (FITS/XISF/TIFF).</source>
+            <translation type="finished">per caricare la tua immagine stack (FITS/XISF/TIFF).</translation>
+        </message>
+        <message>
+            <source>transition to non-linear space using GHS, Histogram, or ArcSinh Stretch tools.</source>
+            <translation type="finished">passa allo spazio non lineare usando gli strumenti GHS, Istogramma o ArcSinh Stretch.</translation>
+        </message>
+        <message>
+            <source>use SPCC or PCC (Color Management) to accurately balance colors.</source>
+            <translation type="finished">usa SPCC o PCC (Color Management) per bilanciare accuratamente i colori.</translation>
+        </message>
+        <message>
+            <source>via Settings to enable AI-powered deconvolution and noise reduction.</source>
+            <translation type="finished">tramite Impostazioni per abilitare deconvolution e riduzione del rumore basate su AI.</translation>
         </message>
     </context>
     <context>
