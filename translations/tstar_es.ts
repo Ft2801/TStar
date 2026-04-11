@@ -2221,6 +2221,10 @@
             <translation type="finished">Renombrar Vista</translation>
         </message>
         <message>
+            <source>Resize the window so it matches the image at its current zoom level</source>
+            <translation type="finished">Redimensiona la ventana para que coincida con la imagen en su nivel de zoom actual</translation>
+        </message>
+        <message>
             <source>The image '%1' has unsaved changes. Do you want to close it?</source>
             <translation type="finished">Imagen '%1' tiene cambios sin guardar. ¿Cerrar?</translation>
         </message>

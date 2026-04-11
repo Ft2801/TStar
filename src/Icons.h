@@ -169,6 +169,12 @@ stroke-linecap="round" stroke-linejoin="round">
 </svg>
 )";
 
+static const QString RESIZE = R"(
+<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+  <path d="M784-120 120-783l57-57 663 663-56 57Zm-401 0L120-383l57-57 263 263-57 57Z"/>
+</svg>
+)";
+
 } // namespace Icons
 
 #endif // ICONS_H

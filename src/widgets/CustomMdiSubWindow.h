@@ -214,7 +214,15 @@ private:
     void updateCursor(const QPoint& pos);
     int  getResizeEdge(const QPoint& pos);
     void installRecursiveFilter(QWidget* w);
+
+    // Resizes the subwindow so the viewer area matches the image aspect ratio
     void adjustToImageSize();
+
+    // Resizes the subwindow to match the image at its current zoom level,
+    // clamping to the minimum and maximum allowed window dimensions
+    void fitWindowToCurrentImageSize();
+
+    
 
     // -- Layout ----------------------------------------------------------
     QFrame*       m_container;
@@ -227,6 +235,7 @@ private:
     NameStrip*    m_nameStrip;
     LinkStrip*    m_linkStrip;
     AdaptStrip*   m_adaptStrip;
+    QPushButton*  m_fitWindowBtn;
 
     // -- Manual resize state ---------------------------------------------
     bool m_resizing     = false;

@@ -676,7 +676,8 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget* parent) : QMdiSubWindow(parent)
     leftLayout->setSpacing(0);
 
     m_nameStrip = new NameStrip(leftStrip);
-    connect(m_nameStrip, &NameStrip::renameRequested, this, &CustomMdiSubWindow::requestRename);
+    connect(m_nameStrip, &NameStrip::renameRequested,
+            this, &CustomMdiSubWindow::requestRename);
 
     m_linkStrip = new LinkStrip(leftStrip);
     connect(m_linkStrip, &LinkStrip::linkToggled, [this]() {
@@ -694,8 +695,10 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget* parent) : QMdiSubWindow(parent)
                         others.append({ov, otherWin});
                 }
                 for (auto& pair : others) {
-                    disconnect(v,          &ImageViewer::viewChanged, pair.first, &ImageViewer::syncView);
-                    disconnect(pair.first, &ImageViewer::viewChanged, v,          &ImageViewer::syncView);
+                    disconnect(v,          &ImageViewer::viewChanged,
+                               pair.first, &ImageViewer::syncView);
+                    disconnect(pair.first, &ImageViewer::viewChanged,
+                               v,          &ImageViewer::syncView);
                 }
                 v->setLinked(false);
 
@@ -723,10 +726,26 @@ CustomMdiSubWindow::CustomMdiSubWindow(QWidget* parent) : QMdiSubWindow(parent)
 
     m_adaptStrip = new AdaptStrip(leftStrip);
 
+    // Button that resizes the subwindow to match the image at its current zoom level
+    m_fitWindowBtn = new QPushButton(leftStrip);
+    m_fitWindowBtn->setFixedWidth(FixedUI::sidebarWidth);
+    m_fitWindowBtn->setFixedHeight(FixedUI::sidebarWidth);
+    m_fitWindowBtn->setFlat(true);
+    m_fitWindowBtn->setToolTip(tr("Resize the window so it matches the image at its current zoom level"));
+    m_fitWindowBtn->setStyleSheet(
+        "QPushButton { border: none; background: transparent; color: white; "
+        "              font-size: 14px; padding: 0px; }"
+        "QPushButton:hover { background: #444; border-radius: 4px; }"
+    );
+    m_fitWindowBtn->setIcon(iconFromSvg(Icons::RESIZE));
+    connect(m_fitWindowBtn, &QPushButton::clicked,
+            this, &CustomMdiSubWindow::fitWindowToCurrentImageSize);
+
     leftLayout->addWidget(m_nameStrip);
     leftLayout->addWidget(m_linkStrip);
     leftLayout->addWidget(m_adaptStrip);
     leftLayout->addStretch();
+    leftLayout->addWidget(m_fitWindowBtn);
 
     m_contentLayout->addWidget(leftStrip);
     m_mainLayout->addWidget(m_contentArea, 1);
@@ -1119,14 +1138,21 @@ void CustomMdiSubWindow::setActiveState(bool active)
 void CustomMdiSubWindow::setWidget(QWidget* widget)
 {
     if (!widget) return;
-
+    
     m_contentLayout->addWidget(widget, 1);
     widget->setParent(m_contentArea);
     widget->show();
     installRecursiveFilter(widget);
 
     if (auto* v = qobject_cast<ImageViewer*>(widget)) {
-        adjustToImageSize();
+
+        // Once the layout is settled and fitToWindow() has run, resize the
+        // subwindow to match the image at the zoom level chosen by fitToWindow()
+        connect(v, &ImageViewer::resized, this, [this]() {
+            QTimer::singleShot(50, this, [this]() {
+                fitWindowToCurrentImageSize();
+            });
+        }, Qt::SingleShotConnection);
 
         connect(v, &ImageViewer::unlinked, [this]() {
             if (m_linkStrip) m_linkStrip->setLinked(false);
@@ -1137,7 +1163,8 @@ void CustomMdiSubWindow::setWidget(QWidget* widget)
             if (mod) {
                 if (!title.endsWith("*")) setSubWindowTitle(title + "*");
             } else {
-                if (title.endsWith("*"))  setSubWindowTitle(title.left(title.length() - 1));
+                if (title.endsWith("*"))
+                    setSubWindowTitle(title.left(title.length() - 1));
             }
         });
 
@@ -1145,7 +1172,7 @@ void CustomMdiSubWindow::setWidget(QWidget* widget)
             if (m_titleBar)
                 m_titleBar->setZoom(static_cast<int>(scale * 100.0f + 0.5f));
         });
-
+        
         if (m_titleBar)
             m_titleBar->setZoom(static_cast<int>(v->getScale() * 100.0f + 0.5f));
     }
@@ -1158,8 +1185,10 @@ ImageViewer* CustomMdiSubWindow::viewer() const
 
 // ---------------------------------------------------------------------------
 // adjustToImageSize
-// Resizes the subwindow to tightly fit the loaded image buffer dimensions,
-// capped at 90% of the parent MDI area.
+// Resizes the subwindow so that the viewer area has exactly the same aspect
+// ratio as the image buffer, eliminating black bands on first open.
+// The resulting window size is clamped between the minimum window constants
+// and 90% of the parent MDI area.
 // ---------------------------------------------------------------------------
 
 void CustomMdiSubWindow::adjustToImageSize()
@@ -1170,20 +1199,138 @@ void CustomMdiSubWindow::adjustToImageSize()
     const ImageBuffer& buf = v->getBuffer();
     if (!buf.isValid()) return;
 
-    const int sidebar = FixedUI::sidebarWidth;
-    const int titleH  = FixedUI::titleBarHeight;
-    const int border  = FixedUI::borderWidth;
+    const int imgW = buf.width();
+    const int imgH = buf.height();
+    if (imgW <= 0 || imgH <= 0) return;
 
-    int totalW = buf.width()  + sidebar + border;
-    int totalH = buf.height() + titleH  + border;
+    // Fixed UI chrome that surrounds the viewer area
+    const int reservedW = FixedUI::sidebarWidth
+                        + FixedUI::borderWidth * 2
+                        + 4; // container padding: 2px per side
+    const int reservedH = FixedUI::titleBarHeight
+                        + FixedUI::borderWidth * 2
+                        + 4; // container padding: 2px per side
 
+    // Minimum viewer area derived from the window minimum size constants
+    const int minViewerW = FixedUI::minWindowWidth  - reservedW;
+    const int minViewerH = FixedUI::minWindowHeight - reservedH;
+
+    // Maximum viewer area available (90% of the MDI area minus reserved chrome)
+    int maxViewerW = 800;
+    int maxViewerH = 600;
     if (parentWidget()) {
         const QSize area = parentWidget()->size();
-        if (totalW > area.width()  * 0.9) totalW = static_cast<int>(area.width()  * 0.9);
-        if (totalH > area.height() * 0.9) totalH = static_cast<int>(area.height() * 0.9);
+        maxViewerW = static_cast<int>(area.width()  * 0.9) - reservedW;
+        maxViewerH = static_cast<int>(area.height() * 0.9) - reservedH;
     }
 
-    resize(totalW, totalH);
+    const double aspectRatio = static_cast<double>(imgW) / imgH;
+
+    int viewerW = imgW;
+    int viewerH = imgH;
+
+    // Scale down uniformly if the image exceeds the maximum viewer area
+    if (viewerW > maxViewerW) {
+        viewerW = maxViewerW;
+        viewerH = static_cast<int>(viewerW / aspectRatio);
+    }
+    if (viewerH > maxViewerH) {
+        viewerH = maxViewerH;
+        viewerW = static_cast<int>(viewerH * aspectRatio);
+    }
+
+    // Scale up uniformly if the image is smaller than the minimum viewer area
+    if (viewerW < minViewerW) {
+        viewerW = minViewerW;
+        viewerH = static_cast<int>(viewerW / aspectRatio);
+    }
+    if (viewerH < minViewerH) {
+        viewerH = minViewerH;
+        viewerW = static_cast<int>(viewerH * aspectRatio);
+    }
+
+    resize(viewerW + reservedW, viewerH + reservedH);
+}
+
+// ---------------------------------------------------------------------------
+// fitWindowToCurrentImageSize
+// Resizes the subwindow so that the viewer area matches the image as it is
+// currently displayed, taking the active zoom level into account.
+// If the resulting size exceeds 90% of the MDI area or falls below the
+// minimum window size, the window is clamped to those bounds and the image
+// zoom is adjusted so no black bands appear.
+// ---------------------------------------------------------------------------
+void CustomMdiSubWindow::fitWindowToCurrentImageSize()
+{
+    ImageViewer* v = m_contentArea->findChild<ImageViewer*>();
+    if (!v) return;
+
+    const QGraphicsPixmapItem* item = v->getImageItem();
+    if (!item || item->pixmap().isNull()) return;
+
+    const float  scale       = v->getScale();
+    const int    displayedW  = static_cast<int>(item->pixmap().width()  * scale);
+    const int    displayedH  = static_cast<int>(item->pixmap().height() * scale);
+    const double aspectRatio = static_cast<double>(displayedW) / displayedH;
+
+    // Padding kept around the image inside the viewer area
+    static constexpr int viewerPadding = 5 * 2; // 5px per side, both axes
+
+    // Fixed UI chrome surrounding the viewer
+    const int reservedW = FixedUI::sidebarWidth
+                        + FixedUI::borderWidth * 2
+                        + 4                  // container padding: 2px per side
+                        + viewerPadding;
+    const int reservedH = FixedUI::titleBarHeight
+                        + FixedUI::borderWidth * 2
+                        + 4                  // container padding: 2px per side
+                        + viewerPadding;
+
+    // Viewer area bounds
+    const int minViewerW = FixedUI::minWindowWidth  - reservedW;
+    const int minViewerH = FixedUI::minWindowHeight - reservedH;
+
+    int maxViewerW = 800;
+    int maxViewerH = 600;
+    if (parentWidget()) {
+        const QSize area = parentWidget()->size();
+        maxViewerW = static_cast<int>(area.width()  * 0.9) - reservedW;
+        maxViewerH = static_cast<int>(area.height() * 0.9) - reservedH;
+    }
+
+    int viewerW = displayedW;
+    int viewerH = displayedH;
+
+    // Clamp to maximum bounds, preserving aspect ratio
+    if (viewerW > maxViewerW) {
+        viewerW = maxViewerW;
+        viewerH = static_cast<int>(viewerW / aspectRatio);
+    }
+    if (viewerH > maxViewerH) {
+        viewerH = maxViewerH;
+        viewerW = static_cast<int>(viewerH * aspectRatio);
+    }
+
+    // Clamp to minimum bounds, preserving aspect ratio
+    if (viewerW < minViewerW) {
+        viewerW = minViewerW;
+        viewerH = static_cast<int>(viewerW / aspectRatio);
+    }
+    if (viewerH < minViewerH) {
+        viewerH = minViewerH;
+        viewerW = static_cast<int>(viewerH * aspectRatio);
+    }
+
+    resize(viewerW + reservedW, viewerH + reservedH);
+
+    // If the viewer area was clamped, update the image zoom so it fills
+    // the viewer exactly with no black bands
+    const float newScaleW = static_cast<float>(viewerW) / item->pixmap().width();
+    const float newScaleH = static_cast<float>(viewerH) / item->pixmap().height();
+    const float newScale  = std::min(newScaleW, newScaleH);
+
+    if (std::abs(newScale - scale) > 1e-4f)
+        v->setTransform(QTransform::fromScale(newScale, newScale));
 }
 
 // ---------------------------------------------------------------------------

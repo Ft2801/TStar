@@ -204,6 +204,11 @@ public:
         return QGraphicsView::mapFromScene(scenePos).toPointF();
     }
 
+    // ---- Scene item access --------------------------------------------------
+
+    // Returns the underlying graphics pixmap item (read-only).
+    const QGraphicsPixmapItem* getImageItem() const { return m_imageItem; }
+
 signals:
     void pointPicked(QPointF p);                               ///< Scene coordinates
     void samplesMoved(const std::vector<QPointF>& points);     ///< After sample drag

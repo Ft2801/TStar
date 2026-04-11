@@ -2221,6 +2221,10 @@
             <translation type="finished">Ansicht umbenennen</translation>
         </message>
         <message>
+            <source>Resize the window so it matches the image at its current zoom level</source>
+            <translation type="finished">Passen Sie die Fenstergröße an das Bild bei der aktuellen Zoomstufe an</translation>
+        </message>
+        <message>
             <source>The image '%1' has unsaved changes. Do you want to close it?</source>
             <translation type="finished">Bild '%1' hat ungespeicherte Änderungen. Schließen?</translation>
         </message>

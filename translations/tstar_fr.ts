@@ -2221,6 +2221,10 @@
             <translation type="finished">Renommer Vue</translation>
         </message>
         <message>
+            <source>Resize the window so it matches the image at its current zoom level</source>
+            <translation type="finished">Redimensionnez la fenêtre pour qu'elle corresponde à l'image à son niveau de zoom actuel</translation>
+        </message>
+        <message>
             <source>The image '%1' has unsaved changes. Do you want to close it?</source>
             <translation type="finished">L'image '%1' a des modifs non enregistrées. Fermer ?</translation>
         </message>

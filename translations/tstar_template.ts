@@ -2221,6 +2221,10 @@
             <translation type="unfinished" />
         </message>
         <message>
+            <source>Resize the window so it matches the image at its current zoom level</source>
+            <translation type="unfinished" />
+        </message>
+        <message>
             <source>The image '%1' has unsaved changes. Do you want to close it?</source>
             <translation type="unfinished" />
         </message>

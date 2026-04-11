@@ -2221,6 +2221,10 @@
             <translation type="finished">Rinomina Vista</translation>
         </message>
         <message>
+            <source>Resize the window so it matches the image at its current zoom level</source>
+            <translation type="finished">Ridimensiona la finestra in modo che corrisponda all'immagine al livello di zoom attuale</translation>
+        </message>
+        <message>
             <source>The image '%1' has unsaved changes. Do you want to close it?</source>
             <translation type="finished">L'immagine '%1' ha modifiche non salvate. Vuoi chiuderla?</translation>
         </message>
