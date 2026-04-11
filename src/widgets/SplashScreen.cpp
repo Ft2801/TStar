@@ -198,7 +198,7 @@ void SplashScreen::paintEvent(QPaintEvent*)
     p.setFont(QFont("Segoe UI", 8));
     p.setPen(QColor(100, 100, 130));
     p.drawText(QRect(0, h - 25, w, 20), Qt::AlignCenter,
-               "(C) 2026 Fabio Tempera");
+               "(c) 2026 Fabio Tempera");
 
     p.end();
 }

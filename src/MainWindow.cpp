@@ -597,9 +597,11 @@ MainWindow::MainWindow(QWidget *parent)
         if (v) {
             m_headerPanel->setMetadata(v->getBuffer().metadata());
             m_historyPanel->updateHistory(v);
+            if (m_rightSidebar) m_rightSidebar->setActiveWindow(csw);
         } else if (!window) {
             m_headerPanel->clear();
             m_historyPanel->clear();
+            if (m_rightSidebar) m_rightSidebar->setActiveWindow(nullptr);
             if (m_autoStretchMedianBtn) {
                 m_autoStretchMedianValue = 0.25f;
                 m_autoStretchMedianBtn->setText("0.25");

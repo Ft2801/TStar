@@ -552,7 +552,9 @@ set(TSTAR_SOURCES
     src/widgets/SidebarWidget.cpp
     src/widgets/SidebarWidget.h
     src/widgets/RightSidebarWidget.cpp
+    src/widgets/ImageStatsWidget.cpp
     src/widgets/RightSidebarWidget.h
+    src/widgets/ImageStatsWidget.h
     src/widgets/HeaderPanel.cpp
     src/widgets/HeaderPanel.h
     src/widgets/HistoryPanel.cpp

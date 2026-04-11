@@ -306,7 +306,7 @@ See [BUILDING.md](BUILDING.md) for complete dependency setup, deployment packagi
 
 ## License
 
-Copyright (C) 2026 Fabio Tempera.
+Copyright (c) 2026 Fabio Tempera.
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for the full license text.
 

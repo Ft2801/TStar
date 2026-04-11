@@ -11,6 +11,7 @@
 #include <QCheckBox>
 
 class CustomMdiSubWindow;
+class ImageStatsWidget;
 class QEnterEvent;
 class QEvent;
 class QAction;
@@ -69,6 +70,9 @@ public:
      */
     void removeThumbnail(CustomMdiSubWindow* sub);
 
+    /** Updates the statistics widget with the currently active window. */
+    void setActiveWindow(CustomMdiSubWindow* sub);
+
     /** Registers a tool action to be searchable via the Search tab. */
     void registerToolAction(QAction* action);
 
@@ -91,6 +95,7 @@ signals:
 private slots:
     void onTabClicked();
     void onSearchTabClicked();
+    void onStatsTabClicked();
     void onSearchTextChanged(const QString& text);
 
 private:
@@ -102,6 +107,7 @@ private:
     QWidget*     m_tabContainer = nullptr;
     QPushButton* m_tabBtn       = nullptr;
     QPushButton* m_searchTabBtn = nullptr;
+    QPushButton* m_statsTabBtn  = nullptr;
 
     // Sliding content area
     QWidget*      m_contentWrapper   = nullptr;
@@ -119,6 +125,10 @@ private:
     QScrollArea*  m_searchScrollArea = nullptr;
     QWidget*      m_searchResultsWidget= nullptr;
     QVBoxLayout*  m_searchResultsLayout= nullptr;
+
+    // Page 2: Stats
+    QWidget*          m_statsPage    = nullptr;
+    ImageStatsWidget* m_statsWidget  = nullptr;
 
     // Top bar within the previews area
     QWidget*   m_topContainer        = nullptr;

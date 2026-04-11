@@ -327,6 +327,7 @@ void PlateSolvingDialog::closeEvent(QCloseEvent* event)
 void PlateSolvingDialog::onSolverLog(const QString& text)
 {
     m_log->append(text);
+    m_log->ensureCursorVisible();
 }
 
 // ============================================================================

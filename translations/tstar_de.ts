@@ -639,16 +639,8 @@
             <translation type="finished">ASTAP-Programm nicht gefunden.</translation>
         </message>
         <message>
-            <source>ASTAP exit code: %1</source>
-            <translation type="finished">ASTAP-Exit-Code: %1</translation>
-        </message>
-        <message>
             <source>ASTAP failed to solve the image.</source>
             <translation type="finished">ASTAP konnte das Bild nicht lösen.</translation>
-        </message>
-        <message>
-            <source>ASTAP process did not exit normally.</source>
-            <translation type="finished">ASTAP-Prozess wurde nicht normal beendet.</translation>
         </message>
         <message>
             <source>ASTAP solve cancelled.</source>
@@ -691,8 +683,8 @@
             <translation type="finished">Großes Sichtfeld erkannt: Reduzierung von %1 Grad auf %2 Grad für Suchstabilität</translation>
         </message>
         <message>
-            <source>QProcess start error: %1</source>
-            <translation type="finished">QProcess Startfehler: %1</translation>
+            <source>Note: ASTAP database not explicitly located by TStar; ASTAP will use its internal search paths.</source>
+            <translation type="unfinished" />
         </message>
         <message>
             <source>Saving temporary image for ASTAP...</source>
@@ -707,16 +699,16 @@
             <translation type="finished">Blind-Lösung</translation>
         </message>
         <message>
-            <source>blind solve (without scale/FOV)</source>
-            <translation type="finished">Blind-Lösung (ohne Skala/FOV)</translation>
+            <source>blind solve (no scale)</source>
+            <translation type="finished">Blind-Lösung (ohne Skalierung)</translation>
         </message>
         <message>
-            <source>hinted solve (with scale/FOV)</source>
-            <translation type="finished">Lösung mit Hinweisen (mit Skala/FOV)</translation>
+            <source>hinted solve (no scale)</source>
+            <translation type="finished">Geführte Lösung (ohne Skalierung)</translation>
         </message>
         <message>
-            <source>hinted solve (without scale/FOV)</source>
-            <translation type="finished">Lösung mit Hinweisen (ohne Skala/FOV)</translation>
+            <source>hinted solve (with scale)</source>
+            <translation type="finished">Geführte Lösung (mit Skalierung)</translation>
         </message>
     </context>
     <context>
@@ -5578,6 +5570,277 @@
         </message>
     </context>
     <context>
+        <name>ImageStatsWidget</name>
+        <message>
+            <source>AvgDev: %1</source>
+            <translation type="finished">AvgDev: %1</translation>
+        </message>
+        <message>
+            <source>AvgDev: N/A</source>
+            <translation type="finished">AvgDev: N/V</translation>
+        </message>
+        <message>
+            <source>Best FWHM: %1 px</source>
+            <translation type="finished">Beste FWHM: %1 px</translation>
+        </message>
+        <message>
+            <source>Best FWHM: N/A</source>
+            <translation type="finished">Beste FWHM: N/V</translation>
+        </message>
+        <message>
+            <source>Best Fit Profile: %1</source>
+            <translation type="finished">Bestes Profil: %1</translation>
+        </message>
+        <message>
+            <source>Best Fit Profile: N/A</source>
+            <translation type="finished">Bestes Profil: N/V</translation>
+        </message>
+        <message>
+            <source>Best Flux: %1</source>
+            <translation type="finished">Bester Fluss: %1</translation>
+        </message>
+        <message>
+            <source>Best Flux: N/A</source>
+            <translation type="finished">Bester Fluss: N/V</translation>
+        </message>
+        <message>
+            <source>Calculate Statistics</source>
+            <translation type="finished">Statistiken berechnen</translation>
+        </message>
+        <message>
+            <source>Gaussian</source>
+            <translation type="finished">Gaußförmig</translation>
+        </message>
+        <message>
+            <source>Global Statistics</source>
+            <translation type="finished">Globale Statistiken</translation>
+        </message>
+        <message>
+            <source>Image Statistics</source>
+            <translation type="finished">Bildstatistiken</translation>
+        </message>
+        <message>
+            <source>MAD: %1</source>
+            <translation type="finished">MAD: %1</translation>
+        </message>
+        <message>
+            <source>MAD: N/A</source>
+            <translation type="finished">MAD: N/V</translation>
+        </message>
+        <message>
+            <source>Max FWHM: %1 px</source>
+            <translation type="finished">Max. FWHM: %1 px</translation>
+        </message>
+        <message>
+            <source>Max FWHM: N/A</source>
+            <translation type="finished">Max. FWHM: N/V</translation>
+        </message>
+        <message>
+            <source>Max Peak: %1</source>
+            <translation type="finished">Maximaler Peak: %1</translation>
+        </message>
+        <message>
+            <source>Max Peak: N/A</source>
+            <translation type="finished">Maximaler Peak: N/V</translation>
+        </message>
+        <message>
+            <source>Max Roundness: %1</source>
+            <translation type="finished">Max. Rundheit: %1</translation>
+        </message>
+        <message>
+            <source>Max Roundness: N/A</source>
+            <translation type="finished">Max. Rundheit: N/V</translation>
+        </message>
+        <message>
+            <source>Max: %1</source>
+            <translation type="finished">Max: %1</translation>
+        </message>
+        <message>
+            <source>Max: N/A</source>
+            <translation type="finished">Max: N/V</translation>
+        </message>
+        <message>
+            <source>Mean Background: %1</source>
+            <translation type="finished">Mittlerer Hintergrund: %1</translation>
+        </message>
+        <message>
+            <source>Mean Background: N/A</source>
+            <translation type="finished">Mittlerer Hintergrund: N/V</translation>
+        </message>
+        <message>
+            <source>Mean FWHM: %1 px</source>
+            <translation type="finished">Mittlere FWHM: %1 px</translation>
+        </message>
+        <message>
+            <source>Mean FWHM: N/A</source>
+            <translation type="finished">Mittlere FWHM: N/V</translation>
+        </message>
+        <message>
+            <source>Mean Flux: %1</source>
+            <translation type="finished">Mittlerer Fluss: %1</translation>
+        </message>
+        <message>
+            <source>Mean Flux: N/A</source>
+            <translation type="finished">Mittlerer Fluss: N/V</translation>
+        </message>
+        <message>
+            <source>Mean RMSE: %1</source>
+            <translation type="finished">Mittlerer RMSE: %1</translation>
+        </message>
+        <message>
+            <source>Mean RMSE: N/A</source>
+            <translation type="finished">Mittlerer RMSE: N/V</translation>
+        </message>
+        <message>
+            <source>Mean Roundness: %1</source>
+            <translation type="finished">Mittlere Rundheit: %1</translation>
+        </message>
+        <message>
+            <source>Mean Roundness: N/A</source>
+            <translation type="finished">Mittlere Rundheit: N/V</translation>
+        </message>
+        <message>
+            <source>Mean: %1</source>
+            <translation type="finished">Mittelwert: %1</translation>
+        </message>
+        <message>
+            <source>Mean: N/A</source>
+            <translation type="finished">Mittelwert: N/V</translation>
+        </message>
+        <message>
+            <source>Median FWHM: %1 px</source>
+            <translation type="finished">Median FWHM: %1 px</translation>
+        </message>
+        <message>
+            <source>Median FWHM: N/A</source>
+            <translation type="finished">Median FWHM: N/V</translation>
+        </message>
+        <message>
+            <source>Median: %1</source>
+            <translation type="finished">Median: %1</translation>
+        </message>
+        <message>
+            <source>Median: N/A</source>
+            <translation type="finished">Median: N/V</translation>
+        </message>
+        <message>
+            <source>Min FWHM: %1 px</source>
+            <translation type="finished">Min. FWHM: %1 px</translation>
+        </message>
+        <message>
+            <source>Min FWHM: N/A</source>
+            <translation type="finished">Min. FWHM: N/V</translation>
+        </message>
+        <message>
+            <source>Min Roundness: %1</source>
+            <translation type="finished">Min. Rundheit: %1</translation>
+        </message>
+        <message>
+            <source>Min Roundness: N/A</source>
+            <translation type="finished">Min. Rundheit: N/V</translation>
+        </message>
+        <message>
+            <source>Min: %1</source>
+            <translation type="finished">Min: %1</translation>
+        </message>
+        <message>
+            <source>Min: N/A</source>
+            <translation type="finished">Min: N/V</translation>
+        </message>
+        <message>
+            <source>Moffat</source>
+            <translation type="finished">Moffat</translation>
+        </message>
+        <message>
+            <source>N/A</source>
+            <translation type="finished">N/V</translation>
+        </message>
+        <message>
+            <source>Noise Estimate: %1</source>
+            <translation type="finished">Rauschabschätzung: %1</translation>
+        </message>
+        <message>
+            <source>Noise Estimate: N/A</source>
+            <translation type="finished">Rauschabschätzung: N/V</translation>
+        </message>
+        <message>
+            <source>Photometry &amp; Background</source>
+            <translation type="finished">Photometrie &amp; Hintergrund</translation>
+        </message>
+        <message>
+            <source>Saturated Stars: %1</source>
+            <translation type="finished">Gesättigte Sterne: %1</translation>
+        </message>
+        <message>
+            <source>Saturated Stars: N/A</source>
+            <translation type="finished">Gesättigte Sterne: N/V</translation>
+        </message>
+        <message>
+            <source>Stars: %1</source>
+            <translation type="finished">Sterne: %1</translation>
+        </message>
+        <message>
+            <source>Stars: N/A</source>
+            <translation type="finished">Sterne: N/V</translation>
+        </message>
+        <message>
+            <source>Status: Analysing…</source>
+            <translation type="finished">Status: Analysiere...</translation>
+        </message>
+        <message>
+            <source>Status: Cached</source>
+            <translation type="finished">Status: Zwischengespeichert</translation>
+        </message>
+        <message>
+            <source>Status: Complete</source>
+            <translation type="finished">Status: Abgeschlossen</translation>
+        </message>
+        <message>
+            <source>Status: No stars detected</source>
+            <translation type="finished">Status: Keine Sterne erkannt</translation>
+        </message>
+        <message>
+            <source>Status: No stars suitable for professional analysis</source>
+            <translation type="finished">Status: Keine Sterne für professionelle Analyse geeignet</translation>
+        </message>
+        <message>
+            <source>Status: Ready</source>
+            <translation type="finished">Status: Bereit</translation>
+        </message>
+        <message>
+            <source>StdDev FWHM: %1 px</source>
+            <translation type="finished">StdAbw FWHM: %1 px</translation>
+        </message>
+        <message>
+            <source>StdDev FWHM: N/A</source>
+            <translation type="finished">StdAbw FWHM: N/V</translation>
+        </message>
+        <message>
+            <source>StdDev Roundness: %1</source>
+            <translation type="finished">StdAbw Rundheit: %1</translation>
+        </message>
+        <message>
+            <source>StdDev Roundness: N/A</source>
+            <translation type="finished">StdAbw Rundheit: N/V</translation>
+        </message>
+        <message>
+            <source>StdDev: %1</source>
+            <translation type="finished">StdAbw: %1</translation>
+        </message>
+        <message>
+            <source>StdDev: N/A</source>
+            <translation type="finished">StdAbw: N/V</translation>
+        </message>
+        <message>
+            <source>Stellar Profile</source>
+            <translation type="finished">Sternprofil</translation>
+        </message>
+        <message>
+            <source>Stellar Shape</source>
+            <translation type="finished">Sternform</translation>
+        </message>
+    </context>
+    <context>
         <name>ImageViewer</name>
         <message>
             <source>Crop from Selection (ROI)</source>
@@ -10318,6 +10581,10 @@
             <translation type="finished">Minimierte Ansichten ausblenden</translation>
         </message>
         <message>
+            <source>Image Statistics</source>
+            <translation type="finished">Bildstatistiken</translation>
+        </message>
+        <message>
             <source>Previews</source>
             <translation type="finished">Vorschaubilder</translation>
         </message>
@@ -10332,6 +10599,10 @@
         <message>
             <source>Search functions...</source>
             <translation type="finished">Suchfunktionen...</translation>
+        </message>
+        <message>
+            <source>Stats</source>
+            <translation type="finished">Statistiken</translation>
         </message>
     </context>
     <context>

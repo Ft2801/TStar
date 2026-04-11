@@ -350,8 +350,12 @@ void AstapSolver::solve(const ImageBuffer& image,
 
     m_cancelRequested.store(false);
 
-    // Run synchronously on the current thread to avoid QtConcurrent global pool starvation
-    auto execute_sync = [&]() {
+    QPointer<AstapSolver> safeThis(this);
+    const QString astapPath = astapExec;
+
+    (void)QtConcurrent::run([safeThis, image, raHint, decHint, radiusDeg, pixelScale, astapPath]() {
+        if (!safeThis) return;
+
         NativeSolveResult res;
 
         // -- Temporary file paths -----------------------------------------
@@ -361,11 +365,16 @@ void AstapSolver::solve(const ImageBuffer& image,
         QString tempIni  = tempDir + "/tstar_astap_solve_" + uniqueId + ".ini";
         QString tempWcs  = tempDir + "/tstar_astap_solve_" + uniqueId + ".wcs";
 
+        // Cleanup previous failed/stale temp files
         QFile::remove(tempTiff);
         QFile::remove(tempIni);
         QFile::remove(tempWcs);
 
-        emit logMessage(tr("Saving temporary image for ASTAP..."));
+        auto emitLog = [&](const QString& msg) {
+            if (safeThis) emit safeThis->logMessage(msg);
+        };
+
+        emitLog(tr("Saving temporary image for ASTAP..."));
 
         // -- Validate image buffer ----------------------------------------
         const int width    = image.width();
@@ -374,13 +383,11 @@ void AstapSolver::solve(const ImageBuffer& image,
 
         if (width <= 0 || height <= 0 || channels <= 0 || image.data().empty()) {
             res.errorMsg = tr("Invalid image buffer for ASTAP solve.");
-            QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection,
-                                      Q_ARG(NativeSolveResult, res));
+            if (safeThis) emit safeThis->finished(res);
             return;
         }
 
         // -- Convert to normalized single-channel luminance ---------------
-        // ASTAP works most reliably with a normalized grayscale image.
         std::vector<float> mono(static_cast<size_t>(width) *
                                 static_cast<size_t>(height));
         const float* src = image.data().data();
@@ -408,7 +415,6 @@ void AstapSolver::solve(const ImageBuffer& image,
             maxV = std::max(maxV, v);
         }
 
-        // Stretch to full [0,1] range for optimal star detection
         const float range = maxV - minV;
         if (range > 1e-6f) {
             for (float& v : mono)
@@ -420,52 +426,38 @@ void AstapSolver::solve(const ImageBuffer& image,
                                      SimpleTiffWriter::Format_uint16, mono))
         {
             res.errorMsg = tr("Failed to save temporary image.");
-            QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection,
-                                      Q_ARG(NativeSolveResult, res));
+            if (safeThis) emit safeThis->finished(res);
             return;
         }
 
         // -- Calculate FOV and coordinate parameters ----------------------
-        // ASTAP expects the FOV of the shorter image dimension (in degrees).
         double fovDeg = (std::min(width, height) * pixelScale) / 3600.0;
-
-        // Apply a conservative reduction for large FOVs to account for
-        // optical distortion across wide fields of view.
         if (fovDeg > 12.0) {
             double fovReduced = fovDeg * 0.92;
-            emit logMessage(
-                tr("Large FOV detected: reducing from %1 deg to %2 deg for search stability")
-                    .arg(fovDeg, 0, 'f', 2).arg(fovReduced, 0, 'f', 2));
+            emitLog(tr("Large FOV detected: reducing from %1 deg to %2 deg for search stability")
+                        .arg(fovDeg, 0, 'f', 2).arg(fovReduced, 0, 'f', 2));
             fovDeg = fovReduced;
         }
 
-        double raHours = raHint / 15.0;        // RA in hours
-        double spdDeg  = decHint + 90.0;        // South pole distance in degrees
+        double raHours = raHint / 15.0;
+        double spdDeg  = decHint + 90.0;
 
-        emit logMessage(
-            tr("Calculated FOV (Height): %1 degrees (dims=%2x%3, scale=%4 arcsec/px)")
-                .arg(fovDeg, 0, 'f', 4).arg(width).arg(height)
-                .arg(pixelScale, 0, 'f', 3));
+        emitLog(tr("Calculated FOV (Height): %1 degrees (dims=%2x%3, scale=%4 arcsec/px)")
+                    .arg(fovDeg, 0, 'f', 4).arg(width).arg(height)
+                    .arg(pixelScale, 0, 'f', 3));
 
         // -- Build command-line arguments ---------------------------------
         QStringList commonArgs;
-        commonArgs << "-f" << tempTiff
-                   << "-progress"
-                   << "-z" << "0"
-                   << "-s" << "500";  // Explicit star limit for stability
+        commonArgs << "-f" << tempTiff << "-progress" << "-z" << "0" << "-s" << "500";
 
-        // Database path
-        QString dbPath = getAstapDatabasePath();
+        QString dbPath = safeThis->getAstapDatabasePath();
         if (!dbPath.isEmpty()) {
             commonArgs << "-d" << dbPath;
-            emit logMessage(tr("ASTAP Database found: %1").arg(dbPath));
+            emitLog(tr("ASTAP Database found: %1").arg(dbPath));
         } else {
-            emit logMessage(
-                tr("Note: ASTAP database not explicitly located by TStar; "
-                   "ASTAP will use its internal search paths."));
+            emitLog(tr("Note: ASTAP database not explicitly located by TStar; ASTAP will use its internal search paths."));
         }
 
-        // Coordinate hint arguments
         QStringList hintedArgs;
         bool hasHint = (raHint != 0.0 || decHint != 0.0);
         if (hasHint) {
@@ -474,193 +466,128 @@ void AstapSolver::solve(const ImageBuffer& image,
                        << "-r"   << QString::number(radiusDeg, 'f', 2);
         }
 
-        // FOV / scale arguments
         QStringList scaleArgs;
-        if (fovDeg > 0.0) {
-            scaleArgs << "-fov" << QString::number(fovDeg, 'f', 4);
-        }
+        if (fovDeg > 0.0) scaleArgs << "-fov" << QString::number(fovDeg, 'f', 4);
 
-        // User-defined extra arguments from application settings
         QSettings settings;
         QString extra = settings.value("paths/astap_extra").toString();
         QStringList extraArgs;
-        if (!extra.isEmpty())
-            extraArgs = extra.split(' ', Qt::SkipEmptyParts);
+        if (!extra.isEmpty()) extraArgs = extra.split(' ', Qt::SkipEmptyParts);
 
-        // -- Output parsing lambda ----------------------------------------
+        // -- Parsing lambda -----------------------------------------------
         auto parseOutputs = [&]() -> bool {
-            // Try .ini file first
             if (QFile::exists(tempIni)) {
-                bool ok = parseAstapIni(tempIni, height, res);
-                if (ok) {
+                if (safeThis && safeThis->parseAstapIni(tempIni, height, res)) {
                     res.success = true;
                     return true;
                 }
-
                 QFile f(tempIni);
                 if (f.open(QIODevice::ReadOnly)) {
                     QString content = QString::fromUtf8(f.readAll());
                     if (content.contains("PLTSOLVD=F"))
                         res.errorMsg = tr("ASTAP was unable to solve the image.");
-                    else {
+                    else
                         res.errorMsg = tr("Failed to parse ASTAP output files.");
-                        emit logMessage("INI Content: " + content);
-                    }
                 }
                 return false;
             }
-
-            // Fall back to .wcs file
             if (QFile::exists(tempWcs)) {
-                if (parseAstapWCS(tempWcs, height, res)) {
+                if (safeThis && safeThis->parseAstapWCS(tempWcs, height, res)) {
                     res.success = true;
                     return true;
                 }
                 res.errorMsg = tr("Failed to parse ASTAP WCS file.");
-                QFile f(tempWcs);
-                if (f.open(QIODevice::ReadOnly))
-                    emit logMessage("WCS Content: " + QString::fromUtf8(f.readAll()));
                 return false;
             }
-
             res.errorMsg = tr("ASTAP failed to solve the image.");
             return false;
         };
 
-        // -- Single-attempt execution lambda ------------------------------
-        auto executeAttempt = [&](const QString& label,
-                                  const QStringList& args) -> bool
-        {
+        // -- Attempt lambda -----------------------------------------------
+        auto executeAttempt = [&](const QString& label, const QStringList& args) -> bool {
             QFile::remove(tempIni);
             QFile::remove(tempWcs);
-
-            emit logMessage(tr("ASTAP attempt: %1").arg(label));
-
-            QString cmd = "\"" + astapExec + "\" " + args.join(" ");
-            emit logMessage(QString("Executing: %1").arg(cmd));
+            emitLog(tr("ASTAP attempt: %1").arg(label));
 
             QProcess p;
             p.setProcessChannelMode(QProcess::MergedChannels);
-            p.start(astapExec, args);
+            p.start(astapPath, args);
 
             if (!p.waitForStarted(10000)) {
                 res.errorMsg = tr("Failed to start ASTAP process.");
-                emit logMessage(tr("QProcess start error: %1")
-                                    .arg(p.errorString()));
                 return false;
             }
 
-            // Register the running process for potential cancellation
-            {
-                QMutexLocker locker(&m_processMutex);
-                m_runningProcess = &p;
+            if (safeThis) {
+                QMutexLocker locker(&safeThis->m_processMutex);
+                safeThis->m_runningProcess = &p;
             }
 
             auto clearRunningProcess = [&]() {
-                QMutexLocker locker(&m_processMutex);
-                if (m_runningProcess == &p)
-                    m_runningProcess = nullptr;
+                if (safeThis) {
+                    QMutexLocker locker(&safeThis->m_processMutex);
+                    if (safeThis->m_runningProcess == &p)
+                        safeThis->m_runningProcess = nullptr;
+                }
             };
 
-            // Flush ASTAP stdout/stderr to our log
-            // Note: setProcessChannelMode(MergedChannels) combines stdout and stderr
-            // into readAllStandardOutput(), so we only read from that once.
             auto flushOutput = [&]() {
                 QString output = p.readAllStandardOutput();
                 const QStringList lines = output.split('\n');
                 for (const QString& line : lines) {
                     QString t = line.trimmed();
-                    if (!t.isEmpty())
-                        emit logMessage(t);
+                    if (!t.isEmpty()) emitLog(t);
                 }
             };
 
-            // Poll loop with timeout and cancellation support
             QElapsedTimer timer;
             timer.start();
-            constexpr qint64 kAttemptTimeoutMs = 120000;
-            bool finished = false;
-
-            while (!(finished = p.waitForFinished(500))) {
+            while (!p.waitForFinished(500)) {
                 flushOutput();
-
-                if (m_cancelRequested.load()) {
-                    emit logMessage(tr("ASTAP solve cancelled."));
-                    terminateAstapProcess(p, 2000);
+                if (!safeThis || safeThis->m_cancelRequested.load()) {
+                    emitLog(tr("ASTAP solve cancelled."));
+                    if (safeThis) safeThis->terminateAstapProcess(p, 2000);
                     clearRunningProcess();
                     res.errorMsg = tr("ASTAP solve cancelled.");
                     return false;
                 }
-
-                if (timer.elapsed() > kAttemptTimeoutMs) {
-                    emit logMessage(
-                        tr("ASTAP timed out after %1 seconds. "
-                           "Terminating process...")
-                            .arg(kAttemptTimeoutMs / 1000));
-                    terminateAstapProcess(p, 2000);
+                if (timer.elapsed() > 120000) {
+                    emitLog(tr("ASTAP timed out."));
+                    if (safeThis) safeThis->terminateAstapProcess(p, 2000);
                     clearRunningProcess();
                     res.errorMsg = tr("ASTAP timed out.");
                     return false;
                 }
             }
-            Q_UNUSED(finished);
-
             flushOutput();
             clearRunningProcess();
-
-            emit logMessage(tr("ASTAP exit code: %1").arg(p.exitCode()));
-            if (p.exitStatus() != QProcess::NormalExit)
-                emit logMessage(tr("ASTAP process did not exit normally."));
-
             return parseOutputs();
         };
 
-        // -- Build attempt sequence (progressive relaxation) --------------
+        // -- Sequence -----------------------------------------------------
         std::vector<QPair<QString, QStringList>> attempts;
-
         if (hasHint) {
-            attempts.push_back({
-                tr("hinted solve (with scale/FOV)"),
-                commonArgs + hintedArgs + scaleArgs + extraArgs
-            });
-            if (!scaleArgs.isEmpty()) {
-                attempts.push_back({
-                    tr("hinted solve (without scale/FOV)"),
-                    commonArgs + hintedArgs + extraArgs
-                });
-            }
-            attempts.push_back({
-                tr("blind solve"),
-                commonArgs + QStringList{"-r", "180.0"} + extraArgs
-            });
+            attempts.push_back({tr("hinted solve (with scale)"), commonArgs + hintedArgs + scaleArgs + extraArgs});
+            if (!scaleArgs.isEmpty())
+                attempts.push_back({tr("hinted solve (no scale)"), commonArgs + hintedArgs + extraArgs});
+            attempts.push_back({tr("blind solve"), commonArgs + QStringList{"-r", "180.0"} + extraArgs});
         } else {
-            attempts.push_back({
-                tr("blind solve"),
-                commonArgs + QStringList{"-r", "180.0"} + scaleArgs + extraArgs
-            });
-            if (!scaleArgs.isEmpty()) {
-                attempts.push_back({
-                    tr("blind solve (without scale/FOV)"),
-                    commonArgs + QStringList{"-r", "180.0"} + extraArgs
-                });
-            }
+            attempts.push_back({tr("blind solve"), commonArgs + QStringList{"-r", "180.0"} + scaleArgs + extraArgs});
+            if (!scaleArgs.isEmpty())
+                attempts.push_back({tr("blind solve (no scale)"), commonArgs + QStringList{"-r", "180.0"} + extraArgs});
         }
 
-        // Execute attempts sequentially, stopping on first success
-        for (const auto& attempt : attempts) {
-            if (executeAttempt(attempt.first, attempt.second))
-                break;
+        for (const auto& att : attempts) {
+            if (executeAttempt(att.first, att.second)) break;
         }
 
-        // -- Cleanup temporary files --------------------------------------
+        // -- Cleanup and Finish -------------------------------------------
         QFile::remove(tempTiff);
         QFile::remove(tempIni);
         QFile::remove(tempWcs);
 
-        QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection,
-                                  Q_ARG(NativeSolveResult, res));
-    };
-    execute_sync();
+        if (safeThis) emit safeThis->finished(res);
+    });
 }
 
 // ============================================================================

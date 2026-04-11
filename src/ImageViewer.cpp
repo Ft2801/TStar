@@ -1622,6 +1622,38 @@ void ImageViewer::drawForeground(QPainter* painter,
                                  [[maybe_unused]] const QRectF& rect)
 {
     // -------------------------------------------------------------------------
+    // Crop rectangle center crosshair
+    //
+    // Draws a small crosshair at the center of the crop rectangle in the same
+    // color as the border to help visualize the crop center.
+    // The crosshair follows the crop rectangle rotation and position.
+    // -------------------------------------------------------------------------
+    if (m_cropMode && m_cropItem && m_cropItem->isVisible())
+    {
+        QRectF cropRect = m_cropItem->rect();
+        if (!cropRect.isEmpty())
+        {
+            // Get the center in local coordinates of the crop rectangle,
+            // then transform to scene coordinates to account for rotation
+            QPointF localCenter = cropRect.center();
+            QPointF sceneCenter = m_cropItem->mapToScene(localCenter);
+            
+            // Use the same yellow color as the crop rectangle border
+            painter->save();
+            painter->setPen(QPen(Qt::yellow, 4));
+            
+            // Draw the crosshair (in scene coordinates)
+            static constexpr float CROSSHAIR_SIZE = 30.0f;
+            painter->drawLine(QPointF(sceneCenter.x() - CROSSHAIR_SIZE, sceneCenter.y()),
+                            QPointF(sceneCenter.x() + CROSSHAIR_SIZE, sceneCenter.y()));
+            painter->drawLine(QPointF(sceneCenter.x(), sceneCenter.y() - CROSSHAIR_SIZE),
+                            QPointF(sceneCenter.x(), sceneCenter.y() + CROSSHAIR_SIZE));
+            
+            painter->restore();
+        }
+    }
+
+    // -------------------------------------------------------------------------
     // Magnifier loupe
     //
     // Renders a 100x100-pixel loupe in viewport space, positioned to the

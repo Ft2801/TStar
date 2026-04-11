@@ -1,5 +1,6 @@
 #include "RightSidebarWidget.h"
 #include "CustomMdiSubWindow.h"
+#include "ImageStatsWidget.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -295,6 +296,20 @@ RightSidebarWidget::RightSidebarWidget(QWidget* parent)
 
     m_stackedWidget->addWidget(m_searchPage);
 
+    // ==========================================
+    // Page 2: Stats
+    // ==========================================
+    m_statsPage = new QWidget();
+    auto* statsPageLayout = new QVBoxLayout(m_statsPage);
+    statsPageLayout->setContentsMargins(0, 0, 0, 0);
+    statsPageLayout->setSpacing(0);
+    
+    m_statsWidget = new ImageStatsWidget(m_statsPage);
+    m_statsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    statsPageLayout->addWidget(m_statsWidget);
+
+    m_stackedWidget->addWidget(m_statsPage);
+
     connect(m_searchBox, &QLineEdit::textChanged, this, &RightSidebarWidget::onSearchTextChanged);
 
     // ------------------------------------------------------------------
@@ -328,6 +343,16 @@ RightSidebarWidget::RightSidebarWidget(QWidget* parent)
             this, &RightSidebarWidget::onSearchTabClicked);
 
     tabLayout->addWidget(m_searchTabBtn);
+
+    m_statsTabBtn = new VerticalButton(tr("Stats"), m_tabContainer);
+    m_statsTabBtn->setCheckable(true);
+    m_statsTabBtn->setFixedSize(30, 100);
+    m_statsTabBtn->setToolTip(tr("Image Statistics"));
+    m_statsTabBtn->setStyleSheet("border: none;");
+    connect(m_statsTabBtn, &QPushButton::clicked,
+            this, &RightSidebarWidget::onStatsTabClicked);
+
+    tabLayout->addWidget(m_statsTabBtn);
     tabLayout->addStretch();
 
     mainLayout->addWidget(m_contentWrapper);
@@ -375,6 +400,11 @@ void RightSidebarWidget::onSearchTabClicked()
     switchToTab(1);
 }
 
+void RightSidebarWidget::onStatsTabClicked()
+{
+    switchToTab(2);
+}
+
 void RightSidebarWidget::switchToTab(int index)
 {
     if (m_expanded && m_currentTabIndex == index) {
@@ -388,8 +418,9 @@ void RightSidebarWidget::switchToTab(int index)
         if (wasExpanded) {
             m_tabBtn->setChecked(m_currentTabIndex == 0);
             m_searchTabBtn->setChecked(m_currentTabIndex == 1);
+            m_statsTabBtn->setChecked(m_currentTabIndex == 2);
             
-            int targetWidth = (m_currentTabIndex == 1) ? static_cast<int>(m_expandedWidth * 1.5) : m_expandedWidth;
+            int targetWidth = (m_currentTabIndex == 1 || m_currentTabIndex == 2) ? static_cast<int>(m_expandedWidth * 1.5) : m_expandedWidth;
             m_widthAnim->stop();
             m_widthAnim->setStartValue(m_contentWrapper->width());
             m_widthAnim->setEndValue(targetWidth);
@@ -414,12 +445,14 @@ void RightSidebarWidget::setExpanded(bool expanded)
     if (!expanded) {
         m_tabBtn->setChecked(false);
         m_searchTabBtn->setChecked(false);
+        m_statsTabBtn->setChecked(false);
     } else {
         m_tabBtn->setChecked(m_currentTabIndex == 0);
         m_searchTabBtn->setChecked(m_currentTabIndex == 1);
+        m_statsTabBtn->setChecked(m_currentTabIndex == 2);
     }
 
-    int targetWidth = (m_currentTabIndex == 1) ? static_cast<int>(m_expandedWidth * 1.5) : m_expandedWidth;
+    int targetWidth = (m_currentTabIndex == 1 || m_currentTabIndex == 2) ? static_cast<int>(m_expandedWidth * 1.5) : m_expandedWidth;
 
     m_widthAnim->stop();
     m_widthAnim->setStartValue(m_contentWrapper->width());
@@ -533,6 +566,13 @@ void RightSidebarWidget::populateSearchResults(const QString& filter)
         // Insert before stretch
         int count = m_searchResultsLayout->count();
         m_searchResultsLayout->insertWidget(count > 0 ? count - 1 : 0, btn);
+    }
+}
+
+void RightSidebarWidget::setActiveWindow(CustomMdiSubWindow* sub)
+{
+    if (m_statsWidget) {
+        m_statsWidget->setActiveWindow(sub);
     }
 }
 
