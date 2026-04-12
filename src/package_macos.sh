@@ -546,6 +546,15 @@ else
     log_warning "TStar scripts folder (scripts) not found."
 fi
 
+# 7.2.1 UI scripts (JS-Scripts)
+if [ -d "JS-Scripts" ]; then
+    ensure_dir "$RESOURCES_DIR/JS-Scripts"
+    cp -R JS-Scripts/* "$RESOURCES_DIR/JS-Scripts/"
+    echo "  - JS-Scripts folder (JS): OK"
+else
+    log_warning "JS-Scripts folder not found."
+fi
+
 # 7.3 Data catalogs and SPCC resources
 echo ""
 echo "[STEP 7.3] Copying Data Catalogs and SPCC Resources..."
@@ -556,6 +565,17 @@ if [ -d "data" ]; then
 else
     log_warning "Data folder (data) not found."
     ERROR_COUNT=$((ERROR_COUNT + 1))
+fi
+
+# 7.4 Minigame resources
+echo ""
+echo "[STEP 7.4] Copying Minigame Resources..."
+if [ -d "src/minigame" ]; then
+    ensure_dir "$RESOURCES_DIR/minigame"
+    cp -R src/minigame/* "$RESOURCES_DIR/minigame/"
+    echo "  - minigame folder: OK"
+else
+    log_warning "Minigame folder (src/minigame) not found (optional)."
 fi
 
 # =============================================================================

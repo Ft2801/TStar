@@ -358,6 +358,18 @@ if exist "scripts" (
     echo  - No TStar scripts found in root scripts folder
 )
 
+REM 11.3 UI scripts (root JS-Scripts folder)
+if exist "JS-Scripts" (
+    xcopy "JS-Scripts" "%DIST_DIR%\JS-Scripts\" /E /I /Q /EXCLUDE:tools\xcopy_exclude.txt >nul 2>&1
+    if exist "%DIST_DIR%\JS-Scripts" (
+        echo  - JS-Scripts folder: OK
+    ) else (
+        echo  [WARNING] JS-Scripts folder: copy may have failed
+    )
+) else (
+    echo  - No JS-Scripts folder found in root
+)
+
 REM =============================================================================
 REM STEP 11.5 -- Bundle ASTAP plate-solver (optional)
 REM =============================================================================
@@ -427,6 +439,23 @@ if exist "data" (
 ) else (
     set /a ERROR_COUNT+=1
     echo  [ERROR] data folder: NOT FOUND IN PROJECT ROOT
+)
+
+REM =============================================================================
+REM STEP 12.5 -- Copy minigame resources
+REM =============================================================================
+
+echo.
+echo [STEP 12.5] Copying Minigame Resources...
+if exist "src\minigame" (
+    xcopy "src\minigame" "%DIST_DIR%\minigame\" /E /I /Q >nul 2>&1
+    if exist "%DIST_DIR%\minigame\index.html" (
+        echo  - minigame folder: OK
+    ) else (
+        echo  [WARNING] minigame folder: copy may have failed
+    )
+) else (
+    echo  - minigame folder: not found ^(optional^)
 )
 
 REM =============================================================================

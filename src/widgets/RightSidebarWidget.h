@@ -12,11 +12,14 @@
 
 class CustomMdiSubWindow;
 class ImageStatsWidget;
+class ScriptConsoleWidget;
 class QEnterEvent;
 class QEvent;
 class QAction;
 class QStackedWidget;
 class QLineEdit;
+
+namespace Scripting { class JSRuntime; }
 
 /**
  * @brief Collapsible right-side panel that displays thumbnail previews of
@@ -76,6 +79,9 @@ public:
     /** Registers a tool action to be searchable via the Search tab. */
     void registerToolAction(QAction* action);
 
+    /** Set the JSRuntime for the scripting console tab. */
+    void setScriptRuntime(Scripting::JSRuntime* runtime);
+
     /** Programmatically collapses the content panel. */
     void collapse() { setExpanded(false); }
 
@@ -96,11 +102,12 @@ private slots:
     void onTabClicked();
     void onSearchTabClicked();
     void onStatsTabClicked();
+    void onScriptTabClicked();
     void onSearchTextChanged(const QString& text);
 
 private:
     void setExpanded(bool expanded);
-    void switchToTab(int index); // 0 = Previews, 1 = Search
+    void switchToTab(int index); // 0 = Previews, 1 = Search, 2 = Stats, 3 = Script
     void populateSearchResults(const QString& filter = "");
 
     // Tab strip (right edge column)
@@ -108,6 +115,7 @@ private:
     QPushButton* m_tabBtn       = nullptr;
     QPushButton* m_searchTabBtn = nullptr;
     QPushButton* m_statsTabBtn  = nullptr;
+    QPushButton* m_scriptTabBtn = nullptr;
 
     // Sliding content area
     QWidget*      m_contentWrapper   = nullptr;
@@ -129,6 +137,10 @@ private:
     // Page 2: Stats
     QWidget*          m_statsPage    = nullptr;
     ImageStatsWidget* m_statsWidget  = nullptr;
+
+    // Page 3: Script Console
+    QWidget*              m_scriptPage    = nullptr;
+    ScriptConsoleWidget*  m_scriptConsole = nullptr;
 
     // Top bar within the previews area
     QWidget*   m_topContainer        = nullptr;

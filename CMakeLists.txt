@@ -184,7 +184,7 @@ endif()
 
 # ---- Qt6 ----
 find_package(Qt6 REQUIRED COMPONENTS
-    Widgets Network Svg Concurrent Xml LinguistTools
+    Widgets Network Svg Concurrent Xml LinguistTools Qml
 )
 
 # ---- OpenMP ----
@@ -565,6 +565,10 @@ set(TSTAR_SOURCES
     src/widgets/SimplePlotWidget.h
     src/widgets/ResourceMonitorWidget.cpp
     src/widgets/ResourceMonitorWidget.h
+    src/widgets/ScriptConsoleWidget.h
+    src/widgets/ScriptConsoleWidget.cpp
+    src/widgets/JSSyntaxHighlighter.h
+    src/widgets/JSSyntaxHighlighter.cpp
 
     # -- Processing algorithms --
     src/algos/AbeMath.cpp
@@ -848,6 +852,21 @@ set(TSTAR_SOURCES
     src/scripting/msvc_compat.cpp
     src/scripting/StackingCommands.cpp
     src/scripting/StackingCommands.h
+    src/scripting/JSRuntime.h
+    src/scripting/JSRuntime.cpp
+    src/scripting/JSApi.h
+    src/scripting/JSApi.cpp
+    src/scripting/JSApp.h
+    src/scripting/JSApp.cpp
+    src/scripting/JSProcessBase.h
+    src/scripting/JSProcesses.h
+    src/scripting/JSProcesses.cpp
+    src/scripting/JSProcessFactory.h
+    src/scripting/JSProcessFactory.cpp
+    src/scripting/JSUI.h
+    src/scripting/JSUI.cpp
+    src/scripting/JSHistogramWidget.h
+    src/scripting/JSHistogramWidget.cpp
 )
 
 # =============================================================================
@@ -1060,6 +1079,7 @@ target_link_libraries(TStar PRIVATE
     Qt6::Network
     Qt6::Concurrent
     Qt6::Xml
+    Qt6::Qml
     ${CFITSIO_LIBRARY}
     ${GSL_LIBRARIES}
     ${OpenCV_LIBS}

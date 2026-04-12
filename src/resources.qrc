@@ -6,5 +6,14 @@
         <file>images/solar_system.svg</file>
         <file>images/astrometry.svg</file>
         <file>images/color_management.svg</file>
+        <file>images/refresh.svg</file>
+        <file>images/burn.svg</file>
+        <file>images/false-color.svg</file>
+        <file>images/help.svg</file>
+        <file>images/home.svg</file>
+        <file>images/info.svg</file>
+        <file>images/invert.svg</file>
+        <file>images/linked.svg</file>
+        <file>images/unlinked.svg</file>
     </qresource>
 </RCC>

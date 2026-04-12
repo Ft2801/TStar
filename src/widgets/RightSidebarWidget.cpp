@@ -1,6 +1,8 @@
 #include "RightSidebarWidget.h"
 #include "CustomMdiSubWindow.h"
 #include "ImageStatsWidget.h"
+#include "ScriptConsoleWidget.h"
+#include "../scripting/JSRuntime.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -310,6 +312,20 @@ RightSidebarWidget::RightSidebarWidget(QWidget* parent)
 
     m_stackedWidget->addWidget(m_statsPage);
 
+    // ==========================================
+    // Page 3: Script Console
+    // ==========================================
+    m_scriptPage = new QWidget();
+    auto* scriptPageLayout = new QVBoxLayout(m_scriptPage);
+    scriptPageLayout->setContentsMargins(0, 0, 0, 0);
+    scriptPageLayout->setSpacing(0);
+
+    m_scriptConsole = new ScriptConsoleWidget(m_scriptPage);
+    m_scriptConsole->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    scriptPageLayout->addWidget(m_scriptConsole);
+
+    m_stackedWidget->addWidget(m_scriptPage);
+
     connect(m_searchBox, &QLineEdit::textChanged, this, &RightSidebarWidget::onSearchTextChanged);
 
     // ------------------------------------------------------------------
@@ -353,6 +369,16 @@ RightSidebarWidget::RightSidebarWidget(QWidget* parent)
             this, &RightSidebarWidget::onStatsTabClicked);
 
     tabLayout->addWidget(m_statsTabBtn);
+
+    m_scriptTabBtn = new VerticalButton(tr("Script"), m_tabContainer);
+    m_scriptTabBtn->setCheckable(true);
+    m_scriptTabBtn->setFixedSize(30, 100);
+    m_scriptTabBtn->setToolTip(tr("JavaScript Console"));
+    m_scriptTabBtn->setStyleSheet("border: none;");
+    connect(m_scriptTabBtn, &QPushButton::clicked,
+            this, &RightSidebarWidget::onScriptTabClicked);
+
+    tabLayout->addWidget(m_scriptTabBtn);
     tabLayout->addStretch();
 
     mainLayout->addWidget(m_contentWrapper);
@@ -405,6 +431,11 @@ void RightSidebarWidget::onStatsTabClicked()
     switchToTab(2);
 }
 
+void RightSidebarWidget::onScriptTabClicked()
+{
+    switchToTab(3);
+}
+
 void RightSidebarWidget::switchToTab(int index)
 {
     if (m_expanded && m_currentTabIndex == index) {
@@ -419,8 +450,11 @@ void RightSidebarWidget::switchToTab(int index)
             m_tabBtn->setChecked(m_currentTabIndex == 0);
             m_searchTabBtn->setChecked(m_currentTabIndex == 1);
             m_statsTabBtn->setChecked(m_currentTabIndex == 2);
+            m_scriptTabBtn->setChecked(m_currentTabIndex == 3);
             
-            int targetWidth = (m_currentTabIndex == 1 || m_currentTabIndex == 2) ? static_cast<int>(m_expandedWidth * 1.5) : m_expandedWidth;
+            int targetWidth = (m_currentTabIndex >= 1) ? static_cast<int>(m_expandedWidth * 1.5) : m_expandedWidth;
+            // Script tab needs even more width for the code editor
+            if (m_currentTabIndex == 3) targetWidth = static_cast<int>(m_expandedWidth * 3.0);
             m_widthAnim->stop();
             m_widthAnim->setStartValue(m_contentWrapper->width());
             m_widthAnim->setEndValue(targetWidth);
@@ -446,13 +480,16 @@ void RightSidebarWidget::setExpanded(bool expanded)
         m_tabBtn->setChecked(false);
         m_searchTabBtn->setChecked(false);
         m_statsTabBtn->setChecked(false);
+        m_scriptTabBtn->setChecked(false);
     } else {
         m_tabBtn->setChecked(m_currentTabIndex == 0);
         m_searchTabBtn->setChecked(m_currentTabIndex == 1);
         m_statsTabBtn->setChecked(m_currentTabIndex == 2);
+        m_scriptTabBtn->setChecked(m_currentTabIndex == 3);
     }
 
-    int targetWidth = (m_currentTabIndex == 1 || m_currentTabIndex == 2) ? static_cast<int>(m_expandedWidth * 1.5) : m_expandedWidth;
+    int targetWidth = (m_currentTabIndex >= 1) ? static_cast<int>(m_expandedWidth * 1.5) : m_expandedWidth;
+    if (m_currentTabIndex == 3) targetWidth = static_cast<int>(m_expandedWidth * 3.0);
 
     m_widthAnim->stop();
     m_widthAnim->setStartValue(m_contentWrapper->width());
@@ -573,6 +610,13 @@ void RightSidebarWidget::setActiveWindow(CustomMdiSubWindow* sub)
 {
     if (m_statsWidget) {
         m_statsWidget->setActiveWindow(sub);
+    }
+}
+
+void RightSidebarWidget::setScriptRuntime(Scripting::JSRuntime* runtime)
+{
+    if (m_scriptConsole) {
+        m_scriptConsole->setRuntime(runtime);
     }
 }
 

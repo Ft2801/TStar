@@ -74,6 +74,8 @@ class NBtoRGBStarsDialog;
 class BlinkComparatorDialog;
 class MorphologyDialog;
 
+namespace Scripting { class JSRuntime; }
+
 struct Annotation;
 
 // =============================================================================
@@ -131,6 +133,19 @@ public:
 
     /// Push the current buffer state onto the undo stack.
     void pushUndo(const QString& description = QString());
+
+    // ---- Tool window management ---------------------------------------------
+
+    /**
+     * @brief Setup a subwindow as a tool window (hiding sidebar strips, etc.).
+     */
+    CustomMdiSubWindow* setupToolSubwindow(CustomMdiSubWindow* sub,
+                                           QWidget* dlg, const QString& title);
+
+    /**
+     * @brief Center a tool window in the MDI area.
+     */
+    void centerToolWindow(CustomMdiSubWindow* sub);
 
     // ---- MainWindowCallbacks implementation ---------------------------------
 
@@ -454,12 +469,6 @@ private:
     class QToolButton*  m_channelViewBtn        = nullptr;
     class QAction*      m_toggleOverlayAct      = nullptr;
 
-    // ---- Tool window management ---------------------------------------------
-
-    CustomMdiSubWindow* setupToolSubwindow(CustomMdiSubWindow* sub,
-                                           QWidget* dlg, const QString& title);
-    void centerToolWindow(CustomMdiSubWindow* sub);
-
     // ---- Active viewer tracking ---------------------------------------------
 
     QPointer<ImageViewer> m_lastActiveImageViewer;
@@ -482,6 +491,10 @@ private:
     RightSidebarWidget* m_rightSidebar  = nullptr;
     HeaderPanel*        m_headerPanel   = nullptr;
     HistoryPanel*       m_historyPanel  = nullptr;
+
+    // ---- JavaScript scripting engine ----------------------------------------
+
+    Scripting::JSRuntime* m_jsRuntime    = nullptr;
 
     // ---- Animations ---------------------------------------------------------
 

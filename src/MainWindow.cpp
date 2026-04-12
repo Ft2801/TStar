@@ -126,6 +126,7 @@
 #include "stacking/StackingProject.h"
 #include "scripting/StackingCommands.h"
 #include "scripting/ScriptRunner.h"
+#include "scripting/JSRuntime.h"
 
 // --- Qt Core ---
 #include <QApplication>
@@ -469,6 +470,10 @@ MainWindow::MainWindow(QWidget *parent)
             }
         }
     });
+
+    // --- 4.9b: JavaScript Runtime ---
+    m_jsRuntime = new Scripting::JSRuntime(this, this);
+    m_rightSidebar->setScriptRuntime(m_jsRuntime);
 
     // --- 4.10: Sidebar Panels ---
 
