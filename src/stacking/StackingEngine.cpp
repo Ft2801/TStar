@@ -7,7 +7,7 @@
  * normalization, weighting, comet alignment, cosmetic correction, and
  * multi-threaded block-based processing with preloaded images.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "StackingEngine.h"

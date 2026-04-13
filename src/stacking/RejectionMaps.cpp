@@ -2,7 +2,7 @@
  * @file RejectionMaps.cpp
  * @brief Implementation of rejection map generation and persistence.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "RejectionMaps.h"

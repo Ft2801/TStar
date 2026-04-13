@@ -10,7 +10,7 @@
  * standard operators (+, -, *, /), unary inversion (~), and built-in
  * functions such as mtf() (midtones transfer function).
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "../ImageBuffer.h"

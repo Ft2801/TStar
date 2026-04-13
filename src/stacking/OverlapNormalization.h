@@ -9,7 +9,7 @@
  * overlapping pixel regions between image pairs, then solves for
  * globally consistent intensity adjustments.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "../ImageBuffer.h"

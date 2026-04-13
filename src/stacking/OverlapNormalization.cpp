@@ -2,7 +2,7 @@
  * @file OverlapNormalization.cpp
  * @brief Implementation of pairwise overlap normalization.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "OverlapNormalization.h"

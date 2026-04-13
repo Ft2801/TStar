@@ -15,7 +15,7 @@
  *   - Makitalo, M. & Foi, A. (2011). "Optimal inversion of the Anscombe
  *     transformation in finite-count photon imaging."
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include <cmath>

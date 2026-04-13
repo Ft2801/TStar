@@ -9,7 +9,7 @@
  * approach (global sigma screening followed by local validation), then
  * replaces them with the median of their valid neighbors.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include <vector>

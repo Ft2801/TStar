@@ -2,7 +2,7 @@
  * @file Distortion.cpp
  * @brief Implementation of SIP distortion corrections and cross-frame mapping.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "Distortion.h"

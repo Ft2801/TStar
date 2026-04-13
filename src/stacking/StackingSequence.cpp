@@ -6,7 +6,7 @@
  * filtering, quality metric computation (via star detection), reference
  * image selection, and comet-mode registration shift computation.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "StackingSequence.h"

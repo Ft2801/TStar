@@ -9,7 +9,7 @@
  * triangle-asterism hashing, and computes an affine (or full homography)
  * transformation that maps each frame onto the reference.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "../ImageBuffer.h"

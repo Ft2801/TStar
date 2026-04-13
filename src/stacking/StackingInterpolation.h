@@ -6,7 +6,7 @@
  * image registration and stacking to sample pixel values at fractional
  * coordinates.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #ifndef STACKING_INTERPOLATION_H

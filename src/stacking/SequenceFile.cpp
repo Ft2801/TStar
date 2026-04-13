@@ -2,7 +2,7 @@
  * @file SequenceFile.cpp
  * @brief Implementation of the persistent sequence file (.tseq) format.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "SequenceFile.h"

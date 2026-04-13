@@ -9,7 +9,7 @@
  *
  * All functions operate on single-precision floating-point data.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #ifndef STACKING_STATISTICS_H

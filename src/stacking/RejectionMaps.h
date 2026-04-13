@@ -9,7 +9,7 @@
  * rejection counts into image buffers (low and high maps) that can later
  * be saved as FITS files for diagnostic purposes.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "../ImageBuffer.h"

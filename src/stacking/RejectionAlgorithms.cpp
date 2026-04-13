@@ -7,7 +7,7 @@
  * flag statistical outliers (cosmic rays, hot pixels, satellite trails, etc.)
  * before the final combination step.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "RejectionAlgorithms.h"

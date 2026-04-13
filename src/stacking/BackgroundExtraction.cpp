@@ -2,7 +2,7 @@
  * @file BackgroundExtraction.cpp
  * @brief Implementation of polynomial background model fitting.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "BackgroundExtraction.h"

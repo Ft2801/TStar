@@ -9,7 +9,7 @@
  * or from zero-valued (no-data) boundaries, then applies weighted
  * averaging to composite multiple overlapping images seamlessly.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "../ImageBuffer.h"

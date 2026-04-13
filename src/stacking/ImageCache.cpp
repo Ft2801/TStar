@@ -2,7 +2,7 @@
  * @file ImageCache.cpp
  * @brief Implementation of the in-memory image cache.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "ImageCache.h"

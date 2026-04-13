@@ -3,7 +3,7 @@
  * @brief Implementation of drizzle integration, mosaic feathering, and
  *        auxiliary rejection algorithms.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "DrizzleStacking.h"

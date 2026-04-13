@@ -10,7 +10,7 @@
  * coordinate pipeline: pixel -> linearized -> homography -> linearized -> pixel
  * for mapping between reference and source frames.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "StackingTypes.h"

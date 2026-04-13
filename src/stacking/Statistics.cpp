@@ -2,7 +2,7 @@
  * @file Statistics.cpp
  * @brief Implementation of the Statistics utility class.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "Statistics.h"

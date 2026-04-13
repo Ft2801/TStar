@@ -9,7 +9,7 @@
  * metadata (selection state, calibration/registration status, quality metrics,
  * and homography registration data).  The file is serialised as JSON.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include <QString>

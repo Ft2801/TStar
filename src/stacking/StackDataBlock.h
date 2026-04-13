@@ -13,7 +13,7 @@
  * ImageBlock describes a horizontal strip of the output image assigned to
  * a single processing unit (thread).
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include <cstdlib>

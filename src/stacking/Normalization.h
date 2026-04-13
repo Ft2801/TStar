@@ -10,7 +10,7 @@
  * before they are combined.  Supports additive, multiplicative, and
  * mixed modes, as well as full-image and overlap-region strategies.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "StackingTypes.h"

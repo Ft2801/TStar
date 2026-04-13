@@ -310,7 +310,8 @@ See [BUILDING.md](BUILDING.md) for complete dependency setup, deployment packagi
 
 Copyright (c) 2026 Fabio Tempera.
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for the full license text.
+This project's original code is licensed under the MIT License. See the [LICENSE](LICENSE) file for the full text. 
+**Note:** Some modules within TStar (e.g., `src/stacking`) incorporate algorithms and code inspired by or derived from [Siril](https://siril.org/), which is released under the **GNU General Public License v3.0 (GPLv3)**. A copy of the GPLv3 license is included in the project as `LICENSE-GPL`, and distribution of compiled binaries incorporating this code must abide by the terms of the GPLv3.
 
 ## Acknowledgments
 
@@ -322,6 +323,8 @@ TStar is built on top of the following open-source projects and libraries:
 | [CFITSIO](https://heasarc.gsfc.nasa.gov/fitsio/) | FITS file I/O |
 | [OpenCV](https://opencv.org/) | Image processing and computer vision |
 | [GSL](https://www.gnu.org/software/gsl/) | Scientific computing and numerical methods |
+
+Additionally, some of the contents and functionalities in TStar have been implemented taking inspiration from [Siril](https://siril.org/) and [Seti Astro Suite](https://www.setiastro.com/). Please see `INSPIRATION.md` for more details.
 | [LibRaw](https://www.libraw.org/) | Camera RAW file decoding |
 | [LittleCMS2](https://www.littlecms.com/) | ICC color profile management |
 | [LZ4](https://lz4.github.io/lz4/) | Fast compression for XISF |

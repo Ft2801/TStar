@@ -9,7 +9,7 @@
  * with FIFO eviction when the cache reaches its count or memory limit.
  * This avoids repeated disk I/O during multi-pass stacking algorithms.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "../ImageBuffer.h"

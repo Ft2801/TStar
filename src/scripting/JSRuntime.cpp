@@ -43,7 +43,7 @@ MainWindow* JSRuntime::mainWindow() const
 void JSRuntime::registerAPIs()
 {
     // -------------------------------------------------------------------------
-    // 1. Console object â€” provides console.log/warn/error/info
+    // 1. Console object — provides console.log/warn/error/info
     // -------------------------------------------------------------------------
 
     m_console = new JSConsole(this, this);
@@ -82,7 +82,7 @@ void JSRuntime::registerAPIs()
     m_engine.globalObject().setProperty("__factory", factoryVal);
 
     // -------------------------------------------------------------------------
-    // 4. Global constructor shims â€” Processes
+    // 4. Global constructor shims — Processes
     //    These mimic PixInsight's pattern: var c = new Curves();
     // -------------------------------------------------------------------------
 
@@ -138,7 +138,7 @@ void JSRuntime::registerAPIs()
     );
 
     // -------------------------------------------------------------------------
-    // 5. Global constructor shims â€” UI Controls
+    // 5. Global constructor shims — UI Controls
     //
     //    Matches the PixInsight / TStar scripting style:
     //      var d    = new Dialog();
@@ -184,7 +184,7 @@ QString JSRuntime::evaluate(const QString& script, const QString& fileName)
     QJSValue result = m_engine.evaluate(script, fileName.isEmpty() ? "script" : fileName);
 
     if (result.isError()) {
-        QString errorMsg = QString("%1:%2 â€” %3")
+        QString errorMsg = QString("%1:%2 — %3")
             .arg(fileName.isEmpty() ? "Script" : fileName)
             .arg(result.property("lineNumber").toInt())
             .arg(result.toString());
@@ -412,7 +412,7 @@ QVariantList JSRuntime::buildApiReference()
     }
 
     // -------------------------------------------------------------------------
-    // UI â€” Layout sizers
+    // UI — Layout sizers
     // -------------------------------------------------------------------------
     {
         QVariantMap obj;
@@ -443,7 +443,7 @@ QVariantList JSRuntime::buildApiReference()
     }
 
     // -------------------------------------------------------------------------
-    // UI â€” Widgets
+    // UI — Widgets
     // -------------------------------------------------------------------------
     {
         QVariantMap obj;
@@ -597,7 +597,7 @@ QVariantList JSRuntime::buildApiReference()
         QVariantList props;
         props << QVariantMap{{"name", "width"},    {"desc", "Image width in pixels (read-only)."}};
         props << QVariantMap{{"name", "height"},   {"desc", "Image height in pixels (read-only)."}};
-        props << QVariantMap{{"name", "channels"}, {"desc", "Number of channels â€” 1 (mono) or 3 (RGB) (read-only)."}};
+        props << QVariantMap{{"name", "channels"}, {"desc", "Number of channels — 1 (mono) or 3 (RGB) (read-only)."}};
         props << QVariantMap{{"name", "isValid"},  {"desc", "True if the image contains data (read-only)."}};
         obj["properties"] = props;
 
@@ -624,7 +624,7 @@ QVariantList JSRuntime::buildApiReference()
     }
 
     // -------------------------------------------------------------------------
-    // Process objects (abbreviated â€” kept from original implementation)
+    // Process objects (abbreviated — kept from original implementation)
     // -------------------------------------------------------------------------
 
     auto addProcess = [&](const QString& name, const QString& desc,
@@ -644,35 +644,58 @@ QVariantList JSRuntime::buildApiReference()
     };
 
     addProcess("Curves",
-        "Non-linear tone-curve adjustment. Individual curve points are set via the 'curve' property.",
-        { QVariantMap{{"name","curve"},     {"desc","Array of [x,y] control points in [0..1] range."}},
-          QVariantMap{{"name","channel"},   {"desc","0=Luminance, 1=Red, 2=Green, 3=Blue, 4=Saturation."}} },
-        "var c = new Curves();\nc.channel = 0;\nc.curve = [[0,0],[0.5,0.6],[1,1]];\nc.executeOn(view.image);\nview.refresh();"
+        "Non-linear tone-curve adjustment using splines.",
+        { QVariantMap{{"name","points"},  {"desc","Array of [x,y] control points."}},
+          QVariantMap{{"name","red"},     {"desc","Array of [x,y] points for the Red channel."}},
+          QVariantMap{{"name","green"},   {"desc","Array of [x,y] points for the Green channel."}},
+          QVariantMap{{"name","blue"},    {"desc","Array of [x,y] points for the Blue channel."}} },
+        "var c = new Curves();\nc.points = [[0,0],[0.5,0.6],[1,1]];\nc.executeOn(view.image);"
     );
 
     addProcess("Saturation",
         "Adjusts per-hue saturation using a curve.",
-        { QVariantMap{{"name","amount"},  {"desc","Global saturation multiplier. Default: 1.0."}},
-          QVariantMap{{"name","protect"}, {"desc","Protect near-neutral colours. Default: false."}} },
-        "var s = new Saturation();\ns.amount = 1.4;\ns.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","amount"},    {"desc","Global saturation multiplier. Default: 1.0."}},
+          QVariantMap{{"name","bgFactor"},  {"desc","Background protection factor. Default: 1.0."}},
+          QVariantMap{{"name","hueCenter"}, {"desc","Hue center for selective mask [0..360]. Default: 0."}},
+          QVariantMap{{"name","hueWidth"},  {"desc","Hue range width. Default: 360 (all)."}},
+          QVariantMap{{"name","hueSmooth"}, {"desc","Hue mask edge smoothness. Default: 20."}},
+          QVariantMap{{"name","protect"},   {"desc","Protect near-neutral colours. Default: false."}} },
+        "var s = new Saturation();\ns.amount = 1.4; s.hueCenter = 200; s.hueWidth = 40;\ns.executeOn(view.image);\nview.refresh();"
     );
 
     addProcess("GHS",
-        "Generalised Hyperbolic Stretch â€” flexible non-linear histogram transform.",
-        { QVariantMap{{"name","D"},  {"desc","Stretch intensity (logâ‚â‚€ scale). Default: 0.0."}},
-          QVariantMap{{"name","B"},  {"desc","Symmetry parameter. Default: 0.0."}},
-          QVariantMap{{"name","SP"}, {"desc","Stretch point [0..1]. Default: 0.0."}},
-          QVariantMap{{"name","HP"}, {"desc","Highlight protection [0..1]. Default: 1.0."}},
-          QVariantMap{{"name","BP"}, {"desc","Black point. Default: 0.0."}} },
+        "Generalised Hyperbolic Stretch — flexible non-linear histogram transform.",
+        { QVariantMap{{"name","D"},        {"desc","Stretch intensity (log₁₀ scale). Default: 0.0."}},
+          QVariantMap{{"name","B"},        {"desc","Symmetry parameter. Default: 0.0."}},
+          QVariantMap{{"name","SP"},       {"desc","Stretch point [0..1]. Default: 0.0."}},
+          QVariantMap{{"name","HP"},       {"desc","Highlight protection [0..1]. Default: 1.0."}},
+          QVariantMap{{"name","BP"},       {"desc","Black point. Default: 0.0."}},
+          QVariantMap{{"name","inverse"},  {"desc","Inverse GHS stretch."}},
+          QVariantMap{{"name","applyLog"}, {"desc","Apply log scaling to the stretch."}} },
         "var g = new GHS();\ng.D = 5.0; g.B = 0.3; g.SP = 0.15;\ng.executeOn(view.image);\nview.refresh();"
     );
 
     addProcess("Stretch",
         "Statistical auto-stretch. Computes optimal midtone and black-point from image statistics.",
-        { QVariantMap{{"name","targetMedian"},    {"desc","Target median brightness [0..1]. Default: 0.25."}},
-          QVariantMap{{"name","linked"},          {"desc","Link RGB channels. Default: true."}},
-          QVariantMap{{"name","blackpointSigma"}, {"desc","Sigma threshold for black point. Default: 5.0."}} },
-        "var s = new Stretch();\ns.targetMedian = 0.25;\ns.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","targetMedian"},      {"desc","Target median brightness [0..1]. Default: 0.25."}},
+          QVariantMap{{"name","linked"},            {"desc","Link RGB channels. Default: true."}},
+          QVariantMap{{"name","normalize"},         {"desc","Normalize background level."}},
+          QVariantMap{{"name","applyCurves"},       {"desc","Apply contrast curve after stretch."}},
+          QVariantMap{{"name","curvesBoost"},       {"desc","Contrast boost amount."}},
+          QVariantMap{{"name","blackpointSigma"},   {"desc","Sigma threshold for black point. Default: 5.0."}},
+          QVariantMap{{"name","noBlackClip"},       {"desc","Prevent black point clipping."}},
+          QVariantMap{{"name","hdrCompress"},       {"desc","Apply HDR compression."}},
+          QVariantMap{{"name","hdrAmount"},         {"desc","Strength of HDR compression."}},
+          QVariantMap{{"name","hdrKnee"},           {"desc","Point where HDR compression starts."}},
+          QVariantMap{{"name","lumaOnly"},          {"desc","Apply to luminance only to preserve color."}},
+          QVariantMap{{"name","lumaMode"},          {"desc","0=Traditional, 1=VeraLux."}},
+          QVariantMap{{"name","highRange"},         {"desc","Enable High-Range Rescaling."}},
+          QVariantMap{{"name","hrPedestal"},        {"desc","High-range pedestal."}},
+          QVariantMap{{"name","hrSoftCeilPct"},     {"desc","Soft ceiling percentage."}},
+          QVariantMap{{"name","hrHardCeilPct"},     {"desc","Hard ceiling percentage."}},
+          QVariantMap{{"name","hrSoftclipThreshold"},{"desc","Soft-clip threshold."}},
+          QVariantMap{{"name","hrSoftclipRolloff"}, {"desc","Soft-clip rolloff."}} },
+        "var s = new Stretch();\ns.targetMedian = 0.25; s.highRange = true;\ns.executeOn(view.image);"
     );
 
     addProcess("PixelMath",
@@ -707,9 +730,10 @@ QVariantList JSRuntime::buildApiReference()
 
     addProcess("MagentaCorrection",
         "Removes magenta halos from stars.",
-        { QVariantMap{{"name","amount"},    {"desc","Correction strength [0..1]. Default: 0.5."}},
-          QVariantMap{{"name","threshold"}, {"desc","Minimum value to correct. Default: 0.1."}} },
-        "var m = new MagentaCorrection();\nm.amount = 0.8;\nm.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","amount"},       {"desc","Correction strength [0..1]. Default: 0.5."}},
+          QVariantMap{{"name","threshold"},    {"desc","Minimum value to correct. Default: 0.5."}},
+          QVariantMap{{"name","withStarMask"}, {"desc","Use internal star mask protection."}} },
+        "var m = new MagentaCorrection();\nm.amount = 0.8; m.withStarMask = true;\nm.executeOn(view.image);\nview.refresh();"
     );
 
     addProcess("TemperatureTint",
@@ -720,38 +744,51 @@ QVariantList JSRuntime::buildApiReference()
     );
 
     addProcess("SCNR",
-        "Selective colour noise reduction â€” removes unwanted channel contamination.",
-        { QVariantMap{{"name","channel"}, {"desc","Target channel to suppress (default: green = 1)."}},
-          QVariantMap{{"name","amount"},  {"desc","Suppression strength [0..1]. Default: 1.0."}} },
-        "var s = new SCNR();\ns.amount = 0.8;\ns.executeOn(view.image);\nview.refresh();"
+        "Selective colour noise reduction — removes green noise contamination.",
+        { QVariantMap{{"name","amount"},  {"desc","Suppression strength [0..1]. Default: 1.0."}},
+          QVariantMap{{"name","method"},  {"desc","0=Average Neutral, 1=Maximum Neutral, 2=Minimum Neutral."}} },
+        "var s = new SCNR();\ns.amount = 0.8; s.method = 1;\ns.executeOn(view.image);\nview.refresh();"
     );
 
     addProcess("GraXpert",
         "AI-powered background extraction and advanced noise reduction.",
-        { QVariantMap{{"name","operation"}, {"desc","0=Bg Extraction, 1=Denoise. Default: 0."}},
-          QVariantMap{{"name","tolerance"}, {"desc","Tolerance for gradient calculation."}},
-          QVariantMap{{"name","smoothing"}, {"desc","Smoothing level."}},
-          QVariantMap{{"name","denoiseStrength"}, {"desc","Denoise strength for operation 1."}} },
-        "var gx = new GraXpert();\ngx.operation = 1;\ngx.denoiseStrength = 0.7;\ngx.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","isDenoise"},   {"desc","Whether to perform denoising instead of gradient removal."}},
+          QVariantMap{{"name","smoothing"},   {"desc","Model smoothing level (0-1)."}},
+          QVariantMap{{"name","strength"},    {"desc","Denoise/gradient removal strength."}},
+          QVariantMap{{"name","aiVersion"},   {"desc","AI model version (e.g. 'v3')."}},
+          QVariantMap{{"name","useGpu"},      {"desc","Enable GPU acceleration."}} },
+        "var gx = new GraXpert();\ngx.isDenoise = true; gx.strength = 0.7;\ngx.executeOn(view.image);"
     );
 
     addProcess("StarNet",
         "AI-powered star removal network separating stars from the background.",
-        { QVariantMap{{"name","stride"},  {"desc","Patch stride. Default: 256"}},
-          QVariantMap{{"name","linear"},  {"desc","Linear mode processing. Default: true"}} },
-        "var sn = new StarNet();\nsn.stride = 256;\nsn.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","isLinear"},     {"desc","Processing in linear space."}},
+          QVariantMap{{"name","generateMask"}, {"desc","Generate a star mask image."}},
+          QVariantMap{{"name","stride"},       {"desc","Batch processing stride."}},
+          QVariantMap{{"name","upsample"},     {"desc","Upsampling factor."}},
+          QVariantMap{{"name","useGpu"},       {"desc","Enable GPU acceleration."}} },
+        "var sn = new StarNet();\nsn.stride = 256; sn.generateMask = true;\nsn.executeOn(view.image);"
     );
 
     addProcess("CosmicClarity",
         "AI-powered denoise and sharpen process.",
-        { QVariantMap{{"name","mode"}, {"desc","0=Both, 1=Denoise, 2=Sharpen. Default: 0"}} },
-        "var cc = new CosmicClarity();\ncc.mode = 0;\ncc.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","mode"},             {"desc","0=Both, 1=Denoise, 2=Sharpen."}},
+          QVariantMap{{"name","sharpenMode"},      {"desc","0=Standard, 1=Deconv/Blind."}},
+          QVariantMap{{"name","stellarAmount"},    {"desc","Sharpening strength for stars."}},
+          QVariantMap{{"name","nonStellarAmount"}, {"desc","Sharpening strength for nebulosity."}},
+          QVariantMap{{"name","denoiseLum"},       {"desc","Luminance denoising strength."}},
+          QVariantMap{{"name","denoiseColor"},     {"desc","Color denoising strength."}},
+          QVariantMap{{"name","useGpu"},           {"desc","Enable GPU acceleration."}} },
+        "var cc = new CosmicClarity();\ncc.mode = 0; cc.stellarAmount = 0.5;\ncc.executeOn(view.image);"
     );
 
     addProcess("RAR",
         "AI-powered residual aberration removal.",
-        { QVariantMap{{"name","strength"}, {"desc","Removal strength. Default: 1.0"}} },
-        "var rar = new RAR();\nrar.strength = 1.0;\nrar.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","modelPath"}, {"desc","Path to the RAR ONNX model."}},
+          QVariantMap{{"name","patchSize"}, {"desc","Processing patch size."}},
+          QVariantMap{{"name","overlap"},   {"desc","Patch overlap in pixels."}},
+          QVariantMap{{"name","provider"},  {"desc","0=CPU, 1=CUDA, 2=DirectML, 3=CoreML."}} },
+        "var rar = new RAR();\nrar.overlap = 32;\nrar.executeOn(view.image);"
     );
 
     addProcess("ChannelCombination",
@@ -771,176 +808,261 @@ QVariantList JSRuntime::buildApiReference()
 
     addProcess("ABE",
         "Automatic Background Extraction — removes gradients from the image.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new ABE();\np.params = {};\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","degree"},    {"desc","Polynomial degree (0-10)."}},
+          QVariantMap{{"name","samples"},   {"desc","Number of samples to generate."}},
+          QVariantMap{{"name","down"},      {"desc","Downsampling factor for calculation."}},
+          QVariantMap{{"name","patch"},     {"desc","Sample patch size in pixels."}},
+          QVariantMap{{"name","rbf"},       {"desc","Use Radial Basis Function model."}},
+          QVariantMap{{"name","smooth"},    {"desc","Model smoothness (0-1)."}},
+          QVariantMap{{"name","normalize"}, {"desc","Normalize final result."}} },
+        "var p = new ABE();\np.degree = 4;\np.samples = 20;\np.executeOn(view.image);"
     );
 
     addProcess("CBE",
-        "Manual/Custom Background Extraction.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new CBE();\np.params = {};\np.executeOn(view.image);\nview.refresh();"
+        "Catalog Background Extraction.",
+        { QVariantMap{{"name","survey"},       {"desc","HiPS survey name (e.g., 'DSS2/color')."}},
+          QVariantMap{{"name","scale"},        {"desc","Blur scale for smoothing."}},
+          QVariantMap{{"name","protectStars"}, {"desc","Whether to protect detected stars."}},
+          QVariantMap{{"name","gradientMap"},  {"desc","Whether to return the gradient map instead."}} },
+        "var p = new CBE();\np.survey = 'DSS2/color';\np.executeOn(view.image);"
     );
 
     addProcess("PCC",
         "Photometric Color Calibration using plate-solved star data.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new PCC();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","whiteReference"}, {"desc","White reference (0=Average Spiral, 1=G2V)."}},
+          QVariantMap{{"name","aperture"},       {"desc","Aperture size in arcseconds."}},
+          QVariantMap{{"name","limitMag"},       {"desc","Magnitude limit for star detection."}} },
+        "var p = new PCC();\np.whiteReference = 1;\np.executeOn(view.image);\nview.refresh();"
     );
 
     addProcess("SPCC",
         "Spectrophotometric Color Calibration.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new SPCC();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","whiteRef"},   {"desc","White reference (e.g., 'G2V', 'A0V')."}},
+          QVariantMap{{"name","rFilter"},    {"desc","Red filter name."}},
+          QVariantMap{{"name","gFilter"},    {"desc","Green filter name."}},
+          QVariantMap{{"name","bFilter"},    {"desc","Blue filter name."}},
+          QVariantMap{{"name","sensor"},     {"desc","Sensor QE curve name."}},
+          QVariantMap{{"name","lpFilter1"},  {"desc","First light pollution filter."}},
+          QVariantMap{{"name","lpFilter2"},  {"desc","Second light pollution filter."}},
+          QVariantMap{{"name","bgMethod"},   {"desc","'Simple' or 'Weighted' background neutralization."}} },
+        "var p = new SPCC();\np.whiteRef = 'G2V';\np.rFilter = 'Antlia Red';\np.executeOn(view.image);"
     );
 
     addProcess("BackgroundNeutralization",
         "Neutralize the background to a flat neutral grey.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new BackgroundNeutralization();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","left"},   {"desc","Left coordinate of neutrality ROI."}},
+          QVariantMap{{"name","top"},    {"desc","Top coordinate of neutrality ROI."}},
+          QVariantMap{{"name","width"},  {"desc","Width of neutrality ROI."}},
+          QVariantMap{{"name","height"}, {"desc","Height of neutrality ROI."}} },
+        "var p = new BackgroundNeutralization();\np.left = 0; p.top = 0;\np.width = 100; p.height = 100;\np.executeOn(view.image);"
     );
 
     addProcess("SelectiveColor",
         "Hue-targeted colour adjustment.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new SelectiveColor();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","hueStart"},   {"desc","Start of hue range (0-360)."}},
+          QVariantMap{{"name","hueEnd"},     {"desc","End of hue range (0-360)."}},
+          QVariantMap{{"name","smoothness"},  {"desc","Smoothness of range edges."}},
+          QVariantMap{{"name","minChroma"},  {"desc","Minimum chroma threshold."}},
+          QVariantMap{{"name","intensity"},  {"desc","Adjustment intensity."}},
+          QVariantMap{{"name","invert"},     {"desc","Invert the mask."}},
+          QVariantMap{{"name","cyan"},       {"desc","Cyan adjustment."}},
+          QVariantMap{{"name","magenta"},    {"desc","Magenta adjustment."}},
+          QVariantMap{{"name","yellow"},     {"desc","Yellow adjustment."}},
+          QVariantMap{{"name","red"},        {"desc","Red adjustment."}},
+          QVariantMap{{"name","green"},      {"desc","Green adjustment."}},
+          QVariantMap{{"name","blue"},       {"desc","Blue adjustment."}},
+          QVariantMap{{"name","luminance"},  {"desc","Luminance adjustment."}},
+          QVariantMap{{"name","saturation"}, {"desc","Saturation adjustment."}},
+          QVariantMap{{"name","contrast"},   {"desc","Contrast adjustment."}} },
+        "var p = new SelectiveColor();\np.hueStart = 0; p.hueEnd = 30;\np.red = 10; p.saturation = 20;\np.executeOn(view.image);"
     );
 
     addProcess("AberrationInspector",
         "Analyse star shapes across the field for optical aberrations.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new AberrationInspector();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","gridSize"}, {"desc","Number of regions along one side (e.g., 3 for 3x3)."}},
+          QVariantMap{{"name","cropSize"}, {"desc","Size of each crop in pixels."}} },
+        "var p = new AberrationInspector();\np.gridSize = 3; p.cropSize = 256;\np.executeOn(view.image);"
     );
 
     addProcess("AlignChannels",
         "Align R/G/B channels to correct chromatic shift.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new AlignChannels();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","referenceChannel"}, {"desc","Reference channel (0=R, 1=G, 2=B). Default: 1."}},
+          QVariantMap{{"name","method"},           {"desc","0=FFT, 1=Star Matching."}},
+          QVariantMap{{"name","upscale"},          {"desc","Perform internal upscaling for sub-pixel accuracy."}} },
+        "var p = new AlignChannels();\np.method = 0; p.referenceChannel = 1;\np.executeOn(view.image);\nview.refresh();"
     );
 
     addProcess("ExtractLuminance",
         "Extract the luminance channel from an RGB image.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new ExtractLuminance();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","method"},  {"desc","0=CIE XYZ, 1=HSL, 2=Average."}},
+          QVariantMap{{"name","weightR"}, {"desc","Relative weight for Red channel."}},
+          QVariantMap{{"name","weightG"}, {"desc","Relative weight for Green channel."}},
+          QVariantMap{{"name","weightB"}, {"desc","Relative weight for Blue channel."}} },
+        "var p = new ExtractLuminance();\np.method = 0;\np.executeOn(view.image);"
     );
 
     addProcess("RecombineLuminance",
         "Recombine a luminance image with an RGB image.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new RecombineLuminance();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","luminanceSource"}, {"desc","Name of the image to use as luminance."}},
+          QVariantMap{{"name","colorSpace"},      {"desc","Target color space (0=CIE L*a*b*, 1=HSL)."}},
+          QVariantMap{{"name","blend"},           {"desc","Blending opacity (0-100)."}} },
+        "var p = new RecombineLuminance();\np.luminanceSource = 'Lum';\np.executeOn(view.image);"
     );
 
     addProcess("StarRecomposition",
         "Recompose separated stars back into the image.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new StarRecomposition();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","starLayer"}, {"desc","Name of the image containing only stars."}},
+          QVariantMap{{"name","stretch"},   {"desc","Amount of stretch to apply to stars."}} },
+        "var p = new StarRecomposition();\np.starLayer = 'Stars';\np.executeOn(view.image);"
     );
 
     addProcess("ImageBlending",
         "Blend two images together with a configurable mode.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new ImageBlending();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","topImage"},      {"desc","Name of the image to blend on top."}},
+          QVariantMap{{"name","mode"},          {"desc","0=Normal, 1=Multiply, 2=Screen, 3=Overlay, 4=Add, 5=Darken, 6=Lighten, 7=ColorBurn, 8=LinearDodge."}},
+          QVariantMap{{"name","opacity"},       {"desc","Blending opacity (0-100)."}},
+          QVariantMap{{"name","lowRange"},      {"desc","Shadow protection range."}},
+          QVariantMap{{"name","highRange"},     {"desc","Highlight protection range."}},
+          QVariantMap{{"name","feather"},       {"desc","Mask feathering."}},
+          QVariantMap{{"name","targetChannel"}, {"desc","0=RGB, 1=R, 2=G, 3=B."}} },
+        "var p = new ImageBlending();\np.mode = 4; p.opacity = 50;\np.executeOn(view.image);"
     );
 
     addProcess("Debayer",
         "Debayer (demosaic) a raw Bayer-pattern image to RGB.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new Debayer();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","pattern"}, {"desc","Bayer pattern string ('RGGB', 'BGGR', 'GRBG', 'GBRG')."}},
+          QVariantMap{{"name","method"},  {"desc","0=Bilinear, 1=VNG, 2=AHD, 3=PPG."}} },
+        "var p = new Debayer();\np.pattern = 'RGGB'; p.method = 1;\np.executeOn(view.image);"
     );
 
     addProcess("ContinuumSubtraction",
         "Subtract broadband continuum from a narrowband image.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new ContinuumSubtraction();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","continuumSource"}, {"desc","Name of the broadband image."}},
+          QVariantMap{{"name","redFactor"},       {"desc","Red channel scaling factor."}},
+          QVariantMap{{"name","greenFactor"},     {"desc","Green channel scaling factor."}},
+          QVariantMap{{"name","blueFactor"},      {"desc","Blue channel scaling factor."}} },
+        "var p = new ContinuumSubtraction();\np.continuumSource = 'Stars';\np.redFactor = 0.8;\np.executeOn(view.image);"
     );
 
     addProcess("NarrowbandNormalization",
         "Normalize narrowband channel intensities.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new NarrowbandNormalization();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","scenario"},    {"desc","0=SHO, 1=HOO, 2=FORAXX."}},
+          QVariantMap{{"name","mode"},        {"desc","0=Natural, 1=Relentless."}},
+          QVariantMap{{"name","shadowBoost"}, {"desc","Boost shadow contrast."}},
+          QVariantMap{{"name","highlights"},  {"desc","Highlight compression."}} },
+        "var p = new NarrowbandNormalization();\np.scenario = 0;\np.executeOn(view.image);"
     );
 
     addProcess("NBtoRGBStars",
         "Map narrowband data into RGB star colours.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new NBtoRGBStars();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","haPath"},      {"desc","Path to H-alpha star mask."}},
+          QVariantMap{{"name","oiiiPath"},    {"desc","Path to OIII star mask."}},
+          QVariantMap{{"name","siiPath"},     {"desc","Path to SII star mask."}},
+          QVariantMap{{"name","ratio"},       {"desc","Narrowband to RGB ratio."}},
+          QVariantMap{{"name","stretch"},     {"desc","Star stretch factor."}},
+          QVariantMap{{"name","saturation"},  {"desc","Star saturation boost."}} },
+        "var p = new NBtoRGBStars();\np.ratio = 0.5;\np.saturation = 1.2;\np.executeOn(view.image);"
     );
 
     addProcess("PlateSolving",
         "Astrometric plate-solving to embed WCS coordinates.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new PlateSolving();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","raHint"},     {"desc","Approximate RA (degrees)."}},
+          QVariantMap{{"name","decHint"},    {"desc","Approximate Dec (degrees)."}},
+          QVariantMap{{"name","radius"},     {"desc","Search radius (degrees)."}},
+          QVariantMap{{"name","pixelScale"}, {"desc","Image scale (arcsec/pixel)."}} },
+        "var p = new PlateSolving();\np.raHint = 280.0; p.decHint = 40.0;\np.executeOn(view.image);"
     );
 
     addProcess("Binning",
         "Bin pixels to reduce resolution and increase SNR.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new Binning();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","factor"}, {"desc","Binning factor (2=2x2, 3=3x3, etc.)."}},
+          QVariantMap{{"name","method"}, {"desc","0=Average, 1=Median, 2=Sum."}} },
+        "var p = new Binning();\np.factor = 2;\np.executeOn(view.image);"
     );
 
     addProcess("Upscale",
         "AI-powered or bicubic image upscaling.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new Upscale();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","factor"}, {"desc","Scaling factor (2x, 4x)."}},
+          QVariantMap{{"name","method"}, {"desc","0=Bicubic, 1=AI Model 1, 2=AI Model 2."}} },
+        "var p = new Upscale();\np.factor = 2;\np.executeOn(view.image);"
     );
 
     addProcess("StarAnalysis",
         "Detect and measure stars: FWHM, eccentricity, flux.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new StarAnalysis();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","threshold"}, {"desc","Detection threshold (0.001-1.0)."}} },
+        "var p = new StarAnalysis();\np.threshold = 0.05;\np.executeOn(view.image);"
     );
 
     addProcess("WavescaleHDR",
         "Wavelet-based HDR compression for nebula detail.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new WavescaleHDR();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","layers"}, {"desc","Number of wavelet layers (1-6)."}},
+          QVariantMap{{"name","amount"}, {"desc","Compression strength (0-1.0)."}} },
+        "var p = new WavescaleHDR();\np.layers = 5; p.amount = 0.5;\np.executeOn(view.image);"
     );
 
     addProcess("Clahe",
         "Contrast-Limited Adaptive Histogram Equalisation.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new Clahe();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","clipLimit"}, {"desc","Contrast limiting factor (1-10)."}},
+          QVariantMap{{"name","gridSize"},  {"desc","Size of tiles for local EQ (8-64)."}},
+          QVariantMap{{"name","opacity"},   {"desc","Blending opacity (0-100)."}} },
+        "var p = new Clahe();\np.clipLimit = 2.0; p.gridSize = 16;\np.executeOn(view.image);"
     );
 
     addProcess("StarHaloRemoval",
         "Reduce halos around bright stars.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new StarHaloRemoval();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","radius"},    {"desc","Maximum halo radius."}},
+          QVariantMap{{"name","strength"},  {"desc","Removal strength."}},
+          QVariantMap{{"name","threshold"}, {"desc","Luminance threshold for stars."}} },
+        "var p = new StarHaloRemoval();\np.radius = 50;\np.strength = 1.0;\np.executeOn(view.image);"
     );
 
     addProcess("Morphology",
-        "Morphological operations: erosion, dilation, opening, closing.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new Morphology();\np.executeOn(view.image);\nview.refresh();"
+        "Morphological operations: erosion, dilation, opening, closing, gradients, top-hats.",
+        { QVariantMap{{"name","operation"},  {"desc","0=Erode, 1=Dilate, 2=Open, 3=Close, 4=Gradient, 5=TopHat, 6=BlackHat."}},
+          QVariantMap{{"name","kernelSize"}, {"desc","Size of the structuring element (3, 5, 7, ...)."}},
+          QVariantMap{{"name","iterations"}, {"desc","Number of times to apply."}} },
+        "var p = new Morphology();\np.operation = 1; p.kernelSize = 3;\np.executeOn(view.image);"
     );
 
     addProcess("MultiscaleDecomp",
         "Multi-scale wavelet decomposition and reconstruction.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new MultiscaleDecomp();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","layers"},       {"desc","Number of layers (1-8)."}},
+          QVariantMap{{"name","detailAmount"}, {"desc","Scaling factor for details."}} },
+        "var p = new MultiscaleDecomp();\np.layers = 5;\np.executeOn(view.image);"
     );
 
     addProcess("BlinkComparator",
         "Visual blink comparison between two images.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new BlinkComparator();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","secondImage"}, {"desc","Name of the image to blink against."}} },
+        "var p = new BlinkComparator();\np.secondImage = 'Reference';\np.executeOn(view.image);"
     );
 
     addProcess("WCSMosaic",
         "WCS-aligned mosaic assembly from multiple frames.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new WCSMosaic();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","imageList"}, {"desc","List of image names to include."}},
+          QVariantMap{{"name","mode"},      {"desc","0=Overlay, 1=Average, 2=Gridded."}} },
+        "var p = new WCSMosaic();\np.mode = 0;\np.executeOn(view.image);"
     );
 
     addProcess("AstroSpike",
         "Add synthetic diffraction spikes to bright stars.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new AstroSpike();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","quantity"},    {"desc","Number of spikes (usually 4)."}},
+          QVariantMap{{"name","angle"},       {"desc","Rotation angle (degrees)."}},
+          QVariantMap{{"name","length"},      {"desc","Length of spikes."}},
+          QVariantMap{{"name","spikeWidth"},  {"desc","Thickness of spikes."}},
+          QVariantMap{{"name","globalScale"}, {"desc","Overall scaling factor."}},
+          QVariantMap{{"name","intensity"},   {"desc","Brightness of spikes."}} },
+        "var p = new AstroSpike();\np.quantity = 4; p.length = 100;\np.executeOn(view.image);"
     );
 
     addProcess("CropRotate",
         "Crop and rotate the image.",
-        { QVariantMap{{"name","params"}, {"desc","Generic parameter map."}} },
-        "var p = new CropRotate();\np.executeOn(view.image);\nview.refresh();"
+        { QVariantMap{{"name","left"},   {"desc","Left crop boundary."}},
+          QVariantMap{{"name","top"},    {"desc","Top crop boundary."}},
+          QVariantMap{{"name","width"},  {"desc","Target width."}},
+          QVariantMap{{"name","height"}, {"desc","Target height."}},
+          QVariantMap{{"name","angle"},  {"desc","Rotation angle (degrees)."}} },
+        "var p = new CropRotate();\np.angle = 90.0;\np.executeOn(view.image);"
     );
 
     return ref;

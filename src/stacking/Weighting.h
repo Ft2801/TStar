@@ -6,7 +6,7 @@
  * from quality metrics and normalization coefficients, and applies those
  * weights during pixel combination.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #ifndef STACKING_WEIGHTING_H

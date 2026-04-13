@@ -10,7 +10,7 @@
  * algorithms (Linear-Fit and Generalized ESD Test) used outside the main
  * inline rejection path.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "../ImageBuffer.h"

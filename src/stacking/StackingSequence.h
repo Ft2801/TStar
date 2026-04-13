@@ -7,7 +7,7 @@
  * selection, registration bookkeeping and comet-mode alignment for a
  * set of images destined for stacking.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #ifndef STACKING_SEQUENCE_H

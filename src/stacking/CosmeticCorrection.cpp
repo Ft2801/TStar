@@ -2,7 +2,7 @@
  * @file CosmeticCorrection.cpp
  * @brief Implementation of hot/cold pixel detection and correction.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "CosmeticCorrection.h"

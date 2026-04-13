@@ -2,7 +2,7 @@
  * @file Weighting.cpp
  * @brief Implementation of per-image weight computation and application.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "Weighting.h"

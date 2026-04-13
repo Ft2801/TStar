@@ -3,7 +3,7 @@
  * @brief Implementation of StackingProject -- project directory management
  *        and JSON persistence.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "StackingProject.h"

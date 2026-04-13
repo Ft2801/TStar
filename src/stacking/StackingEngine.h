@@ -16,7 +16,7 @@
  *
  * StackingWorker wraps the engine in a QThread for non-blocking operation.
  *
- * Copyright (C) 2024-2026 TStar Team
+ * Copyright (C) 2024-2026 Siril Team
  */
 
 #include "StackingTypes.h"
