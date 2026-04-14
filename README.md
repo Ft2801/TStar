@@ -323,9 +323,10 @@ TStar is built on top of the following open-source projects and libraries:
 | [CFITSIO](https://heasarc.gsfc.nasa.gov/fitsio/) | FITS file I/O |
 | [OpenCV](https://opencv.org/) | Image processing and computer vision |
 | [GSL](https://www.gnu.org/software/gsl/) | Scientific computing and numerical methods |
-
-Additionally, some of the contents and functionalities in TStar have been implemented taking inspiration from [Siril](https://siril.org/) and [Seti Astro Suite](https://www.setiastro.com/). Please see `INSPIRATION.md` for more details.
 | [LibRaw](https://www.libraw.org/) | Camera RAW file decoding |
 | [LittleCMS2](https://www.littlecms.com/) | ICC color profile management |
 | [LZ4](https://lz4.github.io/lz4/) | Fast compression for XISF |
 | [Zstd](https://facebook.github.io/zstd/) | High-ratio compression for XISF |
+
+Additionally, some of the contents and functionalities in TStar have been implemented taking inspiration from [Siril](https://siril.org/) and [Seti Astro Suite](https://www.setiastro.com/). Please see `INSPIRATION.md` for more details.
+
