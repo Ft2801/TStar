@@ -184,7 +184,7 @@ endif()
 
 # ---- Qt6 ----
 find_package(Qt6 REQUIRED COMPONENTS
-    Widgets Network Svg Concurrent Xml LinguistTools Qml
+    Widgets Network Svg Concurrent Xml LinguistTools
 )
 
 # ---- OpenMP ----
@@ -1079,7 +1079,6 @@ target_link_libraries(TStar PRIVATE
     Qt6::Network
     Qt6::Concurrent
     Qt6::Xml
-    Qt6::Qml
     ${CFITSIO_LIBRARY}
     ${GSL_LIBRARIES}
     ${OpenCV_LIBS}
