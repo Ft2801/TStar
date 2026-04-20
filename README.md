@@ -4,11 +4,11 @@
   <h1>TStar</h1>
   <h3>Professional Astrophotography Processing Suite</h3>
 
-  ![License](https://img.shields.io/badge/license-MIT-blue.svg)
+  ![License](https://img.shields.io/badge/license-MIT%20%7C%20GPL-blue.svg)
   ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey.svg)
   ![Qt](https://img.shields.io/badge/Qt-6.5%2B-green.svg)
   ![C++](https://img.shields.io/badge/C%2B%2B-17-blue.svg)
-  ![Version](https://img.shields.io/badge/version-1.8.5-orange.svg)
+  ![Version](https://img.shields.io/badge/version-1.8.7-orange.svg)
   ![Downloads](https://img.shields.io/github/downloads/Ft2801/TStar/total)
 </div>
 
