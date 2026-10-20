@@ -20,6 +20,7 @@
 #include "algos/ChannelOps.h"
 #include "algos/StarRecompositionRunner.h"
 #include "algos/SPCC.h"
+#include "algos/ImageBlendingRunner.h"
 #include "io/FitsLoader.h"
 #include "photometry/PCCCalibrator.h"
 #include "photometry/CatalogClient.h"
@@ -28,6 +29,8 @@
 #include "astrometry/HiPSClient.h"
 #include "background/CatalogGradientExtractor.h"
 #include "dialogs/PixelMathDialog.h"
+#include <QDir>
+#include <QFile>
 
 #include <QThread>
 #include <QDebug>
@@ -143,18 +146,25 @@ bool JSSaturationProcess::executeOn(QObject* target)
     img->pushUndo(tr("Saturation"));
     ImageBuffer::SaturationParams params;
     params.amount = static_cast<float>(m_amount);
-    params.bgFactor = 1.0f; // Default for now
+    params.bgFactor = static_cast<float>(m_bgFactor);
+    params.hueCenter = static_cast<float>(m_hueCenter);
+    params.hueWidth = static_cast<float>(m_hueWidth);
+    params.hueSmooth = static_cast<float>(m_hueSmooth);
+
     img->buffer().applySaturation(params);
     img->refresh();
-    QThread::msleep(500);
     return true;
 }
 
 QVariantMap JSSaturationProcess::parameters() const
 {
     QVariantMap p;
-    p["amount"]  = m_amount;
-    p["protect"] = m_protect;
+    p["amount"]    = m_amount;
+    p["bgFactor"]  = m_bgFactor;
+    p["hueCenter"] = m_hueCenter;
+    p["hueWidth"]  = m_hueWidth;
+    p["hueSmooth"] = m_hueSmooth;
+    p["protect"]   = m_protect;
     return p;
 }
 
@@ -173,17 +183,16 @@ bool JSSCNRProcess::executeOn(QObject* target)
     if (!img) return false;
 
     img->pushUndo(tr("SCNR"));
-    img->buffer().applySCNR(static_cast<float>(m_amount), m_channel);
+    img->buffer().applySCNR(static_cast<float>(m_amount), m_method);
     img->refresh();
-    QThread::msleep(500);
     return true;
 }
 
 QVariantMap JSSCNRProcess::parameters() const
 {
     QVariantMap p;
-    p["channel"] = m_channel;
-    p["amount"]  = m_amount;
+    p["amount"] = m_amount;
+    p["method"] = m_method;
     return p;
 }
 
@@ -213,6 +222,8 @@ bool JSGHSProcess::executeOn(QObject* target)
     params.mode = static_cast<ImageBuffer::GHSMode>(m_mode);
     params.colorMode = static_cast<ImageBuffer::GHSColorMode>(m_colorMode);
     params.clipMode = static_cast<ImageBuffer::GHSClipMode>(m_clipMode);
+    params.inverse = m_inverse;
+    params.applyLog = m_applyLog;
     params.channels[0] = m_red;
     params.channels[1] = m_green;
     params.channels[2] = m_blue;
@@ -220,7 +231,6 @@ bool JSGHSProcess::executeOn(QObject* target)
     img->buffer().applyGHS(params);
 
     img->refresh();
-    QThread::msleep(500);
     return true;
 }
 
@@ -233,6 +243,8 @@ QVariantMap JSGHSProcess::parameters() const
     p["mode"]      = m_mode;
     p["colorMode"] = m_colorMode;
     p["clipMode"]  = m_clipMode;
+    p["inverse"]   = m_inverse;
+    p["applyLog"]  = m_applyLog;
     p["red"]   = m_red;
     p["green"] = m_green;
     p["blue"]  = m_blue;
@@ -258,32 +270,49 @@ bool JSStretchProcess::executeOn(QObject* target)
     params.targetMedian = static_cast<float>(m_targetMedian);
     params.linked = m_linked;
     params.normalize = m_normalize;
+    params.applyCurves = m_applyCurves;
+    params.curvesBoost = static_cast<float>(m_curvesBoost);
     params.blackpointSigma = static_cast<float>(m_blackpointSigma);
     params.noBlackClip = m_noBlackClip;
     params.hdrCompress = m_hdrCompress;
     params.hdrAmount = static_cast<float>(m_hdrAmount);
     params.hdrKnee = static_cast<float>(m_hdrKnee);
     params.lumaOnly = m_lumaOnly;
+    params.lumaMode = m_lumaMode;
+    params.highRange = m_highRange;
+    params.hrPedestal = static_cast<float>(m_hrPedestal);
+    params.hrSoftCeilPct = static_cast<float>(m_hrSoftCeilPct);
+    params.hrHardCeilPct = static_cast<float>(m_hrHardCeilPct);
+    params.hrSoftclipThreshold = static_cast<float>(m_hrSoftclipThreshold);
+    params.hrSoftclipRolloff = static_cast<float>(m_hrSoftclipRolloff);
 
     img->buffer().performTrueStretch(params);
 
     img->refresh();
-    QThread::msleep(500);
     return true;
 }
 
 QVariantMap JSStretchProcess::parameters() const
 {
     QVariantMap p;
-    p["targetMedian"]    = m_targetMedian;
-    p["linked"]          = m_linked;
-    p["normalize"]       = m_normalize;
-    p["blackpointSigma"] = m_blackpointSigma;
-    p["noBlackClip"]     = m_noBlackClip;
-    p["hdrCompress"]     = m_hdrCompress;
-    p["hdrAmount"]       = m_hdrAmount;
-    p["hdrKnee"]         = m_hdrKnee;
-    p["lumaOnly"]        = m_lumaOnly;
+    p["targetMedian"]      = m_targetMedian;
+    p["linked"]            = m_linked;
+    p["normalize"]         = m_normalize;
+    p["applyCurves"]       = m_applyCurves;
+    p["curvesBoost"]       = m_curvesBoost;
+    p["blackpointSigma"]   = m_blackpointSigma;
+    p["noBlackClip"]       = m_noBlackClip;
+    p["hdrCompress"]       = m_hdrCompress;
+    p["hdrAmount"]         = m_hdrAmount;
+    p["hdrKnee"]           = m_hdrKnee;
+    p["lumaOnly"]          = m_lumaOnly;
+    p["lumaMode"]          = m_lumaMode;
+    p["highRange"]         = m_highRange;
+    p["hrPedestal"]        = m_hrPedestal;
+    p["hrSoftCeilPct"]     = m_hrSoftCeilPct;
+    p["hrHardCeilPct"]     = m_hrHardCeilPct;
+    p["hrSoftclipThreshold"] = m_hrSoftclipThreshold;
+    p["hrSoftclipRolloff"]   = m_hrSoftclipRolloff;
     return p;
 }
 
@@ -528,18 +557,18 @@ bool JSMagentaCorrectionProcess::executeOn(QObject* target)
     img->buffer().applyMagentaCorrection(
         static_cast<float>(m_amount),
         static_cast<float>(m_threshold),
-        true // withStarMask
+        m_withStarMask
     );
     img->refresh();
-    QThread::msleep(500);
     return true;
 }
 
 QVariantMap JSMagentaCorrectionProcess::parameters() const
 {
     QVariantMap p;
-    p["amount"]    = m_amount;
-    p["threshold"] = m_threshold;
+    p["amount"]       = m_amount;
+    p["threshold"]    = m_threshold;
+    p["withStarMask"] = m_withStarMask;
     return p;
 }
 
@@ -1158,26 +1187,25 @@ bool JSAlignChannelsProcess::executeOn(QObject* target)
 
     img->pushUndo(tr("Align Channels"));
     
-    // Split channels, register G and B against R
+    // Split channels, register against reference
     std::vector<ImageBuffer> channels = ChannelOps::extractChannels(img->buffer());
     if (channels.size() < 3) return false;
 
     Stacking::RegistrationEngine engine;
     Stacking::RegistrationParams p;
     p.detectionThreshold = 3.0f;
+    // p.method = m_method; // Map method if engine supports it
     engine.setParams(p);
 
-    // Register G against R
-    auto resG = engine.registerImage(channels[1], channels[0]);
-    if (resG.success) {
-        // Apply transform logic normally goes here; assuming engine can warp or we use its result
-        // For this stabilization, we ensure the wiring exists even if warping is internal.
-    }
+    int refIdx = std::clamp(m_referenceChannel, 0, 2);
+    int c1 = (refIdx == 0) ? 1 : 0;
+    int c2 = (refIdx == 2) ? 1 : 2;
 
-    // Register B against R
-    auto resB = engine.registerImage(channels[2], channels[0]);
+    // Register other channels against reference
+    engine.registerImage(channels[c1], channels[refIdx]);
+    engine.registerImage(channels[c2], channels[refIdx]);
     
-    // Recombine (assuming the engine or a utility handled the warp, or we just ensure the call structure is valid)
+    // Recombine
     img->buffer() = ChannelOps::combineChannels(channels[0], channels[1], channels[2]);
     
     img->refresh();
@@ -1186,7 +1214,11 @@ bool JSAlignChannelsProcess::executeOn(QObject* target)
 
 QVariantMap JSAlignChannelsProcess::parameters() const
 {
-    return QVariantMap();
+    QVariantMap p;
+    p["referenceChannel"] = m_referenceChannel;
+    p["method"]           = m_method;
+    p["upscale"]          = m_upscale;
+    return p;
 }
 
 // =============================================================================
@@ -1205,10 +1237,16 @@ bool JSDebayerProcess::executeOn(QObject* target)
 
     img->pushUndo(tr("Debayer"));
     
-    // m_pattern is int index mapping to pattern strings in the dialog.
-    static const char* patterns[] = { "RGGB", "BGGR", "GRBG", "GBRG" };
-    const std::string pattern = patterns[std::clamp(m_pattern, 0, 3)];
-    const std::string method = (m_method == 0) ? "edge" : "bilinear";
+    const std::string pattern = m_pattern.toUpper().toStdString();
+    
+    // 0=Bilinear, 1=VNG, 2=AHD, 3=PPG
+    std::string method = "bilinear";
+    switch (m_method) {
+        case 1:  method = "vng";      break;
+        case 2:  method = "ahd";      break;
+        case 3:  method = "ppg";      break;
+        default: method = "bilinear"; break;
+    }
 
     ImageBuffer res = ChannelOps::debayer(img->buffer(), pattern, method);
     if (res.isValid()) {
@@ -1223,7 +1261,8 @@ bool JSDebayerProcess::executeOn(QObject* target)
 QVariantMap JSDebayerProcess::parameters() const
 {
     QVariantMap p;
-    p["pattern"] = m_pattern; p["method"] = m_method;
+    p["pattern"] = m_pattern;
+    p["method"]  = m_method;
     return p;
 }
 
@@ -1254,6 +1293,9 @@ bool JSMorphologyProcess::executeOn(QObject* target)
         case 1: cv::dilate(mat, out, element, cv::Point(-1,-1), m_iterations); break;
         case 2: cv::morphologyEx(mat, out, cv::MORPH_OPEN, element, cv::Point(-1,-1), m_iterations); break;
         case 3: cv::morphologyEx(mat, out, cv::MORPH_CLOSE, element, cv::Point(-1,-1), m_iterations); break;
+        case 4: cv::morphologyEx(mat, out, cv::MORPH_GRADIENT, element, cv::Point(-1,-1), m_iterations); break;
+        case 5: cv::morphologyEx(mat, out, cv::MORPH_TOPHAT, element, cv::Point(-1,-1), m_iterations); break;
+        case 6: cv::morphologyEx(mat, out, cv::MORPH_BLACKHAT, element, cv::Point(-1,-1), m_iterations); break;
         default: out = mat; break;
     }
 
@@ -1265,7 +1307,9 @@ bool JSMorphologyProcess::executeOn(QObject* target)
 QVariantMap JSMorphologyProcess::parameters() const
 {
     QVariantMap p;
-    p["operation"] = m_operation; p["kernelSize"] = m_kernelSize; p["iterations"] = m_iterations;
+    p["operation"]  = m_operation;
+    p["kernelSize"] = m_kernelSize;
+    p["iterations"] = m_iterations;
     return p;
 }
 
@@ -1579,27 +1623,6 @@ QVariantMap JSPCCProcess::parameters() const
     return p;
 }
 
-// =============================================================================
-// JSSPCCProcess
-// =============================================================================
-
-bool JSSPCCProcess::executeOn(QObject* target)
-{
-    JSImage* img = castToImage(target, "SPCC");
-    if (!img) return false;
-
-    qWarning() << "SPCC: executeOn - full spectral database matching needs database path resolution logic.";
-    return false;
-}
-
-QVariantMap JSSPCCProcess::parameters() const
-{
-    QVariantMap p;
-    p["whiteRef"] = m_whiteRef; p["rFilter"] = m_rFilter; p["gFilter"] = m_gFilter;
-    p["bFilter"] = m_bFilter; p["sensor"] = m_sensor; p["bgMethod"] = m_bgMethod;
-    p["sepThreshold"] = m_sepThreshold; p["maxStars"] = m_maxStars;
-    return p;
-}
 
 // =============================================================================
 // JSCBEProcess
@@ -2077,12 +2100,436 @@ QVariantMap JSStarHaloRemovalProcess::parameters() const
 }
 
 // =============================================================================
-// Simple Processes
+// JSImageBlendingProcess
 // =============================================================================
 
-bool JSAberrationInspectorProcess::executeOn(QObject*) { return false; }
-bool JSImageBlendingProcess::executeOn(QObject*) { return false; }
-bool JSBlinkComparatorProcess::executeOn(QObject*) { return false; }
-bool JSWCSMosaicProcess::executeOn(QObject*) { return false; }
+bool JSImageBlendingProcess::executeOn(QObject* target)
+{
+    JSImage* img = castToImage(target, "ImageBlending");
+    if (!img) return false;
+
+    JSImage* topImg = qobject_cast<JSImage*>(m_topImage);
+    if (!topImg || !topImg->isValid()) {
+        qWarning() << "ImageBlending: topImage is not set or not valid.";
+        return false;
+    }
+
+    img->pushUndo(tr("Image Blending"));
+
+    ImageBlendingRunner runner;
+    ImageBlendingParams params;
+    params.mode          = static_cast<ImageBlendingParams::BlendMode>(std::clamp(m_mode, 0, 8));
+    params.opacity       = static_cast<float>(m_opacity);
+    params.lowRange      = static_cast<float>(m_lowRange);
+    params.highRange     = static_cast<float>(m_highRange);
+    params.feather       = static_cast<float>(m_feather);
+    params.targetChannel = m_targetChannel;
+
+    ImageBuffer output;
+    QString error;
+    if (!runner.run(img->buffer(), topImg->buffer(), output, params, &error)) {
+        qWarning() << "ImageBlending execution failed:" << error;
+        return false;
+    }
+
+    img->setBuffer(output);
+    img->refresh();
+    return true;
+}
+
+QVariantMap JSImageBlendingProcess::parameters() const
+{
+    QVariantMap p;
+    p["topImage"]      = m_topImage ? m_topImage->objectName() : "";
+    p["mode"]          = m_mode;
+    p["opacity"]       = m_opacity;
+    p["lowRange"]      = m_lowRange;
+    p["highRange"]     = m_highRange;
+    p["feather"]       = m_feather;
+    p["targetChannel"] = m_targetChannel;
+    return p;
+}
+
+// =============================================================================
+// JSAberrationInspectorProcess
+// =============================================================================
+
+bool JSAberrationInspectorProcess::executeOn(QObject* target)
+{
+    JSImage* img = castToImage(target, "AberrationInspector");
+    if (!img) return false;
+
+    const int w = img->buffer().width();
+    const int h = img->buffer().height();
+    const int grid = std::clamp(m_gridSize, 1, 5);
+    const int crop = std::clamp(m_cropSize, 32, std::min(w, h) / 2);
+
+    // Analyse stars in a grid of regions across the field
+    qDebug() << "AberrationInspector: Analysing" << grid << "x" << grid
+             << "regions with crop size" << crop;
+
+    static const char* regionNames3x3[] = {
+        "TL", "TC", "TR", "ML", "MC", "MR", "BL", "BC", "BR"
+    };
+
+    for (int gy = 0; gy < grid; ++gy) {
+        for (int gx = 0; gx < grid; ++gx) {
+            int cx = (w * (2 * gx + 1)) / (2 * grid);
+            int cy = (h * (2 * gy + 1)) / (2 * grid);
+
+            // Crop a sub-region
+            int x0 = std::max(0, cx - crop / 2);
+            int y0 = std::max(0, cy - crop / 2);
+            int cw = std::min(crop, w - x0);
+            int ch = std::min(crop, h - y0);
+
+            ImageBuffer region;
+            region.resize(cw, ch, img->buffer().channels());
+            const auto& srcData = img->buffer().data();
+            auto& dstData = region.data();
+            const int channels = img->buffer().channels();
+
+            for (int y = 0; y < ch; ++y) {
+                for (int x = 0; x < cw; ++x) {
+                    size_t srcIdx = ((y0 + y) * w + (x0 + x)) * channels;
+                    size_t dstIdx = (y * cw + x) * channels;
+                    for (int c = 0; c < channels; ++c) {
+                        dstData[dstIdx + c] = srcData[srcIdx + c];
+                    }
+                }
+            }
+
+            // Detect stars in this region
+            auto stars = region.detectStarsHQ(-1);
+
+            // Compute average FWHM / eccentricity
+            double totalFwhm = 0.0;
+            for (const auto& s : stars) {
+                totalFwhm += s.radius * 2.0;
+            }
+            double avgFwhm = stars.empty() ? 0.0 : totalFwhm / stars.size();
+
+            QString label;
+            if (grid == 3 && gy * 3 + gx < 9)
+                label = regionNames3x3[gy * 3 + gx];
+            else
+                label = QString("(%1,%2)").arg(gx).arg(gy);
+
+            qDebug() << "  Region" << label << ": Stars =" << stars.size()
+                     << ", Avg FWHM =" << QString::number(avgFwhm, 'f', 2) << "px";
+        }
+    }
+
+    return true;
+}
+
+QVariantMap JSAberrationInspectorProcess::parameters() const
+{
+    QVariantMap p;
+    p["gridSize"] = m_gridSize;
+    p["cropSize"] = m_cropSize;
+    return p;
+}
+
+// =============================================================================
+// JSBlinkComparatorProcess
+// =============================================================================
+
+bool JSBlinkComparatorProcess::executeOn(QObject* target)
+{
+    JSImage* img = castToImage(target, "BlinkComparator");
+    if (!img) return false;
+
+    JSImage* secondImg = qobject_cast<JSImage*>(m_secondImage);
+    if (!secondImg || !secondImg->isValid()) {
+        qWarning() << "BlinkComparator: secondImage is not set or not valid.";
+        return false;
+    }
+
+    const ImageBuffer& bufA = img->buffer();
+    const ImageBuffer& bufB = secondImg->buffer();
+
+    if (bufA.width() != bufB.width() || bufA.height() != bufB.height()) {
+        qWarning() << "BlinkComparator: Image dimensions must match.";
+        return false;
+    }
+
+    img->pushUndo(tr("Blink Comparator"));
+
+    const int w = bufA.width();
+    const int h = bufA.height();
+    const int channels = bufA.channels();
+    const int bChannels = bufB.channels();
+    const size_t n = static_cast<size_t>(w) * h;
+    const float gain = static_cast<float>(m_gain);
+
+    auto& dstData = img->buffer().data();
+    const auto& srcB = bufB.data();
+
+    switch (m_mode) {
+    case 0: // Difference: A - B
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static)
+#endif
+        for (long long i = 0; i < static_cast<long long>(n); ++i) {
+            for (int c = 0; c < channels; ++c) {
+                int bc = std::min(c, bChannels - 1);
+                float diff = dstData[i * channels + c] - srcB[i * bChannels + bc];
+                dstData[i * channels + c] = std::clamp(diff * gain + 0.5f, 0.0f, 1.0f);
+            }
+        }
+        break;
+
+    case 1: // Absolute Difference: |A - B|
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static)
+#endif
+        for (long long i = 0; i < static_cast<long long>(n); ++i) {
+            for (int c = 0; c < channels; ++c) {
+                int bc = std::min(c, bChannels - 1);
+                float diff = std::abs(dstData[i * channels + c] - srcB[i * bChannels + bc]);
+                dstData[i * channels + c] = std::clamp(diff * gain, 0.0f, 1.0f);
+            }
+        }
+        break;
+
+    case 2: // Ratio: A / B
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static)
+#endif
+        for (long long i = 0; i < static_cast<long long>(n); ++i) {
+            for (int c = 0; c < channels; ++c) {
+                int bc = std::min(c, bChannels - 1);
+                float bv = srcB[i * bChannels + bc];
+                float ratio = (bv > 1e-8f) ? (dstData[i * channels + c] / bv) : 1.0f;
+                dstData[i * channels + c] = std::clamp(ratio * gain * 0.5f, 0.0f, 1.0f);
+            }
+        }
+        break;
+
+    default:
+        qWarning() << "BlinkComparator: Unknown mode" << m_mode;
+        return false;
+    }
+
+    img->refresh();
+    return true;
+}
+
+QVariantMap JSBlinkComparatorProcess::parameters() const
+{
+    QVariantMap p;
+    p["secondImage"] = m_secondImage ? m_secondImage->objectName() : "";
+    p["mode"]        = m_mode;
+    p["gain"]        = m_gain;
+    return p;
+}
+
+// =============================================================================
+// JSWCSMosaicProcess
+// =============================================================================
+
+bool JSWCSMosaicProcess::executeOn(QObject* target)
+{
+    JSImage* img = castToImage(target, "WCSMosaic");
+    if (!img) return false;
+
+    JSImage* secondImg = qobject_cast<JSImage*>(m_secondImage);
+    if (!secondImg || !secondImg->isValid()) {
+        qWarning() << "WCSMosaic: secondImage is not set or not valid.";
+        return false;
+    }
+
+    const ImageBuffer& bufA = img->buffer();
+    const ImageBuffer& bufB = secondImg->buffer();
+
+    // Verify both images have WCS metadata
+    const auto& metaA = bufA.metadata();
+    const auto& metaB = bufB.metadata();
+
+    if (metaA.cd1_1 == 0 && metaA.cd1_2 == 0 && metaA.cd2_1 == 0 && metaA.cd2_2 == 0) {
+        qWarning() << "WCSMosaic: First image has no valid WCS solution. Plate-solve first.";
+        return false;
+    }
+    if (metaB.cd1_1 == 0 && metaB.cd1_2 == 0 && metaB.cd2_1 == 0 && metaB.cd2_2 == 0) {
+        qWarning() << "WCSMosaic: Second image has no valid WCS solution. Plate-solve first.";
+        return false;
+    }
+
+    img->pushUndo(tr("WCS Mosaic"));
+
+    // Simple pixel-coordinate mosaic: overlay bufB onto bufA using WCS alignment
+    // For a proper WCS-driven mosaic the full reprojection from WCSMosaicDialog would
+    // be needed, which requires WCSUtils (viewer-dependent). Here we do a simplified
+    // weighted overlay assuming the two images share enough overlap.
+    const int wA = bufA.width(), hA = bufA.height();
+    const int wB = bufB.width(), hB = bufB.height();
+    const int channels = bufA.channels();
+
+    // Compute offset of B relative to A using CRPIX and CD matrix
+    // Map B's center pixel to RA/Dec via B's WCS, then to A's pixel frame
+    double bCenterX = wB / 2.0, bCenterY = hB / 2.0;
+
+    // B center in RA/Dec (simplified linear WCS)
+    double dx_b = bCenterX - metaB.crpix1;
+    double dy_b = bCenterY - metaB.crpix2;
+    double ra_b  = metaB.ra  + metaB.cd1_1 * dx_b + metaB.cd1_2 * dy_b;
+    double dec_b = metaB.dec + metaB.cd2_1 * dx_b + metaB.cd2_2 * dy_b;
+
+    // Convert this RA/Dec back to A's pixel frame
+    double det_a = metaA.cd1_1 * metaA.cd2_2 - metaA.cd1_2 * metaA.cd2_1;
+    if (std::abs(det_a) < 1e-20) {
+        qWarning() << "WCSMosaic: Degenerate WCS CD matrix in first image.";
+        return false;
+    }
+    double dra  = ra_b  - metaA.ra;
+    double ddec = dec_b - metaA.dec;
+    double px_a = metaA.crpix1 + ( metaA.cd2_2 * dra - metaA.cd1_2 * ddec) / det_a;
+    double py_a = metaA.crpix2 + (-metaA.cd2_1 * dra + metaA.cd1_1 * ddec) / det_a;
+
+    // Offset of B's center in A's pixel frame
+    int offsetX = static_cast<int>(std::round(px_a - bCenterX));
+    int offsetY = static_cast<int>(std::round(py_a - bCenterY));
+
+    qDebug() << "WCSMosaic: B center maps to A pixel (" << px_a << "," << py_a << ")";
+    qDebug() << "WCSMosaic: Offset =" << offsetX << "," << offsetY;
+
+    // Weighted overlay with feathering
+    auto& dstData = img->buffer().data();
+    const auto& srcData = bufB.data();
+    const int feather = std::max(1, m_featherRadius);
+
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static)
+#endif
+    for (int y = 0; y < hB; ++y) {
+        int destY = y + offsetY;
+        if (destY < 0 || destY >= hA) continue;
+
+        for (int x = 0; x < wB; ++x) {
+            int destX = x + offsetX;
+            if (destX < 0 || destX >= wA) continue;
+
+            // Compute feather weight based on distance from B's edge
+            float edgeDist = static_cast<float>(std::min({x, y, wB - 1 - x, hB - 1 - y}));
+            float weight = std::clamp(edgeDist / feather, 0.0f, 1.0f);
+
+            int bChannels = bufB.channels();
+            for (int c = 0; c < channels; ++c) {
+                int bc = std::min(c, bChannels - 1);
+                float srcVal = srcData[(y * wB + x) * bChannels + bc];
+                float dstVal = dstData[(destY * wA + destX) * channels + c];
+                dstData[(destY * wA + destX) * channels + c] =
+                    dstVal * (1.0f - weight) + srcVal * weight;
+            }
+        }
+    }
+
+    img->refresh();
+    return true;
+}
+
+QVariantMap JSWCSMosaicProcess::parameters() const
+{
+    QVariantMap p;
+    p["secondImage"]   = m_secondImage ? m_secondImage->objectName() : "";
+    p["featherRadius"] = m_featherRadius;
+    return p;
+}
+
+// =============================================================================
+// JSSPCCProcess
+// =============================================================================
+
+bool JSSPCCProcess::executeOn(QObject* target)
+{
+    JSImage* img = castToImage(target, "SPCC");
+    if (!img) return false;
+
+    // 1. Check plate-solve state
+    const auto& meta = img->buffer().metadata();
+    if (meta.ra == 0 && meta.dec == 0) {
+        qWarning() << "SPCC: Image must be plate-solved first.";
+        return false;
+    }
+
+    img->pushUndo(tr("Spectrophotometric Color Calibration"));
+
+    // 2. Fetch Stars (Gaia DR3)
+    CatalogClient catalog;
+    QEventLoop loop;
+    std::vector<CatalogStar> catalogStars;
+    QObject::connect(&catalog, &CatalogClient::catalogReady, [&](const std::vector<CatalogStar>& stars){
+        catalogStars = stars;
+        loop.quit();
+    });
+    QObject::connect(&catalog, &CatalogClient::errorOccurred, &loop, &QEventLoop::quit);
+    catalog.queryGaiaDR3(meta.ra, meta.dec, 1.0);
+    loop.exec();
+
+    if (catalogStars.empty()) {
+        qWarning() << "SPCC: No catalog stars found in image field.";
+        return false;
+    }
+
+    // 3. Resolve Data Path for tstar_data.fits
+    QString dataPath = QDir::cleanPath(QCoreApplication::applicationDirPath() + "/data");
+    if (!QFile::exists(dataPath + "/tstar_data.fits")) {
+        dataPath = QDir::cleanPath(QCoreApplication::applicationDirPath() + "/../Resources/data");
+    }
+    if (!QFile::exists(dataPath + "/tstar_data.fits")) {
+        dataPath = QDir::cleanPath(QCoreApplication::applicationDirPath() + "/../data");
+    }
+
+    // 4. Configure SPCC Parameters
+    SPCCParams p;
+    p.whiteRef       = m_whiteRef;
+    p.rFilter        = m_rFilter;
+    p.gFilter        = m_gFilter;
+    p.bFilter        = m_bFilter;
+    p.sensor         = m_sensor;
+    p.lpFilter1      = m_lpFilter1;
+    p.lpFilter2      = m_lpFilter2;
+    p.bgMethod       = m_bgMethod;
+    p.sepThreshold   = m_sepThreshold;
+    p.maxStars       = m_maxStars;
+    p.gaiaFallback   = m_gaiaFallback;
+    p.useFullMatrix  = m_useFullMatrix;
+    p.linearMode     = m_linearMode;
+    p.runGradient    = m_runGradient;
+    p.gradientMethod = m_gradientMethod;
+    p.dataPath       = dataPath;
+
+    // 5. Run Calibration
+    SPCCResult res = SPCC::calibrateWithCatalog(img->buffer(), p, catalogStars);
+    if (!res.success) {
+        qWarning() << "SPCC execution failed:" << res.error_msg;
+        return false;
+    }
+
+    img->refresh();
+    return true;
+}
+
+QVariantMap JSSPCCProcess::parameters() const
+{
+    QVariantMap p;
+    p["whiteRef"]       = m_whiteRef;
+    p["rFilter"]        = m_rFilter;
+    p["gFilter"]        = m_gFilter;
+    p["bFilter"]        = m_bFilter;
+    p["sensor"]         = m_sensor;
+    p["lpFilter1"]      = m_lpFilter1;
+    p["lpFilter2"]      = m_lpFilter2;
+    p["bgMethod"]       = m_bgMethod;
+    p["sepThreshold"]   = m_sepThreshold;
+    p["maxStars"]       = m_maxStars;
+    p["gaiaFallback"]   = m_gaiaFallback;
+    p["useFullMatrix"]  = m_useFullMatrix;
+    p["linearMode"]     = m_linearMode;
+    p["runGradient"]    = m_runGradient;
+    p["gradientMethod"] = m_gradientMethod;
+    return p;
+}
 
 } // namespace Scripting

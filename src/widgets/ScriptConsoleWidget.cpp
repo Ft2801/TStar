@@ -736,6 +736,262 @@ void ScriptConsoleWidget::setupTemplates()
         "    Console.log(\"AI processing completed!\");\n"
         "}\n"
     ));
+
+    // 1. ABE: Background Extraction
+    m_templateCombo->addItem(tr("Linear: Background Extraction (ABE)"), QString(
+        "// Automatic Background Extraction (ABE)\n"
+        "// Removes complex gradients from linear images.\n\n"
+        "var view = App.activeWindow();\n"
+        "if (view) {\n"
+        "    var abe = new ABE();\n"
+        "    abe.degree = 4;        // Polynomial degree\n"
+        "    abe.samples = 20;      // Number of sample regions\n"
+        "    abe.normalize = true;  // Normalize result\n"
+        "    \n"
+        "    Console.log(\"Running ABE (degree \" + abe.degree + \")...\");\n"
+        "    abe.executeOn(view.image);\n"
+        "    view.refresh();\n"
+        "}\n"
+    ));
+
+    // 2. Selective Color Masking
+    m_templateCombo->addItem(tr("Color: Selective Range Masking"), QString(
+        "// Selective Color Masking\n"
+        "// Targets specific hues for color correction.\n\n"
+        "var view = App.activeWindow();\n"
+        "if (view) {\n"
+        "    var sc = new SelectiveColor();\n"
+        "    sc.hueStart = 0;   // Start hue (Red = 0)\n"
+        "    sc.hueEnd = 40;    // End hue\n"
+        "    sc.red = 15;       // Increase red intensity\n"
+        "    sc.saturation = 20; // Increase saturation\n"
+        "    \n"
+        "    Console.log(\"Applying selective adjustment to red tones...\");\n"
+        "    sc.executeOn(view.image);\n"
+        "    view.refresh();\n"
+        "}\n"
+    ));
+
+    // 3. Debayer Raw Image
+    m_templateCombo->addItem(tr("Raw: Debayer Image"), QString(
+        "// Debayer (Demosaic)\n"
+        "// Converts raw Bayer-pattern images to RGB.\n\n"
+        "var view = App.activeWindow();\n"
+        "if (view) {\n"
+        "    var db = new Debayer();\n"
+        "    db.pattern = 0; // 0=RGGB, 1=BGGR, 2=GRBG, 3=GBRG\n"
+        "    db.method = 1;  // 1=VNG (high quality)\n"
+        "    \n"
+        "    Console.log(\"Debayering image with VNG method...\");\n"
+        "    db.executeOn(view.image);\n"
+        "    view.refresh();\n"
+        "}\n"
+    ));
+
+    // 4. Morphological Operations
+    m_templateCombo->addItem(tr("Stars: Morphological Reduction"), QString(
+        "// Morphological Star Reduction\n"
+        "// Uses erosion to slightly shrink stars.\n\n"
+        "var view = App.activeWindow();\n"
+        "if (view) {\n"
+        "    var morph = new Morphology();\n"
+        "    morph.operation = 0;  // 0=Erosion\n"
+        "    morph.kernelSize = 3; // 3x3 kernel\n"
+        "    morph.iterations = 1; \n"
+        "    \n"
+        "    Console.log(\"Shrinking stars via morphological erosion...\");\n"
+        "    morph.executeOn(view.image);\n"
+        "    view.refresh();\n"
+        "}\n"
+    ));
+
+    // 5. CLAHE Local Contrast
+    m_templateCombo->addItem(tr("Detail: Local Contrast (CLAHE)"), QString(
+        "// Contrast-Limited Adaptive Histogram Equalisation\n"
+        "// Boosts local contrast in faint nebulosity.\n\n"
+        "var view = App.activeWindow();\n"
+        "if (view) {\n"
+        "    var cl = new Clahe();\n"
+        "    cl.clipLimit = 2.0; \n"
+        "    cl.gridSize = 16;   \n"
+        "    cl.opacity = 60;    // Blend strength\n"
+        "    \n"
+        "    Console.log(\"Enhancing local contrast with CLAHE...\");\n"
+        "    cl.executeOn(view.image);\n"
+        "    view.refresh();\n"
+        "}\n"
+    ));
+
+    // 6. Crop & Rotate
+    m_templateCombo->addItem(tr("Utility: Crop and Rotate"), QString(
+        "// Geometric Transformation\n"
+        "// Crops the image and rotates it.\n\n"
+        "var view = App.activeWindow();\n"
+        "if (view) {\n"
+        "    var cr = new CropRotate();\n"
+        "    cr.left = 100; cr.top = 100;\n"
+        "    cr.width = view.image.width - 200;\n"
+        "    cr.height = view.image.height - 200;\n"
+        "    cr.angle = 90.0;\n"
+        "    \n"
+        "    Console.log(\"Cropping and rotating 90 degrees...\");\n"
+        "    cr.executeOn(view.image);\n"
+        "    view.refresh();\n"
+        "}\n"
+    ));
+
+    // 7. Wavelet HDR
+    m_templateCombo->addItem(tr("Detail: Wavelet HDR Compression"), QString(
+        "// Wavelet-based HDR Compression\n"
+        "// Compresses dynamic range to reveal details in bright areas.\n\n"
+        "var view = App.activeWindow();\n"
+        "if (view) {\n"
+        "    var hdr = new WavescaleHDR();\n"
+        "    hdr.layers = 5;\n"
+        "    hdr.amount = 0.5;\n"
+        "    \n"
+        "    Console.log(\"Applying 5-layer Wavelet HDR...\");\n"
+        "    hdr.executeOn(view.image);\n"
+        "    view.refresh();\n"
+        "}\n"
+    ));
+
+    // 8. Diffraction Spikes
+    m_templateCombo->addItem(tr("Effects: Diffraction Spikes"), QString(
+        "// Star Diffraction Spikes\n"
+        "// Adds artistic spikes to bright stars.\n\n"
+        "var view = App.activeWindow();\n"
+        "if (view) {\n"
+        "    var asp = new AstroSpike();\n"
+        "    asp.quantity = 4;\n"
+        "    asp.length = 150;\n"
+        "    asp.intensity = 0.8;\n"
+        "    \n"
+        "    Console.log(\"Adding synthetic diffraction spikes...\");\n"
+        "    asp.executeOn(view.image);\n"
+        "    view.refresh();\n"
+        "}\n"
+    ));
+
+    // 9. Star Halo Cleaning
+    m_templateCombo->addItem(tr("Stars: Halo Removal"), QString(
+        "// Bright Star Halo Removal\n"
+        "// Desaturates and darkens halos around major stars.\n\n"
+        "var view = App.activeWindow();\n"
+        "if (view) {\n"
+        "    var hr = new StarHaloRemoval();\n"
+        "    hr.radius = 60;\n"
+        "    hr.strength = 1.0;\n"
+        "    \n"
+        "    Console.log(\"Cleaning star halos (radius 60)...\");\n"
+        "    hr.executeOn(view.image);\n"
+        "    view.refresh();\n"
+        "}\n"
+    ));
+
+    // 10. Image Blending
+    m_templateCombo->addItem(tr("Utility: Image Blending"), QString(
+        "// Image Blending\n"
+        "// Blends a top image onto the current image.\n\n"
+        "var view = App.activeWindow();\n"
+        "if (view) {\n"
+        "    var bl = new ImageBlending();\n"
+        "    bl.topImage = \"StarsOnly\"; // Name of target image\n"
+        "    bl.mode = 4;                // 4=Add mode\n"
+        "    bl.opacity = 100;\n"
+        "    \n"
+        "    Console.log(\"Adding 'StarsOnly' image to background...\");\n"
+        "    bl.executeOn(view.image);\n"
+        "    view.refresh();\n"
+        "}\n"
+    ));
+
+    // 11. Luminance Extraction & Recombination
+    m_templateCombo->addItem(tr("workflow: L-RGB Process"), QString(
+        "// L-RGB Workflow\n"
+        "// Extract L -> process -> Recombine with color.\n\n"
+        "var view = App.activeWindow();\n"
+        "if (view) {\n"
+        "    // 1. Extract L\n"
+        "    Console.log(\"Extracting luminance...\");\n"
+        "    var ex = new ExtractLuminance();\n"
+        "    ex.executeOn(view.image);\n"
+        "    \n"
+        "    // Note: Recombination usually needs two images.\n"
+        "    // This shows the object setup.\n"
+        "    var rec = new RecombineLuminance();\n"
+        "    rec.luminanceSource = \"extracted_L\";\n"
+        "    rec.colorSpace = 0; // Lab\n"
+        "    // rec.executeOn(target_image);\n"
+        "}\n"
+    ));
+
+    // 12. Plate Solving
+    m_templateCombo->addItem(tr("Linear: Plate Solving Hint"), QString(
+        "// WCS Plate Solving\n"
+        "// Solves the image field coordinates.\n\n"
+        "var view = App.activeWindow();\n"
+        "if (view) {\n"
+        "    var ps = new PlateSolving();\n"
+        "    ps.raHint = 280.5; \n"
+        "    ps.decHint = -12.4;\n"
+        "    ps.radius = 2.0;\n"
+        "    \n"
+        "    Console.log(\"Starting plate solver with hint [280.5, -12.4]...\");\n"
+        "    ps.executeOn(view.image);\n"
+        "}\n"
+    ));
+
+    // 13. Narrowband Processing
+    m_templateCombo->addItem(tr("Workflow: SHO Normalization"), QString(
+        "// Narrowband Normalization\n"
+        "// Balances SHO channels and boosts SNR.\n\n"
+        "var view = App.activeWindow();\n"
+        "if (view) {\n"
+        "    var nb = new NarrowbandNormalization();\n"
+        "    nb.scenario = 0; // SHO\n"
+        "    nb.mode = 1;     // Relentless stretch\n"
+        "    \n"
+        "    Console.log(\"Normalizing SHO palette...\");\n"
+        "    nb.executeOn(view.image);\n"
+        "    view.refresh();\n"
+        "}\n"
+    ));
+
+    // 14. Custom Dialog Tool
+    m_templateCombo->addItem(tr("Advanced: Custom Script Dialog"), QString(
+        "// Custom Tool UI\n"
+        "// Creates a GUI with a slider linked to a process.\n\n"
+        "var dialog = new Dialog();\n"
+        "dialog.title = \"My Script Tool\";\n\n"
+        "var label = dialog.addLabel(\"Stretch Intensity:\");\n"
+        "var slider = dialog.addSlider(0, 100, 25);\n\n"
+        "dialog.addOkButton();\n"
+        "dialog.addCancelButton();\n\n"
+        "if (dialog.execute()) {\n"
+        "    Console.log(\"Running stretch with intensity: \" + slider.value);\n"
+        "    var s = new Stretch();\n"
+        "    s.targetMedian = slider.value / 1000.0;\n"
+        "    s.executeOn(App.activeWindow().image);\n"
+        "    App.activeWindow().refresh();\n"
+        "}\n"
+    ));
+
+    // 15. Multiscale Decomposition
+    m_templateCombo->addItem(tr("Detail: Multi-scale Decomposition"), QString(
+        "// Wavelet Decomposition\n"
+        "// Enhances details across multiple size scales.\n\n"
+        "var view = App.activeWindow();\n"
+        "if (view) {\n"
+        "    var dec = new MultiscaleDecomp();\n"
+        "    dec.layers = 5;\n"
+        "    dec.detailAmount = 1.2;\n"
+        "    \n"
+        "    Console.log(\"Enhancing 5 wavelet scales...\");\n"
+        "    dec.executeOn(view.image);\n"
+        "    view.refresh();\n"
+        "}\n"
+    ));
 }
 
 void ScriptConsoleWidget::setupScriptsMenu()

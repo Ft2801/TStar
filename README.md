@@ -4,11 +4,11 @@
   <h1>TStar</h1>
   <h3>Professional Astrophotography Processing Suite</h3>
 
-  ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-  ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey.svg)
+  ![License](https://img.shields.io/badge/license-GPLv3-blue.svg)
+  ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-orange.svg)
   ![Qt](https://img.shields.io/badge/Qt-6.5%2B-green.svg)
   ![C++](https://img.shields.io/badge/C%2B%2B-17-blue.svg)
-  ![Version](https://img.shields.io/badge/version-1.8.5-orange.svg)
+  ![Version](https://img.shields.io/badge/version-1.8.7-orange.svg)
   ![Downloads](https://img.shields.io/github/downloads/Ft2801/TStar/total)
 </div>
 
@@ -310,7 +310,9 @@ See [BUILDING.md](BUILDING.md) for complete dependency setup, deployment packagi
 
 Copyright (c) 2026 Fabio Tempera.
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for the full license text.
+This project is licensed under the GNU General Public License v3.0 (GPLv3). See the [LICENSE](LICENSE) file for the full text.
+
+**Note:** TStar is a derivative work of [Siril](https://siril.org/) (hosted at https://gitlab.com/free-astro/siril), which is licensed under the GPLv3+. TStar incorporates modifications from the original Siril code made by Fabio Tempera (Ft2801) in 2026, and clearly acknowledges the original copyright holders of Siril: team free-astro (c) 2012-2026.
 
 ## Acknowledgments
 
@@ -326,3 +328,7 @@ TStar is built on top of the following open-source projects and libraries:
 | [LittleCMS2](https://www.littlecms.com/) | ICC color profile management |
 | [LZ4](https://lz4.github.io/lz4/) | Fast compression for XISF |
 | [Zstd](https://facebook.github.io/zstd/) | High-ratio compression for XISF |
+
+Additionally, some of the contents and functionalities in TStar have been implemented taking inspiration from [Siril](https://siril.org/), [Seti Astro Suite](https://github.com/setiastro/setiastrosuitepro), and [RapidRAW](https://github.com/CyberTimon/RapidRAW). Please see `INSPIRATION.md` for more details.
+
+

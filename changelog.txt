@@ -4,6 +4,7 @@ TStar Changelog
 Version 1.8.7
 -------------
 - Added a button to fit the subwindow to the current image size
+- New view subwindow appearance
 
 Version 1.8.6
 -------------

@@ -378,6 +378,9 @@ RightSidebarWidget::RightSidebarWidget(QWidget* parent)
     connect(m_scriptTabBtn, &QPushButton::clicked,
             this, &RightSidebarWidget::onScriptTabClicked);
 
+    // Hide script button
+    m_scriptTabBtn->setHidden(true);
+
     tabLayout->addWidget(m_scriptTabBtn);
     tabLayout->addStretch();
 

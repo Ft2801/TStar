@@ -15,6 +15,30 @@
 //
 // Based on the geometric voting technique described in Valdes et al. (1995)
 // and the open-source astrometry implementations.
+//
+// This file is part of TStar, a Professional Astrophotography Processing Suite.
+// Copyright (C) 2026 Fabio Tempera (Ft2801)
+//
+// TStar is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// TStar is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with TStar.  If not, see <https://www.gnu.org/licenses/>.
+//
+// -------------------------------------------------------------------
+// Prominent Notice of Modification & Original Copyright:
+// This file is a derivative of atpmatch.c (distributed with Siril at
+// https://gitlab.com/free-astro/siril), originally licensed under GPLv2+.
+// Modified by Ft2801 in 2026.
+// Original copyright (C) 2012-2026 team free-astro.
+// -------------------------------------------------------------------
 // ============================================================================
 
 #include <vector>

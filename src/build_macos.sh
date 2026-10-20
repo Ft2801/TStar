@@ -90,7 +90,7 @@ fi
 echo "  - Qt6: OK ($QT_PREFIX)"
 
 # Required Homebrew dependencies
-DEPS=("zlib" "opencv" "gsl" "cfitsio" "libomp" "libraw" "brotli")
+DEPS=("zlib" "opencv" "gsl" "cfitsio" "libomp" "libraw" "brotli" "qtdeclarative")
 for dep in "${DEPS[@]}"; do
     DEP_PREFIX=$(brew --prefix "$dep" 2>/dev/null || echo "")
     if [ -z "$DEP_PREFIX" ] || [ ! -d "$DEP_PREFIX" ]; then

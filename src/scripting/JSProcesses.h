@@ -68,8 +68,12 @@ private:
 
 class JSSaturationProcess : public JSProcessBase {
     Q_OBJECT
-    Q_PROPERTY(double amount  READ amount  WRITE setAmount)
-    Q_PROPERTY(bool protect   READ protect WRITE setProtect)
+    Q_PROPERTY(double amount    READ amount    WRITE setAmount)
+    Q_PROPERTY(double bgFactor  READ bgFactor  WRITE setBgFactor)
+    Q_PROPERTY(double hueCenter READ hueCenter WRITE setHueCenter)
+    Q_PROPERTY(double hueWidth  READ hueWidth  WRITE setHueWidth)
+    Q_PROPERTY(double hueSmooth READ hueSmooth WRITE setHueSmooth)
+    Q_PROPERTY(bool   protect   READ protect   WRITE setProtect)
 
 public:
     explicit JSSaturationProcess(QObject* parent = nullptr);
@@ -78,15 +82,27 @@ public:
     Q_INVOKABLE bool executeOn(QObject* target) override;
     Q_INVOKABLE QVariantMap parameters() const override;
 
-    double amount()  const { return m_amount; }
-    bool   protect() const { return m_protect; }
+    double amount()    const { return m_amount; }
+    double bgFactor()  const { return m_bgFactor; }
+    double hueCenter() const { return m_hueCenter; }
+    double hueWidth()  const { return m_hueWidth; }
+    double hueSmooth() const { return m_hueSmooth; }
+    bool   protect()   const { return m_protect; }
 
-    void setAmount(double v) { m_amount = v; }
-    void setProtect(bool v)  { m_protect = v; }
+    void setAmount(double v)    { m_amount = v; }
+    void setBgFactor(double v)  { m_bgFactor = v; }
+    void setHueCenter(double v) { m_hueCenter = v; }
+    void setHueWidth(double v)  { m_hueWidth = v; }
+    void setHueSmooth(double v) { m_hueSmooth = v; }
+    void setProtect(bool v)     { m_protect = v; }
 
 private:
-    double m_amount  = 1.0;
-    bool   m_protect = false;
+    double m_amount    = 1.0;
+    double m_bgFactor  = 1.0;
+    double m_hueCenter = 0.0;
+    double m_hueWidth  = 360.0;
+    double m_hueSmooth = 30.0;
+    bool   m_protect   = false;
 };
 
 // =============================================================================
@@ -95,8 +111,8 @@ private:
 
 class JSSCNRProcess : public JSProcessBase {
     Q_OBJECT
-    Q_PROPERTY(int channel   READ channel WRITE setChannel)
-    Q_PROPERTY(double amount READ amount  WRITE setAmount)
+    Q_PROPERTY(double amount READ amount WRITE setAmount)
+    Q_PROPERTY(int method    READ method  WRITE setMethod)
 
 public:
     explicit JSSCNRProcess(QObject* parent = nullptr);
@@ -105,15 +121,15 @@ public:
     Q_INVOKABLE bool executeOn(QObject* target) override;
     Q_INVOKABLE QVariantMap parameters() const override;
 
-    int    channel() const { return m_channel; }
     double amount()  const { return m_amount; }
+    int    method()  const { return m_method; }
 
-    void setChannel(int v)   { m_channel = v; }
     void setAmount(double v) { m_amount = v; }
+    void setMethod(int v)    { m_method = v; }
 
 private:
-    int    m_channel = 1;  // default: green
     double m_amount  = 1.0;
+    int    m_method  = 0;  // 0=Maximum, 1=Additive, 2=Average
 };
 
 // =============================================================================
@@ -131,6 +147,8 @@ class JSGHSProcess : public JSProcessBase {
     Q_PROPERTY(int mode         READ mode      WRITE setMode)
     Q_PROPERTY(int colorMode    READ colorMode WRITE setColorMode)
     Q_PROPERTY(int clipMode     READ clipMode  WRITE setClipMode)
+    Q_PROPERTY(bool inverse     READ inverse   WRITE setInverse)
+    Q_PROPERTY(bool applyLog    READ applyLog  WRITE setApplyLog)
     Q_PROPERTY(bool red         READ red       WRITE setRed)
     Q_PROPERTY(bool green       READ green     WRITE setGreen)
     Q_PROPERTY(bool blue        READ blue      WRITE setBlue)
@@ -151,6 +169,8 @@ public:
     int mode()      const { return m_mode; }
     int colorMode() const { return m_colorMode; }
     int clipMode()  const { return m_clipMode; }
+    bool inverse()  const { return m_inverse; }
+    bool applyLog() const { return m_applyLog; }
     bool red()   const { return m_red; }
     bool green() const { return m_green; }
     bool blue()  const { return m_blue; }
@@ -164,6 +184,8 @@ public:
     void setMode(int v)      { m_mode = v; }
     void setColorMode(int v) { m_colorMode = v; }
     void setClipMode(int v)  { m_clipMode = v; }
+    void setInverse(bool v)  { m_inverse = v; }
+    void setApplyLog(bool v) { m_applyLog = v; }
     void setRed(bool v)   { m_red = v; }
     void setGreen(bool v) { m_green = v; }
     void setBlue(bool v)  { m_blue = v; }
@@ -178,6 +200,8 @@ private:
     int m_mode      = 0;
     int m_colorMode = 0;
     int m_clipMode  = 0;
+    bool m_inverse   = false;
+    bool m_applyLog  = false;
     bool m_red   = true;
     bool m_green = true;
     bool m_blue  = true;
@@ -189,15 +213,24 @@ private:
 
 class JSStretchProcess : public JSProcessBase {
     Q_OBJECT
-    Q_PROPERTY(double targetMedian    READ targetMedian    WRITE setTargetMedian)
-    Q_PROPERTY(bool linked            READ linked          WRITE setLinked)
-    Q_PROPERTY(bool normalize         READ normalize       WRITE setNormalize)
+    Q_PROPERTY(double targetMedian READ targetMedian WRITE setTargetMedian)
+    Q_PROPERTY(bool linked READ linked WRITE setLinked)
+    Q_PROPERTY(bool normalize READ normalize WRITE setNormalize)
+    Q_PROPERTY(bool applyCurves READ applyCurves WRITE setApplyCurves)
+    Q_PROPERTY(double curvesBoost READ curvesBoost WRITE setCurvesBoost)
     Q_PROPERTY(double blackpointSigma READ blackpointSigma WRITE setBlackpointSigma)
-    Q_PROPERTY(bool noBlackClip       READ noBlackClip     WRITE setNoBlackClip)
-    Q_PROPERTY(bool hdrCompress       READ hdrCompress     WRITE setHdrCompress)
-    Q_PROPERTY(double hdrAmount       READ hdrAmount       WRITE setHdrAmount)
-    Q_PROPERTY(double hdrKnee         READ hdrKnee         WRITE setHdrKnee)
-    Q_PROPERTY(bool lumaOnly          READ lumaOnly        WRITE setLumaOnly)
+    Q_PROPERTY(bool noBlackClip READ noBlackClip WRITE setNoBlackClip)
+    Q_PROPERTY(bool hdrCompress READ hdrCompress WRITE setHdrCompress)
+    Q_PROPERTY(double hdrAmount READ hdrAmount WRITE setHdrAmount)
+    Q_PROPERTY(double hdrKnee READ hdrKnee WRITE setHdrKnee)
+    Q_PROPERTY(bool lumaOnly READ lumaOnly WRITE setLumaOnly)
+    Q_PROPERTY(int lumaMode READ lumaMode WRITE setLumaMode)
+    Q_PROPERTY(bool highRange READ highRange WRITE setHighRange)
+    Q_PROPERTY(double hrPedestal READ hrPedestal WRITE setHrPedestal)
+    Q_PROPERTY(double hrSoftCeilPct READ hrSoftCeilPct WRITE setHrSoftCeilPct)
+    Q_PROPERTY(double hrHardCeilPct READ hrHardCeilPct WRITE setHrHardCeilPct)
+    Q_PROPERTY(double hrSoftclipThreshold READ hrSoftclipThreshold WRITE setHrSoftclipThreshold)
+    Q_PROPERTY(double hrSoftclipRolloff READ hrSoftclipRolloff WRITE setHrSoftclipRolloff)
 
 public:
     explicit JSStretchProcess(QObject* parent = nullptr);
@@ -206,36 +239,63 @@ public:
     Q_INVOKABLE bool executeOn(QObject* target) override;
     Q_INVOKABLE QVariantMap parameters() const override;
 
-    double targetMedian()    const { return m_targetMedian; }
-    bool   linked()          const { return m_linked; }
-    bool   normalize()       const { return m_normalize; }
-    double blackpointSigma() const { return m_blackpointSigma; }
-    bool   noBlackClip()     const { return m_noBlackClip; }
-    bool   hdrCompress()     const { return m_hdrCompress; }
-    double hdrAmount()       const { return m_hdrAmount; }
-    double hdrKnee()         const { return m_hdrKnee; }
-    bool   lumaOnly()        const { return m_lumaOnly; }
+    double targetMedian()      const { return m_targetMedian; }
+    bool   linked()            const { return m_linked; }
+    bool   normalize()         const { return m_normalize; }
+    bool   applyCurves()       const { return m_applyCurves; }
+    double curvesBoost()       const { return m_curvesBoost; }
+    double blackpointSigma()   const { return m_blackpointSigma; }
+    bool   noBlackClip()       const { return m_noBlackClip; }
+    bool   hdrCompress()       const { return m_hdrCompress; }
+    double hdrAmount()         const { return m_hdrAmount; }
+    double hdrKnee()           const { return m_hdrKnee; }
+    bool   lumaOnly()          const { return m_lumaOnly; }
+    int    lumaMode()          const { return m_lumaMode; }
+    bool   highRange()         const { return m_highRange; }
+    double hrPedestal()        const { return m_hrPedestal; }
+    double hrSoftCeilPct()     const { return m_hrSoftCeilPct; }
+    double hrHardCeilPct()     const { return m_hrHardCeilPct; }
+    double hrSoftclipThreshold() const { return m_hrSoftclipThreshold; }
+    double hrSoftclipRolloff()   const { return m_hrSoftclipRolloff; }
 
-    void setTargetMedian(double v)    { m_targetMedian = v; }
-    void setLinked(bool v)            { m_linked = v; }
-    void setNormalize(bool v)         { m_normalize = v; }
-    void setBlackpointSigma(double v) { m_blackpointSigma = v; }
-    void setNoBlackClip(bool v)       { m_noBlackClip = v; }
-    void setHdrCompress(bool v)       { m_hdrCompress = v; }
-    void setHdrAmount(double v)       { m_hdrAmount = v; }
-    void setHdrKnee(double v)         { m_hdrKnee = v; }
-    void setLumaOnly(bool v)          { m_lumaOnly = v; }
+    void setTargetMedian(double v)      { m_targetMedian = v; }
+    void setLinked(bool v)              { m_linked = v; }
+    void setNormalize(bool v)           { m_normalize = v; }
+    void setApplyCurves(bool v)         { m_applyCurves = v; }
+    void setCurvesBoost(double v)       { m_curvesBoost = v; }
+    void setBlackpointSigma(double v)   { m_blackpointSigma = v; }
+    void setNoBlackClip(bool v)         { m_noBlackClip = v; }
+    void setHdrCompress(bool v)         { m_hdrCompress = v; }
+    void setHdrAmount(double v)         { m_hdrAmount = v; }
+    void setHdrKnee(double v)           { m_hdrKnee = v; }
+    void setLumaOnly(bool v)            { m_lumaOnly = v; }
+    void setLumaMode(int v)             { m_lumaMode = v; }
+    void setHighRange(bool v)           { m_highRange = v; }
+    void setHrPedestal(double v)        { m_hrPedestal = v; }
+    void setHrSoftCeilPct(double v)     { m_hrSoftCeilPct = v; }
+    void setHrHardCeilPct(double v)     { m_hrHardCeilPct = v; }
+    void setHrSoftclipThreshold(double v) { m_hrSoftclipThreshold = v; }
+    void setHrSoftclipRolloff(double v)   { m_hrSoftclipRolloff = v; }
 
 private:
     double m_targetMedian    = 0.25;
     bool   m_linked          = true;
     bool   m_normalize       = false;
+    bool   m_applyCurves     = false;
+    double m_curvesBoost     = 0.0;
     double m_blackpointSigma = 5.0;
     bool   m_noBlackClip     = false;
     bool   m_hdrCompress     = false;
     double m_hdrAmount       = 0.0;
     double m_hdrKnee         = 0.75;
     bool   m_lumaOnly        = false;
+    int    m_lumaMode        = 0;
+    bool   m_highRange       = false;
+    double m_hrPedestal      = 0.001;
+    double m_hrSoftCeilPct   = 99.0;
+    double m_hrHardCeilPct   = 99.99;
+    double m_hrSoftclipThreshold = 0.98;
+    double m_hrSoftclipRolloff   = 2.0;
 };
 
 // =============================================================================
@@ -379,8 +439,9 @@ private:
 
 class JSMagentaCorrectionProcess : public JSProcessBase {
     Q_OBJECT
-    Q_PROPERTY(double amount    READ amount    WRITE setAmount)
+    Q_PROPERTY(double amount READ amount WRITE setAmount)
     Q_PROPERTY(double threshold READ threshold WRITE setThreshold)
+    Q_PROPERTY(bool withStarMask READ withStarMask WRITE setWithStarMask)
 
 public:
     explicit JSMagentaCorrectionProcess(QObject* parent = nullptr);
@@ -391,13 +452,16 @@ public:
 
     double amount()    const { return m_amount; }
     double threshold() const { return m_threshold; }
+    bool   withStarMask() const { return m_withStarMask; }
 
     void setAmount(double v)    { m_amount = v; }
     void setThreshold(double v) { m_threshold = v; }
+    void setWithStarMask(bool v) { m_withStarMask = v; }
 
 private:
     double m_amount    = 0.5;
-    double m_threshold = 0.1;
+    double m_threshold = 0.5;
+    bool   m_withStarMask = false;
 };
 
 // =============================================================================
@@ -797,6 +861,8 @@ class JSSPCCProcess : public JSProcessBase {
     Q_PROPERTY(QString gFilter        READ gFilter        WRITE setGFilter)
     Q_PROPERTY(QString bFilter        READ bFilter        WRITE setBFilter)
     Q_PROPERTY(QString sensor         READ sensor         WRITE setSensor)
+    Q_PROPERTY(QString lpFilter1      READ lpFilter1      WRITE setLpFilter1)
+    Q_PROPERTY(QString lpFilter2      READ lpFilter2      WRITE setLpFilter2)
     Q_PROPERTY(QString bgMethod       READ bgMethod       WRITE setBgMethod)
     Q_PROPERTY(double sepThreshold    READ sepThreshold   WRITE setSepThreshold)
     Q_PROPERTY(int maxStars           READ maxStars       WRITE setMaxStars)
@@ -818,6 +884,8 @@ public:
     QString gFilter()  const { return m_gFilter; }
     QString bFilter()  const { return m_bFilter; }
     QString sensor()   const { return m_sensor; }
+    QString lpFilter1() const { return m_lpFilter1; }
+    QString lpFilter2() const { return m_lpFilter2; }
     QString bgMethod() const { return m_bgMethod; }
     double sepThreshold() const { return m_sepThreshold; }
     int maxStars() const { return m_maxStars; }
@@ -832,6 +900,8 @@ public:
     void setGFilter(const QString& v)  { m_gFilter = v; }
     void setBFilter(const QString& v)  { m_bFilter = v; }
     void setSensor(const QString& v)   { m_sensor = v; }
+    void setLpFilter1(const QString& v) { m_lpFilter1 = v; }
+    void setLpFilter2(const QString& v) { m_lpFilter2 = v; }
     void setBgMethod(const QString& v) { m_bgMethod = v; }
     void setSepThreshold(double v)     { m_sepThreshold = v; }
     void setMaxStars(int v)            { m_maxStars = v; }
@@ -847,6 +917,8 @@ private:
     QString m_gFilter = "(None)";
     QString m_bFilter = "(None)";
     QString m_sensor = "(None)";
+    QString m_lpFilter1 = "(None)";
+    QString m_lpFilter2 = "(None)";
     QString m_bgMethod = "Simple";
     double m_sepThreshold = 5.0;
     int m_maxStars = 300;
@@ -962,29 +1034,27 @@ private:
 
 class JSAlignChannelsProcess : public JSProcessBase {
     Q_OBJECT
-    Q_PROPERTY(bool allowRotation READ allowRotation WRITE setAllowRotation)
-    Q_PROPERTY(bool allowScale    READ allowScale    WRITE setAllowScale)
-    Q_PROPERTY(double threshold   READ threshold     WRITE setThreshold)
+    Q_PROPERTY(int referenceChannel READ referenceChannel WRITE setReferenceChannel)
+    Q_PROPERTY(int method READ method WRITE setMethod)
+    Q_PROPERTY(bool upscale READ upscale WRITE setUpscale)
 
 public:
     explicit JSAlignChannelsProcess(QObject* parent = nullptr) : JSProcessBase(parent) {}
-
     QString name() const override { return QStringLiteral("AlignChannels"); }
     Q_INVOKABLE bool executeOn(QObject* target) override;
     Q_INVOKABLE QVariantMap parameters() const override;
 
-    bool allowRotation() const { return m_allowRotation; }
-    bool allowScale()    const { return m_allowScale; }
-    double threshold()   const { return m_threshold; }
-
-    void setAllowRotation(bool v) { m_allowRotation = v; }
-    void setAllowScale(bool v)    { m_allowScale = v; }
-    void setThreshold(double v)   { m_threshold = v; }
+    int referenceChannel() const { return m_referenceChannel; }
+    int method() const { return m_method; }
+    bool upscale() const { return m_upscale; }
+    void setReferenceChannel(int v) { m_referenceChannel = v; }
+    void setMethod(int v) { m_method = v; }
+    void setUpscale(bool v) { m_upscale = v; }
 
 private:
-    bool m_allowRotation = true;
-    bool m_allowScale = false;
-    double m_threshold = 5.0;
+    int m_referenceChannel = 1; // 0=R, 1=G, 2=B
+    int m_method = 0;           // 0=FFT, 1=StarMatching
+    bool m_upscale = false;
 };
 
 // =============================================================================
@@ -993,29 +1063,23 @@ private:
 
 class JSDebayerProcess : public JSProcessBase {
     Q_OBJECT
-    Q_PROPERTY(int     pattern READ pattern WRITE setPattern)
-
-    Q_PROPERTY(int     method  READ method  WRITE setMethod)
+    Q_PROPERTY(QString pattern READ pattern WRITE setPattern)
+    Q_PROPERTY(int method READ method WRITE setMethod)
 
 public:
     explicit JSDebayerProcess(QObject* parent = nullptr) : JSProcessBase(parent) {}
-
     QString name() const override { return QStringLiteral("Debayer"); }
     Q_INVOKABLE bool executeOn(QObject* target) override;
     Q_INVOKABLE QVariantMap parameters() const override;
 
-    int     pattern() const { return m_pattern; }
-
-    int     method()  const { return m_method; }
-
-    void setPattern(int v) { m_pattern = v; }
-
-    void setMethod(int v)  { m_method = v; }
+    QString pattern() const { return m_pattern; }
+    int method() const { return m_method; }
+    void setPattern(const QString& v) { m_pattern = v; }
+    void setMethod(int v) { m_method = v; }
 
 private:
-    int     m_pattern = 0; // RGGB, BGGR, GRBG, GBRG
-
-    int     m_method = 0; // 0=Bilinear, 1=EdgeAware
+    QString m_pattern = "RGGB";
+    int m_method = 0; // 0=Bilinear, 1=VNG, 2=AHD, 3=PPG
 };
 
 // =============================================================================
@@ -1024,13 +1088,12 @@ private:
 
 class JSMorphologyProcess : public JSProcessBase {
     Q_OBJECT
-    Q_PROPERTY(int operation   READ operation   WRITE setOperation)
-    Q_PROPERTY(int kernelSize  READ kernelSize  WRITE setKernelSize)
+    Q_PROPERTY(int operation READ operation WRITE setOperation)
+    Q_PROPERTY(int kernelSize READ kernelSize WRITE setKernelSize)
     Q_PROPERTY(int iterations READ iterations WRITE setIterations)
 
 public:
     explicit JSMorphologyProcess(QObject* parent = nullptr) : JSProcessBase(parent) {}
-
     QString name() const override { return QStringLiteral("Morphology"); }
     Q_INVOKABLE bool executeOn(QObject* target) override;
     Q_INVOKABLE QVariantMap parameters() const override;
@@ -1038,25 +1101,15 @@ public:
     int operation() const { return m_operation; }
     int kernelSize() const { return m_kernelSize; }
     int iterations() const { return m_iterations; }
-
     void setOperation(int v) { m_operation = v; }
     void setKernelSize(int v) { m_kernelSize = v; }
     void setIterations(int v) { m_iterations = v; }
 
 private:
-    int m_operation = 0; // 0=Erosion, 1=Dilation, 2=Opening, 3=Closing
+    int m_operation = 0; // 0=Erode, 1=Dilate, 2=Open, 3=Close, 4=Gradient, 5=TopHat, 6=BlackHat
     int m_kernelSize = 3;
     int m_iterations = 1;
 };
-
-// =============================================================================
-// Generic stub process wrapper macro.
-//
-// These processes are registered but not yet fully implemented.  They accept
-// a generic QVariantMap "params" property that can be read/written from JS.
-// When the native C++ implementation is wired up, each stub can be replaced
-// with a fully typed class like the ones above.
-// =============================================================================
 
 // =============================================================================
 // JSClaheProcess
@@ -1567,27 +1620,129 @@ private:
 };
 
 // =============================================================================
-// Placeholder for UI-only and future tools
+// JSImageBlendingProcess
 // =============================================================================
 
-#define TSTAR_DECLARE_SIMPLE_PROCESS(ClassName, JsName)                      \
-class ClassName : public JSProcessBase {                                     \
-    Q_OBJECT                                                                 \
-public:                                                                      \
-    explicit ClassName(QObject* parent = nullptr) : JSProcessBase(parent) {} \
-    QString name() const override { return QStringLiteral(JsName); }         \
-    Q_INVOKABLE bool executeOn(QObject* target) override;                    \
-    Q_INVOKABLE QVariantMap parameters() const override {                    \
-        return QVariantMap();                                                \
-    }                                                                        \
+class JSImageBlendingProcess : public JSProcessBase {
+    Q_OBJECT
+    Q_PROPERTY(QObject* topImage READ topImage WRITE setTopImage)
+    Q_PROPERTY(int mode READ mode WRITE setMode)
+    Q_PROPERTY(double opacity READ opacity WRITE setOpacity)
+    Q_PROPERTY(double lowRange READ lowRange WRITE setLowRange)
+    Q_PROPERTY(double highRange READ highRange WRITE setHighRange)
+    Q_PROPERTY(double feather READ feather WRITE setFeather)
+    Q_PROPERTY(int targetChannel READ targetChannel WRITE setTargetChannel)
+
+public:
+    explicit JSImageBlendingProcess(QObject* parent = nullptr) : JSProcessBase(parent) {}
+    QString name() const override { return QStringLiteral("ImageBlending"); }
+    Q_INVOKABLE bool executeOn(QObject* target) override;
+    Q_INVOKABLE QVariantMap parameters() const override;
+
+    QObject* topImage() const { return m_topImage; }
+    int mode() const { return m_mode; }
+    double opacity() const { return m_opacity; }
+    double lowRange() const { return m_lowRange; }
+    double highRange() const { return m_highRange; }
+    double feather() const { return m_feather; }
+    int targetChannel() const { return m_targetChannel; }
+
+    void setTopImage(QObject* v) { m_topImage = v; }
+    void setMode(int v) { m_mode = v; }
+    void setOpacity(double v) { m_opacity = v; }
+    void setLowRange(double v) { m_lowRange = v; }
+    void setHighRange(double v) { m_highRange = v; }
+    void setFeather(double v) { m_feather = v; }
+    void setTargetChannel(int v) { m_targetChannel = v; }
+
+private:
+    QObject* m_topImage = nullptr;
+    int m_mode = 0;           // Normal
+    double m_opacity = 1.0;
+    double m_lowRange = 0.0;
+    double m_highRange = 1.0;
+    double m_feather = 0.0;
+    int m_targetChannel = 3;  // All
 };
 
-TSTAR_DECLARE_SIMPLE_PROCESS(JSAberrationInspectorProcess,       "AberrationInspector")
-TSTAR_DECLARE_SIMPLE_PROCESS(JSImageBlendingProcess,             "ImageBlending")
-TSTAR_DECLARE_SIMPLE_PROCESS(JSBlinkComparatorProcess,           "BlinkComparator")
-TSTAR_DECLARE_SIMPLE_PROCESS(JSWCSMosaicProcess,                 "WCSMosaic")
+// =============================================================================
+// JSAberrationInspectorProcess
+// =============================================================================
 
-#undef TSTAR_DECLARE_SIMPLE_PROCESS
+class JSAberrationInspectorProcess : public JSProcessBase {
+    Q_OBJECT
+    Q_PROPERTY(int gridSize READ gridSize WRITE setGridSize)
+    Q_PROPERTY(int cropSize READ cropSize WRITE setCropSize)
+
+public:
+    explicit JSAberrationInspectorProcess(QObject* parent = nullptr) : JSProcessBase(parent) {}
+    QString name() const override { return QStringLiteral("AberrationInspector"); }
+    Q_INVOKABLE bool executeOn(QObject* target) override;
+    Q_INVOKABLE QVariantMap parameters() const override;
+
+    int gridSize() const { return m_gridSize; }
+    int cropSize() const { return m_cropSize; }
+    void setGridSize(int v) { m_gridSize = v; }
+    void setCropSize(int v) { m_cropSize = v; }
+
+private:
+    int m_gridSize = 3;    // 3x3 grid
+    int m_cropSize = 256;  // crop size in pixels
+};
+
+// =============================================================================
+// JSBlinkComparatorProcess
+// =============================================================================
+
+class JSBlinkComparatorProcess : public JSProcessBase {
+    Q_OBJECT
+    Q_PROPERTY(QObject* secondImage READ secondImage WRITE setSecondImage)
+    Q_PROPERTY(int mode READ mode WRITE setMode)
+    Q_PROPERTY(double gain READ gain WRITE setGain)
+
+public:
+    explicit JSBlinkComparatorProcess(QObject* parent = nullptr) : JSProcessBase(parent) {}
+    QString name() const override { return QStringLiteral("BlinkComparator"); }
+    Q_INVOKABLE bool executeOn(QObject* target) override;
+    Q_INVOKABLE QVariantMap parameters() const override;
+
+    QObject* secondImage() const { return m_secondImage; }
+    int mode() const { return m_mode; }
+    double gain() const { return m_gain; }
+    void setSecondImage(QObject* v) { m_secondImage = v; }
+    void setMode(int v) { m_mode = v; }
+    void setGain(double v) { m_gain = v; }
+
+private:
+    QObject* m_secondImage = nullptr;
+    int m_mode = 0;       // 0=Difference, 1=AbsDifference, 2=Ratio
+    double m_gain = 1.0;  // Output scale factor
+};
+
+// =============================================================================
+// JSWCSMosaicProcess
+// =============================================================================
+
+class JSWCSMosaicProcess : public JSProcessBase {
+    Q_OBJECT
+    Q_PROPERTY(QObject* secondImage READ secondImage WRITE setSecondImage)
+    Q_PROPERTY(int featherRadius READ featherRadius WRITE setFeatherRadius)
+
+public:
+    explicit JSWCSMosaicProcess(QObject* parent = nullptr) : JSProcessBase(parent) {}
+    QString name() const override { return QStringLiteral("WCSMosaic"); }
+    Q_INVOKABLE bool executeOn(QObject* target) override;
+    Q_INVOKABLE QVariantMap parameters() const override;
+
+    QObject* secondImage() const { return m_secondImage; }
+    int featherRadius() const { return m_featherRadius; }
+    void setSecondImage(QObject* v) { m_secondImage = v; }
+    void setFeatherRadius(int v) { m_featherRadius = v; }
+
+private:
+    QObject* m_secondImage = nullptr;
+    int m_featherRadius = 100;
+};
 
 } // namespace Scripting
 
