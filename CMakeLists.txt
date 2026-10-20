@@ -283,12 +283,22 @@ endif()
 
 # ---- OpenCV ----
 if(APPLE)
+    # Prefer opencv@4 to avoid incompatibility with OpenCV 5.0 module restructuring
     execute_process(
-        COMMAND brew --prefix opencv
+        COMMAND brew --prefix opencv@4
         OUTPUT_VARIABLE OPENCV_PREFIX
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET
     )
+
+    if(NOT OPENCV_PREFIX OR NOT EXISTS "${OPENCV_PREFIX}")
+        execute_process(
+            COMMAND brew --prefix opencv
+            OUTPUT_VARIABLE OPENCV_PREFIX
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+        )
+    endif()
 
     if(OPENCV_PREFIX AND EXISTS "${OPENCV_PREFIX}")
         set(OpenCV_DIR "${OPENCV_PREFIX}/lib/cmake/opencv4")

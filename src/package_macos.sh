@@ -280,7 +280,7 @@ copy_dylib "libopenjp2"   "openjpeg" "$FRAMEWORKS_DIR" "$BUILD_ARCH" || true
 
 # -- OpenCV modules -----------------------------------------------------------
 
-OPENCV_PREFIX=$(brew --prefix opencv 2>/dev/null || echo "")
+OPENCV_PREFIX=$(brew --prefix opencv@4 2>/dev/null || brew --prefix opencv 2>/dev/null || echo "")
 if [ ! -d "$OPENCV_PREFIX/lib" ]; then
     for base in /opt/homebrew /usr/local; do
         if [ -d "$base/Cellar/opencv" ]; then
